@@ -1,0 +1,134 @@
+{
+  "description": "Editable rules for tagging catalog result columns. Exact overrides win; patterns are evaluated in order. Tuned for the AP Agriculture catalog: label columns (geography, crop, season, scheme, status) land on 'dimension', money on 'additive_value', counts and physical quantities (farmers, acres, hectares, quintals, cocoon) on 'additive_count', and anything averaged/per-unit/percentage on 'ratio' so the operations layer refuses to sum it over the displayed rows.",
+  "exact": {
+    "geography": "dimension",
+    "district": "dimension",
+    "districts": "additive_count",
+    "district_total": "additive_count",
+    "missing_district": "additive_count",
+    "mandal": "dimension",
+    "village": "dimension",
+    "season": "dimension",
+    "scheme": "dimension",
+    "scheme_a": "dimension",
+    "scheme_b": "dimension",
+    "scheme_list": "dimension",
+    "only_scheme": "dimension",
+    "reached_by_state_scheme": "dimension",
+    "subsidised_crop": "dimension",
+    "procured_crop": "dimension",
+    "crop_subsidy": "additive_value",
+    "dataset": "dimension",
+    "src": "dimension",
+    "cultivator": "dimension",
+    "pattadar": "dimension",
+    "farmer": "dimension",
+    "land": "dimension",
+    "land_band": "dimension",
+    "caste": "dimension",
+    "sex": "dimension",
+    "pm_kisan": "dimension",
+    "agriculture": "dimension",
+    "horticulture": "dimension",
+    "fisheries": "dimension",
+    "sericulture": "dimension",
+    "markfed": "dimension",
+    "ryss": "dimension",
+    "land_records": "dimension",
+    "pmkisan_ekyc": "dimension",
+    "markfed_ekyc": "dimension",
+    "got_horticulture_subsidy": "dimension",
+    "aadhaar": "identifier",
+    "aadharno": "identifier",
+    "aadhar": "identifier",
+    "mobile": "identifier",
+    "khatano": "identifier",
+    "surveyno": "identifier",
+    "irrmethodcode": "identifier",
+    "released": "additive_value",
+    "sanctioned": "additive_value",
+    "balance": "additive_value",
+    "subsidy": "additive_value",
+    "combined": "additive_value",
+    "farmers_paid": "additive_count",
+    "not_included": "additive_count",
+    "pmkisan_ha": "additive_count",
+    "markfed_minus_pmkisan": "additive_count",
+    "pattadar_in_agriculture": "additive_count",
+    "schemes": "additive_count",
+    "n_schemes": "additive_count",
+    "quantity": "additive_count",
+    "dfls": "additive_count",
+    "dfls_brushed": "additive_count",
+    "extent": "additive_count",
+    "acres": "additive_count",
+    "hectares": "additive_count",
+    "completed": "additive_count",
+    "pending": "additive_count",
+
+    "_comment_entity_grain": "Columns introduced when the entity-listing templates were collapsed to one row per farmer (fidelity item 2). The STRING_AGG'd label lists are dimensions; the per-entity counters are counts. Several need an exact entry because a pattern would otherwise claim them for the wrong family — 'registrations' contains the substring 'ratio', 'unpaid_deliveries' contains 'paid', and the '*_transactions' pair contains 'subsidy'.",
+    "crops": "dimension",
+    "varieties": "dimension",
+    "seasons": "dimension",
+    "crop_years": "dimension",
+    "payment_statuses": "dimension",
+    "deliveries": "additive_count",
+    "unpaid_deliveries": "additive_count",
+    "implausible_deliveries": "additive_count",
+    "registrations": "additive_count",
+    "subsidy_transactions": "additive_count",
+    "input_subsidy_transactions": "additive_count",
+
+    "_comment_new_templates": "Columns introduced by the templates added in the same pass (Q147-Q153, F13, G46). 'declared_over_recorded' is the P11 over-declaration ratio; 'state_schemes' is a scheme count that the dimension pattern would otherwise claim on the word 'state'.",
+    "declared_over_recorded": "ratio",
+    "state_schemes": "additive_count"
+  },
+  "patterns": [
+    {
+      "_comment": "Derived measures announce themselves in their prefix — catch them before anything else can claim the stem ('pct_mobile' is a rate, not an identifier).",
+      "pattern": "^(pct|percent|percentage|avg|average|mean|median|share_of)_",
+      "column_type": "ratio"
+    },
+    {
+      "_comment": "Cardinality prefixes are counts whatever they count ('distinct_aadhaar', 'values_found', 'missing_khata').",
+      "pattern": "^(distinct|unique|null|missing|wrong|has|no)_|_(found|on_file)$",
+      "column_type": "additive_count"
+    },
+    {
+      "_comment": "Dates — anchored so 'PAYMENT_DATE', 'SurveyDate', 'survey_month' and 'latest_installment' are temporal but 'STATUS_UPDATE' is not.",
+      "pattern": "(^|_)(date|day|week|month|quarter|period|fy)(_|$)|date$|datetime$|_at$|^latest_|(^|_)(crop)?year(_|$)|year$",
+      "column_type": "temporal"
+    },
+    {
+      "_comment": "Identifiers: codes, account/reference numbers, Aadhaar, mobile, khata, survey number, IFSC.",
+      "pattern": "(^|_)(id|code|number|no)$|_no$|_code$|_id$|(^|_)(aadhaar|aadhar|ifsc|khata|utr)(_|$)|^(aadhaar|aadhar)|mobile|survey_?no",
+      "column_type": "identifier"
+    },
+    {
+      "_comment": "Rates, averages and per-unit measures. 'tat'/'lag'/'days'/'share' are anchored — unanchored they matched 'status', 'village' and 'shared_farmers'.",
+      "pattern": "(pct|percent|percentage|ratio|proportion|conversion|density|(^|_)(avg|average|mean|median|share|rate)(_|$)|rate$|_per_|(^|_)per_|(^|_)(tat|lag|days)(_|$)|concentration|index|score|gap_pts|equity_gap|capacity)",
+      "column_type": "ratio"
+    },
+    {
+      "_comment": "Label columns: personal and place names, and the closed-vocabulary attributes the catalog groups by.",
+      "pattern": "(^|_)name(_|$)|_name$|^name$|(^|_)(district|dist|mandal|village|panchayat|secretariat|geography|state)(_|$)|_village$|_mandal$|_district$|(^|_)(status|category|gender|sex|caste|season|variety|band|type|title|source|dataset)(_|$)|status$|category$|(^|_)crop(name)?$|^social_category",
+      "column_type": "dimension"
+    },
+    {
+      "_comment": "Money.",
+      "pattern": "(amount|value|subsidy|incentive|payment|paid|payable|credited|price|cost|spend|expenditure|benefit|drawn|released|sanctioned|balance|contribution|financial)",
+      "column_type": "additive_value"
+    },
+    {
+      "_comment": "Countable things and physical quantities — safe to sum across the rows of the displayed table.",
+      "pattern": "(count|^total$|^total_|_total$|number|farmers|beneficiaries|members|records|registrants|claimants|participations|transactions|applications|parcels|khatas|distributions|schemes|villages|mandals|households|cards|documents|events|units|quantity|qty|acres|acreage|hectares|extent|land|cocoon|dfls|seed|(^|_)(shared|exclusive|pending|approved|rejected|completed|converted|covered|surveyed|reached|enrolled|included|off_roster)_|_(covered|surveyed|pending|complete|completed|sharing)$)",
+      "column_type": "additive_count"
+    },
+    {
+      "_comment": "Anything left that reads like a label.",
+      "pattern": "(name|district|division|block|category|status|type|gender|age|group|source|mode|reason|state|rank|bucket|band|label|outcome|^is_|step|metric|rnk|order)",
+      "column_type": "dimension"
+    }
+  ],
+  "fallback": "unclassified"
+}

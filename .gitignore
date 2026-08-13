@@ -1,0 +1,21 @@
+# Secrets — never commit live keys
+.env
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+
+# Embedding/index caches (rebuilt automatically)
+.tmp/
+
+# Office lock files
+~$*
+
+# Data files — too large / Drive-synced; distributed out-of-band
+*.duckdb
+
+# Node / frontend (separate workstream, ~20k files — excluded entirely for now)
+node_modules/
+frontend/
