@@ -1,0 +1,196 @@
+# =============================================================================
+# domain_pack_rtgs / validation.yaml
+# =============================================================================
+# Checks LOG, they never fix. Two of them are expected to report issues on this
+# drop and that is the point:
+#
+#   * CHECK 3 (foreign keys) — 40 farmers appear in Fisheries, Sericulture or
+#     RySS without a PM-KISAN row. That off-roster residue is a real property
+#     of the data. ITERATION 2: it is no longer carried into view2 as the
+#     'NOT_IN_PMKISAN' literal (see the POST-VIEW notes below); CHECK 3 is now
+#     the only place it is counted, and the count is restated as a coverage
+#     statistic in the view2 / view5 descriptions.
+#   * CHECK 6 (date ranges) — MARKFED procurement spans 2023-08 to 2026-07,
+#     i.e. three years, which is inside the configured window.
+#
+# CHECK 5 doubles as the assertion on the recovered district map: if
+# district_code_map ever stopped resolving to the thirteen AP district names,
+# stg_agriculture.district_name / stg_sericulture.district_name would fail here
+# rather than silently producing null dimensions in the views.
+# =============================================================================
+
+null_rate_threshold_pct: 5
+
+primary_keys:
+  pm_kisan: aadhaar_no
+  horticulture_apmip: EXTN_AADHARNO
+  fisheries: aadhar_no
+  sericulture: aadhaar_no
+  ryss: Aadhar_no
+  survey_land_records: khata_no   # 1:1 on this drop; m:n in production
+  # agriculture and markfed are transaction files: one farmer, many rows.
+
+foreign_keys:
+  - {child: agriculture,        child_col: aadharno,      parent: pm_kisan, parent_col: aadhaar_no}
+  - {child: horticulture_apmip, child_col: EXTN_AADHARNO, parent: pm_kisan, parent_col: aadhaar_no}
+  - {child: fisheries,          child_col: aadhar_no,     parent: pm_kisan, parent_col: aadhaar_no}
+  - {child: sericulture,        child_col: aadhaar_no,    parent: pm_kisan, parent_col: aadhaar_no}
+  - {child: markfed,            child_col: AADHAAR_NO,    parent: pm_kisan, parent_col: aadhaar_no}
+  - {child: ryss,               child_col: Aadhar_no,     parent: pm_kisan, parent_col: aadhaar_no}
+  # ITERATION 3 — the land-record spine. This one is expected to report ZERO
+  # orphans: the khata key is 1:1 with the roster on this drop, and view8 rests
+  # on that. If it ever stops being 1:1, this check is where it shows up.
+  - {child: survey_land_records, child_col: khata_no,     parent: pm_kisan, parent_col: khata_no}
+
+categorical:
+  pm_kisan:
+    gender: [Male, Female]
+    category: [SC, ST, BC, OC]
+    ekyc_status: [Completed, Pending]
+    beneficiary_status: [Included, Excluded, Pending]
+  agriculture:
+    season: [Kharif, Rabi]
+    social_status: [SC, ST, BC, OC]
+    cultivator_type: [Owner, Tenant]
+    cropstatus: [Approved, Pending, Under Review, Damaged]
+  horticulture_apmip:
+    Gender: [Male, Female]
+    Category: [SC, ST, BC, OC]
+    Status: [Approved, Pending, Under Review]
+  fisheries:
+    gender: [Male, Female]
+    caste: [SC, ST, BC, OC]
+    payment_status: [Approved, Pending, Under Review]
+  sericulture:
+    Sex: [Male, Female]
+    status: [Approved, Pending, Under Review]
+  markfed:
+    GENDER: [Male, Female]
+    CASTE: [SC, ST, BC, OC]
+    SEASON_ID: [Kharif, Rabi]
+    PAYMENT_STATUS: [Approved, Pending, Under Review]
+  ryss:
+    Gender: [Male, Female]
+    Category: [SC, ST, BC, OC]
+    PaymentStatus: [Approved, Pending, Under Review]
+  # the recovered district map, asserted through the staging views
+  stg_agriculture:
+    district_name: [Srikakulam, Vizianagaram, Visakhapatnam, East Godavari,
+                    West Godavari, Krishna, Guntur, Prakasam, Nellore,
+                    YSR Kadapa, Kurnool, Anantapur, Chittoor]
+  stg_sericulture:
+    district_name: [Srikakulam, Vizianagaram, Visakhapatnam, East Godavari,
+                    West Godavari, Krishna, Guntur, Prakasam, Nellore,
+                    YSR Kadapa, Kurnool, Anantapur, Chittoor]
+
+date_ranges:
+  min_years: 1
+  max_years: 10
+  columns:
+    - {table: markfed, column: PROCUREMENT_DATE}
+
+# -----------------------------------------------------------------------------
+# POST-VIEW — iteration-2 exclusion arithmetic
+# -----------------------------------------------------------------------------
+# Three views now exclude rows, and each expected_rows below states the
+# subtraction so a drift shows up as a failed check rather than as a silently
+# different denominator. None of the three filters names a district, crop,
+# scheme or social category of interest: they remove a placeholder value and an
+# incomplete calendar year.
+#
+#   view1_scheme_benefits   5,844 source benefit rows
+#                             - 26 rows carrying the category placeholder
+#                               'UNKNOWN' (all Sericulture: those farmers have
+#                               no PM-KISAN record, so no category is on file)
+#                           = 5,818
+#
+#   view2_farmer_360        1,140 distinct Aadhaars across the scheme files
+#                             - 40 with no PM-KISAN record at all
+#                               (26 Sericulture, 20 Fisheries, 16 RySS; a
+#                               farmer may appear in more than one)
+#                           = 1,100, i.e. the roster exactly
+#
+#   view3_agri_crop         1,114 registrations
+#                             - 153 in crop year 2026, which is a part year
+#                               (nothing in the drop is dated after 2026-07-31)
+#                           = 961 across 2023, 2024 and 2025
+#
+#   view4_markfed_procurement  unchanged at 1,086 — the part-year ends are
+#                           carried by proc_month, which has enough points to
+#                           see through them.
+#
+#   view5_equity_cube       52 populated district x category cells x 6 AP
+#                           schemes = 312. Thirteen districts x four categories
+#                           is 52, so no cell is empty on this drop; the grid is
+#                           still built from the roster rather than from a cross
+#                           product, so an empty cell would drop out rather than
+#                           be fabricated with a zero denominator.
+post_view:
+  view1_scheme_benefits:
+    expected_rows: 5818
+    tolerance_pct: 1
+  view2_farmer_360:
+    expected_rows: 1100
+    tolerance_pct: 1
+  view3_agri_crop:
+    expected_rows: 961
+    tolerance_pct: 1
+  view4_markfed_procurement:
+    expected_rows: 1086
+    tolerance_pct: 1
+  view5_equity_cube:
+    expected_rows: 312
+    tolerance_pct: 1
+    unique_grain: [district, category, scheme]
+
+# -----------------------------------------------------------------------------
+# POST-VIEW — iteration-3 additions
+# -----------------------------------------------------------------------------
+#   view6_horti_pipeline    567 — every micro-irrigation sanction, nothing
+#                           excluded. Twelve districts, not thirteen: YSR Kadapa
+#                           has no horticulture rows in the drop at all.
+#
+#   view7_input_to_market   the farmers who appear in BOTH the input-subsidy
+#                           register and the procurement file, which is the only
+#                           population whose realisation ratio is defined. The
+#                           count is a property of the data, so min_rows guards
+#                           the floor rather than expected_rows pinning a number
+#                           the build would have to be told.
+#
+#   view8_land_integrity    1,100 — the roster exactly, because khata_no is 1:1
+#                           with survey_land_records on this drop. unique_grain
+#                           on the four dimensions is NOT meaningful here (many
+#                           farmers share a district/category/gender/size cell),
+#                           so only the row count is asserted.
+  view6_horti_pipeline:
+    expected_rows: 567
+    tolerance_pct: 1
+  view7_input_to_market:
+    min_rows: 300
+  view8_land_integrity:
+    expected_rows: 1100
+    tolerance_pct: 1
+
+# -----------------------------------------------------------------------------
+# POST-VIEW — iteration-5 addition
+# -----------------------------------------------------------------------------
+#   view9_scheme_mix        13 districts x 7 schemes = 91, the FULL cross
+#                           product. Unlike view5's grid, which is built from
+#                           the populated cells so an empty one drops out, this
+#                           grid is complete on purpose: a scheme that reached
+#                           nobody in a district paid it zero rupees, and zero
+#                           is the correct share for a decomposition whose
+#                           seven parts must add to 1.0. Exactly one cell is
+#                           zero on this drop (YSR Kadapa x Horticulture APMIP;
+#                           YSR Kadapa has no horticulture rows at all), so 90
+#                           of the 91 rows carry money.
+#
+#                           The cube is built off the roster join, so it rests
+#                           on 5,782 of the 5,844 benefit rows — the 62 dropped
+#                           belong to the 40 off-roster farmers, who have no
+#                           district to attribute rupees to. view1 excludes 26
+#                           of those same rows by the category placeholder.
+  view9_scheme_mix:
+    expected_rows: 91
+    tolerance_pct: 1
+    unique_grain: [district, scheme]

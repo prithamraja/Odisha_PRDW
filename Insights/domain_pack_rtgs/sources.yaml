@@ -1,0 +1,87 @@
+# =============================================================================
+# domain_pack_rtgs / sources.yaml
+# =============================================================================
+# Andhra Pradesh RTGS Decision Aid — "Discover" source registration.
+#
+# Files are produced by scripts/stage_flat_csvs.py from RTGS_Data/flat/*.parquet
+# (in-scope projection only — see domain_pack_rtgs/demo_crosswalk.csv). The
+# runner reads every CSV with all_varchar=true, so every numeric / date column
+# the pack uses must be cast explicitly here; everything else stays VARCHAR.
+#
+# ITERATION 3: survey_land_records joins the pack. It still carries no benefit
+# column and no Aadhaar — but `khata_no` matches `pm_kisan.khata_no` 1:1 for all
+# 1,100 roster farmers on this drop, which is enough to attach a recorded land
+# extent to a farmer. That is the whole of view8. Read the m:n caveat in the
+# view description before reusing the join anywhere else.
+# =============================================================================
+
+row_count_tolerance_pct: 1
+
+tables:
+
+  pm_kisan:
+    file: pm_kisan.csv
+    expected_rows: 1100
+    casts:
+      area_hectares: float          # hectares — the only land column not in acres
+      last_amount_credited: float   # INR, last DBT instalment
+
+  agriculture:
+    file: agriculture.csv
+    expected_rows: 1114
+    casts:
+      dcode: int                    # district code, census ordering (7 = Guntur)
+      cropyear: int
+      subsidyamount: float          # INR
+      nonsubsidyamount: float       # INR, farmer's own contribution
+
+  horticulture_apmip:
+    file: horticulture_apmip.csv
+    expected_rows: 567
+    casts:
+      SubsidyAmt: float             # INR, sanctioned
+      Subsidy_Rlsd: float           # INR, of that, actually released
+      BALANCE_AMOUNT_TO_RELEASE: float   # INR, the remainder still to go out
+      EXTENT: float                 # acres
+
+  fisheries:
+    file: fisheries.csv
+    expected_rows: 627
+    casts:
+      amount: float                 # INR
+      EXTENT: float                 # acres
+
+  sericulture:
+    file: sericulture.csv
+    expected_rows: 666
+    casts:
+      DIST_CODE: int                # same census ordering as agriculture.dcode
+      Net_Incentive: float          # INR
+      Area: float                   # acres
+
+  markfed:
+    file: markfed.csv
+    expected_rows: 1086
+    casts:
+      AMOUNT_PAID: float            # INR
+      PROCURED_QTY: float           # quintals
+      AREA_IN_ACRES: float          # acres
+      # `timestamp`, not `date`: CHECK 6 in the generic runner calls .date() on
+      # the min/max it reads back, which only a datetime carries.
+      PROCUREMENT_DATE: timestamp   # ISO strings in the source
+
+  ryss:
+    file: ryss.csv
+    expected_rows: 684
+    casts:
+      Amount: float                 # INR
+      ACREAGE: float                # acres
+
+  survey_land_records:
+    file: survey_land_records.csv
+    expected_rows: 1100
+    casts:
+      extent: float                 # acres, as the revenue record carries them
+      # khata_no stays VARCHAR: it is an identifier, and pm_kisan carries it as
+      # one, so casting either side would make the join depend on numeric
+      # formatting rather than on the key.
