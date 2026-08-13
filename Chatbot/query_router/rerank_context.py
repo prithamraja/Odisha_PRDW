@@ -3,1644 +3,1705 @@ Family descriptions for the re-ranker's "↳" line.
 
 The re-ranker shows each candidate as
 
-    S02: Which farmers are in {scheme} but not in {scheme_2}?
+    EXP-001: What is the total actual expenditure incurred by {gp_name} in {date_range}?
         ↳ <desc>
-        accepts filters: scheme, scheme_2
+        accepts filters: date_range, district_name, block_name, gp_name
 
 and its system prompt tells the model to judge a candidate by the ↳ description
 rather than by surface word overlap. This module supplies those descriptions.
 
-WHY IT EXISTS
-    Without a ↳ line the model word-matches. The defect this module was written
-    for: "Which farmers are in Fisheries but not Sericulture?" retrieved S02
-    correctly but the model picked Q122 ("registered both as fishers and as crop
-    farmers") — same nouns, inverted set logic. Descriptions that say "difference
-    / but NOT" against "overlap / in BOTH" are what separates them.
+WHAT A FAMILY IS HERE
+    A maximal set of templates with IDENTICAL SQL and identical slots — the only
+    grouping under which the contract "siblings repeat one description
+    word-for-word" is true rather than merely tidy, because those members
+    execute the same statement and the reranker's choice between them cannot
+    change the answer. 14 such groups cover 33 of the 346 ids; the workbook's
+    own scope variants are most of them (PLN-025 "in {GP}", PLN-027 "in
+    {Block}", PLN-029 "in {District}" are one query once D2 makes geography
+    optional). The other 313 templates are each their own family.
+
+    That is a deliberate departure from the AP catalogue, where descriptions
+    covered large families. The AP lesson — per-variant descriptions caused
+    confusion, not precision — is about PARAMETER variants, which the
+    "accepts filters:" line already separates. It does not transfer to this
+    catalogue: SBM-SWM-002 (community compost pits) and SBM-SWM-007 (household
+    compost pits) accept identical filters and differ only in a keyword regex
+    frozen inside the SQL, so one shared description would leave the model
+    choosing between them blind.
+
+WHAT A DESCRIPTION SAYS, and why it is generated
+    Descriptions are BUILT FROM THE SQL by tools/build_catalog.py, because what
+    the reranker is missing is exactly what the SQL knows and the question text
+    does not:
+
+      1. the measure AND its accounting basis — the data dictionary's central
+         trap is that this database holds two expenditure conventions, plan
+         basis (activity_expenditure) and cash basis (the voucher cashbook), and
+         an answer that does not say which is a wrong answer;
+      2. the row grain — one row per GP, per theme, or a single total;
+      3. the status filter — "only WORK COMPLETED", "only activities with an
+         administrative approval", "only those with no expenditure recorded";
+      4. for the 85 SBM families, WHICH KEYWORDS define the concept, since
+         nothing in the database codes SBM activity types and every one of those
+         questions is a text search;
+      5. the scope behaviour — one entry answers state-wide or narrowed.
+
+    Hand-written prose would be a less accurate way of saying the same things
+    and would drift from the SQL at the first re-ratification. The hand-authored
+    half is `_DISAMBIGUATION` in the builder: the near-miss warnings no amount of
+    SQL parsing can infer ("uploaded a GPDP is any plan row, not the approved
+    subset").
 
 CONTRACT (mirrors _RERANK_SYS in reranker.py — do not break it)
-    - A description describes a question FAMILY, not one template. Sibling
-      parameter variants (G10-S / G10-D / G10-M) share one family and therefore
-      repeat the same description word-for-word. The model picks the family by
-      ↳ and then the variant by `accepts filters:`.
     - ONE line, no newlines: the candidate listing is line-oriented.
-    - Every one of the 278 templates must have a non-empty description, and no
-      template may appear in two families. tests/test_rerank_context.py enforces
-      both, plus that the member ids all exist in TEMPLATE_CATALOG.
-
-AUTHORING ORDER (what a description says, most important first)
-    1. What the answer is — the measure and the row grain.
-    2. Which dataset(s) it reads: pm_kisan (roster), agriculture (input/seed
-       subsidy + eCrop), horticulture_apmip (micro-irrigation), fisheries,
-       sericulture, markfed (MSP procurement), ryss (natural farming),
-       survey_land_records.
-    3. The logical relation where one exists — difference / intersection /
-       absence-from-roster / reconciliation mismatch.
-    4. Optionally one or two short example phrasings.
-
-    Examples stay generic for families whose siblings accept different filter
-    values, so an example can never name a value only a sibling can bind.
-
-SEVEN SCHEMES
-    PM-KISAN is a scheme, the seventh, alongside Agriculture, Horticulture,
-    Fisheries, Sericulture, MARKFED and RySS. Scheme-count families say counts
-    include it. The families that deliberately measure the six STATE schemes
-    against the PM-KISAN roster say so explicitly — that contrast is what keeps
-    G35 ("nothing from any state scheme") apart from S02 with scheme=PM-KISAN.
+    - Every template has a non-empty description, and no template appears in two
+      families. tests/test_rerank_context.py enforces both.
 """
+# ── GENERATED FILE — do not edit by hand ─────────────────────────────────────
+# Built from AI_Chatbot_Questions.xlsx by tools/build_catalog.py.
+# To change a question, a caveat or a SQL string, change the WORKBOOK and
+# regenerate; `python tools/build_catalog.py --check` fails if this file and the
+# workbook have drifted apart.
 
-_SEVEN = ("PM-KISAN, Agriculture, Horticulture, Fisheries, Sericulture, "
-          "MARKFED, RySS")
 
 FAMILY_DESCRIPTIONS: dict[str, dict] = {
 
-    # ══ Scheme set logic — the collision-prone core ═══════════════════════
-    "scheme_set_difference": {
-        "desc": "Farmers enrolled in one named scheme and MISSING from a second "
-                "named scheme: a set DIFFERENCE ('in X but NOT in Y'), never an "
-                "intersection and never an overlap count. Two schemes are named "
-                "and both are slots; either may be any of " + _SEVEN + ". "
-                "e.g. 'in Fisheries but not Sericulture', 'in RySS but not PM-KISAN'.",
-        "members": ["S02"],
-    },
-    "roster_minus_one_scheme": {
-        "desc": "PM-KISAN roster members who are NOT in ONE named scheme — a "
-                "difference whose left side is always the whole roster, so only "
-                "one scheme is named. Use when 'PM-KISAN farmers' is the subject "
-                "and a single other scheme is the thing they are missing from; if "
-                "the query names TWO schemes as operands it is the two-scheme "
-                "difference family instead. The scheme slot accepts all seven "
-                "values; scheme=PM-KISAN is answered here and correctly comes back "
-                "empty. e.g. 'which PM-KISAN farmers are not in Sericulture', "
-                "'roster farmers never reached by this programme'. Also answers "
-                "COMPLETENESS questions about this same relation — 'are all "
-                "PM-KISAN farmers present in this scheme', 'is every roster farmer "
-                "also in this scheme', 'do all roster farmers appear here' — which "
-                "are the same difference asked as a yes/no: the answer is the list "
-                "of roster farmers missing from the scheme, and an empty result "
-                "means yes, all of them are present. A yes/no phrasing never makes "
-                "a question unanswerable.",
-        "members": ["S01"],
-    },
-    "scheme_membership_list": {
-        "desc": "The membership roll of ONE named scheme — every farmer registered "
-                "in it, with their roster details where they have them. A plain "
-                "list, no set logic, no amounts. The scheme is a slot and may be "
-                "any of " + _SEVEN + " (PM-KISAN returns the whole roster). "
-                "e.g. 'which farmers are registered in this scheme', 'who is "
-                "enrolled in this programme'.",
-        "members": ["S07"],
-    },
-    "scheme_aadhaar_off_roster": {
-        "desc": "Aadhaar numbers present in ONE named scheme's own data but ABSENT "
-                "from the PM-KISAN roster — that scheme's off-roster beneficiaries. "
-                "Measures a scheme AGAINST the roster, so the roster is the fixed "
-                "right-hand side rather than a second operand. The scheme slot "
-                "accepts all seven values, PM-KISAN included: that case is answered "
-                "here and correctly comes back empty (roster minus roster). e.g. "
-                "'Aadhaar numbers in this scheme that do not exist in PM-KISAN'.",
-        "members": ["S03"],
-    },
-    "scheme_count_ranking": {
-        "desc": "Farmers ranked by HOW MANY schemes they are enrolled in — one row "
-                "per farmer with a scheme count and the scheme names, biggest first. "
-                "Membership breadth, not money. Counts are over all seven schemes "
-                "and include PM-KISAN, so a roster member scores one higher than "
-                "they used to. e.g. 'rank farmers by number of schemes enrolled', "
-                "'who touches the most programmes'.",
-        "members": ["S04"],
-    },
-    "scheme_participations_by_district": {
-        "desc": "Districts ranked by TOTAL scheme participations — one farmer in "
-                "four schemes contributes four, so this counts enrolments and not "
-                "people (the farmer count sits alongside for comparison). Over all "
-                "seven schemes including PM-KISAN. e.g. 'which district has the "
-                "most total scheme participations', 'where is scheme activity "
-                "concentrated'.",
-        "members": ["S05"],
-    },
-    "social_category_scheme_coverage": {
-        "desc": "Farmers of ONE named social category (SC/ST/BC/OC) and which "
-                "schemes cover each of them — one row per farmer with their scheme "
-                "list, across all seven schemes including PM-KISAN. e.g. 'which ST "
-                "farmers exist and which schemes cover them'.",
-        "members": ["S06"],
-    },
-    "scheme_count_exact": {
-        "desc": "Farmers enrolled in EXACTLY a given number of schemes, with the "
-                "scheme names listed — the convergence extremes ('all of them', "
-                "'only one'). Counts run over all seven schemes and include "
-                "PM-KISAN, so a farmer in every AP programme plus the roster counts "
-                "7, and a query saying 'all six AP schemes' should still be read as "
-                "the maximum-convergence question. e.g. 'which farmer participates "
-                "in all the schemes', 'farmers enrolled in exactly N schemes'.",
-        "members": ["Q114"],
-    },
-    "scheme_count_single": {
-        "desc": "Farmers whose scheme count is exactly one (or the given small "
-                "number) AND which single scheme it is — the least-converged "
-                "beneficiaries, named. Counts include PM-KISAN, so roster-only "
-                "farmers now appear here with scheme 'PM-KISAN'. e.g. "
-                "'single-scheme farmers', 'which one scheme is this farmer's only one'.",
-        "members": ["Q115"],
-    },
-    "scheme_count_distribution": {
-        "desc": "The HISTOGRAM of farmers by number of schemes — how many farmers "
-                "are in 1, 2, 3+ schemes, as a distribution table, not a farmer "
-                "list. Counts include PM-KISAN. A STATEWIDE aggregate over the "
-                "whole population: a question that names ONE farmer ('how many "
-                "schemes is this farmer enrolled in') is a per-farmer lookup and "
-                "belongs to the single-farmer membership families, never here. "
-                "e.g. 'distribution of farmers by number of schemes enrolled', "
-                "'scheme-count histogram'.",
-        "members": ["Q016"],
-    },
-    "scheme_participation_matrix": {
-        "desc": "The scheme participation MATRIX: one row per farmer with a 0/1 "
-                "column per programme (pm_kisan, agriculture, horticulture, "
-                "fisheries, sericulture, markfed, ryss) plus a total. The backbone "
-                "view every other convergence question filters. The pm_kisan column "
-                "is 1 for everyone on the roster, which is the point of the spine. "
-                "e.g. 'scheme participation matrix', 'for every farmer, which "
-                "programmes are they in'.",
-        "members": ["Q113"],
-    },
-    "farmer_scheme_membership_lookup": {
-        "desc": "Which schemes ONE farmer is in, looked up by name (and village "
-                "where given) — membership across the seven schemes, not amounts. "
-                "e.g. 'which schemes is this farmer enrolled in', 'how many schemes "
-                "is this farmer in'.",
-        "members": ["Q125"],
-    },
-    "farmer_dataset_presence": {
-        "desc": "A presence matrix for ONE named farmer across all eight datasets — "
-                "Yes/No per dataset, so the answer is which datasets hold them and "
-                "which they are MISSING from. Membership only, no money. Resolves "
-                "the name across every dataset rather than starting from the roster, "
-                "so a 'No' in the pm_kisan column is itself the finding. e.g. "
-                "'which datasets is this farmer missing from', 'how many schemes is "
-                "this farmer in'.",
-        "members": ["F09"],
-    },
-    "scheme_pair_overlap": {
-        "desc": "Which PAIRS of schemes overlap most in the farmers they serve — "
-                "one row per scheme pair with the count of farmers in BOTH, ranked. "
-                "An intersection measured across every pair at once, not a named-pair "
-                "list and not a difference. Includes PM-KISAN, so PM-KISAN×X pairs "
-                "top the list because the roster is the spine. ALSO the right answer "
-                "to a HOW-MANY question about two named schemes with NO crop named — "
-                "'how many input-subsidy farmers also sold produce to MARKFED' is "
-                "read off this table's Agriculture × MARKFED row. The crop-narrowed "
-                "input-to-market family needs a crop to bind and must not be used "
-                "when none is given. e.g. 'which pairs of schemes overlap the most', "
-                "'which programmes share beneficiaries', 'how many farmers are in "
-                "both Agriculture and MARKFED'.",
-        "members": ["Q118"],
-    },
-    "scheme_exclusive_reach": {
-        "desc": "For each of the six AP STATE schemes, how many farmers it serves "
-                "that NO OTHER state scheme reaches — one row per scheme giving its "
-                "exclusive beneficiary count. Uniqueness, the complement of overlap. "
-                "The PM-KISAN roster is deliberately EXCLUDED from the count: it is "
-                "the near-universal spine, so counting it would give every roster "
-                "farmer a second scheme and drive every exclusive count to zero. "
-                "e.g. 'how many farmers does each scheme serve that no other scheme "
-                "reaches', 'unique reach of each programme'.",
-        "members": ["Q126"],
-    },
-    "fisheries_agriculture_overlap": {
-        "desc": "Households registered in BOTH fisheries AND the crop input-subsidy "
-                "data — an INTERSECTION of two fixed datasets (fisheries ∩ "
-                "agriculture), dual-livelihood farmers. Not a difference: it never "
-                "answers 'in fisheries but NOT in something'. e.g. 'Aadhaar numbers "
-                "that appear both as fisheries registrants and crop input-subsidy "
-                "recipients'.",
-        "members": ["Q122"],
-    },
-    "sericulture_markfed_overlap": {
-        "desc": "Sericulture farmers who ALSO sell produce through MARKFED — an "
-                "INTERSECTION of two fixed datasets (sericulture ∩ markfed), "
-                "diversified-income farmers. Not a difference. e.g. 'which "
-                "sericulture farmers also sell through procurement'.",
-        "members": ["Q123"],
-    },
-    "horticulture_agriculture_overlap": {
-        "desc": "Farmers who took BOTH a micro-irrigation subsidy AND an input "
-                "subsidy in one crop year — an INTERSECTION of horticulture_apmip "
-                "and agriculture, filtered to the named year. Not a difference. "
-                "e.g. 'who got both a drip subsidy and a seed subsidy that year'.",
-        "members": ["Q121"],
-    },
-    "crop_input_to_procurement_overlap": {
-        "desc": "For ONE NAMED CROP, farmers who took an input subsidy AND also "
-                "sold that produce to MARKFED — the full input-to-market cycle, an "
-                "INTERSECTION of agriculture and markfed narrowed to a crop slot. "
-                "ONLY when a crop is actually named. A crop-less version of the "
-                "same question — 'how many input-subsidy farmers also sold to "
-                "MARKFED' — has nothing to bind the crop slot to and belongs to the "
-                "scheme-pair overlap family, whose Agriculture x MARKFED row is "
-                "exactly that all-crops answer. e.g. 'which paddy farmers took "
-                "subsidy and also sold to procurement'.",
-        "members": ["Q098"],
-    },
-    "natural_farming_input_subsidy_contradiction": {
-        "desc": "RySS natural-farming members who are STILL drawing chemical input "
-                "subsidies — an INTERSECTION of ryss and agriculture surfaced as a "
-                "policy contradiction (the state pays for conversion and for "
-                "purchased inputs on the same plot). e.g. 'which natural farming "
-                "members still take input subsidies'.",
-        "members": ["Q117"],
+    'alr_001__financial_exceptions': {
+        "desc": "LISTS: Which administratively approved activities in a given block still have zero expenditure a given threshold days after sanction. Returns activity_name, sanction_day, sanction_authority, admin_approved_cost, total_expenditure, days_since_sanction. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Restricted to activities that have an administrative approval (17% of them). Restricted to activities with no expenditure recorded. admin_approved_cost is the administratively approved cost. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Unblocked by the sanction date.",
+        "members": ['ALR-001'],
     },
 
-    # ══ Absence from the PM-KISAN roster (the six STATE schemes vs the spine) ══
-    "state_scheme_beneficiaries_off_roster": {
-        "desc": "People drawing benefits from the six STATE schemes (agriculture, "
-                "horticulture, fisheries, sericulture, markfed, ryss) whose Aadhaar "
-                "is NOT on the PM-KISAN roster at all — off-roster beneficiaries, "
-                "across every scheme at once rather than one named scheme. The "
-                "roster is the comparison target here, not one of the operands, so "
-                "PM-KISAN is deliberately excluded from the scheme set. Legitimate "
-                "cases exist (tenants, landless fishers). e.g. 'which farmers "
-                "receive AP scheme benefits but are not in PM-KISAN'.",
-        "members": ["Q059"],
-    },
-    "off_roster_benefit_value": {
-        "desc": "The total MONEY that has gone to Aadhaar numbers not on the "
-                "PM-KISAN roster — one amount (with a scheme split) sizing the "
-                "off-roster exposure, over the six STATE schemes measured against "
-                "the roster. The ₹ counterpart of the off-roster beneficiary list. "
-                "e.g. 'how much money has gone to Aadhaar numbers not on the roster'.",
-        "members": ["Q129"],
-    },
-    "fisheries_off_roster": {
-        "desc": "Fisheries registrants who are NOT on the PM-KISAN roster — the "
-                "off-roster check for fisheries specifically, no scheme slot. "
-                "Expected non-empty and largely legitimate: fishers often hold no "
-                "agricultural land. e.g. 'list Aadhaar numbers in fisheries that "
-                "do not exist in PM-KISAN'.",
-        "members": ["Q135"],
-    },
-    "markfed_off_roster": {
-        "desc": "MARKFED procurement suppliers who are NOT on the PM-KISAN roster — "
-                "the off-roster check for procurement specifically, no scheme slot. "
-                "Traders selling as farmers is the leakage route this looks for. "
-                "DIRECTION MATTERS: the population is MARKFED and the roster is "
-                "what it is checked against. If the question makes the ROSTER the "
-                "subject — 'are all PM-KISAN farmers present in MARKFED', 'which "
-                "roster farmers are missing from MARKFED' — it is the opposite "
-                "difference and belongs to the roster-minus-one-scheme family. e.g. "
-                "'which MARKFED suppliers have no PM-KISAN record'.",
-        "members": ["Q112"],
-    },
-    "land_records_off_roster": {
-        "desc": "Survey land records whose PATTADAR is not on the PM-KISAN roster — "
-                "land exists but the title holder receives nothing, the reverse of "
-                "the usual exclusion check. Reads survey_land_records against "
-                "pm_kisan by name and village (survey records carry no Aadhaar). "
-                "e.g. 'are there land records for farmers missing from PM-KISAN'.",
-        "members": ["M06"],
-    },
-    "unreached_by_any_state_scheme": {
-        "desc": "PM-KISAN roster farmers who receive NOTHING from any of the six "
-                "STATE schemes — the core exclusion list, one row per completely "
-                "unreached farmer. PM-KISAN is the population being tested, not one "
-                "of the schemes tested for, so being on the roster never counts as "
-                "coverage here. e.g. 'which farmers receive nothing from any state "
-                "scheme', 'the exclusion list'.",
-        "members": ["G35-S", "G35-D", "G35-M"],
-    },
-    "state_scheme_convergence_rate": {
-        "desc": "The SHARE (percentage) of PM-KISAN farmers reached by at least one "
-                "of the six STATE schemes — the headline convergence rate as one "
-                "row, not a farmer list. Roster membership is the denominator and "
-                "never counts as being 'reached'. e.g. 'what share of our farmers "
-                "gets anything beyond PM-KISAN', 'convergence rate'.",
-        "members": ["Q015"],
-    },
-    "excluded_categories_no_state_scheme": {
-        "desc": "Farmers of two named social categories who are covered by NO state "
-                "scheme — the priority outreach list with names and districts, "
-                "filtered to the categories given. Measures the six STATE schemes "
-                "against the roster, so roster membership is not coverage. e.g. "
-                "'which SC and ST farmers are not covered by any state scheme'.",
-        "members": ["Q029"],
+    'alr_002__financial_exceptions': {
+        "desc": "LISTS: Which activities in a given district have expenditure exceeding their administratively approved cost in a given year. Returns activity_name, admin_approved_cost, total_expenditure, overrun_amount, overrun_pct. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. admin_approved_cost is the administratively approved cost. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.",
+        "members": ['ALR-002'],
     },
 
-    # ══ Benefit amounts (money), as opposed to membership ═════════════════
-    "farmer_total_benefit_by_name": {
-        "desc": "The total ₹ AMOUNT one named farmer has received, broken down by "
-                "scheme — money, not membership. Sums each scheme's own benefit "
-                "column and includes a PM-KISAN row carrying the LATEST INSTALLMENT "
-                "ONLY (the roster holds no DBT history). e.g. 'what are this "
-                "farmer's total benefits across all schemes'.",
-        "members": ["F12"],
-    },
-    "aadhaar_total_benefit": {
-        "desc": "The total ₹ AMOUNT paid to ONE Aadhaar number across every scheme, "
-                "with the per-scheme split — money, not membership, keyed by a "
-                "12-digit number rather than a name. Includes a PM-KISAN row for "
-                "the latest installment only. e.g. 'how much has this Aadhaar "
-                "received in total'.",
-        "members": ["Q058"],
-    },
-    "multi_scheme_benefit_total": {
-        "desc": "Farmers drawing benefits from a given NUMBER OF SCHEMES OR MORE, "
-                "with their combined ₹ total — a money question gated on a scheme "
-                "count, the vigilance shortlist. Both the count and the total "
-                "include PM-KISAN (latest installment only). e.g. 'which farmers "
-                "draw from 3 or more schemes and what is their combined total'.",
-        "members": ["Q057"],
-    },
-    "farmer_benefit_ranking": {
-        "desc": "Farmers ranked by TOTAL ₹ BENEFIT across all schemes, biggest "
-                "first, within the chosen geography — a money league table, not a "
-                "scheme-count one. Includes a PM-KISAN leg (latest installment "
-                "only). e.g. 'rank farmers by total benefit across schemes', "
-                "'aggregate public money per farmer'.",
-        "members": ["G36-S", "G36-D", "G36-M"],
-    },
-    "average_benefit_per_scheme": {
-        "desc": "The AVERAGE ₹ benefit per farmer in EACH scheme — one row per "
-                "scheme with beneficiary count, total and mean, so the schemes can "
-                "be compared by transfer size. Includes a PM-KISAN row (latest "
-                "installment only). e.g. 'average benefit per farmer in each "
-                "scheme', 'which scheme pays the most per farmer'.",
-        "members": ["Q056"],
-    },
-    "benefit_concentration_by_village": {
-        "desc": "Villages where BENEFIT PER FARMER is unusually high against their "
-                "district peers — one row per village with average ₹ per farmer, an "
-                "inspection-targeting signal rather than proof. Sums every scheme's "
-                "benefit including PM-KISAN (latest installment only). e.g. 'which "
-                "villages show an unusually high concentration of benefits'.",
-        "members": ["Q131"],
-    },
-    "consolidated_unpaid_liability": {
-        "desc": "How much money is sitting UNPAID across departments — one "
-                "consolidated pendency row per scheme (horticulture, fisheries, "
-                "sericulture, markfed), the total unpaid liability. e.g. 'across "
-                "all departments, how much money is sitting unpaid'.",
-        "members": ["Q051"],
+    'alr_003__financial_exceptions': {
+        "desc": "LISTS: Which activities in a given block have expenditure more than a given threshold percent above estimated cost in a given year. Returns activity_name, estimated_cost, total_expenditure, overrun_pct. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. total_expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.",
+        "members": ['ALR-003'],
     },
 
-    # ══ One-farmer lookups, per dataset ═══════════════════════════════════
-    "farmer_roster_record": {
-        "desc": "The PM-KISAN roster record for ONE named farmer — beneficiary and "
-                "eKYC status, declared area, khata, and the last installment number, "
-                "date and amount. Reads pm_kisan only. e.g. 'what is this farmer's "
-                "eKYC status', 'when was the last installment paid to this farmer "
-                "and how much'.",
-        "members": ["F01"],
-    },
-    "farmer_input_subsidy_record": {
-        "desc": "The input/seed-subsidy record for ONE named farmer — crop, season, "
-                "crop year and subsidy amount from agriculture. e.g. 'which crop did "
-                "this farmer take input subsidy for and in which season'.",
-        "members": ["F02"],
-    },
-    "farmer_micro_irrigation_record": {
-        "desc": "The micro-irrigation (APMIP/horticulture) record for ONE named "
-                "farmer — whether they are a beneficiary, the sanctioned subsidy "
-                "amount and the land EXTENT recorded. Reads horticulture_apmip. An "
-                "empty result means they are not an APMIP beneficiary — that is the "
-                "answer. e.g. 'is this farmer a micro-irrigation beneficiary and "
-                "what was sanctioned', 'what extent is recorded for them in "
-                "horticulture'.",
-        "members": ["F03"],
-    },
-    "farmer_fisheries_record": {
-        "desc": "The fisheries record for ONE named farmer — whether they appear in "
-                "the fisheries data and what amount was paid. Reads fisheries. An "
-                "empty result means they are not a registrant. e.g. 'does this "
-                "person appear in the fisheries data', 'how much was paid to them "
-                "in fisheries'.",
-        "members": ["F04"],
-    },
-    "farmer_sericulture_record": {
-        "desc": "The sericulture record for ONE named farmer — cocoon quantity "
-                "produced and the net incentive paid. Reads sericulture. e.g. 'what "
-                "cocoon quantity is recorded for this farmer', 'what is their net "
-                "incentive'.",
-        "members": ["F05"],
-    },
-    "farmer_procurement_record": {
-        "desc": "The MARKFED procurement record for ONE named farmer — which crop "
-                "was procured, what quantity and rate, and whether payment was made. "
-                "Reads markfed. e.g. 'which crop did procurement buy from this "
-                "farmer and was he paid'.",
-        "members": ["F06"],
-    },
-    "farmer_natural_farming_record": {
-        "desc": "The RySS natural-farming record for ONE named farmer — whether "
-                "they are an APCNF member and what ACREAGE is recorded. Reads ryss. "
-                "e.g. 'is this farmer a natural farming member', 'what acreage is "
-                "recorded for them in RySS'.",
-        "members": ["F07"],
-    },
-    "farmer_land_record": {
-        "desc": "The survey land record(s) for ONE named farmer as pattadar — khata "
-                "number, survey number, extent and mutation status. Reads "
-                "survey_land_records, which carries no Aadhaar, so it matches on "
-                "pattadar name. e.g. 'what is this farmer's khata number in land "
-                "records', 'link this farmer's land parcel to his entry'.",
-        "members": ["F08"],
-    },
-    "farmer_full_profile_by_aadhaar": {
-        "desc": "EVERYTHING held on ONE Aadhaar number, across all eight datasets — "
-                "the grievance-desk 360 profile, keyed by a 12-digit number rather "
-                "than a name. e.g. 'show the complete profile of this Aadhaar across "
-                "all datasets'.",
-        "members": ["Q124"],
+    'alr_004__financial_exceptions': {
+        "desc": "LISTS: Which activities in a given district have a technically approved cost higher than the administratively approved cost in a given year. Returns activity_name, technical_approved_cost, admin_approved_cost, difference. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. admin_approved_cost is the administratively approved cost. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.",
+        "members": ['ALR-004'],
     },
 
-    # ══ Identity / reconciliation mismatches (data quality) ═══════════════
-    "farmer_mobile_consistency": {
-        "desc": "Whether the MOBILE NUMBER held for ONE named farmer agrees across "
-                "the systems that store it (pm_kisan, agriculture, fisheries, "
-                "markfed) — one row per distinct number, so more than one row means "
-                "the departments disagree. An integrity check, not a contact "
-                "lookup. e.g. 'is this farmer's mobile number consistent across all "
-                "datasets'.",
-        "members": ["F10"],
-    },
-    "mobile_mismatch_statewide": {
-        "desc": "Every farmer whose MOBILE NUMBER differs between departments — the "
-                "statewide mismatch list, no farmer named. Integrity check across "
-                "pm_kisan, agriculture, fisheries and markfed. e.g. 'is the mobile "
-                "number for a farmer consistent across all the systems that hold it'.",
-        "members": ["Q061"],
-    },
-    "shared_mobile_numbers": {
-        "desc": "Mobile numbers registered against SEVERAL DIFFERENT farmers — one "
-                "row per shared number with the farmers on it, an agent/middleman "
-                "capture flag. Not the same as one farmer having several numbers. "
-                "e.g. 'is one mobile number registered against several farmers'.",
-        "members": ["Q062"],
-    },
-    "farmer_land_consistency": {
-        "desc": "Whether the LANDHOLDING recorded for ONE named farmer agrees "
-                "across pm_kisan (hectares), markfed and survey_land_records "
-                "(acres) — the per-farmer reconciliation, with the unit conversion "
-                "applied so 1.30 ha and 3.21 acres read as consistent rather than "
-                "as a discrepancy. e.g. 'this farmer's land shows 1.30 in PM-KISAN "
-                "and 3.20 in MARKFED — is that a discrepancy'.",
-        "members": ["F11"],
-    },
-    "land_mismatch_pmkisan_markfed": {
-        "desc": "ALL farmers whose declared area in pm_kisan disagrees with markfed "
-                "beyond a 5% tolerance, once hectares are converted to acres — the "
-                "statewide land-discrepancy COUNT/list, no farmer named. e.g. 'how "
-                "many farmers have discrepancies in their land amount', 'which "
-                "farmers show a land discrepancy'.",
-        "members": ["G42-S", "G42-D", "G42-M"],
-    },
-    "land_declared_vs_surveyed": {
-        "desc": "Each farmer's DECLARED PM-KISAN area set against the extent in the "
-                "revenue/survey land records — one row per farmer with both figures "
-                "and the gap, matched on name and village because survey records "
-                "carry no Aadhaar. The plain comparison, without a tolerance slot "
-                "and without the subsidy consequence. e.g. 'compare declared area "
-                "against the land records'.",
-        "members": ["Q081"],
-    },
-    "land_over_declaration": {
-        "desc": "Farmers whose PM-KISAN declared area EXCEEDS the survey land "
-                "records beyond a tolerance percentage the query supplies — the "
-                "over-declaration list only (not the two-sided comparison). e.g. "
-                "'which farmers declare more land than the revenue record shows, "
-                "beyond 10%'.",
-        "members": ["Q082"],
-    },
-    "land_over_declaration_with_subsidy": {
-        "desc": "Farmers who over-declare land AND whose subsidy per acre is also "
-                "elevated — two findings in one row, the over-declaration and its "
-                "financial consequence. Reads pm_kisan, survey_land_records and "
-                "agriculture. Use when the query asks whether inflated area also "
-                "moved money. e.g. 'which farmers' declared area exceeds their land "
-                "records — and is their subsidy per acre also elevated'.",
-        "members": ["M07"],
-    },
-    "caste_mismatch_across_departments": {
-        "desc": "Farmers whose SOCIAL CATEGORY (caste) is recorded differently in "
-                "different departments — the conflicting-category count/list for "
-                "the chosen geography. An integrity check across pm_kisan and the "
-                "scheme datasets. e.g. 'how many farmers have discrepancies in "
-                "their caste category', 'conflicting caste records'.",
-        "members": ["G41-S", "G41-D", "G41-M"],
-    },
-    "gender_mismatch_across_departments": {
-        "desc": "Farmers whose recorded GENDER differs between departments — one "
-                "row per conflicting Aadhaar with the values each system holds. "
-                "e.g. 'are there farmers whose gender differs between departments'.",
-        "members": ["Q064"],
-    },
-    "name_mismatch_across_departments": {
-        "desc": "The same Aadhaar carrying DIFFERENT FARMER NAMES in pm_kisan and "
-                "markfed — an identity inconsistency that blocks Aadhaar-based "
-                "payment validation. e.g. 'for the same Aadhaar, does the name "
-                "differ between the roster and procurement'.",
-        "members": ["Q060"],
-    },
-    "dob_mismatch_across_departments": {
-        "desc": "The same farmer carrying a DIFFERENT DATE OF BIRTH across "
-                "departments (pm_kisan, markfed, ryss) — age drives eligibility, so "
-                "a mismatch can wrongly include or exclude. e.g. 'does the date of "
-                "birth on record differ across departments'.",
-        "members": ["Q065"],
-    },
-    "ration_card_mismatch": {
-        "desc": "The same farmer carrying DIFFERENT RATION CARD numbers across "
-                "departments — the household identifier used as fallback when "
-                "Aadhaar is masked. e.g. 'do ration card numbers match across "
-                "departments for the same farmer'.",
-        "members": ["Q066"],
-    },
-    "ekyc_status_conflict": {
-        "desc": "Farmers whose eKYC status in MARKFED disagrees with the PM-KISAN "
-                "roster — which system says the farmer is verified, a common cause "
-                "of stuck payments. Not the eKYC backlog and not the "
-                "eKYC-pending-yet-paid check. e.g. 'does the eKYC status in "
-                "procurement agree with the roster'.",
-        "members": ["Q071"],
-    },
-    "malformed_aadhaar": {
-        "desc": "Aadhaar numbers that are NOT 12 digits (malformed, blank or "
-                "non-numeric), counted per dataset across every Aadhaar-bearing "
-                "table including pm_kisan. Run before any cross-dataset join: a "
-                "malformed key silently drops the record from every match. e.g. "
-                "'are there any malformed Aadhaar numbers in our systems'.",
-        "members": ["Q067"],
-    },
-    "duplicate_subsidy_draws": {
-        "desc": "Aadhaar numbers appearing MORE THAN ONCE for the same crop, season "
-                "and crop year in the input-subsidy data — duplicate subsidy draws, "
-                "one row per suspected duplicate. Reads agriculture only. An empty "
-                "result is the correct answer on clean data. e.g. 'which Aadhaar "
-                "numbers have multiple subsidy transactions for the same seed, "
-                "season and cropyear'.",
-        "members": ["M08", "Q068"],
-    },
-    "records_missing_district": {
-        "desc": "Records that carry NO DISTRICT and so cannot be assigned to any "
-                "officer — counted per dataset. A completeness check on geography, "
-                "not a coverage question. e.g. 'which records are missing a district'.",
-        "members": ["Q069"],
-    },
-    "sericulture_district_resolution": {
-        "desc": "Resolving sericulture's DIST_CODE values to real district names by "
-                "going through the farmer's Aadhaar on the PM-KISAN spine — a "
-                "geography-harmonisation fix for the one dataset that stores codes "
-                "without names. e.g. 'which district does each sericulture farmer "
-                "actually belong to'.",
-        "members": ["Q070"],
-    },
-    "district_code_crosswalk": {
-        "desc": "A district CODE-to-NAME crosswalk built from the data already held "
-                "(agriculture and sericulture codes resolved through the PM-KISAN "
-                "spine) — the reusable mapping table, covering every code. e.g. "
-                "'build me a district code to district name crosswalk'.",
-        "members": ["Q140"],
-    },
-    "district_code_lookup": {
-        "desc": "The district CODE (dcode) used in the agriculture data for ONE "
-                "named district — a single lookup answer, not the whole crosswalk. "
-                "e.g. 'what is the district code for Guntur in the data'.",
-        "members": ["M03"],
-    },
-    "zero_land_beneficiaries": {
-        "desc": "PM-KISAN beneficiaries recorded with ZERO or MISSING land area — a "
-                "completeness flag on the roster's own area column. e.g. 'are there "
-                "beneficiaries with no land area recorded'.",
-        "members": ["Q073"],
-    },
-    "data_completeness_scorecard": {
-        "desc": "A FIELD-COMPLETENESS scorecard for the roster by geography — what "
-                "percentage of records carry Aadhaar, mobile, bank details, area and "
-                "so on. A data-quality dashboard, not a farmer list. e.g. 'give me a "
-                "completeness scorecard by district'.",
-        "members": ["G09-S", "G09-D", "G09-M"],
-    },
-    "integrity_dashboard": {
-        "desc": "The ONE-PAGE INTEGRITY DASHBOARD: how many records fail each "
-                "standard check (malformed Aadhaar, off-roster payments, land "
-                "mismatch, duplicates, missing bank details …) as one row per check. "
-                "A roll-up of every integrity query, not any single one of them. "
-                "e.g. 'give me an integrity dashboard', 'all red flags in one view'.",
-        "members": ["Q134"],
+    'alr_005__financial_exceptions': {
+        "desc": "LISTS: Which abandoned activities in a given district had expenditure incurred, and how much in a given year. Returns activity_name, admin_approved_cost, total_expenditure, status_label. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Counts only work abandoned. admin_approved_cost is the administratively approved cost. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: There is no abandonment date, so 'before abandonment' cannot be tested;.",
+        "members": ['ALR-005'],
     },
 
-    # ══ Bank / payment plumbing ═══════════════════════════════════════════
-    "shared_bank_accounts": {
-        "desc": "Bank account numbers linked to MORE THAN ONE farmer on the roster "
-                "— the classic leakage flag, one row per shared account. An empty "
-                "result is a clean bill of health and must be reported as such. "
-                "e.g. 'is any bank account number linked to more than one farmer'.",
-        "members": ["Q052"],
-    },
-    "bank_account_mismatch_markfed": {
-        "desc": "Farmers whose bank account on the PM-KISAN roster differs from the "
-                "one MARKFED pays into — a stale record or a diverted payment. e.g. "
-                "'are we paying two different accounts for one farmer'.",
-        "members": ["Q053"],
-    },
-    "bank_account_mismatch_sericulture": {
-        "desc": "Farmers whose bank details in sericulture differ from the PM-KISAN "
-                "roster — the silk-incentive version of the account cross-check. "
-                "e.g. 'do the bank details in sericulture match the roster'.",
-        "members": ["Q054"],
-    },
-    "missing_bank_details": {
-        "desc": "Beneficiaries with NO bank account or IFSC recorded — farmers who "
-                "physically cannot receive DBT, a blocking data-quality list. e.g. "
-                "'which beneficiaries have no bank account recorded'.",
-        "members": ["Q055"],
+    'alr_008__progress_exceptions': {
+        "desc": "LISTS: Which activities approved more than a given threshold days ago in a given block are still not started. Returns activity_name, sanction_day, sanction_authority, status_label, admin_approved_cost, total_expenditure. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Counts only activities not yet started. Restricted to activities that have an administrative approval (17% of them). admin_approved_cost is the administratively approved cost. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Unblocked by the sanction date.",
+        "members": ['ALR-008'],
     },
 
-    # ══ PM-KISAN roster coverage and demographics ════════════════════════
-    "roster_count_by_geography": {
-        "desc": "How many PM-KISAN beneficiaries there are in each area — a COUNT "
-                "grouped by district, mandal or village depending on the scope "
-                "asked for, ONE ROW PER PLACE. Reads pm_kisan only. Requires the "
-                "question to ask for a geographic breakdown ('in each district', "
-                "'by mandal', 'where'); a bare 'how many beneficiaries are there' "
-                "with no area named is the single-total family, not this one, and a "
-                "count filtered by CASTE, GENDER or STATUS belongs to that "
-                "attribute's own breakdown family rather than here. e.g. 'how many "
-                "beneficiaries in each district', 'where are our farmers'.",
-        "members": ["G01-S", "G01-D", "G01-M"],
-    },
-    "roster_total_count": {
-        "desc": "The single TOTAL number of farmers registered as PM-KISAN "
-                "beneficiaries in the state — ONE NUMBER, one row, no grouping. "
-                "This is the default for any roster-size question that does NOT "
-                "name a district, mandal or village and does not ask for a "
-                "breakdown; the per-area count family is only for questions that "
-                "do. e.g. 'how many beneficiaries are registered in PM-KISAN', "
-                "'how many farmers are on the roster', 'size of the roster'.",
-        "members": ["Q001"],
-    },
-    "state_headline_totals": {
-        "desc": "The statewide HEADLINE ROW: total beneficiaries, total area and "
-                "total subsidy together in a single line — the 'in total' answer, "
-                "as opposed to any by-district breakdown. Reads pm_kisan and "
-                "agriculture. e.g. 'what is the total subsidy amount disbursed', "
-                "'how many distinct districts do beneficiaries come from', "
-                "'headline numbers for the state'.",
-        "members": ["M01"],
-    },
-    "dataset_farmer_counts": {
-        "desc": "How many FARMERS each of the eight datasets holds AND whether that "
-                "dataset carries an Aadhaar column — the joinability answer as much "
-                "as a count (survey_land_records has no Aadhaar at all, which is why "
-                "it joins on pattadar name). e.g. 'how many farmers are in each "
-                "dataset', 'how many land records are there and do they carry "
-                "Aadhaar'.",
-        "members": ["M02"],
-    },
-    "dataset_record_counts": {
-        "desc": "The raw ROW COUNT each department dataset holds — a table-size "
-                "inventory, without the Aadhaar-coverage column. e.g. 'one table "
-                "showing how many records each dataset holds'.",
-        "members": ["Q005"],
-    },
-    "combined_farmer_universe": {
-        "desc": "The number of UNIQUE farmers touched across every dataset put "
-                "together — the size of the union universe on distinct Aadhaar, "
-                "which is larger than the roster because some scheme beneficiaries "
-                "are off-roster. One number. e.g. 'how many unique farmers do we "
-                "actually touch across every dataset'.",
-        "members": ["Q004"],
-    },
-    "administrative_spread": {
-        "desc": "How many MANDALS and VILLAGES in each district contain at least one "
-                "PM-KISAN beneficiary — the administrative footprint, counting "
-                "places rather than farmers. e.g. 'mandal and village coverage by "
-                "district'.",
-        "members": ["Q007"],
-    },
-    "scheme_district_breadth": {
-        "desc": "How many DISTRICTS each scheme operates in — one row per scheme "
-                "with its district count, a geographic-breadth comparison across "
-                "departments. Sericulture is excluded because it stores district "
-                "codes only. e.g. 'how many districts does each scheme operate in'.",
-        "members": ["Q017"],
-    },
-    "ekyc_status_pendency_by_geography": {
-        "desc": "Where the eKYC and beneficiary-status PENDENCY sits by area — "
-                "completed/pending counts grouped by district, mandal or village, "
-                "the backlog dashboard. Reads pm_kisan. e.g. 'which mandals have "
-                "the biggest eKYC backlog', 'distribution of beneficiary_status and "
-                "ekyc_status per district'.",
-        "members": ["G02-S", "G02-D", "G02-M"],
-    },
-    "ekyc_completion_ranking": {
-        "desc": "Districts ranked by eKYC completion RATE (percentage completed), "
-                "worst first — a rate, deliberately not a raw pending count, so big "
-                "districts do not automatically top the list. e.g. 'which districts "
-                "have the worst eKYC completion rate'.",
-        "members": ["Q138"],
-    },
-    "cultivable_area_total": {
-        "desc": "The TOTAL cultivable area held by PM-KISAN beneficiaries in the "
-                "chosen area, in hectares with an acre conversion — a land total, "
-                "not a farmer count. e.g. 'what is the total cultivable area of all "
-                "beneficiaries'.",
-        "members": ["G03-S", "G03-D", "G03-M"],
-    },
-    "average_landholding_by_district": {
-        "desc": "The AVERAGE landholding per district — mean farm size by district, "
-                "showing where the smallest farms are. Not a total and not a size "
-                "band. e.g. 'what is the average landholding per district'.",
-        "members": ["Q019"],
-    },
-    "social_category_breakdown": {
-        "desc": "The SOCIAL CATEGORY (caste) composition of PM-KISAN beneficiaries "
-                "— SC/ST/BC/OC counts and shares for the chosen area. Reads "
-                "pm_kisan. ANY question that names a caste code carries its answer "
-                "here, including bare counts: 'how many SC farmers are there' and "
-                "'how many SC or ST PM-KISAN farmers' are answered by reading the "
-                "SC and ST rows of this breakdown. A caste-named question never "
-                "belongs to the per-district count family. e.g. 'give the category "
-                "breakdown of beneficiaries', 'how many SC beneficiaries are "
-                "there', 'caste-wise beneficiary split'.",
-        "members": ["G04-S", "G04-D", "G04-M"],
-    },
-    "gender_breakdown": {
-        "desc": "The MALE/FEMALE split of PM-KISAN beneficiaries for the chosen "
-                "area — counts and shares by gender. Reads pm_kisan. e.g. 'how many "
-                "male vs female beneficiaries', 'women farmers on the roster'.",
-        "members": ["G05-S", "G05-D", "G05-M"],
-    },
-    "land_size_bands": {
-        "desc": "Beneficiaries split into MARGINAL / SMALL / SEMI-MEDIUM-and-above "
-                "landholding bands (below 1 ha, 1-2 ha, above 2 ha) — a distribution "
-                "over land-size classes. e.g. 'how many marginal farmers are there', "
-                "'break beneficiaries into land size bands'.",
-        "members": ["G06-S", "G06-D", "G06-M"],
-    },
-    "landholding_by_social_category": {
-        "desc": "The AVERAGE LANDHOLDING for each social category (SC/ST/BC/OC) — "
-                "area per category, showing whether some communities hold less land. "
-                "Reads pm_kisan. e.g. 'what is the distribution of declared area by "
-                "category', 'do SC/ST farmers hold less land'.",
-        "members": ["Q027"],
-    },
-    "largest_landholders": {
-        "desc": "The TOP-N largest landholders on the PM-KISAN roster, ranked by "
-                "declared area — a leaderboard of biggest farms, no subsidy figure. "
-                "e.g. 'who has the largest landholding in PM-KISAN', 'top 10 "
-                "landholders'.",
-        "members": ["R01"],
-    },
-    "ekyc_filtered_farmer_list": {
-        "desc": "The list of farmers at a NAMED eKYC status (pending or completed) "
-                "— a status-filtered roster list, with NO other filter. If the "
-                "question also names a CROP ('paddy farmers whose eKYC is pending') "
-                "the crop-filtered family applies instead; answering here would "
-                "silently drop the crop and return every pending farmer. e.g. "
-                "'which farmers have eKYC still pending'.",
-        "members": ["V05"],
-    },
-    "beneficiary_status_filtered_list": {
-        "desc": "The list of farmers at a NAMED beneficiary status (Included, "
-                "Excluded or Pending) — a status-filtered roster list, distinct "
-                "from eKYC. e.g. 'whose beneficiary status is Pending'.",
-        "members": ["V06"],
-    },
-    "gender_ekyc_camp_list": {
-        "desc": "Farmers of a named GENDER at a named eKYC STATUS, with mobile "
-                "numbers — the actionable list for running a targeted verification "
-                "camp. Two filters at once. e.g. 'list women farmers whose eKYC is "
-                "pending so we can run a camp'.",
-        "members": ["Q030"],
+    'alr_009__progress_exceptions': {
+        "desc": 'LISTS: Which GPs in a given block have an approved plan but no administratively approved activities in a given year. Returns approved_plans, admin_approved_activities, total_activities. One row per gp_name × block_name × district_name. Restricted to plans with an approval date. Filterable by district, block; answers state-wide when no place is named — one entry serves every scope. Caveat: Administrative approval proxied by admin_approved_cost > 0.',
+        "members": ['ALR-009'],
     },
 
-    # ══ DBT / installments ════════════════════════════════════════════════
-    "dbt_credited_by_geography": {
-        "desc": "How much PM-KISAN DBT money was CREDITED in each area — installment "
-                "amounts summed by district, mandal or village. Reads pm_kisan's "
-                "last_amount_credited. e.g. 'how much DBT was credited district by "
-                "district'.",
-        "members": ["G07-S", "G07-D", "G07-M"],
-    },
-    "missed_installment": {
-        "desc": "Farmers who have MISSED the most recent PM-KISAN installment — one "
-                "row per farmer behind on DBT, for the chosen area. e.g. 'which "
-                "farmers have missed the latest installment'.",
-        "members": ["G08-S", "G08-D", "G08-M"],
-    },
-    "latest_installment_summary": {
-        "desc": "A summary of the LATEST DBT CYCLE: which installment number it "
-                "was, how many farmers it reached and the total amount — one row "
-                "about the payment run, not about any farmer. e.g. 'what was the "
-                "last installment paid, to how many farmers, for how much'.",
-        "members": ["Q041"],
+    'alr_011__progress_exceptions': {
+        "desc": 'RANKS: Which blocks in a given district are below a given threshold percent activity completion in a given year. Returns activities, completed, started, completion_rate_pct. One row per block_name × district_name. Filterable by district; answers state-wide when no place is named — one entry serves every scope. Caveat: There is no mid-year cut-off in the data, so the whole year is measured.',
+        "members": ['ALR-011'],
     },
 
-    # ══ Input subsidy (agriculture) ═══════════════════════════════════════
-    "input_subsidy_by_geography": {
-        "desc": "How much INPUT/SEED SUBSIDY was disbursed in each area — amounts "
-                "and beneficiary counts grouped by district, mandal or village. "
-                "Reads agriculture, with geography resolved through the PM-KISAN "
-                "spine because agriculture stores codes only. Micro-irrigation is a "
-                "different measure. e.g. 'how much input subsidy went to each "
-                "district'.",
-        "members": ["G10-S", "G10-D", "G10-M"],
-    },
-    "crop_mix_subsidy": {
-        "desc": "The CROP MIX behind input subsidy for the chosen area — one row per "
-                "crop with farmers and subsidy amount, showing what is being "
-                "subsidised. e.g. 'what is the crop mix in this district', 'which "
-                "crops account for the most input subsidy'.",
-        "members": ["G11-S", "G11-D", "G11-M"],
-    },
-    "crop_registration_backlog": {
-        "desc": "How many eCrop CROP REGISTRATIONS are still awaiting approval in "
-                "the chosen area — the approval backlog by status. The only "
-                "statuses that exist are Approved, Pending and Under Review. e.g. "
-                "'how many crop registrations are pending'.",
-        "members": ["G12-S", "G12-D", "G12-M"],
-    },
-    "crop_registration_by_status": {
-        "desc": "Crop registrations filtered to ONE NAMED status — the list at that "
-                "status rather than a backlog count. Only Approved, Pending and "
-                "Under Review exist in this column: a query for any other status "
-                "(e.g. 'Damaged') correctly returns nothing and the answer is that "
-                "the status does not exist. e.g. 'which registered crops are marked "
-                "Damaged', 'which registrations are Under Review'.",
-        "members": ["V02"],
-    },
-    "subsidy_by_social_category": {
-        "desc": "How INPUT SUBSIDY money is distributed across social categories in "
-                "the chosen area — each category's share of farmers set against its "
-                "share of money, so the gap is the targeting story. e.g. 'how is "
-                "input subsidy distributed across categories'.",
-        "members": ["G13-S", "G13-D", "G13-M"],
-    },
-    "subsidy_equity_gap": {
-        "desc": "Whether TWO NAMED social categories' share of subsidy MONEY matches "
-                "their share of FARMERS — two percentages side by side with the gap, "
-                "statewide. A negative gap means under-allocation. e.g. 'is the "
-                "SC/ST share of subsidy in line with their share of farmers'.",
-        "members": ["Q024"],
-    },
-    "subsidy_equity_gap_by_district": {
-        "desc": "Which DISTRICTS give two named social categories a smaller share of "
-                "subsidy than their share of the farmer base — the equity gap "
-                "ranked by district, so it localises where targeting is weakest. "
-                "e.g. 'which districts under-allocate to SC/ST farmers'.",
-        "members": ["Q032"],
-    },
-    "subsidy_per_acre_by_land_band": {
-        "desc": "Whether SMALLER farmers get more or less subsidy PER ACRE — "
-                "subsidy intensity by land-size band, the progressivity test. Raw "
-                "totals always favour large farms, so this normalises. e.g. 'do "
-                "smaller farmers get more subsidy per acre'.",
-        "members": ["Q028"],
-    },
-    "top_subsidy_per_acre_farmers": {
-        "desc": "The individual FARMERS with the highest input subsidy PER ACRE of "
-                "land held — outlier subsidy rates, one row per farmer. Per-acre "
-                "normalisation surfaces anomalies raw amounts hide. e.g. 'who gets "
-                "the highest input subsidy per acre of land'.",
-        "members": ["Q094"],
-    },
-    "subsidy_per_acre_by_district": {
-        "desc": "Which DISTRICTS receive the most subsidy PER ACRE of farmland — "
-                "allocation intensity by district, comparable across districts of "
-                "different sizes. e.g. 'which districts get the most subsidy per "
-                "acre'.",
-        "members": ["Q139"],
-    },
-    "elite_capture_check": {
-        "desc": "How much INPUT SUBSIDY the TOP-N LARGEST LANDHOLDERS take — the "
-                "elite-capture check pairing farm size with money drawn. e.g. "
-                "'which largest landholders take the most input subsidy'.",
-        "members": ["Q035"],
-    },
-    "large_landholders_in_targeted_schemes": {
-        "desc": "LARGE landholders (above the small-farmer ceiling) who still "
-                "receive subsidies meant to be pro-poor — support flowing upward, "
-                "for the chosen area. Reads pm_kisan with agriculture and "
-                "horticulture. e.g. 'which large landholders receive targeted "
-                "subsidies'.",
-        "members": ["G44-S", "G44-D", "G44-M"],
-    },
-    "marginal_farmers_without_subsidy": {
-        "desc": "Farmers BELOW a hectare threshold who are on the PM-KISAN roster "
-                "but have NEVER taken an input subsidy — the highest-priority "
-                "outreach segment. BOTH conditions are required: a bare land-size "
-                "list with no mention of subsidy belongs to the plain "
-                "landholding-threshold family (this one returns roughly half as "
-                "many rows), and a bare 'never took an input subsidy' with no land "
-                "threshold is the roster-minus-one-scheme family with "
-                "scheme=Agriculture. e.g. 'which farmers under 1 hectare have never "
-                "taken input subsidy'.",
-        "members": ["Q036"],
-    },
-    "highest_input_subsidies": {
-        "desc": "The TOP-N single largest INPUT SUBSIDY payments and who received "
-                "them — a payment leaderboard from agriculture. e.g. 'who received "
-                "the highest input subsidy and how much'.",
-        "members": ["R02"],
-    },
-    "highest_district_input_subsidy": {
-        "desc": "The DISTRICT that recorded the largest SINGLE input subsidy "
-                "payment — the peak transaction per district, not the district "
-                "total, so an outlier payment a total would hide becomes visible. "
-                "e.g. 'which district received the highest single input subsidy'.",
-        "members": ["R04"],
-    },
-    "season_filtered_subsidy_list": {
-        "desc": "Farmers who took an input subsidy in ONE NAMED season (Kharif, "
-                "Rabi or Summer) — a season-filtered list of people. e.g. 'list "
-                "farmers who took subsidy in the Rabi season'.",
-        "members": ["V01"],
-    },
-    "seasonal_subsidy_totals": {
-        "desc": "How input subsidy totals split across seasons counted by "
-                "DISTINCT FARMERS — Kharif vs Rabi amounts with the number of "
-                "farmers who took subsidy in each, plus the "
-                "subsidy-to-farmer-contribution ratio (subsidyamount against "
-                "nonsubsidyamount). Aggregates, not a farmer list. The sibling "
-                "family reports the same cut counted by TRANSACTION. e.g. 'how many "
-                "farmers took input subsidy in each season', 'what is the total "
-                "subsidy amount by season'.",
-        "members": ["Q090"],
-    },
-    "crop_filtered_farmer_list": {
-        "desc": "Farmers who grow ONE NAMED crop and what subsidy they received — a "
-                "crop-filtered list of people from agriculture. e.g. 'which farmers "
-                "grow paddy and what subsidy did they get'.",
-        "members": ["V03"],
-    },
-    "crop_pattern_by_district": {
-        "desc": "The CROP PATTERN district by district — which crops are grown "
-                "where, from agriculture with district names resolved through the "
-                "PM-KISAN spine. e.g. 'show me the crop pattern by district'.",
-        "members": ["Q091"],
-    },
-    "seed_distribution": {
-        "desc": "How much SEED was distributed for each crop and VARIETY — input "
-                "quantities issued, by seed variety rather than by money. e.g. 'how "
-                "much seed was distributed for each crop and variety'.",
-        "members": ["Q093"],
-    },
-    "irrigation_method_distribution": {
-        "desc": "The IRRIGATION METHODS recorded against subsidised farmers — a "
-                "distribution over irrmethodcode values from agriculture. e.g. "
-                "'what irrigation methods are recorded against subsidised farmers'.",
-        "members": ["Q096"],
-    },
-    "subsidy_year_trend": {
-        "desc": "How input subsidy spend has moved YEAR ON YEAR — one row per crop "
-                "year, the trend line. e.g. 'how has subsidy spend moved year on "
-                "year'.",
-        "members": ["Q099"],
-    },
-    "crops_of_ekyc_filtered_farmers": {
-        "desc": "Which CROPS are grown by farmers at a NAMED eKYC status — the crop "
-                "mix of (un)verified farmers, joining agriculture to the roster's "
-                "verification state. e.g. 'what crops are grown by farmers whose "
-                "eKYC is pending'.",
-        "members": ["V08"],
-    },
-    "registered_crop_no_subsidy": {
-        "desc": "Farmers with a crop REGISTERED in eCrop but NO seed-subsidy record "
-                "for the same season — registered cultivation that never converted "
-                "into input support. Reads agriculture. e.g. 'which farmers have a "
-                "crop registered but no seed subsidy for the same season'.",
-        "members": ["M05"],
-    },
-    "registered_vs_procured_crop": {
-        "desc": "Whether farmers SELL THE SAME CROP they registered for input "
-                "subsidy — a crop mismatch between agriculture and markfed, per "
-                "farmer. Either a legitimate crop change or a subsidy drawn against "
-                "a crop never sown. e.g. 'do farmers sell the same crop they "
-                "registered for subsidy'.",
-        "members": ["Q095"],
-    },
-    "procurement_without_registration": {
-        "desc": "Farmers who sold produce to MARKFED with NO crop registration in "
-                "the agriculture system at all — unregistered supply, an absence "
-                "check between markfed and agriculture (not an overlap). e.g. "
-                "'which farmers sold to procurement without any eCrop registration'.",
-        "members": ["Q106"],
+    'alr_012__inactivity': {
+        "desc": "LISTS: Which GPs in a given block recorded no activity in a given year. Returns (SELECT COUNT(*). One row per matching record. An ABSENCE, read from the GP ROSTER: the Gram Panchayats with no matching record at all. A query over the activity table alone can never return these rows, because the rows it would need do not exist there. Reads the CASHBOOK (v_voucher) — cash basis, a different convention from the plan-basis expenditure questions. Filterable by block, district; answers state-wide when no place is named — one entry serves every scope. Caveat: 'Last N days' cannot be evaluated - activities carry no dates.",
+        "members": ['ALR-012'],
     },
 
-    # ══ Micro-irrigation / horticulture (APMIP) ═══════════════════════════
-    "micro_irrigation_coverage": {
-        "desc": "MICRO-IRRIGATION (APMIP/horticulture) coverage BROKEN DOWN BY "
-                "AREA — beneficiary counts, extent and subsidy grouped by district, "
-                "mandal or village, one row per place. Reads horticulture_apmip. "
-                "This is drip/sprinkler subsidy, never seed/input subsidy. For the "
-                "single-row statewide total with sanctioned-versus-released subsidy, "
-                "use the APMIP headline family instead. e.g. 'micro-irrigation "
-                "coverage by district', 'which mandals have the most APMIP "
-                "beneficiaries'.",
-        "members": ["G21-S", "G21-D", "G21-M"],
-    },
-    "district_horticulture_reach": {
-        "desc": "Within ONE NAMED district, which roster farmers DID and DID NOT "
-                "receive a horticulture/micro-irrigation subsidy — the reach-and-gap "
-                "list side by side for a district officer. e.g. 'which farmers in "
-                "this district got a horticulture subsidy'.",
-        "members": ["Q040"],
-    },
-    "apmip_stalled_sanctions": {
-        "desc": "Micro-irrigation sanctions where money has been SANCTIONED but "
-                "NOT RELEASED — the stalled-sanction list for the chosen area. "
-                "e.g. 'which beneficiaries have sanctioned but stalled subsidies', "
-                "'which micro-irrigation sanctions have seen no money released'.",
-        "members": ["G22-S", "G22-D", "G22-M"],
-    },
-    "apmip_approved_unpaid": {
-        "desc": "Micro-irrigation sanctions APPROVED on paper against which no money "
-                "has moved — separating a documentation problem from a treasury one, "
-                "statewide. e.g. 'which sanctions are approved but have seen no "
-                "money move'.",
-        "members": ["Q132"],
-    },
-    "apmip_inspection_backlog": {
-        "desc": "Micro-irrigation applications stuck in APPLICATION PROCESSING "
-                "— the approval backlog by Status (Pending and Under Review, "
-                "Approved excluded) for the chosen area. This is the application's "
-                "own approval state; the separate RANDOM INSPECTION process has its "
-                "own column and its own family, so a question naming 'random "
-                "inspection' or 'RI' belongs there, not here. e.g. 'what is the "
-                "inspection backlog', 'how many APMIP applications are pending "
-                "review'.",
-        "members": ["G23-S", "G23-D", "G23-M"],
-    },
-    "apmip_unit_cost": {
-        "desc": "The UNIT COST of micro-irrigation — cost and subsidy per hectare/acre "
-                "for the chosen area, so intensity can be compared across places. "
-                "e.g. 'what is the unit cost of micro-irrigation', 'subsidy per acre "
-                "in APMIP'.",
-        "members": ["G24-S", "G24-D", "G24-M"],
-    },
-    "apmip_release_position": {
-        "desc": "Per micro-irrigation BENEFICIARY, what was sanctioned versus "
-                "released versus still to be released — one row per beneficiary "
-                "with the balance. e.g. 'total Subsidy Amt released vs "
-                "BALANCE_AMOUNT_TO_RELEASE still pending per beneficiary'.",
-        "members": ["M04"],
-    },
-    "apmip_sanctioned_vs_released_total": {
-        "desc": "The STATEWIDE total of micro-irrigation subsidy SANCTIONED against "
-                "what has actually been RELEASED, and the pending balance — "
-                "aggregates, not a per-beneficiary list. e.g. 'how much APMIP "
-                "subsidy has been sanctioned versus released'.",
-        "members": ["Q044"],
-    },
-    "apmip_crop_season_mix": {
-        "desc": "Which CROPS and SEASONS the micro-irrigation programme covers — the "
-                "APMIP crop/season mix from horticulture_apmip. e.g. 'which crops "
-                "and seasons does micro-irrigation cover'.",
-        "members": ["Q097"],
-    },
-    "apmip_gender_share": {
-        "desc": "What SHARE of micro-irrigation subsidy goes to WOMEN beneficiaries "
-                "— the gender split of APMIP money. e.g. 'what share of "
-                "micro-irrigation subsidy goes to women'.",
-        "members": ["Q026"],
-    },
-    "apmip_dry_land_share": {
-        "desc": "How much micro-irrigation coverage sits on DRY LAND versus total "
-                "land — the rainfed share, which is the higher-value targeting "
-                "question. e.g. 'how much of micro-irrigation is on dry land'.",
-        "members": ["Q086"],
-    },
-    "districts_without_apmip": {
-        "desc": "DISTRICTS that have PM-KISAN farmers but NO micro-irrigation "
-                "beneficiary at all — the district-level white space for scheme "
-                "expansion. e.g. 'which districts are untouched by micro-irrigation'.",
-        "members": ["Q018"],
-    },
-    "mandals_without_apmip": {
-        "desc": "MANDALS that have PM-KISAN farmers but NO micro-irrigation "
-                "beneficiary — the same white-space check one level down, at "
-                "sub-district grain. e.g. 'which mandals have no micro-irrigation "
-                "beneficiary'.",
-        "members": ["Q142"],
+    'alr_013__inactivity': {
+        "desc": 'LISTS: Which GPs in a given district have no data entry for a given year in any module. Returns *. One row per matching record. Reads the CASHBOOK (v_voucher) — cash basis, a different convention from the plan-basis expenditure questions. Filterable by district, block; answers state-wide when no place is named — one entry serves every scope. Caveat: Checks the three modules that hold GP-level data: plan, activities and vouchers.',
+        "members": ['ALR-013'],
     },
 
-    # ══ Fisheries ═════════════════════════════════════════════════════════
-    "fisheries_coverage": {
-        "desc": "How many FISHERS/FCS members are registered in each area and how "
-                "much has been paid to them — counts and payouts grouped by "
-                "district, mandal or village. Reads fisheries. e.g. 'how many FCS "
-                "members exist per district', 'fisheries registrations by district'.",
-        "members": ["G25-S", "G25-D", "G25-M"],
-    },
-    "fisheries_headline": {
-        "desc": "The STATEWIDE fisheries summary in one row — how many fishers and "
-                "aqua farmers are registered and how much has been paid in total. "
-                "e.g. 'how many fishers are registered and how much has been paid'.",
-        "members": ["Q010"],
-    },
-    "fisheries_payment_pendency": {
-        "desc": "The fisheries PAYMENT position for the chosen area — paid against "
-                "unpaid claims and the value stuck. Reads fisheries. e.g. 'what is "
-                "the fisheries payment position', 'unpaid fisheries claims'.",
-        "members": ["G26-S", "G26-D", "G26-M"],
-    },
-    "aqua_extent": {
-        "desc": "The AQUA EXTENT position — water area under aquaculture and how "
-                "much of it is cultivable, for the chosen area. A land/water-area "
-                "measure, not a payment one. e.g. 'what area is under aquaculture "
-                "and how much is cultivable'.",
-        "members": ["G27-S", "G27-D", "G27-M"],
-    },
-    "fisheries_by_social_category": {
-        "desc": "What FISHERIES payments look like by SOCIAL CATEGORY — caste-wise "
-                "beneficiary counts and amounts within fisheries. e.g. 'what do "
-                "fisheries payments look like by social category'.",
-        "members": ["Q034"],
+    'ast_001__asset_creation': {
+        "desc": 'COUNTS: How many assets were created in a given gram panchayat during a given year. Returns asset_rows, asset_creating_activities, categorised_assets. One row per gp_name × block_name. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: activity_asset is sparsely populated: asset_category has values on 4,286 of 12,704 rows and asset_subcategory on 4,286;.',
+        "members": ['AST-001'],
     },
 
-    # ══ Sericulture ═══════════════════════════════════════════════════════
-    "sericulture_headline": {
-        "desc": "The STATEWIDE sericulture summary — how many silk farmers are "
-                "registered and what incentive has been paid in total. e.g. 'how "
-                "many sericulture farmers are registered and what incentive was "
-                "paid'.",
-        "members": ["Q011"],
-    },
-    "sericulture_productivity": {
-        "desc": "COCOON OUTPUT and incentive PER FARMER — one row per sericulture "
-                "farmer with quantity produced and incentive drawn, a productivity "
-                "view. e.g. 'what is the cocoon output and incentive per farmer'.",
-        "members": ["Q145"],
-    },
-    "sericulture_by_mandal": {
-        "desc": "Which MANDALS produce the most COCOON and what incentive they drew "
-                "— sericulture output grouped by mandal (a code in this dataset). "
-                "e.g. 'which mandals produce the most cocoon'.",
-        "members": ["Q146"],
-    },
-    "sericulture_payment_pendency": {
-        "desc": "How many SERICULTURE incentive transactions are not yet APPROVED "
-                "and what they are worth — the silk payment backlog. e.g. 'how many "
-                "sericulture incentive transactions are unapproved and what is their "
-                "value'.",
-        "members": ["Q049"],
-    },
-    "sericulture_gender_split": {
-        "desc": "How SERICULTURE incentive money splits between men and women — the "
-                "gender share within silk. e.g. 'how is sericulture incentive split "
-                "between men and women'.",
-        "members": ["Q033"],
+    'ast_002__asset_creation': {
+        "desc": 'COUNTS: What is the asset category-wise count of assets created in a given block for a given year. Returns asset_category_label, asset_rows, activities, expenditure. One row per asset_category_label. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: activity_asset is sparsely populated: asset_category has values on 4,286 of 12,704 rows and asset_subcategory on 4,286;.',
+        "members": ['AST-002'],
     },
 
-    # ══ MARKFED procurement ═══════════════════════════════════════════════
-    "procurement_by_geography": {
-        "desc": "How much was PROCURED (quantity and value) in each area — MSP "
-                "purchases grouped by district, mandal or village. Reads markfed. "
-                "e.g. 'how much was procured in each district'.",
-        "members": ["G14-S", "G14-D", "G14-M"],
-    },
-    "procurement_by_crop": {
-        "desc": "What quantity and value was procured FOR EACH CROP in the chosen "
-                "area — commodity-wise MSP purchases. e.g. 'what was procured by "
-                "crop'.",
-        "members": ["G15-S", "G15-D", "G15-M"],
-    },
-    "procurement_headline": {
-        "desc": "The STATEWIDE procurement summary — total produce MARKFED has "
-                "procured and total money paid to farmers, in one row. e.g. 'how "
-                "much produce has procurement bought and how much has been paid'.",
-        "members": ["Q012"],
-    },
-    "procured_but_unpaid": {
-        "desc": "Farmers who DELIVERED produce but have NOT been paid — the "
-                "field-actionable unpaid list with mobile numbers, for the chosen "
-                "area. Reads markfed. e.g. 'which farmers delivered produce but have "
-                "not been paid'.",
-        "members": ["G16-S", "G16-D", "G16-M"],
-    },
-    "procurement_pendency_by_geography": {
-        "desc": "How much procurement MONEY is STUCK in each area — the unpaid value "
-                "grouped by district, mandal or village, rather than the farmer "
-                "list. e.g. 'how much procurement payment is stuck district by "
-                "district'.",
-        "members": ["G17-S", "G17-D", "G17-M"],
-    },
-    "procurement_pendency_statewide": {
-        "desc": "The statewide procurement PAYMENT STATUS breakdown and how much "
-                "money is stuck — counts and value by payment status. e.g. 'what is "
-                "the payment status breakdown for procurement'.",
-        "members": ["Q046"],
-    },
-    "procurement_pendency_by_crop": {
-        "desc": "For which CROPS the largest share of procurement payment is still "
-                "PENDING — pendency by commodity rather than by place. e.g. 'for "
-                "which crops is the largest share of payment still pending'.",
-        "members": ["Q109"],
-    },
-    "procurement_reconciliation": {
-        "desc": "Procurement records that FAIL ARITHMETIC RECONCILIATION — amount "
-                "paid does not equal quantity times rate within 1% — one row per "
-                "billing anomaly for the chosen area. A data-integrity check, not a "
-                "pendency question. e.g. 'which procurement records do not "
-                "reconcile'.",
-        "members": ["G18-S", "G18-D", "G18-M"],
-    },
-    "procurement_yield_outliers": {
-        "desc": "Farmers who sold an IMPLAUSIBLY HIGH QUANTITY for the land they "
-                "hold — quantity per acre above a plausible ceiling, for the chosen "
-                "area. e.g. 'which farmers show implausible yields'.",
-        "members": ["G19-S", "G19-D", "G19-M"],
-    },
-    "procurement_equity_split": {
-        "desc": "How PROCUREMENT PAYMENTS split by GENDER and SOCIAL CATEGORY in the "
-                "chosen area — who sells to MARKFED, as counts and amounts. e.g. "
-                "'how do procurement payments split by gender and category'.",
-        "members": ["G20-S", "G20-D", "G20-M"],
-    },
-    "procurement_gender_gap": {
-        "desc": "Whether there is a GENDER GAP in the AVERAGE procurement payment "
-                "per farmer — mean payment for men against women, statewide. e.g. "
-                "'is there a gender gap in average procurement payment'.",
-        "members": ["Q039"],
-    },
-    "gender_filtered_procurement_list": {
-        "desc": "The list of farmers of ONE NAMED gender who received MARKFED "
-                "payments — a gender-filtered payment list of people, not a split. "
-                "e.g. 'which female farmers received procurement payments'.",
-        "members": ["V04"],
-    },
-    "highest_procurement_payments": {
-        "desc": "The TOP-N largest MARKFED PAYMENTS and who received them — a "
-                "payment leaderboard measured in rupees. e.g. 'who received the "
-                "highest procurement payment'.",
-        "members": ["R03"],
-    },
-    "largest_suppliers_by_quantity": {
-        "desc": "The TOP-N largest suppliers by QUANTITY procured — a volume "
-                "leaderboard, measured in produce not rupees. e.g. 'who are the "
-                "biggest sellers to MARKFED by quantity'.",
-        "members": ["Q107"],
-    },
-    "procurement_rate_variation": {
-        "desc": "The IMPLIED RATE PER UNIT for each crop and whether it varies by "
-                "district — a price-consistency check on whether farmers get the "
-                "same rate everywhere. e.g. 'what is the implied rate per unit for "
-                "each crop, and does it vary by district'.",
-        "members": ["Q103"],
-    },
-    "procurement_by_season": {
-        "desc": "How PROCUREMENT splits across SEASONS — Kharif against Rabi "
-                "purchases, quantity and value. e.g. 'how does procurement split "
-                "across seasons'.",
-        "members": ["Q108"],
-    },
-    "procurement_intensity_by_district": {
-        "desc": "The AVERAGE procurement value PER FARMER in each district relative "
-                "to their landholding — procurement intensity per acre, comparable "
-                "across districts. e.g. 'what is the procurement payment per farmer "
-                "and which district leads'.",
-        "members": ["Q111"],
+    'ast_003__asset_creation': {
+        "desc": 'COUNTS: How many a given asset sub-category assets exist across a given district for a given year. Returns asset_subcategory_label, asset_rows, gps, expenditure. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: activity_asset is sparsely populated: asset_category has values on 4,286 of 12,704 rows and asset_subcategory on 4,286;.',
+        "members": ['AST-003'],
     },
 
-    # ══ RySS / natural farming ════════════════════════════════════════════
-    "natural_farming_coverage": {
-        "desc": "How many NATURAL FARMING (RySS/APCNF) members there are in each "
-                "area and what acreage they cover — membership and area grouped by "
-                "district, mandal or village. e.g. 'how many APCNF members are "
-                "enrolled and what is the total acreage under natural farming'.",
-        "members": ["G28-S", "G28-D", "G28-M"],
-    },
-    "natural_farming_practice_mix": {
-        "desc": "The AREA under each natural-farming PRACTICE (C1, PMDS, S2S) for "
-                "the chosen area — the APCNF practice mix, each practice having its "
-                "own extent column. e.g. 'what area is under each natural farming "
-                "practice'.",
-        "members": ["G29-S", "G29-D", "G29-M"],
-    },
-    "natural_farming_survey_progress": {
-        "desc": "How the natural-farming field SURVEY is progressing MONTH BY MONTH "
-                "in the chosen area — completion over time, a progress trend rather "
-                "than a stock. e.g. 'how is the natural farming survey progressing'.",
-        "members": ["G30-S", "G30-D", "G30-M"],
-    },
-    "natural_farming_category_profile": {
-        "desc": "The SOCIAL CATEGORY profile of natural-farming members in the "
-                "chosen area — who joins APCNF, by caste. e.g. 'what is the category "
-                "profile of natural farming members'.",
-        "members": ["G31-S", "G31-D", "G31-M"],
-    },
-    "natural_farming_uptake_vs_roster": {
-        "desc": "How natural-farming ENROLMENT compares with the PM-KISAN base by "
-                "social category — an uptake RATE with the roster as denominator, "
-                "not a raw count. e.g. 'is natural farming reaching SC/ST farmers'.",
-        "members": ["Q031"],
-    },
-    "natural_farming_land_share": {
-        "desc": "What SHARE OF FARMLAND is under natural farming in each area — RySS "
-                "acreage against the roster's land base (converted to acres), a "
-                "penetration percentage. e.g. 'what share of farmland is under "
-                "natural farming, district by district'.",
-        "members": ["G43-S", "G43-D", "G43-M"],
+    'ast_006__asset_creation': {
+        "desc": 'COUNTS: How many immovable-type assets were created in a given block during a given year. Returns asset_type_label, asset_rows, activities. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: asset_type decodes to movable / Immovable but is populated on only a small share of rows;.',
+        "members": ['AST-006'],
     },
 
-    # ══ Land and survey records ═══════════════════════════════════════════
-    "land_record_extent_by_geography": {
-        "desc": "How much LAND is on record in each area — surveyed extent and "
-                "parcel counts from survey_land_records, grouped by district, mandal "
-                "or village. e.g. 'how much land is on record in each district'.",
-        "members": ["G32-S", "G32-D", "G32-M"],
-    },
-    "land_record_pendency": {
-        "desc": "Land records NOT YET APPROVED — mutation pendency for the chosen "
-                "area, one row per parcel awaiting clearance. e.g. 'which land "
-                "records are pending'.",
-        "members": ["G33-S", "G33-D", "G33-M"],
-    },
-    "land_record_pendency_count": {
-        "desc": "HOW MANY land records are stuck in pending or under-review status "
-                "— the mutation-pendency count by status, statewide, rather than the "
-                "parcel list. e.g. 'how many land records are stuck in pending "
-                "status'.",
-        "members": ["Q083"],
-    },
-    "pattadar_list_by_village": {
-        "desc": "The PATTADARS (land title holders) in ONE NAMED village — the "
-                "title-holder list for that village from survey_land_records. e.g. "
-                "'who is the pattadar in this village'.",
-        "members": ["V07"],
-    },
-    "khata_extent_by_village": {
-        "desc": "The TOTAL EXTENT recorded against each KHATA, village by village — "
-                "holdings aggregated by khata number. e.g. 'what is the total extent "
-                "recorded against each khata'.",
-        "members": ["Q077"],
-    },
-    "unverified_khatas": {
-        "desc": "PM-KISAN khata numbers with NO matching entry in the land records — "
-                "roster land claims with no revenue record behind them, the sharpest "
-                "single inclusion-error flag. e.g. 'which PM-KISAN khata numbers "
-                "have no matching land record'.",
-        "members": ["Q078"],
-    },
-    "unmatched_land_parcels": {
-        "desc": "Land parcels that CANNOT be matched to a PM-KISAN farmer by name "
-                "and village — survey_land_records carries no Aadhaar, so these are "
-                "a fuzzy-match review queue rather than errors. e.g. 'which land "
-                "parcels cannot be matched to a beneficiary'.",
-        "members": ["Q075"],
-    },
-    "contested_survey_numbers": {
-        "desc": "The same SURVEY NUMBER claimed by more than one person across "
-                "systems — overlapping land claims, either unrecorded subdivision or "
-                "a duplicate benefit claim. e.g. 'is the same survey number claimed "
-                "by more than one person'.",
-        "members": ["Q079"],
-    },
-    "cultivator_not_pattadar_by_survey": {
-        "desc": "SURVEY NUMBERS where the recorded CULTIVATOR differs from the "
-                "PATTADAR — the tenancy signal listed per survey number, joining "
-                "agriculture to survey_land_records. e.g. 'which records show a "
-                "pattadar different from the recorded cultivator for the same survey "
-                "number'.",
-        "members": ["M09"],
-    },
-    "cultivator_not_pattadar_count": {
-        "desc": "IN HOW MANY CASES the recorded cultivator differs from the pattadar "
-                "— the tenancy signal as a count within agriculture, not a per-survey "
-                "listing. e.g. 'in how many cases is the cultivator different from "
-                "the land title holder'.",
-        "members": ["Q074"],
-    },
-    "village_land_saturation": {
-        "desc": "For each VILLAGE, how the number of beneficiaries compares with the "
-                "LAND on record — beneficiaries per acre, where a high count against "
-                "a small land base suggests fragmentation or over-registration. e.g. "
-                "'how does the beneficiary count compare with land on record per "
-                "village'.",
-        "members": ["Q084"],
-    },
-    "apmip_extent_verification": {
-        "desc": "Whether the land EXTENT claimed for a MICRO-IRRIGATION subsidy "
-                "matches the revenue record — horticulture_apmip against "
-                "survey_land_records, both in acres so no conversion is needed. e.g. "
-                "'does the extent claimed for micro-irrigation match the land record'.",
-        "members": ["Q085"],
-    },
-    "natural_farming_acreage_verification": {
-        "desc": "Whether the ACREAGE claimed under NATURAL FARMING matches the "
-                "recorded land extent — ryss against survey_land_records. e.g. 'does "
-                "the acreage claimed under natural farming match the land records'.",
-        "members": ["Q087"],
+    'ast_007__asset_creation': {
+        "desc": "RANKS: Which asset category received the highest expenditure in a given district for a given year. Returns asset_category_label, asset_rows, expenditure. One row per asset_category_label. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: activity_asset is sparsely populated: asset_category has values on 4,286 of 12,704 rows and asset_subcategory on 4,286;.",
+        "members": ['AST-007'],
     },
 
-    # ══ Convergence rankings, scorecards, exclusion ═══════════════════════
-    "convergence_ranking_by_geography": {
-        "desc": "Areas ranked by the AVERAGE NUMBER OF SCHEMES per farmer — "
-                "districts, mandals or villages ordered by convergence breadth, with "
-                "the count of farmers receiving nothing alongside. Counts include "
-                "PM-KISAN. e.g. 'rank districts by average schemes per farmer', "
-                "'which areas converge best'.",
-        "members": ["G34-S", "G34-D", "G34-M"],
-    },
-    "convergence_by_social_category": {
-        "desc": "The AVERAGE NUMBER OF SCHEMES accessed by each SOCIAL CATEGORY — "
-                "does caste predict access, as a mean scheme count per category "
-                "(including PM-KISAN). e.g. 'what is the average number of schemes "
-                "accessed by each social category'.",
-        "members": ["Q038"],
-    },
-    "scheme_access_by_land_size": {
-        "desc": "Whether SCHEME ACCESS RISES WITH LANDHOLDING — average scheme count "
-                "per land-size band for the chosen area, the equity question of "
-                "whether bigger farmers capture more. Counts include PM-KISAN. e.g. "
-                "'does the number of schemes a farmer accesses rise with their "
-                "landholding'.",
-        "members": ["G45-S", "G45-D", "G45-M"],
-    },
-    "ekyc_pending_yet_paid": {
-        "desc": "Farmers whose eKYC is PENDING yet who are STILL RECEIVING benefits "
-                "— money moving to identities the system has not confirmed, for the "
-                "chosen area. Reads the roster's verification state against the "
-                "state schemes. e.g. 'which farmers have eKYC pending yet receive "
-                "scheme benefits'.",
-        "members": ["G37-S", "G37-D", "G37-M"],
-    },
-    "excluded_status_yet_paid": {
-        "desc": "Farmers whose BENEFICIARY STATUS is not 'Included' (Excluded or "
-                "Pending) yet who are still DRAWING benefits — status says stop, "
-                "payments say go. Distinct from the eKYC version, which is about "
-                "verification rather than entitlement. e.g. 'which excluded PM-KISAN "
-                "farmers are still receiving AP scheme benefits'.",
-        "members": ["Q128"],
-    },
-    "benefits_without_land_record": {
-        "desc": "Farmers receiving LAND-LINKED benefits who have NO land record at "
-                "all — unverifiable entitlements for the chosen area, joining the "
-                "roster and agriculture against survey_land_records. e.g. 'which "
-                "farmers have benefits but no land record'.",
-        "members": ["G38-S", "G38-D", "G38-M"],
-    },
-    "area_scorecard": {
-        "desc": "The one-page AREA SCORECARD — farmers, land, subsidy and "
-                "procurement side by side for each district, mandal or village, one "
-                "column per department. The standing review-meeting table. e.g. "
-                "'give me a district scorecard'.",
-        "members": ["G39-S", "G39-D", "G39-M"],
-    },
-    "beneficiary_register": {
-        "desc": "The full BENEFICIARY REGISTER for an area — every farmer listed "
-                "with what they have received from each department, one row per "
-                "farmer. The working list, not an aggregate. e.g. 'list every farmer "
-                "and what they have received'.",
-        "members": ["G40-S", "G40-D", "G40-M"],
+    'ast_008__asset_creation': {
+        "desc": 'COUNTS: How many assets were created under a given LSDG theme in a given block for a given year. Returns theme, asset_rows, activities, expenditure. One row per theme. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme mapping covers 17 of 30 focus areas.',
+        "members": ['AST-008'],
     },
 
-    # ══ Added by the template-fidelity pass (2026-07-30) ══════════════════
-    "apmip_statewide_headline": {
-        "desc": "The STATEWIDE micro-irrigation (APMIP) headline in one row — how "
-                "many beneficiaries there are in total, the acres covered, and the "
-                "subsidy sanctioned against the subsidy actually released. A single "
-                "summary row, not a per-district breakdown: G21 is the family that "
-                "splits the same coverage by district, mandal or village. e.g. 'how "
-                "many horticulture beneficiaries are there', 'total APMIP subsidy "
-                "sanctioned and released'.",
-        "members": ["Q147"],
-    },
-    "farmer_land_record_link": {
-        "desc": "Links ONE named farmer's PM-KISAN entry to their SURVEY LAND RECORD "
-                "on khata number — roster village and declared area against the "
-                "revenue record's pattadar name, survey number, status and recorded "
-                "extent, with the declared-over-recorded ratio. The record-linkage "
-                "view: F11 asks only whether the areas agree, this one shows the "
-                "matched record itself. e.g. 'link this farmer's land records to "
-                "their PM-KISAN entry', 'show the khata and survey number behind "
-                "this farmer's declared area'.",
-        "members": ["F13"],
-    },
-    "roster_in_all_six_state_schemes": {
-        "desc": "PM-KISAN roster farmers who are ALSO in every one of the six AP "
-                "STATE schemes — the full-house convergence list, one row per "
-                "farmer. Membership in the roster is the population being tested "
-                "(the inner join), so the six counted schemes are the state ones "
-                "only. Fixed at six: no scheme-count number is read from the "
-                "question, which is what separates it from the exactly-N family. "
-                "e.g. 'do any farmers receive PM-KISAN and all 6 AP schemes', "
-                "'farmers in every state programme as well as the roster'.",
-        "members": ["Q148"],
-    },
-    "landholding_by_category_and_band": {
-        "desc": "Landholding CROSS-TABULATED by social category AND land-size band "
-                "— SC/ST/BC/OC against marginal (<1 ha), small (1-2 ha) and "
-                "semi-medium-and-above (>2 ha), with farmer counts, total and "
-                "average area in each cell. The two-dimensional distribution, not "
-                "the per-category average (that is the averages-only family) and not "
-                "the bands alone. e.g. 'how is landholding distributed across social "
-                "categories by land size', 'land-size bands per caste category'.",
-        "members": ["Q149"],
-    },
-    "procurement_payment_per_farmer": {
-        "desc": "What EACH FARMER has been paid for MSP procurement — one row per "
-                "supplier with their delivery count, total quantity and total amount "
-                "paid, ranked so the biggest earners lead. A per-farmer league "
-                "table; the family that totals procurement by district or mandal is "
-                "the geographic one. Reads markfed. e.g. 'what has each farmer been "
-                "paid for procurement', 'who are the top procurement earners'.",
-        "members": ["Q151"],
-    },
-    "unreached_small_farmers": {
-        "desc": "Farmers BELOW a land threshold the query supplies who receive "
-                "nothing from any of the six STATE schemes — the most-entitled, "
-                "least-reached list. A size-filtered subset of the plain exclusion "
-                "list: use this one only when the question names a hectare "
-                "threshold or says 'small'/'marginal'. Being on the PM-KISAN roster "
-                "never counts as coverage here. e.g. 'which farmers below 1 hectare "
-                "receive nothing from any state scheme'.",
-        "members": ["Q152"],
-    },
-    "flagged_yet_credited_installment": {
-        "desc": "Farmers the roster has FLAGGED — beneficiary status Excluded or "
-                "Pending, or eKYC still pending — who were nonetheless CREDITED a "
-                "PM-KISAN INSTALLMENT, listed with the installment number, date and "
-                "amount. The central-DBT leakage leg: the eKYC-pending and "
-                "excluded-status families ask whether flagged farmers draw STATE "
-                "scheme benefits, this one asks whether PM-KISAN itself paid them, "
-                "and the plain status-list families apply no payment condition at "
-                "all. e.g. 'which excluded beneficiaries were still credited an "
-                "installment', 'eKYC pending but the money went out'.",
-        "members": ["Q153"],
-    },
-    "apmip_random_inspection_backlog": {
-        "desc": "Micro-irrigation applications whose RANDOM INSPECTION is pending or "
-                "under review — the RI_Status_Code backlog for the chosen area, "
-                "Approved excluded. Random inspection is a SEPARATE process from "
-                "application approval and the two disagree on most rows, so pick "
-                "this family whenever the question says 'random inspection' or 'RI' "
-                "and the application-processing backlog family whenever it says "
-                "inspection or verification backlog without naming RI. e.g. 'how "
-                "many beneficiaries have random inspection pending or under review', "
-                "'what is the RI backlog'.",
-        "members": ["G46-S", "G46-D", "G46-M"],
-    },
-    "seasonal_subsidy_by_transaction": {
-        "desc": "The season split of input subsidy counted by TRANSACTION — one row "
-                "per season with the number of subsidy transactions, subsidy total, "
-                "farmer contribution and the subsidy-to-contribution ratio. Same cut "
-                "as the per-farmer seasonal family, which counts DISTINCT FARMERS "
-                "instead; pick this one when the question is about transactions or "
-                "about the ratio itself, and that one when it is about how many "
-                "farmers took subsidy in each season. e.g. 'what is the input "
-                "subsidy by season and how does it compare with the farmers' own "
-                "contribution'.",
-        "members": ["Q150"],
+    'ast_009__asset_creation': {
+        "desc": "LISTS: Which GPs in a given block created no assets in a given year. Returns gp_name, block_name, district_name. One row per matching record. An ABSENCE, read from the GP ROSTER: the Gram Panchayats with no matching record at all. A query over the activity table alone can never return these rows, because the rows it would need do not exist there. Filterable by block, district; answers state-wide when no place is named — one entry serves every scope. Caveat: 'Created no assets' means no categorised asset row.",
+        "members": ['AST-009'],
     },
 
-    # ══ Casual-phrasing coverage (fidelity item 13, 2026-07-30) ═══════════
-    "crop_filtered_ekyc_pendency": {
-        "desc": "Farmers growing ONE NAMED CROP whose eKYC is still PENDING — a "
-                "crop-filtered verification worklist, one row per farmer. Pick "
-                "this over the plain eKYC-status list whenever a crop is named: "
-                "that family has no crop slot and silently answers for all crops. "
-                "The crops-per-status family is an aggregate of crop names, not a "
-                "list of people. e.g. 'give me a list of paddy farmers whose eKYC "
-                "is pending', 'cotton growers with eKYC not done'.",
-        "members": ["Q154"],
+    'ast_012__asset_creation': {
+        "desc": 'The YEAR-BY-YEAR trend of: How has the number of assets created per year in a given block changed. Returns asset_rows, categorised_assets, activities, expenditure. One row per fiscal_year. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: activity_asset is sparsely populated: asset_category has values on 4,286 of 12,704 rows and asset_subcategory on 4,286;.',
+        "members": ['AST-012'],
     },
-    "landholding_threshold_list": {
-        "desc": "The plain list of PM-KISAN farmers holding LESS THAN a given area, "
-                "with no other condition — name, place, category, hectares and "
-                "acres. This is the default for any bare 'farmers with under N "
-                "hectares / less than an acre' question. Three near neighbours add "
-                "a condition and must NOT be used for the bare question: one also "
-                "requires never having taken an input subsidy, one also requires "
-                "being in no state scheme, and the land-size-band family returns "
-                "counts per band rather than a list of people. Accepts acres and "
-                "converts (1 acre = 0.4047 ha). e.g. 'how many farmers with less "
-                "than 1 acre land', 'list of marginal farmers'.",
-        "members": ["Q155"],
+
+    'bud_001__budgeting': {
+        "desc": 'TOTALS: How much total funding is recorded for a given gram panchayat in a given year. Returns activities, plan_cost, approved_cost_action_plan, admin_approved_cost, actual_expenditure. One row per gp_name × block_name × fiscal_year. approved_cost_action_plan is the action-plan approved cost. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: There is no funds-available/receipts table at GP level tied to the plan.',
+        "members": ['BUD-001'],
     },
-    "farmer_name_search": {
-        "desc": "How many farmers SHARE A GIVEN NAME and where each of them is — "
-                "one row per namesake with district, village, land and status, plus "
-                "the total count of people with that name. The template for name "
-                "COLLISIONS: use it when the question asks to list or count "
-                "everyone called something, rather than to look one person up. The "
-                "single-farmer families answer about one person and will ask which "
-                "one is meant; here the ambiguity IS the answer. e.g. 'give me a "
-                "list of all farmers named Ramesh Naidu', 'how many farmers have "
-                "this name'.",
-        "members": ["F14"],
+
+    'bud_002__budgeting': {
+        "desc": 'TOTALS: How much funding is recorded from each funding source in a given year. Returns funding_source, activities, amount, pct_of_total. One row per funding_source. amount is CASHBOOK voucher amounts (cash basis), which is a different convention from the plan-basis expenditure most questions use. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Funding source is proxied by activity_expenditure.scheme_name, which has only 5 non-null values and is NULL on 82% of rows.',
+        "members": ['BUD-002'],
     },
-    "ecrop_registrations_by_year": {
-        "desc": "eCrop crop registrations BY YEAR — one row per crop year with the "
-                "distinct farmers who registered, the number of registrations and "
-                "the subsidy disbursed. The enrolment trend across all years at "
-                "once, so it is the right answer to 'each year' / 'year-wise' "
-                "questions that must not be clamped to a single year. e.g. 'how "
-                "many farmers registered crops in eCrop each year', 'eCrop "
-                "enrolment trend'.",
-        "members": ["Q156"],
+
+    'bud_003__budgeting': {
+        "desc": 'TOTALS: How much funding is sanctioned under tied and untied components in a given year. Returns tied_untied, activities, general_amount, sc_amount, st_amount, sanctioned_amount. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Tied/untied comes from admin_approval_scheme.scheme_component_code: 4249 = Tied Grant, 4211 = Basic Grant (untied), 4250 = Devolution of Fund (treated as untied).',
+        "members": ['BUD-003'],
+    },
+
+    'bud_004__budgeting': {
+        "desc": 'The PERCENTAGE for: What percentage of the total comes from each funding source in a given year. Returns funding_source, amount, pct_of_total. One row per funding_source. amount is CASHBOOK voucher amounts (cash basis), which is a different convention from the plan-basis expenditure most questions use. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Same scheme_name coverage caveat as BUD-002.',
+        "members": ['BUD-004'],
+    },
+
+    'bud_005__budgeting': {
+        "desc": 'The PERCENTAGE for: What percentage of the sanctioned budget is tied and untied in a given year. Returns tied_untied, sanctioned_amount, pct_of_sanctioned. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Tied/untied comes from admin_approval_scheme.scheme_component_code: 4249 = Tied Grant, 4211 = Basic Grant (untied), 4250 = Devolution of Fund (treated as untied).',
+        "members": ['BUD-005'],
+    },
+
+    'bud_006__budgeting': {
+        "desc": 'TOTALS: How much planned expenditure is allocated to each GPDP theme in a given year. Returns theme, activities, planned_cost, approved_cost, actual_expenditure. One row per theme. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme mapping covers 17 of 30 focus areas.',
+        "members": ['BUD-006', 'BUD-013'],
+    },
+
+    'bud_007__budgeting': {
+        "desc": "RANKS: Which GPDP theme has the highest planned expenditure in a given year. Returns theme, planned_cost, activities. One row per theme. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme mapping is partial.",
+        "members": ['BUD-007'],
+    },
+
+    'bud_008__budgeting': {
+        "desc": "RANKS: Which GPDP theme has the lowest planned expenditure in a given year. Returns theme, planned_cost, activities. One row per theme. A top-N list, lowest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme mapping is partial.",
+        "members": ['BUD-008'],
+    },
+
+    'bud_009__budgeting': {
+        "desc": 'The PERCENTAGE for: What percentage of total planned expenditure is allocated to each GPDP theme in a given year. Returns theme, planned_cost, pct_of_planned_cost. One row per theme. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme mapping is partial.',
+        "members": ['BUD-009'],
+    },
+
+    'bud_010__budgeting': {
+        "desc": "RANKS: Which GPDP themes have high planned expenditure but relatively few activities in a given year. Returns theme, activities, planned_cost, cost_per_activity, pct_of_activities, pct_of_cost. One row per theme. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'High' and 'low' are not defined in the source question, so the query ranks by cost per activity and shows both share columns.",
+        "members": ['BUD-010'],
+    },
+
+    'bud_011__budgeting': {
+        "desc": "RANKS: Which GPDP themes have many activities but relatively low planned expenditure in a given year. Returns theme, activities, planned_cost, cost_per_activity, pct_of_activities, pct_of_cost. One row per theme. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'High' and 'low' are not defined in the source question, so the query ranks by cost per activity and shows both share columns.",
+        "members": ['BUD-011'],
+    },
+
+    'bud_012__budgeting': {
+        "desc": 'LISTS: Which GPDP themes have no planned expenditure in a given year. Returns theme, activities, planned_cost. One row per theme. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Only themes that appear in the plan are considered;.',
+        "members": ['BUD-012'],
+    },
+
+    'bud_014__budgeting': {
+        "desc": 'The YEAR-BY-YEAR trend of: How has planned expenditure under each GPDP theme changed over the years. Returns theme, activities, planned_cost, actual_expenditure. One row per theme × fiscal_year. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme mapping is partial.',
+        "members": ['BUD-014', 'BUD-017'],
+    },
+
+    'bud_018__budgeting': {
+        "desc": 'TOTALS: How much planned expenditure is allocated to each focus area in a given year. Returns focus_area_name, activities, planned_cost, actual_expenditure. One row per focus_area_name. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['BUD-018'],
+    },
+
+    'bud_019__budgeting': {
+        "desc": 'COUNTS: How many activities under a given focus area have planned expenditure greater than zero in a given year. Returns focus_area_name, total_activities, activities_with_planned_cost, planned_cost. One row per focus_area_name. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['BUD-019'],
+    },
+
+    'bud_020__budgeting': {
+        "desc": "LISTS: What are the activities with expenditure under a given focus area in a given year. Returns activity_name, planned_cost, total_expenditure, status_label. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.",
+        "members": ['BUD-020'],
+    },
+
+    'bud_021__budgeting': {
+        "desc": "LISTS: What are the activities with zero expenditure under a given focus area in a given year. Returns activity_name, planned_cost, total_expenditure, status_label. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Restricted to activities with no expenditure recorded. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.",
+        "members": ['BUD-021'],
+    },
+
+    'bud_022__budgeting': {
+        "desc": "RANKS: Which focus area has the highest planned expenditure in a given year. Returns focus_area_name, planned_cost, activities. One row per focus_area_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.",
+        "members": ['BUD-022'],
+    },
+
+    'bud_023__budgeting': {
+        "desc": "RANKS: Which focus area has the lowest planned expenditure in a given year. Returns focus_area_name, planned_cost, activities. One row per focus_area_name. A top-N list, lowest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.",
+        "members": ['BUD-023'],
+    },
+
+    'bud_024__budgeting': {
+        "desc": 'The PERCENTAGE for: What percentage of total planned expenditure is allocated to each focus area in a given year. Returns focus_area_name, planned_cost, pct_of_planned_cost. One row per focus_area_name. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['BUD-024'],
+    },
+
+    'bud_025__budgeting': {
+        "desc": "RANKS: Which focus areas receive high planned expenditure but relatively few activities in a given year. Returns focus_area_name, activities, planned_cost, cost_per_activity, pct_of_activities, pct_of_cost. One row per focus_area_name. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'High' and 'low' are undefined;.",
+        "members": ['BUD-025'],
+    },
+
+    'bud_026__budgeting': {
+        "desc": "RANKS: Which focus areas receive many activities but relatively low planned expenditure in a given year. Returns focus_area_name, activities, planned_cost, cost_per_activity, pct_of_activities, pct_of_cost. One row per focus_area_name. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'High' and 'low' are undefined;.",
+        "members": ['BUD-026'],
+    },
+
+    'bud_027__budgeting': {
+        "desc": 'LISTS: Which focus areas receive no planned expenditure in a given year. Returns focus_area_name, activities, planned_cost. One row per focus_area_name. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['BUD-027'],
+    },
+
+    'dqy_001__missing_fields': {
+        "desc": 'COUNTS: How many activities in a given district have no focus area recorded for a given year. Returns total_activities, undecoded_focus_area, missing_focus_area, pct_unusable. A single summary row. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. A DATA-QUALITY check on how much of the data decodes at all, not a programme measure. Do not answer a coverage or spend question with it. Caveat: Separates genuinely missing focus areas from codes that exist but are not in the decoder.',
+        "members": ['DQY-001'],
+    },
+
+    'dqy_002__missing_fields': {
+        "desc": "LISTS: Which asset-creating activities in a given block have no asset details recorded in a given year. Returns activity_name, asset_category_label, asset_subcategory_label, total_expenditure. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. total_expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: This is the single biggest data-quality gap: asset detail is missing on roughly two-thirds of asset rows.",
+        "members": ['DQY-002'],
+    },
+
+    'dqy_003__missing_fields': {
+        "desc": "LISTS: Which administratively approved activities in a given block have a missing sanction order date or authority in a given year. Returns activity_name, adm_approval_no, sanction_day, sanction_authority_raw, tec_approval_order_no, tec_approval_order_date. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Restricted to activities that have an administrative approval (17% of them). admin_approved_cost is the administratively approved cost. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Unblocked by the new approval tables.",
+        "members": ['DQY-003'],
+    },
+
+    'dqy_004__missing_fields': {
+        "desc": 'COUNTS: How many activities in a given district have no funding scheme recorded for a given year. Returns total_activities, missing_scheme, pct_missing_scheme. A single summary row. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['DQY-004'],
+    },
+
+    'dqy_006__inconsistencies': {
+        "desc": "LISTS: Which activities in a given block are marked completed or ongoing but have no progress evidence in a given year. Returns activity_name, status_label, evidence_uploads, admin_approved_cost, total_expenditure. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. admin_approved_cost is the administratively approved cost. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Rewritten: the original compared status against asset stages, which do not exist.",
+        "members": ['DQY-006'],
+    },
+
+    'dqy_007__inconsistencies': {
+        "desc": "LISTS: Which activities in a given district have a zero or negative estimated cost recorded in a given year. Returns activity_name, total_cost, approved_cost_action_plan, total_expenditure, is_costless_activity, status_label. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. approved_cost_action_plan is the action-plan approved cost. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Activities flagged is_costless_activity = 1 are excluded, since a zero cost is legitimate for those.",
+        "members": ['DQY-007'],
+    },
+
+    'dqy_008__inconsistencies': {
+        "desc": "LISTS: Which activities within a given gram panchayat share identical descriptions in a given year. Returns activity_name, duplicate_count, activity_codes, combined_planned_cost. One row per gp_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Exact string match on activity_name within one GP and year.",
+        "members": ['DQY-008'],
+    },
+
+    'dqy_009__inconsistencies': {
+        "desc": "LISTS: For which activities in a given block does the sanctioned scheme funding not equal the approved cost in a given year. Returns activity_name, scheme_allocation_rows, fund_sanctioned_total, admin_approved_cost, work_proposed_cost, difference. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Restricted to activities that have an administrative approval (17% of them). fund_sanctioned_total is funds sanctioned under the approval's scheme components. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Unblocked by admin_approval_scheme.",
+        "members": ['DQY-009'],
+    },
+
+    'dqy_010__inconsistencies': {
+        "desc": 'LISTS: Which GPs in a given district show all-zero values in the physical-financial comparison for a given year. Returns activities, planned_cost, approved_cost, expenditure, started. One row per gp_name × block_name × district_name. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['DQY-010'],
+    },
+
+    'dqy_011__inconsistencies': {
+        "desc": "LISTS: Which activities in a given block report expenditure but have no payment vouchers in a given year. Returns activity_name, total_expenditure, vouchers, voucher_total. One row per activity_code × gp_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. total_expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Verified clean: all 1,911 activities with expenditure above zero have at least one linked voucher, so this query correctly returns no rows in every year.",
+        "members": ['DQY-011'],
+    },
+
+    'dss_001__prioritisation': {
+        "desc": "RANKS: Which focus areas in a given gram panchayat have high approved cost but completion below a given threshold percent in a given year. Returns focus_area_name, activities, approved_cost, expenditure, completed, completion_rate_pct. One row per focus_area_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Only 17 activities database-wide are complete, so almost every focus area falls below any threshold.",
+        "members": ['DSS-001'],
+    },
+
+    'dss_002__prioritisation': {
+        "desc": "RANKS: Which blocks in a given district combine high pending sanctions with low expenditure in a given year. Returns activities, pending_sanctions, pct_pending, planned_cost, expenditure, pct_utilised. One row per block_name × district_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district; answers state-wide when no place is named — one entry serves every scope. Caveat: 'High' and 'low' are undefined;.",
+        "members": ['DSS-002'],
+    },
+
+    'dss_003__prioritisation': {
+        "desc": "RANKS: Which asset sub-categories in a given block show the highest repeat-maintenance frequency in a given year. Returns asset_subcategory_label, maintenance_activities, years_with_maintenance, total_asset_rows, maintenance_expenditure. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Pooled across all years because a single year cannot show repeat maintenance.",
+        "members": ['DSS-003'],
+    },
+
+    'dss_005__prioritisation': {
+        "desc": "LISTS: Which ongoing activities in a given block have spent less than a given threshold percent of their sanctioned cost in a given year. Returns activity_name, admin_approved_cost, total_expenditure, pct_of_sanction_spent, status_label. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Counts only work ongoing. admin_approved_cost is the administratively approved cost. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: There is no date on activities, so 'with one quarter left' cannot be evaluated;.",
+        "members": ['DSS-005'],
+    },
+
+    'dss_006__prioritisation': {
+        "desc": "RANKS: Which GPs in a given block have the largest unspent balance in a given year. Returns activities, approved_cost, expenditure, unspent_balance, pct_utilised. One row per gp_name × block_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: There is no resource-envelope table, so 'unprogrammed envelope balance' is approximated by approved plan cost minus actual expenditure.",
+        "members": ['DSS-006'],
+    },
+
+    'exp_001__expenditure': {
+        "desc": 'TOTALS: What is the total actual expenditure incurred by a given gram panchayat in a given year. Returns activities, total_expenditure. One row per gp_name × block_name × fiscal_year. total_expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. TOTAL SPEND on the plan basis. The cashbook questions read v_voucher and answer a different accounting convention; never substitute one for the other.',
+        "members": ['EXP-001'],
+    },
+
+    'exp_002__expenditure': {
+        "desc": 'The YEAR-BY-YEAR trend of: How has the total actual expenditure of a given gram panchayat changed over the years. Returns activities, planned_cost, actual_expenditure, pct_utilised. One row per fiscal_year. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Six years are present: 2020-2021 to 2025-2026.',
+        "members": ['EXP-002'],
+    },
+
+    'exp_003__expenditure': {
+        "desc": 'The PERCENTAGE for: What percentage of the planned expenditure has been utilised in a given year. Returns planned_cost, actual_expenditure, pct_utilised. A single summary row. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['EXP-003'],
+    },
+
+    'exp_004__expenditure': {
+        "desc": "TOTALS: What is the total unspent amount (planned minus actual) in a given year. Returns planned_cost, actual_expenditure, unspent_amount, pct_unspent. A single summary row. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'Unspent' here is plan versus spend, not a cash balance - there is no opening/closing balance table.",
+        "members": ['EXP-004'],
+    },
+
+    'exp_005__expenditure': {
+        "desc": 'COUNTS: How many planned activities have recorded actual expenditure in a given year. Returns total_activities, activities_with_expenditure, pct_with_expenditure. A single summary row. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['EXP-005'],
+    },
+
+    'exp_006__expenditure': {
+        "desc": 'TOTALS: How much actual expenditure has been incurred under each funding source in a given year. Returns funding_source, activities, expenditure, pct_of_expenditure. One row per funding_source. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Funding source is proxied by scheme_name (5 non-null values, NULL on 82% of rows).',
+        "members": ['EXP-006', 'EXP-007'],
+    },
+
+    'exp_008__expenditure': {
+        "desc": 'TOTALS: How much actual expenditure has been incurred under tied and untied funds in a given year. Returns tied_untied, activities, sanctioned_amount, actual_expenditure, pct_utilised. Restricted to activities that have an administrative approval (17% of them). actual_expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Expenditure can only be split tied/untied for sanctioned activities.',
+        "members": ['EXP-008'],
+    },
+
+    'exp_009__expenditure': {
+        "desc": 'TOTALS: How much tied-fund expenditure was incurred under a given focus area in a given year. Returns focus_area_name, tied_untied, activities, sanctioned_amount, actual_expenditure. One row per focus_area_name. Restricted to activities that have an administrative approval (17% of them). actual_expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Pass $focus_area = NULL to see every focus area.',
+        "members": ['EXP-009', 'EXP-011'],
+    },
+
+    'exp_010__expenditure': {
+        "desc": 'COUNTS: How many activities have expenditure under a given focus area in a given year. Returns focus_area_name, activities, activities_with_expenditure, expenditure. One row per focus_area_name. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['EXP-010'],
+    },
+
+    'exp_012__expenditure': {
+        "desc": "RANKS: Which funding source has the highest utilisation in a given year. Returns funding_source, planned_cost, expenditure, unspent_amount, pct_utilised. One row per funding_source. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Funding source proxied by scheme_name.",
+        "members": ['EXP-012'],
+    },
+
+    'exp_013__expenditure': {
+        "desc": "RANKS: Which funding source has the largest unspent amount in a given year. Returns funding_source, planned_cost, expenditure, unspent_amount, pct_utilised. One row per funding_source. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Funding source proxied by scheme_name.",
+        "members": ['EXP-013'],
+    },
+
+    'exp_014__expenditure': {
+        "desc": 'TOTALS: What is the total actual expenditure under each GPDP theme in a given year. Returns theme, activities, planned_cost, actual_expenditure. One row per theme. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme mapping covers 17 of 30 focus areas.',
+        "members": ['EXP-014'],
+    },
+
+    'exp_015__expenditure': {
+        "desc": "RANKS: Which GPDP theme has the highest actual expenditure in a given year. Returns theme, actual_expenditure, activities. One row per theme. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. actual_expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme mapping is partial.",
+        "members": ['EXP-015'],
+    },
+
+    'exp_016__expenditure': {
+        "desc": "RANKS: Which GPDP theme has the lowest actual expenditure in a given year. Returns theme, actual_expenditure, activities. One row per theme. A top-N list, lowest first; $top_n = 1 answers 'which is the single highest/lowest'. actual_expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme mapping is partial.",
+        "members": ['EXP-016'],
+    },
+
+    'exp_017__expenditure': {
+        "desc": 'The PERCENTAGE for: What percentage of total actual expenditure goes to each GPDP theme in a given year. Returns theme, actual_expenditure, pct_of_expenditure. One row per theme. actual_expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme mapping is partial.',
+        "members": ['EXP-017'],
+    },
+
+    'exp_018__expenditure': {
+        "desc": "RANKS: Which GPDP themes have the highest expenditure utilisation in a given year. Returns theme, planned_cost, actual_expenditure, pct_utilised. One row per theme. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme mapping is partial.",
+        "members": ['EXP-018'],
+    },
+
+    'exp_019__expenditure': {
+        "desc": "RANKS: Which GPDP themes have the largest gap between planned and actual expenditure in a given year. Returns theme, planned_cost, actual_expenditure, gap_amount, gap_pct. One row per theme. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme mapping is partial.",
+        "members": ['EXP-019'],
+    },
+
+    'exp_020__expenditure': {
+        "desc": "RANKS: Which theme has the highest utilisation of 15th CFC funds at Block level in a given year. Returns theme, funding_source, planned_cost, actual_expenditure, pct_utilised. One row per theme × funding_source. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Pass $scheme = 'XV Finance Commission' for CFC or '5TH STATE FINANCE COMMISSION' for SFC.",
+        "members": ['EXP-020', 'EXP-021', 'EXP-022'],
+    },
+
+    'exp_023__expenditure': {
+        "desc": 'The PERCENTAGE for: What percentage of sanctioned funds was utilised in a given year. Returns admin_sanctioned, actual_expenditure, pct_of_sanctioned_utilised. A single summary row. actual_expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: admin_approved_cost is populated on only 2,247 of 12,730 expenditure rows, so the denominator is incomplete.',
+        "members": ['EXP-023'],
+    },
+
+    'exp_024__expenditure': {
+        "desc": 'TOTALS: What are the receipts, payments and closing balance for a given gram panchayat in a given year. Returns receipts, payments, closing_balance, pct_utilised. One row per gp_name × block_name × fiscal_year. pct_utilised is utilisation as a percentage of the approved cost. Reads the CASHBOOK (v_voucher) — cash basis, a different convention from the plan-basis expenditure questions. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Derived from the voucher cashbook.',
+        "members": ['EXP-024'],
+    },
+
+    'exp_025__expenditure': {
+        "desc": 'TOTALS: What is the total actual expenditure under each focus area in a given year. Returns focus_area_name, activities, planned_cost, actual_expenditure. One row per focus_area_name. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['EXP-025'],
+    },
+
+    'exp_026__expenditure': {
+        "desc": 'COUNTS: How many activities have expenditure under a given focus area in a given year. Returns focus_area_name, activities_with_expenditure, total_activities, expenditure. One row per focus_area_name. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Duplicate of EXP-010 in the source list.',
+        "members": ['EXP-026', 'EXP-030'],
+    },
+
+    'exp_027__expenditure': {
+        "desc": "LISTS: List the activities with expenditure under a given focus area in a given year. Returns activity_name, focus_area_name, approved_cost_action_plan, total_expenditure, status_label. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. approved_cost_action_plan is the action-plan approved cost. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.",
+        "members": ['EXP-027'],
+    },
+
+    'exp_028__expenditure': {
+        "desc": "RANKS: Which focus area has the highest actual expenditure in a given year. Returns focus_area_name, actual_expenditure, activities. One row per focus_area_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. actual_expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Set the geography parameters to choose the GP, Block or District level.",
+        "members": ['EXP-028'],
+    },
+
+    'exp_029__expenditure': {
+        "desc": "RANKS: Which focus area has the lowest actual expenditure in a given year. Returns focus_area_name, actual_expenditure, activities. One row per focus_area_name. A top-N list, lowest first; $top_n = 1 answers 'which is the single highest/lowest'. actual_expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Set the geography parameters to choose the GP, Block or District level.",
+        "members": ['EXP-029'],
+    },
+
+    'exp_031__expenditure': {
+        "desc": "RANKS: Which activities have the highest expenditure in a given year. Returns activity_name, focus_area_name, approved_cost_action_plan, total_expenditure, status_label. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. approved_cost_action_plan is the action-plan approved cost. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.",
+        "members": ['EXP-031', 'EXP-032'],
+    },
+
+    'exp_033__expenditure': {
+        "desc": "LISTS: Which high-value activities (planned cost above a given amount) have no expenditure in a given year. Returns activity_name, approved_cost_action_plan, total_cost, status_label. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Restricted to activities with no expenditure recorded. approved_cost_action_plan is the action-plan approved cost. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'High-value' was undefined in the source question, so it is now the $amount_threshold parameter.",
+        "members": ['EXP-033'],
+    },
+
+    'exp_034__expenditure': {
+        "desc": "LISTS: Which activities have actual expenditure equal to the planned expenditure in a given gram panchayat in a given year. Returns activity_name, planned_cost, total_expenditure, variance, status_label. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.",
+        "members": ['EXP-034'],
+    },
+
+    'exp_035__expenditure': {
+        "desc": "LISTS: Which activities have actual expenditure exceeding the planned expenditure in a given gram panchayat in a given year. Returns activity_name, planned_cost, total_expenditure, variance, status_label. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.",
+        "members": ['EXP-035'],
+    },
+
+    'exp_036__expenditure': {
+        "desc": "TOTALS: How much expenditure went on creation of new assets in a given gram panchayat in a given year. Returns work_type_label, activities, planned_cost, actual_expenditure. One row per work_type_label. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Uses work_type = 'New/Fresh'.",
+        "members": ['EXP-036'],
+    },
+
+    'exp_037__expenditure': {
+        "desc": "TOTALS: How much expenditure went on repair and maintenance in a given gram panchayat in a given year. Returns work_type_label, activities, planned_cost, actual_expenditure. One row per work_type_label. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Uses work_type = 'Maintenance'.",
+        "members": ['EXP-037'],
+    },
+
+    'exp_038__expenditure': {
+        "desc": "TOTALS: How much expenditure went on administrative activities in a given year. Returns focus_area_name, activities, planned_cost, actual_expenditure. One row per focus_area_name. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'Administrative' is interpreted as the focus areas 'Administrative & Technical Support' and 'GP Office Infrastructure';.",
+        "members": ['EXP-038'],
+    },
+
+    'fnd_001__tied_untied_funds': {
+        "desc": 'TOTALS: What is the split of tied and untied funds sanctioned to activities of a given gram panchayat in a given year. Returns tied_untied, fund_component_name, sanctioned_activities, sanctioned_amount, pct_of_sanctioned. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Tied/untied comes from admin_approval_scheme.scheme_component_code: 4249 = Tied Grant, 4211 = Basic Grant (untied), 4250 = Devolution of Fund (treated as untied).',
+        "members": ['FND-001'],
+    },
+
+    'fnd_002__tied_untied_funds': {
+        "desc": "RANKS: Which focus areas consume the largest share of tied funds in a given block in a given year. Returns focus_area_name, tied_activities, tied_amount, pct_of_tied_funds. One row per focus_area_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Tied/untied comes from admin_approval_scheme.scheme_component_code: 4249 = Tied Grant, 4211 = Basic Grant (untied), 4250 = Devolution of Fund (treated as untied).",
+        "members": ['FND-002'],
+    },
+
+    'fnd_003__tied_untied_funds': {
+        "desc": "COUNTS: How many activities in a given gram panchayat are funded entirely from untied funds in a given year. Returns untied_only_activities, tied_activities, other_component_activities, sanctioned_activities, untied_amount. A single summary row. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'Entirely' is taken from the dominant component on the activity.",
+        "members": ['FND-003'],
+    },
+
+    'fnd_004__tied_untied_funds': {
+        "desc": 'The PERCENTAGE for: What percentage of sanctioned funds in a given district is tied in a given year. Returns total_sanctioned, tied_amount, untied_amount, other_amount, pct_tied. A single summary row. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Tied/untied comes from admin_approval_scheme.scheme_component_code: 4249 = Tied Grant, 4211 = Basic Grant (untied), 4250 = Devolution of Fund (treated as untied).',
+        "members": ['FND-004'],
+    },
+
+    'fnd_005__category_funds': {
+        "desc": 'TOTALS: How much of the sanctioned funding in a given block is earmarked for SC and ST categories in a given year. Returns sanctioned_activities, general_sanctioned, sc_sanctioned, st_sanctioned, total_sanctioned, pct_sc_st. A single summary row. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Now uses the real earmark columns from admin_approval_scheme rather than the spent split.',
+        "members": ['FND-005'],
+    },
+
+    'fnd_006__category_funds': {
+        "desc": 'COMPARES: How does the SC-category funding of a given gram panchayat compare with its total for a given year. Returns sc_targeted_activities, sc_amount, total_amount, pct_sc. One row per gp_name × block_name. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: No resource-envelope or allocation table exists in the database - only actual expenditure is recorded, so planned allocation cannot be compared against it.',
+        "members": ['FND-006'],
+    },
+
+    'fnd_007__category_funds': {
+        "desc": 'LISTS: Which GPs in a given block have sanctioned activities but no SC/ST earmark in a given year. Returns sanctioned_activities, total_sanctioned, sc_st_sanctioned. One row per gp_name × block_name × district_name. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Still no resource-envelope table, so this lists GPs with zero SC/ST earmark rather than GPs that had an envelope and did not use it.',
+        "members": ['FND-007'],
+    },
+
+    'fnd_008__multi_scheme': {
+        "desc": 'LISTS: Which activities in a given gram panchayat are funded from more than one scheme in a given year. Returns distinct_schemes, schemes, total_expenditure. One row per activity_code × gp_name × block_name. total_expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Queries activity_expenditure directly (not v_activity) because the view collapses duplicate rows.',
+        "members": ['FND-008'],
+    },
+
+    'fnd_009__multi_scheme': {
+        "desc": "RANKS: Which scheme funds the largest number of activities in a given block in a given year. Returns scheme_name, activities, expenditure. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: scheme_name is NULL on 82% of expenditure rows;.",
+        "members": ['FND-009'],
+    },
+
+    'fnd_010__multi_scheme': {
+        "desc": "TOTALS: What is the total amount recorded per scheme across a given district in a given year. Returns scheme_name, activities, approved_cost, expenditure, pct_of_expenditure. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'Fund allocated' is not stored;.",
+        "members": ['FND-010'],
+    },
+
+    'imp_001__implementation': {
+        "desc": "COUNTS: How many planned activities have been initiated in a given gram panchayat in a given year. Returns planned_activities, initiated_activities, initiation_rate_pct. A single summary row. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'Initiated' = status WORK ONGOING or WORK COMPLETED.",
+        "members": ['IMP-001'],
+    },
+
+    'imp_002__implementation': {
+        "desc": 'COUNTS: How many initiated activities have been completed in a given year. Returns initiated_activities, completed_activities, completion_rate_pct. A single summary row. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Progress is read from activity_status.',
+        "members": ['IMP-002'],
+    },
+
+    'imp_003__implementation': {
+        "desc": "COUNTS: How many planned activities have not yet been initiated in a given gram panchayat in a given year. Returns planned_activities, not_initiated, cost_not_initiated. A single summary row. Counts only activities not yet started. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Includes both 'Activity Approved' and 'UNDER APPROVAL' activities.",
+        "members": ['IMP-003'],
+    },
+
+    'imp_004__implementation': {
+        "desc": 'The PERCENTAGE for: What is the initiation rate under each theme and focus area in a given year. Returns theme, focus_area_name, planned_activities, initiation_count, initiation_rate_pct. One row per theme × focus_area_name. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Progress is read from activity_status.',
+        "members": ['IMP-004'],
+    },
+
+    'imp_005__implementation': {
+        "desc": 'The PERCENTAGE for: What is the completion rate under each theme and focus area in a given year. Returns theme, focus_area_name, planned_activities, completion_count, completion_rate_pct. One row per theme × focus_area_name. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Progress is read from activity_status.',
+        "members": ['IMP-005'],
+    },
+
+    'imp_006__implementation': {
+        "desc": "RANKS: Which themes have the highest number of completed activities in a given year. Returns theme, planned_activities, completed_activities, completion_rate_pct. One row per theme. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Progress is read from activity_status.",
+        "members": ['IMP-006'],
+    },
+
+    'imp_007__implementation': {
+        "desc": "RANKS: Which themes have the largest implementation gap (planned versus initiated) in a given year. Returns theme, planned_activities, initiated_activities, implementation_gap, gap_pct. One row per theme. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Progress is read from activity_status.",
+        "members": ['IMP-007'],
+    },
+
+    'imp_008__implementation': {
+        "desc": "RANKS: Which focus area has the highest number of completed activities in a given year. Returns focus_area_name, planned_activities, completed_activities. One row per focus_area_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Progress is read from activity_status.",
+        "members": ['IMP-008'],
+    },
+
+    'imp_009__implementation': {
+        "desc": "RANKS: Which focus area has the lowest completion rate in a given year. Returns focus_area_name, planned_activities, completed_activities, completion_rate_pct. One row per focus_area_name. A top-N list, lowest first; $top_n = 1 answers 'which is the single highest/lowest'. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: $threshold sets a minimum activity count so focus areas with one or two activities do not dominate the ranking.",
+        "members": ['IMP-009'],
+    },
+
+    'imp_010__implementation': {
+        "desc": "RANKS: Which focus areas have the largest implementation gap (planned versus initiated) in a given year. Returns focus_area_name, planned_activities, initiated_activities, implementation_gap, gap_pct. One row per focus_area_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Progress is read from activity_status.",
+        "members": ['IMP-010'],
+    },
+
+    'imp_011__implementation': {
+        "desc": "RANKS: Which focus areas have the largest number of ongoing activities in a given year. Returns focus_area_name, ongoing_activities, planned_activities, expenditure_on_ongoing. One row per focus_area_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Counts only work ongoing. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.",
+        "members": ['IMP-011'],
+    },
+
+    'imp_012__implementation': {
+        "desc": "RANKS: Which themes receive funds but show poor implementation in a given year. Returns theme, planned_activities, expenditure, completed_activities, completion_rate_pct. One row per theme. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'Poor implementation' is undefined in the source question;.",
+        "members": ['IMP-012'],
+    },
+
+    'imp_013__implementation': {
+        "desc": "LISTS: Which high-expenditure activities have not yet started in a given year. Returns activity_name, approved_cost_action_plan, total_expenditure, status_label. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Counts only activities not yet started. approved_cost_action_plan is the action-plan approved cost. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'High-expenditure' is now the $amount_threshold parameter.",
+        "members": ['IMP-013'],
+    },
+
+    'imp_014__implementation': {
+        "desc": "RANKS: Which themes have the greatest mismatch between planning and expenditure in a given year. Returns theme, activities, pct_of_activities, expenditure, pct_of_expenditure, share_gap_pts. One row per theme. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Mismatch is measured as the gap between a theme's share of activities and its share of spend.",
+        "members": ['IMP-014'],
+    },
+
+    'imp_015__implementation': {
+        "desc": "The YEAR-BY-YEAR trend of: Which GPDP themes consistently perform well in implementation across years. Returns theme, years_present, total_activities, started, completed, avg_initiation_rate_pct. One row per theme. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'Consistently' is not defined in the source question;.",
+        "members": ['IMP-015'],
+    },
+
+    'imp_016__implementation': {
+        "desc": "The YEAR-BY-YEAR trend of: Which GPDP themes consistently underperform in implementation across years. Returns theme, years_present, total_activities, started, completed, avg_initiation_rate_pct. One row per theme. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'Consistently' is not defined in the source question;.",
+        "members": ['IMP-016'],
+    },
+
+    'imp_017__implementation': {
+        "desc": "The YEAR-BY-YEAR trend of: Which types of activity remain incomplete across multiple years. Returns activity_name, years_appearing, occurrences, completed, planned_cost. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Groups on the exact activity_name string.",
+        "members": ['IMP-017'],
+    },
+
+    'imp_018__implementation': {
+        "desc": "LISTS: Which activities are marked Work Ongoing despite expenditure reaching the approved cost in a given year. Returns activity_name, approved_cost_action_plan, total_expenditure, pct_of_approved_spent, status_label. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Counts only work ongoing. approved_cost_action_plan is the action-plan approved cost. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.",
+        "members": ['IMP-018'],
+    },
+
+    'imp_019__implementation': {
+        "desc": "RANKS: Which themes should be prioritised for implementation support in a given year. Returns theme, planned_activities, started, initiation_rate_pct, approved_cost, expenditure. One row per theme. A top-N list, lowest first; $top_n = 1 answers 'which is the single highest/lowest'. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Advisory question with no defined rule.",
+        "members": ['IMP-019'],
+    },
+
+    'imp_020__implementation': {
+        "desc": "RANKS: Which focus areas should be prioritised for implementation support in a given year. Returns focus_area_name, planned_activities, started, initiation_rate_pct, approved_cost, expenditure. One row per focus_area_name. A top-N list, lowest first; $top_n = 1 answers 'which is the single highest/lowest'. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Advisory question with no defined rule.",
+        "members": ['IMP-020'],
+    },
+
+    'imp_021__implementation': {
+        "desc": "LISTS: Which activities should be carried forward to the next GPDP because they are incomplete in a given year. Returns activity_name, focus_area_name, status_label, approved_cost_action_plan, total_expenditure, unspent_amount. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. approved_cost_action_plan is the action-plan approved cost. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'Should be carried forward' is a policy judgement;.",
+        "members": ['IMP-021'],
+    },
+
+    'imp_022__implementation': {
+        "desc": "RANKS: Which schemes have the highest number of delayed or incomplete activities in a given year. Returns scheme_name, activities, incomplete_activities, ongoing, abandoned, pct_incomplete. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: No planned end-date exists, so 'delayed' cannot be measured;.",
+        "members": ['IMP-022'],
+    },
+
+    'phy_001__asset_stages': {
+        "desc": "LOOKS UP: What physical-progress evidence has been recorded for activity a given activity. Returns activity_name, status_label, geotagged_uploads, file_upload_id). One row per matching record. Caveat: physical_progress holds geotagged photo uploads, not a stage model - there are no stage names or stage dates, so the original 'current stage of each asset' cannot be answered.",
+        "members": ['PHY-001'],
+    },
+
+    'phy_003__asset_stages': {
+        "desc": "COUNTS: How many assets in a given gram panchayat belong to completed activities in a given year. Returns asset_rows, assets_under_completed_activities. One row per gp_name × block_name. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: There is no per-asset completion flag, so the parent activity's status is used instead.",
+        "members": ['PHY-003'],
+    },
+
+    'phy_004__asset_stages': {
+        "desc": "COUNTS: How many activities in a given block have physical-progress evidence recorded in a given year. Returns status_label, activities, with_evidence, total_uploads, pct_with_evidence. One row per status_label. Restricted to activities with geotagged progress evidence. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Rewritten from 'assets at each implementation stage' to 'activities with progress evidence', which is what physical_progress actually supports.",
+        "members": ['PHY-004'],
+    },
+
+    'pln_001__planning': {
+        "desc": 'COUNTS: How many Gram Panchayats in a given district/a given block have uploaded the GPDP in a given year. Returns gps_with_gpdp. A single summary row. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. UPLOADED a GPDP, which is any plan row — not the approved subset; the approval question is the neighbouring one. Caveat: A row in plan = an uploaded GPDP.',
+        "members": ['PLN-001'],
+    },
+
+    'pln_002__planning': {
+        "desc": "COUNTS: How many GPs in a given district/a given block have the GPDP approved in a given year. Returns gps_approved. A single summary row. Restricted to plans with an approval date. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. APPROVED plans specifically. Because plan_code_status is entirely NULL, approval is proxied by an approval date, and every loaded plan has one, so this currently returns the same figure as the 'uploaded' question — say so rather than presenting them as two different findings. Caveat: plan_code_status is 100% NULL, so approval is proxied by approval_date IS NOT NULL.",
+        "members": ['PLN-002', 'PLN-013'],
+    },
+
+    'pln_003__planning': {
+        "desc": 'The PERCENTAGE for: What percentage of Gram Panchayats in a given block have uploaded their GPDP in a given year. Returns total_gps, gps_uploaded, pct_uploaded. One row per block_name. Counted FROM THE GP ROSTER by LEFT JOIN, so panchayats with zero activity are still in the denominator and still appear — which is the finding a review meeting is looking for. Filterable by block, district; answers state-wide when no place is named — one entry serves every scope. Caveat: Denominator is the GPs present in gram_panchayat (20 loaded), not the full official roster.',
+        "members": ['PLN-003'],
+    },
+
+    'pln_004__planning': {
+        "desc": 'The PERCENTAGE for: What percentage of Gram Panchayats in a given district have uploaded their GPDP in a given year. Returns total_gps, gps_uploaded, pct_uploaded. One row per district_name. Counted FROM THE GP ROSTER by LEFT JOIN, so panchayats with zero activity are still in the denominator and still appear — which is the finding a review meeting is looking for. Filterable by block, district; answers state-wide when no place is named — one entry serves every scope. Caveat: Denominator is the GPs present in gram_panchayat (20 loaded), not the full official roster.',
+        "members": ['PLN-004'],
+    },
+
+    'pln_005__planning': {
+        "desc": 'LISTS: Which Gram Panchayats have not yet uploaded their GPDP in a given year. Returns gp_name, block_name, district_name. One row per matching record. An ABSENCE, read from the GP ROSTER: the Gram Panchayats with no matching record at all. A query over the activity table alone can never return these rows, because the rows it would need do not exist there. Filterable by district, block; answers state-wide when no place is named — one entry serves every scope. The GPs that filed NOTHING — an absence, listed from the roster by LEFT JOIN, so a GP with no plan still appears. That is the finding a review meeting wants and the opposite of the counting questions. Caveat: Returns zero rows when every loaded GP has a plan for that year.',
+        "members": ['PLN-005'],
+    },
+
+    'pln_006__planning': {
+        "desc": "LISTS: Which Blocks have achieved 100% GPDP submission in a given year. Returns total_gps, gps_uploaded. One row per block_name × district_name. Counted FROM THE GP ROSTER by LEFT JOIN, so panchayats with zero activity are still in the denominator and still appear — which is the finding a review meeting is looking for. Filterable by district; answers state-wide when no place is named — one entry serves every scope. Caveat: '100%' is measured against loaded GPs only.",
+        "members": ['PLN-006'],
+    },
+
+    'pln_007__planning': {
+        "desc": "RANKS: Which Districts have the lowest GPDP submission rate in a given year. Returns total_gps, gps_uploaded, pct_uploaded. One row per district_name. A top-N list, lowest first; $top_n = 1 answers 'which is the single highest/lowest'. Counted FROM THE GP ROSTER by LEFT JOIN, so panchayats with zero activity are still in the denominator and still appear — which is the finding a review meeting is looking for. Caveat: Rate is over loaded GPs only.",
+        "members": ['PLN-007'],
+    },
+
+    'pln_008__planning': {
+        "desc": 'COUNTS: How many GPs in a given block uploaded the GPDP after the deadline a given deadline in a given year. Returns gps_late. A single summary row. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: No upload-date column exists;.',
+        "members": ['PLN-008', 'PLN-009'],
+    },
+
+    'pln_010__planning': {
+        "desc": 'LISTS: Which GPs in a given block/a given district uploaded the GPDP after the deadline a given deadline in a given year. Returns plan_type, approval_date, deadline, days_late. One row per matching record. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: approval_date used as the upload timestamp;.',
+        "members": ['PLN-010'],
+    },
+
+    'pln_011__planning': {
+        "desc": 'COUNTS: How many GPs uploaded the GPDP before and how many after the deadline a given deadline in a given year. Returns on_time_gps, late_gps, total_gps. A single summary row. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: approval_date used as the upload timestamp.',
+        "members": ['PLN-011'],
+    },
+
+    'pln_012__planning': {
+        "desc": 'LOOKS UP: What is the status of the GPDP for a given gram panchayat in a given year. Returns plan_type, approval_date, gpdp_status, (SELECT COUNT(*). One row per matching record. Restricted to plans with an approval date. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Only two states are distinguishable because plan_code_status is NULL throughout.',
+        "members": ['PLN-012'],
+    },
+
+    'pln_014__planning': {
+        "desc": 'COUNTS: How many Gram Panchayats in a given block/a given district are still awaiting GPDP approval in a given year. Returns gps_awaiting_approval. A single summary row. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Returns 0 because every plan row carries an approval_date.',
+        "members": ['PLN-014'],
+    },
+
+    'pln_015__planning': {
+        "desc": 'The PERCENTAGE for: What is the GPDP approval rate for each Block in a given year. Returns gps_with_plan, gps_approved, approval_rate_pct. One row per block_name. Restricted to plans with an approval date. Filterable by district; answers state-wide when no place is named — one entry serves every scope. Caveat: Approval proxied by approval_date, so the rate is 100% everywhere.',
+        "members": ['PLN-015'],
+    },
+
+    'pln_016__planning': {
+        "desc": 'The PERCENTAGE for: What is the GPDP approval rate for each District in a given year. Returns gps_with_plan, gps_approved, approval_rate_pct. One row per district_name. Restricted to plans with an approval date. Filterable by district; answers state-wide when no place is named — one entry serves every scope. Caveat: Approval proxied by approval_date, so the rate is 100% everywhere.',
+        "members": ['PLN-016'],
+    },
+
+    'pln_017__planning': {
+        "desc": 'LISTS: Which Districts have completed GPDP approval for all Gram Panchayats in a given year. Returns total_gps, gps_approved. One row per district_name. Counted FROM THE GP ROSTER by LEFT JOIN, so panchayats with zero activity are still in the denominator and still appear — which is the finding a review meeting is looking for. Caveat: Approval proxied by approval_date.',
+        "members": ['PLN-017'],
+    },
+
+    'pln_018__planning': {
+        "desc": 'LISTS: Which Blocks have completed GPDP approval for all Gram Panchayats in a given year. Returns total_gps, gps_approved. One row per block_name. Counted FROM THE GP ROSTER by LEFT JOIN, so panchayats with zero activity are still in the denominator and still appear — which is the finding a review meeting is looking for. Caveat: Approval proxied by approval_date.',
+        "members": ['PLN-018'],
+    },
+
+    'pln_019__planning': {
+        "desc": 'LISTS: Which Gram Panchayats have uploaded the GPDP but are still awaiting approval in a given year. Returns plan_type. One row per matching record. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Returns no rows: approval_date is populated on every plan.',
+        "members": ['PLN-019'],
+    },
+
+    'pln_020__planning': {
+        "desc": "RANKS: Which Blocks have the highest number of pending GPDP approvals in a given year. Returns pending_approvals, gps_with_plan. One row per block_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Filterable by district; answers state-wide when no place is named — one entry serves every scope. Caveat: pending_approvals is 0 everywhere because approval_date is always populated.",
+        "members": ['PLN-020'],
+    },
+
+    'pln_021__planning': {
+        "desc": "RANKS: Which district have the highest number of pending GPDP approvals in a given year. Returns pending_approvals, gps_with_plan. One row per district_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Filterable by district; answers state-wide when no place is named — one entry serves every scope. Caveat: pending_approvals is 0 everywhere because approval_date is always populated.",
+        "members": ['PLN-021'],
+    },
+
+    'pln_024__planning': {
+        "desc": 'COUNTS: How many activities are planned under each GPDP theme in a given gram panchayat in a given year. Returns theme, planned_activities, planned_cost. One row per theme. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Themes come from dim_lsdg_theme, which maps only 17 of 30 focus areas;.',
+        "members": ['PLN-024'],
+    },
+
+    'pln_025__planning': {
+        "desc": "RANKS: Which GPDP theme has the highest number of planned activities in a given gram panchayat in a given year. Returns theme, planned_activities, planned_cost. One row per theme. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme mapping covers 17 of 30 focus areas.",
+        "members": ['PLN-025', 'PLN-027', 'PLN-029'],
+    },
+
+    'pln_026__planning': {
+        "desc": "RANKS: Which GPDP theme has the lowest number of planned activities in a given gram panchayat in a given year. Returns theme, planned_activities, planned_cost. One row per theme. A top-N list, lowest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme mapping covers 17 of 30 focus areas.",
+        "members": ['PLN-026', 'PLN-028', 'PLN-030'],
+    },
+
+    'pln_031__planning': {
+        "desc": "RANKS: Which Gram Panchayats have planned the highest number of activities under a given LSDG theme in a given year. Returns planned_activities, planned_cost. One row per gp_name × block_name × district_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme values must match dim_lsdg_theme.lsdg_theme exactly (note the trailing space on some).",
+        "members": ['PLN-031'],
+    },
+
+    'pln_032__planning': {
+        "desc": 'LISTS: Which Gram Panchayats have not planned any activities under a given LSDG theme in a given year. Returns gp_name, block_name, district_name. One row per matching record. An ABSENCE, read from the GP ROSTER: the Gram Panchayats with no matching record at all. A query over the activity table alone can never return these rows, because the rows it would need do not exist there. Filterable by district, block; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme mapping covers 17 of 30 focus areas.',
+        "members": ['PLN-032'],
+    },
+
+    'pln_033__planning': {
+        "desc": 'RANKS: Which GP has the highest number of planned activities under each GPDP theme in a given year. Returns theme, planned_activities. One row per theme × gp_name. Filterable by district; answers state-wide when no place is named — one entry serves every scope. Caveat: One winning unit per theme;.',
+        "members": ['PLN-033'],
+    },
+
+    'pln_034__planning': {
+        "desc": 'RANKS: Which Block has the highest number of planned activities under each GPDP theme in a given year. Returns theme, planned_activities. One row per theme × block_name. Filterable by district; answers state-wide when no place is named — one entry serves every scope. Caveat: One winning unit per theme;.',
+        "members": ['PLN-034'],
+    },
+
+    'pln_035__planning': {
+        "desc": 'RANKS: Which District has the highest number of planned activities under each GPDP theme in a given year. Returns theme, planned_activities. One row per theme × district_name. Filterable by district; answers state-wide when no place is named — one entry serves every scope. Caveat: One winning unit per theme;.',
+        "members": ['PLN-035'],
+    },
+
+    'pln_036__planning': {
+        "desc": "RANKS: Which theme receives the greatest planning attention across a given district in a given year. Returns theme, planned_activities, planned_cost, pct_of_activities. One row per theme. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme mapping is partial.",
+        "members": ['PLN-036'],
+    },
+
+    'pln_037__planning': {
+        "desc": "RANKS: Which theme receives the least planning attention across a given district in a given year. Returns theme, planned_activities, planned_cost, pct_of_activities. One row per theme. A top-N list, lowest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme mapping is partial.",
+        "members": ['PLN-037'],
+    },
+
+    'pln_038__planning': {
+        "desc": 'The YEAR-BY-YEAR trend of: How has the number of planned activities under each theme changed over the last five years. Returns theme, planned_activities, planned_cost. One row per theme × fiscal_year. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Covers all six years present (2020-2021 to 2025-2026).',
+        "members": ['PLN-038'],
+    },
+
+    'pln_039__planning': {
+        "desc": "The YEAR-BY-YEAR trend of: Which themes have shown the greatest increase in planned activities between a second year and a given year. Returns theme, activities_year1, activities_year2, change_in_activities. One row per theme. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: The source question said 'in {Date_Range}';.",
+        "members": ['PLN-039'],
+    },
+
+    'pln_040__planning': {
+        "desc": "The YEAR-BY-YEAR trend of: Which themes have shown the greatest decline in planned activities between a second year and a given year. Returns theme, activities_year1, activities_year2, change_in_activities. One row per theme. A top-N list, lowest first; $top_n = 1 answers 'which is the single highest/lowest'. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: The source question said 'in {Date_Range}';.",
+        "members": ['PLN-040'],
+    },
+
+    'pln_043__planning': {
+        "desc": 'LISTS: Which GPDP themes have no planned activities in a given year. Returns theme. One row per matching record. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Universe is the 7 distinct themes in dim_lsdg_theme, not the official nine LSDG themes.',
+        "members": ['PLN-043'],
+    },
+
+    'pln_044__planning': {
+        "desc": "TOTALS: Are the planned activities balanced across themes in a given gram panchayat/a given block in a given year. Returns theme, planned_activities, pct_share, even_share_pct, deviation_pts. One row per theme. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'Balanced' is undefined in the source question, so the query returns each theme's share and its deviation from an even split for the user to judge.",
+        "members": ['PLN-044'],
+    },
+
+    'pln_045__planning': {
+        "desc": 'LISTS: Which GPDP themes have fewer than a given threshold planned activities in a given year. Returns theme, planned_activities. One row per theme. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['PLN-045'],
+    },
+
+    'pln_046__planning': {
+        "desc": "The YEAR-BY-YEAR trend of: Which themes consistently receive low planning attention across multiple years. Returns theme, years_present, years_in_bottom_3, avg_activities_per_year. One row per theme. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'Consistently low' is operationalised as how often a theme lands in the bottom 3 of a year.",
+        "members": ['PLN-046'],
+    },
+
+    'pln_047__planning': {
+        "desc": 'RANKS: Which themes require greater planning attention in the next GPDP cycle in a given year. Returns theme, planned_activities, pct_of_activities, planned_cost, actual_expenditure, pct_completed. One row per theme. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Advisory question with no defined rule;.',
+        "members": ['PLN-047'],
+    },
+
+    'pln_049__planning': {
+        "desc": 'COUNTS: How many activities are planned under a given focus area in a given gram panchayat in a given year. Returns focus_area_name, planned_activities, planned_cost. One row per focus_area_name. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['PLN-049'],
+    },
+
+    'pln_050__planning': {
+        "desc": 'COUNTS: How many activities are planned under each focus area in a given gram panchayat in a given year. Returns focus_area_name, planned_activities, planned_cost. One row per focus_area_name. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['PLN-050', 'PLN-051'],
+    },
+
+    'pln_052__planning': {
+        "desc": "RANKS: Which focus area has the highest number of planned activities in a given year. Returns focus_area_name, planned_activities, planned_cost. One row per focus_area_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Set $top_n = 1 for a single answer.",
+        "members": ['PLN-052', 'PLN-054', 'PLN-056'],
+    },
+
+    'pln_053__planning': {
+        "desc": "RANKS: Which focus area has the lowest number of planned activities in a given year. Returns focus_area_name, planned_activities, planned_cost. One row per focus_area_name. A top-N list, lowest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Set $top_n = 1 for a single answer.",
+        "members": ['PLN-053', 'PLN-055', 'PLN-057'],
+    },
+
+    'pln_058__planning': {
+        "desc": "LISTS: What activities are planned under a given focus area in a given year. Returns activity_name, total_cost, status_label. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Raise $top_n to list more than the default page.",
+        "members": ['PLN-058'],
+    },
+
+    'pln_059__planning': {
+        "desc": 'LISTS: Which Gram Panchayats have not planned any activities under a given focus area in a given year. Returns gp_name, block_name, district_name. One row per matching record. An ABSENCE, read from the GP ROSTER: the Gram Panchayats with no matching record at all. A query over the activity table alone can never return these rows, because the rows it would need do not exist there. Filterable by district, block; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['PLN-059'],
+    },
+
+    'pln_060__planning': {
+        "desc": 'COMPARES: How does the number of planned activities under each focus area compare across Gram Panchayats in a Block in a given year. Returns focus_area_name, unit, planned_activities, planned_cost. One row per focus_area_name. planned_cost is the planned cost the GP entered in the action plan. Filterable by block, district; answers state-wide when no place is named — one entry serves every scope. Caveat: Long format - one row per focus area per unit;.',
+        "members": ['PLN-060'],
+    },
+
+    'pln_061__planning': {
+        "desc": 'COMPARES: How does the number of planned activities under each focus area compare across Blocks in a District in a given year. Returns focus_area_name, unit, planned_activities, planned_cost. One row per focus_area_name. planned_cost is the planned cost the GP entered in the action plan. Filterable by block, district; answers state-wide when no place is named — one entry serves every scope. Caveat: Long format - one row per focus area per unit;.',
+        "members": ['PLN-061'],
+    },
+
+    'pln_062__planning': {
+        "desc": "RANKS: Which focus area receives the highest planning attention across a given district in a given year. Returns focus_area_name, planned_activities, pct_of_activities, planned_cost. One row per focus_area_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district; answers state-wide when no place is named — one entry serves every scope.",
+        "members": ['PLN-062'],
+    },
+
+    'pln_063__planning': {
+        "desc": "RANKS: Which focus area receives the lowest planning attention across a given district in a given year. Returns focus_area_name, planned_activities, pct_of_activities, planned_cost. One row per focus_area_name. A top-N list, lowest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district; answers state-wide when no place is named — one entry serves every scope.",
+        "members": ['PLN-063'],
+    },
+
+    'pln_064__planning': {
+        "desc": "RANKS: Which focus areas account for the largest share of planned activities in a given gram panchayat in a given year. Returns focus_area_name, planned_activities, pct_share, planned_cost, pct_cost_share. One row per focus_area_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.",
+        "members": ['PLN-064'],
+    },
+
+    'pln_065__planning': {
+        "desc": "RANKS: Which focus areas account for the smallest share of planned activities in a given gram panchayat in a given year. Returns focus_area_name, planned_activities, pct_share, planned_cost, pct_cost_share. One row per focus_area_name. A top-N list, lowest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.",
+        "members": ['PLN-065'],
+    },
+
+    'pln_066__planning': {
+        "desc": "The YEAR-BY-YEAR trend of: Which types of activity are repeatedly planned across years. Returns activity_name, years_planned, total_occurrences, total_planned_cost, first_year, last_year. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Matches on the exact activity_name string;.",
+        "members": ['PLN-066'],
+    },
+
+    'pln_068__planning': {
+        "desc": 'LISTS: Which focus areas have no planned activities in a given year. Returns focus_area_name. One row per matching record. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Universe is the 30 focus-area codes in dim_code.',
+        "members": ['PLN-068'],
+    },
+
+    'pln_069__planning': {
+        "desc": 'LISTS: Which focus areas have fewer than a given threshold planned activities in a given year. Returns focus_area_name, planned_activities. One row per focus_area_name. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['PLN-069'],
+    },
+
+    'pln_070__planning': {
+        "desc": 'The YEAR-BY-YEAR trend of: Which focus areas are repeatedly included in the GPDP across multiple years. Returns focus_area_name, years_present, total_activities, avg_planned_cost. One row per focus_area_name. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['PLN-070'],
+    },
+
+    'pln_071__planning': {
+        "desc": 'RANKS: Which focus areas require greater planning attention in the next GPDP cycle after a given year. Returns focus_area_name, planned_activities, pct_of_activities, planned_cost, actual_expenditure, pct_completed. One row per focus_area_name. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Advisory;.',
+        "members": ['PLN-071'],
+    },
+
+    'pln_072__planning': {
+        "desc": "TOTALS: Are the planned activities balanced across themes in a given year. Returns theme, planned_activities, pct_share, even_share_pct. One row per theme. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Same caveat as PLN-044: 'balanced' is not defined, so shares and the even-split benchmark are returned.",
+        "members": ['PLN-072'],
+    },
+
+    'plu_001__plan_structure': {
+        "desc": 'LOOKS UP: What is the status of the a given year plan of a given gram panchayat. Returns plan_type, approval_date, plan_status, (SELECT COUNT(*). One row per matching record. Restricted to plans with an approval date. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: plan_code_status is NULL throughout, so only Approved / Not approved can be distinguished.',
+        "members": ['PLU-001'],
+    },
+
+    'plu_003__plan_structure': {
+        "desc": 'LOOKS UP: Does a given gram panchayat have a supplementary plan in addition to the main plan for a given year. Returns main_plans, supplementary_plans, has_supplementary. One row per gp_name × block_name × district_name. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['PLU-003'],
+    },
+
+    'plu_004__plan_structure': {
+        "desc": 'COUNTS: How many GPs in a given block uploaded supplementary plans for a given year. Returns gps_with_supplementary, supplementary_plans. A single summary row. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['PLU-004'],
+    },
+
+    'plu_006__low_cost_no_cost_activities': {
+        "desc": "COUNTS: How many low-cost activities (below a given threshold rupees) are planned theme-wise in a given year. Returns theme, low_cost_activities, total_activities, pct_low_cost. One row per theme. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Pass $threshold = 1000 to reproduce the 'below Rs.",
+        "members": ['PLU-006'],
+    },
+
+    'plu_007__low_cost_no_cost_activities': {
+        "desc": 'TOTALS: What is the cost-band split (below 500, 500-1000, above 1000) of activities in a given district for a given year. Returns cost_band, activities, planned_cost, pct_of_activities. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['PLU-007'],
+    },
+
+    'plu_008__low_cost_no_cost_activities': {
+        "desc": "COUNTS: How many no-cost activities are planned in a given block for a given year. Returns no_cost_activities, total_activities, pct_no_cost. A single summary row. Restricted to zero-cost activities. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'Flagship' activities are not identifiable - no flagship flag exists.",
+        "members": ['PLU-008'],
+    },
+
+    'plu_009__low_cost_no_cost_activities': {
+        "desc": 'The PERCENTAGE for: What share of planned activities in a given gram panchayat are low-cost (below a given threshold) in a given year. Returns total_activities, low_cost_activities, pct_low_cost. One row per gp_name × block_name. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['PLU-009'],
+    },
+
+    'san_001__administrative_approval': {
+        "desc": 'COUNTS: How many activities in a given gram panchayat received administrative approval in a given year. Returns admin_approved_activities, total_activities, pct_approved. A single summary row. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: There is no approval-date or approval-flag column.',
+        "members": ['SAN-001'],
+    },
+
+    'san_002__administrative_approval': {
+        "desc": 'COUNTS: How many activities in a given block are still awaiting administrative approval in a given year. Returns total_activities, sanctioned, awaiting_sanction, cost_recorded_but_no_approval_row, cost_awaiting. A single summary row. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Now based on the presence of an admin_approval row rather than a non-zero cost.',
+        "members": ['SAN-002'],
+    },
+
+    'san_003__administrative_approval': {
+        "desc": 'TOTALS: What is the total administratively sanctioned amount for a given gram panchayat in a given year. Returns admin_sanctioned_amount, technical_sanctioned_amount, sanctioned_activities. One row per gp_name × block_name. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['SAN-003'],
+    },
+
+    'san_004__administrative_approval': {
+        "desc": 'TOTALS: What is the block-wise administratively sanctioned amount in a given district in a given year. Returns sanctioned_activities, admin_sanctioned_amount, expenditure. One row per block_name. Restricted to activities that have an administrative approval (17% of them). expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['SAN-004'],
+    },
+
+    'san_005__administrative_approval': {
+        "desc": 'LOOKS UP: What are the administrative approval order number, date and issuing authority for activity a given activity. Returns activity_name, admin_approval_no, admin_sanction_date, admin_issuing_authority, admin_authority_as_recorded, work_proposed_cost. One row per matching record. work_proposed_cost is the cost proposed in the approval order. Caveat: Unblocked by the new admin_approval and technical_approval tables.',
+        "members": ['SAN-005'],
+    },
+
+    'san_006__administrative_approval': {
+        "desc": 'COUNTS: How many activities in a given block were administratively sanctioned by each issuing authority in a given year. Returns issuing_authority, sanctioned_activities, proposed_cost, sanctioned_amount, first_sanction, last_sanction. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: adm_approval_authority is free text with many spellings of the same office.',
+        "members": ['SAN-006'],
+    },
+
+    'san_007__administrative_approval': {
+        "desc": 'The PERCENTAGE for: What percentage of planned activities in a given block have received administrative approval in a given year. Returns planned_activities, approved_activities, pct_approved. One row per block_name. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Approval proxied by admin_approved_cost > 0.',
+        "members": ['SAN-007'],
+    },
+
+    'san_008__administrative_approval': {
+        "desc": "RANKS: Which blocks in a given district have the lowest administrative approval coverage in a given year. Returns planned_activities, approved_activities, pct_approved. One row per block_name × district_name. A top-N list, lowest first; $top_n = 1 answers 'which is the single highest/lowest'. Restricted to activities that have an administrative approval (17% of them). Filterable by district; answers state-wide when no place is named — one entry serves every scope. Caveat: Approval proxied by admin_approved_cost > 0.",
+        "members": ['SAN-008'],
+    },
+
+    'san_009__administrative_approval': {
+        "desc": 'The YEAR-BY-YEAR trend of: How many activities were administratively sanctioned in each month of a given year in a given block. Returns month, sanctioned_activities, sanctioned_amount, gps. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Unblocked by admin_approval.adm_approval_sanction_date.',
+        "members": ['SAN-009'],
+    },
+
+    'san_010__administrative_approval': {
+        "desc": 'COUNTS: How many administrative approvals in a given district were issued in each quarter of a given year. Returns calendar_quarter, sanction_year, sanctioned_activities, sanctioned_amount. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Quarters are calendar quarters of the sanction date, shown with their year because sanctions for one plan year are spread across several calendar years in this data.',
+        "members": ['SAN-010'],
+    },
+
+    'san_011__administrative_approval': {
+        "desc": "RANKS: Which activities in a given district received the highest administratively sanctioned amounts in a given year. Returns activity_name, sanction_day, sanction_authority, admin_approved_cost, fund_sanctioned_total, sanctioned_scheme_name. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Restricted to activities that have an administrative approval (17% of them). admin_approved_cost is the administratively approved cost. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Now enriched with the sanction date, authority, scheme and tied/untied component.",
+        "members": ['SAN-011'],
+    },
+
+    'san_012__administrative_approval': {
+        "desc": "RANKS: Which GPs in a given block have the highest total proposed cost awaiting administrative sanction in a given year. Returns activities_awaiting, proposed_cost_awaiting, sanctioned_activities, sanctioned_amount. One row per gp_name × block_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'Awaiting sanction' now means no row in admin_approval.",
+        "members": ['SAN-012'],
+    },
+
+    'san_013__administrative_approval': {
+        "desc": 'TOTALS: What is the scheme-wise split of administratively sanctioned amounts in a given gram panchayat for a given year. Returns sanctioned_scheme_name, fund_component_name, tied_untied, sanctioned_activities, sanctioned_amount, expenditure. Restricted to activities that have an administrative approval (17% of them). expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Uses the sanctioned scheme from admin_approval_scheme, which is far more reliable than activity_expenditure.scheme_name (82% NULL).',
+        "members": ['SAN-013'],
+    },
+
+    'san_014__administrative_approval': {
+        "desc": 'TOTALS: What is the General/SC/ST split of administratively sanctioned funds in a given block for a given year. Returns target_category, sanctioned_activities, general_sanctioned, sc_sanctioned, st_sanctioned, total_sanctioned. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Now uses the real sanctioned-fund category columns.',
+        "members": ['SAN-014'],
+    },
+
+    'sbm_gwm_001__grey_water_management': {
+        "desc": 'COUNTS: How many Grey Water Management activities have been planned in a given year. Returns matching_activities, planned_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /soak|grey ?water|gwm/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-GWM-001'],
+    },
+
+    'sbm_gwm_002__grey_water_management': {
+        "desc": 'TOTALS: What is the expenditure on Grey Water Management activities in a given year. Returns matching_activities, expenditure, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /soak|grey ?water|gwm/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-GWM-002'],
+    },
+
+    'sbm_gwm_003__grey_water_management': {
+        "desc": 'COUNTS: How many community soak pits have been planned in a given year. Returns matching_activities, planned_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(soak).*(community|group|cluster)|(community|group|cluster).*(soak)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-GWM-003'],
+    },
+
+    'sbm_gwm_004__grey_water_management': {
+        "desc": 'COUNTS: How many community soak pits have been approved in a given year. Returns matching_activities, approved_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(soak).*(community|group|cluster)|(community|group|cluster).*(soak)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. Restricted to activities that have an administrative approval (17% of them). planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-GWM-004'],
+    },
+
+    'sbm_gwm_005__grey_water_management': {
+        "desc": 'COUNTS: How many community soak pits are ongoing in a given year. Returns matching_activities, ongoing_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(soak).*(community|group|cluster)|(community|group|cluster).*(soak)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-GWM-005'],
+    },
+
+    'sbm_gwm_006__grey_water_management': {
+        "desc": 'COUNTS: How many community soak pits have been completed in a given year. Returns matching_activities, completed_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(soak).*(community|group|cluster)|(community|group|cluster).*(soak)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-GWM-006'],
+    },
+
+    'sbm_gwm_007__grey_water_management': {
+        "desc": 'TOTALS: What is the expenditure on community soak pits in a given year. Returns matching_activities, expenditure, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(soak).*(community|group|cluster)|(community|group|cluster).*(soak)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-GWM-007'],
+    },
+
+    'sbm_gwm_008__grey_water_management': {
+        "desc": 'COUNTS: How many household soak pits have been planned in a given year. Returns matching_activities, planned_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(soak).*(household|individual|hh)|(household|individual|hh).*(soak)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-GWM-008'],
+    },
+
+    'sbm_gwm_009__grey_water_management': {
+        "desc": 'COUNTS: How many household soak pits have been approved in a given year. Returns matching_activities, approved_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(soak).*(household|individual|hh)|(household|individual|hh).*(soak)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. Restricted to activities that have an administrative approval (17% of them). planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-GWM-009'],
+    },
+
+    'sbm_gwm_010__grey_water_management': {
+        "desc": 'COUNTS: How many household soak pits are ongoing in a given year. Returns matching_activities, ongoing_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(soak).*(household|individual|hh)|(household|individual|hh).*(soak)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-GWM-010'],
+    },
+
+    'sbm_gwm_011__grey_water_management': {
+        "desc": 'COUNTS: How many household soak pits have been completed in a given year. Returns matching_activities, completed_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(soak).*(household|individual|hh)|(household|individual|hh).*(soak)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-GWM-011'],
+    },
+
+    'sbm_gwm_012__grey_water_management': {
+        "desc": 'TOTALS: What is the expenditure on household soak pits in a given year. Returns matching_activities, expenditure, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(soak).*(household|individual|hh)|(household|individual|hh).*(soak)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-GWM-012'],
+    },
+
+    'sbm_om_001__operation_maintenance': {
+        "desc": 'TOTALS: What is the Operation & Maintenance expenditure on community sanitary complexes in a given year. Returns maintenance_activities, planned_cost, om_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(toilet|sanitary).*(complex|community)|community.*(toilet|complex)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: O&M is read as work_type Maintenance or Upgradation, combined with a keyword match on the activity text.',
+        "members": ['SBM-OM-001'],
+    },
+
+    'sbm_om_002__operation_maintenance': {
+        "desc": 'TOTALS: What is the Operation & Maintenance expenditure on community compost pits in a given year. Returns maintenance_activities, planned_cost, om_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(compost).*(community|group|cluster)|(community|group|cluster).*(compost)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: O&M is read as work_type Maintenance or Upgradation, combined with a keyword match on the activity text.',
+        "members": ['SBM-OM-002'],
+    },
+
+    'sbm_om_003__operation_maintenance': {
+        "desc": 'TOTALS: What is the Operation & Maintenance expenditure on segregation sheds in a given year. Returns maintenance_activities, planned_cost, om_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /segregation shed|sorting shed|waste.*shed/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: O&M is read as work_type Maintenance or Upgradation, combined with a keyword match on the activity text.',
+        "members": ['SBM-OM-003'],
+    },
+
+    'sbm_om_004__operation_maintenance': {
+        "desc": 'TOTALS: What is the Operation & Maintenance expenditure on Plastic Waste Management Units in a given year. Returns maintenance_activities, planned_cost, om_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /plastic waste|pwmu/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: O&M is read as work_type Maintenance or Upgradation, combined with a keyword match on the activity text.',
+        "members": ['SBM-OM-004'],
+    },
+
+    'sbm_om_005__operation_maintenance': {
+        "desc": 'TOTALS: What is the Operation & Maintenance expenditure on Gobardhan units in a given year. Returns maintenance_activities, planned_cost, om_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /gobardhan|bio.?gas/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: O&M is read as work_type Maintenance or Upgradation, combined with a keyword match on the activity text.',
+        "members": ['SBM-OM-005'],
+    },
+
+    'sbm_om_006__operation_maintenance': {
+        "desc": 'TOTALS: What is the Operation & Maintenance expenditure on community Grey Water Management systems and soak pits in a given year. Returns maintenance_activities, planned_cost, om_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /soak|grey ?water|gwm/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: O&M is read as work_type Maintenance or Upgradation, combined with a keyword match on the activity text.',
+        "members": ['SBM-OM-006'],
+    },
+
+    'sbm_om_007__operation_maintenance': {
+        "desc": 'TOTALS: What is the Operation & Maintenance expenditure on Faecal Sludge Management plants in a given year. Returns maintenance_activities, planned_cost, om_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /faecal|fsm|sludge/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: O&M is read as work_type Maintenance or Upgradation, combined with a keyword match on the activity text.',
+        "members": ['SBM-OM-007'],
+    },
+
+    'sbm_om_008__operation_maintenance': {
+        "desc": 'COUNTS: How many PPE kits and safety equipment purchases have been planned in a given year. Returns matching_activities, planned_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /ppe|safety equipment|glove|mask|protective/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-OM-008'],
+    },
+
+    'sbm_om_009__operation_maintenance': {
+        "desc": 'TOTALS: What is the expenditure on waste-management and safety equipment in a given year. Returns matching_activities, expenditure, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /ppe|safety equipment|glove|mask|protective|waste.*equipment|equipment.*waste/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-OM-009'],
+    },
+
+    'sbm_om_010__operation_maintenance': {
+        "desc": 'TOTALS: What is the total Operation & Maintenance expenditure in a given gram panchayat in a given year. Returns focus_area_name, maintenance_activities, planned_cost, om_expenditure. One row per focus_area_name. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: O&M is read as work_type Maintenance or Upgradation.',
+        "members": ['SBM-OM-010'],
+    },
+
+    'sbm_si_001__sanitation_infrastructure': {
+        "desc": 'COUNTS: How many toilets in public institutions have been planned in a given year. Returns matching_activities, planned_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(toilet).*(public|institution|community)|(public|institution|community).*(toilet)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-001'],
+    },
+
+    'sbm_si_002__sanitation_infrastructure': {
+        "desc": 'COUNTS: How many toilets in public institutions have been approved in a given year. Returns matching_activities, approved_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(toilet).*(public|institution|community)|(public|institution|community).*(toilet)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. Restricted to activities that have an administrative approval (17% of them). planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-002'],
+    },
+
+    'sbm_si_003__sanitation_infrastructure': {
+        "desc": 'COUNTS: How many toilets in public institutions are ongoing in a given year. Returns matching_activities, ongoing_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(toilet).*(public|institution|community)|(public|institution|community).*(toilet)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-003'],
+    },
+
+    'sbm_si_004__sanitation_infrastructure': {
+        "desc": 'COUNTS: How many toilets in public institutions have been completed in a given year. Returns matching_activities, completed_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(toilet).*(public|institution|community)|(public|institution|community).*(toilet)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-004'],
+    },
+
+    'sbm_si_005__sanitation_infrastructure': {
+        "desc": 'TOTALS: What is the expenditure on toilets in public institutions in a given year. Returns matching_activities, expenditure, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(toilet).*(public|institution|community)|(public|institution|community).*(toilet)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-005'],
+    },
+
+    'sbm_si_006__sanitation_infrastructure': {
+        "desc": 'COUNTS: How many Individual Household Latrines (IHHLs) have been planned in a given year. Returns matching_activities, planned_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /ihhl|individual household latrine/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-006'],
+    },
+
+    'sbm_si_007__sanitation_infrastructure': {
+        "desc": 'COUNTS: How many Individual Household Latrines (IHHLs) have been approved in a given year. Returns matching_activities, approved_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /ihhl|individual household latrine/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. Restricted to activities that have an administrative approval (17% of them). planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-007'],
+    },
+
+    'sbm_si_008__sanitation_infrastructure': {
+        "desc": 'COUNTS: How many Individual Household Latrines (IHHLs) are ongoing in a given year. Returns matching_activities, ongoing_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /ihhl|individual household latrine/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-008'],
+    },
+
+    'sbm_si_009__sanitation_infrastructure': {
+        "desc": 'COUNTS: How many Individual Household Latrines (IHHLs) have been completed in a given year. Returns matching_activities, completed_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /ihhl|individual household latrine/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-009'],
+    },
+
+    'sbm_si_010__sanitation_infrastructure': {
+        "desc": 'TOTALS: What is the expenditure on Individual Household Latrines (IHHLs) in a given year. Returns matching_activities, expenditure, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /ihhl|individual household latrine/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-010'],
+    },
+
+    'sbm_si_011__sanitation_infrastructure': {
+        "desc": 'COUNTS: How many toilets and handwash units in AWCs and schools have been planned in a given year. Returns matching_activities, planned_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(toilet|handwash).*(anganwadi|awc|school)|(anganwadi|awc|school).*(toilet|handwash)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-011'],
+    },
+
+    'sbm_si_012__sanitation_infrastructure': {
+        "desc": 'COUNTS: How many toilets and handwash units in AWCs and schools have been approved in a given year. Returns matching_activities, approved_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(toilet|handwash).*(anganwadi|awc|school)|(anganwadi|awc|school).*(toilet|handwash)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. Restricted to activities that have an administrative approval (17% of them). planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-012'],
+    },
+
+    'sbm_si_013__sanitation_infrastructure': {
+        "desc": 'COUNTS: How many toilets and handwash units in AWCs and schools are ongoing in a given year. Returns matching_activities, ongoing_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(toilet|handwash).*(anganwadi|awc|school)|(anganwadi|awc|school).*(toilet|handwash)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-013'],
+    },
+
+    'sbm_si_014__sanitation_infrastructure': {
+        "desc": 'COUNTS: How many toilets and handwash units in AWCs and schools have been completed in a given year. Returns matching_activities, completed_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(toilet|handwash).*(anganwadi|awc|school)|(anganwadi|awc|school).*(toilet|handwash)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-014'],
+    },
+
+    'sbm_si_015__sanitation_infrastructure': {
+        "desc": 'TOTALS: What is the expenditure on toilets and handwash units in AWCs and schools in a given year. Returns matching_activities, expenditure, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(toilet|handwash).*(anganwadi|awc|school)|(anganwadi|awc|school).*(toilet|handwash)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-015'],
+    },
+
+    'sbm_si_016__sanitation_infrastructure': {
+        "desc": 'COUNTS: How many single-pit to twin-pit toilet retrofits have been planned in a given year. Returns matching_activities, planned_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /retrofit.*(twin|single)|twin pit|single pit/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-016'],
+    },
+
+    'sbm_si_017__sanitation_infrastructure': {
+        "desc": 'COUNTS: How many single-pit to twin-pit toilet retrofits have been approved in a given year. Returns matching_activities, approved_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /retrofit.*(twin|single)|twin pit|single pit/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. Restricted to activities that have an administrative approval (17% of them). planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-017'],
+    },
+
+    'sbm_si_018__sanitation_infrastructure': {
+        "desc": 'COUNTS: How many single-pit to twin-pit toilet retrofits are ongoing in a given year. Returns matching_activities, ongoing_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /retrofit.*(twin|single)|twin pit|single pit/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-018'],
+    },
+
+    'sbm_si_019__sanitation_infrastructure': {
+        "desc": 'COUNTS: How many single-pit to twin-pit toilet retrofits have been completed in a given year. Returns matching_activities, completed_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /retrofit.*(twin|single)|twin pit|single pit/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-019'],
+    },
+
+    'sbm_si_020__sanitation_infrastructure': {
+        "desc": 'TOTALS: What is the expenditure on single-pit to twin-pit toilet retrofits in a given year. Returns matching_activities, expenditure, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /retrofit.*(twin|single)|twin pit|single pit/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-020'],
+    },
+
+    'sbm_si_021__sanitation_infrastructure': {
+        "desc": 'COUNTS: How many septic-tank-with-soak-pit retrofits have been planned in a given year. Returns matching_activities, planned_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /septic/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-021'],
+    },
+
+    'sbm_si_022__sanitation_infrastructure': {
+        "desc": 'COUNTS: How many septic-tank-with-soak-pit retrofits have been approved in a given year. Returns matching_activities, approved_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /septic/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. Restricted to activities that have an administrative approval (17% of them). planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-022'],
+    },
+
+    'sbm_si_023__sanitation_infrastructure': {
+        "desc": 'COUNTS: How many septic-tank-with-soak-pit retrofits are ongoing in a given year. Returns matching_activities, ongoing_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /septic/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-023'],
+    },
+
+    'sbm_si_024__sanitation_infrastructure': {
+        "desc": 'COUNTS: How many septic-tank-with-soak-pit retrofits have been completed in a given year. Returns matching_activities, completed_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /septic/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-024'],
+    },
+
+    'sbm_si_025__sanitation_infrastructure': {
+        "desc": 'TOTALS: What is the expenditure on septic-tank-with-soak-pit retrofits in a given year. Returns matching_activities, expenditure, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /septic/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SI-025'],
+    },
+
+    'sbm_swm_001__solid_waste_management': {
+        "desc": 'COUNTS: How many Solid Waste Management activities have been planned in a given year. Returns matching_activities, planned_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /solid waste|waste management|compost|segregat|gobardhan|plastic waste/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-001'],
+    },
+
+    'sbm_swm_002__solid_waste_management': {
+        "desc": 'COUNTS: How many community compost pits have been planned in a given year. Returns matching_activities, planned_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(compost).*(community|group|cluster)|(community|group|cluster).*(compost)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-002'],
+    },
+
+    'sbm_swm_003__solid_waste_management': {
+        "desc": 'COUNTS: How many community compost pits have been approved in a given year. Returns matching_activities, approved_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(compost).*(community|group|cluster)|(community|group|cluster).*(compost)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. Restricted to activities that have an administrative approval (17% of them). planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-003'],
+    },
+
+    'sbm_swm_004__solid_waste_management': {
+        "desc": 'COUNTS: How many community compost pits are ongoing in a given year. Returns matching_activities, ongoing_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(compost).*(community|group|cluster)|(community|group|cluster).*(compost)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-004'],
+    },
+
+    'sbm_swm_005__solid_waste_management': {
+        "desc": 'COUNTS: How many community compost pits have been completed in a given year. Returns matching_activities, completed_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(compost).*(community|group|cluster)|(community|group|cluster).*(compost)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-005'],
+    },
+
+    'sbm_swm_006__solid_waste_management': {
+        "desc": 'TOTALS: What is the expenditure on community compost pits in a given year. Returns matching_activities, expenditure, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(compost).*(community|group|cluster)|(community|group|cluster).*(compost)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-006'],
+    },
+
+    'sbm_swm_007__solid_waste_management': {
+        "desc": 'COUNTS: How many household compost pits have been planned in a given year. Returns matching_activities, planned_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(compost).*(household|individual|hh)|(household|individual|hh).*(compost)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-007'],
+    },
+
+    'sbm_swm_008__solid_waste_management': {
+        "desc": 'COUNTS: How many household compost pits have been approved in a given year. Returns matching_activities, approved_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(compost).*(household|individual|hh)|(household|individual|hh).*(compost)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. Restricted to activities that have an administrative approval (17% of them). planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-008'],
+    },
+
+    'sbm_swm_009__solid_waste_management': {
+        "desc": 'COUNTS: How many household compost pits are ongoing in a given year. Returns matching_activities, ongoing_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(compost).*(household|individual|hh)|(household|individual|hh).*(compost)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-009'],
+    },
+
+    'sbm_swm_010__solid_waste_management': {
+        "desc": 'COUNTS: How many household compost pits have been completed in a given year. Returns matching_activities, completed_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(compost).*(household|individual|hh)|(household|individual|hh).*(compost)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-010'],
+    },
+
+    'sbm_swm_011__solid_waste_management': {
+        "desc": 'TOTALS: What is the expenditure on household compost pits in a given year. Returns matching_activities, expenditure, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(compost).*(household|individual|hh)|(household|individual|hh).*(compost)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-011'],
+    },
+
+    'sbm_swm_012__solid_waste_management': {
+        "desc": 'COUNTS: How many segregation sheds have been planned in a given year. Returns matching_activities, planned_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /segregation shed|sorting shed|waste.*shed/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-012'],
+    },
+
+    'sbm_swm_013__solid_waste_management': {
+        "desc": 'COUNTS: How many segregation sheds have been approved in a given year. Returns matching_activities, approved_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /segregation shed|sorting shed|waste.*shed/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. Restricted to activities that have an administrative approval (17% of them). planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-013'],
+    },
+
+    'sbm_swm_014__solid_waste_management': {
+        "desc": 'COUNTS: How many segregation sheds are ongoing in a given year. Returns matching_activities, ongoing_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /segregation shed|sorting shed|waste.*shed/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-014'],
+    },
+
+    'sbm_swm_015__solid_waste_management': {
+        "desc": 'COUNTS: How many segregation sheds have been completed in a given year. Returns matching_activities, completed_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /segregation shed|sorting shed|waste.*shed/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-015'],
+    },
+
+    'sbm_swm_016__solid_waste_management': {
+        "desc": 'TOTALS: What is the expenditure on segregation sheds in a given year. Returns matching_activities, expenditure, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /segregation shed|sorting shed|waste.*shed/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-016'],
+    },
+
+    'sbm_swm_017__solid_waste_management': {
+        "desc": 'COUNTS: How many segregation bins have been planned in a given year. Returns matching_activities, planned_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /bin|dustbin|dust bin/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-017'],
+    },
+
+    'sbm_swm_018__solid_waste_management': {
+        "desc": 'COUNTS: How many segregation bins have been approved in a given year. Returns matching_activities, approved_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /bin|dustbin|dust bin/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. Restricted to activities that have an administrative approval (17% of them). planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-018'],
+    },
+
+    'sbm_swm_019__solid_waste_management': {
+        "desc": 'COUNTS: How many segregation bins are ongoing in a given year. Returns matching_activities, ongoing_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /bin|dustbin|dust bin/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-019'],
+    },
+
+    'sbm_swm_020__solid_waste_management': {
+        "desc": 'COUNTS: How many segregation bins have been completed in a given year. Returns matching_activities, completed_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /bin|dustbin|dust bin/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-020'],
+    },
+
+    'sbm_swm_021__solid_waste_management': {
+        "desc": 'COUNTS: How many household segregation bins have been planned in a given year. Returns matching_activities, planned_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(bin|dustbin).*(household|individual|hh)|(household|individual|hh).*(bin|dustbin)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-021'],
+    },
+
+    'sbm_swm_022__solid_waste_management': {
+        "desc": 'COUNTS: How many community segregation bins have been planned in a given year. Returns matching_activities, planned_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /(bin|dustbin).*(community|group|cluster|public)|(community|group|cluster|public).*(bin|dustbin)/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-022'],
+    },
+
+    'sbm_swm_023__solid_waste_management': {
+        "desc": 'TOTALS: What is the expenditure on segregation bins in a given year. Returns matching_activities, expenditure, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /bin|dustbin|dust bin/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-023'],
+    },
+
+    'sbm_swm_024__solid_waste_management': {
+        "desc": 'COUNTS: How many Gobardhan units have been planned in a given year. Returns matching_activities, planned_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /gobardhan|bio.?gas/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-024'],
+    },
+
+    'sbm_swm_025__solid_waste_management': {
+        "desc": 'COUNTS: How many Gobardhan units have been approved in a given year. Returns matching_activities, approved_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /gobardhan|bio.?gas/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. Restricted to activities that have an administrative approval (17% of them). planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-025'],
+    },
+
+    'sbm_swm_026__solid_waste_management': {
+        "desc": 'COUNTS: How many Gobardhan units are ongoing in a given year. Returns matching_activities, ongoing_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /gobardhan|bio.?gas/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-026'],
+    },
+
+    'sbm_swm_027__solid_waste_management': {
+        "desc": 'COUNTS: How many Gobardhan units have been completed in a given year. Returns matching_activities, completed_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /gobardhan|bio.?gas/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-027'],
+    },
+
+    'sbm_swm_028__solid_waste_management': {
+        "desc": 'TOTALS: What is the expenditure on Gobardhan units in a given year. Returns matching_activities, expenditure, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /gobardhan|bio.?gas/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-028'],
+    },
+
+    'sbm_swm_029__solid_waste_management': {
+        "desc": 'COUNTS: How many door-to-door waste-collection vehicles have been planned in a given year. Returns matching_activities, planned_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /tricycle|vehicle|rickshaw|e-?cart|pushcart|collection cart/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-029'],
+    },
+
+    'sbm_swm_030__solid_waste_management': {
+        "desc": 'COUNTS: How many door-to-door waste-collection vehicles have been approved in a given year. Returns matching_activities, approved_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /tricycle|vehicle|rickshaw|e-?cart|pushcart|collection cart/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. Restricted to activities that have an administrative approval (17% of them). planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-030'],
+    },
+
+    'sbm_swm_031__solid_waste_management': {
+        "desc": 'COUNTS: How many door-to-door waste-collection vehicles are ongoing in a given year. Returns matching_activities, ongoing_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /tricycle|vehicle|rickshaw|e-?cart|pushcart|collection cart/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-031'],
+    },
+
+    'sbm_swm_032__solid_waste_management': {
+        "desc": 'COUNTS: How many door-to-door waste-collection vehicles have been completed in a given year. Returns matching_activities, completed_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /tricycle|vehicle|rickshaw|e-?cart|pushcart|collection cart/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-032'],
+    },
+
+    'sbm_swm_034__solid_waste_management': {
+        "desc": 'TOTALS: What is the expenditure on door-to-door waste-collection vehicles in a given year. Returns matching_activities, expenditure, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /tricycle|vehicle|rickshaw|e-?cart|pushcart|collection cart/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-034'],
+    },
+
+    'sbm_swm_035__solid_waste_management': {
+        "desc": 'COUNTS: How many weighing machines have been planned in a given year. Returns matching_activities, planned_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /weighing/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-035'],
+    },
+
+    'sbm_swm_036__solid_waste_management': {
+        "desc": 'COUNTS: How many weighing machines have been approved in a given year. Returns matching_activities, approved_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /weighing/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. Restricted to activities that have an administrative approval (17% of them). planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-036'],
+    },
+
+    'sbm_swm_037__solid_waste_management': {
+        "desc": 'COUNTS: How many weighing machines are ongoing in a given year. Returns matching_activities, ongoing_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /weighing/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-037'],
+    },
+
+    'sbm_swm_038__solid_waste_management': {
+        "desc": 'COUNTS: How many weighing machines have been completed in a given year. Returns matching_activities, completed_activities, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /weighing/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-038'],
+    },
+
+    'sbm_swm_039__solid_waste_management': {
+        "desc": 'TOTALS: What is the expenditure on weighing machines in a given year. Returns matching_activities, expenditure, planned_cost, total_expenditure. A single summary row. Identifies the activity by KEYWORD MATCH on activity_name + activity_desc against the pattern /weighing/. Nothing in the database codes SBM activity types, so this is a text search: it both misses differently-worded activities and picks up unrelated ones. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL.',
+        "members": ['SBM-SWM-039'],
+    },
+
+    'sch_001__scheme_coverage': {
+        "desc": 'COUNTS: How many activities are recorded under a given scheme in a given district for a given year. Returns scheme_name, activities, expenditure. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: scheme_name has only 5 non-null values and is NULL on 82% of rows.',
+        "members": ['SCH-001'],
+    },
+
+    'sch_002__scheme_coverage': {
+        "desc": "LISTS: Which activities of a given gram panchayat are funded under a given scheme in a given year. Returns activity_name, focus_area_name, approved_cost_action_plan, total_expenditure, status_label. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. approved_cost_action_plan is the action-plan approved cost. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: scheme_name coverage is 18%.",
+        "members": ['SCH-002'],
+    },
+
+    'sch_003__scheme_coverage': {
+        "desc": 'TOTALS: What is the total estimated cost of activities under a given scheme in a given block for a given year. Returns scheme_name, activities, estimated_cost, approved_cost, expenditure. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: scheme_name coverage is 18%.',
+        "members": ['SCH-003'],
+    },
+
+    'sch_005__scheme_coverage': {
+        "desc": "RANKS: Which scheme has the highest expenditure in a given block for a given year. Returns scheme_name, activities, expenditure. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: scheme_name coverage is 18%.",
+        "members": ['SCH-005'],
+    },
+
+    'sch_006__scheme_coverage': {
+        "desc": 'LISTS: Which GPs in a given block have no activities under a given scheme in a given year. Returns gp_name, block_name, district_name. One row per matching record. An ABSENCE, read from the GP ROSTER: the Gram Panchayats with no matching record at all. A query over the activity table alone can never return these rows, because the rows it would need do not exist there. Filterable by block, district; answers state-wide when no place is named — one entry serves every scope. Caveat: Because scheme_name is NULL on 82% of rows, many GPs appear here purely from missing data rather than genuine absence.',
+        "members": ['SCH-006'],
+    },
+
+    'sch_007__scheme_coverage': {
+        "desc": "LOOKS UP: Under which scheme and fund component is activity a given activity sanctioned. Returns activity_name, sanctioned_scheme_name, fund_component_name, tied_untied, fund_sanctioned_general, fund_sanctioned_sc. One row per matching record. fund_sanctioned_total is funds sanctioned under the approval's scheme components. Caveat: Fully unblocked: admin_approval_scheme supplies both the scheme and the fund component, which the previous database could not.",
+        "members": ['SCH-007'],
+    },
+
+    'sch_008__scheme_coverage': {
+        "desc": 'COMPARES: Compare the activity counts and expenditure of a given scheme and a second scheme in a given district for a given year. Returns scheme_name, activities, approved_cost, expenditure, pct_utilised. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: scheme_name coverage is 18%.',
+        "members": ['SCH-008'],
+    },
+
+    'sch_009__scheme_coverage': {
+        "desc": 'COUNTS: What is the status breakdown of activities under a given scheme in a given district for a given year. Returns status_label, activities, expenditure. One row per status_label. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: scheme_name coverage is 18%;.',
+        "members": ['SCH-009'],
+    },
+
+    'sch_010__scheme_coverage': {
+        "desc": 'TOTALS: What is the General/SC/ST funding split under a given scheme in a given block for a given year. Returns scheme_name, general_amount, sc_amount, st_amount, total_amount. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: sc and st amounts are sparsely populated.',
+        "members": ['SCH-010'],
+    },
+
+    'sch_011__scheme_coverage': {
+        "desc": 'COUNTS: What is the district-wise activity count under a given scheme for a given year. Returns activities, expenditure. One row per district_name. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Caveat: scheme_name coverage is 18%.',
+        "members": ['SCH-011'],
+    },
+
+    'sts_001__status_counts': {
+        "desc": "COUNTS: How many activities in a given gram panchayat are in each progress status for a given year. Returns status_label, activities, planned_cost, expenditure. One row per status_label. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: activity_status code 173 decodes to 'Buildings' in dim_code, which is not a status and needs verifying.",
+        "members": ['STS-001'],
+    },
+
+    'sts_002__status_counts': {
+        "desc": 'COUNTS: What is the block-wise activity status breakdown in a given district for a given year. Returns status_label, activities. One row per block_name × status_label. Filterable by district; answers state-wide when no place is named — one entry serves every scope. Caveat: See STS-001 note on code 173.',
+        "members": ['STS-002'],
+    },
+
+    'sts_003__status_counts': {
+        "desc": 'COUNTS: How many activities in a given block are in a given status status for a given year. Returns status_label, activities, planned_cost, expenditure. One row per status_label. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: $status must match a decoded label exactly: Activity Approved, WORK ONGOING, WORK COMPLETED, WORK ABANDONED, UNDER APPROVAL.',
+        "members": ['STS-003'],
+    },
+
+    'sts_004__status_counts': {
+        "desc": "RANKS: Which GPs in a given district have the highest number of abandoned activities in a given year. Returns abandoned_activities, total_activities, expenditure_on_abandoned. One row per gp_name × block_name × district_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Counts only work abandoned. Filterable by district; answers state-wide when no place is named — one entry serves every scope.",
+        "members": ['STS-004'],
+    },
+
+    'sts_005__status_counts': {
+        "desc": "LISTS: Which activities in a given block are abandoned, and what are their costs in a given year. Returns activity_name, estimated_cost, admin_approved_cost, total_expenditure, status_label. One row per matching record. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Counts only work abandoned. admin_approved_cost is the administratively approved cost. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: There is no 'suspended' status in the data;.",
+        "members": ['STS-005'],
+    },
+
+    'sts_006__status_counts': {
+        "desc": 'The PERCENTAGE for: What percentage of taken-up activities in a given block are completed in a given year. Returns taken_up_activities, completed_activities, pct_completed. A single summary row. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Progress is read from activity_status.',
+        "members": ['STS-006'],
+    },
+
+    'sts_007__status_counts': {
+        "desc": "RANKS: Which blocks in a given district have the highest activity completion rate for a given year. Returns activities, started, completed, pct_completed. One row per block_name × district_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Filterable by district; answers state-wide when no place is named — one entry serves every scope. Caveat: Progress is read from activity_status.",
+        "members": ['STS-007'],
+    },
+
+    'sts_008__status_counts': {
+        "desc": "The PERCENTAGE for: What share of approved activities in a given district has not yet started in a given year. Returns activities, approved_not_started, started, pct_not_started. A single summary row. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'Not started' is read as status 'Activity Approved' - approved but with no work status recorded.",
+        "members": ['STS-008'],
+    },
+
+    'sts_009__status_counts': {
+        "desc": 'LISTS: Which GPs in a given block have zero completed activities in a given year. Returns activities, completed. One row per gp_name × block_name × district_name. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Progress is read from activity_status.',
+        "members": ['STS-009'],
+    },
+
+    'sts_010__status_counts': {
+        "desc": 'COUNTS: How many activities in a given block are stuck in Under Approval status for a given year. Returns under_approval, total_activities, cost_under_approval. A single summary row. Counts only activities under approval. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 36 activities carry this status across the whole database.',
+        "members": ['STS-010'],
+    },
+
+    'sts_011__status_counts': {
+        "desc": 'LISTS: Which blocks in a given district have every taken-up activity started for a given year. Returns activities, started, pct_started. One row per block_name × district_name. Filterable by district; answers state-wide when no place is named — one entry serves every scope. Caveat: Progress is read from activity_status.',
+        "members": ['STS-011'],
+    },
+
+    'sts_012__status_counts': {
+        "desc": 'COUNTS: How many plan units and taken-up activities does a given gram panchayat have for a given year. Returns plan_units, planned_activities, taken_up_activities, completed_activities. One row per gp_name × block_name. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['STS-012'],
+    },
+
+    'sts_013__status_counts': {
+        "desc": 'COUNTS: What is the district-wise activity status summary for a given year. Returns activities, approved_not_started, ongoing, completed, abandoned, under_approval. One row per district_name. Caveat: Progress is read from activity_status.',
+        "members": ['STS-013'],
+    },
+
+    'trd_001__year_on_year': {
+        "desc": 'COMPARES: Compare the activities planned and started theme-wise between a second year and a given year. Returns theme, planned_year1, planned_year2, started_year1, started_year2. One row per theme. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme mapping covers 17 of 30 focus areas.',
+        "members": ['TRD-001'],
+    },
+
+    'trd_002__year_on_year': {
+        "desc": 'COMPARES: Compare the approved cost and expenditure theme-wise between a second year and a given year. Returns theme, approved_cost_year1, approved_cost_year2, expenditure_year1, expenditure_year2. One row per theme. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme mapping is partial.',
+        "members": ['TRD-002'],
+    },
+
+    'trd_003__year_on_year': {
+        "desc": 'The YEAR-BY-YEAR trend of: What is the year-wise expenditure of a given gram panchayat against the plan of each year. Returns activities, approved_cost, expenditure, pct_utilised. One row per fiscal_year. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Expenditure is recorded against the year of the plan it belongs to;.',
+        "members": ['TRD-003'],
+    },
+
+    'trd_004__year_on_year': {
+        "desc": 'COMPARES: How did the total expenditure of a given block change between a second year and a given year. Returns expenditure_year1, expenditure_year2, change_amount, change_pct. One row per matching record. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['TRD-004'],
+    },
+
+    'trd_005__year_on_year': {
+        "desc": 'The YEAR-BY-YEAR trend of: How has the activity completion rate of a given district changed over the years. Returns activities, started, completed, completion_rate_pct, initiation_rate_pct. One row per fiscal_year. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Only 17 activities in the whole database are marked WORK COMPLETED, so completion rates are near zero throughout.',
+        "members": ['TRD-005'],
+    },
+
+    'trd_006__year_on_year': {
+        "desc": 'The YEAR-BY-YEAR trend of: What is the year-wise total expenditure of a given gram panchayat. Returns activities, expenditure. One row per gp_name × fiscal_year. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['TRD-006'],
+    },
+
+    'trd_007__physical_vs_financial': {
+        "desc": 'COMPARES: What are the approved cost, expenditure and status counts theme-wise for a given gram panchayat in a given year. Returns theme, activities, approved_cost, expenditure, started, ongoing. One row per theme. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme mapping is partial.',
+        "members": ['TRD-007'],
+    },
+
+    'trd_008__physical_vs_financial': {
+        "desc": "COMPARES: What are the approved cost and expenditure sector-wise in a given district for a given year. Returns sector, activities, approved_cost, expenditure, pct_utilised. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'Sector' is read as focus area, the closest sectoral classification in the data.",
+        "members": ['TRD-008'],
+    },
+
+    'trd_009__physical_vs_financial': {
+        "desc": "RANKS: Which themes in a given block show high expenditure but low activity completion in a given year. Returns theme, activities, expenditure, completed, completion_rate_pct. One row per theme. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: 'High' and 'low' are undefined;.",
+        "members": ['TRD-009'],
+    },
+
+    'trd_010__entity_comparison': {
+        "desc": 'COMPARES: Compare planned expenditure, actual expenditure and completion rate between a given gram panchayat and a second gram panchayat for a given year. Returns activities, planned_cost, actual_expenditure, pct_utilised, completed, completion_rate_pct. One row per gp_name × block_name × district_name. planned_cost is the planned cost the GP entered in the action plan. A two-GP head-to-head. Both GPs must be named; a question about one GP alone belongs to an ordinary GP-filtered family. Caveat: Both $gp_name and $gp_name_2 must be supplied (no NULL skip here).',
+        "members": ['TRD-010'],
+    },
+
+    'trd_011__entity_comparison': {
+        "desc": 'COMPARES: Compare activity counts, expenditure and completion rates between a given block and a second block for a given year. Returns gps, activities, planned_cost, actual_expenditure, pct_utilised, completion_rate_pct. One row per block_name × district_name. planned_cost is the planned cost the GP entered in the action plan. A two-BLOCK head-to-head. Both blocks must be named. Caveat: Both block parameters must be supplied.',
+        "members": ['TRD-011'],
+    },
+
+    'trd_012__entity_comparison': {
+        "desc": 'COMPARES: How does a given district compare with the state average on expenditure per GP and completion rate for a given year. Returns gps, activities, expenditure, expenditure_per_gp, completion_rate_pct, state_avg_expenditure_per_gp. One row per district_name. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district; answers state-wide when no place is named — one entry serves every scope. One district read against the STATE benchmark. Every district is returned so the chosen one can be seen in context — the district filter deliberately does not narrow the table. Caveat: Every district is returned alongside the state benchmark so the chosen district can be read in context.',
+        "members": ['TRD-012'],
+    },
+
+    'wrk_001__fresh_vs_maintenance': {
+        "desc": 'COUNTS: How many fresh and how many maintenance activities does a given gram panchayat have in a given year. Returns work_type_label, activities, planned_cost, actual_expenditure. One row per work_type_label. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: work_type decodes to New/Fresh, Maintenance, Upgradation, None;.',
+        "members": ['WRK-001'],
+    },
+
+    'wrk_002__fresh_vs_maintenance': {
+        "desc": 'TOTALS: What is the expenditure on fresh versus maintenance activities in a given block for a given year. Returns work_type_label, activities, planned_cost, actual_expenditure, pct_of_expenditure. One row per work_type_label. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['WRK-002'],
+    },
+
+    'wrk_003__fresh_vs_maintenance': {
+        "desc": 'The PERCENTAGE for: What share of total expenditure in a given district went to maintenance activities in a given year. Returns total_expenditure, maintenance_expenditure, pct_maintenance. A single summary row. total_expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['WRK-003'],
+    },
+
+    'wrk_004__fresh_vs_maintenance': {
+        "desc": "RANKS: Which asset sub-categories have the highest number of maintenance activities in a given district in a given year. Returns asset_subcategory_label, maintenance_activities, expenditure. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: asset_subcategory is populated on 4,286 of 12,704 asset rows, so most maintenance activity lands in 'Uncategorised'.",
+        "members": ['WRK-004'],
+    },
+
+    'wrk_005__fresh_vs_maintenance': {
+        "desc": 'LISTS: Which GPs in a given block spend more on maintenance than on fresh assets in a given year. Returns maintenance_exp, fresh_exp, total_exp. One row per gp_name × block_name. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['WRK-005'],
+    },
+
+    'wrk_007__fresh_vs_maintenance': {
+        "desc": 'The YEAR-BY-YEAR trend of: How has maintenance expenditure in a given block changed over the years. Returns maintenance_activities, maintenance_expenditure, total_expenditure, pct_maintenance. One row per fiscal_year. total_expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['WRK-007'],
+    },
+
+    'wrk_008__fresh_vs_maintenance': {
+        "desc": 'COMPARES: What is the fresh versus maintenance split for a given asset category activities in a given district in a given year. Returns asset_category_label, work_type_label, activities, expenditure. One row per asset_category_label × work_type_label. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: asset_category is populated on 4,286 of 12,704 rows.',
+        "members": ['WRK-008'],
+    },
+
+    'wrk_009__fresh_vs_maintenance': {
+        "desc": 'LISTS: Which assets in a given gram panchayat have had maintenance activities in more than one year. Returns asset_subcategory_label, activity_name, years_with_maintenance, years, total_maintenance_expenditure. One row per gp_name. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: There is no asset identifier that persists across years, so repeat maintenance is inferred from identical activity_name + asset sub-category.',
+        "members": ['WRK-009'],
     },
 }
+
 
 # query_id -> family description, expanded from the members lists above.
 DESC_BY_QID: dict[str, str] = {

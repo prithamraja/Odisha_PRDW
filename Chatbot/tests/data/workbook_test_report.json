@@ -1,0 +1,3856 @@
+{
+ "ALR-001": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "threshold": 50,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "ALR-002": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 0,
+  "status": "PASS (0 rows)"
+ },
+ "ALR-003": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "threshold": 50,
+   "top_n": 10
+  },
+  "rows": 0,
+  "status": "PASS (0 rows)"
+ },
+ "ALR-004": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 2,
+  "status": "PASS"
+ },
+ "ALR-005": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 0,
+  "status": "PASS (0 rows)"
+ },
+ "ALR-008": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "threshold": 50,
+   "top_n": 10
+  },
+  "rows": 2,
+  "status": "PASS"
+ },
+ "ALR-009": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "ALR-011": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025",
+   "district_name": null,
+   "threshold": 50
+  },
+  "rows": 16,
+  "status": "PASS"
+ },
+ "ALR-012": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null
+  },
+  "rows": 0,
+  "status": "PASS (0 rows)"
+ },
+ "ALR-013": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null
+  },
+  "rows": 0,
+  "status": "PASS (0 rows)"
+ },
+ "AST-001": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 20,
+  "status": "PASS"
+ },
+ "AST-002": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 25,
+  "status": "PASS"
+ },
+ "AST-003": {
+  "answerable": "Partial",
+  "params": {
+   "asset_sub_category": "Well",
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "AST-006": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 3,
+  "status": "PASS"
+ },
+ "AST-007": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "AST-008": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "theme": "Theme 5 - Clean and Green Village "
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "AST-009": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null
+  },
+  "rows": 0,
+  "status": "PASS (0 rows)"
+ },
+ "AST-012": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 6,
+  "status": "PASS"
+ },
+ "BUD-001": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 20,
+  "status": "PASS"
+ },
+ "BUD-002": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 3,
+  "status": "PASS"
+ },
+ "BUD-003": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 3,
+  "status": "PASS"
+ },
+ "BUD-004": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 3,
+  "status": "PASS"
+ },
+ "BUD-005": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 3,
+  "status": "PASS"
+ },
+ "BUD-006": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "BUD-007": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "BUD-008": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "BUD-009": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "BUD-010": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "BUD-011": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "BUD-012": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 0,
+  "status": "PASS (0 rows)"
+ },
+ "BUD-013": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "BUD-014": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 39,
+  "status": "PASS"
+ },
+ "BUD-017": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 39,
+  "status": "PASS"
+ },
+ "BUD-018": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 25,
+  "status": "PASS"
+ },
+ "BUD-019": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": "Sanitation",
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "BUD-020": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": "Sanitation",
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "BUD-021": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": "Sanitation",
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "BUD-022": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "BUD-023": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "BUD-024": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 25,
+  "status": "PASS"
+ },
+ "BUD-025": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 25,
+  "status": "PASS"
+ },
+ "BUD-026": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 25,
+  "status": "PASS"
+ },
+ "BUD-027": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 6,
+  "status": "PASS"
+ },
+ "DQY-001": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "DQY-002": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "DQY-003": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "DQY-004": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "DQY-006": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "DQY-007": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 0,
+  "status": "PASS (0 rows)"
+ },
+ "DQY-008": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "DQY-009": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 0,
+  "status": "PASS (0 rows)"
+ },
+ "DQY-010": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 0,
+  "status": "PASS (0 rows)"
+ },
+ "DQY-011": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 0,
+  "status": "PASS (0 rows)"
+ },
+ "DSS-001": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "threshold": 50,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "DSS-002": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025",
+   "district_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "DSS-003": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "DSS-005": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "threshold": 50,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "DSS-006": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "EXP-001": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 20,
+  "status": "PASS"
+ },
+ "EXP-002": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 6,
+  "status": "PASS"
+ },
+ "EXP-003": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "EXP-004": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "EXP-005": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "EXP-006": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 3,
+  "status": "PASS"
+ },
+ "EXP-007": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 3,
+  "status": "PASS"
+ },
+ "EXP-008": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 3,
+  "status": "PASS"
+ },
+ "EXP-009": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": "Sanitation",
+   "gp_name": null
+  },
+  "rows": 2,
+  "status": "PASS"
+ },
+ "EXP-010": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": "Sanitation",
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "EXP-011": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": "Sanitation",
+   "gp_name": null
+  },
+  "rows": 2,
+  "status": "PASS"
+ },
+ "EXP-012": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 3,
+  "status": "PASS"
+ },
+ "EXP-013": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 3,
+  "status": "PASS"
+ },
+ "EXP-014": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "EXP-015": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "EXP-016": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "EXP-017": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "EXP-018": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "EXP-019": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "EXP-020": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "scheme": "XV Finance Commission",
+   "top_n": 10
+  },
+  "rows": 6,
+  "status": "PASS"
+ },
+ "EXP-021": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "scheme": "XV Finance Commission",
+   "top_n": 10
+  },
+  "rows": 6,
+  "status": "PASS"
+ },
+ "EXP-022": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "scheme": "XV Finance Commission",
+   "top_n": 10
+  },
+  "rows": 6,
+  "status": "PASS"
+ },
+ "EXP-023": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "EXP-024": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 20,
+  "status": "PASS"
+ },
+ "EXP-025": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 25,
+  "status": "PASS"
+ },
+ "EXP-026": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": "Sanitation",
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "EXP-027": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": "Sanitation",
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "EXP-028": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "EXP-029": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "EXP-030": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": "Sanitation",
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "EXP-031": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "EXP-032": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "EXP-033": {
+  "answerable": "Yes",
+  "params": {
+   "amount_threshold": 100000,
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "EXP-034": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "EXP-035": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 0,
+  "status": "PASS (0 rows)"
+ },
+ "EXP-036": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "EXP-037": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "EXP-038": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 2,
+  "status": "PASS"
+ },
+ "FND-001": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 5,
+  "status": "PASS"
+ },
+ "FND-002": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 2,
+  "status": "PASS"
+ },
+ "FND-003": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "FND-004": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "FND-005": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "FND-006": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 20,
+  "status": "PASS"
+ },
+ "FND-007": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 18,
+  "status": "PASS"
+ },
+ "FND-008": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 0,
+  "status": "PASS (0 rows)"
+ },
+ "FND-009": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 3,
+  "status": "PASS"
+ },
+ "FND-010": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 3,
+  "status": "PASS"
+ },
+ "IMP-001": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "IMP-002": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "IMP-003": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "IMP-004": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 25,
+  "status": "PASS"
+ },
+ "IMP-005": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 25,
+  "status": "PASS"
+ },
+ "IMP-006": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "IMP-007": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "IMP-008": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "IMP-009": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "threshold": 50,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "IMP-010": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "IMP-011": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "IMP-012": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "IMP-013": {
+  "answerable": "Yes",
+  "params": {
+   "amount_threshold": 100000,
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "IMP-014": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "IMP-015": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "IMP-016": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "IMP-017": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "IMP-018": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "IMP-019": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "threshold": 50,
+   "top_n": 10
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "IMP-020": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "threshold": 50,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "IMP-021": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "IMP-022": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 3,
+  "status": "PASS"
+ },
+ "PHY-001": {
+  "answerable": "Partial",
+  "params": {
+   "activity_code": "44434659"
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "PHY-003": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 20,
+  "status": "PASS"
+ },
+ "PHY-004": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 6,
+  "status": "PASS"
+ },
+ "PLN-001": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "PLN-002": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "PLN-003": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null
+  },
+  "rows": 16,
+  "status": "PASS"
+ },
+ "PLN-004": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null
+  },
+  "rows": 9,
+  "status": "PASS"
+ },
+ "PLN-005": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null
+  },
+  "rows": 0,
+  "status": "PASS (0 rows)"
+ },
+ "PLN-006": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025",
+   "district_name": null
+  },
+  "rows": 16,
+  "status": "PASS"
+ },
+ "PLN-007": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025",
+   "top_n": 10
+  },
+  "rows": 9,
+  "status": "PASS"
+ },
+ "PLN-008": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "deadline": "2024-06-30",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "PLN-009": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "deadline": "2024-06-30",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "PLN-010": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "deadline": "2024-06-30",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 9,
+  "status": "PASS"
+ },
+ "PLN-011": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "deadline": "2024-06-30",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "PLN-012": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 28,
+  "status": "PASS"
+ },
+ "PLN-013": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "PLN-014": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "PLN-015": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025",
+   "district_name": null
+  },
+  "rows": 16,
+  "status": "PASS"
+ },
+ "PLN-016": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025",
+   "district_name": null
+  },
+  "rows": 9,
+  "status": "PASS"
+ },
+ "PLN-017": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025"
+  },
+  "rows": 9,
+  "status": "PASS"
+ },
+ "PLN-018": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025"
+  },
+  "rows": 16,
+  "status": "PASS"
+ },
+ "PLN-019": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 0,
+  "status": "PASS (0 rows)"
+ },
+ "PLN-020": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025",
+   "district_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "PLN-021": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025",
+   "district_name": null,
+   "top_n": 10
+  },
+  "rows": 9,
+  "status": "PASS"
+ },
+ "PLN-024": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "PLN-025": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "PLN-026": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "PLN-027": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "PLN-028": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "PLN-029": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "PLN-030": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "PLN-031": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "theme": "Theme 5 - Clean and Green Village ",
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "PLN-032": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "theme": "Theme 5 - Clean and Green Village "
+  },
+  "rows": 0,
+  "status": "PASS (0 rows)"
+ },
+ "PLN-033": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025",
+   "district_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "PLN-034": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025",
+   "district_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "PLN-035": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025",
+   "district_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "PLN-036": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025",
+   "district_name": null,
+   "top_n": 10
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "PLN-037": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025",
+   "district_name": null,
+   "top_n": 10
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "PLN-038": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 39,
+  "status": "PASS"
+ },
+ "PLN-039": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "date_range_2": "2023-2024",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "PLN-040": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "date_range_2": "2023-2024",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "PLN-043": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 0,
+  "status": "PASS (0 rows)"
+ },
+ "PLN-044": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "PLN-045": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "threshold": 50
+  },
+  "rows": 0,
+  "status": "PASS (0 rows)"
+ },
+ "PLN-046": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "PLN-047": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "PLN-049": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": "Sanitation",
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "PLN-050": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 25,
+  "status": "PASS"
+ },
+ "PLN-051": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 25,
+  "status": "PASS"
+ },
+ "PLN-052": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "PLN-053": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "PLN-054": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "PLN-055": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "PLN-056": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "PLN-057": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "PLN-058": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": "Sanitation",
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "PLN-059": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": "Sanitation"
+  },
+  "rows": 0,
+  "status": "PASS (0 rows)"
+ },
+ "PLN-060": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null
+  },
+  "rows": 354,
+  "status": "PASS"
+ },
+ "PLN-061": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null
+  },
+  "rows": 296,
+  "status": "PASS"
+ },
+ "PLN-062": {
+  "answerable": "Yes",
+  "params": {
+   "date_range": "2024-2025",
+   "district_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "PLN-063": {
+  "answerable": "Yes",
+  "params": {
+   "date_range": "2024-2025",
+   "district_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "PLN-064": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "PLN-065": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "PLN-066": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "PLN-068": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 5,
+  "status": "PASS"
+ },
+ "PLN-069": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "threshold": 50
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "PLN-070": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 30,
+  "status": "PASS"
+ },
+ "PLN-071": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 25,
+  "status": "PASS"
+ },
+ "PLN-072": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "PLU-001": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 28,
+  "status": "PASS"
+ },
+ "PLU-003": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 20,
+  "status": "PASS"
+ },
+ "PLU-004": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "PLU-006": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "threshold": 50
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "PLU-007": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 4,
+  "status": "PASS"
+ },
+ "PLU-008": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "PLU-009": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "threshold": 50
+  },
+  "rows": 20,
+  "status": "PASS"
+ },
+ "SAN-001": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SAN-002": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SAN-003": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 20,
+  "status": "PASS"
+ },
+ "SAN-004": {
+  "answerable": "Yes",
+  "params": {
+   "date_range": "2024-2025",
+   "district_name": null
+  },
+  "rows": 16,
+  "status": "PASS"
+ },
+ "SAN-005": {
+  "answerable": "Yes",
+  "params": {
+   "activity_code": "44434659"
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SAN-006": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "SAN-007": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 16,
+  "status": "PASS"
+ },
+ "SAN-008": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025",
+   "district_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "SAN-009": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 33,
+  "status": "PASS"
+ },
+ "SAN-010": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 14,
+  "status": "PASS"
+ },
+ "SAN-011": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "SAN-012": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "SAN-013": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 5,
+  "status": "PASS"
+ },
+ "SAN-014": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 3,
+  "status": "PASS"
+ },
+ "SBM-GWM-001": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-GWM-002": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-GWM-003": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-GWM-004": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-GWM-005": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-GWM-006": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-GWM-007": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-GWM-008": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-GWM-009": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-GWM-010": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-GWM-011": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-GWM-012": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-OM-001": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-OM-002": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-OM-003": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-OM-004": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-OM-005": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-OM-006": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-OM-007": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-OM-008": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-OM-009": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-OM-010": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": "Sanitation",
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-001": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-002": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-003": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-004": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-005": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-006": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-007": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-008": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-009": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-010": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-011": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-012": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-013": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-014": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-015": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-016": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-017": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-018": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-019": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-020": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-021": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-022": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-023": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-024": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SI-025": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-001": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-002": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-003": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-004": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-005": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-006": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-007": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-008": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-009": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-010": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-011": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-012": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-013": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-014": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-015": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-016": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-017": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-018": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-019": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-020": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-021": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-022": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-023": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-024": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-025": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-026": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-027": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-028": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-029": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-030": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-031": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-032": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-034": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-035": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-036": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-037": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-038": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SBM-SWM-039": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SCH-001": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "scheme": "XV Finance Commission"
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SCH-002": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "scheme": "XV Finance Commission",
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "SCH-003": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "scheme": "XV Finance Commission"
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SCH-005": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 3,
+  "status": "PASS"
+ },
+ "SCH-006": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "scheme": "XV Finance Commission"
+  },
+  "rows": 0,
+  "status": "PASS (0 rows)"
+ },
+ "SCH-007": {
+  "answerable": "Yes",
+  "params": {
+   "activity_code": "44434659"
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SCH-008": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "scheme": "XV Finance Commission",
+   "scheme_2": "5TH STATE FINANCE COMMISSION"
+  },
+  "rows": 2,
+  "status": "PASS"
+ },
+ "SCH-009": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "scheme": "XV Finance Commission"
+  },
+  "rows": 4,
+  "status": "PASS"
+ },
+ "SCH-010": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "scheme": "XV Finance Commission"
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "SCH-011": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025",
+   "scheme": "XV Finance Commission"
+  },
+  "rows": 9,
+  "status": "PASS"
+ },
+ "STS-001": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 6,
+  "status": "PASS"
+ },
+ "STS-002": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025",
+   "district_name": null
+  },
+  "rows": 43,
+  "status": "PASS"
+ },
+ "STS-003": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "status": "WORK ONGOING"
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "STS-004": {
+  "answerable": "Yes",
+  "params": {
+   "date_range": "2024-2025",
+   "district_name": null,
+   "top_n": 10
+  },
+  "rows": 6,
+  "status": "PASS"
+ },
+ "STS-005": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "STS-006": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "STS-007": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025",
+   "district_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "STS-008": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "STS-009": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 19,
+  "status": "PASS"
+ },
+ "STS-010": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "STS-011": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025",
+   "district_name": null
+  },
+  "rows": 0,
+  "status": "PASS (0 rows)"
+ },
+ "STS-012": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 20,
+  "status": "PASS"
+ },
+ "STS-013": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025"
+  },
+  "rows": 9,
+  "status": "PASS"
+ },
+ "TRD-001": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "date_range_2": "2023-2024",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "TRD-002": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "date_range_2": "2023-2024",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "TRD-003": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 6,
+  "status": "PASS"
+ },
+ "TRD-004": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "date_range_2": "2023-2024",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "TRD-005": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 6,
+  "status": "PASS"
+ },
+ "TRD-006": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 120,
+  "status": "PASS"
+ },
+ "TRD-007": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "TRD-008": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 25,
+  "status": "PASS"
+ },
+ "TRD-009": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 7,
+  "status": "PASS"
+ },
+ "TRD-010": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025",
+   "gp_name": null,
+   "gp_name_2": "Bandhpali"
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "TRD-011": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "block_name_2": "Barpali",
+   "date_range": "2024-2025"
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "TRD-012": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025",
+   "district_name": null
+  },
+  "rows": 9,
+  "status": "PASS"
+ },
+ "WRK-001": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 4,
+  "status": "PASS"
+ },
+ "WRK-002": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 4,
+  "status": "PASS"
+ },
+ "WRK-003": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "WRK-004": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "WRK-005": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 3,
+  "status": "PASS"
+ },
+ "WRK-007": {
+  "answerable": "Yes",
+  "params": {
+   "block_name": null,
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 6,
+  "status": "PASS"
+ },
+ "WRK-008": {
+  "answerable": "Partial",
+  "params": {
+   "asset_category": "Irrigation Sources",
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "WRK-009": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "district_name": null,
+   "gp_name": null
+  },
+  "rows": 31,
+  "status": "PASS"
+ }
+}
