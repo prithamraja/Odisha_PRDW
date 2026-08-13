@@ -1,6 +1,6 @@
 # Odisha PR&DW Analytics — Project Plan & Decision Log
 
-Maintained by the PM session. Last updated: **2026-08-13 (post WP-2)**.
+Maintained by the PM session. Last updated: **2026-08-13 (post WP-3)**.
 Read `ODISHA_PRDW_BOOTSTRAP.md` first — this document layers the *current* plan,
 decisions, and state on top of it. Implementation agents receive work via
 `handoffs/WP*.md` briefs and reply with `REPORT.md` at the repo root.
@@ -67,6 +67,7 @@ decisions, and state on top of it. Implementation agents receive work via
 | D9 | **Fiscal year is an ordinary named slot** (`$date_range` etc.), never a `date_filter` injection — `date_kind` machinery stays dormant for PR&DW (its `year` kind compares integers; Odisha's fiscal year is the `'2024-2025'` string). `date_phrase.py` (WP-2) maps phrasings ("FY 24-25", "last year", "this year") onto the exact full-form string. A question with no year stated follows required-slot behavior — clarification chip — for v1; revisit from pilot logs if officers overwhelmingly mean "current year". | PM ruling on WP-1 report §8.3. |
 | D10 | **Geography binds LGD codes end-to-end — decided in principle (D4); the SQL predicate rewrite (`gp_name = $gp_name` → `gp_lgd_code = $gp_code`) is a WP-3 decision** pending `create_views.sql`, which determines whether the views expose block/district codes. WP-2 must deliver name→code resolution machinery regardless, so WP-3's choice is a predicate edit, not new design. | Workbook SQL filters on names (safe for the 20 unique sample GPs, unsafe statewide). Operator has waived byte-level SQL fidelity in favor of performance/correctness. |
 | D12 | ~~Rebuild `dim_code` from `code_descriptions_updated.xlsx`~~ **RESCINDED 2026-08-13** — the operator withdrew the `20_GP_flattened_data` drop as incorrect before anything was executed. No code, database, or catalogue change ever happened under D12 (the WP-3 T1b task was removed from the brief unrun). The DB's `dim_code` stands as shipped. | Drop declared incorrect by operator. |
+| D13 | **Rulings on WP-3 report §12 (PM, 2026-08-13):** (1) caveat appended verbatim to the deterministic answer text AND kept as a response field — accepted, strengthens D3 (WP-1's separate-field-only stance assumed an LLM-regenerated answer; `echo_answer` is deterministic and no frontend renders fields yet); (2) SQL-derived optionality wins over the Parameter Registry sheet for the 12 disagreements — the sheet needs the edit (team ask); (3) ALR-001/ALR-008's optional `$date_range` stands as a workbook-endorsed exception to D9; (4) the four duplicate question pairs keep both IDs (traceability to the signed-off workbook; identical SQL means either route is correct — WP-4 grading must treat them as acceptable-answer sets); (5) dashboards stay OFF until operator+SME ratify the 21-entry proposal, the pinned `'2024-2025'` year, and caveats-on-tiles; (6) statewide pagination for unbounded exception reports is deferred to pilot evidence — with `top_n` ratified at 1,000 (operator, commit `96179d8`), oversize requests clarify. **D11.4 is closed: ceiling 1,000, ratified.** | WP-3 report §§5.2, 6.5, 9, 10, 12. |
 | D11 | **Rulings on WP-2 report §8:** (1) a bare four-digit year reads as the fiscal year *starting* in it ("2024" → `2024-2025`) — keep, pinned in tests, revisit from pilot logs; (2) unqualified "SFC" → `5TH STATE FINANCE COMMISSION` (the current one), "4th SFC" reaches the 4th — keep; (3) rename `EntityCandidate.village` to a tier-neutral name in WP-3; (4) `top_n` ceiling 1000 accepted **provisionally** — WP-3 must check whether any listing template legitimately needs more statewide (a full GP listing is ~6,800) and raise it then; (5) thin alias tables accepted — they fill from the D5 dictionary file and query logs, not guesses. | PM rulings 2026-08-13. |
 
 ## 3a. Standing disciplines (learned in this repo — additional to the bootstrap's)
@@ -93,7 +94,7 @@ decisions, and state on top of it. Implementation agents receive work via
 |---|---|---|---|
 | WP-1 | Engine extensions: DuckDB-file adapter (read-only), named binding (D1), optional slots (D2), caveat passthrough (D3). No domain content. | Baseline test suite still green + new unit tests green. | **DONE — gate green** (report: `handoffs/REPORT.md`; PM replay confirmed 293/32/17 on 2026-08-13). Commits `55c5a76`..`8af162e`. |
 | WP-2 | Entity layer: registry generated from the Parameter Registry sheet (values loaded from the DB, read-only); name→LGD-code resolution with clarification chips; extractor enums generated from the registry; fiscal-year phrase mapping (D9); lakh/crore amount normalization; collision test with synthetic duplicates (D4); alias scaffolding (Odia/colloquial). | `test_extraction_enums` green; collision test green; baseline preserved modulo documented AP-fixture swaps. | **DONE — gate green** (report: `handoffs/WP2_REPORT.md`; PM replay confirmed 359/33/0 on 2026-08-13). Commits `de3b052`..`56d3501`. Note: the brief's "20 bind names" was a PM miscount — the sheet has 19; nothing is missing. |
-| WP-3 | Catalogue: xlsx → `template_catalog.py` + caveats + scope-phrased paraphrases (D2); geography predicate decision (D10); dashboard picks; `rerank_context.py` family descriptions (Bracket/Module/Submodule as family structure); 17 No + 13 dropped wired into fallback as known-unanswerable; audit of the four retrieval-layer modules that assume all slots required (`reranker.py`, `suggestions.py`, `followup_classifier.py`, `fragment_reroute.py`, plus retire `router._scope_sibling` — WP-1 report §8.2); answer layer must render `caveat` when present; no `$tag$` quoting in catalogue SQL (WP-1 report §8.4). | Structural tests green; all 346 queries execute with sample binds matching the workbook Test Report row counts. | Blocked on `create_views.sql` |
+| WP-3 | Catalogue: xlsx → generated `template_catalog.py` (346) + `unanswerable_catalog.py` (30) + `rerank_context.py` (327 families) via committed `tools/build_catalog.py`; D10 decided (GP binds LGD code — 302 predicates rewritten, oracle-proven neutral; block/district bind validated names pending view amendment); caveats rendered verbatim on all three serving paths; AP retrieval layer retired; dashboard proposal (21, ships OFF pending ratification). | Structural tests green; 346/346 row-count agreement with the workbook Test Report. | **DONE — gate green** (report: `handoffs/WP3_REPORT.md`; PM replay 2026-08-13: suite 391/28/0 + `validate_catalog.py` all-clear). Commits `ea7cdef`..`96179d8`. |
 | WP-4 | Gold eval set (≥100 questions, officer phrasing, Odia/English/code-mixed) + recall/routing evals; then threshold calibration from eval evidence only. | Recall@30 ≈ 97%, end-to-end ≈ 96–97% parity benchmarks. | After WP-3 |
 | WP-5 | Gates file `prdw_gates.py` (replaces `pmkisan_gates.py`): catalogue validity, routing accuracy, extraction-enum agreement, model-identity check. | "Gate-green" is a single command. | Can start alongside WP-3 |
 
@@ -142,6 +143,14 @@ decisions, and state on top of it. Implementation agents receive work via
    `dim_code` oddities ('Buildings' code 173, the `'\t'` tab). Note: `Data/`
    is the per-table CSV format `PandasAdapter` loads — keep as the canonical
    raw export and the template for the statewide load / stub-data builder.
+6. **Team asks after WP-3 (2026-08-13):** (a) the additive view amendment —
+   `gp_lgd_code` on `v_asset`/`v_progress`, `block_code` + `district_code` on
+   the geography views (finishes D10 for statewide; not pilot-blocking);
+   (b) Parameter Registry sheet: correct the 12 optionality cells where the
+   SQL disagrees (WP-3 report §5.2); (c) confirm intent on the four duplicate
+   question pairs (EXP-031/032, BUD-014/017, EXP-009/011, EXP-026/030);
+   (d) cosmetic: views file header says V4; `days_since_sanction`
+   code/comment mismatch (unused by the catalogue).
 
 ## 6. Standing risks
 

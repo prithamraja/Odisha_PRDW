@@ -1,0 +1,54 @@
+{
+ "total_questions": 205,
+ "in_catalogue_brackets": 195,
+ "by_bracket": {
+  "Planning": 42,
+  "Sanitation (SBM)": 34,
+  "Budgeting & Funding": 22,
+  "Expenditure": 22,
+  "Implementation & Progress": 24,
+  "Monitoring, Alerts & Data Quality": 15,
+  "Sanctions & Approvals": 11,
+  "Assets": 10,
+  "Trends & Comparison": 9,
+  "Decision Support": 6,
+  "Beneficiaries": 4,
+  "Out of domain": 6
+ },
+ "by_language": {
+  "en": 122,
+  "code_mixed": 49,
+  "odia": 19,
+  "odia_translit": 15
+ },
+ "by_case_type": {
+  "standard": 158,
+  "followup": 11,
+  "ambiguity": 11,
+  "unanswerable": 19,
+  "out_of_domain": 6
+ },
+ "by_expected_behavior": {
+  "answer": 158,
+  "context_preserving_reroute": 11,
+  "clarify": 11,
+  "cannot_answer": 19,
+  "graceful_fallback": 6
+ },
+ "dashboard_eligible": 78,
+ "with_expected_result": 42,
+ "needing_sme_review": 35,
+ "distinct_workbook_ids_covered": 164,
+ "catalogue_distribution": {
+  "Planning": 23.7,
+  "Budgeting & Funding": 12.7,
+  "Expenditure": 10.5,
+  "Sanctions & Approvals": 3.9,
+  "Implementation & Progress": 11.0,
+  "Assets": 3.3,
+  "Sanitation (SBM)": 23.7,
+  "Trends & Comparison": 3.3,
+  "Monitoring, Alerts & Data Quality": 6.3,
+  "Decision Support": 1.7
+ }
+}
