@@ -28,14 +28,24 @@ Everything returns an ExtractedEntity, so the router flow is unchanged. Numeric
 values are returned as strings because that is what ExtractedEntity carries;
 DuckDB casts them at bind time, including in LIMIT and HAVING.
 
-**Exact DB strings bind; matching is whitespace-collapsed.** Several source
-values carry stray whitespace — `dim_lsdg_theme.lsdg_theme` has a trailing space
-on 'Theme 5 - Clean and Green Village ', and the `activity_status` decode of
-code 178 has a LEADING TAB. Both are logged at load. Neither is repaired: the
-column holds those bytes, so a tidied value would filter to zero rows — a silent
-wrong answer, which is exactly what "validation logs, never fixes" is about. The
-registry therefore stores the database's own strings and normalises only the
-COMPARISON, so a user typing the label cleanly still resolves.
+**Exact DB strings bind; matching is whitespace-collapsed.** Source values carry
+stray whitespace — `dim_lsdg_theme.lsdg_theme` has a trailing space on
+'Theme 5 - Clean and Green Village ', and the `activity_status` decode of code
+178 has a LEADING TAB. Logged at load, never repaired: the column holds those
+bytes, so a tidied value would filter to zero rows — a silent wrong answer, which
+is exactly what "validation logs, never fixes" is about. The registry therefore
+stores the database's own strings and normalises only the COMPARISON, so a user
+typing the label cleanly still resolves.
+
+**Every value is loaded from the column the catalogue FILTERS ON**, which since
+WP-3 means the `v_*` views rather than the base tables behind them. That
+distinction is doing real work: `v_activity.status_label` TRIMs and de-tabs the
+`dim_code` decode, so the value the registry binds is 'WORK COMPLETED' even
+though `dim_code` still stores '\\tWORK COMPLETED'. Loading the raw decode and
+binding it against the view is a zero-row answer with no error anywhere. The
+theme trailing space, by contrast, survives into the view and so survives here.
+The views are created at adapter startup — see `db_factory._seed_views` and
+`open_analytical_db`, which anything constructing an adapter directly must use.
 """
 import re
 from dataclasses import dataclass
@@ -349,10 +359,20 @@ REGISTRY_CONFIG: dict[str, dict] = {
     "activity_code": {"kind": "passthrough"},
 
     # ── Numeric pass-through ─────────────────────────────────────────────────
-    # 1,000 rather than AP's 100: "list every block" is 314 rows statewide and
-    # refusing it would be the registry inventing a limit the catalogue does not
-    # have.
-    "top_n":            {"kind": "numeric", "cast": int, "min": 1, "max": 1000},
+    # 10,000 rather than WP-2's provisional 1,000 (decision D11.4, which asked
+    # WP-3 to audit and raise if needed — it is needed). The audit of all 91
+    # $top_n templates found 38 whose statewide result can exceed 1,000, in two
+    # classes:
+    #   * whole-roster rankings and listings at GP grain — "list every GP by
+    #     unspent balance" is ~6,800 rows statewide, and a ceiling that refuses
+    #     it makes a legitimate question unanswerable;
+    #   * exception reports at ACTIVITY grain (ALR-*, DQY-*, EXP-03x) — those are
+    #     unbounded, 12,704 activities in a 20-GP sample alone.
+    # 10,000 clears the roster case with headroom. It deliberately does NOT clear
+    # the activity case: serving tens of thousands of exception rows into a chat
+    # answer is a pagination problem, not a limit to raise, and is flagged for
+    # the operator in WP3_REPORT rather than solved by a bigger number here.
+    "top_n":            {"kind": "numeric", "cast": int, "min": 1, "max": 10000},
     # The sheet is explicit that $threshold's unit varies by question — percent,
     # rupees, days, or a minimum activity count. Amount notation is accepted
     # because some of those questions ARE rupee questions; a bare number passes
@@ -620,17 +640,31 @@ class EntityValidator:
             _log.warning("entity registry query failed (%s): %s", sql.strip()[:60], exc)
             return []
 
-    # The allowed-values queries from the workbook's Parameter Registry sheet.
+    # The allowed-values queries from the workbook's Parameter Registry sheet,
+    # verbatim. WP-2 had to substitute base-table decodes for four of them
+    # because the v_* views were absent; WP-3 created the views (see
+    # db_factory._seed_views) and switched all four back. The registry now reads
+    # exactly the columns the catalogue SQL filters on, which is the only way a
+    # validated value is guaranteed to match.
     #
-    # TODO(create_views): four of these are SUBSTITUTES. The sheet points
-    # $status at `v_activity.status_label` and the two asset slots at
-    # `v_asset.asset_*_label`, but the seven v_* views are absent from this copy
-    # of the database (see PROJECT_PLAN blocker 1), so the base tables are
-    # decoded here instead. `dim_code` needs BOTH halves of its join — the
-    # `variable` predicate AND a VARCHAR cast of the code — per the data
-    # dictionary §4; the asset columns are DOUBLE, so they take a BIGINT cast
-    # first or '77.0' never matches '77'. When create_views.sql arrives, swap
-    # these four back to the view columns and delete this note.
+    # THE VIEW IS THE SOURCE OF TRUTH, NOT THE DECODE BEHIND IT. Three values
+    # moved in the switch, and each one matters:
+    #   status_label      the view TRIMs and de-tabs the decode, so the registry
+    #                     now holds 'WORK COMPLETED' where WP-2 held
+    #                     '\tWORK COMPLETED'. This is WP2_REPORT §4.1's marked
+    #                     switch. Binding the tabbed form against the view would
+    #                     answer "no activities are complete" — same value count
+    #                     (6), opposite meaning.
+    #   asset_*_label     the view COALESCEs an undecoded code to 'Uncategorised'
+    #                     (+1 value each). That is not padding: 8,439 of the
+    #                     12,704 asset rows are 'Uncategorised', the single
+    #                     largest bucket, and it is a legitimate thing to ask
+    #                     about. Omitting it would refuse a question the view can
+    #                     answer.
+    # `theme` deliberately still reads dim_lsdg_theme, because that is the query
+    # the sheet gives for it. v_activity.theme carries a seventh value,
+    # 'Unmapped theme', for the 13 focus areas with no LSDG mapping; it is a
+    # view artefact rather than a theme, so it is not offered as one.
     _DB_SOURCES: dict[str, str] = {
         "district": 'SELECT DISTINCT zp_name FROM gram_panchayat '
                     'WHERE zp_name IS NOT NULL',
@@ -646,27 +680,12 @@ class EntityValidator:
                        'WHERE lsdg_theme IS NOT NULL',
         "scheme":      'SELECT DISTINCT scheme_name FROM activity_expenditure '
                        'WHERE scheme_name IS NOT NULL',
-        # TODO(create_views): v_activity.status_label
-        "status": (
-            "SELECT DISTINCT d.description FROM planned_activity pa "
-            "JOIN dim_code d ON d.variable = 'activity_status' "
-            "                AND d.code = CAST(pa.activity_status AS VARCHAR) "
-            "WHERE d.description IS NOT NULL"
-        ),
-        # TODO(create_views): v_asset.asset_category_label
-        "asset_category": (
-            "SELECT DISTINCT d.description FROM activity_asset aa "
-            "JOIN dim_code d ON d.variable = 'asset_category' "
-            "                AND d.code = CAST(CAST(aa.asset_category AS BIGINT) AS VARCHAR) "
-            "WHERE d.description IS NOT NULL"
-        ),
-        # TODO(create_views): v_asset.asset_subcategory_label
-        "asset_subcategory": (
-            "SELECT DISTINCT d.description FROM activity_asset aa "
-            "JOIN dim_code d ON d.variable = 'asset_subcategory' "
-            "                AND d.code = CAST(CAST(aa.asset_subcategory AS BIGINT) AS VARCHAR) "
-            "WHERE d.description IS NOT NULL"
-        ),
+        "status":            'SELECT DISTINCT status_label FROM v_activity '
+                             'WHERE status_label IS NOT NULL',
+        "asset_category":    'SELECT DISTINCT asset_category_label FROM v_asset '
+                             'WHERE asset_category_label IS NOT NULL',
+        "asset_subcategory": 'SELECT DISTINCT asset_subcategory_label FROM v_asset '
+                             'WHERE asset_subcategory_label IS NOT NULL',
     }
 
     # Same vocabulary, ordered by how much of the data each value actually
@@ -681,13 +700,13 @@ class EntityValidator:
         # Newest first: an officer offered a year wants the current one.
         "fiscal_year": 'SELECT DISTINCT fiscal_year FROM planned_activity '
                        'WHERE fiscal_year IS NOT NULL ORDER BY fiscal_year DESC',
-        "focus_area": (
-            "SELECT d.description FROM planned_activity pa "
-            "JOIN dim_code d ON d.variable = 'focus_area' "
-            "                AND d.code = CAST(pa.focus_area AS VARCHAR) "
-            "WHERE d.description IS NOT NULL "
-            "GROUP BY d.description ORDER BY COUNT(*) DESC"
-        ),
+        # The fourth WP-2 substitute, switched to the view. Same 30 values in the
+        # same frequency order; the join was already equivalent, but reading the
+        # view keeps every allowed-values query pointed at the column the
+        # catalogue actually filters on.
+        "focus_area": 'SELECT focus_area_name FROM v_activity '
+                      'WHERE focus_area_name IS NOT NULL '
+                      'GROUP BY focus_area_name ORDER BY COUNT(*) DESC',
         "scheme": 'SELECT scheme_name FROM activity_expenditure '
                   'WHERE scheme_name IS NOT NULL '
                   'GROUP BY scheme_name ORDER BY COUNT(*) DESC',
@@ -1089,7 +1108,7 @@ class EntityValidator:
                 EntityCandidate(
                     name=g.name,
                     districts=[g.district] if g.district else [],
-                    village=g.block or None,   # the narrower place; see models
+                    parent_place=g.block or None,   # the narrower place; see models
                     code=g.lgd_code,
                 )
                 for g in shortlist[:MAX_GP_CANDIDATES]

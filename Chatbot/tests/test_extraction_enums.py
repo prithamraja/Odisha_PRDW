@@ -74,14 +74,20 @@ def _adapter():
 
     Memoised because the skip decorator and setUpClass both ask, and the
     database sits on a Drive-synced path where a cold open is not free.
+
+    Opened through `db_factory.open_analytical_db`, NOT `DuckDBFileAdapter`
+    directly: three of the allowed-values queries read `v_activity`/`v_asset`,
+    and a view-less adapter would fail them softly — `_query` logs and returns
+    `[]`, leaving the status and asset registries empty and every assertion over
+    them vacuously true. Which is the failure this whole module exists to catch.
     """
     if _ADAPTER_CACHE:
         return _ADAPTER_CACHE[0]
     adapter = None
     if _DB_PATH.exists():
         try:
-            from db_adapters import DuckDBFileAdapter
-            adapter = DuckDBFileAdapter(_DB_PATH)
+            from db_factory import open_analytical_db
+            adapter = open_analytical_db(_DB_PATH)
         except Exception:
             adapter = None
     _ADAPTER_CACHE.append(adapter)

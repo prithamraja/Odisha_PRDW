@@ -109,12 +109,23 @@ class DuckDBFileAdapter:
           - DuckDB itself rejects any write aimed at the file, so read-only is
             enforced by the engine rather than by our own care.
 
-        The cost of `memory.main` coming first is that an in-memory table would
-        SHADOW a file table of the same name. Nothing collides today
-        (`dashboard_cache`/`query_templates` against 19 domain tables), and
-        `check_cache_table_collisions()` reports it loudly if that ever changes
-        — a silently shadowed table would serve stale cache rows as if they were
-        data.
+        The cost of `memory.main` coming first is that an in-memory relation
+        would SHADOW a file relation of the same name. Nothing collides today
+        (`dashboard_cache`/`query_templates` plus the seven `v_*` views against
+        19 domain tables), and `check_cache_table_collisions()` reports it loudly
+        if that ever changes — a silently shadowed table would serve stale cache
+        rows as if they were data.
+
+    THE ANALYTICAL VIEWS LIVE HERE TOO (WP-3)
+        `sql/create_views.sql` is the supplied, PM-validated definition of the
+        seven `v_*` views every catalogue query reads from. They are NOT baked
+        into the shipped `.duckdb` — `data_relations()` reports 19 tables and no
+        views — and they cannot be, because the file is read-only on Drive. So
+        they are created in the same writable in-memory catalog, by
+        `ensure_views()`, on exactly the mechanism the cache tables already use:
+        the view BODIES reference base tables unqualified, and those names
+        resolve through `search_path` into the attached read-only file. The Drive
+        file is never modified; the views exist for the life of the process.
 
     Thread safety: one connection behind a lock, as SupabaseAdapter does.
     """
@@ -178,17 +189,56 @@ class DuckDBFileAdapter:
             ).fetchall()
         return [r[0] for r in rows]
 
+    def ensure_views(self, ddl: str) -> None:
+        """Create the analytical views in the writable in-memory catalog.
+
+        `ddl` is the whole of `sql/create_views.sql`, executed as one script:
+        DuckDB accepts a multi-statement string, which is safer than splitting on
+        `;` ourselves (the cache-table seeder can split naively because its DDL
+        has no semicolons inside literals; a 270-line view script is not a place
+        to rely on that).
+
+        Order matters and the supplied file already has it right: `v_exp` and
+        `v_approval` are defined before `v_activity` reads them, and `v_activity`
+        before `v_asset`/`v_progress`. DuckDB binds a view's body at CREATE time,
+        so a forward reference would fail here rather than at query time.
+        """
+        with self._lock:
+            self._conn.execute(ddl)
+
+    def memory_views(self) -> list[str]:
+        """View names created in the writable in-memory catalog."""
+        with self._lock:
+            rows = self._conn.execute(
+                "SELECT view_name FROM duckdb_views() "
+                "WHERE database_name = 'memory' ORDER BY 1"
+            ).fetchall()
+        return [r[0] for r in rows]
+
     def check_cache_table_collisions(self) -> list[str]:
         """Names present in BOTH catalogs, where the in-memory one wins.
 
-        Empty is the healthy answer. A non-empty list means a cache table is
-        shadowing a domain table of the same name and queries against it are
-        reading the cache instead of the data.
+        Empty is the healthy answer. A non-empty list means an in-memory relation
+        is shadowing a domain relation of the same name and queries against it
+        are reading the in-memory one instead of the data.
+
+        Covers in-memory VIEWS as well as tables, because WP-3 puts the seven
+        `v_*` views in that same catalog. The shipped sample carries no views, so
+        nothing collides — but the workbook's "How to use" sheet claims the views
+        were baked into *its* copy of the database, and if such a copy is ever
+        pointed at by DB_PATH the in-memory definition would silently win over
+        the file's. Same definition or not, that is a fact the operator should
+        see rather than infer.
         """
+        # Both sides are parenthesised deliberately: INTERSECT binds TIGHTER
+        # than UNION, so an unbracketed `a UNION b INTERSECT (…)` would read as
+        # `a UNION (b INTERSECT …)` and report every cache table as a collision.
         with self._lock:
             rows = self._conn.execute(
-                "SELECT table_name FROM duckdb_tables() WHERE database_name = 'memory' "
-                "INTERSECT ("
+                "("
+                "  SELECT table_name FROM duckdb_tables() WHERE database_name = 'memory' "
+                "  UNION SELECT view_name FROM duckdb_views() WHERE database_name = 'memory'"
+                ") INTERSECT ("
                 "  SELECT table_name FROM duckdb_tables() WHERE database_name = ? "
                 "  UNION SELECT view_name FROM duckdb_views() WHERE database_name = ?"
                 ") ORDER BY 1",

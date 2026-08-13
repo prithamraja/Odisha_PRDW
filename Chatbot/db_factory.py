@@ -74,6 +74,69 @@ def _seed_cache_tables(adapter) -> None:
             adapter.execute_ddl(stmt)
 
 
+# The seven analytical views every PR&DW catalogue query reads from, in the
+# order sql/create_views.sql defines them. v_exp and v_approval are building
+# blocks (1:1 rollups) that v_activity joins; the other five are what the
+# catalogue names directly.
+VIEWS = ("v_exp", "v_approval", "v_activity", "v_plan",
+         "v_asset", "v_progress", "v_voucher")
+
+VIEWS_DDL_PATH = Path(__file__).parent / "sql" / "create_views.sql"
+
+
+def _seed_views(adapter) -> list[str]:
+    """Create the v_* analytical views, and prove each one is queryable.
+
+    The views are NOT in the shipped .duckdb (19 tables, no views) and cannot be
+    added to it — it is opened read-only, on Drive, deliberately. They are
+    created in the adapter's writable in-memory catalog instead, where their
+    unqualified base-table references resolve through search_path into the
+    attached file. Byte-identical to the supplied Data/create_views.sql.
+
+    Returns the view names that exist afterwards. A missing DDL file is fatal
+    rather than degraded: every one of the 346 catalogue queries reads a view, so
+    a backend that boots without them answers nothing and would fail 346 times at
+    query time instead of once here.
+    """
+    if not VIEWS_DDL_PATH.exists():
+        raise RuntimeError(
+            f"DB_ENGINE=duckdb_file but {VIEWS_DDL_PATH} is missing. Every "
+            "catalogue query reads a v_* view; without this file the backend "
+            "cannot answer anything."
+        )
+    adapter.ensure_views(VIEWS_DDL_PATH.read_text(encoding="utf-8"))
+
+    created = set(adapter.memory_views())
+    missing = [v for v in VIEWS if v not in created]
+    if missing:
+        raise RuntimeError(
+            f"create_views.sql ran but did not define: {', '.join(missing)}"
+        )
+    # Bind-time success is not proof a view SELECTs: an unresolved column in a
+    # LEFT JOIN target would only surface on first read, which in production is
+    # a user's question rather than startup.
+    for view in VIEWS:
+        adapter.execute(f"SELECT * FROM {view} LIMIT 0")
+    return sorted(created)
+
+
+def open_analytical_db(db_path) -> DuckDBFileAdapter:
+    """The PR&DW database, read-only, WITH its views — for direct constructors.
+
+    `get_adapter()` is the singleton the app boots through; tests, eval harnesses
+    and one-off scripts open the sample database on their own. They must go
+    through here rather than calling `DuckDBFileAdapter(path)` themselves,
+    because an adapter without views fails SOFTLY: `EntityValidator._query`
+    catches a failing allowed-values query, logs a warning and returns `[]`, so
+    the status and asset registries load EMPTY and every test that reads them
+    passes vacuously. A view-less adapter is not a smaller version of this
+    database; it is a differently-behaved one.
+    """
+    adapter = DuckDBFileAdapter(db_path)
+    _seed_views(adapter)
+    return adapter
+
+
 _adapter: PandasAdapter | SupabaseAdapter | DuckDBFileAdapter | None = None
 
 
@@ -100,18 +163,22 @@ def get_adapter() -> PandasAdapter | SupabaseAdapter | DuckDBFileAdapter:
         # DuckDBFileAdapter's docstring for why the attachment is inverted.
         _seed_cache_tables(_adapter)
 
+        # The analytical views go in the same catalog, for the same reason.
+        views = _seed_views(_adapter)
+
+        # Checked AFTER both, so it sees everything the in-memory catalog holds.
         shadowed = _adapter.check_cache_table_collisions()
         if shadowed:
             _log.error(
-                "[db] cache tables shadow relations in %s: %s — queries against "
-                "these names read the cache, not the data",
+                "[db] in-memory relations shadow relations in %s: %s — queries "
+                "against these names read the in-memory copy, not the file",
                 db_path.name, ", ".join(shadowed),
             )
 
         relations = _adapter.data_relations()
         print(
             f"[db] Using DuckDB file {db_path} (read-only, "
-            f"{len(relations)} tables/views; cache tables in-memory)"
+            f"{len(relations)} tables; {len(views)} views + cache tables in-memory)"
         )
         return _adapter
 
