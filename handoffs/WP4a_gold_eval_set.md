@@ -1,7 +1,9 @@
 # WP-4a — Gold eval set, first draft (handoff brief)
 
 **For:** the operator-controlled implementation agent.
-**Runnable NOW** — content-only, no code changes, no dependency on `create_views.sql`. Designed to fill the idle slot while WP-3 is blocked. Must be finished (or paused and committed) before WP-3 starts — one agent run per working tree.
+**Runnable NOW — including in PARALLEL with WP-3, in sandbox mode.** Content-only, no code changes.
+
+**Sandbox mode (mandatory when WP-3 is running, fine anytime):** WP-3 owns the repo's working tree and git. You READ the repo freely (the workbook, the eval harness code) but WRITE everything — the `eval/gold/` tree and your report — to a staging directory OUTSIDE the repo (your session scratchpad or an operator-named folder), and perform **zero git operations**. Your output is purely additive, so integration afterwards is: copy `eval/gold/` + the report into the repo, one commit. State the staging path prominently at the top of your report. One soft dependency: the harness-format check imports `Chatbot/` code that WP-3 may be mid-rewrite on — if it fails strangely, note it and re-run the check after WP-3 lands instead of debugging.
 **Read first:** `ODISHA_PRDW_BOOTSTRAP.md` (Stage 3–4, multilingual lessons); `PROJECT_PLAN.md` (D5, D9, D11); the Questions sheet of `AI_Chatbot_Questions.xlsx`.
 
 ## What this is
@@ -10,7 +12,7 @@ The gold question set that WP-4's recall/routing evals will grade against (AP be
 
 ## Constraints
 
-- New files only, under `eval/gold/` at the repo root. No code edits, no LLM calls, no DB writes (read-only DB access is fine for sampling realistic entity values).
+- New files only, in an `eval/gold/` tree (in your staging directory under sandbox mode; at the repo root only if WP-3 is not running). No code edits, no LLM calls, no DB writes (read-only DB access is fine for sampling realistic entity values).
 - First inspect `recall_eval.py` / `run_full_eval.py` to learn the harness's expected input format, and match it (fields like question, expected query_id(s), expected entities). Do not modify the harnesses.
 - §3a disciplines apply (clean tree; commit at the end).
 
