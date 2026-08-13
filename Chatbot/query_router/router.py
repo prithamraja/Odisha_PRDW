@@ -49,7 +49,9 @@ from .zones             import (
     readable_question,
     zone,
 )
+from .dashboard_catalog import DASHBOARD_CATALOG
 from .fragment_reroute   import drill_target
+from .sql_params         import NAMED, param_style
 from .suggestions       import elicitation_chips
 from .config            import (
     MAX_CLARIFY_OPTIONS,
@@ -92,10 +94,28 @@ def _year_of(value: str) -> int:
     return int(str(value).strip()[:4])
 
 
+# Names for the injected date placeholders on the NAMED path. Double underscore
+# so they cannot collide with a catalogue bind name (the Parameter Registry's
+# names are all plain, e.g. district_name, fin_year).
+DATE_START_PARAM = "__date_start"
+DATE_END_PARAM   = "__date_end"
+
+
 def _date_predicate(
-    alias: str, column: str, date_kind: str | None, start_date: str, end_date: str
-) -> tuple[str, list]:
-    """(predicate SQL with ? placeholders, the values to bind after the template's own).
+    alias: str,
+    column: str,
+    date_kind: str | None,
+    start_date: str,
+    end_date: str,
+    *,
+    named: bool = False,
+) -> tuple[str, list | dict]:
+    """(predicate SQL, the date values to bind).
+
+    Placeholder style follows the template's own: `?` with a list of values for
+    positional SQL, `$__date_start`/`$__date_end` with a dict for named SQL. A
+    template's injected predicate MUST match the style of the statement it is
+    spliced into — DuckDB will not mix `?` and `$name` in one prepared statement.
 
     Column references are quoted because AP columns are mixed-case
     ("SurveyDate", "PROCUREMENT_DATE"), and the alias is omitted entirely when
@@ -103,13 +123,23 @@ def _date_predicate(
     where `alias.column` would emit a broken leading dot.
     """
     col = f'{alias}."{column}"' if alias else f'"{column}"'
+    lo  = f"${DATE_START_PARAM}" if named else "?"
+    hi  = f"${DATE_END_PARAM}"   if named else "?"
+
+    def _binds(start, end) -> list | dict:
+        if named:
+            return {DATE_START_PARAM: start, DATE_END_PARAM: end}
+        return [start, end]
 
     if date_kind in (None, "", "iso"):
-        return f"{col}::DATE BETWEEN ? AND ?", [start_date, end_date]
+        return f"{col}::DATE BETWEEN {lo} AND {hi}", _binds(start_date, end_date)
 
     if date_kind == "year":
         # agriculture has no date column, only cropyear — a plain number.
-        return f"{col} >= ? AND {col} <= ?", [_year_of(start_date), _year_of(end_date)]
+        return (
+            f"{col} >= {lo} AND {col} <= {hi}",
+            _binds(_year_of(start_date), _year_of(end_date)),
+        )
 
     if date_kind == "serial":
         # Excel day serials. No template ships with this kind any more (the data
@@ -130,18 +160,27 @@ def _inject_date_filter(
     *,
     start_date: str,
     end_date: str,
-) -> tuple[str, int, list]:
+    named: bool = False,
+) -> tuple[str, int, list | dict]:
     """
     Appends the date condition to the SQL, inserting just before the first
     GROUP BY / ORDER BY / LIMIT after the last WHERE clause.
 
-    Returns (sql, placeholder_offset, date_params). Placeholders bind by their
-    order in the SQL TEXT, and the predicate can land ahead of one the template
-    already has — 'LIMIT ?' on the top-N templates is the case that bites. So the
-    caller must splice, not append: `params[:offset] + date_params + params[offset:]`.
-    Use merge_date_params() rather than doing it by hand.
+    Returns (sql, placeholder_offset, date_params).
+
+    POSITIONAL (`named=False`): placeholders bind by their order in the SQL TEXT,
+    and the predicate can land ahead of one the template already has — 'LIMIT ?'
+    on the top-N templates is the case that bites. So the caller must splice, not
+    append: `params[:offset] + date_params + params[offset:]`. Use
+    merge_date_params() rather than doing it by hand.
+
+    NAMED (`named=True`): placeholders bind by name, so text order carries no
+    meaning and `date_params` is a dict the caller merges with `{**params,
+    **date_params}`. The returned offset is 0 and must be ignored.
     """
-    predicate, date_params = _date_predicate(alias, column, date_kind, start_date, end_date)
+    predicate, date_params = _date_predicate(
+        alias, column, date_kind, start_date, end_date, named=named,
+    )
 
     # AP templates are terminated with ';' — drop it so a trailing append lands
     # inside the statement rather than after it.
@@ -159,9 +198,10 @@ def _inject_date_filter(
         for m in re.finditer(kw, sql, re.IGNORECASE):
             if m.start() >= last_where_end:
                 head = sql[:m.start()].rstrip()
-                return head + condition + '\n' + sql[m.start():], head.count("?"), date_params
+                offset = 0 if named else head.count("?")
+                return head + condition + '\n' + sql[m.start():], offset, date_params
 
-    return sql.rstrip() + condition, sql.count("?"), date_params
+    return sql.rstrip() + condition, (0 if named else sql.count("?")), date_params
 
 
 def merge_date_params(param_values: list, offset: int, date_params: list) -> list:
@@ -169,10 +209,36 @@ def merge_date_params(param_values: list, offset: int, date_params: list) -> lis
     return param_values[:offset] + date_params + param_values[offset:]
 
 
-def _exec_template(cache_conn, query_id: str, sql_template: str, param_values: list, ttl: int) -> list[dict]:
-    h = hashlib.sha256(
-        json.dumps([str(p) for p in param_values]).encode()
-    ).hexdigest()[:8]
+def _merge_date_binds(
+    params: list | dict, offset: int, date_params: list | dict
+) -> list | dict:
+    """Style-agnostic merge of the injected date binds into the template's own."""
+    if isinstance(params, dict):
+        return {**params, **date_params}
+    return merge_date_params(params, offset, date_params)
+
+
+def _param_cache_fingerprint(param_values: list | dict) -> str:
+    """A stable string identifying one set of bound values.
+
+    Named binds are a DICT, and iterating a dict yields its KEYS — the original
+    positional-only fingerprint would have hashed `["district_name", "fin_year"]`
+    for every question of that shape, so two different districts would have
+    shared one cache entry and the second would have been served the first's
+    rows. Sort by key so ordering cannot change the fingerprint either.
+    """
+    if isinstance(param_values, dict):
+        payload = [[k, str(v)] for k, v in sorted(param_values.items())]
+    else:
+        payload = [str(p) for p in param_values]
+    return hashlib.sha256(json.dumps(payload).encode()).hexdigest()[:8]
+
+
+def _exec_template(
+    cache_conn, query_id: str, sql_template: str,
+    param_values: list | dict, ttl: int,
+) -> list[dict]:
+    h = _param_cache_fingerprint(param_values)
     cache_key = f"tmpl:{query_id}:{h}"
     cached = _cache_get(cache_key)
     if cached is not None:
@@ -305,6 +371,68 @@ def _extract_slot_values(
     return raw
 
 
+def optional_slots(param_slots: list[dict]) -> set[str]:
+    """Slot names this template may execute WITHOUT a value.
+
+    An optional slot marked {"optional": True} binds NULL when nothing was
+    extracted, which the Odisha catalogue's filter idiom
+
+        ($district_name IS NULL OR gp.district_name = $district_name)
+
+    reads as "don't filter on district". That is how one consolidated template
+    per question answers at every geographic scope, instead of the AP catalogue's
+    -S/-D/-M sibling variants. Absent optional slots must NOT stall on a
+    clarification: "how many activities are planned?" is a complete question
+    state-wide, and asking "for which district?" would be inventing a
+    requirement the question never had.
+
+    Required slots (no "optional" key — every AP slot) are unchanged: absent
+    means pause and ask, never execute broken SQL.
+    """
+    return {s["name"] for s in param_slots if s.get("optional")}
+
+
+def _resolve_slot_value(
+    slot: dict,
+    params_by_name: dict,
+    person_ids: dict[str, str],
+    context: str,
+):
+    """The value one slot binds — its Aadhaar, its extracted value, or None.
+
+    Shared by the positional and named binders so the two cannot drift on which
+    slot binds what.
+    """
+    name = slot["name"]
+    if slot.get("bind") == "aadhaar":
+        # An optional person-bound slot that was never supplied is absent, not
+        # unresolved — bind NULL rather than failing.
+        if name not in params_by_name and slot.get("optional"):
+            return None
+        aadhaar = person_ids.get(name)
+        if not aadhaar:
+            raise ValueError(
+                f"'{name}'{context} did not resolve to one person"
+            )
+        return aadhaar
+    return params_by_name.get(name)
+
+
+def _check_required(
+    param_slots: list[dict], params_by_name: dict, context: str
+) -> None:
+    """Raise unless every REQUIRED slot has a value."""
+    optional = optional_slots(param_slots)
+    missing = [
+        n for n in dict.fromkeys(s["name"] for s in param_slots)
+        if n not in params_by_name and n not in optional
+    ]
+    if missing:
+        raise ValueError(
+            f"missing parameter(s){context}: {', '.join(missing)}"
+        )
+
+
 def bind_param_values(
     param_slots: list[dict],
     params_by_name: dict,
@@ -324,30 +452,65 @@ def bind_param_values(
     that. `person_ids` carries slot -> Aadhaar for the entities that resolved to
     one individual; a person-bound slot with nothing there is a bug upstream and
     fails loudly rather than falling back to the name.
+
+    A slot marked {"optional": True} with no value binds None (SQL NULL) instead
+    of raising — see optional_slots().
     """
     ordered = sorted(param_slots, key=lambda s: s["position"])
     person_ids = person_ids or {}
-    missing = [
-        n for n in dict.fromkeys(s["name"] for s in ordered)
-        if n not in params_by_name
+    _check_required(ordered, params_by_name, context)
+    return [
+        _resolve_slot_value(slot, params_by_name, person_ids, context)
+        for slot in ordered
     ]
-    if missing:
-        raise ValueError(
-            f"missing parameter(s){context}: {', '.join(missing)}"
-        )
 
-    values = []
-    for slot in ordered:
-        if slot.get("bind") == "aadhaar":
-            aadhaar = person_ids.get(slot["name"])
-            if not aadhaar:
-                raise ValueError(
-                    f"'{slot['name']}'{context} did not resolve to one person"
-                )
-            values.append(aadhaar)
-        else:
-            values.append(params_by_name[slot["name"]])
-    return values
+
+def bind_named_params(
+    param_slots: list[dict],
+    params_by_name: dict,
+    *,
+    context: str = "",
+    person_ids: dict[str, str] | None = None,
+) -> dict:
+    """
+    {name: value} for SQL that uses `$name` placeholders — ONE entry per slot
+    NAME, however many times the name occurs in the statement.
+
+    This is the whole reason named binding is worth having: the Odisha catalogue
+    repeats every optional filter's parameter twice
+    (`($p IS NULL OR col = $p)`), and some questions repeat one across several
+    subqueries. Positional binding would need the value duplicated at exactly
+    the right offsets, which is where the conversion bugs live.
+
+    `position` is irrelevant here and is not required on the slot dicts.
+    """
+    person_ids = person_ids or {}
+    _check_required(param_slots, params_by_name, context)
+    return {
+        slot["name"]: _resolve_slot_value(slot, params_by_name, person_ids, context)
+        for slot in param_slots
+    }
+
+
+def bind_for_template(
+    template: dict,
+    params_by_name: dict,
+    *,
+    context: str = "",
+    person_ids: dict[str, str] | None = None,
+) -> list | dict:
+    """Bind in whichever style the template's SQL is written in.
+
+    Returns a LIST for positional (`?`) SQL and a DICT for named (`$name`) SQL;
+    both are what the DuckDB-backed adapters take directly.
+    """
+    binder = (
+        bind_named_params if param_style(template) == NAMED else bind_param_values
+    )
+    return binder(
+        template["param_slots"], params_by_name,
+        context=context, person_ids=person_ids,
+    )
 
 
 def _person_bound_slots(param_slots: list[dict]) -> set[str]:
@@ -391,6 +554,8 @@ def _fill_slots_or_clarify(
     user_query: str,
     normalized: str,
     start: float,
+    *,
+    optional: set[str] | frozenset[str] = frozenset(),
 ) -> tuple[list[ExtractedEntity], RouteResult | None]:
     """Validate every slot value, or return a clarify carrying pending state so
     the user's next message can resume this exact question.
@@ -400,6 +565,13 @@ def _fill_slots_or_clarify(
     load-bearing: every mandal-scoped question reads "…in {mandal} mandal" but
     its SQL also needs {district}, so the router must ask for the district
     without throwing away the mandal the user just named.
+
+    `optional` names the slots that may be left unfilled (see optional_slots()).
+    An absent optional slot is simply not validated and not reported missing —
+    the binder turns it into NULL, which the SQL reads as "don't filter". A
+    SUPPLIED optional value is validated exactly as a required one: "in Kendrapara
+    district" naming a district the registry doesn't know is a mistake to
+    surface, not a filter to silently drop.
     """
     validated: list[ExtractedEntity] = []
     missing: list[str] = []
@@ -425,7 +597,8 @@ def _fill_slots_or_clarify(
             # behave identically.
             raw_val = _DEFAULT_ENTITY_VALUES.get(slot_type[slot])
         if raw_val is None:
-            missing.append(slot)
+            if slot not in optional:
+                missing.append(slot)
             continue
         try:
             entity = validator.validate(raw_val, slot_type[slot])
@@ -684,8 +857,8 @@ def requery_template(
     resolved = validator.validate(swap_value, slot_types[swap_slot]).resolved_value
     params = dict(bound_params, **{swap_slot: resolved})
 
-    param_values = bind_param_values(
-        slots, params, context=f" for {query_id}",
+    param_values = bind_for_template(
+        template, params, context=f" for {query_id}",
         person_ids=_person_ids_for(slots, slot_types, params, validator),
     )
 
@@ -695,8 +868,9 @@ def requery_template(
         sql, offset, date_params = _inject_date_filter(
             sql, date_filter["alias"], date_filter["column"],
             template.get("date_kind"), start_date=start_date, end_date=end_date,
+            named=param_style(template) == NAMED,
         )
-        param_values = merge_date_params(param_values, offset, date_params)
+        param_values = _merge_date_binds(param_values, offset, date_params)
 
     return _exec_template(
         cache_conn, query_id, sql, param_values,
@@ -1037,6 +1211,7 @@ def serve_pending_answer(
     validated, clarify_result = _fill_slots_or_clarify(
         pending.query_id, slot_type, raw_entities, validator,
         pending.original_query, normalized, start,
+        optional=optional_slots(template["param_slots"]),
     )
     if clarify_result is not None:
         return clarify_result
@@ -1122,6 +1297,7 @@ def _serve_query_id(
             query_id=query_id,
             intent=intent,
             query_description=dashboard_questions.get(query_id),
+            caveat=(DASHBOARD_CATALOG.get(query_id) or {}).get("caveat"),
             start_date=start_date,
             end_date=end_date,
         )
@@ -1168,9 +1344,10 @@ def _serve_query_id(
     person_ids = {
         e.slot_name: e.person_aadhaar for e in validated_entities if e.person_aadhaar
     }
+    is_named = param_style(template) == NAMED
     try:
-        param_values = bind_param_values(
-            param_slots, params_by_name, context=f" for {query_id}",
+        param_values = bind_for_template(
+            template, params_by_name, context=f" for {query_id}",
             person_ids=person_ids,
         )
     except ValueError as ex:
@@ -1185,10 +1362,11 @@ def _serve_query_id(
             sql, offset, date_params = _inject_date_filter(
                 sql, date_filter["alias"], date_filter["column"],
                 template.get("date_kind"), start_date=start_date, end_date=end_date,
+                named=is_named,
             )
         except DateFilterUnsupported as ex:
             return _fallback(str(ex), user_query, normalized, start)
-        param_values        = merge_date_params(param_values, offset, date_params)
+        param_values        = _merge_date_binds(param_values, offset, date_params)
         date_filter_applied = True
 
     try:
@@ -1209,6 +1387,7 @@ def _serve_query_id(
         query_id=query_id,
         intent=intent,
         query_description=query_description,
+        caveat=template.get("caveat"),
         start_date=start_date,
         end_date=end_date,
         date_filter_applied=date_filter_applied,
@@ -1290,6 +1469,7 @@ def _route_vector(
             validated_entities, clarify_result = _fill_slots_or_clarify(
                 query_id, slot_type, raw_entities, validator,
                 user_query, normalized, start,
+                optional=optional_slots(template_map[query_id]["param_slots"]),
             )
             if clarify_result is not None:
                 return clarify_result

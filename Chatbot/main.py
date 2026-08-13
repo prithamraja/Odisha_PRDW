@@ -190,6 +190,11 @@ class QueryResponse(BaseModel):
     query_description:  Optional[str]        = None
     intent:             Optional[str]        = None
     entities:           Optional[list[dict]] = None
+    # The matched catalogue entry's answerability note, when it has one. The
+    # answer layer and the frontend are responsible for surfacing it; it is a
+    # separate field rather than glued onto `answer` so a caveat can be rendered
+    # distinctly (and cannot be lost when the answer text is regenerated).
+    caveat:             Optional[str]        = None
     # {"start_date", "end_date", "is_default", "derived_from_question"} —
     # derived_from_question marks a window read out of the question text rather
     # than sent by the date picker, so the UI can show what it actually answered.
@@ -214,6 +219,22 @@ def _catalog_question(query_id: Optional[str]) -> Optional[str]:
     if query_id in _template_map:
         return _template_map[query_id]["abstract_question"]
     return _dashboard_questions.get(query_id)
+
+
+def _catalog_caveat(query_id: Optional[str]) -> Optional[str]:
+    """The answerability note for a query_id, from whichever catalogue holds it.
+
+    Used by the endpoints that serve rows WITHOUT re-routing (/context/pop
+    restores a stored table, /operation recomputes on one). The caveat is a
+    property of the question the rows answer, so it has to be re-attached there
+    too — dropping it on the way back through a breadcrumb would quietly turn a
+    caveated answer into an uncaveated one.
+    """
+    if not query_id:
+        return None
+    if query_id in _template_map:
+        return _template_map[query_id].get("caveat")
+    return (DASHBOARD_CATALOG.get(query_id) or {}).get("caveat")
 
 
 class OperationCallRequest(OperationRequest):
@@ -752,6 +773,7 @@ def query_endpoint(req: QueryRequest):
         query_id=result.query_id,
         query_description=result.query_description,
         intent=result.intent,
+        caveat=result.caveat,
         entities=[
             {"slot": e.slot_name, "value": e.resolved_value, "confidence": e.confidence}
             for e in (result.entities or [])
@@ -798,6 +820,7 @@ def context_pop(req: ContextRequest):
         answer=answer,
         result=rows,
         query_id=frame.template_id,
+        caveat=_catalog_caveat(frame.template_id),
         latency_ms=0.0,
         suggestions=suggest_followups(frame) or None,
     )
@@ -841,6 +864,7 @@ def operation_endpoint(req: OperationCallRequest):
         answer=op_result.answer,
         result=op_result.result,
         query_id=frame.template_id,
+        caveat=_catalog_caveat(frame.template_id),
         latency_ms=(time.monotonic() - started) * 1000,
         operation=op_result.operation,
         operation_mode=op_result.mode.value,

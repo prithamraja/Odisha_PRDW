@@ -161,6 +161,20 @@ class RouteResult(BaseModel):
     fallback_message:  Optional[str]                   = None
     result:            Optional[list[dict]]             = None
 
+    # The catalogue entry's answerability note, carried through to the payload
+    # so the answer layer and the frontend can surface it.
+    #
+    # 251 of the 363 signed-off PR&DW questions are only PARTIALLY answerable —
+    # approval tables cover ~17% of activities, scheme_name is 82% null, the
+    # 2023-24 reporting step-change poisons cross-year trends, and percentages
+    # divide by the GPs actually loaded rather than the official roster. A
+    # partial answer served without its caveat is the confidently-wrong failure
+    # mode this field exists to prevent, so it travels WITH the rows rather than
+    # being looked up separately by whoever renders them.
+    #
+    # None for entries that carry no note — those behave exactly as before.
+    caveat:            Optional[str]                   = None
+
     raw_query:        str
     normalized_query: str
     total_latency_ms: float

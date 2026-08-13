@@ -25,6 +25,33 @@ EXTRA KEYS
     paraphrases, notes and date_kind. All additive — a loader reading only the
     original five keys is unaffected.
 
+ENGINE-LEVEL OPTIONAL KEYS (added in WP-1; no AP entry uses any of them)
+    These are read by the runtime, not by this catalogue. They exist so the
+    Odisha PR&DW catalogue can be loaded verbatim alongside this one. An entry
+    that omits all of them behaves exactly as it did before they existed.
+
+    param_style   "named" | "positional". Normally OMITTED: the runtime sniffs
+                  the style from the SQL (any `$name` placeholder outside a
+                  string literal ⇒ named). Set it only to overrule the sniffer.
+                  See query_router/sql_params.py.
+
+    slot "optional": True
+                  On a param_slots entry: the slot may go unfilled, and binds
+                  SQL NULL when it does, with no clarification stall. Written
+                  for the idiom `($p IS NULL OR col = $p)`, which is how ONE
+                  template answers at every geographic scope instead of needing
+                  -S/-D/-M variants. Slots without the key are required, as all
+                  AP slots are.
+
+    slot "position"
+                  Required for positional entries, IGNORED for named ones — a
+                  named bind has no position to get wrong.
+
+    caveat        The question's answerability note, surfaced in the answer
+                  payload as QueryResponse.caveat. 251 of the 363 PR&DW
+                  questions are only partially answerable, so most Odisha
+                  entries will carry one.
+
 DATE FILTERING
     ``date_filter`` is {"alias", "column"} exactly as in PM-JAY; ``date_kind`` says
     how to compare:
@@ -8591,17 +8618,32 @@ ALL_TEMPLATES: dict[str, dict] = TEMPLATE_CATALOG
 
 
 def bind(template_id: str, values: dict):
-    """Return (sql, ordered_params) for a template and a {slot_name: value} dict.
+    """Return (sql, params) for a template and a {slot_name: value} dict.
 
-    Slot names repeat when one entity appears at several positions, so the
+    POSITIONAL templates (`?` placeholders — all 278 AP entries) get an ordered
+    LIST: slot names repeat when one entity appears at several positions, so the
     ordering comes from param_slots, not from the dict.
+
+    NAMED templates (`$name` placeholders) get a DICT with one entry per slot
+    name, however often the name occurs in the SQL.
+
+    Slots marked {"optional": True} may be absent from `values`; they bind None
+    (SQL NULL). Missing REQUIRED slots still raise.
     """
+    from .sql_params import NAMED, param_style
+
     t = ALL_TEMPLATES[template_id]
-    slots = sorted(t['param_slots'], key=lambda s: s['position'])
-    missing = {s['name'] for s in slots} - set(values)
+    slots = t['param_slots']
+    optional = {s['name'] for s in slots if s.get('optional')}
+    missing = {s['name'] for s in slots} - set(values) - optional
     if missing:
         raise KeyError(f'{template_id} missing slot values: {sorted(missing)}')
-    return t['sql_template'], [values[s['name']] for s in slots]
+
+    if param_style(t) == NAMED:
+        return t['sql_template'], {s['name']: values.get(s['name']) for s in slots}
+
+    ordered = sorted(slots, key=lambda s: s['position'])
+    return t['sql_template'], [values.get(s['name']) for s in ordered]
 
 
 def required_entities(template_id: str) -> list[str]:
