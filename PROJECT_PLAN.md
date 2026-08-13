@@ -1,6 +1,6 @@
 # Odisha PR&DW Analytics — Project Plan & Decision Log
 
-Maintained by the PM session. Last updated: **2026-08-13 (post WP-1)**.
+Maintained by the PM session. Last updated: **2026-08-13 (post WP-2)**.
 Read `ODISHA_PRDW_BOOTSTRAP.md` first — this document layers the *current* plan,
 decisions, and state on top of it. Implementation agents receive work via
 `handoffs/WP*.md` briefs and reply with `REPORT.md` at the repo root.
@@ -66,6 +66,7 @@ decisions, and state on top of it. Implementation agents receive work via
 | D8 | **Keep `to_pyformat()`** as a tested utility, not wired to any adapter. `SupabaseAdapter` binds through DuckDB's postgres extension, so `$name` dicts bind natively there — translation would break a working path. The utility is correct code for a future driver-level (psycopg2) adapter. Each adapter declares `PARAMSTYLE`. | PM ruling on WP-1 report §8.1, accepting the implementer's analysis. |
 | D9 | **Fiscal year is an ordinary named slot** (`$date_range` etc.), never a `date_filter` injection — `date_kind` machinery stays dormant for PR&DW (its `year` kind compares integers; Odisha's fiscal year is the `'2024-2025'` string). `date_phrase.py` (WP-2) maps phrasings ("FY 24-25", "last year", "this year") onto the exact full-form string. A question with no year stated follows required-slot behavior — clarification chip — for v1; revisit from pilot logs if officers overwhelmingly mean "current year". | PM ruling on WP-1 report §8.3. |
 | D10 | **Geography binds LGD codes end-to-end — decided in principle (D4); the SQL predicate rewrite (`gp_name = $gp_name` → `gp_lgd_code = $gp_code`) is a WP-3 decision** pending `create_views.sql`, which determines whether the views expose block/district codes. WP-2 must deliver name→code resolution machinery regardless, so WP-3's choice is a predicate edit, not new design. | Workbook SQL filters on names (safe for the 20 unique sample GPs, unsafe statewide). Operator has waived byte-level SQL fidelity in favor of performance/correctness. |
+| D11 | **Rulings on WP-2 report §8:** (1) a bare four-digit year reads as the fiscal year *starting* in it ("2024" → `2024-2025`) — keep, pinned in tests, revisit from pilot logs; (2) unqualified "SFC" → `5TH STATE FINANCE COMMISSION` (the current one), "4th SFC" reaches the 4th — keep; (3) rename `EntityCandidate.village` to a tier-neutral name in WP-3; (4) `top_n` ceiling 1000 accepted **provisionally** — WP-3 must check whether any listing template legitimately needs more statewide (a full GP listing is ~6,800) and raise it then; (5) thin alias tables accepted — they fill from the D5 dictionary file and query logs, not guesses. | PM rulings 2026-08-13. |
 
 ## 3a. Standing disciplines (learned in this repo — additional to the bootstrap's)
 
@@ -75,13 +76,22 @@ decisions, and state on top of it. Implementation agents receive work via
   T0 includes this.
 - **Commit the tree before and after every agent run** (bootstrap rule, restated because the
   tree currently accumulates operator file moves between runs).
+- **Audit every test/eval harness for accidental live API calls before running it.** WP-2
+  found `LiveExtractionTests` making ~7 paid OpenAI calls on every suite run (it
+  `load_dotenv()`s the keyed `.env`, then "skips if no key"). Now opt-in via
+  `PRDW_LIVE_EXTRACTION=1`. Check the same pattern in the eval harnesses before WP-4.
+- **The data-oddities log lives in WP reports** (validation logs, never fixes — bootstrap).
+  Running list: WP-2 report §7 — leading tab in `'\tWORK COMPLETED'` (dim_code 178),
+  `'Buildings'` mis-decoded into activity_status (code 173), `'Poverty allevation'`
+  misspelling (focus_area 16), GP `Kalyansinghpur` vs block `Kalyansingpur`, theme trailing
+  spaces, scheme_name 82% null. These feed the eventual ministry data-quality report.
 
 ## 4. Stage plan → work packages
 
 | WP | Scope | Gate | Status |
 |---|---|---|---|
 | WP-1 | Engine extensions: DuckDB-file adapter (read-only), named binding (D1), optional slots (D2), caveat passthrough (D3). No domain content. | Baseline test suite still green + new unit tests green. | **DONE — gate green** (report: `handoffs/REPORT.md`; PM replay confirmed 293/32/17 on 2026-08-13). Commits `55c5a76`..`8af162e`. |
-| WP-2 | Entity layer: registry generated from the Parameter Registry sheet (values loaded from the DB, read-only); name→LGD-code resolution with clarification chips; extractor enums generated from the registry; fiscal-year phrase mapping (D9); lakh/crore amount normalization; collision test with synthetic duplicates (D4); alias scaffolding (Odia/colloquial). | `test_extraction_enums` green; collision test green; baseline preserved modulo documented AP-fixture swaps. | **Brief ready: `handoffs/WP2_entity_layer.md`** |
+| WP-2 | Entity layer: registry generated from the Parameter Registry sheet (values loaded from the DB, read-only); name→LGD-code resolution with clarification chips; extractor enums generated from the registry; fiscal-year phrase mapping (D9); lakh/crore amount normalization; collision test with synthetic duplicates (D4); alias scaffolding (Odia/colloquial). | `test_extraction_enums` green; collision test green; baseline preserved modulo documented AP-fixture swaps. | **DONE — gate green** (report: `handoffs/WP2_REPORT.md`; PM replay confirmed 359/33/0 on 2026-08-13). Commits `de3b052`..`56d3501`. Note: the brief's "20 bind names" was a PM miscount — the sheet has 19; nothing is missing. |
 | WP-3 | Catalogue: xlsx → `template_catalog.py` + caveats + scope-phrased paraphrases (D2); geography predicate decision (D10); dashboard picks; `rerank_context.py` family descriptions (Bracket/Module/Submodule as family structure); 17 No + 13 dropped wired into fallback as known-unanswerable; audit of the four retrieval-layer modules that assume all slots required (`reranker.py`, `suggestions.py`, `followup_classifier.py`, `fragment_reroute.py`, plus retire `router._scope_sibling` — WP-1 report §8.2); answer layer must render `caveat` when present; no `$tag$` quoting in catalogue SQL (WP-1 report §8.4). | Structural tests green; all 346 queries execute with sample binds matching the workbook Test Report row counts. | Blocked on `create_views.sql` |
 | WP-4 | Gold eval set (≥100 questions, officer phrasing, Odia/English/code-mixed) + recall/routing evals; then threshold calibration from eval evidence only. | Recall@30 ≈ 97%, end-to-end ≈ 96–97% parity benchmarks. | After WP-3 |
 | WP-5 | Gates file `prdw_gates.py` (replaces `pmkisan_gates.py`): catalogue validity, routing accuracy, extraction-enum agreement, model-identity check. | "Gate-green" is a single command. | Can start alongside WP-3 |
