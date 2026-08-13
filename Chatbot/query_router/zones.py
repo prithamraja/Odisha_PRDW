@@ -36,24 +36,34 @@ def zone(scores: list[float]) -> str:
 
 
 # How an UNFILLED slot reads in a chip. The naive "a " + slot_name produces
-# "a farmer name", "a aadhaar", "a top n" — text a user is being invited to tap
+# "a gp name", "a date range", "a top n" — text a user is being invited to tap
 # but which reads as a placeholder leaking through, so each slot gets a phrase
 # an English speaker would actually say.
+#
+# KEYED ON THE WORKBOOK'S BIND NAMES, which is what appears in a catalogue
+# question's {placeholders}, not on the entity types behind them. `$date_range`
+# is a fiscal year and reads as one; `$gp_name` binds an LGD code but the user
+# still says a panchayat.
 _SLOT_PHRASES: dict[str, str] = {
-    "farmer_name":       "a farmer",
-    "aadhaar":           "an Aadhaar number",
-    "district":          "a district",
-    "mandal":            "a mandal",
-    "village":           "a village",
-    "crop":              "a crop",
-    "scheme":            "a scheme",
-    "scheme_2":          "another scheme",
-    "season":            "a season",
-    "top_n":             "N",
-    "scheme_count":      "N",
-    "social_category":   "a social category",
-    "social_category_2": "another social category",
-    "crop_year":         "a year",
+    "date_range":         "a year",
+    "date_range_2":       "another year",
+    "district_name":      "a district",
+    "block_name":         "a block",
+    "block_name_2":       "another block",
+    "gp_name":            "a gram panchayat",
+    "gp_name_2":          "another gram panchayat",
+    "focus_area":         "a focus area",
+    "theme":              "an LSDG theme",
+    "scheme":             "a scheme",
+    "scheme_2":           "another scheme",
+    "status":             "a work status",
+    "asset_category":     "an asset category",
+    "asset_sub_category": "an asset sub-category",
+    "activity_code":      "an activity",
+    "top_n":              "N",
+    "threshold":          "a threshold",
+    "amount_threshold":   "an amount",
+    "deadline":           "a deadline",
 }
 
 _VOWELS = "aeiou"
@@ -68,24 +78,59 @@ def _slot_phrase(name: str) -> str:
     return ("an " if words[:1].lower() in _VOWELS else "a ") + words
 
 
-def _readable(question: str, fill: dict[str, str] | None = None) -> str:
-    """'input subsidy in {district}?' -> 'input subsidy in Krishna?' when the
-    value is known from the user's own utterance, else 'input subsidy in a
-    district?' (either way the text stays routable).
+# The nouns a question may repeat after a placeholder, per slot. Without this,
+# "in {block_name} block" renders "in a block block" — the AP version compared
+# the following word to the SLOT NAME itself with a backreference, which worked
+# while slots were called `mandal` and stopped working the moment they were
+# called `block_name`.
+_SLOT_UNIT_NOUNS: dict[str, tuple[str, ...]] = {
+    "district_name":  ("district", "districts", "zilla", "zp"),
+    "block_name":     ("block", "blocks", "samiti", "ps"),
+    "block_name_2":   ("block", "blocks", "samiti"),
+    "gp_name":        ("gp", "gps", "panchayat", "panchayats"),
+    "gp_name_2":      ("gp", "gps", "panchayat", "panchayats"),
+    "date_range":     ("year", "fy"),
+    "date_range_2":   ("year", "fy"),
+    "theme":          ("theme",),
+    "scheme":         ("scheme",),
+    "focus_area":     ("area",),
+    "activity_code":  ("activity",),
+}
 
-    Many AP questions already name the unit after the slot ('in {mandal}
-    mandal'), so the placeholder swallows a following repeat of its own name
-    rather than emitting 'a mandal mandal'."""
+
+def _unit_nouns(slot: str) -> tuple[str, ...]:
+    """The words this slot's placeholder may swallow after itself.
+
+    Always includes the slot name and its stem, so a question written "in
+    {block_name} block_name" or "in {block} block" behaves too.
+    """
+    stem = re.sub(r"_(name|code|range)(_\d)?$", "", slot)
+    return tuple({slot, stem, *_SLOT_UNIT_NOUNS.get(slot, ())})
+
+
+def _readable(question: str, fill: dict[str, str] | None = None) -> str:
+    """'GPDP status for {gp_name}?' -> 'GPDP status for Andhrua?' when the value
+    is known from the user's own utterance, else 'GPDP status for a gram
+    panchayat?' (either way the text stays routable).
+
+    Many questions already name the unit after the slot ('in {block_name}
+    block'), so the placeholder swallows a following repeat of its own unit
+    rather than emitting 'a block block'. Only a UNIT noun is eaten — ordinary
+    following words are left alone, or 'in {district_name} have uploaded' would
+    lose its verb.
+    """
     def _sub(match: re.Match) -> str:
         name = match.group(1)
-        unit = match.group(2) or ""      # ' mandal' in 'in {mandal} mandal'
+        following = match.group(2) or ""          # ' block' in '{block_name} block'
+        word = (match.group(3) or "").lower()
+        swallowed = word in _unit_nouns(name)
         if fill and name in fill:
-            return str(fill[name]) + unit
-        return _slot_phrase(name)              # unit dropped: 'in a mandal'
+            # A known value keeps the unit — "in Khordha district" reads better
+            # than "in Khordha" and is what the user said.
+            return str(fill[name]) + following
+        return _slot_phrase(name) + ("" if swallowed else following)
 
-    # The backreference means group 2 only ever matches a word that repeats the
-    # slot name, so ordinary following words are never eaten.
-    return re.sub(r"\{(\w+?)\}(\s+\1\b)?", _sub, question)
+    return re.sub(r"\{(\w+?)\}(\s+(\w+)\b)?", _sub, question)
 
 
 def readable_question(question: str, fill: dict[str, str] | None = None) -> str:
@@ -130,12 +175,12 @@ def candidate_tiebreak(candidate: EntityCandidate) -> str | None:
 def candidate_label(candidate: EntityCandidate, *, masked: bool = False) -> str:
     """What tells this candidate apart, for a chip or a prompt.
 
-    The district alone does not do it: two of the four farmers called Lakshmi
-    Devi are both in Nellore, and a GP name can repeat inside one district. The
-    narrower place leads.
+    The district alone does not do it: a district holds ~10 blocks and a gram
+    panchayat name can repeat inside one, so the narrower place (the block)
+    leads.
     """
-    where = [candidate.village] if candidate.village else []
-    where += [d for d in candidate.districts if d != candidate.village]
+    where = [candidate.parent_place] if candidate.parent_place else []
+    where += [d for d in candidate.districts if d != candidate.parent_place]
     label = f"{candidate.name} ({', '.join(where)})" if where else candidate.name
     tiebreak = candidate_tiebreak(candidate)
     if masked and tiebreak:
@@ -144,24 +189,27 @@ def candidate_label(candidate: EntityCandidate, *, masked: bool = False) -> str:
 
 
 def candidate_replies(candidates: list[EntityCandidate]) -> list[str]:
-    """One send_text per candidate, each of which resolves to that ONE person.
+    """One send_text per candidate, each of which resolves to that ONE panchayat.
 
     Sending the bare name back is the loop this path exists to break: the name
-    is precisely what was ambiguous, so it would clarify again, forever. A
-    person is referenced as 'Lakshmi Devi of Rambilli', which the roster
-    validator resolves outright.
+    is precisely what was ambiguous, so it would clarify again, forever. A gram
+    panchayat is referenced as 'Naugaon of Barpali', which the roster validator
+    resolves outright.
 
-    Name + village is unique across the whole roster on this drop. Where a
-    future drop makes it collide, the masked Aadhaar is appended — masked, never
-    the full number, and short enough that the reply still reads as a slot
-    answer rather than a new question.
+    Name + block is the reference form, and it is unique for every panchayat in
+    this drop. Statewide two panchayats CAN share a name inside one block, and
+    the LGD code is appended for those — a public identifier, shown in full, and
+    short enough that the reply still reads as a slot answer rather than a new
+    question. (The same slot appends a MASKED Aadhaar where the domain has
+    people rather than places; `candidate_tiebreak` owns that distinction.)
 
-    A candidate that is a NAME rather than a person has no village, but it may
-    have been narrowed to one district already. Carrying that district into the
-    reply is what stops the next round offering people the user just ruled out.
+    A candidate that is a NAME rather than one panchayat has no parent place,
+    but it may have been narrowed to one district already. Carrying that
+    district into the reply is what stops the next round offering the ones the
+    user just ruled out.
     """
     replies = [
-        f"{c.name} of {c.village}" if c.village
+        f"{c.name} of {c.parent_place}" if c.parent_place
         else (f"{c.name} of {c.districts[0]}" if len(c.districts) == 1 else c.name)
         for c in candidates
     ]
@@ -177,8 +225,8 @@ def candidate_chips(
     candidates: list[EntityCandidate], limit: int | None = None
 ) -> list[Chip]:
     """Disambiguation chips: one per candidate the prompt listed, labelled with
-    what tells them apart ('Lakshmi Devi (Rambilli, Visakhapatnam)') and sending
-    a reference to that one person, which resolves the paused question outright."""
+    what tells them apart ('Naugaon (Barpali, Bargarh)') and sending a reference
+    to that one panchayat, which resolves the paused question outright."""
     chosen = list(candidates[:limit] if limit else candidates)
     replies = candidate_replies(chosen)
     chips: list[Chip] = []

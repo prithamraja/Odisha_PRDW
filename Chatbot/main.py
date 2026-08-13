@@ -69,21 +69,39 @@ from query_router.fragment_reroute  import (
 )
 from query_router.followup_classifier import FrameEdit
 from query_router.suggestions       import suggest_followups
-from query_router.echo              import echo_answer
+from query_router.echo              import (
+    append_caveat,
+    echo_answer,
+    echo_answer_without_caveat,
+)
+from query_router.unanswerable_catalog import UNANSWERABLE_CATALOG
 from query_router.date_phrase       import extract_date_window
 from query_router.preprocessor      import normalize
 from query_router.zones             import readable_question
 
-# A bare place name is read as the widest scope it validates as — "Guntur" is a
-# district before it is a mandal of the same name. A frame that already binds
-# that scope is skipped, so a district-scoped question reads "in peddapuram?" as
-# the mandal it must be.
-GEO_SLOTS_WIDEST_FIRST = ("district", "mandal", "village")
+# A bare place name is read as the widest scope it validates as — "Bhubaneswar"
+# is a district before it is the block of the same name. A frame that already
+# binds that scope is skipped, so a district-scoped question reads "in Barpali?"
+# as the block it must be.
+#
+# PAIRED, because the two halves are no longer the same word and mixing them is
+# silent: a context frame keys `bound_params` by the workbook's BIND NAME
+# (`district_name`), while the entity registry is keyed by ENTITY TYPE
+# (`district`). `registry_values("district_name")` returns [] rather than
+# raising, so a mix-up would empty the place vocabulary and simply stop every
+# follow-up fragment working, with nothing in the logs.
+GEO_TIERS_WIDEST_FIRST: tuple[tuple[str, str], ...] = (
+    ("district_name", "district"),
+    ("block_name",    "block"),
+    ("gp_name",       "gp"),
+)
+GEO_SLOTS_WIDEST_FIRST = tuple(slot for slot, _ in GEO_TIERS_WIDEST_FIRST)
+GEO_ENTITY_TYPES_WIDEST_FIRST = tuple(etype for _, etype in GEO_TIERS_WIDEST_FIRST)
 
 _context_store = ContextStore()
 _catalog_column_metadata = build_catalog_column_metadata(DASHBOARD_CATALOG, TEMPLATE_CATALOG)
 
-app = FastAPI(title="AP RTGS Decision Aid API")
+app = FastAPI(title="Odisha PR&DW Panchayat Analytics API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -138,9 +156,12 @@ def startup():
     refresh_prompt_enums(_validator.registry_values)
 
     # The place vocabulary, as words. Used to tell a follow-up FRAGMENT ("in
-    # kurnool?") from a question that merely mentions a place.
+    # Ganjam?") from a question that merely mentions a place. Indexed by ENTITY
+    # TYPE — `fragment_reroute.GEO_SLOTS` holds bind names, which the registry
+    # does not answer to.
     _geo_tokens.update(geo_vocabulary_tokens(
-        *(_validator.registry_values(slot) for slot in GEO_SLOTS)
+        *(_validator.registry_values(etype)
+          for etype in GEO_ENTITY_TYPES_WIDEST_FIRST)
     ))
 
     # Load pre-computed dashboard results from cache
@@ -164,7 +185,13 @@ def startup():
     # Build the vector-retrieval index (embeds the catalog once; cached to .tmp)
     if USE_VECTOR_RETRIEVAL:
         try:
-            _retriever = VectorRetriever(_openai_client, DASHBOARD_CATALOG, TEMPLATE_CATALOG)
+            # The known-unanswerables are indexed alongside the templates on
+            # purpose: an officer's beneficiary question has to RETRIEVE before
+            # it can be refused with a reason instead of a generic miss.
+            _retriever = VectorRetriever(
+                _openai_client, DASHBOARD_CATALOG, TEMPLATE_CATALOG,
+                UNANSWERABLE_CATALOG,
+            )
             print(f"[startup] Vector retriever ready — {len(_retriever.ids)} catalog entries")
         except Exception as e:
             print(f"[startup] WARNING: vector retriever failed to build ({e}) — "
@@ -314,11 +341,11 @@ def _fragment_edit(frame: ContextFrame, message: str):
     phrase = fragment_place_phrase(message, _geo_tokens)
     if not phrase:
         return None
-    for slot in GEO_SLOTS_WIDEST_FIRST:
+    for slot, entity_type in GEO_TIERS_WIDEST_FIRST:
         if slot in frame.bound_params:
             continue
         try:
-            resolved = _validator.validate(phrase, slot).resolved_value
+            resolved = _validator.validate(phrase, entity_type).resolved_value
         except Exception:
             continue
         return FrameEdit(slot=slot, value=resolved)
@@ -749,15 +776,21 @@ def query_endpoint(req: QueryRequest):
     # Build human-readable answer + next-question chips
     suggestions: list[Chip] | None = None
     if result.tier.value in ("tier1", "tier2"):
+        # Composed so the CAVEAT IS LAST — it is the thing an officer must not
+        # stop reading before. echo_answer already appends it, so the scope note
+        # is inserted ahead of it rather than after.
         answer = echo_answer(result)
         if inherited_scope:
             # Inheriting scope silently would be the same class of defect as
             # answering state-wide silently. Name what was carried and from
             # where, and lead the chips with the way out.
             carried = ", ".join(inherited_scope.values())
-            answer += (
-                f"\n\nAnswered for {carried}, carried over from your previous "
+            note = (
+                f"Answered for {carried}, carried over from your previous "
                 "question."
+            )
+            answer = append_caveat(
+                f"{echo_answer_without_caveat(result)}\n\n{note}", result.caveat
             )
         if result.context_frame is not None:
             suggestions = suggest_followups(result.context_frame) or None
@@ -819,16 +852,24 @@ def context_pop(req: ContextRequest):
     frame, rows = popped
 
     base = frame.template_question or frame.template_id
-    answer = "Back to: " + base
+    caveat = _catalog_caveat(frame.template_id)
+    # Verbatim, on the way back too: a breadcrumb hop restores the rows, so it
+    # has to restore what qualifies them. See echo.append_caveat.
+    answer = append_caveat("Back to: " + base, caveat)
 
     return QueryResponse(
         session_id=req.session_id,
         context_frame=frame,
-        tier="tier2" if frame.template_id.startswith("T") else "tier1",
+        # MEMBERSHIP, not a prefix. This read `startswith("T")`, which was a
+        # workable stand-in only while AP dashboards were "D…" and templates
+        # were not. Twelve PR&DW template ids begin with T (TRD-001…012) and 340
+        # do not, so the prefix test would label almost every restored answer
+        # tier1.
+        tier="tier1" if frame.template_id in DASHBOARD_CATALOG else "tier2",
         answer=answer,
         result=rows,
         query_id=frame.template_id,
-        caveat=_catalog_caveat(frame.template_id),
+        caveat=caveat,
         latency_ms=0.0,
         suggestions=suggest_followups(frame) or None,
     )
@@ -865,14 +906,19 @@ def operation_endpoint(req: OperationCallRequest):
         requery=_requery_for_frame(frame, start_date, end_date),
     )
 
+    caveat = _catalog_caveat(frame.template_id)
     return QueryResponse(
         session_id=req.session_id,
         context_frame=frame,
         tier="operation",
-        answer=op_result.answer,
+        # An operation RECOMPUTES on the same question's rows — a top-N, a share,
+        # a re-sort. The caveat qualifies the rows, so it qualifies the
+        # recomputation too: a percentage taken over a 17%-covered population is
+        # exactly as misleading as the count it came from.
+        answer=append_caveat(op_result.answer, caveat),
         result=op_result.result,
         query_id=frame.template_id,
-        caveat=_catalog_caveat(frame.template_id),
+        caveat=caveat,
         latency_ms=(time.monotonic() - started) * 1000,
         operation=op_result.operation,
         operation_mode=op_result.mode.value,

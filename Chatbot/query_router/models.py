@@ -35,10 +35,12 @@ class EntityCandidate(BaseModel):
     same-named candidates apart; the district alone does not, because a name can
     repeat inside one district.
 
-    `village` is the NARROWER PLACE, whatever the domain's tier below district
-    is called: a village in AP, **the block (Panchayat Samiti) in PR&DW**. The
-    field keeps its AP name because `zones` renders it generically and WP-3
-    owns that file's copy — renaming it is on the WP-3 list.
+    `parent_place` is the NARROWER PLACE — whatever the domain's tier between
+    the candidate and its district is called: **the block (Panchayat Samiti) for
+    PR&DW**, a village in the AP build this engine came from. Renamed off
+    `village` in WP-3 (decision D11.3): PR&DW has villages AND blocks AND gram
+    panchayats, so a field literally called `village` that in fact holds a block
+    is a trap for the next reader, not merely untidy.
 
     `code` is the candidate's own unique identifier — `gp_lgd_code` here. It is
     public and is shown and sent in full; it is the last tiebreak when two
@@ -49,11 +51,11 @@ class EntityCandidate(BaseModel):
     set it must pass through `mask_aadhaar` before reaching any label, chip or
     answer.
     """
-    name:      str
-    districts: list[str] = []
-    village:   Optional[str] = None
-    code:      Optional[str] = None
-    aadhaar:   Optional[str] = None
+    name:         str
+    districts:    list[str] = []
+    parent_place: Optional[str] = None
+    code:         Optional[str] = None
+    aadhaar:      Optional[str] = None
 
 
 class PendingClarification(BaseModel):

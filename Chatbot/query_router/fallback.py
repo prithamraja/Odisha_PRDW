@@ -1,27 +1,38 @@
+"""What the bot offers when nothing in the catalogue matches.
+
+The examples are grouped the way an officer's work is, not the way the catalogue
+is: what did GPs plan, what did they spend, what is stuck, and what does the data
+itself not support. Each line is phrased as a real question and routes cleanly
+through the ordinary matcher, so a user can copy one verbatim and get an answer.
+"""
 FALLBACK_EXAMPLES: dict[str, list[str]] = {
-    "A single farmer": [
-        "What is the PM-KISAN record for Ramesh Naidu?",
-        "What are the total benefits for Lakshmi Devi across every scheme?",
-        "Which datasets is Suresh Reddy present in?",
-        "What did MARKFED procure from Mohan Rao, and was payment made?",
+    "Planning (GPDP)": [
+        "How many Gram Panchayats in Khordha uploaded their GPDP in 2024-2025?",
+        "Which Gram Panchayats have not yet uploaded their GPDP?",
+        "What percentage of Gram Panchayats in each block have uploaded their GPDP?",
+        "Which focus area has the highest number of planned activities?",
     ],
-    "Coverage & subsidy": [
-        "How many PM-KISAN beneficiaries are there in each mandal of Krishna district?",
-        "How much input subsidy went to each mandal of Guntur district?",
-        "What is the micro-irrigation coverage in each mandal of Kurnool district?",
-        "Which mandals in Krishna district have the biggest eKYC backlog?",
+    "Budget & expenditure": [
+        "What is the total actual expenditure in 2024-2025?",
+        "What percentage of the planned expenditure has been utilised?",
+        "How much expenditure was incurred under each funding source?",
+        "How much funding is sanctioned under tied and untied components?",
     ],
-    "Procurement & payments": [
-        "How much was procured in each mandal of Guntur district?",
-        "Which farmers in Krishna district are still unpaid for procurement?",
-        "How much DBT was credited in each mandal of Prakasam district?",
-        "Which sanctions are stalled in Anantapur district?",
+    "Progress, approvals & assets": [
+        "How many activities are still awaiting administrative approval?",
+        "What is the completion rate under each theme?",
+        "Which activities are abandoned, and what did they cost?",
+        "How many assets were created in Barpali block this year?",
     ],
-    "Targeting & data quality": [
-        "Give me the social category breakdown for Krishna district.",
-        "What is the male-female split in Guntur district?",
-        "Which farmers in Krishna district show a land discrepancy?",
-        "Are there any malformed Aadhaar numbers in our systems?",
+    "Sanitation (SBM)": [
+        "How many Individual Household Latrines have been planned in 2024-2025?",
+        "How many community compost pits have been completed?",
+        "What is the expenditure on Solid Waste Management activities?",
+    ],
+    "Alerts & data quality": [
+        "Which Gram Panchayats recorded no activity in 2024-2025?",
+        "Which activities are marked completed but have no expenditure recorded?",
+        "How many activities have no focus area recorded?",
     ],
 }
 

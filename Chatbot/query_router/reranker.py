@@ -18,37 +18,36 @@ from openai import OpenAI
 from .config import RERANK_MODEL, LLM_TEMPERATURE, LLM_TIMEOUT_SECONDS, REASONING_MODELS
 from .rerank_context import DESC_BY_QID
 from .template_catalog import TEMPLATE_CATALOG
+from .unanswerable_catalog import UNANSWERABLE_CATALOG
 
 _TEMPLATES = dict(TEMPLATE_CATALOG)
 
 _RERANK_SYS = """\
-You match a user's question to the single best canonical question from a numbered list, for the Andhra Pradesh Department of Agriculture "RTGS Decision Aid" database. It covers eight departmental datasets: the PM-KISAN farmer roster, Agriculture (input/seed subsidy and eCrop booking), Horticulture/APMIP (micro-irrigation subsidy), Fisheries, Sericulture, MARKFED (MSP procurement and payments), RySS (natural farming / Rythu Sadhikara), and Survey & Land Records.
+You match a user's question to the single best canonical question from a numbered list, for the Odisha Panchayati Raj & Drinking Water Department's panchayat analytics database. Its users are programme officers. It covers the Gram Panchayat Development Plan (GPDP) cycle: the plans GPs upload each year, the activities inside those plans, what each activity was budgeted and what was actually spent, administrative and technical approvals, physical progress evidence, the assets created, and Swachh Bharat Mission (SBM) sanitation work. Geography is three tiers — Gram Panchayat inside Block (Panchayat Samiti) inside District (Zilla Parishad).
 
 Some candidates carry two extra lines:
-- "↳" — what the question measures, with example queries.
+- "↳" — what the question actually measures: the measure and its accounting basis, the row grain, any status filter, and for SBM questions the keyword pattern that defines the subject.
 - "accepts filters:" — every filter that candidate can actually apply. This is authoritative for that candidate.
 
-Judge a candidate with a "↳" line by that description rather than by surface word overlap with its wording. But a "↳" description describes a question FAMILY, not one candidate: sibling candidates that are parameter variants of the same family repeat the same description and the same examples word-for-word. So an example may name a district or scheme that THIS candidate cannot accept — sometimes matching the user's query almost word-for-word. Use "↳" to choose the family, then "accepts filters:" and the {placeholder} rule to choose the variant within it. Never pick a candidate merely because one of its examples resembles the query: if the query names a filter the candidate does not accept and a sibling does accept it, the sibling wins.
+Judge a candidate with a "↳" line by that description rather than by surface word overlap with its wording. A "↳" describes a question FAMILY: where two candidates are variants of one family they repeat the same description word-for-word, and you choose between them with "accepts filters:".
 
 Rules:
 - Return the id of the candidate whose question best matches the user's intent.
-- {placeholders} in a candidate mark filters it expects. Prefer the variant that matches the filters ACTUALLY present in the query:
-    - Query names a district -> prefer the {district} variant over the state-wide one.
-    - Query names a mandal   -> prefer the {mandal} variant (mandals are inside districts; a mandal-scoped question usually reports by village).
-    - Query names no place   -> prefer the state-wide (no-placeholder) variant.
-    - Same for {crop}, {season}, {scheme}, {social_category}, {gender}, {crop_year} and the numeric filters ({top_n}, {threshold_hectares}, {tolerance_pct}).
+- MOST CANDIDATES ANSWER AT EVERY GEOGRAPHIC SCOPE. Their district, block and GP filters are OPTIONAL: the same candidate answers state-wide when the query names no place, and narrowed when it names one. So do NOT reject a candidate because the query names a district and the candidate's wording does not, or the reverse. Choose on the MEASURE, and let the filters follow.
+- {placeholders} mark filters a candidate expects. Where a filter is genuinely required — a second GP or block for a head-to-head comparison, an activity code for a single-activity lookup, a deadline — prefer the candidate whose required filters the query actually supplies.
 - Pick the MOST SPECIFIC candidate that matches the query.
 
-Disambiguation — these words mean different datasets depending on context:
-- "subsidy": input subsidy / seed subsidy -> AGRICULTURE. Micro-irrigation, drip, sprinkler, APMIP -> HORTICULTURE. Do not treat them as one measure.
-- "payment": MSP / procurement / paddy purchase payment -> MARKFED. Incentive for cocoon or silk -> SERICULTURE. Natural-farming payment -> RySS.
-- "registered": eCrop / crop booking registration -> AGRICULTURE. Fisheries society or vessel registration -> FISHERIES. Natural-farming membership -> RySS.
-- Farmer lookup: if the query gives a NAME, prefer the {farmer_name} candidate; if it gives a 12-digit number, prefer the {aadhaar} candidate. Never substitute one for the other.
-- Scheme membership ("which schemes is this farmer in", "how many farmers are in both X and Y") is a different family from benefit amount ("how much has this farmer received"). Match the one the user actually asked for.
-- Scheme set logic: "in X but NOT in Y" is a DIFFERENCE — answer it with the {scheme}/{scheme_2} difference template, never with an overlap or intersection candidate, however closely that candidate's wording matches the two datasets named. "in BOTH X and Y" is an overlap. When the difference is measured from the PM-KISAN roster and only one other scheme is named, prefer the single-{scheme} roster-minus-scheme template over the two-scheme one.
-- Land questions: "declared"/"PM-KISAN extent" is the roster's own area_hectares; "surveyed"/"revenue record" is Survey & Land Records. A question comparing the two is the mismatch family.
-- Data-quality questions ("missing", "duplicate", "malformed", "mismatch") are integrity checks and are their own family — do not answer them with a coverage or payment question.
-- If NONE of the candidates can answer the query exactly, return "no_match" for query_id — and in "candidates", list up to 3 ids of the questions that come CLOSEST to what the user wants (the ones a helpful analyst would offer instead), best first. Judge closeness by meaning, not wording — e.g. a question about women farmers is closest to a gender-breakdown question even if the words differ.
+Disambiguation — the distinctions this database punishes most:
+- TWO EXPENDITURE CONVENTIONS, and they do not agree. "Expenditure"/"spent"/"utilisation" normally means the PLAN basis (expenditure booked against a planned activity). The CASHBOOK basis is the voucher ledger — receipts and payments. A candidate whose "↳" says CASHBOOK answers a different question from one that says PLAN basis; never substitute one for the other.
+- PLANNED versus APPROVED versus STARTED versus COMPLETED are four different measures, not synonyms. "Planned" is every activity in the plan; "approved" means an administrative approval exists (only ~17% of activities have one); "ongoing"/"completed" are work statuses. Match the one asked for.
+- UPLOADED versus APPROVED plans: "how many GPs uploaded a GPDP" counts every plan row, "how many had it approved" counts the approved subset. Different candidates.
+- ABSENCE questions are their own family — "which GPs have NOT uploaded", "which planned nothing under this theme", "which recorded no activity". Their "↳" says they read the GP ROSTER. Never answer one with a counting question over activities: an activity-side query cannot return a GP that has no activities.
+- SBM questions identify their subject by SEARCHING ACTIVITY TEXT for keywords, and every SBM candidate's "↳" quotes its own pattern. Two SBM candidates can accept identical filters and differ only in that pattern (community compost pits versus household compost pits; segregation sheds versus segregation bins). Read the pattern; it is the only thing separating them.
+- COST words are not interchangeable: planned cost (what the GP entered), approved cost (the action plan's), administratively sanctioned amount (the approval order's), technically approved cost, and actual expenditure are five different columns.
+- DATA-QUALITY questions ("missing", "no record", "duplicate", "mismatch", "not decoded") are integrity checks and are their own family — do not answer them with a coverage or spend question.
+- TIED versus UNTIED funds is a grant-component split, not a scheme.
+- Some listed questions are ones this database CANNOT answer (beneficiary counts, pensions, ward-level detail, delay reasons). If one of those matches the user's intent, return it: naming what is missing is better than a near-miss that answers something else.
+- If NONE of the candidates can answer the query exactly, return "no_match" for query_id — and in "candidates", list up to 3 ids of the questions that come CLOSEST to what the user wants (the ones a helpful analyst would offer instead), best first. Judge closeness by meaning, not wording.
 - If the query is entirely off-topic for this database, return "no_match" and an empty "candidates" list.
 
 Return ONLY a JSON object: {"query_id": "<id or no_match>", "candidates": ["<id>", ...]}."""
@@ -64,6 +63,24 @@ def _accepted_filters(qid: str) -> str:
         return "none (state-wide totals only)"
     slots = [slot["name"] for slot in template.get("param_slots") or []]
     return ", ".join(slots) if slots else "none (state-wide totals only)"
+
+
+def _unanswerable_context(qid: str) -> tuple[str, str]:
+    """The ↳ line for a question the database cannot answer.
+
+    These are in the candidate list on purpose, so the model has to be told what
+    they are — otherwise a beneficiary question, whose whole point is that it
+    CANNOT be answered, reads to the model like any other candidate and either
+    gets picked silently or loses to a near-miss that answers something else.
+    The reason is the workbook's own.
+    """
+    entry = UNANSWERABLE_CATALOG[qid]
+    return (
+        f"CANNOT BE ANSWERED from this database. {entry['reason']} "
+        f"Pick this when the user genuinely asked for it: saying what is missing "
+        f"is a better answer than a near-miss that measures something else.",
+        "none — this question cannot be answered",
+    )
 
 
 def _build_qid_to_context() -> dict[str, tuple[str, str]]:
@@ -82,10 +99,12 @@ def _build_qid_to_context() -> dict[str, tuple[str, str]]:
     every template has an entry and siblings of a family share one string
     verbatim — the contract _RERANK_SYS states.
     """
-    return {
+    context = {
         qid: (DESC_BY_QID.get(qid, ""), _accepted_filters(qid))
         for qid in _TEMPLATES
     }
+    context.update({qid: _unanswerable_context(qid) for qid in UNANSWERABLE_CATALOG})
+    return context
 
 
 _QID_TO_CONTEXT: dict[str, tuple[str, str]] = _build_qid_to_context()

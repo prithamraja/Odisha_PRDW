@@ -16,9 +16,48 @@ from .models import RouteResult
 
 _NO_ROWS = "No records matched — nothing was found for this question."
 
+# Decision D3. 296 of the 346 PR&DW templates carry a caveat, because 251 of the
+# signed-off questions are only PARTIALLY answerable: approval tables cover ~17%
+# of activities, scheme_name is 82% null, SBM subjects are found by searching
+# free text, and every percentage divides by the GPs actually loaded rather than
+# the official roster. An answer served without its caveat is not a slightly
+# worse answer — it is the confidently-wrong failure mode.
+_CAVEAT_PREFIX = "Note: "
 
-def echo_answer(result: RouteResult) -> str:
+
+def append_caveat(answer: str, caveat: str | None) -> str:
+    """Put the caveat under the answer, VERBATIM.
+
+    Two properties matter and both are structural rather than stylistic:
+
+    IT IS CONCATENATED, NOT PROMPTED. `answer` is built here, deterministically,
+    from the resolved question — no LLM is involved on this path. The caveat is
+    appended to that finished string, so there is no step at which a model could
+    soften it, shorten it or drop it. Putting the caveat into a generation prompt
+    instead would make it advisory, and the whole point is that it is not.
+
+    IT IS ALSO STILL A SEPARATE FIELD. `QueryResponse.caveat` carries the same
+    text unchanged, so a frontend can render it distinctly. This function exists
+    because a caveat that ONLY lives in a field is one an unaware client silently
+    drops — and the client here is a separate workstream.
+    """
+    if not (caveat or "").strip():
+        return answer
+    return f"{answer}\n\n{_CAVEAT_PREFIX}{caveat.strip()}"
+
+
+def echo_answer_without_caveat(result: RouteResult) -> str:
+    """The echoed question and the empty-result sentence, and nothing else.
+
+    Exists only for the one caller that has to insert its own line BETWEEN the
+    question and the caveat (the scope-inheritance note). Everything else wants
+    `echo_answer`, which cannot forget the caveat.
+    """
     question = result.query_description or result.query_id or "Query matched."
     if result.result is not None and len(result.result) == 0:
         return f"{question}\n\n{_NO_ROWS}"
     return question
+
+
+def echo_answer(result: RouteResult) -> str:
+    return append_caveat(echo_answer_without_caveat(result), result.caveat)

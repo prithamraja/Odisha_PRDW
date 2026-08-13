@@ -50,6 +50,7 @@ from .zones             import (
     zone,
 )
 from .dashboard_catalog import DASHBOARD_CATALOG
+from .unanswerable_catalog import UNANSWERABLE_CATALOG, refusal_for
 from .fragment_reroute   import drill_target
 from .sql_params         import NAMED, param_style
 from .suggestions       import elicitation_chips
@@ -269,24 +270,29 @@ def _template_slot_types(template: dict) -> dict[str, str]:
 
 
 # Entity types the catalog exposes as SQL parameters but which are constants,
-# not something a user ever says ("how long is an Aadhaar?"). Asking the LLM for
-# them wastes a slot and asking the user produces a nonsense clarify prompt, so
-# they are filled in here before extraction.
-_CONSTANT_ENTITY_TYPES: dict[str, str] = {"aadhaar_length": "12"}
+# not something a user ever says. Asking the LLM for them wastes a slot and
+# asking the user produces a nonsense clarify prompt, so they are filled in here
+# before extraction.
+#
+# EMPTY FOR PR&DW. The AP catalogue's one member was `aadhaar_length` (fixed at
+# 12, exposed only so the rule was visible in the SQL); none of the workbook's
+# 19 bind names is a constant of that kind. The mechanism is kept because it is
+# the right shape for one if the statewide catalogue ever adds it — a constant
+# must never reach the user as "for which Aadhaar length?".
+_CONSTANT_ENTITY_TYPES: dict[str, str] = {}
 
 # Numeric slots whose value the QUESTION IMPLIES, so asking for it is a stall
-# rather than a clarification: "Rank farmers by number of schemes enrolled."
-# does not need "for which top n?" — a ranking implies a list length, and a
-# tolerance question implies the standard tolerance.
+# rather than a clarification: "Which theme has the most planned activities?"
+# does not need "for which top n?" — a ranking implies a list length.
 #
-# Strictly numeric-and-presentational. A categorical slot (crop, scheme,
-# district) or a threshold that changes the population (threshold_hectares,
-# scheme_count) must NEVER get a default: guessing there silently answers a
-# different question than the one asked. Routing handles those instead — the
-# rerank descriptions say which template applies when no value is named.
+# Strictly numeric-and-presentational. A categorical slot (theme, scheme,
+# district) or a threshold that changes the population ($threshold,
+# $amount_threshold) must NEVER get a default: guessing there silently answers a
+# different question than the one asked. $threshold is especially not defaultable
+# — the Parameter Registry is explicit that its unit varies by question between
+# percent, rupees, days and a minimum activity count.
 _DEFAULT_ENTITY_VALUES: dict[str, str] = {
     "top_n": "10",          # a ranking with no length asked for
-    "tolerance_pct": "10",  # matches the P11 answer-key figure
 }
 
 # The slots a plainly-stated rupee figure may prefill. `threshold` is included
@@ -722,6 +728,22 @@ def _clarify(
     )
 
 
+def _elicitation_defaults(validator: EntityValidator) -> dict[str, str]:
+    """Slots an elicitation chip must fill that the user did not say.
+
+    Only the fiscal year, and only the most recent loaded one — which is what an
+    officer naming no year means, and is read from the data rather than the wall
+    clock so it stays right as the extract moves. Best-effort: a validator with
+    no years loaded returns nothing and the chips degrade to a readable
+    stand-in rather than disappearing.
+    """
+    try:
+        years = validator.fiscal_years()
+    except Exception:
+        return {}
+    return {"date_range": years[-1]} if years else {}
+
+
 def _broad_question_clarify(
     user_query: str,
     normalized: str,
@@ -730,51 +752,58 @@ def _broad_question_clarify(
     validator: EntityValidator,
     openai_client,
 ) -> RouteResult | None:
-    """"How is Krishna doing?" / "Tell me what we know about Rajesh Sri" — an
-    entity with no measure. Offer the measures we hold for that entity rather
-    than a failure message. Best-effort: None means "fall through to the miss".
+    """"How is Khordha doing?" / "Tell me about Andhrua" — an entity with no
+    measure. Offer the measures we hold for that entity rather than a failure
+    message. Best-effort: None means "fall through to the miss".
 
-    District wins ties on purpose. Many AP district names ("Krishna", "Guntur")
-    also occur as farmer names, and a bare place name almost always means the
-    place. The cost is that "Tell me about Rajesh Sri in Guntur" elicits on
-    Guntur — acceptable, because the miss chips still carry the farmer name.
+    THE TIERS ARE TRIED WIDEST FIRST, which is the opposite of how they narrow.
+    A bare place name is far more often a district than a gram panchayat — there
+    are 30 districts an officer names constantly and ~6,800 panchayats — and the
+    cost of guessing wrong is only that the miss chips carry the other reading
+    anyway.
 
-    Note this is the ONE-farmer path and deliberately keeps roster
-    disambiguation. F14 ("which farmers share the name X?") is the opposite
-    question — it uses entity_type name_search precisely to bypass this — and
-    reaches its own template through normal routing, never through here.
+    The GP probe replaces the AP build's `farmer_name` one. That path existed
+    because AP's roster was people; PR&DW's is places, and the same machinery —
+    one extraction call, roster disambiguation, reference chips — answers "what
+    about Naugaon?" including when several panchayats hold that name.
     """
     try:
-        raw = extract_entities(user_query, ["district", "farmer_name"], openai_client)
+        raw = extract_entities(
+            user_query, ["district_name", "block_name", "gp_name"], openai_client
+        )
     except Exception:
         return None
 
-    raw_district = raw.get("district")
-    if raw_district:
+    for slot, entity_type in (("district_name", "district"),
+                              ("block_name", "block")):
+        raw_value = raw.get(slot)
+        if not raw_value:
+            continue
         try:
-            district = validator.validate(raw_district, "district")
+            place = validator.validate(raw_value, entity_type)
         except Exception:
-            pass
-        else:
-            chips = elicitation_chips("district", district.resolved_value)
-            if chips:
-                return _clarify(
-                    "broad_question",
-                    f"What would you like to know about {district.resolved_value}?",
-                    chips, user_query, normalized, start,
-                )
+            continue
+        chips = elicitation_chips(entity_type, place.resolved_value,
+                                  defaults=_elicitation_defaults(validator))
+        if chips:
+            return _clarify(
+                "broad_question",
+                f"What would you like to know about {place.resolved_value}?",
+                chips, user_query, normalized, start,
+            )
 
-    raw_name = raw.get("farmer_name")
+    raw_name = raw.get("gp_name")
     if not raw_name:
         return None
     try:
-        farmer = validator.validate(raw_name, "farmer_name")
+        gp = validator.validate(raw_name, "gp")
     except ClarificationNeeded as e:
-        # Several people answer to the name. Offer the user's own question with
-        # each candidate's REFERENCE substituted — every chip routes cleanly and
-        # no pending state has to survive the round trip. The reference, not the
-        # name: where the candidates are four people all called Lakshmi Devi,
-        # substituting the name gives four identical chips and no way to choose.
+        # Several panchayats answer to the name. Offer the user's own question
+        # with each candidate's REFERENCE substituted — every chip routes
+        # cleanly and no pending state has to survive the round trip. The
+        # reference, not the name: where the candidates are three panchayats all
+        # called Naugaon, substituting the name gives three identical chips and
+        # no way to choose.
         chips = corrected_query_chips(
             user_query, str(raw_name),
             candidate_replies(e.candidates)[:MAX_CLARIFY_OPTIONS],
@@ -786,12 +815,13 @@ def _broad_question_clarify(
     except Exception:
         return None   # not in the roster — the generic miss message is honest
 
-    chips = elicitation_chips("farmer_name", farmer.resolved_value)
+    chips = elicitation_chips("gp", gp.resolved_value,
+                              defaults=_elicitation_defaults(validator))
     if not chips:
         return None
     return _clarify(
         "broad_question",
-        f"What would you like to know about {farmer.resolved_value}?",
+        f"What would you like to know about {gp.resolved_value}?",
         chips, user_query, normalized, start,
     )
 
@@ -807,10 +837,7 @@ def _no_match(
     template_map: dict[str, dict],
 ) -> RouteResult:
     # Broad-question elicitation (8e): entity resolved, measure missing —
-    # "How is Krishna doing?" gets measure chips, not a failure message.
-    # One extraction call covers both probes; district is tried FIRST because
-    # district names are also farmer names ("Krishna"), and a district reading
-    # of a bare place name is the safer default.
+    # "How is Khordha doing?" gets measure chips, not a failure message.
     elicited = _broad_question_clarify(
         user_query, normalized, start,
         validator=validator, openai_client=openai_client,
@@ -889,41 +916,49 @@ def requery_template(
 
 # ── Frame scope inheritance ───────────────────────────────────────────────────
 # A new question asked inside a conversation about one district usually means
-# that district. "How much was procured in each mandal of East Godavari?" then
-# "how many small or marginal farmers" routes to G06-S and answers STATE-WIDE —
-# a different question from the one the user believes they asked, and nothing in
-# the answer says so.
+# that district. "What is the block-wise sanctioned amount in Khordha?" then
+# "how many activities are abandoned" answers STATE-WIDE — a different question
+# from the one the user believes they asked, and nothing in the answer says so.
 #
-# The catalog's Gnn-S / -D / -M convention encodes scope in the id (46 families,
-# every one with all three), so narrowing is a deterministic sibling lookup, not
-# a guess. Two rules keep it honest:
+# HOW THIS CHANGED IN WP-3. The AP catalogue encoded scope in the id (Gnn-S /
+# -D / -M), so narrowing was a lookup for a narrower SIBLING template;
+# `_scope_sibling` did that and is retired here, because decision D2 leaves no
+# siblings to find. Under D2 the scope is not a different template but an
+# UNBOUND OPTIONAL SLOT on the same one — which is exactly what makes the defect
+# easier to hit, not harder: every geography-optional template silently answers
+# state-wide the moment nothing fills its district slot.
+#
+# So the mechanism is re-pointed rather than removed: re-serve the SAME query_id
+# with the frame's geography bound into the slot the question left empty. The
+# two honesty rules are unchanged:
 #   - it only ever fires when the question named NO geography of its own;
 #   - the answer says the scope was carried over, and ships an undo chip.
 
-_GEO_SLOT_ORDER = ("mandal", "district")   # deepest first
+# Deepest first — the narrowest scope the frame can supply is the one the
+# conversation is actually about.
+_GEO_SLOT_ORDER = ("gp_name", "block_name", "district_name")
+_GEO_ENTITY_TYPES = frozenset({"gp", "gp_2", "block", "block_2", "district"})
 
-# Wordings that mean "deliberately not narrowed". Bare "ap" and bare "all" are
-# excluded: too loose to distinguish from ordinary phrasing.
+# Wordings that mean "deliberately not narrowed", so inheritance must not fire.
+# Bare "all" is excluded as too loose to tell from ordinary phrasing. "across the
+# whole state" is here because `statewide_undo_chip` puts it in the chip it
+# sends — the undo has to survive its own round trip or tapping it re-inherits
+# the scope it was meant to escape.
 _EXPLICIT_STATEWIDE = re.compile(
     r"\b(state[\s-]?wide|entire state|whole state|across the state|"
-    r"in the state|andhra pradesh)\b",
+    r"across the whole state|in the state|odisha|orissa|"
+    r"all districts|all blocks|all gps|all gram panchayats)\b",
     re.IGNORECASE,
 )
 
 
-def _scope_sibling(query_id: str, frame, template_map: dict[str, dict]) -> str | None:
-    """The narrower sibling of a state-level template that the frame can fill."""
-    match = re.match(r"^(.+)-S$", query_id or "")
-    if not match:
-        return None
-    for suffix in ("-M", "-D"):
-        sibling = match.group(1) + suffix
-        template = template_map.get(sibling)
-        if template is None:
-            continue
-        needed = {s["name"] for s in template["param_slots"]}
-        if needed and needed <= set(frame.bound_params):
-            return sibling
+def _inheritable_geo_slot(template: dict, frame) -> str | None:
+    """The narrowest OPTIONAL geography slot this template left empty and the
+    frame can fill. None when there is nothing to inherit."""
+    optional = optional_slots(template["param_slots"])
+    for slot in _GEO_SLOT_ORDER:
+        if slot in optional and frame.bound_params.get(slot):
+            return slot
     return None
 
 
@@ -950,27 +985,29 @@ def inherit_frame_scope(
         return None
     if _EXPLICIT_STATEWIDE.search(user_query):
         return None   # the user said state-wide; narrowing would contradict them
-    if any(e.entity_type in _GEO_SLOT_ORDER for e in (result.entities or [])):
+    if any(e.entity_type in _GEO_ENTITY_TYPES for e in (result.entities or [])):
         return None   # the question named its own geography — that one wins
 
-    sibling = _scope_sibling(result.query_id, frame, template_map)
-    if sibling is None:
+    template = template_map.get(result.query_id)
+    if template is None:
+        return None
+    slot = _inheritable_geo_slot(template, frame)
+    if slot is None:
         return None
 
-    template = template_map[sibling]
-    entities: list[ExtractedEntity] = []
+    # The already-validated entities are kept as they are and the inherited
+    # geography is ADDED, so re-serving cannot disturb a slot the user did fill.
+    entities: list[ExtractedEntity] = list(result.entities or [])
     inherited: dict[str, str] = {}
     try:
-        for name, etype in _template_slot_types(template).items():
-            value = frame.bound_params[name]
-            entity = validator.validate(value, etype)
-            entity.slot_name = name
-            entities.append(entity)
-            if name in _GEO_SLOT_ORDER:
-                inherited[name] = entity.resolved_value
+        etype = _template_slot_types(template)[slot]
+        entity = validator.validate(frame.bound_params[slot], etype)
+        entity.slot_name = slot
+        entities.append(entity)
+        inherited[slot] = entity.resolved_value
 
         narrowed = _serve_query_id(
-            sibling, entities, _QID_TO_INTENT.get(sibling),
+            result.query_id, entities, _QID_TO_INTENT.get(result.query_id),
             user_query=user_query, normalized=normalize(user_query),
             start=time.monotonic(),
             cache_conn=cache_conn, dashboard_results=dashboard_results,
@@ -978,7 +1015,7 @@ def inherit_frame_scope(
             start_date=start_date, end_date=end_date,
         )
     except Exception as ex:
-        _log.debug("frame scope inheritance to %s failed: %s", sibling, ex)
+        _log.debug("frame scope inheritance of %s failed: %s", slot, ex)
         return None
 
     if narrowed.tier != RouteTier.TIER2_TEMPLATE:
@@ -989,17 +1026,30 @@ def inherit_frame_scope(
 def statewide_undo_chip(query_id: str, template_map: dict[str, dict]) -> Chip | None:
     """'Show this state-wide instead' — the escape from an inherited scope.
 
-    The -S question is slotless, so its own text routes cleanly through the
-    normal matcher and lands back on the un-narrowed answer.
+    Under D2 there is no slotless state-wide sibling to send the user back to:
+    the same template answers both ways, and what changes is whether its
+    optional geography slot is bound. So the chip sends this template's own
+    question with the geography placeholders dropped and an explicit state-wide
+    phrase appended.
+
+    That phrase is load-bearing rather than decorative. It is matched by
+    `_EXPLICIT_STATEWIDE`, which is what stops the re-asked question inheriting
+    the very scope the chip exists to escape — without it, tapping "show this
+    state-wide" would silently return the same narrowed answer.
     """
-    match = re.match(r"^(.+)-[DM]$", query_id or "")
-    if not match:
+    template = template_map.get(query_id or "")
+    if template is None:
         return None
-    template = template_map.get(match.group(1) + "-S")
-    if template is None or template["param_slots"]:
-        return None
-    question = template["abstract_question"]
-    return Chip(label="Show this state-wide instead", send_text=question)
+    if not (optional_slots(template["param_slots"]) & set(_GEO_SLOT_ORDER)):
+        return None    # nothing to widen — the question has no geography slot
+
+    question = re.sub(r"\s*(?:in|for|of)?\s*\{(?:gp_name|block_name|district_name)\}",
+                      "", template["abstract_question"])
+    question = re.sub(r"\s{2,}", " ", question).strip().rstrip("?.")
+    return Chip(
+        label="Show this across the whole state instead",
+        send_text=f"{question} across the whole state?",
+    )
 
 
 def serve_frame_edit(
@@ -1280,6 +1330,43 @@ def serve_scope_alternative(
 
 # ── Shared back-end: serve a resolved query_id ────────────────────────────────
 
+def _serve_unanswerable(
+    query_id: str, user_query: str, normalized: str, start: float,
+    template_map: dict[str, dict],
+) -> RouteResult:
+    """An honest refusal for a question the database genuinely cannot answer.
+
+    These 30 questions are in the retrieval index on purpose (see
+    unanswerable_catalog's docstring): officers WILL ask them — the 13 dropped
+    ones are all beneficiary questions, and "how many people got a pension here"
+    is an obvious thing to want from a panchayat system. Retrieving them and
+    saying exactly what is missing is a better answer than the generic miss
+    message, which reads as the bot merely failing and leaves the officer
+    rephrasing a question that can never work.
+
+    The reason is the WORKBOOK'S OWN, verbatim, for the same reason a caveat is
+    verbatim: it is the answer to "why not", and a paraphrase of it is a worse
+    answer. Where the workbook names an answerable near-miss, it is offered as a
+    chip rather than substituted silently — the user asked for something else and
+    gets to choose.
+    """
+    entry = UNANSWERABLE_CATALOG[query_id]
+    result = _fallback(refusal_for(query_id), user_query, normalized, start)
+    result.query_id = query_id
+    result.query_description = entry["question"]
+
+    alternative = entry.get("alternative")
+    template = template_map.get(alternative or "")
+    if template is not None:
+        question = readable_question(template["abstract_question"])
+        result.clarification = Clarification(
+            reason="known_unanswerable",
+            prompt="The closest question I can answer is:",
+            options=[Chip(label=question, send_text=question)],
+        )
+    return result
+
+
 def _serve_query_id(
     query_id: str,
     validated_entities: list,
@@ -1295,8 +1382,21 @@ def _serve_query_id(
     start_date: str | None,
     end_date: str | None,
 ) -> RouteResult:
-    # Dashboard (Tier-1) — serve pre-computed result
-    if query_id.startswith("D"):
+    # Known-unanswerable — retrieved on purpose, executed never.
+    if query_id in UNANSWERABLE_CATALOG:
+        return _serve_unanswerable(query_id, user_query, normalized, start,
+                                   template_map)
+
+    # Dashboard (Tier-1) — serve pre-computed result.
+    #
+    # MEMBERSHIP, NOT A PREFIX. This read `query_id.startswith("D")`, which was
+    # safe only while no AP template id began with D. Fifteen PR&DW ids do —
+    # DQY-001…011 (data quality) and DSS-001…006 (decision support) — and every
+    # one of them would have been served here as a dashboard, returning the
+    # empty `dashboard_results.get(query_id, [])` with no error and an answer
+    # reading "no records matched". Fifteen templates permanently, silently
+    # empty. The catalogue an id belongs to is the ground truth; a letter is not.
+    if query_id in DASHBOARD_CATALOG:
         return RouteResult(
             tier=RouteTier.TIER1_DASHBOARD,
             result=dashboard_results.get(query_id, []),
@@ -1433,7 +1533,9 @@ def _route_vector(
     query_id, near_misses = rerank(user_query, candidates, openai_client)
 
     if query_id == "no_match" or (
-        not query_id.startswith("D") and query_id not in template_map
+        query_id not in DASHBOARD_CATALOG
+        and query_id not in UNANSWERABLE_CATALOG
+        and query_id not in template_map
     ):
         # No exact match. The clarify chips are the reranker's semantically
         # chosen near-misses — not raw embedding order, whose surface-wording
@@ -1463,9 +1565,10 @@ def _route_vector(
 
     intent = _QID_TO_INTENT.get(query_id)
 
-    # Extract entities for exactly the slots this template needs
+    # Extract entities for exactly the slots this template needs. Dashboards are
+    # precomputed and take none; a known-unanswerable has none to take.
     validated_entities = []
-    if not query_id.startswith("D"):
+    if query_id in template_map:
         slot_type = _template_slot_types(template_map[query_id])
         if slot_type:
             raw_entities = _extract_slot_values(

@@ -2,9 +2,14 @@
 Query normalisation for RETRIEVAL only.
 
 The output feeds the embedding lookup, so expansions here exist to close the
-vocabulary gap between how officials speak ("apmip", "msp") and how the catalog
-questions are written ("micro-irrigation", "procurement"). Entity extraction
-still sees the user's original text, so nothing here can corrupt a bound value.
+vocabulary gap between how officials speak ("GPDP", "SBM", "IHHL") and how the
+catalogue questions are written. Entity extraction still sees the user's
+original text, so nothing here can corrupt a bound value — this is a retrieval
+aid, not a resolver.
+
+NOT the place for entity aliases. `entity_validator`'s per-entity alias tables
+are where "khurda" becomes "Khordha", because they resolve a value that gets
+BOUND. Anything expanded here only ever changes what gets embedded.
 """
 import re
 
@@ -13,27 +18,42 @@ ABBREVIATIONS: dict[str, str] = {
     "how's":   "how is",
     "govt":    "government",
     "dist":    "district",
-    "agri":    "agriculture",
-    "hort":    "horticulture",
-    "benef":   "beneficiary",
-    "ben":     "beneficiary",
-    "pmk":     "pm-kisan",
-    "pmkisan": "pm-kisan",
-    "apmip":   "micro-irrigation",
-    "apcnf":   "natural farming",
-    "cnf":     "natural farming",
-    "msp":     "procurement",
-    "dbt":     "direct benefit transfer",
-    "slr":     "survey and land records",
+    # The programme vocabulary an officer types in short form.
+    "gpdp":    "gram panchayat development plan",
+    "sbm":     "swachh bharat mission sanitation",
+    "swm":     "solid waste management",
+    "lwm":     "liquid waste management",
+    "gwm":     "grey water management",
+    "fsm":     "faecal sludge management",
+    "pwm":     "plastic waste management",
+    "ihhl":    "individual household latrine toilet",
+    "csc":     "community sanitary complex",
+    "odf":     "open defecation free sanitation",
+    "o&m":     "operation and maintenance",
+    "cfc":     "central finance commission",
+    "sfc":     "state finance commission",
+    "fc":      "finance commission",
+    "lsdg":    "localised sustainable development goals theme",
+    "aa":      "administrative approval",
+    "ta":      "technical approval",
+    "ps":      "panchayat samiti block",
+    "zp":      "zilla parishad district",
+    "gp":      "gram panchayat",
+    "gps":     "gram panchayats",
+    "awc":     "anganwadi centre",
 }
 
-# Colloquial / pre-reorganisation district names → the roster spelling.
+# Colloquial / pre-reorganisation DISTRICT spellings → the roster spelling.
+# Retrieval-side only, and deliberately a copy of the same few names the
+# validator aliases: a question that says "khurda" should embed near the
+# catalogue questions that say "Khordha", quite apart from how the value binds.
 DISTRICT_ALIASES: dict[str, str] = {
-    "vizag":        "visakhapatnam",
-    "cuddapah":     "ysr kadapa",
-    "kadapa":       "ysr kadapa",
-    "ananthapur":   "anantapur",
-    "anantapuram":  "anantapur",
+    "khurda":      "khordha",
+    "khorda":      "khordha",
+    "khurdha":     "khordha",
+    "cuttak":      "cuttack",
+    "sundergarh":  "sundargarh",
+    "phulbani":    "kandhamal",
 }
 
 

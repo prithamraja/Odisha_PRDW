@@ -1,25 +1,22 @@
 """Context-preserving handling of follow-up FRAGMENTS.
 
-The defect this module exists for: a state-wide question on screen ("What is the
-average landholding by social category?", Q027, no parameters) followed by the
-fragment "in kurnool?".
+The defect this module exists for: a state-wide question on screen ("How many
+activities are abandoned?") followed by the fragment "in Ganjam?".
 
-The follow-up classifier reads that as a district edit, correctly refuses it —
-Q027 has no district slot to swap — and the message then falls through to
-standard catalog matching **on its own**. The only retrievable signal left in
-"in kurnool?" is the district name, so the reranker picks an essentially
-arbitrary district-parameterised template (observed: G14-D MARKFED procurement,
-G01-D beneficiary counts). Confident, and about the wrong subject.
+The follow-up classifier reads that as a district edit, refuses it when the
+frame has no district bound, and the message then falls through to standard
+catalog matching **on its own**. The only retrievable signal left in "in Ganjam?"
+is the district name, so the reranker picks an essentially arbitrary
+district-mentioning template. Confident, and about the wrong subject.
 
 Three deterministic pieces live here, all pure — no LLM, no I/O:
 
-  DRILL_MAP / drill_target   the state-wide → geo sibling map (item 2). Derived
-                             from the catalog's own -S/-D/-M id convention, plus
-                             a short authored list for the pairs that convention
-                             cannot express.
+  drill_target               the state-wide → narrowed mapping (item 2). Under
+                             decision D2 this is the SAME template with an
+                             optional slot filled, not a different one.
   combined_question          the frame's question + the fragment, so matching
                              sees the subject the fragment omits (item 1).
-  templates_share_subject    the datasets/theme overlap test behind the guard
+  templates_share_subject    the bracket/module overlap test behind the guard
   is_slot_only_fragment      "is this message nothing but a place and/or a date?"
                              (item 3)
 
@@ -33,11 +30,23 @@ import re
 from .template_catalog import TEMPLATE_CATALOG
 
 # Deepest first: the slot a hop is keyed on is the narrowest geography the
-# target adds, which is what the user actually named.
-GEO_SLOTS: tuple[str, ...] = ("village", "mandal", "district")
+# target adds, which is what the user actually named. These are the WORKBOOK'S
+# BIND NAMES, which is what param_slots carries.
+GEO_SLOTS: tuple[str, ...] = ("gp_name", "block_name", "district_name")
 
 
-# ── Item 2: the state-wide → geo drill map ───────────────────────────────────
+# ── Item 2: the state-wide → narrowed drill hop ──────────────────────────────
+#
+# THE AP DRILL MAP IS GONE, and nothing replaces it, because there is nothing
+# left to map. That map existed to find a NARROWER SIBLING TEMPLATE: the AP
+# catalogue spelled scope into the id (G01-S state / -D district / -M mandal),
+# so "in Peddapuram?" after a state-wide answer meant hopping G01-S → G01-M.
+#
+# Decision D2 removed the siblings. One PR&DW template answers at every scope,
+# and narrowing it means BINDING ITS OPTIONAL GEOGRAPHY SLOT — the same template
+# id, one more parameter. So the hop target is the frame's own template whenever
+# that template has the named tier as an optional slot, which is what
+# `drill_target` now returns.
 
 def _geo_slots_of(query_id: str) -> set[str]:
     template = TEMPLATE_CATALOG.get(query_id)
@@ -46,54 +55,18 @@ def _geo_slots_of(query_id: str) -> set[str]:
     return {s["name"] for s in template["param_slots"] if s["name"] in GEO_SLOTS}
 
 
-def _build_drill_map() -> dict[str, dict[str, str]]:
-    """{wider template id: {geo slot named: narrower sibling id}}.
-
-    Derived from the id suffixes rather than hand-copied: the AP catalog has 46
-    Gnn families, each with an -S (state), -D (district) and -M (mandal) member,
-    and that convention IS the drill relationship. A hop is keyed on the deepest
-    geography the sibling adds — G01-S → G01-M adds district AND mandal, and the
-    user who said "in Peddapuram?" named the mandal.
-    """
-    drill: dict[str, dict[str, str]] = {}
-    for query_id in TEMPLATE_CATALOG:
-        match = re.match(r"^(.+)-([SD])$", query_id)
-        if match is None:
-            continue
-        base = match.group(1)
-        wider = _geo_slots_of(query_id)
-        for suffix in ("D", "M"):
-            sibling = f"{base}-{suffix}"
-            if sibling == query_id or sibling not in TEMPLATE_CATALOG:
-                continue
-            added = _geo_slots_of(sibling) - wider
-            if not added:
-                continue
-            deepest = next(slot for slot in GEO_SLOTS if slot in added)
-            drill.setdefault(query_id, {})[deepest] = sibling
-    return drill
-
-
-# Pairs the id convention cannot express: two state-wide PM-KISAN landholding
-# questions whose district/mandal reading is the G04 equity family, not a
-# same-named sibling (they have none — they are Qnnn ids).
-_AUTHORED_DRILL: dict[str, dict[str, str]] = {
-    # "What is the average landholding by social category?"
-    "Q027": {"district": "G04-D", "mandal": "G04-M"},
-    # "What is the average landholding per district?"
-    "Q019": {"district": "G04-D"},
-}
-
-DRILL_MAP: dict[str, dict[str, str]] = _build_drill_map()
-for _wider, _targets in _AUTHORED_DRILL.items():
-    DRILL_MAP.setdefault(_wider, {}).update(_targets)
-
-
 def drill_target(query_id: str | None, slot: str | None) -> str | None:
-    """The sibling that answers `query_id` narrowed to `slot`, or None."""
+    """The template that answers `query_id` narrowed to `slot`, or None.
+
+    Returns `query_id` ITSELF when that template can take the slot — under D2
+    the narrowed question is the same entry with one more optional parameter
+    bound. None when the template has no such slot, which is the honest answer:
+    there is no narrower form of that question to hop to, and the caller falls
+    through to ordinary matching rather than inventing one.
+    """
     if not query_id or not slot:
         return None
-    return DRILL_MAP.get(query_id, {}).get(slot)
+    return query_id if slot in _geo_slots_of(query_id) else None
 
 
 # ── Item 1: the combined question ────────────────────────────────────────────
@@ -119,56 +92,32 @@ def combined_question(frame_question: str | None, fragment: str) -> str:
 
 # ── Item 3: is the routed template plausibly the same subject? ───────────────
 
-# 'All 8', 'All 6 AP schemes', 'All 7 Aadhaar-bearing datasets' — a collective
-# that covers every dataset, so it cannot tell two subjects apart.
-_WILDCARD_DATASETS = re.compile(r"^(all\b|\d+\s+ap\s+schemes\b)", re.IGNORECASE)
-
-
-def _dataset_tokens(spec: str | None) -> set[str] | None:
-    """{'pm-kisan', 'agriculture'} for 'PM-KISAN + Agriculture'.
-
-    None means "a collective that spans everything" — it overlaps with anything,
-    so it can never be evidence that two templates are about different things.
-    """
-    tokens: set[str] = set()
-    for part in re.split(r"\s*\+\s*", spec or ""):
-        name = part.strip().lower()
-        if not name:
-            continue
-        if _WILDCARD_DATASETS.match(name):
-            return None
-        name = name.replace("_", " ")
-        name = re.sub(r"\bhorticulture apmip\b", "horticulture", name)
-        tokens.add(name)
-    return tokens or None
-
-
 def templates_share_subject(a_id: str | None, b_id: str | None) -> bool:
     """True when two catalog templates are plausibly about the same thing.
 
-    The test is `datasets AND theme`, not "either one". Both halves are needed:
+    The test is `bracket AND module`, the workbook's own two-level
+    classification. Both halves are needed, for the reason the AP version needed
+    both of its own:
 
-      - theme alone is too coarse — 40 templates share 'Targeting & equity';
-      - datasets alone is too coarse in the other direction — the observed
-        Q027 → G01-D misroute shares 'PM-KISAN' with its frame, and two of the
-        catalog's dataset strings are collectives that match everything, which
-        would make the guard unfireable exactly where it is needed (Q067's
-        'All 7 Aadhaar-bearing datasets').
+      - the BRACKET alone is far too coarse — 'Planning' holds 66 templates and
+        'Sanitation (SBM)' 85, so a guard keyed on it would almost never fire;
+      - the MODULE alone is too coarse in the other direction — 'GPDP' spans
+        Planning, Budgeting, Expenditure and Implementation, which are exactly
+        the subjects a stray fragment slides between.
 
-    Unknown ids (dashboards, anything not in the catalog) are treated as sharing
-    — the guard only ever fires on evidence, never on a lookup miss.
+    Together they are the level at which "is this still the same subject?" has a
+    sensible answer: Planning/GPDP against Expenditure/GPDP is a real change of
+    subject, and Planning/GPDP against Planning/GPDP is not.
+
+    Unknown ids (dashboards, known-unanswerables, anything not in the catalogue)
+    are treated as sharing — the guard only ever fires on evidence, never on a
+    lookup miss.
     """
     a = TEMPLATE_CATALOG.get(a_id or "")
     b = TEMPLATE_CATALOG.get(b_id or "")
     if a is None or b is None:
         return True
-    if (a.get("theme") or "") != (b.get("theme") or ""):
-        return False
-    a_sets = _dataset_tokens(a.get("datasets"))
-    b_sets = _dataset_tokens(b.get("datasets"))
-    if a_sets is None or b_sets is None:
-        return True
-    return bool(a_sets & b_sets)
+    return (a.get("bracket"), a.get("module")) == (b.get("bracket"), b.get("module"))
 
 
 # ── Item 3: is the message nothing but a place and/or a period? ──────────────
@@ -178,23 +127,29 @@ def templates_share_subject(a_id: str | None, b_id: str | None) -> bool:
 # user puts in front of a bare scope ("show me kurnool").
 _FUNCTION_WORDS = {
     "a", "about", "again", "also", "an", "and", "are", "as", "at", "back",
-    "be", "but", "by", "did", "do", "does", "district", "districts", "for",
+    "be", "but", "by", "did", "do", "does", "for",
     "from", "give", "here", "how", "in", "into", "is", "it", "its", "just",
-    "many", "mandal", "mandals", "me", "much", "now", "of", "ok", "okay", "on",
+    "many", "me", "much", "now", "of", "ok", "okay", "on",
     "one", "only", "or", "our", "please", "same", "show", "so", "some",
     "something", "that", "the", "then", "there", "these", "this", "those",
-    "to", "us", "village", "villages", "was", "were", "what", "which", "with",
-    "s",
+    "to", "us", "was", "were", "what", "which", "with", "s",
+    # The unit nouns that trail a place name in PR&DW: "in Ganjam district",
+    # "for Barpali block", "Andhrua GP", "Bhubaneswar panchayat samiti".
+    "district", "districts", "zilla", "parishad", "zp",
+    "block", "blocks", "samiti", "samitis", "panchayat", "panchayats",
+    "gram", "gp", "gps", "village", "villages",
 }
 
 # Anything that reads as a period rather than a measure. Kept in step with
 # date_phrase.py's vocabulary, which is what actually sets the SQL window.
+# The agricultural seasons are gone — kharif and rabi are not PR&DW concepts —
+# and the fiscal wording an officer uses is in.
 _DATE_WORDS = {
     "jan", "january", "feb", "february", "mar", "march", "apr", "april", "may",
     "jun", "june", "jul", "july", "aug", "august", "sep", "sept", "september",
     "oct", "october", "nov", "november", "dec", "december",
-    "kharif", "rabi", "season", "year", "years", "fy", "month", "months",
-    "last", "quarter",
+    "year", "years", "fy", "financial", "fiscal", "month", "months",
+    "last", "quarter", "quarters", "q1", "q2", "q3", "q4",
 }
 
 _YEARISH = re.compile(r"^(19|20)\d{2}$")
@@ -202,11 +157,10 @@ _TOKEN = re.compile(r"[a-z0-9']+")
 
 
 def geo_vocabulary_tokens(*value_lists: list[str]) -> set[str]:
-    """Every word that occurs in a district / mandal / village name, lowercased.
+    """Every word that occurs in a district / block / GP name, lowercased.
 
-    Token-level rather than whole-name matching so multi-word places ("East
-    Godavari", "Pedda Nandipadu") are recognised without an O(vocabulary) scan
-    of every message.
+    Token-level rather than whole-name matching so multi-word places ("Tangi
+    Choudwar") are recognised without an O(vocabulary) scan of every message.
     """
     tokens: set[str] = set()
     for values in value_lists:
@@ -216,7 +170,7 @@ def geo_vocabulary_tokens(*value_lists: list[str]) -> set[str]:
 
 
 def fragment_place_phrase(message: str, geo_tokens: set[str]) -> str | None:
-    """The place a fragment names: 'in east godavari district' -> 'east godavari'.
+    """The place a fragment names: 'in tangi choudwar block' -> 'tangi choudwar'.
 
     Every word that belongs to the place vocabulary, in order. Nothing else is
     kept, so the function words and any period wording fall away. A message

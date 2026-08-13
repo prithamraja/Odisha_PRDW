@@ -39,7 +39,13 @@ def _clean(text: str) -> str:
 
 
 class VectorRetriever:
-    def __init__(self, client, dashboard_catalog: dict, template_catalog: dict):
+    def __init__(
+        self,
+        client,
+        dashboard_catalog: dict,
+        template_catalog: dict,
+        unanswerable_catalog: dict | None = None,
+    ):
         self.client = client
         self.ids: list[str] = []             # distinct query_ids, catalog order
         self.display: dict[str, str] = {}    # qid -> original question (braced)
@@ -60,6 +66,13 @@ class VectorRetriever:
             add(qid, entry["question"], entry.get("paraphrases"))
         for tid, entry in template_catalog.items():
             add(tid, entry["abstract_question"], entry.get("paraphrases"))
+        # The questions the database CANNOT answer are indexed too. They have to
+        # be retrievable to be refused with a reason — an officer's beneficiary
+        # question that retrieves nothing gets the generic miss message, which
+        # reads as the bot failing rather than as the data being absent. The
+        # router refuses them; nothing here executes.
+        for qid, entry in (unanswerable_catalog or {}).items():
+            add(qid, entry["question"], entry.get("paraphrases"))
 
         self._matrix = self._load_or_build(embed_texts)   # (V, dim) L2-normalised
 

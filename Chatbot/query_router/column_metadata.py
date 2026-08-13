@@ -112,6 +112,34 @@ _SELECT_LIST_TERMINATORS = ("FROM", "UNION", "INTERSECT", "EXCEPT",
                             "WHERE", "GROUP", "HAVING", "ORDER", "LIMIT")
 
 
+def _cte_select_lists(sql: str) -> dict[str, str]:
+    """{cte name: its SELECT list} for a leading WITH clause.
+
+    Only what `SELECT * FROM <cte>` needs to be resolvable — the body is located
+    by brace matching from the CTE's opening paren, so a nested subquery inside
+    it cannot end the capture early.
+    """
+    lists: dict[str, str] = {}
+    for match in re.finditer(r"(\w+)\s+AS\s*\(", sql, re.IGNORECASE):
+        name = match.group(1)
+        depth, index = 1, match.end()
+        while index < len(sql) and depth:
+            depth += (sql[index] == "(") - (sql[index] == ")")
+            index += 1
+        body = sql[match.end():index - 1]
+        select_at = _find_keyword_at_depth_zero(body, "SELECT")
+        if select_at < 0:
+            continue
+        start = select_at + len("SELECT")
+        end = len(body)
+        for keyword in _SELECT_LIST_TERMINATORS:
+            at = _find_keyword_at_depth_zero(body, keyword, start)
+            if 0 <= at < end:
+                end = at
+        lists[name.lower()] = body[start:end]
+    return lists
+
+
 def extract_result_columns(sql: str) -> list[str]:
     """Extract the outer SELECT list without executing catalog SQL."""
     sql = re.sub(r"--[^\n]*", "", sql).rstrip().rstrip(";")
@@ -126,8 +154,25 @@ def extract_result_columns(sql: str) -> list[str]:
         if 0 <= at < end:
             end = at
 
+    select_list = sql[body_start:end]
+
+    # `SELECT * FROM <cte>` — the outer list names nothing, so read the columns
+    # off the CTE it selects from. ALR-013 is written this way ("which GPs have
+    # no data entry in ANY module": three correlated counts in a CTE, then a
+    # star select of the rows where all three are zero). Without this the entry
+    # has NO declared columns at all, and every downstream consumer of that
+    # metadata — the operations layer's column typing, the follow-up
+    # classifier's dimension list, the frontend's chart hint — silently has
+    # nothing to work with for that one question.
+    if select_list.strip() == "*":
+        source = re.match(r"\s*FROM\s+(\w+)", sql[end:], re.IGNORECASE)
+        if source:
+            resolved = _cte_select_lists(sql).get(source.group(1).lower())
+            if resolved:
+                select_list = resolved
+
     columns = []
-    for expression in _split_top_level_csv(sql[body_start:end]):
+    for expression in _split_top_level_csv(select_list):
         name = _column_name(expression)
         if name:
             columns.append(name)

@@ -1,6 +1,41 @@
 {
-  "description": "Editable rules for tagging catalog result columns. Exact overrides win; patterns are evaluated in order. Tuned for the AP Agriculture catalog: label columns (geography, crop, season, scheme, status) land on 'dimension', money on 'additive_value', counts and physical quantities (farmers, acres, hectares, quintals, cocoon) on 'additive_count', and anything averaged/per-unit/percentage on 'ratio' so the operations layer refuses to sum it over the displayed rows.",
+  "description": "Editable rules for tagging catalog result columns. Exact overrides win; patterns are evaluated in order. Label columns (geography, theme, focus area, scheme, status) land on 'dimension', money on 'additive_value', counts on 'additive_count', and anything averaged/per-unit/percentage on 'ratio' so the operations layer refuses to sum it over the displayed rows. The 'ratio' classification is the load-bearing one: summing a column of percentages down a displayed table produces a confident number that means nothing.",
+  "_comment_prdw": "The exact entries and the first three pattern rules below were added for the Odisha PR&DW catalogue. The rest are the generic rules inherited from the AP build; they are kept because they are generic (name/status/date/code/money wording is not domain-specific) and because pruning working rules to tidy up is how a classifier quietly starts returning 'unclassified'.",
   "exact": {
+    "theme": "dimension",
+    "item": "dimension",
+    "unit": "dimension",
+    "sector": "dimension",
+    "tied_untied": "dimension",
+    "funding_source": "dimension",
+    "sanction_authority": "dimension",
+    "sanction_authority_raw": "dimension",
+    "_comment_prdw_aggregated_labels": "STRING_AGG'd lists, not counts. Each needs an exact entry because the count patterns would otherwise claim it on a plural stem — 'activity_codes' on the code rule, 'schemes' and 'years' on the countable-things rule. Summing a comma-joined list is not an error anyone would catch by reading the answer.",
+    "activity_codes": "dimension",
+    "schemes": "dimension",
+    "years": "dimension",
+    "plans": "additive_count",
+    "vouchers": "additive_count",
+    "started": "additive_count",
+    "ongoing": "additive_count",
+    "difference": "additive_value",
+    "unspent_amount": "additive_value",
+    "variance": "additive_value",
+    "receipts": "additive_value",
+    "under_approval": "additive_count",
+    "not_initiated": "additive_count",
+    "categorised_assets": "additive_count",
+    "occurrences": "additive_count",
+    "with_evidence": "additive_count",
+    "implementation_gap": "additive_count",
+    "deadline": "temporal",
+    "first_sanction": "temporal",
+    "last_sanction": "temporal",
+    "issuing_authority": "dimension",
+    "admin_issuing_authority": "dimension",
+    "admin_authority_as_recorded": "dimension",
+    "technical_authority": "dimension",
+
     "geography": "dimension",
     "district": "dimension",
     "districts": "additive_count",
@@ -55,7 +90,6 @@
     "pmkisan_ha": "additive_count",
     "markfed_minus_pmkisan": "additive_count",
     "pattadar_in_agriculture": "additive_count",
-    "schemes": "additive_count",
     "n_schemes": "additive_count",
     "quantity": "additive_count",
     "dfls": "additive_count",
@@ -88,6 +122,21 @@
       "_comment": "Derived measures announce themselves in their prefix — catch them before anything else can claim the stem ('pct_mobile' is a rate, not an identifier).",
       "pattern": "^(pct|percent|percentage|avg|average|mean|median|share_of)_",
       "column_type": "ratio"
+    },
+    {
+      "_comment": "PR&DW: percentage-point deviations. Anchored and placed above the count rules, which would otherwise never see it — but it must also stay below the pct_ prefix rule.",
+      "pattern": "_pts$|_pp$",
+      "column_type": "ratio"
+    },
+    {
+      "_comment": "PR&DW: the counted nouns of this domain. GRAM PANCHAYATS in every shape the catalogue counts them ('gps_uploaded', 'late_gps', 'gps_with_plan'), ACTIVITIES ditto ('planned_activities', 'matching_activities', 'activities_year1', 'change_in_activities'), and the year/status counters. Above the money and label rules because several of these contain a money or label word — 'sc_targeted_activities' holds no rupees, and 'gps_approved' is a count and not a status.",
+      "pattern": "(^|_)gps?(_|$)|activit(y|ies)_?\\w*$|^activities|(^|_)years(_|$)|^years_|_uploads$|_rows$|^(main|supplementary)_plans$|(^|_)(started|ongoing|completed|approved|abandoned|awaiting)_|_(year1|year2)$|^undecoded_|^change_in_",
+      "column_type": "additive_count"
+    },
+    {
+      "_comment": "PR&DW: expenditure written short. The generic money rule catches 'expenditure' and 'cost'; the catalogue also abbreviates ('maintenance_exp', 'fresh_exp') and uses bare 'spent'.",
+      "pattern": "(^|_)exp$|_exp$|(^|_)spent(_|$)|_spent$|^unspent",
+      "column_type": "additive_value"
     },
     {
       "_comment": "Cardinality prefixes are counts whatever they count ('distinct_aadhaar', 'values_found', 'missing_khata').",
