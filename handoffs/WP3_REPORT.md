@@ -482,7 +482,10 @@ anyone would catch by reading the answer.
 
 ## 9. The `top_n` audit (decision D11.4)
 
-**The 1,000 ceiling was too low. Raised to 10,000.**
+**Audited; operator ruled the ceiling stays at 1,000** (2026-08-13). D11.4 asked
+WP-3 to check whether any listing template legitimately needs more and raise it
+if so. The audit says 38 templates can, the operator's answer is that they should
+not be served that way, and the ceiling is unchanged.
 
 Of the 91 templates that take `$top_n`, **38 can exceed 1,000 rows statewide**, in
 two classes:
@@ -497,11 +500,19 @@ two classes:
    `BUD-020`/`021`, `SCH-002`, `PLN-058`, `DSS-005`. 12,704 activities exist in a
    20-GP sample alone.
 
-10,000 clears class 1 with headroom. It deliberately does **not** clear class 2:
-serving tens of thousands of exception rows into a chat answer is a pagination
-problem, not a limit to raise, and is flagged as an operator decision (§10.3).
 The remaining 53 templates group by a bounded dimension (theme ≤ 7, focus area
-≤ 30, scheme ≤ 5, asset category ≤ 36) and are nowhere near any ceiling.
+≤ 30, scheme ≤ 5, asset category ≤ 36) and are nowhere near the ceiling.
+
+**The behaviour this ratifies:** an officer asking for more than 1,000 rows gets
+a *clarification*, not an answer. That is the intended outcome for both classes —
+neither a 6,800-row GP roster nor an unbounded exception report is a useful chat
+answer at full length, and the ceiling is what surfaces "this is an export"
+rather than dumping the rows. It is pinned in `test_amount_units.py` so raising
+it later is a deliberate act, and it should only be raised alongside a product
+decision about how a large result is actually delivered.
+
+The 38 affected ids are listed above so the question can be revisited from pilot
+logs if officers turn out to ask for full listings often.
 
 ---
 
@@ -600,8 +611,10 @@ Adding to the running list in PROJECT_PLAN §3a:
 2. **Statewide block-name uniqueness is unverified.** The sample's 16 blocks are
    collision-free; 314 statewide are not something this data can speak to. The
    full LGD roster is still an open ask.
-3. **Pagination for statewide exception reports (§9).** Class-2 `$top_n`
-   templates are unbounded and 10,000 does not solve them. A product decision.
+3. ~~**`top_n` ceiling**~~ — **RULED 2026-08-13: stays at 1,000.** Requests above
+   it clarify rather than answer; delivering a >1,000-row result is a separate
+   product decision (export? pagination?) and is not blocking anything today.
+   Revisit from pilot logs (§9).
 4. **The dashboard proposal (§10)** — the selection, the pinned fiscal year, and
    whether caveated questions belong on tiles.
 5. **The four duplicate question pairs (§11.3)** — keep both ids for traceability,

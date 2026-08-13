@@ -359,20 +359,20 @@ REGISTRY_CONFIG: dict[str, dict] = {
     "activity_code": {"kind": "passthrough"},
 
     # ── Numeric pass-through ─────────────────────────────────────────────────
-    # 10,000 rather than WP-2's provisional 1,000 (decision D11.4, which asked
-    # WP-3 to audit and raise if needed — it is needed). The audit of all 91
-    # $top_n templates found 38 whose statewide result can exceed 1,000, in two
-    # classes:
-    #   * whole-roster rankings and listings at GP grain — "list every GP by
-    #     unspent balance" is ~6,800 rows statewide, and a ceiling that refuses
-    #     it makes a legitimate question unanswerable;
-    #   * exception reports at ACTIVITY grain (ALR-*, DQY-*, EXP-03x) — those are
-    #     unbounded, 12,704 activities in a 20-GP sample alone.
-    # 10,000 clears the roster case with headroom. It deliberately does NOT clear
-    # the activity case: serving tens of thousands of exception rows into a chat
-    # answer is a pagination problem, not a limit to raise, and is flagged for
-    # the operator in WP3_REPORT rather than solved by a bigger number here.
-    "top_n":            {"kind": "numeric", "cast": int, "min": 1, "max": 10000},
+    # 1,000, RATIFIED (decision D11.4). WP-2 chose it provisionally and asked
+    # WP-3 to audit whether anything legitimately needs more; the audit of all 91
+    # $top_n templates found 38 whose statewide result can exceed it, and the
+    # operator ruled on 2026-08-13 that the ceiling stays at 1,000 anyway.
+    #
+    # WHAT THAT MEANS IN PRACTICE, so the next reader does not "fix" it: an
+    # officer who asks for more than 1,000 rows gets a CLARIFICATION, not an
+    # answer. The two classes that hit it are whole-roster listings at GP grain
+    # (~6,800 statewide) and exception reports at activity grain (unbounded —
+    # 12,704 activities in a 20-GP sample alone). Neither is a useful chat
+    # answer at full length; both are export or pagination questions, and the
+    # ceiling is what surfaces that rather than dumping the rows. Raise it only
+    # with a product decision about how such a result is delivered.
+    "top_n":            {"kind": "numeric", "cast": int, "min": 1, "max": 1000},
     # The sheet is explicit that $threshold's unit varies by question — percent,
     # rupees, days, or a minimum activity count. Amount notation is accepted
     # because some of those questions ARE rupee questions; a bare number passes

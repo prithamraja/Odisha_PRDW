@@ -141,13 +141,19 @@ class ValidatorAmountTests(unittest.TestCase):
             self.v.validate("1 lakh", "top_n")
 
     def test_top_n_range(self):
-        """The ceiling is 10,000 (decision D11.4, raised in WP-3 from WP-2's
-        provisional 1,000). A full statewide GP listing is ~6,800 rows, so a
-        1,000 cap made "list every gram panchayat" unanswerable — the registry
-        inventing a limit the catalogue does not have."""
-        self.assertEqual(self.v.validate("6800", "top_n").resolved_value, "6800")
-        self.assertEqual(self.v.validate("10000", "top_n").resolved_value, "10000")
-        for bad in ("0", "-5", "10001", "2.5"):
+        """The ceiling is 1,000, RATIFIED by the operator on 2026-08-13 after
+        WP-3's audit (decision D11.4).
+
+        The audit found 38 of the 91 $top_n templates whose statewide result can
+        exceed it — whole-roster GP listings (~6,800) and unbounded activity-grain
+        exception reports. The ruling is that those get a clarification rather
+        than a 6,800-row chat answer: they are export questions, and the ceiling
+        is what surfaces that instead of dumping the rows.
+
+        Pinned here so raising it is a deliberate act, not a passing thought.
+        """
+        self.assertEqual(self.v.validate("1000", "top_n").resolved_value, "1000")
+        for bad in ("0", "-5", "1001", "6800", "2.5"):
             with self.subTest(bad=bad):
                 with self.assertRaises(EntityNotFound):
                     self.v.validate(bad, "top_n")
