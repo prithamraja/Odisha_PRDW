@@ -18,6 +18,7 @@ from openai import OpenAI
 
 from db_factory import get_adapter
 from query_router.entity_validator  import EntityValidator
+from query_router.entity_extractor  import refresh_prompt_enums
 from query_router.router            import (
     route,
     ambiguous_fragment_clarify,
@@ -128,6 +129,13 @@ def startup():
 
     _openai_client = OpenAI(api_key=oai_key)
     _validator     = EntityValidator(adapter)
+
+    # The extraction prompt's enum lists are GENERATED from the registry, never
+    # hand-written — an incomplete enumeration is a value the extractor cannot
+    # emit, and that failure is silent (see entity_extractor's docstring). The
+    # registry only exists once the validator above has read the database, so
+    # this is the one place the prompt can be finalised.
+    refresh_prompt_enums(_validator.registry_values)
 
     # The place vocabulary, as words. Used to tell a follow-up FRAGMENT ("in
     # kurnool?") from a question that merely mentions a place.
