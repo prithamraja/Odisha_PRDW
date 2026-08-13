@@ -2,18 +2,28 @@
 Database factory — picks the right backend adapter from env config.
 
 Env vars:
-  DB_ENGINE      = "pandas" (default) | "supabase"
+  DB_ENGINE      = "pandas" (default) | "supabase" | "duckdb_file"
   DATABASE_URL   = required when DB_ENGINE=supabase  (e.g. postgresql://user:pass@host:5432/db)
+  DB_PATH        = required when DB_ENGINE=duckdb_file — path to the .duckdb file.
+                   Relative paths resolve against Chatbot/, exactly like DATA_DIR,
+                   so `DB_PATH=data/panchayat_1.duckdb` means the same thing to
+                   pytest, `python startup.py` and uvicorn.
+
+"pandas" remains the default: an unset DB_ENGINE behaves exactly as it did
+before duckdb_file existed.
 """
 from __future__ import annotations
 
+import logging
 import os
 from pathlib import Path
 
 try:
-    from .db_adapters import PandasAdapter, SupabaseAdapter
+    from .db_adapters import DuckDBFileAdapter, PandasAdapter, SupabaseAdapter
 except ImportError:
-    from db_adapters import PandasAdapter, SupabaseAdapter
+    from db_adapters import DuckDBFileAdapter, PandasAdapter, SupabaseAdapter
+
+_log = logging.getLogger(__name__)
 
 # ── Shared constants ─────────────────────────────────────────────────────────
 
@@ -45,16 +55,65 @@ TABLES = [
     "survey_land_records",
 ]
 
-_adapter: PandasAdapter | SupabaseAdapter | None = None
+def _resolve_db_path(configured: str) -> Path:
+    """DB_PATH → an absolute path, relative entries anchored at Chatbot/."""
+    path = Path(configured)
+    return path.resolve() if path.is_absolute() else (_backend_dir / path).resolve()
 
 
-def get_adapter() -> PandasAdapter | SupabaseAdapter:
+def _seed_cache_tables(adapter) -> None:
+    """Create the router's cache tables from sql/cache_tables.sql."""
+    ddl_path = Path(__file__).parent / "sql" / "cache_tables.sql"
+    if not ddl_path.exists():
+        return
+    import re
+    cleaned = re.sub(r'--[^\n]*', '', ddl_path.read_text())
+    for stmt in cleaned.split(";"):
+        stmt = stmt.strip()
+        if stmt:
+            adapter.execute_ddl(stmt)
+
+
+_adapter: PandasAdapter | SupabaseAdapter | DuckDBFileAdapter | None = None
+
+
+def get_adapter() -> PandasAdapter | SupabaseAdapter | DuckDBFileAdapter:
     """Singleton factory — creates the adapter on first call."""
     global _adapter
     if _adapter is not None:
         return _adapter
 
     engine = os.environ.get("DB_ENGINE", "pandas").lower()
+
+    if engine == "duckdb_file":
+        configured = os.environ.get("DB_PATH", "")
+        if not configured:
+            raise RuntimeError(
+                "DB_ENGINE=duckdb_file but DB_PATH is not set. "
+                "Add it to your .env (e.g. DB_PATH=data/panchayat_1.duckdb)."
+            )
+        db_path = _resolve_db_path(configured)
+        _adapter = DuckDBFileAdapter(db_path)
+
+        # Cache tables land in the adapter's writable in-memory catalog — the
+        # analytical file is attached read-only and could not hold them. See
+        # DuckDBFileAdapter's docstring for why the attachment is inverted.
+        _seed_cache_tables(_adapter)
+
+        shadowed = _adapter.check_cache_table_collisions()
+        if shadowed:
+            _log.error(
+                "[db] cache tables shadow relations in %s: %s — queries against "
+                "these names read the cache, not the data",
+                db_path.name, ", ".join(shadowed),
+            )
+
+        relations = _adapter.data_relations()
+        print(
+            f"[db] Using DuckDB file {db_path} (read-only, "
+            f"{len(relations)} tables/views; cache tables in-memory)"
+        )
+        return _adapter
 
     if engine == "supabase":
         url = os.environ.get("DATABASE_URL", "")
@@ -66,15 +125,7 @@ def get_adapter() -> PandasAdapter | SupabaseAdapter:
         _adapter = SupabaseAdapter(url)
 
         # Ensure cache tables exist on first connect
-        ddl_path = Path(__file__).parent / "sql" / "cache_tables.sql"
-        if ddl_path.exists():
-            import re
-            raw = ddl_path.read_text()
-            cleaned = re.sub(r'--[^\n]*', '', raw)
-            for stmt in cleaned.split(";"):
-                stmt = stmt.strip()
-                if stmt:
-                    _adapter.execute_ddl(stmt)
+        _seed_cache_tables(_adapter)
 
         print(f"[db] Using Supabase (PostgreSQL) backend")
         return _adapter
@@ -83,15 +134,7 @@ def get_adapter() -> PandasAdapter | SupabaseAdapter:
     _adapter = PandasAdapter(DATA_DIR, TABLES)
 
     # Ensure cache tables exist
-    ddl_path = Path(__file__).parent / "sql" / "cache_tables.sql"
-    if ddl_path.exists():
-        import re
-        raw = ddl_path.read_text()
-        cleaned = re.sub(r'--[^\n]*', '', raw)
-        for stmt in cleaned.split(";"):
-            stmt = stmt.strip()
-            if stmt:
-                _adapter.execute_ddl(stmt)
+    _seed_cache_tables(_adapter)
 
     print(f"[db] Loaded {len(_adapter.dataframes)}/{len(TABLES)} tables from {DATA_DIR} (DuckDB in-memory)")
     return _adapter
