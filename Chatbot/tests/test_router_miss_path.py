@@ -79,48 +79,63 @@ class NoMatchChipFillTests(unittest.TestCase):
         self.assertIn("How many claims were filed in a block?", labels)
 
 
-FARMER_TEMPLATE_MAP = {
-    "F09": {"param_slots": [
-        {"name": "farmer_name", "entity_type": "farmer_name"},
-        {"name": "village", "entity_type": "village"},
+# WP-3 fixture swap. AP's roster was PEOPLE, so the bare-name path probed
+# `farmer_name`; PR&DW's roster is PLACES and the same machinery — one
+# extraction call, roster disambiguation, reference chips — answers "what about
+# Naugaon?". The behaviour asserted is unchanged; only the roster is.
+GP_TEMPLATE_MAP = {
+    "GPX": {"param_slots": [
+        {"name": "gp_name", "entity_type": "gp", "bind": "code"},
+        {"name": "date_range", "entity_type": "fiscal_year"},
     ]},
 }
 
-FARMER_SCORED = [
-    ("F09", "Which schemes is {farmer_name} of {village} enrolled in?", 0.21),
+GP_SCORED = [
+    ("GPX", "What is the GPDP status for {gp_name} in {date_range}?", 0.21),
 ]
 
+# Three panchayats called Naugaon. The BLOCK is what tells them apart — a
+# district holds ~10 blocks and a GP name can repeat inside one, so the district
+# alone is not the qualifier.
 AMBIGUOUS = [
-    EntityCandidate(name="Venkateswarlu Gupta", districts=["Anantapur"]),
-    EntityCandidate(name="Venkateswarlu Devi", districts=["Chittoor"]),
+    EntityCandidate(name="Naugaon", districts=["Bargarh"],
+                    parent_place="Barpali", code="900001"),
+    EntityCandidate(name="Naugaon", districts=["Khordha"],
+                    parent_place="Bhubaneswar", code="900002"),
 ]
 
 
 class RosterValidator:
-    """'Rajesh Sri' is one person; 'Venkateswarlu G' is several; 'Zzyzx Kumar'
-    is nobody. Nothing here is a district."""
+    """'Andhrua' is one panchayat; 'Naugaon' is several; 'Zzyzx' is nobody.
+    Nothing here is a district or a block."""
 
     def validate(self, value, entity_type):
         text = str(value).strip().lower()
-        if entity_type == "farmer_name":
-            if text == "rajesh sri":
-                return ExtractedEntity(
-                    slot_name="farmer_name", raw_value=str(value),
-                    resolved_value="Rajesh Sri", entity_type="farmer_name",
+        if entity_type == "gp":
+            if text == "andhrua":
+                entity = ExtractedEntity(
+                    slot_name="gp_name", raw_value=str(value),
+                    resolved_value="Andhrua", entity_type="gp",
                     confidence="exact",
                 )
-            if text.startswith("venkateswarlu"):
+                entity.resolved_code = "116350"
+                return entity
+            if text.startswith("naugaon"):
                 raise ClarificationNeeded(
-                    "Several farmers match 'Venkateswarlu G': …",
-                    entity_type="farmer_name", raw_value=str(value),
+                    "2 different gram panchayats are called 'Naugaon': …",
+                    entity_type="gp", raw_value=str(value),
                     candidates=AMBIGUOUS,
                 )
         raise EntityNotFound(entity_type, str(value), [])
 
+    @staticmethod
+    def fiscal_years():
+        return ["2023-2024", "2024-2025"]
+
 
 class AmbiguousNameFillTests(unittest.TestCase):
     """Fix 4.1 — a name that matches several roster entries is ambiguous, not
-    unknown. Dropping it put 'a farmer name' where the user's own words go."""
+    unknown. Dropping it put 'a gram panchayat' where the user's own words go."""
 
     def setUp(self):
         self._real_extract = router.extract_entities
@@ -129,13 +144,13 @@ class AmbiguousNameFillTests(unittest.TestCase):
             # The elicitation probe and the chip-fill probe are separate calls
             # with different slot sets, and they can disagree. Here elicitation
             # finds nothing, so the miss chips are what the user actually sees.
-            if slots == ["district", "farmer_name"]:
+            if slots == ["district_name", "block_name", "gp_name"]:
                 return {}
             found = {}
-            if "farmer_name" in slots:
-                found["farmer_name"] = "Venkateswarlu G"
-            if "village" in slots:
-                found["village"] = "Nowhere"      # EntityNotFound → dropped
+            if "gp_name" in slots:
+                found["gp_name"] = "Naugaon"
+            if "date_range" in slots:
+                found["date_range"] = "nonesuch"   # EntityNotFound → dropped
             return found
 
         router.extract_entities = fake_extract
@@ -145,32 +160,33 @@ class AmbiguousNameFillTests(unittest.TestCase):
 
     def test_ambiguous_value_is_kept_raw_and_unknown_values_are_dropped(self):
         fill = router._extract_fill_values(
-            "Tell me what we know about Venkateswarlu G",
-            ["F09"], FARMER_TEMPLATE_MAP, RosterValidator(), object(),
+            "Tell me what we know about Naugaon",
+            ["GPX"], GP_TEMPLATE_MAP, RosterValidator(), object(),
         )
-        self.assertEqual(fill.get("farmer_name"), "Venkateswarlu G")
-        self.assertNotIn("village", fill, "a genuinely unknown value stays dropped")
+        self.assertEqual(fill.get("gp_name"), "Naugaon")
+        self.assertNotIn("date_range", fill,
+                         "a genuinely unknown value stays dropped")
 
     def test_the_users_name_reaches_the_chip(self):
         result = router._no_match(
-            FARMER_SCORED,
-            "Tell me what we know about Venkateswarlu G",
-            "tell me what we know about venkateswarlu g",
+            GP_SCORED,
+            "Tell me what we know about Naugaon",
+            "tell me what we know about naugaon",
             time.monotonic(),
             validator=RosterValidator(), openai_client=object(),
-            template_map=FARMER_TEMPLATE_MAP,
+            template_map=GP_TEMPLATE_MAP,
         )
         labels = [chip.label for chip in result.clarification.options]
         self.assertIn(
-            "Which schemes is Venkateswarlu G of a village enrolled in?", labels
+            "What is the GPDP status for Naugaon in a year?", labels
         )
         for label in labels:
-            self.assertNotIn("a farmer name", label)
+            self.assertNotIn("a gram panchayat", label)
 
 
-class FarmerElicitationTests(unittest.TestCase):
-    """Fix 4.5 — a bare name gets the measures we hold for that farmer, not a
-    chip reading 'a farmer name of a village'. District keeps precedence."""
+class GramPanchayatElicitationTests(unittest.TestCase):
+    """Fix 4.5 — a bare place name gets the measures we hold for it, not a chip
+    reading 'a gram panchayat in a year'. The WIDEST tier keeps precedence."""
 
     def setUp(self):
         self._real_extract = router.extract_entities
@@ -181,76 +197,89 @@ class FarmerElicitationTests(unittest.TestCase):
     def _extract(self, **found):
         def fake_extract(user_query, slots, client, **kwargs):
             self.assertEqual(
-                slots, ["district", "farmer_name"],
-                "both probes must share ONE extraction call",
+                slots, ["district_name", "block_name", "gp_name"],
+                "all three tier probes must share ONE extraction call",
             )
             return {k: v for k, v in found.items() if v is not None}
 
         router.extract_entities = fake_extract
 
-    def _run(self, query):
+    def _run(self, query, validator=None):
         return router._no_match(
-            FARMER_SCORED, query, query.lower(), time.monotonic(),
-            validator=RosterValidator(), openai_client=object(),
-            template_map=FARMER_TEMPLATE_MAP,
+            GP_SCORED, query, query.lower(), time.monotonic(),
+            validator=validator or RosterValidator(), openai_client=object(),
+            template_map=GP_TEMPLATE_MAP,
         )
 
-    def test_a_unique_farmer_gets_elicitation_chips(self):
-        self._extract(farmer_name="Rajesh Sri")
-        result = self._run("Tell me what we know about Rajesh Sri")
+    def test_a_unique_panchayat_gets_elicitation_chips(self):
+        self._extract(gp_name="Andhrua")
+        result = self._run("Tell me what we know about Andhrua")
         self.assertEqual(result.clarification.reason, "broad_question")
-        self.assertIn("Rajesh Sri", result.clarification.prompt)
+        self.assertIn("Andhrua", result.clarification.prompt)
         self.assertTrue(result.clarification.options)
         for chip in result.clarification.options:
-            self.assertIn("Rajesh Sri", chip.send_text)
+            self.assertIn("Andhrua", chip.send_text)
             self.assertNotIn("{", chip.send_text)
+
+    def test_the_elicitation_chips_carry_a_year_so_they_execute(self):
+        """Every one of these templates requires $date_range. Without a default
+        the chip list would be EMPTY and a known panchayat would look like one
+        the bot holds nothing about.
+
+        The year is asserted only where the question NAMES one. EXP-002 ("how
+        has expenditure changed over the years") is a trend across all of them
+        and deliberately has no year in its wording — it still binds
+        `$date_range`, which is what makes it offerable at all.
+        """
+        self._extract(gp_name="Andhrua")
+        result = self._run("Tell me what we know about Andhrua")
+        sends = [chip.send_text for chip in result.clarification.options]
+        self.assertTrue(sends, "a known panchayat got no elicitation chips")
+        self.assertTrue(
+            any("2024-2025" in s for s in sends),
+            "no chip named the year — the default was not applied",
+        )
+        for send in sends:
+            self.assertNotIn("a year", send, "an unfilled year reached a chip")
 
     def test_an_ambiguous_name_offers_the_query_with_each_candidate_substituted(self):
         """Substituted with a REFERENCE, not a bare name. Where the candidates
-        are several people who share one name — four Lakshmi Devis — the name
-        gives four identical chips and there is nothing to choose between."""
-        self._extract(farmer_name="Venkateswarlu G")
-        result = self._run("Tell me what we know about Venkateswarlu G")
+        are several panchayats that share one name, the name gives identical
+        chips and there is nothing to choose between."""
+        self._extract(gp_name="Naugaon")
+        result = self._run("Tell me what we know about Naugaon")
         self.assertEqual(result.clarification.reason, "unknown_entity")
         sends = [chip.send_text for chip in result.clarification.options]
         self.assertEqual(len(set(sends)), len(sends), "chips must be distinguishable")
-        self.assertIn(
-            "Tell me what we know about Venkateswarlu Gupta of Anantapur", sends
-        )
-        self.assertIn(
-            "Tell me what we know about Venkateswarlu Devi of Chittoor", sends
-        )
+        self.assertIn("Tell me what we know about Naugaon of Barpali", sends)
+        self.assertIn("Tell me what we know about Naugaon of Bhubaneswar", sends)
 
-    def test_district_wins_when_the_name_is_also_a_place(self):
-        """'How is Krishna doing?' must stay a district elicitation — 'Krishna'
-        fuzzy-matches farmer names too."""
+    def test_the_district_reading_wins_when_a_name_is_both(self):
+        """'How is Bhubaneswar doing?' must stay a DISTRICT elicitation.
+        Bhubaneswar is a block as well, and several Odisha place names repeat
+        across tiers, so the tiers are probed widest-first."""
 
-        class DistrictAndFarmerValidator(RosterValidator):
+        class AllTiersValidator(RosterValidator):
             def validate(self, value, entity_type):
-                if entity_type == "district" and str(value).lower() == "krishna":
+                if entity_type == "district" and str(value).lower() == "bhubaneswar":
                     return ExtractedEntity(
-                        slot_name="district", raw_value=str(value),
-                        resolved_value="Krishna", entity_type="district",
-                        confidence="exact",
+                        slot_name="district_name", raw_value=str(value),
+                        resolved_value="Khordha", entity_type="district",
+                        confidence="alias",
                     )
                 return super().validate(value, entity_type)
 
-        self._extract(district="Krishna", farmer_name="Krishna")
-        result = router._no_match(
-            FARMER_SCORED, "How is Krishna doing?", "how is krishna doing",
-            time.monotonic(),
-            validator=DistrictAndFarmerValidator(), openai_client=object(),
-            template_map=FARMER_TEMPLATE_MAP,
-        )
+        self._extract(district_name="Bhubaneswar", block_name="Bhubaneswar")
+        result = self._run("How is Bhubaneswar doing?", AllTiersValidator())
         self.assertEqual(result.clarification.reason, "broad_question")
-        self.assertIn("What would you like to know about Krishna?",
+        self.assertIn("What would you like to know about Khordha?",
                       result.clarification.prompt)
         for chip in result.clarification.options:
-            self.assertIn("Krishna", chip.send_text)
+            self.assertIn("Khordha", chip.send_text)
 
     def test_an_unknown_name_falls_through_to_the_generic_miss(self):
-        self._extract(farmer_name="Zzyzx Kumar")
-        result = self._run("Tell me about Zzyzx Kumar")
+        self._extract(gp_name="Zzyzx")
+        result = self._run("Tell me about Zzyzx")
         self.assertEqual(result.clarification.reason, "no_match")
 
 

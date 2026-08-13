@@ -141,8 +141,13 @@ class ValidatorAmountTests(unittest.TestCase):
             self.v.validate("1 lakh", "top_n")
 
     def test_top_n_range(self):
-        self.assertEqual(self.v.validate("1000", "top_n").resolved_value, "1000")
-        for bad in ("0", "-5", "1001", "2.5"):
+        """The ceiling is 10,000 (decision D11.4, raised in WP-3 from WP-2's
+        provisional 1,000). A full statewide GP listing is ~6,800 rows, so a
+        1,000 cap made "list every gram panchayat" unanswerable — the registry
+        inventing a limit the catalogue does not have."""
+        self.assertEqual(self.v.validate("6800", "top_n").resolved_value, "6800")
+        self.assertEqual(self.v.validate("10000", "top_n").resolved_value, "10000")
+        for bad in ("0", "-5", "10001", "2.5"):
             with self.subTest(bad=bad):
                 with self.assertRaises(EntityNotFound):
                     self.v.validate(bad, "top_n")

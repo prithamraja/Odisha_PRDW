@@ -1,119 +1,146 @@
 #!/usr/bin/env python3
 """
-Exercise every template in query_router/template_catalog.py against the live
-backend: the same tables db_factory.TABLES declares, loaded by the same adapter
-the router executes through, with the date predicate appended by the same
-router function.
+Execute every template in query_router/template_catalog.py against the live
+backend and check it against the workbook's own answers.
 
-This is the integrated version of the catalog author's validator. The original
-built its own throwaway SQLite from the workbook's demo tabs; running through
-db_factory.get_adapter() instead means the check covers the DuckDB dialect, the
-Parquet column types and the router's real _inject_date_filter — the three
-places a template can pass on SQLite and still fail in production.
+    cd Chatbot
+    python validate_catalog.py [--verbose] [--limit N]
 
-Four checks per template:
-  1. placeholder arity — the number of ? matches len(param_slots)
-  2. positional binding — the query executes with demo values bound in slot order
-  3. emptiness — the result matches expected_empty_on_demo
-  4. date composability — for templates with a date_filter, the query still runs
-     once the runtime's date predicate is appended, with its own parameters bound
+This is the COMMAND-LINE form of tests/test_catalog_execution.py — same oracle,
+same binds, same adapter — so that "the catalogue is valid" is a command with an
+exit code rather than a judgement call. WP-5's gates file calls this.
 
-Usage:
-    cd Chatbot/backend
-    python validate_catalog.py [--verbose] [--skip-emptiness]
+WHAT IT CHECKS, per template
+  1. binding      every declared slot has a `$name` in the statement and vice
+                  versa, and the statement is detected as NAMED (decision D1)
+  2. execution    it runs against the real DuckDB, through the real adapter,
+                  with the seven v_* views created the way the app creates them
+  3. row counts   the number of rows matches the workbook's Test Report sheet
+                  at the sample parameters it recorded
 
-DATA_DIR selects the data (default: the shipped 10-row Parquet stub). Exit code
-is 0 only if every check passes for every template.
+WHY ROW COUNTS ARE AN EXACT CHECK
+  SQL is deterministic. Routing is not — identical replays flip ~3% of questions
+  and must never be regressed on a single miss — but nothing here goes near the
+  router's LLM. A mismatch is a real defect every time: in the conversion from
+  the workbook, in the D10 geography rewrite, or in the view wiring.
+
+  It is also the only end-to-end check that the geography rewrite is SEMANTICALLY
+  neutral. Every `$gp_name` predicate was moved off `gp_name` onto `gp_lgd_code`,
+  and binding a name where a code is expected returns zero rows with no error
+  anywhere — which is exactly what this catches, because the oracle records how
+  many rows each query returned BEFORE the rewrite.
+
+Exit code is 0 only if every template passes every check.
 """
 import argparse
+import json
 import os
+import re
 import sys
+from pathlib import Path
 
-# Demo date window, wide enough to keep every demo row in scope so the date
-# check tests composability rather than re-testing emptiness.
-DATE_FROM, DATE_TO = "2020-01-01", "2030-12-31"
+HERE = Path(__file__).resolve().parent
+ORACLE_PATH = HERE / "tests" / "data" / "workbook_test_report.json"
+DB_PATH = HERE / "data" / "panchayat_1.duckdb"
 
 
-def main():
+def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--verbose", action="store_true")
-    ap.add_argument(
-        "--skip-emptiness", action="store_true",
-        help="only check that every template runs; ignore expected_empty_on_demo "
-             "(use when DATA_DIR points at data other than the demo extract)",
-    )
+    ap.add_argument("--limit", type=int, default=0,
+                    help="stop after N templates (smoke check)")
+    ap.add_argument("--db", type=Path, default=DB_PATH)
     args = ap.parse_args()
 
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    sys.path.insert(0, str(HERE))
     from dotenv import load_dotenv
     load_dotenv()
 
-    from db_factory import get_adapter, DATA_DIR, TABLES
-    from query_router.router import (
-        _inject_date_filter, bind_param_values, merge_date_params,
-    )
-    from query_router.template_catalog import ALL_TEMPLATES, ENTITY_TYPES
+    from db_factory import open_analytical_db, VIEWS
+    from query_router.entity_validator import EntityValidator
+    from query_router.sql_params import NAMED, param_style
+    from query_router.template_catalog import TEMPLATE_CATALOG, bind
+    from tools.build_catalog import mask_literals
 
-    adapter = get_adapter()
-    print(f"Data: {DATA_DIR}")
-    for table in TABLES:
-        try:
-            n = adapter.execute(f'SELECT COUNT(*) FROM "{table}"').fetchone()[0]
-            cols = len(adapter.execute(f'SELECT * FROM "{table}" LIMIT 0').description)
-            print(f"  {table:<22} {cols:>4} columns {n:>6} rows")
-        except Exception as exc:
-            print(f"  {table:<22} MISSING: {exc}")
+    if not args.db.exists():
+        print(f"no database at {args.db}", file=sys.stderr)
+        return 2
+    if not ORACLE_PATH.exists():
+        print(f"no oracle at {ORACLE_PATH} — run tools/build_catalog.py",
+              file=sys.stderr)
+        return 2
 
-    print(f"\nValidating {len(ALL_TEMPLATES)} templates ...")
-    arity = binding = emptiness = dates = 0
+    oracle = json.loads(ORACLE_PATH.read_text(encoding="utf-8"))
+    adapter = open_analytical_db(args.db)
+    validator = EntityValidator(adapter)
 
-    for tid, t in sorted(ALL_TEMPLATES.items()):
-        sql = t["sql_template"]
-        slots = t["param_slots"]
+    print(f"Database: {args.db}")
+    for view in VIEWS:
+        n = adapter.execute(f"SELECT COUNT(*) FROM {view}").fetchone()[0]
+        print(f"  {view:<12} {n:>8,} rows")
 
-        if sql.count("?") != len(slots):
-            print(f"  ARITY  {tid}  {sql.count('?')} placeholders vs {len(slots)} slots")
-            arity += 1
-            continue
+    missing = sorted(set(TEMPLATE_CATALOG) ^ set(oracle))
+    if missing:
+        print(f"\ncatalogue and oracle disagree on {len(missing)} ids: "
+              f"{missing[:10]}", file=sys.stderr)
+        return 1
 
-        values = {s["name"]: ENTITY_TYPES[s["entity_type"]]["demo"] for s in slots}
-        params = bind_param_values(slots, values)
-        try:
-            rows = adapter.execute(sql, params).fetchall()
-        except Exception as exc:
-            print(f"  BIND   {tid}  {exc}")
+    print(f"\nValidating {len(TEMPLATE_CATALOG)} templates ...")
+    binding = execution = counts = 0
+    ids = sorted(TEMPLATE_CATALOG)
+    if args.limit:
+        ids = ids[:args.limit]
+
+    for qid in ids:
+        template = TEMPLATE_CATALOG[qid]
+        slots = template["param_slots"]
+        declared = {s["name"] for s in slots}
+        in_sql = set(re.findall(r"\$(\w+)", mask_literals(template["sql_template"])))
+
+        if declared != in_sql or param_style(template) != NAMED:
+            print(f"  BIND   {qid}  slots={sorted(declared)} sql={sorted(in_sql)} "
+                  f"style={param_style(template)}")
             binding += 1
             continue
 
-        if not args.skip_emptiness and (len(rows) == 0) != t["expected_empty_on_demo"]:
-            state = "now returns rows" if t["expected_empty_on_demo"] else "now returns nothing"
-            print(f"  FLIP   {tid}  {state}: {t['abstract_question']}")
-            emptiness += 1
+        # The Test Report binds GP NAMES; the rewritten SQL wants LGD codes.
+        # Resolved through the real validator rather than a lookup of this
+        # script's own, so a break in name->code resolution fails here too.
+        code_bound = {s["name"] for s in slots if s.get("bind") == "code"}
+        values = {}
+        for name, value in oracle[qid]["params"].items():
+            if value is not None and name in code_bound:
+                resolved = validator.validate(str(value), name.replace("_name", ""))
+                value = resolved.resolved_code or value
+            values[name] = value
+
+        try:
+            sql, params = bind(qid, values)
+            rows = adapter.execute(sql, params).fetchall()
+        except Exception as exc:
+            print(f"  EXEC   {qid}  {type(exc).__name__}: {exc}")
+            execution += 1
+            continue
+
+        expected = oracle[qid]["rows"]
+        if len(rows) != expected:
+            print(f"  ROWS   {qid}  got {len(rows)}, Test Report says {expected}")
+            counts += 1
         elif args.verbose:
-            print(f"  ok     {tid:<10} {len(rows):>3} row(s)  {t['abstract_question'][:56]}")
+            print(f"  ok     {qid:<14} {len(rows):>4} row(s)  "
+                  f"{template['abstract_question'][:56]}")
 
-        if t["date_filter"]:
-            try:
-                dated_sql, offset, date_params = _inject_date_filter(
-                    sql, t["date_filter"]["alias"], t["date_filter"]["column"],
-                    t.get("date_kind"), start_date=DATE_FROM, end_date=DATE_TO,
-                )
-                adapter.execute(dated_sql, merge_date_params(params, offset, date_params))
-            except Exception as exc:
-                print(f"  DATE   {tid}  predicate does not compose: {exc}")
-                dates += 1
-
-    total = arity + binding + emptiness + dates
-    n_slots = sum(1 for t in ALL_TEMPLATES.values() if t["param_slots"])
-    n_dated = sum(1 for t in ALL_TEMPLATES.values() if t["date_filter"])
-    print(f"\n{len(ALL_TEMPLATES)} templates · {n_slots} parameterised · {n_dated} date-filtered")
-    print(f"arity {arity} · binding {binding} · emptiness {emptiness} · date composability {dates}")
+    zero_row = sum(1 for q in ids if oracle[q]["rows"] == 0)
+    total = binding + execution + counts
+    print(f"\n{len(ids)} templates · {zero_row} legitimately return no rows")
+    print(f"binding {binding} · execution {execution} · row counts {counts}")
 
     if total:
-        print("\nFix the templates above, or update expected_empty_on_demo if the data changed.")
-        sys.exit(1)
+        print("\nEvery mismatch is a real defect — SQL is deterministic here.")
+        return 1
     print("All clear.")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

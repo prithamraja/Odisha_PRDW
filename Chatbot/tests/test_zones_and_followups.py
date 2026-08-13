@@ -33,15 +33,24 @@ from query_router.zones import corrected_query_chips, question_chips, zone
 
 
 def make_frame(
-    template_id: str = "G01-D",
+    template_id: str = "PLN-004",
     bound_params: dict | None = None,
     grain: str = "day",
 ) -> ContextFrame:
-    params = {"district": "Krishna"} if bound_params is None else bound_params
+    """WP-3 fixture swap: an AP district frame becomes an Odisha one.
+
+    PLN-004 is the district-scoped GPDP submission-rate question. Like almost
+    every PR&DW template it binds a fiscal year as well as a place, which the AP
+    fixture had no equivalent of — a frame without one cannot fill any follow-up
+    target, because `$date_range` is required nearly everywhere.
+    """
+    params = ({"district_name": "Khordha", "date_range": "2024-2025"}
+              if bound_params is None else bound_params)
     return ContextFrame(
         template_id=template_id,
         template_question=(
-            "How many PM-KISAN beneficiaries are there in each mandal of {district} district?"
+            "What percentage of Gram Panchayats in {district_name} have uploaded "
+            "their GPDP in {date_range}?"
         ),
         bound_params=params,
         active_filters=[
@@ -107,25 +116,46 @@ class SuggestionTests(unittest.TestCase):
         self.assertTrue(0 < len(chips) <= 3)
         for chip in chips:
             self.assertNotIn("{", chip.send_text, "chip must be fully pre-filled")
-            self.assertIn("Krishna", chip.send_text)
+            self.assertIn("Khordha", chip.send_text)
 
     def test_current_template_is_not_suggested(self):
-        chips = suggest_followups(make_frame("G01-D"))
-        current = TEMPLATE_CATALOG["G01-D"]["abstract_question"].format(district="Krishna")
+        chips = suggest_followups(make_frame("PLN-004"))
+        current = TEMPLATE_CATALOG["PLN-004"]["abstract_question"].format(
+            district_name="Khordha", block_name="", date_range="2024-2025")
         self.assertNotIn(current, [c.send_text for c in chips])
 
     def test_unfillable_targets_are_skipped(self):
-        # A mandal-scoped family needs district AND mandal — a crop-only frame
-        # can fill neither, so nothing half-substituted may escape.
-        chips = suggest_followups(make_frame("V03", {"crop": "Paddy"}))
+        # A frame that knows a focus area but no YEAR can fill no target at all
+        # — $date_range is required almost everywhere — so nothing
+        # half-substituted may escape.
+        chips = suggest_followups(make_frame("PLN-049", {"focus_area": "Sanitation"}))
         for chip in chips:
             self.assertNotIn("{", chip.send_text)
 
     def test_elicitation_chips_for_broad_district_question(self):
-        chips = elicitation_chips("district", "Krishna")
+        """"How is Khordha doing?" — the four measures an officer opens with.
+
+        `defaults` carries the year. Without it every target would be refused
+        for a missing $date_range and a district the bot knows plenty about
+        would come back with no chips at all.
+        """
+        chips = elicitation_chips(
+            "district", "Khordha", defaults={"date_range": "2024-2025"}
+        )
         self.assertEqual(len(chips), 4)
         for chip in chips:
-            self.assertIn("Krishna", chip.send_text)
+            self.assertIn("Khordha", chip.send_text)
+            self.assertNotIn("{", chip.send_text)
+
+    def test_an_elicitation_chip_never_silently_drops_the_place(self):
+        """EXP-001's wording names a GP, not a district. Formatted with a
+        district in hand it would render a chip naming NO place, so tapping
+        "what about Khordha?" would answer state-wide and present it as
+        Khordha's figure."""
+        chips = elicitation_chips(
+            "district", "Khordha", defaults={"date_range": "2024-2025"}
+        )
+        self.assertTrue(all("Khordha" in c.send_text for c in chips))
 
 
 class FollowupParseTests(unittest.TestCase):
@@ -134,11 +164,12 @@ class FollowupParseTests(unittest.TestCase):
 
     def test_entity_swap_is_a_frame_edit(self):
         decision = parse_decision(
-            {"kind": "frame_edit", "slot": "district", "value": "Lucknow"}, self.frame
+            {"kind": "frame_edit", "slot": "district_name", "value": "Ganjam"},
+            self.frame,
         )
         self.assertEqual(decision.kind, "frame_edit")
-        self.assertEqual(decision.edit.slot, "district")
-        self.assertEqual(decision.edit.value, "Lucknow")
+        self.assertEqual(decision.edit.slot, "district_name")
+        self.assertEqual(decision.edit.value, "Ganjam")
 
     def test_swap_of_unknown_slot_degrades_to_new_question(self):
         decision = parse_decision(
@@ -377,21 +408,24 @@ class SlotPlaceholderTests(unittest.TestCase):
         return question_chips([("X", question, 0.4)], limit=1, fill=fill)[0].send_text
 
     def test_mapped_slots_read_naturally(self):
+        """WP-3 fixture swap — the mapping is keyed on the WORKBOOK'S BIND
+        NAMES now (`gp_name`, `date_range`), which is what appears in a PR&DW
+        catalogue question's placeholders."""
         self.assertEqual(
-            self._chip("Which schemes is {farmer_name} of {village} enrolled in?"),
-            "Which schemes is a farmer of a village enrolled in?",
+            self._chip("What is the GPDP status for {gp_name} in {date_range}?"),
+            "What is the GPDP status for a gram panchayat in a year?",
         )
         self.assertEqual(
-            self._chip("Show me everything we hold on {aadhaar}."),
-            "Show me everything we hold on an Aadhaar number.",
+            self._chip("How many assets exist under {asset_sub_category}?"),
+            "How many assets exist under an asset sub-category?",
         )
         self.assertEqual(
-            self._chip("Who received the {top_n} highest input subsidies?"),
-            "Who received the N highest input subsidies?",
+            self._chip("Which activities have the {top_n} highest expenditure?"),
+            "Which activities have the N highest expenditure?",
         )
 
     def test_unmapped_slots_fall_back_to_a_or_an(self):
-        self.assertEqual(self._chip("Claims filed in {block}?"), "Claims filed in a block?")
+        self.assertEqual(self._chip("Claims filed in {ward}?"), "Claims filed in a ward?")
         self.assertEqual(self._chip("Claims filed in {area}?"), "Claims filed in an area?")
         self.assertEqual(
             self._chip("Registrations at {approval_status}?"),
@@ -399,9 +433,11 @@ class SlotPlaceholderTests(unittest.TestCase):
         )
 
     def test_the_unit_swallowing_behaviour_is_retained(self):
+        """PR&DW questions name the unit after the slot the same way AP's did —
+        "in {block_name} block" must not render "in a block block"."""
         self.assertEqual(
-            self._chip("Beneficiaries in each village of {mandal} mandal?"),
-            "Beneficiaries in each village of a mandal?",
+            self._chip("How many activities are planned in {block_name} block?"),
+            "How many activities are planned in a block?",
         )
 
     def test_a_filled_slot_still_wins(self):
@@ -467,7 +503,7 @@ class CatalogQuestionGuardTests(unittest.TestCase):
 
 class EchoTests(unittest.TestCase):
     def test_echo_is_just_the_resolved_question(self):
-        frame = make_frame(bound_params={"district": "Guntur", "gender": "Female"})
+        frame = make_frame(bound_params={"district_name": "Ganjam", "date_range": "2024-2025"})
         result = RouteResult(
             tier=RouteTier.TIER2_TEMPLATE,
             raw_query="q", normalized_query="q", total_latency_ms=1,
@@ -513,8 +549,8 @@ class ContextPopTests(unittest.TestCase):
         from query_router.context_store import ContextStore
 
         store = ContextStore()
-        first = make_frame("T01", {"district": "Agra"})
-        second = make_frame("T02", {"district": "Lucknow"})
+        first = make_frame("T01", {"district_name": "Bargarh"})
+        second = make_frame("T02", {"district_name": "Ganjam"})
         store.set_frame("s", first, rows=[{"total_cases": 1}])
         store.set_frame("s", second, rows=[{"total_cases": 2}])
 

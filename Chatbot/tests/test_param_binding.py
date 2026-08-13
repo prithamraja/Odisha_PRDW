@@ -1,17 +1,20 @@
-"""Regression: templates that repeat a slot across several SQL placeholders
-(Q098 filters both its subsidy and procurement subqueries by crop; F09 resolves
-one farmer_name across all eight datasets) must receive one value per
-placeholder, not one per logical entity. The normal route previously bound each
-validated entity once, so every such template failed at the database despite
-correct routing. Both execution paths (_serve_query_id and requery_template) now
-share bind_param_values."""
+"""Regression: templates that repeat a slot across several SQL placeholders must
+receive one value per placeholder, not one per logical entity. The normal route
+previously bound each validated entity once, so every such template failed at
+the database despite correct routing. Both execution paths (_serve_query_id and
+requery_template) share the binders.
+
+That defect was found on the AP catalogue, where repetition was occasional
+(Q098's twice-filtered crop). It is the NORM here: decision D2's optional-filter
+idiom `($p IS NULL OR col = $p)` writes every geography parameter twice, so all
+346 PR&DW templates repeat at least one slot and most repeat three."""
 import time
 import unittest
 from types import SimpleNamespace
 
 from query_router import router
 from query_router.models import ExtractedEntity, RouteTier
-from query_router.template_catalog import TEMPLATE_CATALOG
+from query_router.template_catalog import TEMPLATE_CATALOG, bind as bind_template
 
 
 def _entity(slot, resolved):
@@ -58,52 +61,67 @@ _INTERLEAVED = {
 
 
 class BindParamValuesTests(unittest.TestCase):
-    def test_q098_binds_crop_twice(self):
-        slots = TEMPLATE_CATALOG["Q098"]["param_slots"]
-        self.assertEqual(
-            router.bind_param_values(slots, {"crop": "Paddy"}),
-            ["Paddy", "Paddy"],
-        )
+    """WP-3 fixture swap. The AP catalogue these named (Q098's twice-bound crop,
+    F09's eight-dataset farmer lookup) is gone; the MECHANISM they pin is not,
+    and the PR&DW catalogue exercises it harder — the optional-filter idiom
+    `($p IS NULL OR col = $p)` writes every geography parameter twice, in all
+    346 entries."""
 
-    def test_f09_binds_the_person_not_the_name(self):
-        """F09 used to bind the name eight times, once per dataset, and so
-        answered for everyone who shares it. It now binds one Aadhaar once."""
-        slots = TEMPLATE_CATALOG["F09"]["param_slots"]
-        self.assertEqual(
-            router.bind_param_values(
-                slots, {"farmer_name": "Ramesh Naidu"},
-                person_ids={"farmer_name": "104002954660"},
-            ),
-            ["104002954660"],
-        )
+    def test_a_repeated_slot_binds_once_per_occurrence(self):
+        """The named path binds a DICT with one entry per slot NAME, however many
+        times the name occurs — which is the whole point, since PLN-001 writes
+        `$gp_name` twice and would otherwise need two values for one entity."""
+        sql, params = bind_template("PLN-001", {
+            "date_range": "2024-2025", "district_name": None,
+            "block_name": None, "gp_name": "116350",
+        })
+        self.assertEqual(sql.count("$gp_name"), 2)
+        self.assertEqual(params["gp_name"], "116350")
+        self.assertEqual(len(params), 4)
 
-    def test_a_person_bound_slot_without_an_identity_fails_loudly(self):
-        """Falling back to the name is what this whole change exists to stop:
+    def test_a_code_bound_slot_binds_the_code_not_the_name(self):
+        """Decision D4/D10: a GP name is not an identity. This is the AP
+        name-collision defect (four Lakshmi Devis reported as one farmer's
+        ₹259,181) transplanted into geography — statewide ~6,800 panchayats share
+        names freely, so binding 'Naugaon' would merge every namesake."""
+        slots = TEMPLATE_CATALOG["PLN-001"]["param_slots"]
+        bound = router.bind_named_params(
+            slots,
+            {"date_range": "2024-2025", "gp_name": "Naugaon"},
+            person_ids={"gp_name": "116350"},
+        )
+        self.assertEqual(bound["gp_name"], "116350")
+
+    def test_a_code_bound_slot_without_an_identity_fails_loudly(self):
+        """Falling back to the name is what this whole mechanism exists to stop:
         it would put a shared name back into the SQL with nothing to say so."""
-        slots = TEMPLATE_CATALOG["F12"]["param_slots"]
+        slots = TEMPLATE_CATALOG["TRD-010"]["param_slots"]
         with self.assertRaises(ValueError) as ctx:
-            router.bind_param_values(
-                slots, {"farmer_name": "Lakshmi Devi"}, context=" for F12"
+            router.bind_named_params(
+                slots,
+                {"date_range": "2024-2025", "gp_name": "Naugaon",
+                 "gp_name_2": "Rampur"},
+                context=" for TRD-010",
             )
-        # WP-2 fixture swap: the message is domain-neutral now ("one record"),
-        # because the same mechanism binds a gram panchayat's LGD code as well
-        # as a farmer's Aadhaar. The behaviour asserted is unchanged.
         self.assertIn("did not resolve to one record", str(ctx.exception))
 
-    def test_no_farmer_template_binds_a_name(self):
-        """Every farmer_name slot in the catalog is person-bound — F14 is the
-        one exception and declares entity_type name_search, because 'which
-        farmers share this name' is asking about the collision itself."""
-        offenders = [
+    def test_every_gp_slot_in_the_catalogue_is_code_bound(self):
+        """The catalogue-wide version of the same rule: not one template may
+        filter a gram panchayat by name."""
+        offenders = sorted(
             qid for qid, t in TEMPLATE_CATALOG.items()
             for s in t["param_slots"]
-            if s.get("entity_type") == "farmer_name" and s.get("bind") != "aadhaar"
-        ]
-        self.assertEqual(offenders, [])
-        self.assertEqual(
-            [s.get("entity_type") for s in TEMPLATE_CATALOG["F14"]["param_slots"]],
-            ["name_search"],
+            if s.get("entity_type") in ("gp", "gp_2") and s.get("bind") != "code"
         )
+        self.assertEqual(offenders, [])
+
+    def test_an_absent_optional_slot_binds_null_rather_than_stalling(self):
+        """Decision D2. 'How many activities are planned?' is a complete question
+        state-wide; demanding a district would invent a requirement it never had."""
+        _, params = bind_template("PLN-001", {"date_range": "2024-2025"})
+        self.assertEqual(params["district_name"], None)
+        self.assertEqual(params["block_name"], None)
+        self.assertEqual(params["gp_name"], None)
 
     def test_interleaved_paired_category_template(self):
         self.assertEqual(
@@ -125,26 +143,39 @@ class BindParamValuesTests(unittest.TestCase):
         )
 
     def test_missing_parameter_raises(self):
-        slots = TEMPLATE_CATALOG["Q098"]["param_slots"]
+        """A REQUIRED slot with no value still stops, on the named path too —
+        optional slots binding NULL must not have made every slot optional."""
+        slots = TEMPLATE_CATALOG["PLN-001"]["param_slots"]
         with self.assertRaises(ValueError) as ctx:
-            router.bind_param_values(slots, {}, context=" for Q098")
-        self.assertIn("missing parameter(s) for Q098: crop", str(ctx.exception))
+            router.bind_named_params(slots, {}, context=" for PLN-001")
+        self.assertIn("missing parameter(s) for PLN-001: date_range",
+                      str(ctx.exception))
 
-    def test_every_catalog_template_binds_all_placeholders(self):
-        """One value per '?' for the whole catalog, with a value per slot name."""
+    def test_every_catalog_template_binds_every_placeholder_it_contains(self):
+        """The structural gate, for all 346: every `$name` in a statement has a
+        slot to bind it, and every slot appears in its statement.
+
+        A `$name` with no slot is an unbound-parameter error at execution; a slot
+        with no placeholder is a value the user was asked for and then ignored,
+        which is worse because it answers.
+        """
+        import re
+        from tools.build_catalog import mask_literals
         for qid, template in TEMPLATE_CATALOG.items():
-            slots = template["param_slots"]
-            params = {s["name"]: s["name"].upper() for s in slots}
-            person_ids = {
-                s["name"]: "104002954660"
-                for s in slots if s.get("bind") == "aadhaar"
-            }
-            bound = router.bind_param_values(slots, params, person_ids=person_ids)
-            self.assertEqual(
-                len(bound), template["sql_template"].count("?"),
-                f"{qid}: bound {len(bound)} values for "
-                f"{template['sql_template'].count('?')} placeholders",
-            )
+            with self.subTest(qid=qid):
+                declared = {s["name"] for s in template["param_slots"]}
+                in_sql = set(re.findall(
+                    r"\$(\w+)", mask_literals(template["sql_template"])))
+                self.assertEqual(declared, in_sql)
+
+    def test_every_template_is_detected_as_named(self):
+        """Decision D1 — the workbook's `$name` SQL executes verbatim. A template
+        mis-sniffed as positional would bind a LIST against `$name` placeholders
+        and fail at the database."""
+        from query_router.sql_params import NAMED, param_style
+        for qid, template in TEMPLATE_CATALOG.items():
+            with self.subTest(qid=qid):
+                self.assertEqual(param_style(template), NAMED)
 
 
 class ExecutionPathParityTests(unittest.TestCase):

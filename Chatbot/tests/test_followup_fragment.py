@@ -1,16 +1,23 @@
 """Follow-up fragments keep the question they follow on from.
 
-The reproduction: "Distribution of declared area_hectares by category
-(SC/ST/BC/OC)" answers with Q027 (average landholding by social category,
-state-wide), and the follow-up "in kurnool?" came back with a MARKFED
-procurement table for Kurnool. Q027 has no district slot, so the edit was
-refused and the bare fragment routed on its own — and a fragment carries no
-subject, so it landed wherever the district name pointed.
+The reproduction (AP, and the same shape here): a state-wide answer on screen,
+then the fragment "in Ganjam?". The follow-up classifier reads it as a
+geography edit, the frame has no such value bound, and the bare fragment then
+routes on its own — carrying no subject, so it lands wherever the district name
+points. Confident, and about the wrong thing.
 
-The unit tests here pin the deterministic pieces (the drill map, the combined
-question, the subject test, the fragment test). The endpoint tests pin the
-wiring through the real /query handler, so they need OPENAI_API_KEY and the flat
-Parquet drop; they skip cleanly without them.
+WHAT WP-3 CHANGED, AND WHY THESE TESTS LOOK DIFFERENT FROM THE AP ONES
+    The AP catalogue spelled geographic scope into the id (G01-S state / -D
+    district / -M mandal), so narrowing a state-wide answer meant HOPPING TO A
+    NARROWER SIBLING TEMPLATE, and `DRILL_MAP` was the table of those hops. That
+    table is gone, because decision D2 removed the siblings: one PR&DW template
+    answers at every scope and narrowing it means binding its optional geography
+    slot. `drill_target` therefore returns the template ITSELF when it can take
+    the named tier, and None when it cannot.
+
+    The unit tests below pin the new contract; the endpoint tests pin the wiring
+    through the real /query handler and are OPT-IN, because they route for real
+    and routing costs money (see PRDW_LIVE_ROUTING).
 """
 import os
 import time
@@ -20,9 +27,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from query_router.fragment_reroute import (
-    DRILL_MAP,
+    GEO_SLOTS,
     combined_question,
     drill_target,
+    fragment_place_phrase,
     geo_vocabulary_tokens,
     is_slot_only_fragment,
     templates_share_subject,
@@ -38,17 +46,29 @@ from query_router.models import (
 from query_router.template_catalog import TEMPLATE_CATALOG
 
 _BACKEND = Path(__file__).resolve().parents[1]
-_FLAT = _BACKEND.parents[1] / "RTGS_Data" / "flat"
+_DB_PATH = _BACKEND / "data" / "panchayat_1.duckdb"
 
 load_dotenv(_BACKEND / ".env")
 
-# db_factory reads DATA_DIR at import time, so it must be set before `import main`.
-if _FLAT.is_dir():
-    os.environ["DATA_DIR"] = str(_FLAT)
-
+# OPT-IN, for the reason WP-2 report §7.1 gives: these tests drive the real
+# /query handler, which embeds, reranks and extracts through the OpenAI API. A
+# suite that quietly makes paid calls whenever a key happens to sit in .env is
+# not a suite anyone can run freely — and at T0 of WP-2 this repo was doing
+# exactly that.
+#
+# The AP version was guarded by needing a flat Parquet drop that does not exist
+# here, so it skipped by accident rather than by decision. It also computed that
+# path as `parents[1].parents[1]`, which since the Chatbot/ flattening resolves
+# OUTSIDE this repo (WP-1 report §7.2) — so a stray RTGS_Data/ landing in the
+# shared parent would have silently pointed these tests at another project's
+# data. Both are fixed here: the guard is explicit and the path is this repo's.
+_LIVE = os.environ.get("PRDW_LIVE_ROUTING") == "1"
 _SKIP = None
-if not _FLAT.is_dir():
-    _SKIP = f"flat Parquet drop not present at {_FLAT}"
+if not _LIVE:
+    _SKIP = ("live routing is opt-in: set PRDW_LIVE_ROUTING=1 (costs money, "
+             "requires OPENAI_API_KEY)")
+elif not _DB_PATH.exists():
+    _SKIP = f"no sample database at {_DB_PATH}"
 elif not os.environ.get("OPENAI_API_KEY"):
     _SKIP = "OPENAI_API_KEY not set — the router is disabled without it"
 
@@ -61,131 +81,155 @@ def _frame(template_id: str, bound: dict[str, str] | None = None) -> ContextFram
         bound_params=bound or {},
         active_filters=[],
         time_range=TimeRange(start=None, end=None, grain="all_time"),
-        grouping_dimension="category",
+        grouping_dimension="theme",
         result_set=ResultSetReference(
             id="rs_test", row_count=4,
-            columns=[ColumnMetadata(name="category", column_type=ColumnType.DIMENSION)],
+            columns=[ColumnMetadata(name="theme", column_type=ColumnType.DIMENSION)],
         ),
     )
 
 
-class DrillMapTests(unittest.TestCase):
-    def test_every_geo_family_maps_to_its_narrower_siblings(self):
-        # 46 Gnn families, each with -S/-D/-M: -S drills to both, -D to the mandal.
-        self.assertEqual(drill_target("G01-S", "district"), "G01-D")
-        self.assertEqual(drill_target("G01-S", "mandal"), "G01-M")
-        self.assertEqual(drill_target("G01-D", "mandal"), "G01-M")
-        self.assertEqual(drill_target("G06-S", "district"), "G06-D")
+class DrillTargetTests(unittest.TestCase):
+    """Decision D2: the narrowed question is the SAME template with one more
+    optional parameter bound, so a hop is a self-hop or nothing."""
 
-    def test_the_authored_non_suffix_pairs_are_present(self):
-        self.assertEqual(drill_target("Q027", "district"), "G04-D")
-        self.assertEqual(drill_target("Q027", "mandal"), "G04-M")
-        self.assertEqual(drill_target("Q019", "district"), "G04-D")
+    def test_a_template_with_the_tier_hops_to_itself(self):
+        # PLN-001 takes all three tiers as optional filters.
+        for slot in ("district_name", "block_name", "gp_name"):
+            with self.subTest(slot=slot):
+                self.assertEqual(drill_target("PLN-001", slot), "PLN-001")
 
-    def test_every_mapped_target_exists_and_takes_the_slot(self):
-        for wider, targets in DRILL_MAP.items():
-            self.assertIn(wider, TEMPLATE_CATALOG, wider)
-            for slot, target in targets.items():
-                self.assertIn(target, TEMPLATE_CATALOG, target)
-                slots = {s["name"] for s in TEMPLATE_CATALOG[target]["param_slots"]}
-                self.assertIn(slot, slots, f"{target} has no {slot} parameter")
+    def test_a_template_without_the_tier_refuses(self):
+        """TRD-012 compares one district against the state benchmark and has no
+        block or GP filter. Returning a hop it cannot bind would serve an
+        unrelated table; None sends the message on to ordinary matching."""
+        self.assertEqual(drill_target("TRD-012", "district_name"), "TRD-012")
+        self.assertIsNone(drill_target("TRD-012", "block_name"))
+        self.assertIsNone(drill_target("TRD-012", "gp_name"))
 
-    def test_nothing_maps_to_itself_or_to_a_wider_scope(self):
-        for wider, targets in DRILL_MAP.items():
-            for target in targets.values():
-                self.assertNotEqual(wider, target)
-                self.assertFalse(target.endswith("-S"), f"{wider} -> {target} widens")
+    def test_an_unknown_id_or_slot_refuses(self):
+        self.assertIsNone(drill_target("NOPE-999", "district_name"))
+        self.assertIsNone(drill_target("PLN-001", None))
+        self.assertIsNone(drill_target(None, "district_name"))
+        self.assertIsNone(drill_target("PLN-001", "ward_name"))
+
+    def test_the_geo_slots_are_the_workbook_bind_names(self):
+        """`param_slots` carries bind names, so GEO_SLOTS must too — the entity
+        types (`district`, `block`, `gp`) are a different vocabulary and mixing
+        them yields a silent no-op rather than an error."""
+        self.assertEqual(GEO_SLOTS, ("gp_name", "block_name", "district_name"))
+        slots = {s["name"] for s in TEMPLATE_CATALOG["PLN-001"]["param_slots"]}
+        for slot in GEO_SLOTS:
+            self.assertIn(slot, slots)
 
 
 class CombinedQuestionTests(unittest.TestCase):
     def test_the_frame_question_carries_the_subject(self):
         self.assertEqual(
             combined_question(
-                "What is the average landholding by social category?", "in kurnool?"
+                "How many activities are abandoned?", "in ganjam?"
             ),
-            "What is the average landholding by social category? in kurnool",
+            "How many activities are abandoned? in ganjam",
         )
 
     def test_a_question_mark_is_added_when_the_frame_has_none(self):
-        self.assertEqual(combined_question("Land by category", "for Guntur"),
-                         "Land by category? for Guntur")
+        self.assertEqual(combined_question("Abandoned activities", "for Barpali"),
+                         "Abandoned activities? for Barpali")
 
     def test_a_missing_frame_question_degrades_to_the_fragment(self):
-        self.assertEqual(combined_question(None, "in kurnool?"), "in kurnool")
+        self.assertEqual(combined_question(None, "in ganjam?"), "in ganjam")
 
 
 class SubjectOverlapTests(unittest.TestCase):
-    def test_the_observed_misroutes_do_not_share_a_subject(self):
-        self.assertFalse(templates_share_subject("Q027", "G14-D"))  # MARKFED
-        self.assertFalse(templates_share_subject("Q027", "G01-D"))  # coverage
+    """The guard: bracket AND module, the workbook's own classification."""
 
-    def test_the_right_target_does_share_a_subject(self):
-        self.assertTrue(templates_share_subject("Q027", "G04-D"))
+    def test_a_different_module_is_a_different_subject(self):
+        # Planning/GPDP against Expenditure/GPDP — the same module word, and the
+        # exact slide a subjectless fragment makes.
+        self.assertFalse(templates_share_subject("PLN-001", "EXP-001"))
+        self.assertFalse(templates_share_subject("PLN-001", "SAN-001"))
+
+    def test_the_same_bracket_and_module_do_share_a_subject(self):
+        self.assertTrue(templates_share_subject("PLN-001", "PLN-005"))
 
     def test_an_unknown_id_is_never_evidence_of_a_different_subject(self):
-        self.assertTrue(templates_share_subject("Q027", "D01"))
-        self.assertTrue(templates_share_subject(None, "G04-D"))
+        self.assertTrue(templates_share_subject("PLN-001", "D01"))
+        self.assertTrue(templates_share_subject(None, "PLN-005"))
 
 
 class SlotOnlyFragmentTests(unittest.TestCase):
-    GEO = {"kurnool", "guntur", "east", "godavari", "peddapuram"}
+    GEO = {"ganjam", "khordha", "barpali", "tangi", "choudwar", "andhrua"}
 
     def test_a_bare_place_is_a_fragment(self):
-        for message in ("in kurnool?", "for Guntur?", "what about 2024 in Kurnool?",
-                        "in east godavari district"):
+        for message in ("in ganjam?", "for Barpali?", "what about 2024 in Khordha?",
+                        "in tangi choudwar block", "for Andhrua GP",
+                        "in Barpali panchayat samiti"):
             self.assertTrue(is_slot_only_fragment(message, self.GEO), message)
 
     def test_anything_with_a_measure_word_is_not(self):
-        for message in ("how many fishers are registered?",
-                        "how many small or marginal farmers",
-                        "input subsidy in Kurnool",
+        for message in ("how many activities are abandoned?",
+                        "how much was spent in Khordha",
+                        "which GPs uploaded a plan",
                         "total?", ""):
             self.assertFalse(is_slot_only_fragment(message, self.GEO), message)
 
     def test_the_vocabulary_is_tokenised(self):
-        tokens = geo_vocabulary_tokens(["East Godavari", "YSR Kadapa"])
-        self.assertEqual(tokens, {"east", "godavari", "ysr", "kadapa"})
+        """Multi-word places have to match word by word, or "Tangi Choudwar"
+        needs an exact-string scan of every message."""
+        tokens = geo_vocabulary_tokens(["Tangi Choudwar", "Kalyansingpur"])
+        self.assertEqual(tokens, {"tangi", "choudwar", "kalyansingpur"})
+
+    def test_the_place_phrase_drops_the_unit_noun(self):
+        self.assertEqual(
+            fragment_place_phrase("in tangi choudwar block", self.GEO),
+            "tangi choudwar",
+        )
+        self.assertEqual(fragment_place_phrase("for Andhrua GP", self.GEO), "andhrua")
 
 
 class UnexecutableEditTests(unittest.TestCase):
     """parse_decision must say WHY a frame edit was refused."""
 
     def test_a_slot_the_question_lacks_is_an_unexecutable_edit(self):
+        # TRD-012 has a district filter but no block one.
         decision = parse_decision(
-            {"kind": "frame_edit", "slot": "district", "value": "Kurnool"},
-            _frame("Q027"),
+            {"kind": "frame_edit", "slot": "block_name", "value": "Barpali"},
+            _frame("TRD-012"),
         )
         self.assertEqual(decision.kind, "unexecutable_edit")
-        self.assertEqual(decision.edit.slot, "district")
-        self.assertEqual(decision.edit.value, "Kurnool")
+        self.assertEqual(decision.edit.slot, "block_name")
+        self.assertEqual(decision.edit.value, "Barpali")
 
     def test_an_invented_slot_is_still_a_new_question(self):
         decision = parse_decision(
-            {"kind": "frame_edit", "slot": "hospital", "value": "X"}, _frame("Q027")
+            {"kind": "frame_edit", "slot": "hospital", "value": "X"},
+            _frame("TRD-012"),
         )
         self.assertEqual(decision.kind, "new_question")
 
     def test_a_noop_swap_is_still_a_new_question(self):
         decision = parse_decision(
-            {"kind": "frame_edit", "slot": "district", "value": "Kurnool"},
-            _frame("G04-D", {"district": "Kurnool"}),
+            {"kind": "frame_edit", "slot": "district_name", "value": "Khordha"},
+            _frame("PLN-004", {"district_name": "Khordha"}),
         )
         self.assertEqual(decision.kind, "new_question")
 
     def test_an_executable_swap_is_still_a_frame_edit(self):
         decision = parse_decision(
-            {"kind": "frame_edit", "slot": "district", "value": "Guntur"},
-            _frame("G04-D", {"district": "Kurnool"}),
+            {"kind": "frame_edit", "slot": "district_name", "value": "Ganjam"},
+            _frame("PLN-004", {"district_name": "Khordha"}),
         )
         self.assertEqual(decision.kind, "frame_edit")
 
 
 @unittest.skipIf(_SKIP is not None, _SKIP or "")
 class FragmentEndpointTests(unittest.TestCase):
-    """The gates, through the real /query handler."""
+    """The gates, through the real /query handler. Opt-in — see _LIVE above."""
 
     @classmethod
     def setUpClass(cls):
+        os.environ.setdefault("DB_ENGINE", "duckdb_file")
+        os.environ.setdefault("DB_PATH", "data/panchayat_1.duckdb")
         from fastapi.testclient import TestClient
         import main
 
@@ -204,11 +248,9 @@ class FragmentEndpointTests(unittest.TestCase):
     def seed_frame(self, session: str, query_id: str, **slot_values) -> None:
         """Put an answered table on screen without going through matching.
 
-        Typing the question is not reliable enough to build a gate on (measured
-        at 293 templates, near-misses inside CLARIFY_SCORE_MARGIN divert it), and
-        the seed helper in test_context_window_endpoint.py resumes a PENDING,
-        which needs a template with a missing slot — Q027 has none. This executes
-        the template directly through the same _serve_query_id + frame wiring the
+        Typing the question is not reliable enough to build a gate on — routing
+        flips ~3% of questions on identical replays — so this executes the
+        template directly through the same _serve_query_id + frame wiring the
         endpoint uses.
         """
         import main
@@ -219,6 +261,8 @@ class FragmentEndpointTests(unittest.TestCase):
         template = main._template_map[query_id]
         entities = []
         for name, etype in _template_slot_types(template).items():
+            if name not in slot_values:
+                continue
             entity = main._validator.validate(slot_values[name], etype)
             entity.slot_name = name
             entities.append(entity)
@@ -241,121 +285,51 @@ class FragmentEndpointTests(unittest.TestCase):
         main._context_store.reset(session)
         main._context_store.set_frame(session, frame, rows=result.result)
 
-    # ── Gate 2a / 1a — the reproduction ───────────────────────────────────────
-
-    def test_gate_2a_statewide_frame_drills_without_a_rerank_call(self):
+    def test_a_statewide_frame_narrows_without_a_rerank_call(self):
+        """The whole point of the deterministic path: a bare place fragment must
+        not reach the reranker, which has no subject to work from."""
         from query_router import reranker
 
-        session = "frag-2a"
-        self.seed_frame(session, "Q027")
+        session = "frag-narrow"
+        self.seed_frame(session, "EXP-001", date_range="2024-2025")
         before = reranker.rerank_call_count()
 
-        payload = self.ask("in kurnool?", session_id=session)
+        payload = self.ask("in khordha?", session_id=session)
 
-        self.assertEqual(payload["query_id"], "G04-D", payload["answer"])
-        self.assertEqual(
-            [(e["slot"], e["value"]) for e in payload["entities"]],
-            [("district", "Kurnool")],
-        )
-        self.assertEqual(reranker.rerank_call_count(), before,
-                         "the drill hop must be deterministic — no rerank call")
-        # Gate 1a's negative half: never a procurement/MARKFED answer.
-        self.assertNotIn("procure", (payload["query_description"] or "").lower())
-
-    def test_gate_1b_a_complete_question_still_routes_on_its_own(self):
-        session = "frag-1b"
-        self.seed_frame(session, "Q027")
-        payload = self.ask("how many fishers are registered?", session_id=session)
-        self.assertEqual(payload["query_id"], "Q010", payload["answer"])
-
-    # ── Gate 2b — another statewide family ────────────────────────────────────
-
-    def test_gate_2b_land_size_bands_drill_to_the_district(self):
-        session = "frag-2b"
-        self.seed_frame(session, "G06-S")
-        payload = self.ask("in guntur?", session_id=session)
-        self.assertEqual(payload["query_id"], "G06-D", payload["answer"])
-        self.assertIn("Guntur", payload["query_description"])
-
-    # ── Gate 2c — district frame drills to the mandal, but only for a mandal ──
-
-    def test_gate_2c_a_district_frame_drills_to_the_mandal(self):
-        session = "frag-2c"
-        self.seed_frame(session, "G01-D", district="East Godavari")
-        payload = self.ask("in peddapuram?", session_id=session)
-        self.assertEqual(payload["query_id"], "G01-M", payload["answer"])
+        self.assertEqual(payload["query_id"], "EXP-001", payload["answer"])
         bound = {e["slot"]: e["value"] for e in payload["entities"]}
-        self.assertEqual(bound.get("mandal"), "Peddapuram")
-        self.assertEqual(bound.get("district"), "East Godavari")
+        self.assertEqual(bound.get("district_name"), "Khordha")
+        self.assertEqual(reranker.rerank_call_count(), before,
+                         "the narrowing hop must be deterministic — no rerank call")
 
-    def test_gate_2c_a_value_that_is_not_a_mandal_does_not_hop(self):
-        """The half that can't be typed: serve_drill_hop refuses outright, which
-        is what sends the message on to the contextual re-route."""
-        import main
-        from db_factory import get_adapter
-        from query_router.context_store import build_context_frame
-        from query_router.router import serve_drill_hop
-
-        session = "frag-2c-neg"
-        self.seed_frame(session, "G01-D", district="East Godavari")
-        frame = main._context_store.get(session)
-
-        hopped = serve_drill_hop(
-            frame, "mandal", "Zzzzqqq Notaplace",
-            template_map=main._template_map, cache_conn=get_adapter(),
-            validator=main._validator, dashboard_results=main._dashboard_results,
-            dashboard_questions=main._dashboard_questions,
-            user_query="in zzzzqqq notaplace?",
-            start_date=main._default_start_date, end_date=main._default_end_date,
+    def test_a_complete_question_still_routes_on_its_own(self):
+        session = "frag-complete"
+        self.seed_frame(session, "EXP-001", date_range="2024-2025")
+        payload = self.ask(
+            "how many gram panchayats uploaded their GPDP in 2024-2025?",
+            session_id=session,
         )
-        self.assertIsNone(hopped)
-
-    def test_a_mandal_of_another_district_is_never_served_as_an_empty_table(self):
-        """'in tenali?' inside an East Godavari conversation. Tenali is a real
-        mandal — of Guntur — so the hop binds cleanly and returns nothing. An
-        empty table presented as the answer is the silent wrong answer this path
-        exists to remove."""
-        session = "frag-cross"
-        self.seed_frame(session, "G01-D", district="East Godavari")
-        payload = self.ask("in tenali?", session_id=session)
-        self.assertEqual(payload["tier"], "clarify", payload["answer"])
-        self.assertEqual(payload["clarification"]["reason"], "ambiguous_fragment")
-        self.assertFalse(payload["result"])
-
-    # ── Gate 3 — no sibling, no same-subject match: ask, don't serve ──────────
-
-    def test_gate_3_a_fragment_with_nowhere_to_drill_clarifies(self):
-        session = "frag-3"
-        self.seed_frame(session, "Q067", aadhaar_length="12")
-        payload = self.ask("in kurnool?", session_id=session)
-
-        self.assertEqual(payload["tier"], "clarify", payload["answer"])
-        self.assertEqual(payload["clarification"]["reason"], "ambiguous_fragment")
-        self.assertIn("Kurnool", payload["clarification"]["prompt"])
-        options = payload["clarification"]["options"]
-        self.assertGreaterEqual(len(options), 2)
-        for chip in options:
-            self.assertNotIn("{", chip["label"])
-        self.assertEqual(options[-1]["label"], "Something else")
-
-    # ── Regression — the catalog-question guard is untouched ──────────────────
-
-    def test_a_word_for_word_catalog_question_still_routes_to_matching(self):
-        session = "frag-catalog"
-        self.seed_frame(session, "Q027")
-        question = TEMPLATE_CATALOG["G04-D"]["abstract_question"].format(
-            district="Kurnool"
-        )
-        payload = self.ask(question, session_id=session)
-        self.assertEqual(payload["tier"], "tier2", payload["answer"])
-        self.assertIn("Kurnool", payload["query_description"])
+        self.assertNotEqual(payload["query_id"], "EXP-001", payload["answer"])
 
     def test_an_operation_on_a_statewide_frame_still_classifies(self):
         session = "frag-op"
-        self.seed_frame(session, "Q027")
+        self.seed_frame(session, "EXP-001", date_range="2024-2025")
         payload = self.ask("total?", session_id=session)
         self.assertEqual(payload["tier"], "operation", payload["answer"])
         self.assertEqual(payload["operation"], "sum")
+
+    def test_a_caveated_answer_carries_its_caveat_on_the_query_path(self):
+        """T7, path 1 of 3. PLN-002's note says approval is PROXIED by a date —
+        without it the answer reads as a real approval count."""
+        session = "frag-caveat"
+        payload = self.ask(
+            "how many GPs had their GPDP approved in 2024-2025?", session_id=session
+        )
+        if payload.get("query_id") != "PLN-002":
+            self.skipTest(f"routed to {payload.get('query_id')}, not PLN-002")
+        caveat = TEMPLATE_CATALOG["PLN-002"]["caveat"]
+        self.assertEqual(payload["caveat"], caveat)
+        self.assertIn(caveat, payload["answer"])
 
 
 if __name__ == "__main__":

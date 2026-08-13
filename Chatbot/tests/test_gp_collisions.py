@@ -170,7 +170,7 @@ class GPCollisionTests(unittest.TestCase):
             self.resolve("Rampur")
         districts = {d for c in ctx.exception.candidates for d in c.districts}
         self.assertEqual(districts, {"Bargarh"})
-        blocks = {c.village for c in ctx.exception.candidates}
+        blocks = {c.parent_place for c in ctx.exception.candidates}
         self.assertEqual(blocks, {"Attabira", "Barpali"})
 
     def test_every_candidate_carries_its_own_code(self):
@@ -245,7 +245,7 @@ class GPCollisionTests(unittest.TestCase):
             with self.subTest(chip=chip.send_text):
                 entity = self.resolve(chip.send_text)
                 candidate = by_code[entity.resolved_code]
-                self.assertIn(candidate.village, chip.label)
+                self.assertIn(candidate.parent_place, chip.label)
 
     def test_a_resolved_panchayat_survives_a_second_round_trip(self):
         """A chained clarify re-validates everything already filled. If the
