@@ -85,7 +85,10 @@ class BindParamValuesTests(unittest.TestCase):
             router.bind_param_values(
                 slots, {"farmer_name": "Lakshmi Devi"}, context=" for F12"
             )
-        self.assertIn("did not resolve to one person", str(ctx.exception))
+        # WP-2 fixture swap: the message is domain-neutral now ("one record"),
+        # because the same mechanism binds a gram panchayat's LGD code as well
+        # as a farmer's Aadhaar. The behaviour asserted is unchanged.
+        self.assertIn("did not resolve to one record", str(ctx.exception))
 
     def test_no_farmer_template_binds_a_name(self):
         """Every farmer_name slot in the catalog is person-bound — F14 is the

@@ -289,54 +289,53 @@ _DEFAULT_ENTITY_VALUES: dict[str, str] = {
     "tolerance_pct": "10",  # matches the P11 answer-key figure
 }
 
-# A land threshold stated outright — "under 2 acres", "less than 50 cents",
-# "below 1.5 ha". These are the common shapes, and reading them here means the
-# frequent case never depends on the LLM at all: not just deterministic
-# arithmetic (the validator handles that), but deterministic end to end.
-# Anything this cannot see still goes to the extractor.
-_LAND_THRESHOLD_RE = re.compile(
-    r"(?<![\w.])(\d+(?:\.\d+)?)\s*(acres?|ac|cents?|hectares?|ha)(?![a-z])",
+# The slots a plainly-stated rupee figure may prefill. `threshold` is included
+# because some of its questions are rupee questions, and `amount_from_text`
+# claims a figure only when the text carries a money marker — so the percent /
+# days / activity-count readings of `threshold` still reach the extractor.
+_AMOUNT_ENTITY_TYPES = frozenset({"amount_threshold", "threshold"})
+
+# A rupee amount stated outright — "above ₹1 lakh", "more than 50,000",
+# "over 2.5 crore". Reading it here means the frequent case never depends on the
+# LLM at all: not just deterministic arithmetic (the validator handles that),
+# but deterministic end to end. Anything this cannot see still goes to the
+# extractor.
+#
+# A MONEY MARKER is required — the ₹/Rs prefix, or a lakh/crore/thousand
+# multiplier, or a trailing "rupees". A bare "more than 50" is deliberately NOT
+# claimed: $threshold's unit varies by question (percent, rupees, days, or a
+# minimum activity count, per the Parameter Registry sheet), so prefilling a
+# bare figure would bypass the extractor's reading of which one was meant.
+_AMOUNT_TEXT_RE = re.compile(
+    r"(?:(?P<sym>₹|₨|\bRs\.?|\bINR)\s*(?P<n1>\d[\d,]*(?:\.\d+)?)"
+    r"\s*(?P<u1>lakhs?|lacs?|crores?|cr|thousand|k)?"
+    r"|(?P<n2>\d[\d,]*(?:\.\d+)?)\s*(?P<u2>lakhs?|lacs?|crores?|cr|thousand)\b"
+    r"|(?P<n3>\d[\d,]*(?:\.\d+)?)\s*(?=rupees\b))",
     re.IGNORECASE,
 )
-# A RANGE is not a threshold: "between 1 and 2 acres" has two figures and only
-# the second carries a unit, so the plain scan would see one match and silently
-# answer "under 2 acres". One threshold slot cannot express a range, so hand the
-# sentence to the extractor instead of guessing.
-_LAND_RANGE_RE = re.compile(
-    r"\bbetween\b|"
-    r"\d+(?:\.\d+)?\s*(?:acres?|ac|cents?|hectares?|ha)?\s*(?:and|to|–|—|-)\s*\d",
-    re.IGNORECASE,
-)
-# The policy bands, which name a threshold without stating a figure.
-_LAND_BAND_VALUES: list[tuple[re.Pattern, str]] = [
-    (re.compile(r"\bsmall\s+(?:and|or|/)\s+marginal\b|\bmarginal\s+(?:and|or|/)\s+small\b",
-                re.IGNORECASE), "2"),
-    (re.compile(r"\bmarginal\b", re.IGNORECASE), "1"),
-    (re.compile(r"\bsmall\b", re.IGNORECASE), "2"),
-]
+# A RANGE is not a threshold: "between ₹1 lakh and ₹5 lakh" has two figures, so
+# the plain scan would claim one and silently answer about the wrong bound. One
+# threshold slot cannot express a range — hand the sentence to the extractor.
+_AMOUNT_RANGE_RE = re.compile(r"\bbetween\b", re.IGNORECASE)
 
 
-def land_threshold_from_text(text: str) -> str | None:
-    """'farmers under 2 acres' -> '2 acres'. None when it is not stated plainly.
+def amount_from_text(text: str) -> str | None:
+    """'activities above ₹1 lakh' -> '1 lakh'. None when not stated plainly.
 
-    Returns the figure WITH its unit word, exactly the shape the extractor is
-    now asked for, so the validator does the one conversion either way. Only a
-    SINGLE unambiguous match counts — two figures in one question ("between 1
-    and 2 acres") is not something one threshold slot can represent, so that
-    falls through to the LLM rather than silently picking one.
+    Returns the figure WITH its multiplier word, exactly the shape the extractor
+    is asked for, so `entity_validator.parse_amount` does the one conversion
+    either way. Only a SINGLE unambiguous match counts.
     """
-    if _LAND_RANGE_RE.search(text or ""):
+    text = text or ""
+    if _AMOUNT_RANGE_RE.search(text):
         return None
-    matches = _LAND_THRESHOLD_RE.findall(text or "")
-    if len(matches) == 1:
-        number, unit = matches[0]
-        return f"{number} {unit.lower()}"
-    if matches:
-        return None          # ambiguous — let the extractor read the sentence
-    for pattern, hectares in _LAND_BAND_VALUES:
-        if pattern.search(text or ""):
-            return hectares  # bands are defined in hectares, so no unit word
-    return None
+    matches = [m for m in _AMOUNT_TEXT_RE.finditer(text)]
+    if len(matches) != 1:
+        return None          # none, or ambiguous — let the extractor read it
+    m = matches[0]
+    number = m.group("n1") or m.group("n2") or m.group("n3")
+    unit = m.group("u1") or m.group("u2")
+    return f"{number} {unit.lower()}" if unit else number
 
 
 def _extract_slot_values(
@@ -347,12 +346,12 @@ def _extract_slot_values(
     intent: str | None = None,
 ) -> dict[str, str | None]:
     """extract_entities() over the genuinely user-supplied slots, with the
-    catalog's constant slots filled in afterwards, and land thresholds read
+    catalog's constant slots filled in afterwards, and rupee amounts read
     straight out of the text when they are stated plainly."""
     prefilled: dict[str, str] = {}
     for slot, etype in slot_type.items():
-        if etype == "threshold_hectares":
-            found = land_threshold_from_text(user_query)
+        if etype in _AMOUNT_ENTITY_TYPES:
+            found = amount_from_text(user_query)
             if found is not None:
                 prefilled[slot] = found
 
@@ -392,29 +391,37 @@ def optional_slots(param_slots: list[dict]) -> set[str]:
     return {s["name"] for s in param_slots if s.get("optional")}
 
 
+# A slot may bind the RESOLVED CODE of the one roster row its value named
+# rather than the name itself. "code" is the neutral spelling PR&DW templates
+# use ($gp_name -> gp_lgd_code, decision D10); "aadhaar" is the AP spelling of
+# the same mechanism and stays accepted so the AP catalogue keeps binding while
+# it is still in the tree.
+_CODE_BIND_KINDS = frozenset({"code", "aadhaar"})
+
+
 def _resolve_slot_value(
     slot: dict,
     params_by_name: dict,
     person_ids: dict[str, str],
     context: str,
 ):
-    """The value one slot binds — its Aadhaar, its extracted value, or None.
+    """The value one slot binds — its resolved code, its extracted value, or None.
 
     Shared by the positional and named binders so the two cannot drift on which
     slot binds what.
     """
     name = slot["name"]
-    if slot.get("bind") == "aadhaar":
-        # An optional person-bound slot that was never supplied is absent, not
+    if slot.get("bind") in _CODE_BIND_KINDS:
+        # An optional code-bound slot that was never supplied is absent, not
         # unresolved — bind NULL rather than failing.
         if name not in params_by_name and slot.get("optional"):
             return None
-        aadhaar = person_ids.get(name)
-        if not aadhaar:
+        code = person_ids.get(name)
+        if not code:
             raise ValueError(
-                f"'{name}'{context} did not resolve to one person"
+                f"'{name}'{context} did not resolve to one record"
             )
-        return aadhaar
+        return code
     return params_by_name.get(name)
 
 
@@ -443,15 +450,17 @@ def bind_param_values(
     """
     One value per SQL placeholder: walk param_slots in positional order,
     repeating a logical value wherever its slot name recurs (many templates
-    filter several subqueries by the same district/mandal/farmer).
+    filter several subqueries by the same district/block/GP).
 
-    A slot may declare {"bind": "aadhaar"}, and every per-farmer template does.
-    It binds the resolved PERSON's Aadhaar rather than their name, because a
-    name is not a person: 71% of roster names are shared, so a name-keyed filter
-    silently returned — and F12 summed — everyone who happened to be called
-    that. `person_ids` carries slot -> Aadhaar for the entities that resolved to
-    one individual; a person-bound slot with nothing there is a bug upstream and
-    fails loudly rather than falling back to the name.
+    A slot may declare {"bind": "code"} (or the AP spelling {"bind": "aadhaar"}
+    — same mechanism). It binds the resolved ROW's unique code rather than its
+    name, because a name is not a row: statewide, GP names repeat across the 314
+    blocks, so a name-keyed filter silently aggregates every panchayat that
+    happens to be called that — the AP defect (F12 summed four Lakshmi Devis
+    into one farmer's total) transplanted into geography. `person_ids` carries
+    slot -> code for the entities that resolved to one record; a code-bound slot
+    with nothing there is a bug upstream and fails loudly rather than falling
+    back to the name.
 
     A slot marked {"optional": True} with no value binds None (SQL NULL) instead
     of raising — see optional_slots().
@@ -514,8 +523,8 @@ def bind_for_template(
 
 
 def _person_bound_slots(param_slots: list[dict]) -> set[str]:
-    """The slot names this template binds by person rather than by name."""
-    return {s["name"] for s in param_slots if s.get("bind") == "aadhaar"}
+    """The slot names this template binds by resolved code rather than by name."""
+    return {s["name"] for s in param_slots if s.get("bind") in _CODE_BIND_KINDS}
 
 
 def _person_ids_for(
@@ -524,13 +533,13 @@ def _person_ids_for(
     params_by_name: dict,
     validator: EntityValidator,
 ) -> dict[str, str]:
-    """Recover each person-bound slot's Aadhaar by re-resolving its value.
+    """Recover each code-bound slot's identifier by re-resolving its value.
 
     A context frame stores bound parameters as plain strings, so an identity
     resolved on the original turn is not in it. Re-validating gets it back: the
-    roster resolves a person REFERENCE ('Lakshmi Devi of Rambilli') to the same
-    individual every time, which is exactly why resolved_value carries the
-    village whenever a name is shared.
+    roster resolves a REFERENCE ('Naugaon of Barpali') to the same panchayat
+    every time, which is exactly why resolved_value carries the block whenever a
+    name is shared.
     """
     person_ids: dict[str, str] = {}
     for name in _person_bound_slots(param_slots):
@@ -541,8 +550,8 @@ def _person_ids_for(
             entity = validator.validate(value, slot_types.get(name, name))
         except Exception:
             continue   # bind_param_values reports it as the unresolved person
-        if entity.person_aadhaar:
-            person_ids[name] = entity.person_aadhaar
+        if entity.resolved_code:
+            person_ids[name] = entity.resolved_code
     return person_ids
 
 
@@ -1317,24 +1326,20 @@ def _serve_query_id(
         elif e.entity_type in _display_raw:
             entity_values[e.slot_name] = e.raw_value
         elif e.confidence == "converted":
-            # A land threshold the user gave in acres or cents. Echo their own
-            # words and show the conversion, so "less than 1 acre" does not come
-            # back as the unrecognisable "less than 0.4047 hectares".
-            entity_values[e.slot_name] = f"{e.raw_value} ({e.resolved_value} ha)"
+            # An amount the user gave in lakhs or crores. Echo their own words
+            # AND the figure that was filtered on, so "above 1 lakh" does not
+            # come back as the unrecognisable "above 100000" — and so the reader
+            # can check the conversion rather than take it on trust.
+            entity_values[e.slot_name] = f"{e.raw_value} (₹{e.resolved_value})"
         else:
             entity_values[e.slot_name] = e.resolved_value
     try:
         query_description = template["abstract_question"].format(**entity_values)
     except KeyError:
         query_description = template["abstract_question"]
-    # Every threshold_hectares question reads "{slot} hectares", which turns into
-    # "1 acre (0.4047 ha) hectares" once the echo above carries its own unit.
-    query_description = re.sub(
-        r"(\(\d+(?:\.\d+)?\s*ha\))\s+hectares\b", r"\1", query_description
-    )
-    # Q125 reads "{farmer_name} of {village}", and a farmer whose name is shared
-    # resolves to "Lakshmi Devi of Rambilli" so the person survives a round trip
-    # — which renders "…of Rambilli of Rambilli". Same place named twice, said
+    # A GP whose name is shared resolves to "Naugaon of Barpali" so the
+    # panchayat survives a round trip — which renders "…of Barpali of Barpali"
+    # in a question that already names the block. Same place named twice, said
     # once. Only an immediate repeat collapses, so two real places never merge.
     query_description = re.sub(
         r"\bof\s+(\S+)\s+of\s+\1\b", r"of \1", query_description, flags=re.IGNORECASE
@@ -1342,7 +1347,7 @@ def _serve_query_id(
 
     params_by_name = {e.slot_name: e.resolved_value for e in validated_entities}
     person_ids = {
-        e.slot_name: e.person_aadhaar for e in validated_entities if e.person_aadhaar
+        e.slot_name: e.resolved_code for e in validated_entities if e.resolved_code
     }
     is_named = param_style(template) == NAMED
     try:

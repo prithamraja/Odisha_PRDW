@@ -25,22 +25,34 @@ class Clarification(BaseModel):
 
 class EntityCandidate(BaseModel):
     """One of the several registry entries a raw value matched. Districts are
-    what the roster disambiguation prompt names people by, so a reply naming a
+    what the disambiguation prompt names candidates by, so a reply naming a
     district is answerable against this list without another round trip.
 
     A candidate is sometimes a NAME (several different names fuzzy-match what
-    the user typed) and sometimes a PERSON (one name, several Aadhaars hold
-    it). `village` and `aadhaar` are set only in the second case and are what
-    tell two people apart — district alone does not: two of the four Lakshmi
-    Devis are both in Nellore.
+    the user typed) and sometimes ONE THING that shares its name with others —
+    for PR&DW a gram panchayat, several of which are called 'Naugaon'. The
+    fields below are set only in the second case and are what tell two
+    same-named candidates apart; the district alone does not, because a name can
+    repeat inside one district.
 
-    PRIVACY: `aadhaar` is the full number. It exists so a tap can resolve to an
-    individual; it must be passed through `mask_aadhaar` before it reaches any
-    label, chip or answer.
+    `village` is the NARROWER PLACE, whatever the domain's tier below district
+    is called: a village in AP, **the block (Panchayat Samiti) in PR&DW**. The
+    field keeps its AP name because `zones` renders it generically and WP-3
+    owns that file's copy — renaming it is on the WP-3 list.
+
+    `code` is the candidate's own unique identifier — `gp_lgd_code` here. It is
+    public and is shown and sent in full; it is the last tiebreak when two
+    candidates share both name and block.
+
+    PRIVACY: `aadhaar` is a full Aadhaar number and is a different thing
+    entirely — unused in PR&DW (the panchayat database holds none). Where it IS
+    set it must pass through `mask_aadhaar` before reaching any label, chip or
+    answer.
     """
     name:      str
     districts: list[str] = []
     village:   Optional[str] = None
+    code:      Optional[str] = None
     aadhaar:   Optional[str] = None
 
 
@@ -69,13 +81,17 @@ class ExtractedEntity(BaseModel):
     raw_value:      str
     resolved_value: str
     entity_type:    str
-    confidence:     str   # exact | alias | fuzzy
-    # The Aadhaar of the ONE person a farmer_name resolved to. A name is not a
-    # person — 316 of 446 roster names are shared — so templates bind this
-    # rather than the name string wherever a param slot declares
-    # {"bind": "aadhaar"}. None for every other entity type.
-    # PRIVACY: never rendered; query_description shows resolved_value.
-    person_aadhaar: Optional[str] = None
+    confidence:     str   # exact | alias | fuzzy | converted | numeric | constant
+    # The unique code of the ONE roster row this value resolved to — the
+    # `gp_lgd_code` of one gram panchayat. A name is not a panchayat: statewide
+    # there are ~6,800 GPs across 314 blocks and names repeat, so templates bind
+    # this rather than the name string wherever a param slot declares
+    # {"bind": "code"}. None for every other entity type.
+    #
+    # Named neutrally because it is not always safe to render: an LGD code is
+    # public, whereas the AP build's Aadhaar (same mechanism, {"bind":
+    # "aadhaar"}) had to be masked. query_description shows resolved_value.
+    resolved_code:  Optional[str] = None
 
 class ColumnType(str, Enum):
     DIMENSION       = "dimension"

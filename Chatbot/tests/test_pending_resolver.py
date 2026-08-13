@@ -253,10 +253,17 @@ class ScopeWideningVocabularyTests(unittest.TestCase):
             self.assertFalse(is_scope_widening_reply(reply, "crop"), reply)
 
     def test_geo_slots_accept_the_validators_state_level_terms(self):
-        for reply in ("statewide", "state", "entire state", "andhra pradesh", "ap"):
+        # WP-2 fixture swap: the state-level markers are PR&DW's now. Same
+        # assertion, same shared `_STATE_LEVEL_TERMS` source.
+        for reply in ("statewide", "state", "entire state", "odisha", "orissa",
+                      "all districts"):
             self.assertTrue(is_scope_widening_reply(reply, "district"), reply)
-        # Those are scope markers for geography only — 'ap' is not a crop answer.
+        for reply in ("all gps", "whole state"):
+            self.assertTrue(is_scope_widening_reply(reply, "gp"), reply)
+        # Those are scope markers for geography only — 'odisha' is not a crop
+        # answer.
         self.assertFalse(is_scope_widening_reply("statewide", "crop"))
+        self.assertFalse(is_scope_widening_reply("odisha", "crop"))
 
 
 class ScopeWideningResolutionTests(unittest.TestCase):

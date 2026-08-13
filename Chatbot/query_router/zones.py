@@ -115,18 +115,31 @@ def question_chips(
     return chips
 
 
+def candidate_tiebreak(candidate: EntityCandidate) -> str | None:
+    """The identifier that separates two candidates their places cannot.
+
+    A gram panchayat's LGD code is a public identifier and is shown in full; a
+    farmer's Aadhaar is the same mechanism but must never leave this function
+    unmasked. One place to get that distinction right.
+    """
+    if candidate.code:
+        return str(candidate.code)
+    return mask_aadhaar(candidate.aadhaar) if candidate.aadhaar else None
+
+
 def candidate_label(candidate: EntityCandidate, *, masked: bool = False) -> str:
     """What tells this candidate apart, for a chip or a prompt.
 
-    District alone does not do it for people: two of the four farmers called
-    Lakshmi Devi are both in Nellore, so a district-only label offers two
-    identical chips and the user cannot choose. Village leads.
+    The district alone does not do it: two of the four farmers called Lakshmi
+    Devi are both in Nellore, and a GP name can repeat inside one district. The
+    narrower place leads.
     """
     where = [candidate.village] if candidate.village else []
     where += [d for d in candidate.districts if d != candidate.village]
     label = f"{candidate.name} ({', '.join(where)})" if where else candidate.name
-    if masked and candidate.aadhaar:
-        label += f" · {mask_aadhaar(candidate.aadhaar)}"
+    tiebreak = candidate_tiebreak(candidate)
+    if masked and tiebreak:
+        label += f" · {tiebreak}"
     return label
 
 
@@ -154,7 +167,8 @@ def candidate_replies(candidates: list[EntityCandidate]) -> list[str]:
     ]
     duplicated = {r for r in replies if replies.count(r) > 1}
     return [
-        f"{r} {mask_aadhaar(c.aadhaar)}" if r in duplicated and c.aadhaar else r
+        f"{r} {candidate_tiebreak(c)}"
+        if r in duplicated and candidate_tiebreak(c) else r
         for c, r in zip(candidates, replies)
     ]
 
@@ -169,10 +183,11 @@ def candidate_chips(
     replies = candidate_replies(chosen)
     chips: list[Chip] = []
     for candidate, reply in zip(chosen, replies):
-        # The reply only carries a masked Aadhaar when name + village was not
-        # enough; when it did, the label says so too, so what the user reads
+        # The reply only carries the code/masked Aadhaar when name + place was
+        # not enough; when it did, the label says so too, so what the user reads
         # matches what distinguishes them.
-        masked = bool(candidate.aadhaar) and mask_aadhaar(candidate.aadhaar) in reply
+        tiebreak = candidate_tiebreak(candidate)
+        masked = bool(tiebreak) and tiebreak in reply
         chips.append(
             Chip(label=candidate_label(candidate, masked=masked), send_text=reply)
         )
