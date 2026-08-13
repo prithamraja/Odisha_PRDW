@@ -66,6 +66,7 @@ decisions, and state on top of it. Implementation agents receive work via
 | D8 | **Keep `to_pyformat()`** as a tested utility, not wired to any adapter. `SupabaseAdapter` binds through DuckDB's postgres extension, so `$name` dicts bind natively there — translation would break a working path. The utility is correct code for a future driver-level (psycopg2) adapter. Each adapter declares `PARAMSTYLE`. | PM ruling on WP-1 report §8.1, accepting the implementer's analysis. |
 | D9 | **Fiscal year is an ordinary named slot** (`$date_range` etc.), never a `date_filter` injection — `date_kind` machinery stays dormant for PR&DW (its `year` kind compares integers; Odisha's fiscal year is the `'2024-2025'` string). `date_phrase.py` (WP-2) maps phrasings ("FY 24-25", "last year", "this year") onto the exact full-form string. A question with no year stated follows required-slot behavior — clarification chip — for v1; revisit from pilot logs if officers overwhelmingly mean "current year". | PM ruling on WP-1 report §8.3. |
 | D10 | **Geography binds LGD codes end-to-end — decided in principle (D4); the SQL predicate rewrite (`gp_name = $gp_name` → `gp_lgd_code = $gp_code`) is a WP-3 decision** pending `create_views.sql`, which determines whether the views expose block/district codes. WP-2 must deliver name→code resolution machinery regardless, so WP-3's choice is a predicate edit, not new design. | Workbook SQL filters on names (safe for the 20 unique sample GPs, unsafe statewide). Operator has waived byte-level SQL fidelity in favor of performance/correctness. |
+| D12 | ~~Rebuild `dim_code` from `code_descriptions_updated.xlsx`~~ **RESCINDED 2026-08-13** — the operator withdrew the `20_GP_flattened_data` drop as incorrect before anything was executed. No code, database, or catalogue change ever happened under D12 (the WP-3 T1b task was removed from the brief unrun). The DB's `dim_code` stands as shipped. | Drop declared incorrect by operator. |
 | D11 | **Rulings on WP-2 report §8:** (1) a bare four-digit year reads as the fiscal year *starting* in it ("2024" → `2024-2025`) — keep, pinned in tests, revisit from pilot logs; (2) unqualified "SFC" → `5TH STATE FINANCE COMMISSION` (the current one), "4th SFC" reaches the 4th — keep; (3) rename `EntityCandidate.village` to a tier-neutral name in WP-3; (4) `top_n` ceiling 1000 accepted **provisionally** — WP-3 must check whether any listing template legitimately needs more statewide (a full GP listing is ~6,800) and raise it then; (5) thin alias tables accepted — they fill from the D5 dictionary file and query logs, not guesses. | PM rulings 2026-08-13. |
 
 ## 3a. Standing disciplines (learned in this repo — additional to the bootstrap's)
@@ -98,10 +99,23 @@ decisions, and state on top of it. Implementation agents receive work via
 
 ## 5. Blockers & asks (operator)
 
-1. **`create_views.sql`** — the seven `v_*` views are missing from this copy of
-   the DB; all 346 tested queries depend on them. Blocks WP-3's execution gate.
-   When supplying it: if the views don't already expose **block and district LGD
-   codes** (not just names), say so — it decides D10's predicate rewrite.
+1. **`create_views.sql` — RESOLVED (2026-08-13).** Team supplied it at
+   `Data/create_views.sql`. **PM acceptance validation: 346/346 queries
+   reproduce the workbook Test Report row counts exactly** (views created on a
+   scratch copy; zero mismatches, zero errors; 17 documented skips). Seven
+   views: v_activity/v_plan/v_asset/v_progress/v_voucher + building blocks
+   v_exp/v_approval (both 1:1 rollups). Facts WP-3 needs: `v_activity` grain is
+   one row per planned activity; `search_text` = `LOWER(activity_name || ' ' ||
+   COALESCE(activity_desc,''))`; `status_label` is TRIM/tab-cleaned in views
+   (WP-2's marked one-line `_DB_SOURCES` switch now applies — view value is
+   clean `'WORK COMPLETED'`), while `theme` keeps its trailing space; views
+   expose `gp_lgd_code` but NOT block/district codes → D10: GP binds code,
+   block/district bind registry-validated names for the pilot (additive view
+   amendment is the statewide option — `gram_panchayat` carries the codes).
+   Minor, flag-only: file header says V4 (validation proves V5-compatible);
+   `days_since_sanction` computes to CURRENT_DATE while its comment says
+   "end of plan year" — unused by the catalogue, tell the team, don't touch.
+   WP-3 runs Path A; Path B is moot.
 2. **`q_*.py` workbook-builder modules** (optional but valuable) — would let
    WP-3 generate the catalogue programmatically instead of parsing the xlsx;
    the workbook notes a JSON export is a small addition.
@@ -109,6 +123,25 @@ decisions, and state on top of it. Implementation agents receive work via
    changed" and "Findings" sheets not present in this copy.
 4. Later: full LGD geography roster (statewide), SBM keyword dictionary file
    (D5), SME contact for eval grading (WP-4).
+5. **Raw-data history (2026-08-13):** the first drop (`20_GP_flattened_data`)
+   was withdrawn by the operator as incorrect; all conclusions from it stay
+   void (incl. the rescinded D12 and the Meri-Panchayat-JSON opportunity list —
+   do not re-raise unless corroborated by a correct source). The replacement —
+   **`Data/` (one CSV per table) + `table_sources_and_changes.docx`** — was
+   verified by the PM: schema AND content are identical to the shipped
+   `panchayat_1.duckdb` (19/19 tables, columns, row counts, money totals to
+   the paisa, `dim_code` byte-identical). The docx is the build-provenance
+   document for the existing DB, and it was built post-fix of the 987-date
+   parsing bug it describes. **No rework anywhere; WP-1/WP-2 stand.**
+   Resolved by it: (a) `plan.approval_date` comes from the Activity-wise
+   Expenditure scrape (`plan_code_status` is a generated, always-empty
+   placeholder) — ask closed; (b) `gram_panchayat` carries geography *codes*
+   merged from the voucher source, so D10 has a dimension to resolve
+   block/district codes against. Still standing (DB-verified, drop-independent):
+   the `plan_year`/`fiscal_year` naming split in approval tables; the
+   `dim_code` oddities ('Buildings' code 173, the `'\t'` tab). Note: `Data/`
+   is the per-table CSV format `PandasAdapter` loads — keep as the canonical
+   raw export and the template for the statewide load / stub-data builder.
 
 ## 6. Standing risks
 
