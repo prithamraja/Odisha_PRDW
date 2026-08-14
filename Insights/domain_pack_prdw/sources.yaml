@@ -1,0 +1,191 @@
+# =============================================================================
+# domain_pack_prdw / sources.yaml
+# =============================================================================
+# Odisha Panchayati Raj & Drinking Water — "Discover" source registration.
+#
+# Input is `Data/` exactly as distributed: 19 per-table CSVs, no staging script.
+# The runner reads every file with all_varchar=true (no type sampling), so every
+# numeric / date column the pack uses must be cast explicitly here; IDs and
+# anything not listed stay VARCHAR.
+#
+# Cast rules follow domain_pack/README.md and DISCOVER_VIEW_MAPPING.md §7:
+#   money / continuous measures -> float    counts, years -> int
+#   calendar dates              -> date     everything else stays VARCHAR
+# Decode-joining codes (focus_area, activity_status, work_type, activity_type,
+# activity_for, output_type, scheme_code, scheme_component_code, asset_*,
+# training_*, community_service_code) stay VARCHAR: `create_views.sql` joins
+# them to dim_code.code, which is VARCHAR, and casting either side would make
+# the decode depend on numeric formatting rather than on the code.
+#
+# SAMPLE SCALE LIVES HERE. `expected_rows` below are the WP-D0 audited sample
+# counts (DISCOVER_VIEW_MAPPING §2, re-measured in WP-D1). When the statewide
+# drop lands in the same format (D15), this block and validation.yaml `post_view`
+# are the only two places that change — no view SQL carries a scale literal.
+# =============================================================================
+
+# Tight: these are exact known counts, not estimates. A 1% drift is a real
+# change in the drop and should stop the build under --strict.
+row_count_tolerance_pct: 1
+
+tables:
+
+  # ── geography master ───────────────────────────────────────────────────────
+  # The spine every view hangs off. Fully populated, zero nulls (§2). Codes stay
+  # VARCHAR: they are LGD identifiers, not quantities.
+  gram_panchayat:
+    file: gram_panchayat.csv
+    expected_rows: 20
+
+  # ── planning core ──────────────────────────────────────────────────────────
+  plan:
+    file: plan.csv
+    expected_rows: 204
+    casts:
+      approval_date: date
+
+  planned_activity:
+    file: planned_activity.csv
+    expected_rows: 12704
+    casts:
+      total_cost: float           # PLANNED basis; null <=> costless activity
+
+  # ── money layers ───────────────────────────────────────────────────────────
+  # 12,730 rows, not 12,704: six activity_codes carry duplicate rows and twenty
+  # codes have no planned_activity parent (§8). Both are handled downstream by
+  # the stg_exp_rollup GROUP BY, never by dropping rows here.
+  activity_expenditure:
+    file: activity_expenditure.csv
+    expected_rows: 12730
+    casts:
+      approved_cost_action_plan: float
+      technical_approved_cost: float
+      admin_approved_cost: float
+      general: float
+      sc: float
+      st: float
+      total_expenditure: float    # SPENT basis; == linked voucher sums exactly
+
+  activity_voucher:
+    file: activity_voucher.csv
+    expected_rows: 5976
+    casts:
+      voucher_cost: float
+      voucher_date: date
+
+  voucher:
+    file: voucher.csv
+    expected_rows: 12440
+    casts:
+      amount: float               # CASHBOOK basis; direction gives the sign
+      date: date
+
+  # ── approvals ──────────────────────────────────────────────────────────────
+  # plan_year stays VARCHAR: v_approval builds the 'YYYY-YYYY' fiscal year by
+  # string concatenation off it, and that expression is re-expressed verbatim.
+  admin_approval:
+    file: admin_approval.csv
+    expected_rows: 2101
+    casts:
+      work_proposed_cost: float
+      adm_approval_sanction_date: date
+
+  admin_approval_scheme:
+    file: admin_approval_scheme.csv
+    expected_rows: 2107          # 2,101 approvals + 6 second scheme rows
+    casts:
+      fund_sanctioned_general: float
+      fund_sanctioned_sc: float
+      fund_sanctioned_st: float
+      fund_sanctioned_total: float
+
+  technical_approval:
+    file: technical_approval.csv
+    expected_rows: 2134
+    casts:
+      tec_approval_cost: float
+      tec_approval_order_date: date
+
+  # ── activity 1:1 child tables (12,704 rows each, one per activity) ─────────
+  activity_fund:
+    file: activity_fund.csv
+    expected_rows: 12704
+    casts:
+      fund_tied_general: float
+      fund_tied_sc: float
+      fund_tied_st: float
+      fund_untied_general: float
+      fund_untied_sc: float
+      fund_untied_st: float
+      fund_amount_total: float
+      fund_tied_abandoned_general: float
+      fund_tied_abandoned_sc: float
+      fund_tied_abandoned_st: float
+      fund_untied_abandoned_general: float
+      fund_untied_abandoned_sc: float
+      fund_untied_abandoned_st: float
+
+  activity_asset:
+    file: activity_asset.csv
+    expected_rows: 12704
+    casts:
+      asset_unit_cost: float          # meas (candidate, 30% populated) — §7
+      asset_unit_count: float         # staged, too sparse for v1 — §7
+      main_asset_unit_count: float    # staged, too sparse for v1 — §7
+      asset_loc_unit_count: float     # staged, too sparse for v1 — §7
+      asset_loc_unit_cost_total: float  # staged, all null on this drop — §7
+
+  activity_training:
+    file: activity_training.csv
+    expected_rows: 12704
+    casts:
+      training_trainees_total: int
+      training_duration_days: int
+
+  activity_community_service:
+    file: activity_community_service.csv
+    expected_rows: 12704
+    casts:
+      community_service_duration: int
+      community_beneficiaries_expected: int
+
+  # Staged and unused: every analytical column is null (is_delegated fully null,
+  # is_shareable constant False). Registering it is a crosswalk-visible fact —
+  # "this table exists and feeds nothing" — not an oversight.
+  activity_delegation:
+    file: activity_delegation.csv
+    expected_rows: 12704
+
+  # Zero rows. This is the evidence for "no equity view in v1" (§4.4), so the
+  # table is staged rather than dropped. `expected_rows` is deliberately omitted:
+  # the runner skips a falsy expected_rows (and 0 would be a divide-by-zero in
+  # the tolerance arithmetic), so the zero-row fact is asserted in crosswalk.csv
+  # and in the WP-D1 report instead of here.
+  activity_nsap:
+    file: activity_nsap.csv
+
+  # ── evidence ───────────────────────────────────────────────────────────────
+  # longitude_raw / latitude_raw stay VARCHAR: they hold comma-joined coordinate
+  # LISTS ('83.7815807,83.7815986'), not scalars, and would fail a float cast.
+  physical_progress:
+    file: physical_progress.csv
+    expected_rows: 8267
+    casts:
+      longitude: float
+      latitude: float
+      n_coords: int
+
+  # ── dimension / decode tables ──────────────────────────────────────────────
+  dim_code:
+    file: dim_code.csv
+    expected_rows: 717
+
+  dim_lsdg_theme:
+    file: dim_lsdg_theme.csv
+    expected_rows: 17
+    casts:
+      distinct_themes: int
+      n_rows: int
+
+  dim_welfare_scheme:
+    file: dim_welfare_scheme.csv
+    expected_rows: 12
