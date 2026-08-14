@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"i:/My Drive/ASC Lab/LMIC AI Code repo/Odisha_PRDW\" && sed -E 's/\\(sk-[A-Za-z0-9_-]{6}\\)[A-Za-z0-9_-]+/\\\\1…REDACTED/' Insights/.env | sed -E 's/=\\(.{0,8}\\).*/=\\\\1…/' ; echo \"=== example ===\"; cat Insights/.env.example; echo \"=== loader ===\"; grep -n \"load_dotenv\\\\|OPENAI_API_KEY\\\\|DISCOVER_PROSE_MODEL\\\\|DISCOVER_MAX_COMPLETION\" Insights/src/phase5b_report.py Insights/src/discover_config.py | head -20)",
+      "Bash(PYTHONIOENCODING=utf-8 PRDW_EVAL_CONFIRM=1 python run_consistency_eval.py --runs 3)",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(cd \"i:/My Drive/ASC Lab/LMIC AI Code repo/Odisha_PRDW/Chatbot\" && rm -f ../_model_identity.py && grep -n \"max_completion_tokens\\\\|max_tokens\\\\|MAX_TOKENS\\\\|REASONING_MODELS\\\\|temperature\" query_router/entity_extractor.py query_router/reranker.py query_router/config.py | head -30)"
+    ],
+    "additionalDirectories": [
+      "i:\\My Drive\\ASC Lab\\LMIC AI Code repo\\Odisha_PRDW\\Insights",
+      "i:\\My Drive\\ASC Lab\\LMIC AI Code repo\\Odisha_PRDW"
+    ]
+  }
+}
