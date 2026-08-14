@@ -1,0 +1,206 @@
+======================================================================
+STEP 1: Register sources
+======================================================================
+  registered gram_panchayat: 20 rows x 8 cols
+  registered plan: 204 rows x 6 cols
+  registered planned_activity: 12,704 rows x 17 cols
+  registered activity_expenditure: 12,730 rows x 14 cols
+  registered activity_voucher: 5,976 rows x 7 cols
+  registered voucher: 12,440 rows x 10 cols
+  registered admin_approval: 2,101 rows x 12 cols
+  registered admin_approval_scheme: 2,107 rows x 10 cols
+  registered technical_approval: 2,134 rows x 12 cols
+  registered activity_fund: 12,704 rows x 17 cols
+  registered activity_asset: 12,704 rows x 21 cols
+  registered activity_training: 12,704 rows x 7 cols
+  registered activity_community_service: 12,704 rows x 5 cols
+  registered activity_delegation: 12,704 rows x 8 cols
+  registered activity_nsap: 0 rows x 6 cols
+  registered physical_progress: 8,267 rows x 11 cols
+  registered dim_code: 717 rows x 5 cols
+  registered dim_lsdg_theme: 17 rows x 4 cols
+  registered dim_welfare_scheme: 12 rows x 2 cols
+
+======================================================================
+STEP 2: Apply derived columns
+======================================================================
+  derived_columns.sql executed (stg_* views created)
+
+======================================================================
+STEP 3: Pre-view validation
+======================================================================
+Generated: 2026-08-14 11:12:35
+
+--- CHECK 1: Row counts ---
+  gram_panchayat: actual=20 expected~20 (0.0% diff) [OK]
+  plan: actual=204 expected~204 (0.0% diff) [OK]
+  planned_activity: actual=12,704 expected~12,704 (0.0% diff) [OK]
+  activity_expenditure: actual=12,730 expected~12,730 (0.0% diff) [OK]
+  activity_voucher: actual=5,976 expected~5,976 (0.0% diff) [OK]
+  voucher: actual=12,440 expected~12,440 (0.0% diff) [OK]
+  admin_approval: actual=2,101 expected~2,101 (0.0% diff) [OK]
+  admin_approval_scheme: actual=2,107 expected~2,107 (0.0% diff) [OK]
+  technical_approval: actual=2,134 expected~2,134 (0.0% diff) [OK]
+  activity_fund: actual=12,704 expected~12,704 (0.0% diff) [OK]
+  activity_asset: actual=12,704 expected~12,704 (0.0% diff) [OK]
+  activity_training: actual=12,704 expected~12,704 (0.0% diff) [OK]
+  activity_community_service: actual=12,704 expected~12,704 (0.0% diff) [OK]
+  activity_delegation: actual=12,704 expected~12,704 (0.0% diff) [OK]
+  physical_progress: actual=8,267 expected~8,267 (0.0% diff) [OK]
+  dim_code: actual=717 expected~717 (0.0% diff) [OK]
+  dim_lsdg_theme: actual=17 expected~17 (0.0% diff) [OK]
+  dim_welfare_scheme: actual=12 expected~12 (0.0% diff) [OK]
+[PASSED] CHECK 1: Row counts
+
+--- CHECK 2: Primary-key uniqueness ---
+  [OK]   gram_panchayat.gp_lgd_code: unique
+  [OK]   plan.plan_code: unique
+  [OK]   planned_activity.activity_code: unique
+  [OK]   voucher.voucher_pk: unique
+  [OK]   activity_expenditure.expenditure_id: unique
+  [OK]   admin_approval.row_id: unique
+  [OK]   admin_approval_scheme.row_id: unique
+  [OK]   technical_approval.row_id: unique
+  [OK]   physical_progress.row_id: unique
+  [OK]   activity_asset.activity_code: unique
+  [OK]   activity_fund.activity_code: unique
+  [OK]   activity_training.activity_code: unique
+  [OK]   activity_community_service.activity_code: unique
+  [OK]   activity_delegation.activity_code: unique
+  [OK]   dim_lsdg_theme.focus_area_name: unique
+  [OK]   dim_welfare_scheme.scheme_code: unique
+[PASSED] CHECK 2: Primary-key uniqueness
+
+--- CHECK 3: Foreign-key integrity ---
+  planned_activity.gp_lgd_code -> gram_panchayat.gp_lgd_code: 0/12,704 orphans (0.0%)
+  plan.gp_lgd_code -> gram_panchayat.gp_lgd_code: 0/204 orphans (0.0%)
+  voucher.gp_lgd_code -> gram_panchayat.gp_lgd_code: 0/12,440 orphans (0.0%)
+  activity_expenditure.gp_lgd_code -> gram_panchayat.gp_lgd_code: 0/12,730 orphans (0.0%)
+  activity_voucher.gp_lgd_code -> gram_panchayat.gp_lgd_code: 0/5,976 orphans (0.0%)
+  admin_approval.gp_lgd_code -> gram_panchayat.gp_lgd_code: 0/2,101 orphans (0.0%)
+  technical_approval.gp_lgd_code -> gram_panchayat.gp_lgd_code: 0/2,134 orphans (0.0%)
+  planned_activity.plan_code -> plan.plan_code: 0/12,704 orphans (0.0%)
+  activity_asset.activity_code -> planned_activity.activity_code: 0/12,704 orphans (0.0%)
+  activity_fund.activity_code -> planned_activity.activity_code: 0/12,704 orphans (0.0%)
+  activity_training.activity_code -> planned_activity.activity_code: 0/12,704 orphans (0.0%)
+  activity_community_service.activity_code -> planned_activity.activity_code: 0/12,704 orphans (0.0%)
+  activity_delegation.activity_code -> planned_activity.activity_code: 0/12,704 orphans (0.0%)
+  physical_progress.activity_code -> planned_activity.activity_code: 0/8,267 orphans (0.0%)
+  admin_approval.activity_code -> planned_activity.activity_code: 0/2,101 orphans (0.0%)
+  admin_approval_scheme.activity_code -> planned_activity.activity_code: 0/2,107 orphans (0.0%)
+  admin_approval_scheme.activity_code -> admin_approval.activity_code: 0/2,107 orphans (0.0%)
+  technical_approval.activity_code -> planned_activity.activity_code: 0/2,134 orphans (0.0%)
+  activity_voucher.expenditure_id -> activity_expenditure.expenditure_id: 0/5,976 orphans (0.0%)
+  stg_activity_voucher.voucher_pk_norm -> voucher.voucher_pk: 0/5,488 orphans (0.0%)
+[PASSED] CHECK 3: Foreign-key integrity
+
+--- CHECK 4: Null rates (columns with >20% nulls) ---
+  plan.plan_code_status: 100.0% null
+  planned_activity.total_cost: 55.7% null
+  planned_activity.operation_type: 97.3% null
+  planned_activity.operation_remarks: 98.6% null
+  activity_expenditure.scheme_name: 82.3% null
+  activity_expenditure.approved_cost_action_plan: 55.6% null
+  activity_expenditure.technical_approved_cost: 82.7% null
+  activity_expenditure.admin_approved_cost: 82.3% null
+  activity_expenditure.general: 82.5% null
+  activity_expenditure.sc: 99.9% null
+  activity_expenditure.st: 100.0% null
+  admin_approval_scheme.fund_sanctioned_sc: 99.9% null
+  admin_approval_scheme.fund_sanctioned_st: 99.1% null
+  activity_fund.fund_scheme_code: 55.7% null
+  activity_fund.fund_component_code: 55.7% null
+  activity_fund.fund_tied_general: 55.7% null
+  activity_fund.fund_tied_sc: 55.7% null
+  activity_fund.fund_tied_st: 55.7% null
+  activity_fund.fund_untied_general: 55.7% null
+  activity_fund.fund_untied_sc: 55.7% null
+  activity_fund.fund_untied_st: 55.7% null
+  activity_fund.fund_amount_total: 55.7% null
+  activity_fund.fund_tied_abandoned_general: 96.5% null
+  activity_fund.fund_tied_abandoned_sc: 96.5% null
+  activity_fund.fund_tied_abandoned_st: 96.5% null
+  activity_fund.fund_untied_abandoned_general: 96.5% null
+  activity_fund.fund_untied_abandoned_sc: 96.5% null
+  activity_fund.fund_untied_abandoned_st: 96.5% null
+  activity_fund.fund_overflow_json: 100.0% null
+  activity_asset.main_asset_category: 90.9% null
+  activity_asset.main_asset_subcategory: 89.7% null
+  activity_asset.main_asset_unit_type: 89.7% null
+  activity_asset.main_asset_unit_count: 89.7% null
+  activity_asset.asset_type: 66.3% null
+  activity_asset.asset_category: 66.3% null
+  activity_asset.asset_subcategory: 66.3% null
+  activity_asset.asset_coverage_code: 66.3% null
+  activity_asset.asset_name: 100.0% null
+  activity_asset.asset_unit_type: 66.3% null
+  activity_asset.asset_unit_count: 66.3% null
+  activity_asset.asset_unit_cost: 69.8% null
+  activity_asset.asset_parameter_type: 71.4% null
+  activity_asset.asset_details_raw: 100.0% null
+  activity_asset.asset_loc_code: 66.3% null
+  activity_asset.asset_loc_unit_code: 100.0% null
+  activity_asset.asset_loc_unit_type: 100.0% null
+  activity_asset.asset_loc_unit_count: 66.3% null
+  activity_asset.asset_loc_unit_cost_total: 100.0% null
+  activity_asset.asset_loc_overflow_json: 99.6% null
+  activity_training.training_capacity_raw: 100.0% null
+  activity_training.training_category_code: 91.9% null
+  activity_training.training_organiser_code: 91.9% null
+  activity_training.training_subject: 91.9% null
+  activity_training.training_trainees_total: 91.9% null
+  activity_training.training_duration_days: 91.9% null
+  activity_community_service.community_service_raw: 100.0% null
+  activity_community_service.community_service_code: 94.0% null
+  activity_community_service.community_service_duration: 94.0% null
+  activity_community_service.community_beneficiaries_expected: 94.0% null
+  activity_delegation.is_delegated: 100.0% null
+  activity_delegation.delegated_unit_code: 100.0% null
+  activity_delegation.delegated_unit_type: 100.0% null
+  activity_delegation.delegated_unit_level: 100.0% null
+  activity_delegation.delegated_unit_category: 100.0% null
+  activity_delegation.delegated_parent_unit_code: 100.0% null
+  dim_code.description: 32.5% null
+  dim_code.confidence: 35.3% null
+
+--- CHECK 5: Categorical value domains ---
+  voucher.direction: ['payment', 'receipt']
+  plan.plan_type: ['Main', 'Supplementary']
+  technical_approval.tec_approval_required: ['N', 'R']
+  planned_activity.is_costless_activity: ['0', '1']
+  stg_planned_activity.is_costless: ['Costed', 'Costless']
+  stg_approval.tied_untied: ['Other', 'Tied', 'Untied']
+[PASSED] CHECK 5: Categorical value domains
+
+--- CHECK 6: Date ranges (span 1-10 yrs) ---
+  stg_voucher.date_ts: 2020-04-01 -> 2026-03-31 (6.0 yrs)
+  stg_activity_voucher.voucher_date_ts: 2020-11-27 -> 2026-08-03 (5.7 yrs)
+  stg_admin_approval.adm_approval_sanction_date_ts: 2019-10-02 -> 2026-08-19 (6.9 yrs)
+  stg_technical_approval.tec_approval_order_date_ts: 2019-03-13 -> 2026-07-09 (7.3 yrs)
+  stg_plan.approval_date_ts: 2019-10-02 -> 2026-06-10 (6.7 yrs)
+[PASSED] CHECK 6: Date ranges
+
+======================================================================
+STEP 4: Build views
+======================================================================
+  built view1_activity_lifecycle: 12,704 rows -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\af8add88-3cac-461b-8d13-59fde0aaead7\scratchpad\wpd1\Insights\views_prdw\view1_activity_lifecycle.parquet
+  built view2_geo_month_cube: 1,440 rows -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\af8add88-3cac-461b-8d13-59fde0aaead7\scratchpad\wpd1\Insights\views_prdw\view2_geo_month_cube.parquet
+  built view3_gp_performance: 120 rows -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\af8add88-3cac-461b-8d13-59fde0aaead7\scratchpad\wpd1\Insights\views_prdw\view3_gp_performance.parquet
+
+======================================================================
+STEP 5: Profile views
+======================================================================
+  view summaries -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\af8add88-3cac-461b-8d13-59fde0aaead7\scratchpad\wpd1\Insights\reports_prdw\view_summaries.txt
+
+======================================================================
+STEP 6: Post-view checks
+======================================================================
+  view1_activity_lifecycle: 12,704 rows (expected ~12,704, 0.0% diff)
+  view1_activity_lifecycle: grain ['activity_code'] unique
+[PASSED] POST-VIEW: view1_activity_lifecycle
+  view2_geo_month_cube: 1,440 rows (expected ~1,440, 0.0% diff)
+  view2_geo_month_cube: grain ['gp_lgd_code', 'month'] unique
+[PASSED] POST-VIEW: view2_geo_month_cube
+  view3_gp_performance: 120 rows (expected ~120, 0.0% diff)
+  view3_gp_performance: grain ['gp_lgd_code', 'fiscal_year'] unique
+[PASSED] POST-VIEW: view3_gp_performance

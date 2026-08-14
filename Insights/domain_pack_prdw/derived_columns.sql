@@ -137,10 +137,21 @@ FROM voucher v;
 -- 2026-04 onward, beyond the cashbook's coverage (§8.1). They are NOT filtered
 -- here — view2's derived calendar ends where the cashbook ends, so they fall
 -- outside it structurally, and the crosswalk/report state the arithmetic.
+--
+-- voucher_pk_norm — NEW DEFECT, found in WP-D1, not in DISCOVER_VIEW_MAPPING §8.
+-- activity_voucher stores voucher_pk in float text form ('186.0') while voucher
+-- stores it as integer text ('1'). Compared as VARCHAR the two NEVER match:
+-- 0 of the 5,488 non-null links join, not 5,488 of 5,488. The normalisation is
+-- v_asset's own double-cast idiom, applied to the same class of problem, and it
+-- recovers all 5,488 links exactly. Nothing is repaired in the data and no
+-- measure depends on this column — no view projects it. It exists so the
+-- foreign key can be declared and checked (validation.yaml CHECK 3) instead of
+-- the defect sitting silently between two tables.
 CREATE OR REPLACE VIEW stg_activity_voucher AS
 SELECT av.*,
-       DATE_TRUNC('month', av.voucher_date)     AS voucher_month_start,
-       CAST(av.voucher_date AS TIMESTAMP)       AS voucher_date_ts
+       DATE_TRUNC('month', av.voucher_date)              AS voucher_month_start,
+       CAST(av.voucher_date AS TIMESTAMP)                AS voucher_date_ts,
+       CAST(CAST(av.voucher_pk AS BIGINT) AS VARCHAR)    AS voucher_pk_norm
 FROM activity_voucher av;
 
 

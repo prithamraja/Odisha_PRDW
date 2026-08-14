@@ -1,0 +1,183 @@
+table,column,role,cast,used_in_views,output_columns,fill_pct,n_distinct,exclusion_reason,note
+gram_panchayat,gp_lgd_code,dim,varchar,view1_activity_lifecycle; view2_geo_month_cube; view3_gp_performance,gp_lgd_code,100.0,20,,the join spine of every view and the grain of views 2 and 3
+gram_panchayat,gp_name,dim,varchar,view1_activity_lifecycle; view2_geo_month_cube; view3_gp_performance,gp_name,100.0,20,,
+gram_panchayat,state_code,X-const,varchar,,,100.0,1,constant in this drop (Odisha only),staged for statewide continuity
+gram_panchayat,state_name,X-const,varchar,,,100.0,1,constant in this drop (Odisha only),staged for statewide continuity
+gram_panchayat,district_code,dim,varchar,view1_activity_lifecycle; view2_geo_month_cube; view3_gp_performance,district_code,100.0,9,,
+gram_panchayat,zp_name,dim,varchar,view1_activity_lifecycle; view2_geo_month_cube; view3_gp_performance,district_name,100.0,9,,"renamed district_name, as v_activity does"
+gram_panchayat,block_code,dim,varchar,view1_activity_lifecycle; view2_geo_month_cube; view3_gp_performance,block_code,100.0,16,,
+gram_panchayat,block_name,dim,varchar,view1_activity_lifecycle; view2_geo_month_cube; view3_gp_performance,block_name,100.0,16,,
+plan,plan_code,grain,varchar,,,100.0,204,"plan grain; view3 exposes the COUNT, not the code",n_plans
+plan,gp_lgd_code,join,varchar,view3_gp_performance,,100.0,20,,attributes n_plans to a GP
+plan,fiscal_year,dim,varchar,view3_gp_performance,fiscal_year,100.0,6,,one of the three sources of stg_fiscal_year_domain
+plan,plan_type,dim,varchar,,,100.0,2,"Main/Supplementary is a plan-grain attribute; view3 is GP x FY, where a cell can hold both",CHECK 5 asserts the domain
+plan,approval_date,temp,date,,,100.0,146,"non-null on all 204 rows, so is_approved is constant 1 here",CHECK 6 reads it via stg_plan.approval_date_ts
+plan,plan_code_status,X-empty,varchar,,,0.0,0,always null (known generated placeholder) - §8.6,
+planned_activity,activity_code,grain,varchar,view1_activity_lifecycle,activity_code,100.0,12704,,view1's grain; the unique_grain post-view check
+planned_activity,plan_code,join,varchar,,,100.0,202,consumed by the plan FK check; no analytical role,
+planned_activity,gp_lgd_code,join,varchar,view1_activity_lifecycle; view2_geo_month_cube; view3_gp_performance,,100.0,20,,consumed into the geography block
+planned_activity,fiscal_year,dim,varchar,view1_activity_lifecycle; view3_gp_performance,fiscal_year,100.0,6,,CATEGORICAL in view1 - §5 routes temporal mining to view2
+planned_activity,source_file,X-id,varchar,,,100.0,6,"ingestion provenance, no analytical role",
+planned_activity,activity_type,decode-dim,varchar,view1_activity_lifecycle,activity_type_label,100.0,2,,dim_code variable activity_type
+planned_activity,activity_name,join,varchar,,,100.0,2177,free text; feeds Ask's search_text only - §9.6,
+planned_activity,activity_desc,join,varchar,,,100.0,11653,free text; feeds Ask's search_text only - §9.6,
+planned_activity,focus_area,decode-dim,varchar,view1_activity_lifecycle,focus_area_name; theme,100.0,30,,also the join to dim_lsdg_theme
+planned_activity,activity_for,decode-dim,varchar,view1_activity_lifecycle,activity_for_label,100.0,4,,
+planned_activity,work_type,decode-dim,varchar,view1_activity_lifecycle,work_type_label,100.0,4,,code 142 has no description -> 'Unknown'
+planned_activity,is_costless_activity,dim,varchar,view1_activity_lifecycle,is_costless,100.0,2,,0/1 raw; view1 exposes the Costed/Costless label (§2)
+planned_activity,total_cost,meas,float,view1_activity_lifecycle; view3_gp_performance,total_cost; planned_cost,44.3,1033,,PLANNED basis; null <=> costless
+planned_activity,operation_type,X-empty,varchar,,,2.7,7,97.3% null,
+planned_activity,operation_remarks,X-empty,varchar,,,1.4,137,98.6% null,
+planned_activity,output_type,decode-dim,varchar,view1_activity_lifecycle,output_type_label,100.0,8,,all 8 codes lack a dim_code description -> every label is 'Code 1NN'
+planned_activity,activity_status,decode-dim,varchar,view1_activity_lifecycle,status_label,100.0,6,,carries the 'Buildings' mis-decode (13) and the tab-prefixed WORK COMPLETED (17) - §8.3
+activity_expenditure,expenditure_id,grain,varchar,,,100.0,12730,expenditure grain; stg_exp_rollup collapses it to the activity,also the activity_voucher FK parent
+activity_expenditure,activity_code,join,varchar,,,100.0,12724,20 codes have no planned_activity parent - the FK is deliberately NOT declared,
+activity_expenditure,plan_code,join,varchar,,,100.0,204,redundant with planned_activity,
+activity_expenditure,gp_lgd_code,join,varchar,,,100.0,20,redundant with planned_activity; FK-checked,
+activity_expenditure,fiscal_year,dim,varchar,,,100.0,6,equals planned_activity.fiscal_year on every matched row; view1/view3 use the activity's,
+activity_expenditure,s_no,X-id,varchar,,,100.0,431,source line number,
+activity_expenditure,scheme_name,X-empty,varchar,,,17.7,5,82.3% null - superseded by sanctioned_scheme_name (§2),v_activity carries it; Discover does not
+activity_expenditure,approved_cost_action_plan,meas,float,view1_activity_lifecycle,approved_cost_action_plan,44.4,1046,,
+activity_expenditure,technical_approved_cost,meas,float,view1_activity_lifecycle,technical_approved_cost,17.3,620,,
+activity_expenditure,admin_approved_cost,meas,float,view1_activity_lifecycle,admin_approved_cost,17.7,620,,also drives has_approval_cost_only (140 activities)
+activity_expenditure,general,meas,float,view1_activity_lifecycle,gen_amount,17.5,616,,v_exp naming
+activity_expenditure,sc,meas,float,view1_activity_lifecycle,sc_amount,0.1,11,,19 non-null rows sample-wide (§4.4)
+activity_expenditure,st,meas,float,view1_activity_lifecycle,st_amount,0.0,2,,2 non-null rows sample-wide (§4.4)
+activity_expenditure,total_expenditure,meas,float,view1_activity_lifecycle; view3_gp_performance,total_expenditure; expenditure_total; overspend_vs_plan; overspend_vs_sanction,100.0,1291,,SPENT basis; == linked voucher sums exactly
+activity_voucher,expenditure_id,join,varchar,,,100.0,1917,links a voucher to an expenditure row,
+activity_voucher,voucher_pk,join,varchar,,,91.8,4155,"488 null + 5,488 float-text values that never match voucher.voucher_pk as VARCHAR - see stg_activity_voucher.voucher_pk_norm",NEW defect found in WP-D1
+activity_voucher,gp_lgd_code,join,varchar,view2_geo_month_cube,,100.0,20,,attributes activity_linked_expenditure to a GP
+activity_voucher,fiscal_year,dim,varchar,,,100.0,7,the only place '2026-2027' exists (488 orphan rows); view2 derives FY from the calendar month instead,§8.1
+activity_voucher,voucher_no,X-id,varchar,,,100.0,711,document number,
+activity_voucher,voucher_date,temp,date,view2_geo_month_cube,month; quarter; fiscal_year,100.0,1009,,attributes linked spend to a cash month
+activity_voucher,voucher_cost,meas,float,view2_geo_month_cube,activity_linked_expenditure,100.0,3282,,SPENT basis on the cash timeline
+voucher,voucher_pk,grain,varchar,,,100.0,12440,"cashbook grain; view2 exposes counts, not keys",
+voucher,gp_lgd_code,join,varchar,view2_geo_month_cube; view3_gp_performance,,100.0,20,,attributes cash flows to a GP
+voucher,fiscal_year,dim,varchar,view3_gp_performance,fiscal_year,100.0,6,,one of the three sources of stg_fiscal_year_domain
+voucher,voucher_no,X-id,varchar,,,100.0,3150,document number,
+voucher,voucher_id,X-id,varchar,,,100.0,12323,system identifier,
+voucher,direction,dim,varchar,view2_geo_month_cube,payment_amount; receipt_amount; payment_count; receipt_count,100.0,2,,"splits every cashbook measure; CHECK 5 asserts [payment, receipt]"
+voucher,type,dim,varchar,,,100.0,7,"7 transaction types; an OPEN domain, so not asserted and not exposed as a v1 dimension",profiled every build
+voucher,date,temp,date,view2_geo_month_cube,month; quarter; fiscal_year,100.0,1645,,DERIVES the whole view2 calendar (min..max month)
+voucher,month,X-derived,varchar,,,100.0,12,"month-name string, redundant with date - §8.7",
+voucher,amount,meas,float,view2_geo_month_cube; view3_gp_performance,payment_amount; receipt_amount,100.0,5828,,CASHBOOK basis
+admin_approval,row_id,X-id,varchar,,,100.0,2101,source row identifier (declared as the PK),
+admin_approval,gp_lgd_code,join,varchar,view2_geo_month_cube,,100.0,19,,attributes sanctions to a GP in view2
+admin_approval,gp_name,X-derived,varchar,,,100.0,19,denormalised; joins use codes - §8.9,
+admin_approval,plan_year,temp,varchar,view1_activity_lifecycle; view3_gp_performance,,100.0,6,,"'YYYY' -> 'YYYY-YYYY'; equals planned_activity.fiscal_year on all 2,101 rows"
+admin_approval,doc_type,X-id,varchar,,,100.0,1,ingestion provenance,
+admin_approval,source_file,X-id,varchar,,,100.0,6,ingestion provenance,
+admin_approval,activity_code,join,varchar,,,100.0,2101,the approval-to-activity link,
+admin_approval,work_plan_year,X-derived,varchar,,,100.0,6,identical to plan_year on every row,
+admin_approval,adm_approval_no,X-id,varchar,,,100.0,356,document number - §9.6,
+admin_approval,adm_approval_sanction_date,temp,date,view2_geo_month_cube,month; quarter; fiscal_year,100.0,802,,attributes sanctions to a month; one value is future-dated (§8.2). NOT projected by view1 - §4.1 carries no temporal dimension
+admin_approval,work_proposed_cost,meas,float,view1_activity_lifecycle; view2_geo_month_cube; view3_gp_performance,work_proposed_cost; work_proposed_amount,100.0,583,,SANCTIONED basis
+admin_approval,adm_approval_authority,join,varchar,view1_activity_lifecycle,sanction_authority,100.0,33,,free text consumed into authority_clean; the raw form never leaves derived_columns.sql - §9.6
+admin_approval_scheme,row_id,X-id,varchar,,,100.0,2107,source row identifier (declared as the PK),
+admin_approval_scheme,parent_row_id,X-id,varchar,,,100.0,2101,link to admin_approval.row_id,
+admin_approval_scheme,pos,X-id,varchar,,,100.0,2,position within the parent record,
+admin_approval_scheme,activity_code,join,varchar,,,100.0,2101,6 duplicates - the multi-scheme approvals the ARG_MAX rollup collapses,
+admin_approval_scheme,scheme_code,decode-dim,varchar,view1_activity_lifecycle,sanctioned_scheme_name,100.0,5,,ARG_MAX by fund_sanctioned_total
+admin_approval_scheme,scheme_component_code,decode-dim,varchar,view1_activity_lifecycle,fund_component_name; tied_untied,100.0,8,,4249 Tied / 4211+4250 Untied / else Other
+admin_approval_scheme,fund_sanctioned_general,meas,float,view1_activity_lifecycle,fund_sanctioned_general,99.0,583,,
+admin_approval_scheme,fund_sanctioned_sc,meas,float,view1_activity_lifecycle,fund_sanctioned_sc,0.1,2,,₹0.44M sample-wide - thin (§4.4)
+admin_approval_scheme,fund_sanctioned_st,meas,float,view1_activity_lifecycle,fund_sanctioned_st,0.9,11,,₹3.23M sample-wide - thin (§4.4)
+admin_approval_scheme,fund_sanctioned_total,meas,float,view1_activity_lifecycle; view2_geo_month_cube; view3_gp_performance,fund_sanctioned_total; sanctioned_amount; sanctioned_total; overspend_vs_sanction,100.0,586,,"SANCTIONED basis, headline measure"
+technical_approval,row_id,X-id,varchar,,,100.0,2134,source row identifier (declared as the PK),
+technical_approval,gp_lgd_code,join,varchar,,,100.0,19,FK-checked; geography comes from the activity,
+technical_approval,gp_name,X-derived,varchar,,,100.0,19,denormalised - §8.9,
+technical_approval,plan_year,X-derived,varchar,,,100.0,6,redundant with the activity's fiscal year,
+technical_approval,doc_type,X-id,varchar,,,100.0,1,ingestion provenance,
+technical_approval,source_file,X-id,varchar,,,100.0,6,ingestion provenance,
+technical_approval,activity_code,join,varchar,,,100.0,2134,"joined onto the ADMIN approval, as v_approval does",
+technical_approval,tec_approval_required,dim,varchar,view1_activity_lifecycle,tec_approval_required,100.0,2,,"CHECK 5 asserts [R, N]"
+technical_approval,tec_approval_cost,meas,float,view1_activity_lifecycle,tec_approval_cost,96.5,586,,SANCTIONED basis
+technical_approval,tec_approval_authority,join,varchar,,,100.0,39,"free text, excluded - §9.6",
+technical_approval,tec_approval_order_no,X-id,varchar,,,100.0,327,document number - §9.6,
+technical_approval,tec_approval_order_date,temp,date,,,100.0,772,view1 carries no temporal dimension (§4.1),CHECK 6 reads it via stg_technical_approval
+activity_fund,activity_code,join,varchar,,,100.0,12704,1:1 with planned_activity,
+activity_fund,fund_scheme_code,decode-dim,varchar,view1_activity_lifecycle,planned_fund_scheme_name,44.3,21,,"sparse candidate (44% populated) - staged, sample configs omit it (§9.7)"
+activity_fund,fund_component_code,decode-dim,varchar,view1_activity_lifecycle,planned_fund_component_name,44.3,29,,"sparse candidate (44% populated) - staged, sample configs omit it (§9.7)"
+activity_fund,fund_tied_general,meas,float,view1_activity_lifecycle,fund_tied_general; fund_tied_total,44.3,504,,
+activity_fund,fund_tied_sc,meas,float,view1_activity_lifecycle,fund_tied_sc; fund_tied_total,44.3,5,,
+activity_fund,fund_tied_st,meas,float,view1_activity_lifecycle,fund_tied_st; fund_tied_total,44.3,12,,
+activity_fund,fund_untied_general,meas,float,view1_activity_lifecycle,fund_untied_general; fund_untied_total,44.3,627,,
+activity_fund,fund_untied_sc,meas,float,view1_activity_lifecycle,fund_untied_sc; fund_untied_total,44.3,6,,
+activity_fund,fund_untied_st,meas,float,view1_activity_lifecycle,fund_untied_st; fund_untied_total,44.3,17,,
+activity_fund,fund_amount_total,meas,float,,,44.3,1033,"identical to planned_activity.total_cost in aggregate (₹773,088,536) and per activity; view1 carries total_cost",the reconciliation identity of §3
+activity_fund,fund_tied_abandoned_general,meas,float,view1_activity_lifecycle,fund_abandoned_total,3.5,69,,
+activity_fund,fund_tied_abandoned_sc,meas,float,view1_activity_lifecycle,fund_abandoned_total,3.5,1,,
+activity_fund,fund_tied_abandoned_st,meas,float,view1_activity_lifecycle,fund_abandoned_total,3.5,4,,
+activity_fund,fund_untied_abandoned_general,meas,float,view1_activity_lifecycle,fund_abandoned_total,3.5,70,,
+activity_fund,fund_untied_abandoned_sc,meas,float,view1_activity_lifecycle,fund_abandoned_total,3.5,3,,
+activity_fund,fund_untied_abandoned_st,meas,float,view1_activity_lifecycle,fund_abandoned_total,3.5,10,,
+activity_fund,fund_overflow_json,X-empty,varchar,,,0.0,2,"2 non-null rows: multi-scheme funding squeezed into one row; the 1:1 fold loses that split for exactly 2 activities - accepted, §8.8",
+activity_asset,activity_code,join,varchar,,,100.0,12704,1:1 with planned_activity,
+activity_asset,main_asset_category,X-sparse,varchar,,,9.1,21,"90.9% null - too sparse for v1, revisit statewide",
+activity_asset,main_asset_subcategory,X-sparse,varchar,,,10.3,132,"89.7% null - too sparse for v1, revisit statewide",
+activity_asset,main_asset_unit_type,X-sparse,varchar,,,10.3,3,89.7% null - too sparse for v1,
+activity_asset,main_asset_unit_count,X-sparse,float,,,10.3,30,89.7% null - too sparse for v1,
+activity_asset,asset_type,decode-dim,varchar,view1_activity_lifecycle,asset_type_label,33.7,2,,decoded with v_asset's double cast
+activity_asset,asset_category,decode-dim,varchar,view1_activity_lifecycle,asset_category_label,33.7,36,,decoded with v_asset's double cast
+activity_asset,asset_subcategory,X-sparse,varchar,,,33.7,203,"66.3% null and 198 codes, 56 without a description - too sparse for v1 (§7, §9.7)",
+activity_asset,asset_coverage_code,X-const,varchar,,,33.7,1,single value across every populated row,
+activity_asset,asset_name,X-empty,varchar,,,0.0,0,100% null,
+activity_asset,asset_unit_type,X-sparse,varchar,,,33.7,3,66.3% null - too sparse for v1,
+activity_asset,asset_unit_count,X-sparse,float,,,33.7,47,66.3% null - too sparse for v1,
+activity_asset,asset_unit_cost,meas,float,view1_activity_lifecycle,asset_unit_cost,30.2,721,,"candidate measure, 30.2% populated (§7)"
+activity_asset,asset_parameter_type,X-sparse,varchar,,,28.6,198,"71.5% null, 193 codes, 74 without a description",
+activity_asset,asset_details_raw,X-empty,varchar,,,0.0,0,100% null,
+activity_asset,asset_loc_code,X-sparse,varchar,,,33.7,122,66.3% null - too sparse for v1,
+activity_asset,asset_loc_unit_code,X-empty,varchar,,,0.0,0,100% null,
+activity_asset,asset_loc_unit_type,X-empty,varchar,,,0.0,0,100% null,
+activity_asset,asset_loc_unit_count,X-sparse,float,,,33.7,26,66.3% null - too sparse for v1,
+activity_asset,asset_loc_unit_cost_total,X-empty,float,,,0.0,0,100% null,
+activity_asset,asset_loc_overflow_json,X-empty,varchar,,,0.4,35,99.6% null (54 rows) - §7 records it as X-empty; measured non-zero in WP-D1,
+activity_training,activity_code,join,varchar,,,100.0,12704,1:1 with planned_activity,
+activity_training,training_capacity_raw,X-empty,varchar,,,0.0,0,100% null,
+activity_training,training_category_code,decode-dim,varchar,view1_activity_lifecycle,training_category_label,8.1,6,,"sparse candidate (8.1% populated) - staged, sample configs omit it (§9.7)"
+activity_training,training_organiser_code,decode-dim,varchar,view1_activity_lifecycle,training_organiser_label,8.1,4,,"sparse candidate (8.1% populated) - staged, sample configs omit it (§9.7)"
+activity_training,training_subject,X-id,varchar,,,8.1,591,free text - §9.6,
+activity_training,training_trainees_total,meas,int,view1_activity_lifecycle,trainees_total,8.1,91,,"127,588 trainees across 1,034 activities"
+activity_training,training_duration_days,meas,int,view1_activity_lifecycle,training_days,8.1,34,,
+activity_community_service,activity_code,join,varchar,,,100.0,12704,1:1 with planned_activity,
+activity_community_service,community_service_raw,X-empty,varchar,,,0.0,0,100% null,
+activity_community_service,community_service_code,decode-dim,varchar,view1_activity_lifecycle,community_service_label,6.0,3,,"sparse candidate (6.0% populated), no dim_code descriptions - staged, sample configs omit it (§9.7)"
+activity_community_service,community_service_duration,meas,int,view1_activity_lifecycle,community_service_days,6.0,37,,
+activity_community_service,community_beneficiaries_expected,meas,int,view1_activity_lifecycle,beneficiaries_expected,6.0,88,,"206,929 expected beneficiaries across 763 activities"
+activity_delegation,activity_code,join,varchar,,,100.0,12704,1:1 with planned_activity; the table feeds nothing,
+activity_delegation,is_delegated,X-empty,varchar,,,0.0,0,100% null,
+activity_delegation,delegated_unit_code,X-empty,varchar,,,0.0,0,100% null,
+activity_delegation,delegated_unit_type,X-empty,varchar,,,0.0,0,100% null,
+activity_delegation,delegated_unit_level,X-empty,varchar,,,0.0,0,100% null,
+activity_delegation,delegated_unit_category,X-empty,varchar,,,0.0,0,100% null,
+activity_delegation,is_shareable,X-const,varchar,,,88.9,1,"constant False where populated (11,289 rows), null elsewhere",
+activity_delegation,delegated_parent_unit_code,X-empty,varchar,,,0.0,0,100% null,
+activity_nsap,nsap_id,X-empty,varchar,,,0.0,0,table has zero rows,the evidence for 'no equity view in v1' - §4.4
+activity_nsap,activity_code,X-empty,varchar,,,0.0,0,table has zero rows,
+activity_nsap,category,X-empty,varchar,,,0.0,0,table has zero rows,
+activity_nsap,age_band,X-empty,varchar,,,0.0,0,table has zero rows,
+activity_nsap,gender,X-empty,varchar,,,0.0,0,table has zero rows,
+activity_nsap,beneficiary_count,X-empty,varchar,,,0.0,0,table has zero rows,
+physical_progress,row_id,X-id,varchar,,,100.0,8267,source row identifier (declared as the PK),
+physical_progress,parent_row_id,X-id,varchar,,,100.0,1866,link to the parent record,
+physical_progress,pos,X-id,varchar,,,100.0,210,position within the parent record,
+physical_progress,activity_code,join,varchar,,,100.0,1675,the evidence-to-activity link,
+physical_progress,file_upload_id,meas,varchar,view1_activity_lifecycle; view3_gp_performance,evidence_uploads; n_with_evidence; has_progress_evidence,100.0,8267,,"counted, never exposed: 8,267 uploads on 1,675 activities"
+physical_progress,longitude,X-id,float,,,100.0,4162,evidence coordinate; Ask's v_progress serves it,
+physical_progress,latitude,X-id,float,,,100.0,4129,evidence coordinate; Ask's v_progress serves it,
+physical_progress,n_coords,X-id,int,,,100.0,6,coordinate-list length,
+physical_progress,longitude_raw,X-id,varchar,,,100.0,4233,"comma-joined coordinate LIST, not a scalar - stays VARCHAR",
+physical_progress,latitude_raw,X-id,varchar,,,100.0,4195,"comma-joined coordinate LIST, not a scalar - stays VARCHAR",
+physical_progress,plan_unit_type_code,X-const,varchar,,,100.0,1,"single value across all 8,267 rows",
+dim_code,variable,decode,varchar,view1_activity_lifecycle,,100.0,23,,half of the composite decode key
+dim_code,code,decode,varchar,view1_activity_lifecycle,,100.0,463,,half of the composite decode key
+dim_code,description,decode,varchar,view1_activity_lifecycle,focus_area_name; status_label; work_type_label; activity_type_label; activity_for_label; output_type_label; asset_category_label; asset_type_label; sanctioned_scheme_name; fund_component_name; planned_fund_scheme_name; planned_fund_component_name; training_category_label; training_organiser_label; community_service_label,67.5,227,,233 of 717 codes have none -> 'Code N' / 'Unknown' / 'Uncategorised' labels reach findings (§8.5)
+dim_code,source,X-id,varchar,,,100.0,6,decode provenance,drives the §8.5 logging
+dim_code,confidence,X-id,varchar,,,64.7,2,decode provenance,drives the §8.5 logging
+dim_lsdg_theme,focus_area_name,decode,varchar,view1_activity_lifecycle,,100.0,17,,"joins to dim_code.description, not to a code"
+dim_lsdg_theme,lsdg_theme,decode,varchar,view1_activity_lifecycle,theme,100.0,6,,"'Theme 5 - Clean and Green Village ' carries a trailing space - logged, NOT trimmed (§8)"
+dim_lsdg_theme,distinct_themes,X-derived,int,,,100.0,3,profiling artefact of the source extract,
+dim_lsdg_theme,n_rows,X-derived,int,,,100.0,13,profiling artefact of the source extract,
+dim_welfare_scheme,scheme_code,decode,varchar,,,100.0,12,"referenced by no populated column in this drop - welfare tagging arrives with NSAP data, if ever (§7)",
+dim_welfare_scheme,scheme_name,decode,varchar,,,100.0,12,referenced by no populated column in this drop,

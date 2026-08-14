@@ -1,0 +1,193 @@
+# =============================================================================
+# domain_pack_prdw / validation.yaml
+# =============================================================================
+# CHECKS LOG; THEY NEVER FIX. Data-quality issues in this drop are analytically
+# meaningful and must flow through to the views untouched.
+#
+# THE --strict RULE APPLIED HERE. `--strict` exits non-zero if ANY declared check
+# fails, so a pack that declares a constraint the data is known to violate makes
+# the build permanently red and teaches everyone to ignore it. The rule this file
+# follows is therefore: DECLARE ONLY CONSTRAINTS THAT ACTUALLY HOLD. Every known
+# violation is instead measured and reported — the list below is exhaustive, and
+# handoffs/WPD1_REPORT.md §3 carries the same list with its counts.
+#
+# DELIBERATELY NOT DECLARED, with the measured reason:
+#
+#   FK activity_expenditure.activity_code -> planned_activity.activity_code
+#       20 orphan rows / 20 distinct codes (12,724 expenditure codes vs 12,704
+#       activities). DISCOVER_VIEW_MAPPING §8. They carry ₹0.00 of
+#       total_expenditure between them, so view1's SPENT total is unaffected;
+#       ₹3,092,854.00 of approved_cost_action_plan does depart with them.
+#
+#   FK activity_voucher.voucher_pk -> voucher.voucher_pk
+#       Two failures in one column, so the RAW form is undeclarable:
+#         * 488 rows have a NULL voucher_pk (fiscal_year '2026-2027', dates from
+#           2026-04-09, past the cashbook's end) — §8.1;
+#         * the other 5,488 are stored as float text ('186.0') against voucher's
+#           integer text ('1') and match on ZERO rows as VARCHAR — a defect
+#           found in WP-D1 and NOT in §8.
+#       The normalised key IS declared below (stg_activity_voucher.voucher_pk_norm),
+#       where it holds with zero orphans and thereby pins the recovery.
+#
+#   PK admin_approval_scheme.activity_code
+#       6 duplicate activity_codes (2,107 rows / 2,101 activities) — the known
+#       multi-scheme approvals that v_approval's ARG_MAX collapses. `row_id` IS
+#       unique and is declared instead.
+#
+#   PK dim_code.code
+#       717 rows, 463 distinct codes: the real key is (variable, code) and the
+#       generic runner's CHECK 2 takes a single column. A runner limitation, not
+#       a data defect — the composite key holds (zero duplicates, verified).
+#
+#   CATEGORICAL status_label / theme / voucher.type / district_name
+#       Observed domains, not closed ones. Asserting them would make the
+#       statewide drop fail CHECK 5 for arriving with more values, which breaks
+#       D15's promise that statewide is a one-file update. They are profiled in
+#       reports/view_summaries.txt every build instead. The domains asserted
+#       below are closed either structurally (direction, plan_type,
+#       tec_approval_required, is_costless_activity) or by this pack's own CASE
+#       construction (stg is_costless, tied_untied).
+#
+# A violation found later that is NOT on this list is a finding: log it, report
+# it, do not quietly stop declaring the constraint.
+# =============================================================================
+
+# CHECK 4 only logs; it never fails a build. This drop is deliberately sparse —
+# 55.7% of total_cost is null because 7,074 activities are costless, 82% of
+# activity_expenditure.scheme_name is null, most activity_asset detail columns
+# are 66-100% null. The log is the census of that sparsity.
+null_rate_threshold_pct: 20
+
+# ── CHECK 2: primary-key uniqueness ─────────────────────────────────────────
+# All verified to hold on this drop.
+primary_keys:
+  gram_panchayat: gp_lgd_code
+  plan: plan_code
+  planned_activity: activity_code
+  voucher: voucher_pk
+  activity_expenditure: expenditure_id
+  admin_approval: row_id
+  admin_approval_scheme: row_id      # activity_code is NOT unique — see header
+  technical_approval: row_id
+  physical_progress: row_id
+  # the five 1:1 activity child tables — one row per planned activity, exactly
+  activity_asset: activity_code
+  activity_fund: activity_code
+  activity_training: activity_code
+  activity_community_service: activity_code
+  activity_delegation: activity_code
+  dim_lsdg_theme: focus_area_name
+  dim_welfare_scheme: scheme_code
+  # activity_voucher has no single-column key: an expenditure may be paid by
+  # several vouchers and a voucher may pay several expenditures.
+  # activity_nsap has zero rows.
+
+# ── CHECK 3: foreign-key integrity ──────────────────────────────────────────
+# Every FK below reports ZERO orphans on this drop. The two that do not hold are
+# in the header, quantified.
+foreign_keys:
+  # geography — the spine. Any orphan here means a view would silently lose rows.
+  - {child: planned_activity,     child_col: gp_lgd_code, parent: gram_panchayat, parent_col: gp_lgd_code}
+  - {child: plan,                 child_col: gp_lgd_code, parent: gram_panchayat, parent_col: gp_lgd_code}
+  - {child: voucher,              child_col: gp_lgd_code, parent: gram_panchayat, parent_col: gp_lgd_code}
+  - {child: activity_expenditure, child_col: gp_lgd_code, parent: gram_panchayat, parent_col: gp_lgd_code}
+  - {child: activity_voucher,     child_col: gp_lgd_code, parent: gram_panchayat, parent_col: gp_lgd_code}
+  - {child: admin_approval,       child_col: gp_lgd_code, parent: gram_panchayat, parent_col: gp_lgd_code}
+  - {child: technical_approval,   child_col: gp_lgd_code, parent: gram_panchayat, parent_col: gp_lgd_code}
+
+  # planning spine
+  - {child: planned_activity,     child_col: plan_code,     parent: plan,             parent_col: plan_code}
+
+  # the activity grain — view1's row set. Each of these holding is what makes
+  # the 1:1 folds safe.
+  - {child: activity_asset,             child_col: activity_code, parent: planned_activity, parent_col: activity_code}
+  - {child: activity_fund,              child_col: activity_code, parent: planned_activity, parent_col: activity_code}
+  - {child: activity_training,          child_col: activity_code, parent: planned_activity, parent_col: activity_code}
+  - {child: activity_community_service, child_col: activity_code, parent: planned_activity, parent_col: activity_code}
+  - {child: activity_delegation,        child_col: activity_code, parent: planned_activity, parent_col: activity_code}
+  - {child: physical_progress,          child_col: activity_code, parent: planned_activity, parent_col: activity_code}
+
+  # approvals — all three hold, which is why view1's approval block can be a
+  # plain LEFT JOIN and view3's n_admin_approvals reconciles to 2,101 exactly.
+  - {child: admin_approval,        child_col: activity_code, parent: planned_activity, parent_col: activity_code}
+  - {child: admin_approval_scheme, child_col: activity_code, parent: planned_activity, parent_col: activity_code}
+  - {child: admin_approval_scheme, child_col: activity_code, parent: admin_approval,   parent_col: activity_code}
+  - {child: technical_approval,    child_col: activity_code, parent: planned_activity, parent_col: activity_code}
+
+  # money links
+  - {child: activity_voucher, child_col: expenditure_id, parent: activity_expenditure, parent_col: expenditure_id}
+  # the recovered voucher key (see header). Declared on the normalised form so
+  # the 5,488 links are pinned; if the formats ever agree again, or diverge
+  # further, this is where it shows up.
+  - {child: stg_activity_voucher, child_col: voucher_pk_norm, parent: voucher, parent_col: voucher_pk}
+
+# ── CHECK 5: categorical value domains ──────────────────────────────────────
+# Closed domains only — see the header for what is deliberately absent.
+categorical:
+  voucher:
+    direction: [payment, receipt]
+  plan:
+    plan_type: [Main, Supplementary]
+  technical_approval:
+    tec_approval_required: [R, N]
+  planned_activity:
+    is_costless_activity: ['0', '1']
+  # Derived domains, closed by this pack's own CASE construction. A third value
+  # appearing means a raw input value the derivation does not recognise —
+  # exactly the signal worth failing on, and it cannot be caused by scale.
+  stg_planned_activity:
+    is_costless: [Costed, Costless]
+  stg_approval:
+    tied_untied: [Tied, Untied, Other]
+
+# ── CHECK 6: date ranges ────────────────────────────────────────────────────
+# Read against the `_ts` twins in the staging layer, not the source columns. The
+# analytical columns are DATE per §7; the runner reads min()/max() back and calls
+# .date() on them, which only a datetime carries, so a DATE column would abort
+# the build. The twins exist solely for this check and no view projects them.
+# Measured spans: voucher 6.0 yrs, activity_voucher 5.7, admin_approval 6.9,
+# technical_approval 7.3, plan 6.7 — all inside the window.
+date_ranges:
+  min_years: 1
+  max_years: 10
+  columns:
+    - {table: stg_voucher,            column: date_ts}
+    - {table: stg_activity_voucher,   column: voucher_date_ts}
+    - {table: stg_admin_approval,     column: adm_approval_sanction_date_ts}
+    - {table: stg_technical_approval, column: tec_approval_order_date_ts}
+    - {table: stg_plan,               column: approval_date_ts}
+
+# ── STEP 6: post-view checks ────────────────────────────────────────────────
+# THE SECOND PLACE SAMPLE SCALE LIVES (sources.yaml `expected_rows` is the
+# other). Statewide is a one-file update of these numbers — no view SQL carries
+# a scale literal, and every grid below is a product of derived spines, so the
+# arithmetic re-derives itself.
+#
+#   view1  12,704 = one row per planned activity. The grain check is the guard
+#          against a fold silently fanning out: all five activity child tables
+#          are 1:1, and stg_exp_rollup / stg_approval collapse the two tables
+#          that are not (6 duplicate expenditure codes, 6 multi-scheme approvals).
+#
+#   view2  1,440 = 20 GPs x 72 months, the FULL cross join. 1,181 cells carry
+#          cashbook activity; the other 259 exist because a silent month is a
+#          finding, not a missing row. The month count is derived from the
+#          cashbook's own span (2020-04 .. 2026-03), so this number moves with
+#          the data rather than with a literal.
+#
+#   view3  120 = 20 GPs x 6 fiscal years, the FULL cross join. This is the
+#          Chikilli guard: 640 activities, zero approvals, and an inner join
+#          anywhere in the aggregate chain would delete its six rows. If this
+#          check ever reads 114, that is what happened.
+post_view:
+  view1_activity_lifecycle:
+    expected_rows: 12704
+    tolerance_pct: 1
+    unique_grain: [activity_code]
+  view2_geo_month_cube:
+    expected_rows: 1440
+    tolerance_pct: 1
+    unique_grain: [gp_lgd_code, month]
+  view3_gp_performance:
+    expected_rows: 120
+    tolerance_pct: 1
+    unique_grain: [gp_lgd_code, fiscal_year]

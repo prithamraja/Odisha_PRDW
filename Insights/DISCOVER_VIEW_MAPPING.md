@@ -317,3 +317,40 @@ dictionary docx (plan §2 summary). **Not done:** no engine run, no pack file,
 no statewide extrapolation beyond row-count arithmetic. Profiling scripts were
 session-scratch and are disposable; every number they produced is in this
 document.
+
+---
+
+## 11. Amendments log (post-signature — D22 signed §9 on 2026-08-13)
+
+Corrections measured by WP-D1 (report §§4–5, PM-replayed). The signed text
+above is unedited; where this log and §§2–8 disagree, this log wins.
+
+1. §7 `asset_loc_overflow_json`: roled `X-empty`; measured 54 non-null rows
+   (99.6% null). Role stands on the null rate; the label was literally wrong.
+2. §2 `sanction_authority` "~8": measured **14** — ten free-text residues
+   (15 rows) pass through `authority_clean`'s ELSE branch. Statewide-arrival
+   checklist item (plan §5.6e).
+3. §2 `asset_category_label` "36 + Uncategorised": **27 named labels +
+   'Uncategorised'** reach view1 (8 codes undescribed, several share one);
+   'Uncategorised' spans 8,439 rows incl. 21 description-less codes.
+4. §3/§4 `output_type` "decode exists": the 8 codes exist in dim_code with
+   **NULL descriptions** — labels are 'Code 101'…'Code 110'. Team ask open.
+5. §3 sanctioned sc/st parenthetical ("sc ₹3.2M / st ₹0.4M"): the two source
+   tables carry these values **swapped relative to each other**
+   (`admin_approval_scheme` sc=₹0.44M/st=₹3.23M; `activity_expenditure`
+   sc=₹3.23M/st=₹0.44M). Possible column transposition at source — team ask
+   open; §4.4's too-thin-for-equity conclusion unaffected either way.
+6. §4.3 implicit tech-approval count: view3 `n_tech_approvals` totals
+   **2,095**, not 2,134 — 39 technical approvals sit on activities with no
+   administrative approval and are invisible to `v_approval`, hence to Ask
+   and Discover alike. Kept deliberately for Ask↔Discover agreement (D23);
+   team ask open on whether TA-without-AA is legitimate.
+7. §7 `activity_delegation`: `is_shareable` is 'False' on 11,289 rows and
+   NULL on 1,415 (not constant-false); `is_delegated` is 100% null. The
+   feeds-nothing conclusion stands.
+8. Additions the pack made within T2's rules, accepted by D23: five
+   TIMESTAMP twin columns in staging (runner CHECK 6 compatibility, never
+   projected); `stg_activity_voucher.voucher_pk_norm` (float-text key
+   normalisation — the `v_asset` double-cast idiom; FK declared on it);
+   view1 carries `sanction_scheme_rows` and the five statewide-staged sparse
+   dimension columns; view2 additionally carries `work_proposed_amount`.

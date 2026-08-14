@@ -1,0 +1,93 @@
+﻿
+--- raw CSV header line: admin_approval_scheme
+    column0 | column1 | column2 | column3 | column4 | column5 | column6 | column7 | column8 | column9
+    row_id | parent_row_id | pos | activity_code | scheme_code | scheme_component_code | fund_sanctioned_general | fund_sanctioned_sc | fund_sanctioned_st | fund_sanctioned_total
+
+--- raw CSV header line: activity_expenditure
+    column00 | column01 | column02 | column03 | column04 | column05 | column06 | column07 | column08 | column09 | column10 | column11 | column12 | column13
+    expenditure_id | activity_code | plan_code | gp_lgd_code | fiscal_year | s_no | scheme_name | approved_cost_action_plan | technical_approved_cost | admin_approved_cost | general | sc | st | total_expenditure
+
+--- raw non-null counts + sums
+    col | n | total
+    admin_approval_scheme.fund_sanctioned_sc | 2 | 440000.0
+    admin_approval_scheme.fund_sanctioned_st | 19 | 3226802.0
+    activity_expenditure.sc | 19 | 3226802.0
+    activity_expenditure.st | 2 | 440000.0
+    admin_approval_scheme.fund_sanctioned_general | 2086 | 284771943.0
+    activity_expenditure.general | 2226 | 304333391.0
+
+--- every activity with a non-null SC or ST on EITHER side
+    activity_code | sanc_sc | sanc_st | exp_sc | exp_st | verdict
+    48344875 | 350000.0 | NULL | NULL | 350000.0 | CROSSWISE EQUAL
+    48866885 | NULL | 500000.0 | 500000.0 | NULL | CROSSWISE EQUAL
+    48867032 | NULL | 176866.0 | 176866.0 | NULL | CROSSWISE EQUAL
+    48867383 | NULL | 330000.0 | 330000.0 | NULL | CROSSWISE EQUAL
+    48868605 | NULL | 150000.0 | 150000.0 | NULL | CROSSWISE EQUAL
+    48868799 | NULL | 150000.0 | 150000.0 | NULL | CROSSWISE EQUAL
+    48869171 | NULL | 200000.0 | 200000.0 | NULL | CROSSWISE EQUAL
+    48869338 | NULL | 100000.0 | 100000.0 | NULL | CROSSWISE EQUAL
+    48869572 | NULL | 200000.0 | 200000.0 | NULL | CROSSWISE EQUAL
+    48870687 | NULL | 150000.0 | 150000.0 | NULL | CROSSWISE EQUAL
+    48871145 | NULL | 120000.0 | 120000.0 | NULL | CROSSWISE EQUAL
+    60851379 | NULL | 200000.0 | 200000.0 | NULL | CROSSWISE EQUAL
+    60851530 | NULL | 100000.0 | 100000.0 | NULL | CROSSWISE EQUAL
+    60852206 | NULL | 81392.0 | 81392.0 | NULL | CROSSWISE EQUAL
+    60852406 | NULL | 150000.0 | 150000.0 | NULL | CROSSWISE EQUAL
+    60852518 | NULL | 300000.0 | 300000.0 | NULL | CROSSWISE EQUAL
+    60854790 | NULL | 100000.0 | 100000.0 | NULL | CROSSWISE EQUAL
+    60854945 | NULL | 178544.0 | 178544.0 | NULL | CROSSWISE EQUAL
+    79314928 | NULL | 20000.0 | 20000.0 | NULL | CROSSWISE EQUAL
+    79319035 | NULL | 20000.0 | 20000.0 | NULL | CROSSWISE EQUAL
+    99201373 | 90000.0 | NULL | NULL | 90000.0 | CROSSWISE EQUAL
+
+--- verdict tally
+    verdict | count_star()
+    CROSSWISE EQUAL | 21
+
+--- activity_fund sc/st for the same activities
+    activity_code | fund_tied_sc | fund_tied_st | fund_untied_sc | fund_untied_st | fund_sanctioned_sc | fund_sanctioned_st
+    48344875 | 350000.0 | 0.0 | 0.0 | 0.0 | 350000.0 | NULL
+    48866885 | 0.0 | 500000.0 | 0.0 | 0.0 | NULL | 500000.0
+    48867032 | 0.0 | 176866.0 | 0.0 | 0.0 | NULL | 176866.0
+    48867383 | 0.0 | 330000.0 | 0.0 | 0.0 | NULL | 330000.0
+    48868605 | 0.0 | 0.0 | 0.0 | 150000.0 | NULL | 150000.0
+    48868799 | 0.0 | 0.0 | 0.0 | 150000.0 | NULL | 150000.0
+    48869171 | 0.0 | 0.0 | 0.0 | 200000.0 | NULL | 200000.0
+    48869338 | 0.0 | 0.0 | 0.0 | 100000.0 | NULL | 100000.0
+    48869572 | 0.0 | 0.0 | 0.0 | 200000.0 | NULL | 200000.0
+    48870687 | 0.0 | 0.0 | 0.0 | 150000.0 | NULL | 150000.0
+    48871145 | 0.0 | 0.0 | 0.0 | 120000.0 | NULL | 120000.0
+    60851379 | 0.0 | 0.0 | 0.0 | 200000.0 | NULL | 200000.0
+    60851530 | 0.0 | 0.0 | 0.0 | 100000.0 | NULL | 100000.0
+    60852206 | 0.0 | 0.0 | 0.0 | 81392.0 | NULL | 81392.0
+    60852406 | 0.0 | 0.0 | 0.0 | 150000.0 | NULL | 150000.0
+    60852518 | 0.0 | 0.0 | 0.0 | 300000.0 | NULL | 300000.0
+    60854790 | 0.0 | 100000.0 | 0.0 | 0.0 | NULL | 100000.0
+    60854945 | 0.0 | 178544.0 | 0.0 | 0.0 | NULL | 178544.0
+    79314928 | 0.0 | 20000.0 | 0.0 | 0.0 | NULL | 20000.0
+    79319035 | 0.0 | 20000.0 | 0.0 | 0.0 | NULL | 20000.0
+    99201373 | 90000.0 | 0.0 | 0.0 | 0.0 | 90000.0 | NULL
+
+--- activity_for on those activities (111=General 112=sc 113=st 114=ALL)
+    activity_code | activity_for | fund_sanctioned_sc | fund_sanctioned_st | exp_sc | exp_st
+    48344875 | 112 | 350000.0 | NULL | NULL | 350000.0
+    99201373 | 112 | 90000.0 | NULL | NULL | 90000.0
+    48866885 | 113 | NULL | 500000.0 | 500000.0 | NULL
+    48867032 | 113 | NULL | 176866.0 | 176866.0 | NULL
+    48867383 | 113 | NULL | 330000.0 | 330000.0 | NULL
+    48868605 | 113 | NULL | 150000.0 | 150000.0 | NULL
+    48868799 | 113 | NULL | 150000.0 | 150000.0 | NULL
+    48869171 | 113 | NULL | 200000.0 | 200000.0 | NULL
+    48869338 | 113 | NULL | 100000.0 | 100000.0 | NULL
+    48869572 | 113 | NULL | 200000.0 | 200000.0 | NULL
+    48870687 | 113 | NULL | 150000.0 | 150000.0 | NULL
+    48871145 | 113 | NULL | 120000.0 | 120000.0 | NULL
+    60851379 | 113 | NULL | 200000.0 | 200000.0 | NULL
+    60851530 | 113 | NULL | 100000.0 | 100000.0 | NULL
+    60852206 | 113 | NULL | 81392.0 | 81392.0 | NULL
+    60852406 | 113 | NULL | 150000.0 | 150000.0 | NULL
+    60852518 | 113 | NULL | 300000.0 | 300000.0 | NULL
+    60854790 | 113 | NULL | 100000.0 | 100000.0 | NULL
+    60854945 | 113 | NULL | 178544.0 | 178544.0 | NULL
+    79314928 | 113 | NULL | 20000.0 | 20000.0 | NULL
+    79319035 | 113 | NULL | 20000.0 | 20000.0 | NULL
