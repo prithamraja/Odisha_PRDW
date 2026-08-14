@@ -37,11 +37,35 @@ import re
 
 __all__ = [
     "extract_date_window",
+    "normalize_digits",
     "resolve_fiscal_years",
     "resolve_fiscal_year",
     "fiscal_year_window",
     "FISCAL_YEAR_START_MONTH",
 ]
+
+# ── Odia numerals ─────────────────────────────────────────────────────────────
+# Decision D18.P5. Every pattern below is ASCII-only, so `୨୦୨୪-୨୫` yielded no
+# fiscal year at all and D9's required-slot behaviour turned a perfectly clear
+# question into a clarification (WP-4a §6.2 / B9). Odia is an official language
+# of the state and the officers this serves type its digits.
+#
+# A CODE-POINT-FOR-CODE-POINT translation, which is what makes it safe here:
+# U+0B66..U+0B6F map 1:1 onto '0'..'9', so the translated string has the same
+# LENGTH and the same INDICES as the original. Every span this module records —
+# `consumed`, the guard lookarounds, `_collect`'s claimed ranges — stays valid.
+# A normalisation that changed offsets would silently mis-claim spans instead.
+#
+# Devanagari digits are deliberately NOT included: no gold row exercises them,
+# and widening the surface without a test is how a normalisation starts eating
+# text nobody checked. One line to add if pilot logs show officers typing them.
+_ODIA_DIGITS = str.maketrans("୦୧୨୩୪୫୬୭୮୯", "0123456789")
+
+
+def normalize_digits(text: str) -> str:
+    """Odia numerals to ASCII, leaving everything else — including length and
+    character offsets — untouched. `'୨୦୨୪-୨୫'` -> `'2024-25'`."""
+    return str(text or "").translate(_ODIA_DIGITS)
 
 # India's financial year runs 1 April → 31 March. `'2024-2025'` therefore means
 # 2024-04-01 .. 2025-03-31, which is why a fiscal label can never be read as a
@@ -227,7 +251,7 @@ def resolve_fiscal_years(text: str, known_years=()) -> list[str]:
     year nobody loaded reaches the registry and is refused by name rather than
     silently answered about a different year.
     """
-    text = str(text or "")
+    text = normalize_digits(text)
     if not text:
         return []
 
@@ -288,7 +312,7 @@ def fiscal_year_window(label: str) -> tuple[str, str] | None:
     Only for the questions that compare a fiscal year against a real DATE column
     (`plan.approval_date`). The fiscal-year SLOT binds the label itself.
     """
-    match = re.fullmatch(r"\s*(\d{4})\s*-\s*(\d{4})\s*", str(label or ""))
+    match = re.fullmatch(r"\s*(\d{4})\s*-\s*(\d{4})\s*", normalize_digits(label))
     if not match:
         return None
     start = int(match.group(1))
@@ -369,6 +393,7 @@ def extract_date_window(message: str) -> tuple[str, str] | None:
     """
     if not message:
         return None
+    message = normalize_digits(message)
 
     consumed: list[tuple[int, int]] = []
     windows: list[tuple[str, str]] = []

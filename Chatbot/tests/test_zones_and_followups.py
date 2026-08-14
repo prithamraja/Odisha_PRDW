@@ -29,7 +29,13 @@ from query_router.suggestions import (
     suggest_followups,
 )
 from query_router.template_catalog import TEMPLATE_CATALOG
-from query_router.zones import corrected_query_chips, question_chips, zone
+from query_router.zones import (
+    corrected_query_chips,
+    question_chips,
+    resolved_question,
+    unfilled_phrases,
+    zone,
+)
 
 
 def make_frame(
@@ -445,6 +451,102 @@ class SlotPlaceholderTests(unittest.TestCase):
             self._chip("Which schemes is {farmer_name} enrolled in?",
                        fill={"farmer_name": "Rajesh Sri"}),
             "Which schemes is Rajesh Sri enrolled in?",
+        )
+
+
+class AnswerEchoTests(unittest.TestCase):
+    """T2(d) — the question as ANSWERED, rendered per placeholder.
+
+    Operator-reported, screenshot-verified 2026-08-13: asking for "each GP in
+    2024-25" echoed `{gp_name}` AND `{date_range}` unfilled while the query
+    underneath executed correctly. `abstract_question.format(**entity_values)`
+    is all-or-nothing — one unbound optional slot raises KeyError and the old
+    fallback printed the RAW abstract question, discarding even the
+    substitutions that HAD resolved. Latent in AP (every slot required, so the
+    except never fired); under D2 partial binding is the NORMAL case.
+    """
+
+    def _echo(self, qid, **fill):
+        template = TEMPLATE_CATALOG[qid]
+        return resolved_question(
+            template["abstract_question"], fill,
+            unfilled_phrases(template["param_slots"], set(fill),
+                             template.get("grouped_geo")),
+        )
+
+    def test_bound_values_render(self):
+        self.assertEqual(
+            self._echo("EXP-001", gp_name="Andhrua", date_range="2024-2025"),
+            "What is the total actual expenditure incurred by Andhrua in 2024-2025?",
+        )
+
+    def test_a_bound_slot_survives_an_unbound_sibling(self):
+        """The defect itself: the year WAS resolved and used to vanish with the
+        GP because one `.format()` covered both."""
+        self.assertEqual(
+            self._echo("EXP-001", date_range="2024-2025"),
+            "What is the total actual expenditure incurred by each GP in 2024-2025?",
+        )
+
+    def test_an_unbound_optional_slot_reads_as_its_collective(self):
+        """PLN-001 aggregates to one count, so the filter being off reads
+        'all districts', not 'each district'."""
+        self.assertEqual(
+            self._echo("PLN-001", date_range="2024-2025"),
+            "How many Gram Panchayats in all districts/all blocks have uploaded "
+            "the GPDP in 2024-2025?",
+        )
+
+    def test_a_grouped_geography_reads_distributively(self):
+        """PLN-003 returns one row PER BLOCK. 'all blocks' would describe a
+        single state-wide percentage, which is not what came back."""
+        self.assertEqual(
+            self._echo("PLN-003", date_range="2024-2025"),
+            "What percentage of Gram Panchayats in each block have uploaded "
+            "their GPDP in 2024-2025?",
+        )
+        self.assertIn("block_name", TEMPLATE_CATALOG["PLN-003"]["grouped_geo"])
+
+    def test_a_defaulted_slot_echoes_its_default(self):
+        """D18.P1: `$top_n` unsaid was still BOUND, to 10 — so it echoes 10
+        rather than the chip's invitation 'N'.
+
+        No workbook question TEXT carries `{top_n}` (the workbook writes the
+        limit into the SQL, not the sentence), so the phrase is pinned on the
+        real slot definition against a synthetic sentence rather than on a
+        catalogue question that cannot exercise it.
+        """
+        qid = next(q for q, t in TEMPLATE_CATALOG.items()
+                   if any(s["name"] == "top_n" for s in t["param_slots"]))
+        slots = TEMPLATE_CATALOG[qid]["param_slots"]
+        phrases = unfilled_phrases(slots, {"date_range"})
+        self.assertEqual(phrases["top_n"], "10")
+        self.assertEqual(
+            resolved_question("The {top_n} highest in {date_range}?",
+                              {"date_range": "2024-2025"}, phrases),
+            "The 10 highest in 2024-2025?",
+        )
+
+    def test_no_brace_survives_into_any_answer(self):
+        """The whole-of-state assertion: every one of the 346 catalogue entries
+        rendered with ZERO entities bound, which is the worst case for an
+        all-or-nothing formatter and the shape the operator actually saw."""
+        leaking = sorted(
+            qid for qid, t in TEMPLATE_CATALOG.items()
+            if set("{}") & set(resolved_question(
+                t["abstract_question"], {},
+                unfilled_phrases(t["param_slots"], set(), t.get("grouped_geo"))))
+        )
+        self.assertEqual(leaking, [])
+
+    def test_a_required_slot_is_never_described_as_a_collective(self):
+        """'below all thresholds' would state something the query never did. An
+        unbound REQUIRED slot keeps the chip stand-in, which reads as the
+        placeholder it is — and validation stops before it can reach an answer
+        anyway."""
+        self.assertIn(
+            "below a threshold",
+            self._echo("PLU-009", date_range="2024-2025"),
         )
 
 

@@ -108,7 +108,82 @@ def _unit_nouns(slot: str) -> tuple[str, ...]:
     return tuple({slot, stem, *_SLOT_UNIT_NOUNS.get(slot, ())})
 
 
-def _readable(question: str, fill: dict[str, str] | None = None) -> str:
+# How an unfilled OPTIONAL slot reads in an ANSWER, which is a different job
+# from how it reads in a chip. A chip is an invitation — "GPDP status for a
+# gram panchayat?" asks the user to name one. An answer is a report of what was
+# actually run: an absent optional slot bound SQL NULL, the filter was off, and
+# every GP is in the result. Echoing the chip's "a gram panchayat" over an
+# answer covering all of them is a wrong description of the query that ran.
+#
+# TWO READINGS, decided by the template's `grouped_geo` (emitted by
+# tools/build_catalog.py from the outermost GROUP BY):
+#   collective   the filter is simply off — one figure spanning them all
+#                ("How many GPs across all districts uploaded the GPDP?")
+#   distributive the statement returns ONE ROW PER unit
+#                ("total expenditure incurred by each GP")
+_SLOT_COLLECTIVES: dict[str, str] = {
+    "date_range":         "all years",
+    "date_range_2":       "all years",
+    "district_name":      "all districts",
+    "block_name":         "all blocks",
+    "block_name_2":       "all blocks",
+    "gp_name":            "all GPs",
+    "gp_name_2":          "all GPs",
+    "focus_area":         "all focus areas",
+    "theme":              "all themes",
+    "scheme":             "all schemes",
+    "scheme_2":           "all schemes",
+    "status":             "all statuses",
+    "asset_category":     "all categories",
+    "asset_sub_category": "all categories",
+    "activity_code":      "all activities",
+}
+
+_SLOT_DISTRIBUTIVES: dict[str, str] = {
+    "district_name": "each district",
+    "block_name":    "each block",
+    "block_name_2":  "each block",
+    "gp_name":       "each GP",
+    "gp_name_2":     "each GP",
+}
+
+
+def unfilled_phrases(
+    slots: list[dict],
+    bound: set[str] | frozenset[str],
+    grouped_geo: list[str] | None = None,
+) -> dict[str, str]:
+    """Slot -> how it reads in an answer, for every optional slot left unbound.
+
+    Only OPTIONAL slots get a phrase. A required slot cannot legitimately be
+    unbound on a serving path (validation stops first), and describing one as
+    "all thresholds" would state something the query never did — so anything
+    else falls through to the chip stand-in, which reads as the placeholder it
+    is rather than as a claim about the result.
+
+    A slot carrying a DEFAULT renders that default: `$top_n` left unsaid was
+    still bound, to 10.
+    """
+    grouped = set(grouped_geo or ())
+    phrases: dict[str, str] = {}
+    for slot in slots:
+        name = slot["name"]
+        if name in bound or name in phrases or not slot.get("optional"):
+            continue
+        if "default" in slot:
+            phrases[name] = str(slot["default"])
+        elif name in grouped and name in _SLOT_DISTRIBUTIVES:
+            phrases[name] = _SLOT_DISTRIBUTIVES[name]
+        elif name in _SLOT_COLLECTIVES:
+            phrases[name] = _SLOT_COLLECTIVES[name]
+    return phrases
+
+
+def _readable(
+    question: str,
+    fill: dict[str, str] | None = None,
+    phrases: dict[str, str] | None = None,
+) -> str:
     """'GPDP status for {gp_name}?' -> 'GPDP status for Andhrua?' when the value
     is known from the user's own utterance, else 'GPDP status for a gram
     panchayat?' (either way the text stays routable).
@@ -128,7 +203,8 @@ def _readable(question: str, fill: dict[str, str] | None = None) -> str:
             # A known value keeps the unit — "in Khordha district" reads better
             # than "in Khordha" and is what the user said.
             return str(fill[name]) + following
-        return _slot_phrase(name) + ("" if swallowed else following)
+        stand_in = (phrases or {}).get(name) or _slot_phrase(name)
+        return stand_in + ("" if swallowed else following)
 
     return re.sub(r"\{(\w+?)\}(\s+(\w+)\b)?", _sub, question)
 
@@ -138,6 +214,28 @@ def readable_question(question: str, fill: dict[str, str] | None = None) -> str:
     the slots the caller knows filled in and the rest turned into readable
     stand-ins. Always routable."""
     return _readable(question, fill)
+
+
+def resolved_question(
+    question: str,
+    fill: dict[str, str] | None = None,
+    phrases: dict[str, str] | None = None,
+) -> str:
+    """The question as ANSWERED — every placeholder substituted, none left.
+
+    Per-placeholder, deliberately. The router used to call
+    `abstract_question.format(**entity_values)`, which is all-or-nothing: one
+    unbound slot raises KeyError and the fallback echoed the RAW abstract
+    question, discarding even the substitutions that HAD resolved. Under D2 that
+    is the normal case rather than an edge one — every geography slot is
+    optional — so an officer asking for "each GP in 2024-25" saw both
+    `{gp_name}` AND `{date_range}` come back unfilled while the query underneath
+    executed perfectly (operator report, 2026-08-13).
+
+    `phrases` comes from unfilled_phrases(); anything it does not name falls back
+    to the chip stand-in. A `{` must never survive into an answer.
+    """
+    return _readable(question, fill, phrases)
 
 
 def question_chips(

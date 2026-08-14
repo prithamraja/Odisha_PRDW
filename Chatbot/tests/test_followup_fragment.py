@@ -30,10 +30,17 @@ from query_router.fragment_reroute import (
     GEO_SLOTS,
     combined_question,
     drill_target,
+    executable_geo_slots,
     fragment_place_phrase,
     geo_vocabulary_tokens,
     is_slot_only_fragment,
     templates_share_subject,
+)
+from query_router.router import (
+    TIER_NOUNS,
+    ambiguous_fragment_clarify,
+    name_the_tier,
+    tier_collision_clarify,
 )
 from query_router.followup_classifier import parse_decision
 from query_router.models import (
@@ -41,6 +48,7 @@ from query_router.models import (
     ColumnType,
     ContextFrame,
     ResultSetReference,
+    RouteTier,
     TimeRange,
 )
 from query_router.template_catalog import TEMPLATE_CATALOG
@@ -220,6 +228,218 @@ class UnexecutableEditTests(unittest.TestCase):
             _frame("PLN-004", {"district_name": "Khordha"}),
         )
         self.assertEqual(decision.kind, "frame_edit")
+
+
+class ExecutableGeoSlotTests(unittest.TestCase):
+    """T2(e)(i). The tier a fragment is read as must be chosen from the tiers
+    the FRAME can execute, not filtered afterwards.
+
+    36 of the 346 templates carry an incomplete tier set — PLN-006 filters only
+    by district, PLN-003 by district and block — so "widest tier that validates,
+    then check" abandons hops the catalogue could have served.
+    """
+
+    def test_a_full_tier_template_offers_all_three(self):
+        self.assertEqual(
+            executable_geo_slots("PLN-001"),
+            {"district_name", "block_name", "gp_name"},
+        )
+
+    def test_a_partial_tier_template_offers_only_what_it_filters(self):
+        self.assertEqual(executable_geo_slots("PLN-003"),
+                         {"district_name", "block_name"})
+        self.assertEqual(executable_geo_slots("PLN-006"), {"district_name"})
+
+    def test_an_unknown_or_missing_id_offers_nothing(self):
+        self.assertEqual(executable_geo_slots("NOPE-999"), set())
+        self.assertEqual(executable_geo_slots(None), set())
+
+    def test_it_agrees_with_drill_target_on_every_template(self):
+        """The two must not drift: a slot in this set is exactly a slot
+        `drill_target` will hop on."""
+        for qid in TEMPLATE_CATALOG:
+            for slot in GEO_SLOTS:
+                with self.subTest(qid=qid, slot=slot):
+                    self.assertEqual(
+                        slot in executable_geo_slots(qid),
+                        drill_target(qid, slot) is not None,
+                    )
+
+
+class TierCollisionClarifyTests(unittest.TestCase):
+    """T2(e)(iii). D18.P3 rules that GP/block collisions CLARIFY in v1, and the
+    question to ask is WHICH PLACE — not the generic "narrowed, or a new
+    question?", which asks about an intent that was never in doubt and leaves
+    the officer retyping the name that was ambiguous."""
+
+    def test_the_prompt_is_about_the_place_not_the_intent(self):
+        result = tier_collision_clarify(
+            frame_question="What is the total actual expenditure incurred by "
+                           "Andhrua in 2024-2025?",
+            readings=[("Laxmipur (block)", "…in Laxmipur block?"),
+                      ("Laxmipur (GP)", "…in Laxmipur GP?")],
+            user_query="what about Laxmipur?",
+        )
+        self.assertEqual(result.tier, RouteTier.CLARIFY)
+        self.assertEqual(result.clarification.reason, "tier_collision")
+        self.assertIn("more than one place", result.clarification.prompt)
+        self.assertNotIn("new question", result.clarification.prompt)
+
+    def test_every_reading_is_a_tier_qualified_chip(self):
+        result = tier_collision_clarify(
+            frame_question="Q?",
+            readings=[("Laxmipur (block)", "a"), ("Laxmipur (GP)", "b")],
+            user_query="what about Laxmipur?",
+        )
+        labels = [c.label for c in result.clarification.options]
+        self.assertEqual(labels, ["Laxmipur (block)", "Laxmipur (GP)",
+                                  "Something else"])
+
+    def test_the_tier_nouns_cover_every_geography_slot(self):
+        self.assertEqual(set(TIER_NOUNS), set(GEO_SLOTS))
+
+
+class TierNamingTests(unittest.TestCase):
+    """T2(e)(ii). When one tier was picked for the user, the echo says which —
+    "Laxmipur" alone is exactly the string that was ambiguous."""
+
+    def test_the_served_tier_is_named(self):
+        self.assertEqual(
+            name_the_tier(
+                "What is the total actual expenditure incurred by Laxmipur in "
+                "2024-2025?", "Laxmipur", "gp_name"),
+            "What is the total actual expenditure incurred by Laxmipur (GP) in "
+            "2024-2025?",
+        )
+
+    def test_only_the_first_occurrence_is_annotated(self):
+        self.assertEqual(
+            name_the_tier("Compare Laxmipur with Laxmipur?", "Laxmipur", "block_name"),
+            "Compare Laxmipur (block) with Laxmipur?",
+        )
+
+    def test_nothing_to_name_leaves_the_question_alone(self):
+        self.assertEqual(name_the_tier("Q?", "X", "theme"), "Q?")
+        self.assertIsNone(name_the_tier(None, "X", "gp_name"))
+        self.assertEqual(name_the_tier("Q?", None, "gp_name"), "Q?")
+
+
+class AmbiguousFragmentChipTests(unittest.TestCase):
+    """T2(e)(iv). Retrieval on a bare place name matches on the NAME. A chip
+    whose only tie to what the user said is a place name is noise dressed as a
+    reading, and tapping it silently changes the subject."""
+
+    def _clarify(self, fragment_id):
+        return ambiguous_fragment_clarify(
+            frame_question="What percentage of GPs in Khordha uploaded the GPDP?",
+            value="Laxmipur",
+            contextual_question="…narrowed to Laxmipur?",
+            fragment_question="…some question that merely says Laxmipur?",
+            user_query="what about Laxmipur?",
+            frame_query_id="PLN-001",
+            fragment_query_id=fragment_id,
+        )
+
+    def test_a_subject_sharing_match_is_still_offered(self):
+        texts = [c.send_text for c in self._clarify("PLN-005").clarification.options]
+        self.assertIn("…some question that merely says Laxmipur?", texts)
+
+    def test_a_name_only_match_is_dropped(self):
+        self.assertTrue(templates_share_subject("PLN-001", "EXP-001") is False)
+        texts = [c.send_text for c in self._clarify("EXP-001").clarification.options]
+        self.assertNotIn("…some question that merely says Laxmipur?", texts)
+        self.assertIn("…narrowed to Laxmipur?", texts)
+
+    def test_the_fragment_chip_survives_when_nothing_else_would(self):
+        """An empty clarification is worse than a noisy one."""
+        result = ambiguous_fragment_clarify(
+            frame_question="Q?", value="Laxmipur",
+            contextual_question=None,
+            fragment_question="the only reading on offer?",
+            user_query="what about Laxmipur?",
+            frame_query_id="PLN-001", fragment_query_id="EXP-001",
+        )
+        texts = [c.send_text for c in result.clarification.options]
+        self.assertIn("the only reading on offer?", texts)
+
+
+@unittest.skipIf(not _DB_PATH.exists(), f"no sample database at {_DB_PATH}")
+class FragmentTierSelectionTests(unittest.TestCase):
+    """The whole of T2(e) against the REAL registry — no LLM, no network.
+
+    Laxmipur, Bheden and Kalimela are each both a block and a GP in the 20-GP
+    sample, so the collision class is exercisable today rather than only
+    statewide (WP-4a §2).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import main
+        from db_factory import open_analytical_db
+        from query_router.entity_validator import EntityValidator
+
+        cls.adapter = open_analytical_db(_DB_PATH)
+        cls.main = main
+        main._validator = EntityValidator(cls.adapter)
+        main._template_map = dict(TEMPLATE_CATALOG)
+        main._geo_tokens = set(geo_vocabulary_tokens(
+            *(main._validator.registry_values(etype)
+              for etype in main.GEO_ENTITY_TYPES_WIDEST_FIRST)
+        ))
+
+    @classmethod
+    def tearDownClass(cls):
+        try:
+            cls.adapter.close()
+        except Exception:                                    # pragma: no cover
+            pass
+
+    def test_a_colliding_name_is_read_at_both_tiers(self):
+        tiers = self.main._fragment_tiers(
+            _frame("EXP-001", {"date_range": "2024-2025"}), "what about Laxmipur?")
+        self.assertEqual([slot for slot, _ in tiers], ["block_name", "gp_name"])
+
+    def test_a_colliding_name_clarifies_instead_of_picking(self):
+        """Both tiers resolve AND both fit EXP-001, so serving either would be
+        a coin flip presented as an answer."""
+        edit, clarify, name_tier = self.main._fragment_reading(
+            _frame("EXP-001", {"date_range": "2024-2025"}), "what about Laxmipur?")
+        self.assertIsNone(edit)
+        self.assertIsNotNone(clarify)
+        self.assertEqual(clarify.clarification.reason, "tier_collision")
+        labels = [c.label for c in clarify.clarification.options]
+        self.assertEqual(labels[:2], ["Laxmipur (block)", "Laxmipur (GP)"])
+        for chip in clarify.clarification.options[:2]:
+            self.assertNotIn("{", chip.send_text)
+            self.assertIn("Laxmipur", chip.send_text)
+
+    def test_an_unambiguous_name_still_serves_without_asking(self):
+        edit, clarify, name_tier = self.main._fragment_reading(
+            _frame("PLN-001", {"date_range": "2024-2025"}), "in Khordha?")
+        self.assertIsNone(clarify)
+        self.assertEqual((edit.slot, edit.value), ("district_name", "Khordha"))
+        self.assertFalse(name_tier, "one tier resolved — nothing to disambiguate")
+
+    def test_only_executable_tiers_compete(self):
+        """PLN-006 filters by district alone. A GP-and-block name must not be
+        read at a tier the template cannot bind — the old walk stopped at the
+        first tier that VALIDATED and the hop then died at drill_target."""
+        edit, clarify, _ = self.main._fragment_reading(
+            _frame("PLN-006", {"date_range": "2024-2025"}), "what about Laxmipur?")
+        self.assertIsNone(clarify, "neither tier is executable, so nothing to ask")
+        self.assertNotIn(edit.slot, executable_geo_slots("PLN-006"))
+
+    def test_a_single_fitting_tier_is_auto_slotted_and_named(self):
+        """Only `gp_name` fits, but the NAME was ambiguous — so the hop is
+        served and the echo has to say which Laxmipur it served."""
+        gp_only = [q for q in TEMPLATE_CATALOG
+                   if executable_geo_slots(q) == {"gp_name"}]
+        self.assertTrue(gp_only, "no gp-only template left to pin this on")
+        edit, clarify, name_tier = self.main._fragment_reading(
+            _frame(gp_only[0], {"date_range": "2024-2025"}), "what about Laxmipur?")
+        self.assertIsNone(clarify)
+        self.assertEqual(edit.slot, "gp_name")
+        self.assertTrue(name_tier)
 
 
 @unittest.skipIf(_SKIP is not None, _SKIP or "")

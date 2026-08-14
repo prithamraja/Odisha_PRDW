@@ -30,6 +30,8 @@ from query_router.router            import (
     serve_pending_answer,
     serve_scope_alternative,
     statewide_undo_chip,
+    tier_collision_clarify,
+    TIER_NOUNS,
 )
 from query_router.vector_retriever  import VectorRetriever
 from query_router.dashboard_catalog import DASHBOARD_CATALOG
@@ -62,6 +64,7 @@ from query_router.fragment_reroute  import (
     GEO_SLOTS,
     combined_question,
     drill_target,
+    executable_geo_slots,
     fragment_place_phrase,
     geo_vocabulary_tokens,
     is_slot_only_fragment,
@@ -305,24 +308,77 @@ def _requery_for_frame(frame: ContextFrame, start_date: str, end_date: str):
 # drill hop, then re-route WITH the frame's question, then — if what comes back
 # still isn't plausibly the same subject — ask instead of serving.
 
-def _fragment_top_match(message: str, fill: dict[str, str]) -> Optional[str]:
-    """What the fragment WOULD have matched on its own, as tappable text.
+def _fragment_top_match(
+    message: str, fill: dict[str, str]
+) -> tuple[Optional[str], Optional[str]]:
+    """What the fragment WOULD have matched on its own: (query_id, tappable text).
 
     Retrieval only — no rerank, and nothing is executed. This is offered as one
-    reading of an ambiguous fragment, never served as the answer to it.
+    reading of an ambiguous fragment, never served as the answer to it. The id
+    comes back too so the caller can test whether the match shares a subject
+    with the frame at all — retrieval on a bare place name matches on the NAME,
+    which is not a reading of anything.
     """
     if _retriever is None:
-        return None
+        return None, None
     try:
         scored = _retriever.retrieve_scored(normalize(message), 1)
     except Exception:
-        return None
+        return None, None
     if not scored:
-        return None
-    return readable_question(scored[0][1], fill)
+        return None, None
+    return scored[0][0], readable_question(scored[0][1], fill)
 
 
-def _fragment_edit(frame: ContextFrame, message: str):
+def _fragment_tiers(frame: ContextFrame, message: str) -> list[tuple[str, str]]:
+    """Every (slot, resolved value) a bare place fragment could mean.
+
+    Widest first, and NOT yet filtered by what the frame can execute — the
+    caller needs both readings to tell "this name is ambiguous" from "this name
+    is a block". Slots the frame already has bound are skipped: those are
+    executable edits, which are the classifier's job.
+    """
+    if not is_slot_only_fragment(message, _geo_tokens):
+        return []
+    phrase = fragment_place_phrase(message, _geo_tokens)
+    if not phrase:
+        return []
+    tiers: list[tuple[str, str]] = []
+    for slot, entity_type in GEO_TIERS_WIDEST_FIRST:
+        if slot in frame.bound_params:
+            continue
+        try:
+            tiers.append((slot, _validator.validate(phrase, entity_type).resolved_value))
+        except Exception:
+            continue
+    return tiers
+
+
+def _tier_reading_chip(frame: ContextFrame, slot: str, value: str) -> tuple[str, str]:
+    """(label, send_text) for one tier of an ambiguous place name.
+
+    The label is tier-qualified because the bare name is precisely what was
+    ambiguous — "Laxmipur (GP)" against "Laxmipur (block)". The send_text is the
+    frame's own question narrowed to that reading, with the tier noun written
+    into the sentence so the re-route cannot land on the other tier; where the
+    question has no placeholder for that slot the scope is APPENDED rather than
+    silently dropped, the same rule `suggestions._chip_for` follows.
+    """
+    noun = TIER_NOUNS.get(slot, "")
+    label = f"{value} ({noun})" if noun else str(value)
+    template = _template_map.get(frame.template_id) or {}
+    fill = {**frame.bound_params, slot: f"{value} {noun}".strip()}
+    question = drill_question(frame.template_id, fill, _template_map) or (
+        template.get("abstract_question") or frame.template_question or str(value)
+    )
+    if str(value) not in question:
+        question = f"{question.rstrip('?. ')} in {value} {noun}".strip() + "?"
+    return label, question
+
+
+def _fragment_reading(
+    frame: ContextFrame, message: str
+) -> tuple[Optional[FrameEdit], Optional[RouteResult], bool]:
     """Read a slot-only fragment ("in kurnool?") as an edit, without an LLM.
 
     The follow-up classifier is not reliable on these: measured on the same
@@ -332,24 +388,46 @@ def _fragment_edit(frame: ContextFrame, message: str):
     in it is either a function word, a period, or a place — so it is read here
     and the classifier's coin flip stops mattering.
 
-    Returns a FrameEdit for the geography named, or None when the message is not
-    a bare fragment, names no place we hold, or names a slot the frame already
-    has bound (an executable edit, which is the classifier's job).
+    TIERS ARE FILTERED BY WHAT THE FRAME CAN EXECUTE, BEFORE ONE IS PICKED.
+    Walking widest-first and stopping at the first tier that merely VALIDATES
+    reads "what about Laxmipur?" as a block, and Laxmipur is both a block and a
+    GP in the 20-GP sample; the frame's EXP-001 has no `$block_name` to hop on,
+    so `drill_target` returned None and the whole follow-up collapsed into a
+    generic "narrowed, or new?" prompt (operator report, 2026-08-13). Only tiers
+    the template can actually bind get to compete.
+
+    Returns `(edit, clarify, name_tier)`:
+      exactly one tier fits   -> the edit, and `name_tier` when the NAME was
+                                 ambiguous across tiers, so the echo says which
+                                 one was served;
+      two or more fit         -> a TIER clarification (D18.P3: ask, don't infer),
+                                 never the generic ambiguous-fragment prompt;
+      none fits               -> the widest reading, so the value still reaches
+                                 the contextual re-route, which is where a
+                                 fragment the frame cannot answer has always
+                                 been handled;
+      not a place fragment    -> nothing.
     """
-    if not is_slot_only_fragment(message, _geo_tokens):
-        return None
-    phrase = fragment_place_phrase(message, _geo_tokens)
-    if not phrase:
-        return None
-    for slot, entity_type in GEO_TIERS_WIDEST_FIRST:
-        if slot in frame.bound_params:
-            continue
-        try:
-            resolved = _validator.validate(phrase, entity_type).resolved_value
-        except Exception:
-            continue
-        return FrameEdit(slot=slot, value=resolved)
-    return None
+    tiers = _fragment_tiers(frame, message)
+    if not tiers:
+        return None, None, False
+    executable = executable_geo_slots(frame.template_id)
+    fitting = [(slot, value) for slot, value in tiers if slot in executable]
+
+    if len(fitting) > 1:
+        return None, tier_collision_clarify(
+            frame_question=frame.template_question,
+            readings=[_tier_reading_chip(frame, slot, value)
+                      for slot, value in fitting],
+            user_query=message,
+        ), False
+
+    if fitting:
+        slot, value = fitting[0]
+        return FrameEdit(slot=slot, value=value), None, len(tiers) > 1
+
+    slot, value = tiers[0]
+    return FrameEdit(slot=slot, value=value), None, False
 
 
 def _reroute_unexecutable_edit(
@@ -360,6 +438,7 @@ def _reroute_unexecutable_edit(
     start_date: str,
     end_date: str,
     session_id: str,
+    name_tier: bool = False,
 ) -> RouteResult:
     """Items 1–3 for a slot edit the current template has no parameter for."""
     fill = {edit.slot: edit.value} if edit.slot and edit.value else {}
@@ -370,6 +449,7 @@ def _reroute_unexecutable_edit(
         template_map=_template_map, cache_conn=get_adapter(), validator=_validator,
         dashboard_results=_dashboard_results, dashboard_questions=_dashboard_questions,
         user_query=message, start_date=start_date, end_date=end_date,
+        name_tier=name_tier,
     )
     if hop is not None:
         return hop
@@ -414,12 +494,15 @@ def _reroute_unexecutable_edit(
             contextual = candidate.query_description
         elif candidate.clarification and candidate.clarification.options:
             contextual = candidate.clarification.options[0].send_text
+    fragment_id, fragment_text = _fragment_top_match(message, fill)
     return ambiguous_fragment_clarify(
         frame_question=frame.template_question,
         value=edit.value,
         contextual_question=contextual,
-        fragment_question=_fragment_top_match(message, fill),
+        fragment_question=fragment_text,
         user_query=message,
+        frame_query_id=frame.template_id,
+        fragment_query_id=fragment_id,
     )
 
 
@@ -457,6 +540,8 @@ def _fragment_guard(
         contextual_question=contextual,
         fragment_question=result.query_description,
         user_query=message,
+        frame_query_id=frame.template_id,
+        fragment_query_id=result.query_id,
     )
 
 
@@ -692,19 +777,28 @@ def query_endpoint(req: QueryRequest):
             #
             # The classifier's own verdict is taken when it says so, and a bare
             # place fragment is read deterministically when it doesn't — see
-            # _fragment_edit for why that second reading is needed at all.
+            # _fragment_reading for why that second reading is needed at all.
             unexecutable = (
                 decision.edit if decision.kind == "unexecutable_edit" else None
             )
+            name_tier = False
             if unexecutable is None and decision.kind in ("new_question", "frame_edit"):
                 # A "frame_edit" still standing here is one that threw on
                 # execution — a mandal read as a district, say. That loses the
                 # context exactly as a demotion does, so it takes the same path.
-                unexecutable = _fragment_edit(current_frame, req.message)
-            if unexecutable is not None:
+                unexecutable, tier_clarify, name_tier = _fragment_reading(
+                    current_frame, req.message
+                )
+                if tier_clarify is not None:
+                    # The name is ambiguous across tiers the frame can BOTH
+                    # execute. D18.P3: ask which place, not whether they meant
+                    # to follow on — that part was never in doubt.
+                    result = tier_clarify
+            if result is None and unexecutable is not None:
                 result = _reroute_unexecutable_edit(
                     current_frame, unexecutable, req.message,
                     start_date=start_date, end_date=end_date, session_id=session_id,
+                    name_tier=name_tier,
                 )
 
     if result is None:

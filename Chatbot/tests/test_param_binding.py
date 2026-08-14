@@ -123,6 +123,69 @@ class BindParamValuesTests(unittest.TestCase):
         self.assertEqual(params["block_name"], None)
         self.assertEqual(params["gp_name"], None)
 
+    def test_every_top_n_slot_is_optional_with_the_default_page_size(self):
+        """Decision D18.P1. `$top_n` is the LIMIT on 91 of the 346 templates and
+        no officer says "top 10" — generated as REQUIRED, every ranking question
+        stalls on a "how many rows?" chip (WP-4a §5.2)."""
+        offenders = sorted(
+            f"{qid} ${s['name']}"
+            for qid, t in TEMPLATE_CATALOG.items()
+            for s in t["param_slots"]
+            if s["name"] == "top_n"
+            and not (s.get("optional") and s.get("default") == "10")
+        )
+        self.assertEqual(offenders, [])
+        self.assertEqual(
+            sum(1 for t in TEMPLATE_CATALOG.values()
+                for s in t["param_slots"] if s["name"] == "top_n"),
+            91,
+        )
+
+    def test_the_declared_default_and_the_runtime_table_agree(self):
+        """Two places name a default and they must not drift: the catalogue
+        declares it per slot (the authority since D18.P1) while
+        `_DEFAULT_ENTITY_VALUES` keeps the entity-type fallback the AP fixtures
+        still use."""
+        from tools.build_catalog import DEFAULTED_SLOTS
+        for name, value in DEFAULTED_SLOTS.items():
+            with self.subTest(slot=name):
+                self.assertEqual(router._DEFAULT_ENTITY_VALUES.get(name), value)
+
+    def test_a_ranking_template_binds_the_default_rather_than_null(self):
+        """The one thing optionality must NOT mean here: `LIMIT NULL` is
+        unbounded, so a `$top_n` that fell through to NULL would dump the whole
+        result set instead of a page — the opposite of what the slot is for."""
+        qid = next(q for q, t in TEMPLATE_CATALOG.items()
+                   if any(s["name"] == "top_n" for s in t["param_slots"]))
+        slots = TEMPLATE_CATALOG[qid]["param_slots"]
+        bound = router.bind_named_params(
+            slots,
+            {s["name"]: "x" for s in slots
+             if s["name"] != "top_n" and not s.get("optional")},
+            person_ids={s["name"]: "116350"
+                        for s in slots if s.get("bind") == "code"},
+        )
+        self.assertEqual(bound["top_n"], "10")
+
+    def test_judgement_thresholds_stay_required_and_undefaulted(self):
+        """Decision D18.P2, the counterpart to P1: `$threshold` (13 templates)
+        and `$amount_threshold` (2) change the POPULATION under study — a
+        completion-rate league table topped by a focus area with two activities
+        is the confidently-wrong output the threshold exists to prevent. They
+        clarify; they never default."""
+        bearing = sorted({
+            qid for qid, t in TEMPLATE_CATALOG.items()
+            for s in t["param_slots"]
+            if s["name"] in ("threshold", "amount_threshold")
+        })
+        self.assertEqual(len(bearing), 15)
+        for qid in bearing:
+            for slot in TEMPLATE_CATALOG[qid]["param_slots"]:
+                if slot["name"] in ("threshold", "amount_threshold"):
+                    with self.subTest(qid=qid, slot=slot["name"]):
+                        self.assertNotIn("default", slot)
+                        self.assertFalse(slot.get("optional"))
+
     def test_interleaved_paired_category_template(self):
         self.assertEqual(
             router.bind_param_values(

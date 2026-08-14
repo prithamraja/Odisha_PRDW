@@ -55,6 +55,20 @@ def _geo_slots_of(query_id: str) -> set[str]:
     return {s["name"] for s in template["param_slots"] if s["name"] in GEO_SLOTS}
 
 
+def executable_geo_slots(query_id: str | None) -> set[str]:
+    """The geography tiers `query_id` can actually be narrowed to.
+
+    Public because the tier CHOICE has to be made against this set, not after
+    it. Reading a fragment's place at the widest tier that merely VALIDATES and
+    only then asking whether the template has that slot is how "what about
+    Laxmipur?" over an EXP-001 frame died: Laxmipur is a block AND a GP in the
+    sample, the walk stopped at block, EXP-001 has no `$block_name` in its
+    question shape to hop on, and a perfectly answerable follow-up became a
+    generic "narrowed or new?" prompt (operator report, 2026-08-13).
+    """
+    return _geo_slots_of(query_id) if query_id else set()
+
+
 def drill_target(query_id: str | None, slot: str | None) -> str | None:
     """The template that answers `query_id` narrowed to `slot`, or None.
 

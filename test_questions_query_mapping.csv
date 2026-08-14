@@ -35,6 +35,7 @@ WRK-005,Bhubaneswar ke kaun se GP maintenance par fresh asset se zyada kharch ka
 PLN-001,GPDP status?,Planning
 PLN-001,How many GPs in Laxmipur uploaded the GPDP in 2024-25?,Planning
 PLU-001,Bheden ka plan status 2024-25?,Planning
+PLN-003,What percentage of Gram Panchayats in each block uploaded their GPDP in 2024-2025?,Planning
 SBM-GWM-003,How many community soak pits have been planned in 2024-25?,Sanitation (SBM)
 SBM-GWM-006,How many soak pits were completed in 2024-2025?,Sanitation (SBM)
 SBM-GWM-002,What is the expenditure on Grey Water Management activities in 2024-25?,Sanitation (SBM)
@@ -108,6 +109,8 @@ EXP-004,2024-2025 ରେ ମୋଟ କେତେ ଟଙ୍କା ଖର୍ଚ୍�
 EXP-023,What percentage of sanctioned funds was utilised in 2024-2025?,Expenditure
 EXP-001,expenditure Andhrua?,Expenditure
 EXP-008,Tied aur untied fund se 2024-25 me kitna kharcha hua?,Expenditure
+EXP-001,What is the total actual expenditure incurred by each GP in 2024-2025?,Expenditure
+EXP-001,what about Laxmipur?,Expenditure
 STS-001,How many activities in Andhrua are in each progress status for 2024-25?,Implementation & Progress
 STS-013,What is the district-wise activity status summary for 2024-2025?,Implementation & Progress
 STS-003,How many activities in Bhubaneswar are ongoing in 2024-25?,Implementation & Progress

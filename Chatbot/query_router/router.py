@@ -47,11 +47,13 @@ from .zones             import (
     corrected_query_chips,
     question_chips,
     readable_question,
+    resolved_question,
+    unfilled_phrases,
     zone,
 )
 from .dashboard_catalog import DASHBOARD_CATALOG
 from .unanswerable_catalog import UNANSWERABLE_CATALOG, refusal_for
-from .fragment_reroute   import drill_target
+from .fragment_reroute   import drill_target, templates_share_subject
 from .sql_params         import NAMED, param_style
 from .suggestions       import elicitation_chips
 from .config            import (
@@ -291,6 +293,13 @@ _CONSTANT_ENTITY_TYPES: dict[str, str] = {}
 # different question than the one asked. $threshold is especially not defaultable
 # — the Parameter Registry is explicit that its unit varies by question between
 # percent, rupees, days and a minimum activity count.
+#
+# KEYED BY ENTITY TYPE, and now the FALLBACK rather than the authority: since
+# D18.P1 the PR&DW catalogue declares the default on the slot itself
+# (`{"optional": True, "default": "10"}`, emitted by tools/build_catalog.py), and
+# slot_defaults() below wins over this table. The table stays for templates whose
+# slots carry no declaration — the AP fixtures still in the test suite — and
+# tests/test_param_binding.py asserts the two agree, so they cannot drift.
 _DEFAULT_ENTITY_VALUES: dict[str, str] = {
     "top_n": "10",          # a ranking with no length asked for
 }
@@ -393,8 +402,27 @@ def optional_slots(param_slots: list[dict]) -> set[str]:
 
     Required slots (no "optional" key — every AP slot) are unchanged: absent
     means pause and ask, never execute broken SQL.
+
+    A slot may be optional AND carry a default (D18.P1's `$top_n`). Optional
+    there means "the router supplies it instead of asking", not "bind NULL" —
+    see slot_defaults().
     """
     return {s["name"] for s in param_slots if s.get("optional")}
+
+
+def slot_defaults(param_slots: list[dict]) -> dict[str, str]:
+    """Slot name -> the value to use when the question did not state one.
+
+    Declared by the catalogue (`tools/build_catalog.py::DEFAULTED_SLOTS`), so
+    the generated file is the single source of truth and a future defaulted slot
+    needs no runtime edit. Decision D18.P1 puts exactly one slot here: `$top_n`,
+    the presentational LIMIT on 91 templates that no officer ever states.
+
+    Distinct from optional-and-absent, which binds SQL NULL: `LIMIT NULL` is
+    UNBOUNDED, the opposite of a page size, so a defaulted slot that reached the
+    binder empty would silently dump the whole result set.
+    """
+    return {s["name"]: s["default"] for s in param_slots if "default" in s}
 
 
 # A slot may bind the RESOLVED CODE of the one roster row its value named
@@ -417,6 +445,11 @@ def _resolve_slot_value(
     slot binds what.
     """
     name = slot["name"]
+    if name not in params_by_name and "default" in slot:
+        # A defaulted slot must never fall through to NULL: `LIMIT NULL` is
+        # unbounded. _fill_slots_or_clarify normally fills it, so this is the
+        # backstop for the paths that bind without going through validation.
+        return slot["default"]
     if slot.get("bind") in _CODE_BIND_KINDS:
         # An optional code-bound slot that was never supplied is absent, not
         # unresolved — bind NULL rather than failing.
@@ -571,6 +604,7 @@ def _fill_slots_or_clarify(
     start: float,
     *,
     optional: set[str] | frozenset[str] = frozenset(),
+    defaults: dict[str, str] | None = None,
 ) -> tuple[list[ExtractedEntity], RouteResult | None]:
     """Validate every slot value, or return a clarify carrying pending state so
     the user's next message can resume this exact question.
@@ -587,6 +621,11 @@ def _fill_slots_or_clarify(
     SUPPLIED optional value is validated exactly as a required one: "in Kendrapara
     district" naming a district the registry doesn't know is a mistake to
     surface, not a filter to silently drop.
+
+    `defaults` (slot -> value, from slot_defaults()) fills a slot the question
+    left unstated but which must not bind NULL — `$top_n`, whose NULL means
+    "no limit". A defaulted value is validated like any other, so the 1,000
+    ceiling still applies to it.
     """
     validated: list[ExtractedEntity] = []
     missing: list[str] = []
@@ -606,10 +645,13 @@ def _fill_slots_or_clarify(
     for slot in slot_type:
         raw_val = raw_entities.get(slot)
         if raw_val is None:
-            # A slot the question implies is filled from the default table rather
-            # than clarified for. Applied here, in the one place every path
-            # validates through, so the vector path and the resumed-pending path
-            # behave identically.
+            # A slot the question implies is filled from its declared default
+            # rather than clarified for. Applied here, in the one place every
+            # path validates through, so the vector path and the resumed-pending
+            # path behave identically. The catalogue's own declaration wins; the
+            # entity-type table is the fallback for slots that carry none.
+            raw_val = (defaults or {}).get(slot)
+        if raw_val is None:
             raw_val = _DEFAULT_ENTITY_VALUES.get(slot_type[slot])
         if raw_val is None:
             if slot not in optional:
@@ -1135,9 +1177,14 @@ def serve_drill_hop(
     user_query: str,
     start_date: str | None,
     end_date: str | None,
+    name_tier: bool = False,
 ) -> RouteResult | None:
     """Answer the current question at the geography the fragment named, by
     hopping to the mapped sibling. No LLM call is involved at all.
+
+    `name_tier` marks the case where the place resolved at several tiers and
+    only one of them was executable here — the echo then says which tier was
+    served, because "Laxmipur" alone does not.
 
     None means "no hop applies" — no sibling for this slot, a value that isn't a
     real place of that kind, or a sibling whose other slots the frame can't fill
@@ -1181,6 +1228,10 @@ def serve_drill_hop(
         # path exists to remove, so fall through to the contextual re-route.
         _log.debug("drill hop %s -> %s returned no rows", frame.template_id, target)
         return None
+    if name_tier and edit_slot:
+        result.query_description = name_the_tier(
+            result.query_description, edit_value, edit_slot
+        )
     return result
 
 
@@ -1192,6 +1243,8 @@ def ambiguous_fragment_clarify(
     fragment_question: str | None,
     user_query: str,
     start: float | None = None,
+    frame_query_id: str | None = None,
+    fragment_query_id: str | None = None,
 ) -> RouteResult:
     """Ask which reading was meant, instead of serving a confident wrong one.
 
@@ -1199,10 +1252,23 @@ def ambiguous_fragment_clarify(
     executable catalog questions. The third chip is the escape for a user who
     meant neither — it routes through the miss path, which offers the nearest
     catalog questions.
+
+    THE STANDALONE-FRAGMENT CHIP IS DROPPED WHEN IT SHARES NO SUBJECT with the
+    frame. The fragment retrieved here is a bare place ("what about
+    Laxmipur?"), so the only signal retrieval had was a NAME — and a chip whose
+    only tie to what the user said is a place name is noise dressed as a
+    reading. Offering it invites a tap that silently changes the subject. It is
+    kept when nothing else survives, because an empty clarification is worse
+    than a noisy one; pass both ids to enable the test at all.
     """
+    keep_fragment = True
+    if fragment_query_id and frame_query_id and contextual_question:
+        keep_fragment = templates_share_subject(frame_query_id, fragment_query_id)
+
     options: list[Chip] = []
     seen: set[str] = set()
-    for text in (contextual_question, fragment_question):
+    for text in (contextual_question,
+                 fragment_question if keep_fragment else None):
         if not text or text in seen:
             continue
         seen.add(text)
@@ -1235,6 +1301,62 @@ def drill_question(
     if template is None:
         return None
     return readable_question(template["abstract_question"], fill)
+
+
+# The noun each geography tier is called in a chip and in an echo. Decision
+# D18.P3 makes GP/block collisions CLARIFY in v1 rather than infer the tier from
+# the sentence, so both readings have to be sayable — "Laxmipur" alone is
+# exactly the string that was ambiguous.
+TIER_NOUNS: dict[str, str] = {
+    "district_name": "district",
+    "block_name":    "block",
+    "gp_name":       "GP",
+}
+
+
+def name_the_tier(question: str | None, value: str | None, slot: str) -> str | None:
+    """'…incurred by Laxmipur in 2024-2025?' -> '…by Laxmipur (GP) in 2024-2025?'
+
+    Used when a place name resolved at MORE THAN ONE tier and the frame's
+    template could only execute one of them. The router picked; the echo has to
+    say which, or the answer silently asserts a reading the user never made.
+    """
+    noun = TIER_NOUNS.get(slot)
+    if not question or not value or not noun or f"({noun})" in question:
+        return question
+    return question.replace(str(value), f"{value} ({noun})", 1)
+
+
+def tier_collision_clarify(
+    *,
+    frame_question: str | None,
+    readings: list[tuple[str, str]],
+    user_query: str,
+    start: float | None = None,
+) -> RouteResult:
+    """"Laxmipur block, or Laxmipur GP?" — asked as a TIER question.
+
+    `readings` is [(chip label, send text)], one per tier the place resolves at
+    AND the frame's template can execute. This exists because the generic
+    "narrowed, or a new question?" prompt is the wrong question to ask here: the
+    user's intent to narrow is not in doubt, only which of two same-named places
+    they meant, and D18.P3 says ask rather than infer. Answering the wrong
+    question makes the officer re-type the name that was ambiguous in the first
+    place.
+    """
+    options = [Chip(label=label, send_text=text) for label, text in readings]
+    options.append(Chip(label="Something else", send_text="Something else"))
+    names = " or ".join(label for label, _ in readings) or "either"
+    subject = frame_question or "the question you were looking at"
+    prompt = (
+        f"That name belongs to more than one place — did you mean {names}? "
+        f"Either way I'll narrow “{subject}”."
+    )
+    return _clarify(
+        "tier_collision", prompt, options,
+        user_query, normalize(user_query),
+        start if start is not None else time.monotonic(),
+    )
 
 
 def serve_pending_answer(
@@ -1271,6 +1393,7 @@ def serve_pending_answer(
         pending.query_id, slot_type, raw_entities, validator,
         pending.original_query, normalized, start,
         optional=optional_slots(template["param_slots"]),
+        defaults=slot_defaults(template["param_slots"]),
     )
     if clarify_result is not None:
         return clarify_result
@@ -1433,10 +1556,19 @@ def _serve_query_id(
             entity_values[e.slot_name] = f"{e.raw_value} (₹{e.resolved_value})"
         else:
             entity_values[e.slot_name] = e.resolved_value
-    try:
-        query_description = template["abstract_question"].format(**entity_values)
-    except KeyError:
-        query_description = template["abstract_question"]
+    # PER-PLACEHOLDER, never all-or-nothing. `.format(**entity_values)` raises
+    # KeyError on the first unbound slot and the old fallback echoed the RAW
+    # abstract question, throwing away the substitutions that HAD resolved: the
+    # operator's "each GP in 2024-25" came back with `{gp_name}` AND
+    # `{date_range}` showing, while the SQL underneath had run correctly. Latent
+    # in AP, where every slot was required and the except never fired; under D2
+    # a partly-bound template is the normal case.
+    query_description = resolved_question(
+        template["abstract_question"],
+        entity_values,
+        unfilled_phrases(param_slots, set(entity_values),
+                         template.get("grouped_geo")),
+    )
     # A GP whose name is shared resolves to "Naugaon of Barpali" so the
     # panchayat survives a round trip — which renders "…of Barpali of Barpali"
     # in a question that already names the block. Same place named twice, said
@@ -1578,6 +1710,7 @@ def _route_vector(
                 query_id, slot_type, raw_entities, validator,
                 user_query, normalized, start,
                 optional=optional_slots(template_map[query_id]["param_slots"]),
+                defaults=slot_defaults(template_map[query_id]["param_slots"]),
             )
             if clarify_result is not None:
                 return clarify_result

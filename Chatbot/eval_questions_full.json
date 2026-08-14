@@ -178,16 +178,17 @@
   "q": "ଆର୍ଥିକ ବର୍ଷ ୨୦୨୪-୨୫ରେ ଖୋର୍ଦ୍ଧାରେ କେତେ GP GPDP ଅପଲୋଡ କରିଛନ୍ତି?",
   "gold": "PLN-001",
   "acc": [],
-  "partial": true,
+  "partial": false,
   "excluded": false,
   "src": "WP4a-gold/planning",
   "id": "G1008",
   "bracket": "Planning",
   "lang": "odia",
-  "case_type": "ambiguity",
-  "expected_behavior": "clarify",
+  "case_type": "standard",
+  "expected_behavior": "answer",
   "expected_entities": {
-   "district_name": "Khordha"
+   "district_name": "Khordha",
+   "date_range": "2024-2025"
   },
   "dashboard_eligible": false,
   "entity_surface": [
@@ -195,7 +196,7 @@
   ],
   "answerability": "Yes",
   "sme_review": true,
-  "notes": "KNOWN GAP, deliberate: date_phrase.py's _YEAR regex is ASCII-only, so Odia numerals yield no fiscal year and D9 required-slot behaviour should clarify. Graded as clarify-with-gold-chip. If WP-4 wants Odia numerals bound, that is a date_phrase change, not an eval fix."
+  "notes": "D18.P5 FIXED in WP-4: date_phrase.normalize_digits maps Odia numerals (U+0B66..U+0B6F) to ASCII before the year patterns run, so this question now binds $date_range = 2024-2025 and answers instead of clarifying. Was encoded as a deliberate known gap (WP-4a §6.2 / B9); the operator ruled fix-now."
  },
  {
   "n": 1009,
@@ -1057,6 +1058,53 @@
   "sme_review": false,
   "notes": "activity_delegation.is_delegated is 100% NULL.",
   "unanswerable_ref": "PLU-005"
+ },
+ {
+  "acc": [],
+  "excluded": false,
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "sme_review": false,
+  "n": 1043,
+  "q": "What percentage of Gram Panchayats in each block uploaded their GPDP in 2024-2025?",
+  "gold": "PLN-003",
+  "partial": false,
+  "src": "WP4-gold/planning",
+  "id": "G1043",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "answerability": "Partial",
+  "notes": "Frame-setter for G1044. PLN-003 filters by district and block only — it has no $gp_name slot, which is what makes the follow-up unambiguous."
+ },
+ {
+  "acc": [],
+  "excluded": false,
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "sme_review": true,
+  "n": 1044,
+  "q": "and Laxmipur?",
+  "gold": "PLN-003",
+  "partial": false,
+  "src": "WP4-gold/planning",
+  "id": "G1044",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "followup",
+  "expected_behavior": "context_preserving_reroute",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "block_name": "Laxmipur"
+  },
+  "answerability": "Partial",
+  "notes": "T2(e)(i)+(ii) — fragment x tier collision x SLOT CONSTRAINT. Laxmipur resolves as both a block and a GP, but PLN-003 has no $gp_name slot, so exactly one reading is executable: serve it rather than asking. The echo must name the tier ('Laxmipur (block)') because the bare name was ambiguous. Under the old widest-first walk the tier was chosen before the template's slots were consulted.",
+  "session": "prev",
+  "prior_id": "G1043"
  },
  {
   "n": 1201,
@@ -3023,6 +3071,50 @@
    "sample_output": "tied_untied  activities  sanctioned_amount  actual_expenditure  pct_utilised\n     Untied         196         27613806.0          24622782.6         89.17\n       Tied         193         18230430.0          14782626.0         81.09\n      Other           2           445152.0            219000.0         49.20",
    "source": "AI_Chatbot_Questions.xlsx : Test Report sheet"
   }
+ },
+ {
+  "acc": [],
+  "excluded": false,
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "sme_review": false,
+  "n": 1523,
+  "q": "What is the total actual expenditure incurred by each GP in 2024-2025?",
+  "gold": "EXP-001",
+  "partial": false,
+  "src": "WP4-gold/expenditure",
+  "id": "G1523",
+  "bracket": "Expenditure",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "answerability": "Partial",
+  "notes": "Frame-setter for G1524. Whole-of-state EXP-001: no geography bound, so the follow-up fragment has every tier open to it."
+ },
+ {
+  "acc": [],
+  "excluded": false,
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "sme_review": true,
+  "n": 1524,
+  "q": "what about Laxmipur?",
+  "gold": "EXP-001",
+  "partial": true,
+  "src": "WP4-gold/expenditure",
+  "id": "G1524",
+  "bracket": "Expenditure",
+  "lang": "en",
+  "case_type": "ambiguity",
+  "expected_behavior": "clarify",
+  "expected_entities": {},
+  "answerability": "Partial",
+  "notes": "T2(e)(iii) — fragment x tier collision, NO slot constraint. Laxmipur is both a block and a GP in the 20-GP sample and EXP-001 can filter on either, so both readings are executable and serving one is a coin flip presented as an answer. D18.P3: clarify, and the prompt must be the TIER question ('Laxmipur (block)' / 'Laxmipur (GP)'), not the generic 'narrowed, or a new question?'. Pairs with G1523; graded as clarify-with-gold-chip.",
+  "session": "prev",
+  "prior_id": "G1523"
  },
  {
   "n": 1601,

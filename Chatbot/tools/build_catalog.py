@@ -35,6 +35,9 @@ WHAT THIS SCRIPT DECIDES (everything else is copied verbatim)
        {theme}" needs the theme).
     3. Scope-phrased paraphrases (decision D2), so one consolidated template is
        retrievable at district, block and GP phrasing.
+    4. Which slots carry a DEFAULT — see `DEFAULTED_SLOTS`. Decision D18.P1:
+       `$top_n` is a presentational LIMIT the system supplies, not something an
+       officer says, so it ships optional-with-default rather than required.
 
 DEPENDENCY
     openpyxl, which is a build-time requirement only and is deliberately NOT in
@@ -124,6 +127,102 @@ def mask_literals(sql: str) -> str:
     """
     out = re.sub(r"'(?:[^']|'')*'", lambda m: " " * len(m.group(0)), sql)
     return re.sub(r"--[^\n]*", lambda m: " " * len(m.group(0)), out)
+
+
+# ── Which geography a statement reports ONE ROW PER ───────────────────────────
+#
+# Read at BUILD time and emitted as `grouped_geo`, so the runtime never parses
+# SQL. The echo layer needs it to tell two readings of the same unbound slot
+# apart: EXP-001 with no `$gp_name` reports one row PER GP ("…incurred by each
+# GP…") while PLN-001 with no `$gp_name` reports a single count over all of them
+# ("…across all GPs…"). Rendering both as "all GPs" describes the first one
+# wrongly — see query_router/zones.py.
+
+_GEO_COLUMNS = {
+    "district_name": re.compile(r"\bdistrict_name\b", re.IGNORECASE),
+    "block_name":    re.compile(r"\bblock_name\b", re.IGNORECASE),
+    "gp_name":       re.compile(r"\bgp_(?:name|lgd_code)\b", re.IGNORECASE),
+}
+
+
+def _split_top_level(text: str) -> list[str]:
+    """Comma-split at paren depth 0, so `SUM(a, b)` stays one item."""
+    out: list[str] = []
+    depth = 0
+    current: list[str] = []
+    for ch in text:
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+        if ch == "," and depth == 0:
+            out.append("".join(current))
+            current = []
+        else:
+            current.append(ch)
+    out.append("".join(current))
+    return [piece.strip() for piece in out if piece.strip()]
+
+
+def outer_select_and_group(sql: str) -> tuple[list[str], list[str]]:
+    """(SELECT items, GROUP BY items) of the OUTERMOST statement.
+
+    Depth-0 only: 145 of the geography templates carry a GROUP BY inside a
+    subquery whose grain says nothing about the shape of the answer. Literals
+    are masked first so a 'group by' inside an SBM regex cannot be read as a
+    clause.
+    """
+    masked = mask_literals(sql)
+    upper = masked.upper()
+    depth = 0
+    select_start = select_end = group_start = group_end = None
+    for i, ch in enumerate(masked):
+        if ch == "(":
+            depth += 1
+            continue
+        if ch == ")":
+            depth -= 1
+            continue
+        if depth != 0 or (i and (upper[i - 1].isalnum() or upper[i - 1] == "_")):
+            continue
+        if select_start is None and upper.startswith("SELECT", i):
+            select_start = i + len("SELECT")
+        elif select_start is not None and select_end is None and upper.startswith("FROM", i):
+            select_end = i
+        elif upper.startswith("GROUP BY", i):
+            group_start = i + len("GROUP BY")
+        elif (group_start is not None and group_end is None
+              and re.match(r"(?:ORDER\s+BY|LIMIT|HAVING)\b", upper[i:])):
+            group_end = i
+
+    select = (_split_top_level(sql[select_start:select_end])
+              if select_start is not None and select_end is not None else [])
+    group = (_split_top_level(sql[group_start:group_end or len(sql)])
+             if group_start is not None else [])
+    return select, group
+
+
+def grouped_geo_slots(sql: str, slots: list[dict]) -> list[str]:
+    """The geography slots this statement returns one row per.
+
+    A bare ordinal (`GROUP BY 1,2,3`, which is how 155 of these are written) is
+    resolved against the SELECT list, because the ordinal alone says nothing.
+    """
+    names = {s["name"] for s in slots}
+    select, group = outer_select_and_group(sql)
+    if not group:
+        return []
+    expressions = []
+    for item in group:
+        if item.isdigit():
+            index = int(item) - 1
+            if 0 <= index < len(select):
+                expressions.append(select[index])
+        else:
+            expressions.append(item)
+    joined = mask_literals(" , ".join(expressions))
+    return [slot for slot, pattern in _GEO_COLUMNS.items()
+            if slot in names and pattern.search(joined)]
 
 
 def alias_relations(sql: str) -> dict[str, str]:
@@ -247,6 +346,24 @@ PARAM_ENTITY_TYPES = {
 # The slots that bind a resolved code rather than the text the user said.
 CODE_BOUND = {"gp_name", "gp_name_2"}
 
+# Slots that ship OPTIONAL WITH A DEFAULT regardless of what the SQL guard says
+# (decision D18.P1). `$top_n` is the LIMIT on 91 of the 346 templates and no
+# officer says "top 10" — it is a page size the system supplies. Generated as
+# required, every ranking question stalls on a "how many rows?" clarification,
+# which WP-4a §5.2 showed would cost the first eval run a large, uniform and
+# entirely artificial accuracy loss.
+#
+# STRICTLY numeric-and-presentational, and the runtime asserts the same list:
+# `query_router.router._DEFAULT_ENTITY_VALUES` must agree with these values
+# (tests/test_param_binding.py pins it). A categorical slot or a threshold that
+# changes the POPULATION under study — $threshold, $amount_threshold — must
+# never appear here: guessing there silently answers a different question than
+# the one asked (D18.P2; the 15 threshold-bearing templates clarify instead).
+#
+# The value is a string because ExtractedEntity carries strings and DuckDB casts
+# at bind time, including inside LIMIT.
+DEFAULTED_SLOTS = {"top_n": "10"}
+
 # {Token} in the question text -> the slot it stands for. `.format()` is called
 # on abstract_question by suggestions._chip_for, so every placeholder must be a
 # real slot name or a pre-filled chip raises KeyError.
@@ -287,8 +404,14 @@ def build_slots(row: dict, sql: str) -> list[dict]:
         if entity_type is None:
             raise ValueError(f"{row['Question ID']}: unknown bind name ${name}")
         slot = {"name": name, "entity_type": entity_type}
-        if is_optional(sql, name):
+        if is_optional(sql, name) or name in DEFAULTED_SLOTS:
             slot["optional"] = True
+        if name in DEFAULTED_SLOTS:
+            # Optional here means "the router supplies it", NOT "bind NULL" —
+            # `LIMIT NULL` is unbounded, the opposite of a page size. The
+            # default is declared on the slot so every serving path reads it
+            # from one place; see router.slot_defaults().
+            slot["default"] = DEFAULTED_SLOTS[name]
         if name in CODE_BOUND:
             slot["bind"] = "code"
         slots.append(slot)
@@ -438,8 +561,9 @@ def py(value, indent: int = 0) -> str:
 
 def emit_entry(qid: str, entry: dict) -> str:
     order = ["abstract_question", "date_filter", "date_kind", "sql_template",
-             "param_slots", "result_ttl_seconds", "caveat", "bracket", "module",
-             "submodule", "question_type", "answerable", "paraphrases", "notes"]
+             "param_slots", "grouped_geo", "result_ttl_seconds", "caveat",
+             "bracket", "module", "submodule", "question_type", "answerable",
+             "paraphrases", "notes"]
     lines = [f"    {qid!r}: {{"]
     for key in order:
         if key not in entry:
@@ -1062,10 +1186,16 @@ def build_templates(sheets: dict) -> tuple[str, list[str], dict]:
         abstract = to_abstract(text(row["Parameterized Question"]), slot_names, qid)
 
         for slot in slots:
-            declared = registry_optional.get(slot["name"])
+            name = slot["name"]
+            if name in DEFAULTED_SLOTS:
+                # D18.P1 overrides both sources for these; counting them as
+                # disagreements would bury the 12 real ones under 91 noisy rows.
+                stats["defaulted"] += 1
+                continue
+            declared = registry_optional.get(name)
             if declared is not None and declared != bool(slot.get("optional")):
                 disagreements.append(
-                    f"{qid} ${slot['name']}: SQL guard says "
+                    f"{qid} ${name}: SQL guard says "
                     f"{'optional' if slot.get('optional') else 'required'}, "
                     f"Parameter Registry says "
                     f"{'optional' if declared else 'required'}"
@@ -1085,6 +1215,10 @@ def build_templates(sheets: dict) -> tuple[str, list[str], dict]:
             "answerable": text(row["Answerable from DB"]),
             "paraphrases": build_paraphrases(row, abstract, slots),
         }
+        grouped = grouped_geo_slots(sql, slots)
+        if grouped:
+            entry["grouped_geo"] = grouped
+            stats["grouped_geo"] += 1
         note = text(row["Answerability Note"])
         if note:
             entry["caveat"] = note
@@ -1110,6 +1244,14 @@ def build_templates(sheets: dict) -> tuple[str, list[str], dict]:
         f"optional-slot disagreements with the Parameter Registry "
         f"({len(disagreements)}) — the SQL guard wins:\n    "
         + "\n    ".join(disagreements)
+    )
+    findings.append(
+        f"optional-with-default slots (D18.P1, {stats['defaulted']} occurrences): "
+        + ", ".join(f"${n} = {v!r}" for n, v in sorted(DEFAULTED_SLOTS.items()))
+    )
+    findings.append(
+        f"templates reporting one row per geography (grouped_geo): "
+        f"{stats['grouped_geo']}"
     )
     return body, findings, stats
 

@@ -145,6 +145,74 @@ class NoFiscalYearTests(unittest.TestCase):
         )
 
 
+class OdiaNumeralTests(unittest.TestCase):
+    """Decision D18.P5. Odia is an official language of the state and its
+    numerals are U+0B66..U+0B6F, which the ASCII-only `_YEAR` pattern read as no
+    year at all — so under D9 a perfectly clear question became a
+    required-slot clarification (WP-4a §6.2).
+    """
+
+    def test_the_two_digit_form_in_odia_digits(self):
+        self.assertEqual(
+            resolve_fiscal_years("୨୦୨୪-୨୫", LOADED_YEARS), ["2024-2025"]
+        )
+
+    def test_the_stored_full_form_in_odia_digits(self):
+        self.assertEqual(
+            resolve_fiscal_years("୨୦୨୪-୨୦୨୫", LOADED_YEARS), ["2024-2025"]
+        )
+
+    def test_a_bare_odia_year(self):
+        self.assertEqual(
+            resolve_fiscal_years("୨୦୨୪", LOADED_YEARS), ["2024-2025"]
+        )
+
+    def test_inside_a_whole_odia_question(self):
+        """G1008's own phrasing: 'How much was spent in Odisha in 2024-25?'"""
+        self.assertEqual(
+            resolve_fiscal_year("ଓଡ଼ିଶାରେ ୨୦୨୪-୨୫ରେ କେତେ ଖର୍ଚ୍ଚ ହୋଇଛି?",
+                                LOADED_YEARS),
+            "2024-2025",
+        )
+
+    def test_an_ascii_label_in_front_of_odia_digits(self):
+        self.assertEqual(
+            resolve_fiscal_years("FY ୨୦୨୪-୨୫", LOADED_YEARS), ["2024-2025"]
+        )
+
+    def test_the_calendar_window_reads_odia_digits_too(self):
+        self.assertEqual(
+            extract_date_window("FY ୨୦୨୪-୨୫"), ("2024-04-01", "2025-03-31")
+        )
+        self.assertEqual(
+            extract_date_window("March ୨୦୨୫"), ("2025-03-01", "2025-03-31")
+        )
+
+    def test_an_odia_month_name_is_not_translated(self):
+        """The scope of D18.P5 is DIGITS. `_MONTHS` is an English vocabulary, so
+        'ମାର୍ଚ୍ଚ ୨୦୨୫' degrades to the bare-year window rather than the March
+        one — honest, and the alternative (an Odia month lexicon) is a larger
+        change than the ruling asked for."""
+        self.assertEqual(
+            extract_date_window("ମାର୍ଚ୍ଚ ୨୦୨୫"), ("2025-01-01", "2025-12-31")
+        )
+
+    def test_normalisation_preserves_length_and_offsets(self):
+        """The property the span bookkeeping depends on: `consumed` ranges and
+        the money/quantity guards index into the SAME positions after
+        translation, so a 1:1 code-point map is the only safe kind here."""
+        from query_router.date_phrase import normalize_digits
+        source = "ଓଡ଼ିଶାରେ ୨୦୨୪-୨୫ରେ କେତେ ଖର୍ଚ୍ଚ?"
+        self.assertEqual(len(normalize_digits(source)), len(source))
+        self.assertEqual(normalize_digits("୨୦୨୪-୨୫"), "2024-25")
+
+    def test_the_guards_still_hold_in_odia_digits(self):
+        """A rupee figure written in Odia numerals is still not a year."""
+        self.assertEqual(
+            resolve_fiscal_years("₹୨୦୨୫ ରୁ ଅଧିକ", LOADED_YEARS), []
+        )
+
+
 class YearOutsideTheDataTests(unittest.TestCase):
     """Canonicalised, not suppressed. The REGISTRY refuses an unloaded year by
     name and offers the loaded ones; silently reading it as a year that IS

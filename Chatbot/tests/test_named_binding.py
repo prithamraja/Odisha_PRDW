@@ -141,6 +141,21 @@ class StubValidator:
         raise EntityNotFound(entity_type, str(raw), self.known.get(entity_type, [])[:3])
 
 
+class NumericStubValidator:
+    """Passes a number through, the way the real registry's numeric kind does.
+
+    Kept separate from StubValidator, whose whole job is to raise for anything
+    outside its roster — a defaulted slot has to reach validation and survive it,
+    which a roster stub cannot express.
+    """
+
+    def validate(self, raw, entity_type):
+        return ExtractedEntity(
+            slot_name=entity_type, raw_value=str(raw), resolved_value=str(raw),
+            entity_type=entity_type, confidence="exact",
+        )
+
+
 def _entities(**slots) -> list[ExtractedEntity]:
     return [
         ExtractedEntity(slot_name=name, raw_value=value, resolved_value=value,
@@ -294,6 +309,41 @@ class OptionalSlotTests(unittest.TestCase):
         self.assertEqual(clarify.tier, RouteTier.CLARIFY)
         self.assertEqual(clarify.clarification.reason, "missing_parameter")
         self.assertEqual(clarify.pending.missing_slot, "district_name")
+
+    def test_a_defaulted_slot_is_filled_rather_than_asked_for(self):
+        """Decision D18.P1, at the layer that decides between answering and
+        clarifying. A real catalogue ranking template: the officer states the
+        year and nothing else, and `$top_n` arrives at the validator as the
+        declared '10' instead of becoming a "how many rows?" chip."""
+        from query_router.template_catalog import TEMPLATE_CATALOG
+        qid = next(q for q, t in TEMPLATE_CATALOG.items()
+                   if any(s["name"] == "top_n" for s in t["param_slots"]))
+        slots = TEMPLATE_CATALOG[qid]["param_slots"]
+        validated, clarify = router._fill_slots_or_clarify(
+            qid,
+            {"top_n": "top_n"},
+            {"top_n": None},
+            NumericStubValidator(), "which theme has the most planned activities?",
+            "normalized", 0.0,
+            optional=router.optional_slots(slots),
+            defaults=router.slot_defaults(slots),
+        )
+        self.assertIsNone(clarify, "a defaulted slot must never stall")
+        self.assertEqual([e.resolved_value for e in validated], ["10"])
+
+    def test_a_supplied_top_n_wins_over_the_default(self):
+        from query_router.template_catalog import TEMPLATE_CATALOG
+        qid = next(q for q, t in TEMPLATE_CATALOG.items()
+                   if any(s["name"] == "top_n" for s in t["param_slots"]))
+        slots = TEMPLATE_CATALOG[qid]["param_slots"]
+        validated, clarify = router._fill_slots_or_clarify(
+            qid, {"top_n": "top_n"}, {"top_n": "3"},
+            NumericStubValidator(), "top 3 themes", "normalized", 0.0,
+            optional=router.optional_slots(slots),
+            defaults=router.slot_defaults(slots),
+        )
+        self.assertIsNone(clarify)
+        self.assertEqual([e.resolved_value for e in validated], ["3"])
 
     def test_a_supplied_optional_value_is_still_validated(self):
         """Optional means 'may be absent', NOT 'accept anything'. A district the
