@@ -1,7 +1,7 @@
 # WP-4 — Eval integration and first runs (handoff brief)
 
 **For:** the operator-controlled implementation agent.
-**Read first:** `PROJECT_PLAN.md` (D9, D13, **D14**, §3a); `handoffs/WP4a_REPORT.md` (§0, §5, §6, §7 are your spec); `handoffs/WP3_REPORT.md` §13.
+**Read first:** `PROJECT_PLAN.md` (D9, D13, **D18**, §3a); `handoffs/WP4a_REPORT.md` (§0, §5, §6, §7 are your spec); `handoffs/WP3_REPORT.md` §13.
 **Scope:** make the gold set live, fix what blocks a meaningful eval, run the evals, triage. **Explicitly NOT in scope: any threshold change** (`NO_MATCH_LOWER`, `CLARIFY_UPPER`, `CLARIFY_SCORE_MARGIN`) — calibration is WP-4c, after SME sign-off.
 
 ## Hard constraints
@@ -14,10 +14,10 @@ Repo-only; Drive `.duckdb` read-only; `.env` untouched/unprinted; §3a cache-del
 
 **T1 — Integrate.** Commit the WP-4a output as delivered (`eval/`, the two built harness inputs, `handoffs/WP4a_REPORT.md`, the pending `PROJECT_PLAN.md` edits). Then `python eval/gold/build_eval_questions.py --check` must pass from the committed tree.
 
-**T2 — D14 catalogue fixes (edit the GENERATOR, then regenerate — never the generated files):**
-  a) **`top_n` optional-with-default 10** (D14.P1): `build_catalog.py` marks `$top_n` slots `optional` with default `"10"`; regenerate; `--check` green; update the pins in `test_catalog_execution.py` / `test_param_binding.py` that assert required-ness. Ceiling stays 1,000 (operator-ratified; commit `96179d8`).
-  b) **`$threshold` / `$amount_threshold` stay required** (D14.P2) — confirm no code change needed; the 15 templates clarify.
-  c) **Odia digit normalization** (D14.P5): `str.translate` of Odia digits → ASCII in `date_phrase.py`'s preprocessing (and anywhere fiscal-year surfaces are read); tests for `୨୦୨୪-୨୫` → `2024-2025`; update gold row G1008 from clarify to answer, rebuild via `--install`, re-run `--check`.
+**T2 — D18 catalogue fixes (edit the GENERATOR, then regenerate — never the generated files):**
+  a) **`top_n` optional-with-default 10** (D18.P1): `build_catalog.py` marks `$top_n` slots `optional` with default `"10"`; regenerate; `--check` green; update the pins in `test_catalog_execution.py` / `test_param_binding.py` that assert required-ness. Ceiling stays 1,000 (operator-ratified; commit `96179d8`).
+  b) **`$threshold` / `$amount_threshold` stay required** (D18.P2) — confirm no code change needed; the 15 templates clarify.
+  c) **Odia digit normalization** (D18.P5): `str.translate` of Odia digits → ASCII in `date_phrase.py`'s preprocessing (and anywhere fiscal-year surfaces are read); tests for `୨୦୨୪-୨୫` → `2024-2025`; update gold row G1008 from clarify to answer, rebuild via `--install`, re-run `--check`.
 
 **T3 — Unanswerable-gold upgrade** (WP-4a §5): flip the 19 rows from `gold: "no_match"` + `unanswerable_ref` to `gold: <unanswerable id>` so "declined for the right documented reason" is distinguishable from "declined generically". Extend `grade_full_eval.grade()` to accept a served-refusal id as a hit for those golds. Add the assertion (also destined for WP-5's gates): **a served refusal leaves `result` as `None`, never `[]`** — the one coupling that silently flips all 19 rows to `wrong_template`.
 
@@ -41,7 +41,7 @@ Repo-only; Drive `.duckdb` read-only; `.env` untouched/unprinted; §3a cache-del
 ## Gate (definition of done)
 
 1. Integration committed; `--check` and the harness gate green from the committed tree.
-2. D14 fixes in via the generator; execution oracle still 346/346; suite green with updated pins.
+2. D18 fixes in via the generator; execution oracle still 346/346; suite green with updated pins.
 3. All three paid runs completed with spend recorded; consistency replays done.
 4. Every reported failure is replay-confirmed and classified; zero threshold changes.
 5. The 23 AP endpoint tests no longer reference paths outside the repo.
