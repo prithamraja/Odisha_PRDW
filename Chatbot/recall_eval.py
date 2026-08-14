@@ -237,7 +237,8 @@ def load_gold() -> list[dict]:
             topic = (r.get("topic") or "").strip()
             if gold and topic:
                 rows.append({"topic": topic, "gold": gold,
-                             "intent": (r.get("intent") or "").strip()})
+                             "intent": (r.get("intent") or "").strip(),
+                             "lang": (r.get("lang") or "").strip() or "en"})
     return rows
 
 
@@ -313,11 +314,13 @@ def main() -> None:
     dup_of = {qid: set(group) - {qid}
               for group in dup_groups for qid in group}
 
+    ranks_in_order = []
     for g, qv in zip(scorable, q_vecs):
         ranked, raw = cosine_rank(qv, vectors, vec_qids)
         gold_id  = g["gold"]
         rank     = ranked.index(gold_id)          # 0-based, distinct ids
         ranks.append(rank)
+        ranks_in_order.append(rank)
         for k in Ks:
             if rank < k:
                 hits[k] += 1
@@ -353,6 +356,21 @@ def main() -> None:
     print(f"\n── Recall@K ({args.lang}; {note}) ──")
     for k in Ks:
         print(f"  recall@{k:<3}: {hits[k]/n:6.1%}  ({hits[k]}/{n})")
+
+    # PER LANGUAGE, because the headline hides the finding. English rows are
+    # phrased like the catalogue and flatter retrieval; the Odia-script rows are
+    # the ones that measure whether an officer typing in the state language can
+    # reach the catalogue at all.
+    print(f"\n── Recall@{args.k} by language ──")
+    by_lang = defaultdict(lambda: [0, 0])
+    for g, rank in zip(scorable, ranks_in_order):
+        bucket = by_lang[g.get("lang") or "en"]
+        bucket[1] += 1
+        if rank < args.k:
+            bucket[0] += 1
+    for lang in sorted(by_lang):
+        hit_n, total = by_lang[lang]
+        print(f"  {lang:<14} {hit_n/total:6.1%}  ({hit_n}/{total})")
 
     ranks.sort()
     def pct(p): return ranks[min(len(ranks) - 1, int(len(ranks) * p))]

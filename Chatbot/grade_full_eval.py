@@ -126,15 +126,28 @@ def grade(rec):
 
 
 def main():
+    # The replay to grade. WP-4 T5c runs the full eval three times and the
+    # triage rule is that no failure counts as a regression unless it appears in
+    # at least 2 of 3 — which means grading each replay, not just the last one
+    # to overwrite the default file.
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--in", dest="in_path", type=Path,
+                    default=HERE / "eval_full_results.jsonl")
+    ap.add_argument("--out", dest="out_path", type=Path, default=None)
+    args = ap.parse_args()
+    out_path = args.out_path or args.in_path.with_name(
+        args.in_path.stem.replace("results", "graded") + ".json")
+
     recs = [json.loads(l) for l in
-            (HERE / "eval_full_results.jsonl").read_text(encoding="utf-8").splitlines() if l.strip()]
+            args.in_path.read_text(encoding="utf-8").splitlines() if l.strip()]
     buckets = {}
     for r in recs:
         v = grade(r)
         r["verdict"] = v
         buckets.setdefault(v, []).append(r)
 
-    print(f"total: {len(recs)}")
+    print(f"{args.in_path.name}: total {len(recs)}")
     for k in ("hit", "partial", "clarify_gold_offered", "clarify", "wrong_template",
               "wrong_refusal", "declined_generically", "refusal_with_rows",
               "fallback", "error", "excluded", "new"):
@@ -174,8 +187,9 @@ def main():
         if rows:
             print(f"    rows: {json.dumps(rows, ensure_ascii=False, default=str)[:220]}")
 
-    (HERE / "eval_full_graded.json").write_text(
+    out_path.write_text(
         json.dumps(recs, indent=1, ensure_ascii=False), encoding="utf-8")
+    print(f"\nWrote {out_path}")
 
 
 if __name__ == "__main__":

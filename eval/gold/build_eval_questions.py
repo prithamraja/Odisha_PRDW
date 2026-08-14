@@ -175,15 +175,26 @@ def write_full(recs: list[dict], out: Path) -> None:
 
 
 def write_recall_csv(recs: list[dict], out: Path) -> None:
+    # A FRAGMENT has no standalone retrieval target — "what about Laxmipur?"
+    # carries a place and no subject, so scoring it against a template measures
+    # the frame it was denied rather than the retriever. `session: "prev"` is
+    # the property that says so; case_type does not, because a fragment can also
+    # be an AMBIGUITY row (G1524 is both, and scored 107 here before this rule).
     rows = [r for r in recs
             if r.get("case_type") not in RECALL_EXCLUDED_CASES
+            and r.get("session") != "prev"
             and r.get("gold") and r["gold"] != "no_match"]
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("w", encoding="utf-8-sig", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["query_code", "topic", "intent"])
+        # `lang` is additive — recall_eval reads by DictReader, so older
+        # readers ignore it — and it is what turns "recall@30 is 94.8%" into
+        # "recall@30 is 98% in English and 76% in Odia script", which is a
+        # finding rather than a number.
+        w.writerow(["query_code", "topic", "intent", "lang"])
         for r in rows:
-            w.writerow([r["gold"], r["q"], r.get("bracket") or ""])
+            w.writerow([r["gold"], r["q"], r.get("bracket") or "",
+                        r.get("lang") or ""])
     skipped = len(recs) - len(rows)
     print(f"wrote {out}  ({len(rows)} rows; {skipped} skipped — "
           f"fragments, unanswerables and out-of-domain have no retrieval target)")
