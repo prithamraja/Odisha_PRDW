@@ -539,6 +539,39 @@ class AnswerEchoTests(unittest.TestCase):
         )
         self.assertEqual(leaking, [])
 
+    def test_a_bound_slot_with_no_placeholder_is_appended_not_dropped(self):
+        """Measured in WP-4's eval run, not hypothesised: "what about
+        Laxmipur?" over an EXP-001 frame bound `block_name = Laxmipur`,
+        returned the one right row, and echoed "…incurred by each GP in
+        2024-2025?" — no Laxmipur anywhere. EXP-001's SQL filters on
+        `$block_name` but its QUESTION TEXT names only `{gp_name}` and
+        `{date_range}`, so the value had nowhere to render. Correct answer,
+        wrong question printed above it: the operator's original report in
+        different clothes."""
+        self.assertEqual(
+            self._echo("EXP-001", date_range="2024-2025", block_name="Laxmipur"),
+            "What is the total actual expenditure incurred by each GP in "
+            "2024-2025 (Laxmipur block)?",
+        )
+
+    def test_an_appended_scope_is_never_a_duplicate(self):
+        """A value the question already renders must not be appended again."""
+        echoed = self._echo("EXP-001", date_range="2024-2025", gp_name="Andhrua")
+        self.assertEqual(echoed.count("Andhrua"), 1)
+        self.assertFalse(echoed.endswith(")?"))
+
+    def test_the_append_survives_the_whole_catalogue(self):
+        """Fully bound, every template, no brace and no runaway."""
+        for qid, template in TEMPLATE_CATALOG.items():
+            fill = {s["name"]: s["name"].upper() for s in template["param_slots"]}
+            with self.subTest(qid=qid):
+                text = resolved_question(
+                    template["abstract_question"], fill,
+                    unfilled_phrases(template["param_slots"], set(fill),
+                                     template.get("grouped_geo")))
+                self.assertNotIn("{", text)
+                self.assertNotIn("}", text)
+
     def test_a_required_slot_is_never_described_as_a_collective(self):
         """'below all thresholds' would state something the query never did. An
         unbound REQUIRED slot keeps the chip stand-in, which reads as the

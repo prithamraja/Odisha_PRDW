@@ -139,6 +139,19 @@ _SLOT_COLLECTIVES: dict[str, str] = {
     "activity_code":      "all activities",
 }
 
+# How a bound value reads when it has to be APPENDED because the question text
+# has no placeholder for it. Written the way an officer says the tier, not the
+# way the bind name spells it: "Laxmipur block", never "Laxmipur block_name".
+# A slot with no entry here appends its bare value, which is right for the ones
+# whose value already says what it is (a fiscal year, a theme, a status).
+_APPEND_NOUNS: dict[str, str] = {
+    "district_name": "district",
+    "block_name":    "block",
+    "block_name_2":  "block",
+    "gp_name":       "GP",
+    "gp_name_2":     "GP",
+}
+
 _SLOT_DISTRIBUTIVES: dict[str, str] = {
     "district_name": "each district",
     "block_name":    "each block",
@@ -234,8 +247,25 @@ def resolved_question(
 
     `phrases` comes from unfilled_phrases(); anything it does not name falls back
     to the chip stand-in. A `{` must never survive into an answer.
+
+    A BOUND SLOT WITH NO PLACEHOLDER IS APPENDED, not dropped. Under D2 a
+    template filters on slots its question text never names — EXP-001 reads
+    "…incurred by {gp_name} in {date_range}?" but its SQL also filters on
+    `$block_name`. Measured in WP-4's eval run: "what about Laxmipur?" bound
+    `block_name = Laxmipur`, returned the one right row, and echoed "…incurred
+    by each GP in 2024-2025?" — no Laxmipur anywhere. Correct answer, wrong
+    question printed above it, which is the SAME defect the operator reported
+    wearing different clothes. `suggestions._chip_for` already appends for this
+    reason; the answer echo has to as well.
     """
-    return _readable(question, fill, phrases)
+    rendered = _readable(question, fill, phrases)
+    for slot, value in (fill or {}).items():
+        text = str(value)
+        if not text or f"{{{slot}}}" in question or text in rendered:
+            continue
+        scope = f"{text} {_APPEND_NOUNS.get(slot, '')}".strip()
+        rendered = f"{rendered.rstrip('?. ')} ({scope})?"
+    return rendered
 
 
 def question_chips(
