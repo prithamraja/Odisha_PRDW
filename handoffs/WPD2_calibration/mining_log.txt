@@ -1,0 +1,161 @@
+WP-D2b MINING TRANSCRIPT  (run 2026-08-14)
+==========================================================================
+view1 was re-mined at the D25 depth-1 config and DRAINED.
+
+view2 and view3 were NOT re-mined: their configs are unchanged by WP-D2b, so
+their WP-D2 candidate files are current. Their transcripts below are the WP-D2
+run's, reproduced unedited. The candidate files this package was ranked from:
+
+  view1_candidates.json  sha256 236f8e1b4c5d2d0e30c1a4b8e56df209f90f0f71b790d2d338b2bf09f78239b1
+  view2_candidates.json  sha256 33501b929ce348410f8661d86f4af4657a4b45d0f84a6567b6d502b7f21bc426
+  view3_candidates.json  sha256 b8085da4970eb5749a8a483274237cab7bac95776c54b96f603a36806f54e5d8
+
+Re-ranking view2 and view3 from those unchanged files reproduced their WP-D2
+`*_ranked.json` BYTE FOR BYTE, so the phase5 `__main__` list edit changed the
+set of views ranked and nothing about the ranking itself.
+
+==========================================================================
+PART 1 -- view2, view3  (WP-D2 run, transcript unedited)
+==========================================================================
+
+DISCOVER_SCALE=sample
+
+======================================================================
+VIEW: Geo-Month Cash Cube
+======================================================================
+Loading C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\ad3d2343-4b3b-4dc8-bc1d-8fec8019f58d\scratchpad\mirror\Insights\views_prdw\view2_geo_month_cube.parquet ...
+  1,440 rows x 17 cols
+
+Pattern types: 6 categorical, 5 temporal  (11 total)
+
+Generating subspaces ...
+  depth-0: 1  depth-1: 51  depth-2: 0  total: 52
+Building priority queue ...
+  52 subspaces retained after impact pruning (min=0.01)
+
+Mining (budget: 300s) ...
+
+Mining complete in 21.6s
+  Scopes evaluated:      2,149
+  Patterns found:        1,613
+  HDPs evaluated:        1,845
+  HDPs skipped (dedup):  3,116
+  HDP dedup hit rate:    62.8%
+  MetaInsights found:    110
+  Query cache hit rate:  96.8%
+  Pattern cache rate:    48.0%
+  Top score:             0.7211
+
+  Candidates by pattern type:
+    TREND               : 49
+    SEASONALITY         : 30
+    OUTSTANDING_1       : 11
+    OUTLIER             : 10
+    CHANGE_POINT        : 3
+    TOP_TWO             : 2
+    OUTSTANDING_LAST    : 2
+    UNIMODALITY         : 2
+    ATTRIBUTION         : 1
+Saved 110 candidates -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\ad3d2343-4b3b-4dc8-bc1d-8fec8019f58d\scratchpad\mirror\Insights\metainsights\view2_candidates.json
+
+======================================================================
+VIEW: GP Performance
+======================================================================
+Loading C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\ad3d2343-4b3b-4dc8-bc1d-8fec8019f58d\scratchpad\mirror\Insights\views_prdw\view3_gp_performance.parquet ...
+  120 rows x 26 cols
+
+Pattern types: 6 categorical, 5 temporal  (11 total)
+
+Generating subspaces ...
+  depth-0: 1  depth-1: 45  depth-2: 0  total: 46
+Building priority queue ...
+  46 subspaces retained after impact pruning (min=0.01)
+
+Mining (budget: 120s) ...
+
+Mining complete in 6.2s
+  Scopes evaluated:      2,502
+  Patterns found:        618
+  HDPs evaluated:        430
+  HDPs skipped (dedup):  876
+  HDP dedup hit rate:    67.1%
+  MetaInsights found:    5
+  Query cache hit rate:  96.5%
+  Pattern cache rate:    23.1%
+  Top score:             0.6598
+
+  Candidates by pattern type:
+    TREND               : 4
+    EVENNESS            : 1
+Saved 5 candidates -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\ad3d2343-4b3b-4dc8-bc1d-8fec8019f58d\scratchpad\mirror\Insights\metainsights\view3_candidates.json
+
+==========================================================================
+PART 2 -- view1 at max_subspace_depth = 1  (WP-D2b run)
+==========================================================================
+For comparison, the WP-D2 depth-2 attempt on the same Parquet enumerated
+13,495 subspaces (13,322 of them depth-2), kept 2,438 after the 1% impact
+prune, and put 880,752 data scopes behind them; it reached 15,000 scopes
+(1.7%) in 585.6s at 3.94 GB of process memory and was stopped. The run below
+is the same view, same 17 dimensions and same 24 measures, at depth 1.
+
+DISCOVER_SCALE=sample
+view1 max_subspace_depth=1
+view1 dimensions=17 measures=24
+
+======================================================================
+VIEW: Activity Lifecycle
+======================================================================
+Loading C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\1223e392-2b26-45c2-82d4-ecbde6125d84\scratchpad\mirror\Insights\views_prdw\view1_activity_lifecycle.parquet ...
+  12,704 rows x 70 cols
+
+Pattern types: 6 categorical, 5 temporal  (11 total)
+
+Generating subspaces ...
+  depth-0: 1  depth-1: 172  depth-2: 0  total: 173
+Building priority queue ...
+  127 subspaces retained after impact pruning (min=0.01)
+
+Mining (budget: 3600s) ...
+  5,000 scopes | 6,578 patterns | 2,068 MetaInsights | 74.2s elapsed
+  10,000 scopes | 13,213 patterns | 2,290 MetaInsights | 97.0s elapsed
+  15,000 scopes | 18,985 patterns | 2,439 MetaInsights | 120.1s elapsed
+  20,000 scopes | 25,130 patterns | 2,622 MetaInsights | 148.3s elapsed
+  25,000 scopes | 29,845 patterns | 2,716 MetaInsights | 178.7s elapsed
+  30,000 scopes | 34,566 patterns | 2,817 MetaInsights | 202.1s elapsed
+  35,000 scopes | 39,455 patterns | 2,913 MetaInsights | 220.8s elapsed
+  40,000 scopes | 44,181 patterns | 3,008 MetaInsights | 239.0s elapsed
+  45,000 scopes | 48,401 patterns | 3,086 MetaInsights | 252.3s elapsed
+
+Mining complete in 262.5s
+  Scopes evaluated:      48,792
+  Patterns found:        51,571
+  HDPs evaluated:        22,724
+  HDPs skipped (dedup):  86,959
+  HDP dedup hit rate:    79.3%
+  MetaInsights found:    3,139
+  Query cache hit rate:  97.4%
+  Pattern cache rate:    43.0%
+  Top score:             0.8760
+
+  Candidates by pattern type:
+    OUTSTANDING_1       : 1,074
+    ATTRIBUTION         : 820
+    TOP_TWO             : 676
+    EVENNESS            : 267
+    OUTSTANDING_LAST    : 175
+    LAST_TWO            : 127
+Saved 3,139 candidates -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\1223e392-2b26-45c2-82d4-ecbde6125d84\scratchpad\mirror\Insights\metainsights\view1_candidates.json
+
+ELAPSED       262.8s of 3600s budget
+DRAINED       YES
+CANDIDATES    3,139
+PEAK RSS      0.60 GB private; machine free 0.54 GB of 15.67 GB
+DIAGNOSTICS
+  elapsed: 262.4702961444855
+  scopes_evaluated: 48792
+  patterns_found: 51571
+  hdps_evaluated: 22724
+  hdps_skipped: 86959
+  query_cache: <phase2_engine.QueryCache object at 0x000001B2E0086660>
+  pattern_cache: <phase2_engine.PatternCache object at 0x000001B2E00878C0>
+  type_counts: {'EVENNESS': 267, 'OUTSTANDING_1': 1074, 'ATTRIBUTION': 820, 'TOP_TWO': 676, 'OUTSTANDING_LAST': 175, 'LAST_TWO': 127}

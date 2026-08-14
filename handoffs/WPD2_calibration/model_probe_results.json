@@ -1,0 +1,43 @@
+{
+  "view": "view2",
+  "n_findings": 15,
+  "prompt_chars": 34724,
+  "results": {
+    "gpt-5.6-luna": {
+      "finish_reason": "stop",
+      "prompt_tokens": 9049,
+      "completion_tokens": 2011,
+      "reasoning_tokens": 1024,
+      "visible_tokens": 987,
+      "budget": 9000,
+      "headroom_tokens": 6989,
+      "chars": 4481,
+      "words": 650,
+      "empty": false
+    },
+    "gpt-5.6-sol": {
+      "finish_reason": "stop",
+      "prompt_tokens": 9049,
+      "completion_tokens": 2622,
+      "reasoning_tokens": 1565,
+      "visible_tokens": 1057,
+      "budget": 9000,
+      "headroom_tokens": 6378,
+      "chars": 4861,
+      "words": 677,
+      "empty": false
+    },
+    "gpt-5.6-terra": {
+      "finish_reason": "stop",
+      "prompt_tokens": 9049,
+      "completion_tokens": 1519,
+      "reasoning_tokens": 512,
+      "visible_tokens": 1007,
+      "budget": 9000,
+      "headroom_tokens": 7481,
+      "chars": 4793,
+      "words": 685,
+      "empty": false
+    }
+  }
+}

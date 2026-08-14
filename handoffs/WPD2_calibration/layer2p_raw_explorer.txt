@@ -1,0 +1,75 @@
+======================================================================
+LAYER 2P -- RAW METAINSIGHT EXPLORER
+======================================================================
+
+======================================================================
+VIEW: view1  |  Total candidates: 3,139
+======================================================================
+
+Score distribution:
+  Max=0.8760  Median=0.2693  Min=0.0006  Mean=0.3233
+
+  Pattern Type                 Total   Actionable  Top Score
+  ---------------------------------------------------------
+  OUTSTANDING_1                1,074          905     0.8402
+  ATTRIBUTION                    820          691     0.8402
+  TOP_TWO                        676          622     0.7384
+  EVENNESS                       267          150     0.8760
+  OUTSTANDING_LAST               175          146     0.7384
+  LAST_TWO                       127          124     0.7211
+
+  Zero candidates: ['TREND', 'OUTLIER', 'SEASONALITY', 'CHANGE_POINT', 'UNIMODALITY']
+
+Extending strategies:
+  subspace: 2,027
+  measure: 1,112
+
+Universal: 501  |  Actionable: 2,638
+
+======================================================================
+VIEW: view2  |  Total candidates: 110
+======================================================================
+
+Score distribution:
+  Max=0.7211  Median=0.0376  Min=0.0046  Mean=0.0899
+
+  Pattern Type                 Total   Actionable  Top Score
+  ---------------------------------------------------------
+  TREND                           49           38     0.7211
+  SEASONALITY                     30           30     0.4877
+  OUTSTANDING_1                   11           11     0.6373
+  OUTLIER                         10           10     0.0514
+  CHANGE_POINT                     3            3     0.1112
+  TOP_TWO                          2            2     0.1207
+  OUTSTANDING_LAST                 2            2     0.0570
+  UNIMODALITY                      2            2     0.0051
+  ATTRIBUTION                      1            1     0.0418
+
+  Zero candidates: ['LAST_TWO', 'EVENNESS']
+
+Extending strategies:
+  breakdown: 54
+  measure: 49
+  subspace: 7
+
+Universal: 11  |  Actionable: 99
+
+======================================================================
+VIEW: view3  |  Total candidates: 5
+======================================================================
+
+Score distribution:
+  Max=0.6598  Median=0.4877  Min=0.0507  Mean=0.4112
+
+  Pattern Type                 Total   Actionable  Top Score
+  ---------------------------------------------------------
+  TREND                            4            4     0.6598
+  EVENNESS                         1            1     0.0507
+
+  Zero candidates: ['OUTSTANDING_1', 'OUTSTANDING_LAST', 'TOP_TWO', 'LAST_TWO', 'ATTRIBUTION', 'OUTLIER', 'SEASONALITY', 'CHANGE_POINT', 'UNIMODALITY']
+
+Extending strategies:
+  subspace: 4
+  measure: 1
+
+Universal: 0  |  Actionable: 5

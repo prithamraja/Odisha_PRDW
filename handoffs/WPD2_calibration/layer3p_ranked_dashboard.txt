@@ -1,0 +1,359 @@
+======================================================================
+LAYER 3P -- RANKED PER-VIEW DASHBOARD
+======================================================================
+
+======================================================================
+VIEW: view1  |  Selected 15 from 3,139 candidates
+======================================================================
+
+Diversity:
+  Pattern types (6): ATTRIBUTION, EVENNESS, LAST_TWO, OUTSTANDING_1, OUTSTANDING_LAST, TOP_TWO
+  Extending dims (3): asset_category_label, fiscal_year, gp_name
+  Measures (8): fund_tied_total, fund_untied_total, is_started, n_activities, overspend_vs_plan, overspend_vs_sanction, trainees_total, work_proposed_cost
+
+TotalUse: 11.6889  |  Sum of scores: 11.6889  |  Redundancy penalty: 0.0000
+
+--- Ranked MetaInsights ---
+
+  #1  score=0.8760  (conciseness=0.8760, impact=1.0000)
+    subspace on asset_category_label  |  EVENNESS  |  breakdown=gp_name  |  measure=overspend_vs_plan
+    Subspace: {*}  |  HDP: 28
+    Commonness: [EVENNESS] ('EVEN',)  (27/28 = 96%)
+      Members: Water Sources & Structures, Electrification, Roads, Bridges & Culverts, Buildings, Solid Waste Management, Movable Sanitation Asset +21 more
+    Exceptions (1):
+      Banking Facilities        NO_PATTERN           
+    >> Across nearly all asset_category_label values (27/28), overspend_vs_plan is evenly distributed across gp_name values. Exception: Banking Facilities (no clear pattern)
+
+  #2  score=0.8760  (conciseness=0.8760, impact=1.0000)
+    subspace on asset_category_label  |  EVENNESS  |  breakdown=block_name  |  measure=overspend_vs_sanction
+    Subspace: {*}  |  HDP: 28
+    Commonness: [EVENNESS] ('EVEN',)  (27/28 = 96%)
+      Members: Water Sources & Structures, Electrification, Roads, Bridges & Culverts, Buildings, Solid Waste Management, Movable Sanitation Asset +21 more
+    Exceptions (1):
+      Banking Facilities        NO_PATTERN           
+    >> Across nearly all asset_category_label values (27/28), overspend_vs_sanction is evenly distributed across block_name values. Exception: Banking Facilities (no clear pattern)
+
+  #3  score=0.8402  (conciseness=0.8402, impact=1.0000)
+    subspace on gp_name  |  OUTSTANDING_1  |  breakdown=work_type_label  |  measure=trainees_total
+    Subspace: {*}  |  HDP: 20
+    Commonness: [OUTSTANDING_1] ('New/Fresh',)  (19/20 = 95%)
+      Members: Hirlipali, Bandhpali, Bhatigaon, Bheden, Dadhapatna, Govindapur +13 more
+    Exceptions (1):
+      Barimunda                 NO_PATTERN           
+    >> Across nearly all gp_name values (19/20), New/Fresh has the highest trainees_total among work_type_label values. Exception: Barimunda (no clear pattern)
+
+  #4  score=0.8402  (conciseness=0.8402, impact=1.0000)
+    subspace on gp_name  |  ATTRIBUTION  |  breakdown=work_type_label  |  measure=trainees_total
+    Subspace: {*}  |  HDP: 20
+    Commonness: [ATTRIBUTION] ('New/Fresh',)  (19/20 = 95%)
+      Members: Hirlipali, Bandhpali, Bhatigaon, Bheden, Dadhapatna, Govindapur +13 more
+    Exceptions (1):
+      Barimunda                 NO_PATTERN           
+    >> Across nearly all gp_name values (19/20), New/Fresh accounts for the majority of trainees_total among work_type_label values. Exception: Barimunda (no clear pattern)
+
+  #5  score=0.8402  (conciseness=0.8402, impact=1.0000)
+    subspace on gp_name  |  OUTSTANDING_1  |  breakdown=fund_component_name  |  measure=fund_tied_total
+    Subspace: {*}  |  HDP: 20
+    Commonness: [OUTSTANDING_1] ('Tied Grant',)  (19/20 = 95%)
+      Members: Hirlipali, Bandhpali, Bhatigaon, Bheden, Dadhapatna, Govindapur +13 more
+    Exceptions (1):
+      Chikilli                  NO_PATTERN           
+    >> Across nearly all gp_name values (19/20), Tied Grant has the highest fund_tied_total among fund_component_name values. Exception: Chikilli (no clear pattern)
+
+  #6  score=0.8402  (conciseness=0.8402, impact=1.0000)
+    subspace on gp_name  |  ATTRIBUTION  |  breakdown=fund_component_name  |  measure=fund_tied_total
+    Subspace: {*}  |  HDP: 20
+    Commonness: [ATTRIBUTION] ('Tied Grant',)  (19/20 = 95%)
+      Members: Hirlipali, Bandhpali, Bhatigaon, Bheden, Dadhapatna, Govindapur +13 more
+    Exceptions (1):
+      Chikilli                  NO_PATTERN           
+    >> Across nearly all gp_name values (19/20), Tied Grant accounts for the majority of fund_tied_total among fund_component_name values. Exception: Chikilli (no clear pattern)
+
+  #7  score=0.7384  (conciseness=0.7384, impact=1.0000)
+    subspace on gp_name  |  OUTSTANDING_1  |  breakdown=theme  |  measure=fund_untied_total
+    Subspace: {*}  |  HDP: 20
+    Commonness: [OUTSTANDING_1] ('Theme 6 - Self-sufficient Infrastructure in Village',)  (18/20 = 90%)
+      Members: Hirlipali, Bandhpali, Bhatigaon, Bheden, Dadhapatna, Govindapur +12 more
+    Exceptions (2):
+      Boipariguda               HIGHLIGHT_CHANGE     ('Unmapped theme',)
+      Kalimela                  HIGHLIGHT_CHANGE     ('Theme 4 - Water Sufficient Village',)
+    >> Across nearly all gp_name values (18/20), Theme 6 - Self-sufficient Infrastructure in Village has the highest fund_untied_total among theme values. Exception: Boipariguda (Unmapped theme has the highest fund_untied_total among theme values); Kalimela (Theme 4 - Water Sufficient Village has the highest fund_untied_total among theme values)
+
+  #8  score=0.7384  (conciseness=0.7384, impact=1.0000)
+    subspace on gp_name  |  TOP_TWO  |  breakdown=output_type_label  |  measure=fund_tied_total
+    Subspace: {*}  |  HDP: 20
+    Commonness: [TOP_TWO] ('Code 101', 'Code 105')  (18/20 = 90%)
+      Members: Hirlipali, Bandhpali, Bhatigaon, Bheden, Govindapur, Biswamathpur +12 more
+    Exceptions (2):
+      Dadhapatna                TYPE_CHANGE          
+      Dutimendi                 TYPE_CHANGE          
+    >> Across nearly all gp_name values (18/20), Code 101 and Code 105 lead in fund_tied_total among output_type_label values. Exception: Dadhapatna (different pattern); Dutimendi (different pattern)
+
+  #9  score=0.7384  (conciseness=0.7384, impact=1.0000)
+    subspace on gp_name  |  OUTSTANDING_1  |  breakdown=status_label  |  measure=n_activities
+    Subspace: {*}  |  HDP: 20
+    Commonness: [OUTSTANDING_1] ('Activity Approved',)  (18/20 = 90%)
+      Members: Hirlipali, Bandhpali, Bhatigaon, Bheden, Dadhapatna, Govindapur +12 more
+    Exceptions (2):
+      Boipariguda               NO_PATTERN           
+      Laxmipur                  NO_PATTERN           
+    >> Across nearly all gp_name values (18/20), Activity Approved has the highest n_activities among status_label values. Exception: Boipariguda (no clear pattern); Laxmipur (no clear pattern)
+
+  #10  score=0.7384  (conciseness=0.7384, impact=1.0000)
+    subspace on gp_name  |  ATTRIBUTION  |  breakdown=status_label  |  measure=n_activities
+    Subspace: {*}  |  HDP: 20
+    Commonness: [ATTRIBUTION] ('Activity Approved',)  (18/20 = 90%)
+      Members: Hirlipali, Bandhpali, Bhatigaon, Bheden, Dadhapatna, Govindapur +12 more
+    Exceptions (2):
+      Boipariguda               NO_PATTERN           
+      Laxmipur                  NO_PATTERN           
+    >> Across nearly all gp_name values (18/20), Activity Approved accounts for the majority of n_activities among status_label values. Exception: Boipariguda (no clear pattern); Laxmipur (no clear pattern)
+
+  #11  score=0.7384  (conciseness=0.7384, impact=1.0000)
+    subspace on gp_name  |  OUTSTANDING_LAST  |  breakdown=status_label  |  measure=overspend_vs_plan
+    Subspace: {*}  |  HDP: 20
+    Commonness: [OUTSTANDING_LAST] ('Activity Approved',)  (18/20 = 90%)
+      Members: Hirlipali, Bandhpali, Bhatigaon, Bheden, Dadhapatna, Govindapur +12 more
+    Exceptions (2):
+      Boipariguda               NO_PATTERN           
+      Laxmipur                  NO_PATTERN           
+    >> Across nearly all gp_name values (18/20), Activity Approved has the lowest overspend_vs_plan among status_label values. Exception: Boipariguda (no clear pattern); Laxmipur (no clear pattern)
+
+  #12  score=0.7211  (conciseness=0.7211, impact=1.0000)
+    subspace on fiscal_year  |  OUTSTANDING_LAST  |  breakdown=gp_name  |  measure=work_proposed_cost
+    Subspace: {*}  |  HDP: 6
+    Commonness: [OUTSTANDING_LAST] ('Chikilli',)  (6/6 = 100%)
+      Members: 2020-2021, 2021-2022, 2022-2023, 2023-2024, 2024-2025, 2025-2026
+    >> Across all fiscal_year values, Chikilli has the lowest work_proposed_cost among gp_name values
+
+  #13  score=0.7211  (conciseness=0.7211, impact=1.0000)
+    subspace on fiscal_year  |  TOP_TWO  |  breakdown=focus_area_name  |  measure=is_started
+    Subspace: {*}  |  HDP: 6
+    Commonness: [TOP_TWO] ('Drinking water', 'Sanitation')  (6/6 = 100%)
+      Members: 2020-2021, 2021-2022, 2022-2023, 2023-2024, 2024-2025, 2025-2026
+    >> Across all fiscal_year values, Drinking water and Sanitation lead in is_started among focus_area_name values
+
+  #14  score=0.7211  (conciseness=0.7211, impact=1.0000)
+    subspace on fiscal_year  |  TOP_TWO  |  breakdown=work_type_label  |  measure=n_activities
+    Subspace: {*}  |  HDP: 6
+    Commonness: [TOP_TWO] ('Maintenance', 'New/Fresh')  (6/6 = 100%)
+      Members: 2020-2021, 2021-2022, 2022-2023, 2023-2024, 2024-2025, 2025-2026
+    >> Across all fiscal_year values, Maintenance and New/Fresh lead in n_activities among work_type_label values
+
+  #15  score=0.7211  (conciseness=0.7211, impact=1.0000)
+    subspace on fiscal_year  |  LAST_TWO  |  breakdown=work_type_label  |  measure=overspend_vs_plan
+    Subspace: {*}  |  HDP: 6
+    Commonness: [LAST_TWO] ('Maintenance', 'New/Fresh')  (6/6 = 100%)
+      Members: 2020-2021, 2021-2022, 2022-2023, 2023-2024, 2024-2025, 2025-2026
+    >> Across all fiscal_year values, Maintenance and New/Fresh are lowest in overspend_vs_plan among work_type_label values
+
+
+======================================================================
+VIEW: view2  |  Selected 15 from 110 candidates
+======================================================================
+
+Diversity:
+  Pattern types (5): CHANGE_POINT, OUTSTANDING_1, SEASONALITY, TOP_TWO, TREND
+  Extending dims (5): block_name, district_name, fiscal_year, measure, temporal_grain
+  Measures (5): activity_linked_expenditure, payment_count, receipt_count, sanctioned_amount, sanctions_count
+
+TotalUse: 4.1263  |  Sum of scores: 5.0976  |  Redundancy penalty: 0.9713
+
+--- Ranked MetaInsights ---
+
+  #1  score=0.7211  (conciseness=0.7211, impact=1.0000)
+    breakdown on temporal_grain  |  TREND  |  breakdown=(varies)  |  measure=activity_linked_expenditure
+    Subspace: {*}  |  HDP: 3
+    Commonness: [TREND] ('INCREASING',)  (3/3 = 100%)
+      Members: month, quarter, fiscal_year
+    >> Across all temporal_grain values, activity_linked_expenditure is increasing over (varies)
+
+  #2  score=0.6373  (conciseness=0.6373, impact=1.0000)
+    subspace on fiscal_year  |  OUTSTANDING_1  |  breakdown=block_name  |  measure=payment_count
+    Subspace: {*}  |  HDP: 6
+    Commonness: [OUTSTANDING_1] ('Bhubaneswar',)  (5/6 = 83%)
+      Members: 2022-2023, 2025-2026, 2023-2024, 2021-2022, 2020-2021
+    Exceptions (1):
+      2024-2025                 NO_PATTERN           
+    >> Across most fiscal_year values (5/6), Bhubaneswar has the highest payment_count among block_name values. Exception: 2024-2025 (no clear pattern)
+
+  #3  score=0.4877  (conciseness=0.4877, impact=1.0000)
+    breakdown on temporal_grain  |  SEASONALITY  |  breakdown=(varies)  |  measure=payment_count
+    Subspace: {*}  |  HDP: 3
+    Commonness: [SEASONALITY] ('PERIOD_12',)  (2/3 = 67%)
+      Members: month, quarter
+    Exceptions (1):
+      fiscal_year               NO_PATTERN           
+    >> Across most temporal_grain values (2/3), payment_count shows seasonal pattern (PERIOD_12) over (varies). Exception: fiscal_year (no clear pattern)
+
+  #4  score=0.4877  (conciseness=0.4877, impact=1.0000)
+    subspace on district_name  |  TREND  |  breakdown=quarter  |  measure=activity_linked_expenditure
+    Subspace: {*}  |  HDP: 9
+    Commonness: [TREND] ('INCREASING',)  (6/9 = 67%)
+      Members: Khordha, Sundargarh, Malkangiri, Rayagada, Ganjam, Kandhamal
+    Exceptions (3):
+      Bargarh                   TYPE_CHANGE          
+      Cuttack                   TYPE_CHANGE          
+      Koraput                   TYPE_CHANGE          
+    >> Across most district_name values (6/9), activity_linked_expenditure is increasing over quarter. Exception: Bargarh (different pattern); Cuttack (different pattern); Koraput (different pattern)
+
+  #5  score=0.2308  (conciseness=0.2308, impact=1.0000)
+    measure on measure  |  OUTSTANDING_1  |  breakdown=block_name  |  measure=(varies)
+    Subspace: {*}  |  HDP: 7
+    Commonness: [OUTSTANDING_1] ('Bhubaneswar',)  (4/7 = 57%)
+      Members: payment_amount, receipt_amount, payment_count, receipt_count
+    Exceptions (3):
+      activity_linked_expenditure NO_PATTERN           
+      sanctioned_amount         NO_PATTERN           
+      sanctions_count           TYPE_CHANGE          
+    >> Across most measure values (4/7), Bhubaneswar has the highest (varies) among block_name values. Exception: activity_linked_expenditure (no clear pattern); sanctioned_amount (no clear pattern); sanctions_count (different pattern)
+
+  #6  score=0.2308  (conciseness=0.2308, impact=1.0000)
+    measure on measure  |  SEASONALITY  |  breakdown=month  |  measure=(varies)
+    Subspace: {*}  |  HDP: 7
+    Commonness: [SEASONALITY] ('PERIOD_12',)  (4/7 = 57%)
+      Members: payment_amount, receipt_amount, payment_count, receipt_count
+    Exceptions (3):
+      activity_linked_expenditure HIGHLIGHT_CHANGE     ('PERIOD_3',)
+      sanctions_count           TYPE_CHANGE          
+      sanctioned_amount         TYPE_CHANGE          
+    >> Across most measure values (4/7), (varies) shows seasonal pattern (PERIOD_12) over month. Exception: activity_linked_expenditure ((varies) shows seasonal pattern (PERIOD_3) over month); sanctions_count (different pattern); sanctioned_amount (different pattern)
+
+  #7  score=0.1992  (conciseness=0.1992, impact=1.0000)
+    subspace on district_name  |  SEASONALITY  |  breakdown=quarter  |  measure=activity_linked_expenditure
+    Subspace: {*}  |  HDP: 9
+    Commonness: [SEASONALITY] ('PERIOD_12',)  (5/9 = 56%)
+      Members: Khordha, Bargarh, Cuttack, Ganjam, Koraput
+    Exceptions (4):
+      Sundargarh                HIGHLIGHT_CHANGE     ('PERIOD_6',)
+      Rayagada                  HIGHLIGHT_CHANGE     ('PERIOD_3',)
+      Malkangiri                TYPE_CHANGE          
+      Kandhamal                 TYPE_CHANGE          
+    >> Across most district_name values (5/9), activity_linked_expenditure shows seasonal pattern (PERIOD_12) over quarter. Exceptions: Sundargarh (activity_linked_expenditure shows seasonal pattern (PERIOD_6) over quarter); Rayagada (activity_linked_expenditure shows seasonal pattern (PERIOD_3) over quarter); Malkangiri (different pattern) and 1 others
+
+  #8  score=0.4877  (conciseness=0.4877, impact=1.0000)
+    breakdown on temporal_grain  |  TREND  |  breakdown=(varies)  |  measure=sanctions_count
+    Subspace: {*}  |  HDP: 3
+    Commonness: [TREND] ('INCREASING',)  (2/3 = 67%)
+      Members: quarter, fiscal_year
+    Exceptions (1):
+      month                     TYPE_CHANGE          
+    >> Across most temporal_grain values (2/3), sanctions_count is increasing over (varies). Exception: month (different pattern)
+
+  #9  score=0.4877  (conciseness=0.4877, impact=1.0000)
+    breakdown on temporal_grain  |  SEASONALITY  |  breakdown=(varies)  |  measure=receipt_count
+    Subspace: {*}  |  HDP: 3
+    Commonness: [SEASONALITY] ('PERIOD_12',)  (2/3 = 67%)
+      Members: month, quarter
+    Exceptions (1):
+      fiscal_year               TYPE_CHANGE          
+    >> Across most temporal_grain values (2/3), receipt_count shows seasonal pattern (PERIOD_12) over (varies). Exception: fiscal_year (different pattern)
+
+  #10  score=0.1559  (conciseness=0.6699, impact=0.2327)
+    measure on measure  |  OUTSTANDING_1  |  breakdown=district_name  |  measure=(varies)
+    Subspace: {fiscal_year:2025-2026}  |  HDP: 7
+    Commonness: [OUTSTANDING_1] ('Ganjam',)  (6/7 = 86%)
+      Members: payment_amount, receipt_amount, receipt_count, activity_linked_expenditure, sanctions_count, sanctioned_amount
+    Exceptions (1):
+      payment_count             TYPE_CHANGE          
+    >> Across most measure values (6/7), Ganjam has the highest (varies) among district_name values. Exception: payment_count (different pattern)
+
+  #11  score=0.4484  (conciseness=0.4484, impact=1.0000)
+    subspace on block_name  |  TREND  |  breakdown=quarter  |  measure=activity_linked_expenditure
+    Subspace: {*}  |  HDP: 16
+    Commonness: [TREND] ('INCREASING',)  (9/16 = 56%)
+      Members: Bhubaneswar, Lahunipara, Kalimela, Kalyansingpur, Balisankara, Sheragada +3 more
+    Exceptions (7):
+      Barpali                   TYPE_CHANGE          
+      Bheden                    TYPE_CHANGE          
+      Baranga                   TYPE_CHANGE          
+      Attabira                  TYPE_CHANGE          
+      ... +3 more
+    >> Across most block_name values (9/16), activity_linked_expenditure is increasing over quarter. Exceptions: Barpali (different pattern); Bheden (different pattern); Baranga (different pattern) and 4 others
+
+  #12  score=0.1207  (conciseness=0.5185, impact=0.2327)
+    measure on measure  |  TOP_TWO  |  breakdown=block_name  |  measure=(varies)
+    Subspace: {fiscal_year:2025-2026}  |  HDP: 7
+    Commonness: [TOP_TWO] ('Bhubaneswar', 'Rangeilunda')  (5/7 = 71%)
+      Members: payment_amount, receipt_amount, payment_count, receipt_count, activity_linked_expenditure
+    Exceptions (2):
+      sanctions_count           TYPE_CHANGE          
+      sanctioned_amount         TYPE_CHANGE          
+    >> Across most measure values (5/7), Bhubaneswar and Rangeilunda lead in (varies) among block_name values. Exception: sanctions_count (different pattern); sanctioned_amount (different pattern)
+
+  #13  score=0.1112  (conciseness=0.4503, impact=0.2469)
+    measure on measure  |  CHANGE_POINT  |  breakdown=month  |  measure=(varies)
+    Subspace: {district_name:Ganjam}  |  HDP: 7
+    Commonness: [CHANGE_POINT] ('2020-08',)  (4/7 = 57%)
+      Members: payment_amount, receipt_amount, payment_count, receipt_count
+    Exceptions (3):
+      activity_linked_expenditure HIGHLIGHT_CHANGE     ('2020-11',)
+      sanctions_count           HIGHLIGHT_CHANGE     ('2020-10',)
+      sanctioned_amount         HIGHLIGHT_CHANGE     ('2020-10',)
+    >> Across most measure values (4/7), (varies) has a significant shift at 2020-08 in month. Exception: activity_linked_expenditure ((varies) has a significant shift at 2020-11 in month); sanctions_count ((varies) has a significant shift at 2020-10 in month); sanctioned_amount ((varies) has a significant shift at 2020-10 in month)
+
+  #14  score=0.1110  (conciseness=0.4877, impact=0.2275)
+    breakdown on temporal_grain  |  TREND  |  breakdown=(varies)  |  measure=sanctioned_amount
+    Subspace: {fiscal_year:2020-2021}  |  HDP: 3
+    Commonness: [TREND] ('INCREASING',)  (2/3 = 67%)
+      Members: month, quarter
+    Exceptions (1):
+      fiscal_year               NO_PATTERN           
+    >> Across most temporal_grain values (2/3), sanctioned_amount is increasing over (varies). Exception: fiscal_year (no clear pattern)
+
+  #15  score=0.1805  (conciseness=0.7211, impact=0.2503)
+    breakdown on temporal_grain  |  TREND  |  breakdown=(varies)  |  measure=activity_linked_expenditure
+    Subspace: {block_name:Bhubaneswar}  |  HDP: 3
+    Commonness: [TREND] ('INCREASING',)  (3/3 = 100%)
+      Members: month, quarter, fiscal_year
+    >> Across all temporal_grain values, activity_linked_expenditure is increasing over (varies)
+
+
+======================================================================
+VIEW: view3  |  Selected 3 from 5 candidates
+======================================================================
+
+Diversity:
+  Pattern types (2): EVENNESS, TREND
+  Extending dims (3): block_name, gp_name, measure
+  Measures (1): n_completed
+
+TotalUse: 0.8940  |  Sum of scores: 1.3221  |  Redundancy penalty: 0.4281
+
+--- Ranked MetaInsights ---
+
+  #1  score=0.6598  (conciseness=0.6598, impact=1.0000)
+    subspace on gp_name  |  TREND  |  breakdown=fiscal_year  |  measure=n_completed
+    Subspace: {*}  |  HDP: 20
+    Commonness: [TREND] ('DECREASING',)  (17/20 = 85%)
+      Members: Hirlipali, Bandhpali, Bhatigaon, Bheden, Dadhapatna, Govindapur +11 more
+    Exceptions (3):
+      Dutimendi                 NO_PATTERN           
+      Andhrua                   NO_PATTERN           
+      Kalimela                  NO_PATTERN           
+    >> Across most gp_name values (17/20), n_completed is decreasing over fiscal_year. Exception: Dutimendi (no clear pattern); Andhrua (no clear pattern); Kalimela (no clear pattern)
+
+  #2  score=0.6116  (conciseness=0.6116, impact=1.0000)
+    subspace on block_name  |  TREND  |  breakdown=fiscal_year  |  measure=n_completed
+    Subspace: {*}  |  HDP: 16
+    Commonness: [TREND] ('DECREASING',)  (13/16 = 81%)
+      Members: Attabira, Barpali, Bheden, Baranga, Tangi Choudwar, Khallikote +7 more
+    Exceptions (3):
+      Khajuripada               NO_PATTERN           
+      Bhubaneswar               NO_PATTERN           
+      Kalimela                  NO_PATTERN           
+    >> Across most block_name values (13/16), n_completed is decreasing over fiscal_year. Exception: Khajuripada (no clear pattern); Bhubaneswar (no clear pattern); Kalimela (no clear pattern)
+
+  #3  score=0.0507  (conciseness=0.2105, impact=0.2410)
+    measure on measure  |  EVENNESS  |  breakdown=gp_name  |  measure=(varies)
+    Subspace: {district_name:Bargarh}  |  HDP: 18
+    Commonness: [EVENNESS] ('EVEN',)  (10/18 = 56%)
+      Members: n_activities, n_costless, expenditure_total, overspend_vs_plan, overspend_vs_sanction, n_admin_approvals +4 more
+    Exceptions (8):
+      n_plans                   NO_PATTERN           
+      sanctioned_total          NO_PATTERN           
+      n_completed               NO_PATTERN           
+      n_costed                  TYPE_CHANGE          
+      ... +4 more
+    >> Across most measure values (10/18), (varies) is evenly distributed across gp_name values. Exceptions: n_plans (no clear pattern); sanctioned_total (no clear pattern); n_completed (no clear pattern) and 5 others
+

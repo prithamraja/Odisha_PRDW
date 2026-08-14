@@ -507,8 +507,12 @@ def generate_layer3p_report(
 # =============================================================================
 
 if __name__ == "__main__":
-    views = ["view1", "view2", "view3", "view4", "view5",
-             "view6", "view7", "view8", "view9"]
+    # The three PR&DW views. The nine-view list this replaced was the last stale
+    # Andhra Pradesh registry in the pipeline; deleting the six dead entries is
+    # authorised by D-12 / D25 (WP-D2b), and retires
+    # handoffs/WPD2_calibration/run_phase5_prdw.py, the driver that existed only
+    # to work around it. Ranking behaviour is unchanged.
+    views = ["view1", "view2", "view3"]
     k = 15
 
     all_candidates: dict = {}

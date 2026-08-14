@@ -87,53 +87,142 @@ class ViewConfig:
         return "sum"
 
 
-# --- View 1 configuration ---
-# Domain: Andhra Pradesh RTGS Decision Aid. Built by
-# domain_pack_rtgs/views/view1_scheme_benefits.sql — one row per benefit row
-# across the seven AP scheme files (5,818 rows).
+# =============================================================================
+# DISCOVER SCALE SWITCH — sample (20 GPs) vs statewide (~6,800 GPs)
+# =============================================================================
+# D15 / DISCOVER_VIEW_MAPPING.md §6. This drop is a 20-GP sample; the statewide
+# drop is ~6,800 Gram Panchayats across 314 blocks and 30 districts. Everything
+# that differs between the two is a dimension list or a subspace depth — the
+# measures, the impact measures and every threshold are identical — so the
+# difference is carried HERE, in one module-level switch read from the
+# environment, in the same shape as the Ask adapter's `_DB_SOURCES`:
 #
-# ITERATION 2: `season` and `crop_year` are gone, and with them the view's only
-# temporal dimension. Both were placeholder-dominated in a view that unions
-# seven programmes ('ALL' on 62% of value, 'NA' on 98%), so every pattern built
-# over them described the union rather than the farmers. Season lives on view3
-# and view4, the crop year on view3, where the values are real for every row.
-VIEW1_CONFIG = ViewConfig(
-    name="Scheme Benefits",
-    parquet_path=os.path.join(BASE_DIR, "views_rtgs", "view1_scheme_benefits.parquet"),
+#     DISCOVER_SCALE=statewide python src/phase4b_engine.py
+#
+# The statewide branches ship now and are UNTESTED: no statewide drop exists
+# yet. Each carries the §6 reason it differs. Switching scale must never become
+# a code edit — that is the whole promise D15 makes — so the branches live in
+# the configs and nowhere else. `expected_rows` / `post_view` counts are the
+# pack's business (sources.yaml, validation.yaml), not the engine's.
+DISCOVER_SCALE = os.getenv("DISCOVER_SCALE", "sample")
+_STATEWIDE = DISCOVER_SCALE == "statewide"
 
-    dimensions=[
-        "scheme",     # 7 values  — PM-KISAN, Agriculture Input Subsidy, ...
-        "district",   # 13 values
-        "gender",     # 2 values
-        "category",   # 4 values  — SC/ST/BC/OC (the UNKNOWN rows are excluded)
-        "status",     # 5 values  — Approved, Pending, Under Review, Damaged, Completed
+
+# --- View 1 configuration ---
+# Domain: Odisha Panchayati Raj & Drinking Water. Built by
+# domain_pack_prdw/views/view1_activity_lifecycle.sql — one row per planned
+# activity (12,704 in this sample), from plan through sanction and spending to
+# status and photo evidence.
+#
+# Wide by design: 17 dimensions x 24 measures. Every dimension here is a NAME
+# column. The view also carries the LGD code for each geography because the
+# frontend contract needs it, and a code is the same dimension as its name —
+# mining both would find every geographic pattern twice and rank the duplicate
+# next to the original. Codes stay out of every config.
+#
+# No temporal dimension: D22 / §5 routes ALL temporal mining to view2, whose
+# cashbook axis is free of the 2023-24 reporting artifact. `fiscal_year` is
+# here as a CATEGORICAL dimension only.
+#
+# The geography names are dimensions at sample scale and drop out statewide:
+# 6,800 GP values and 314 block values put every depth-2 GP subspace far below
+# the 1% impact prune (§6), so they would cost the whole enumeration budget and
+# return nothing rankable. GP remains the GRAIN either way — findings still
+# name individual GPs as HDP members and as exceptions.
+_VIEW1_GEO_DIMS = ["district_name"] if _STATEWIDE else [
+    "gp_name", "block_name", "district_name",
+]
+
+VIEW1_CONFIG = ViewConfig(
+    name="Activity Lifecycle",
+    parquet_path=os.path.join(BASE_DIR, "views_prdw", "view1_activity_lifecycle.parquet"),
+
+    dimensions=_VIEW1_GEO_DIMS + [
+        "theme",                   # 7 values  — 6 LSDG themes + 'Unmapped theme'
+        "focus_area_name",         # 30 values — roads, drinking water, sanitation, ...
+        "work_type_label",         # 4 values
+        "activity_for_label",      # 4 values
+        "activity_type_label",     # 2 values
+        "output_type_label",       # 8 values  — 'Code 101'..'Code 110', no decode on file
+        "status_label",            # 6 values  — Activity Approved dominates (10,108)
+        "is_costless",             # 2 values  — Costed / Costless
+        "tied_untied",             # 3 values, null on the 10,603 without a sanction
+        "sanction_authority",      # 14 values (5 cleaned offices + 10 free-text residues)
+        "sanctioned_scheme_name",  # 5 values, sanctioned subset only
+        "fund_component_name",     # 8 values, sanctioned subset only
+        "asset_category_label",    # 28 values — 27 named + 'Uncategorised' (8,439 rows)
+        "fiscal_year",             # 6 values  — CATEGORICAL here; see §5 above
     ],
 
     temporal_dimensions=[],
 
+    # Every PR&DW measure is a SUM (mapping doc §3): volumes, rupee amounts,
+    # counted flags and the two signed overspend differences all add up across
+    # rows. There is no rate or per-unit measure in v1 — the view is at activity
+    # grain, so a rate would have to be assembled at query time, which the
+    # engine cannot do. That is also why `extremum_ratio` is left at its 0.67
+    # default below.
     measures=[
-        MeasureConfig("benefit_amount",      "sum"),   # total INR disbursed
-        MeasureConfig("benefit_amount_mean", "avg"),   # same column, per-benefit average
-        MeasureConfig("land_acres",          "sum"),   # acres behind those benefits
-        MeasureConfig("benefit_count",       "sum"),   # number of benefit rows
+        MeasureConfig("n_activities",           "sum"),  # activities, 1 per row
+        MeasureConfig("total_cost",             "sum"),  # PLANNED rupees
+        MeasureConfig("fund_tied_total",        "sum"),  # PLANNED rupees, tied
+        MeasureConfig("fund_untied_total",      "sum"),  # PLANNED rupees, untied
+        MeasureConfig("fund_abandoned_total",   "sum"),  # PLANNED rupees on abandoned works
+        MeasureConfig("work_proposed_cost",     "sum"),  # SANCTIONED rupees, proposed
+        MeasureConfig("fund_sanctioned_total",  "sum"),  # SANCTIONED rupees
+        MeasureConfig("total_expenditure",      "sum"),  # SPENT rupees, voucher-linked
+        MeasureConfig("gen_amount",             "sum"),  # SPENT rupees, general component
+        MeasureConfig("sc_amount",              "sum"),  # SPENT rupees — SUSPECTED LABEL SWAP
+        MeasureConfig("st_amount",              "sum"),  # SPENT rupees — see WP-D1 §5.5
+        MeasureConfig("overspend_vs_plan",      "sum"),  # SIGNED: spent minus planned
+        MeasureConfig("overspend_vs_sanction",  "sum"),  # SIGNED: spent minus sanctioned
+        MeasureConfig("is_started",             "sum"),  # counted flags, activities
+        MeasureConfig("is_completed",           "sum"),  # 17 sample-wide — near-degenerate
+        MeasureConfig("is_ongoing",             "sum"),
+        MeasureConfig("is_abandoned",           "sum"),
+        MeasureConfig("is_under_approval",      "sum"),
+        MeasureConfig("is_admin_approved",      "sum"),
+        MeasureConfig("has_technical_approval", "sum"),
+        MeasureConfig("has_progress_evidence",  "sum"),
+        MeasureConfig("evidence_uploads",       "sum"),  # geotagged photo uploads
+        MeasureConfig("trainees_total",         "sum"),  # people, training subset
+        MeasureConfig("beneficiaries_expected", "sum"),  # people, community-service subset
     ],
 
     impact_measures=[
-        "benefit_count",   # volume signal
-        "benefit_amount",  # financial exposure
-        "land_acres",      # area covered
+        "n_activities",  # volume signal
+        "total_cost",    # financial exposure (PLANNED basis, the only near-complete one)
     ],
 
-    max_subspace_depth=2,
+    # D25 (WP-D2b): the SAMPLE runs at depth 1; statewide keeps depth 2.
+    #
+    # WP-D2 measured this view at depth 2 rather than estimating it. 13,322 of
+    # the 13,495 enumerated subspaces are depth-2, and at 20 GPs those two-filter
+    # slices average ~37 rows — statistically fragile, and the source of nothing
+    # this sample can support. The full queue behind them is 880,752 data scopes,
+    # which breaks two things at once: the never-evict QueryCache/PatternCache
+    # (3.94 GB of process memory at 1.7% of the queue, on a 15.7 GB machine) and
+    # the ranker (~800k projected candidates against a 5,000 pre-filter). Depth 1
+    # is 127 subspaces / 48,792 scopes — an 18x cut, and the only knob on this
+    # view with an order of magnitude in it. What it costs is every two-filter
+    # slice ("within Bargarh district, among costless activities ..."); all 17
+    # dimensions and all 24 measures are kept.
+    #
+    # STATEWIDE KEEPS DEPTH 2 and is compute-gated: at ~6,800 GPs a two-filter
+    # subspace is populated and specific rather than fragile, and the geography
+    # dimensions drop to district_name (see _VIEW1_GEO_DIMS), which is most of
+    # the enumeration. It must not be run before the statewide checklist is
+    # cleared — the engine-scaling WP and its provisioning — because the cache
+    # and ranker walls above are scale walls, not sample walls.
+    max_subspace_depth=2 if _STATEWIDE else 1,
     tau=0.5,
     min_impact=0.01,
     min_hdp_size=3,
-    # ITERATION 3 — see ViewConfig.extremum_ratio. Every AP view is set to 0.80,
-    # a 20% gap rather than a 33% one, because the findings this deployment
-    # exists to surface are proportional (an equity index at 0.75 of parity, a
-    # coverage cliff at 0.75 of the norm) and were being rejected by a bar built
-    # for volumetric extremes. UP's configs keep the 0.67 default.
-    extremum_ratio=0.80,
+    # extremum_ratio is deliberately NOT set: it stays at the 0.67 default.
+    # AP raised every view to 0.80 because its findings were proportional (an
+    # equity index at 0.75 of parity was being rejected by a bar built for
+    # volumetric extremes). Every measure here is volumetric, so the loosened
+    # bar would buy nothing and would lower the evidence standard.
 )
 
 

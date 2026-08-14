@@ -1,8 +1,8 @@
 # =============================================================================
-# Phase 4b: All Four Views
+# Phase 4b: All Views
 # =============================================================================
 # Runs the MetaInsight engine (all 11 pattern types, HDP deduplication,
-# SUM/AVG aggregation) independently on all four analytical views.
+# SUM/AVG aggregation) independently on each analytical view in ALL_CONFIGS.
 #
 # Engine unchanged from Phase 4a + dedup:
 #   - Pandas query layer with augmented-query prefetch
@@ -14,7 +14,6 @@
 #   metainsights/view1_candidates.json
 #   metainsights/view2_candidates.json
 #   metainsights/view3_candidates.json
-#   metainsights/view4_candidates.json
 #   reports/engine_diagnostics_all_views.txt
 #
 # Run from project root:
@@ -42,8 +41,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # ---------------------------------------------------------------------------
 from phase4a_engine import (
     # Config
-    MeasureConfig, ViewConfig, VIEW1_CONFIG, VIEW2_CONFIG, VIEW3_CONFIG, VIEW4_CONFIG,
-    VIEW5_CONFIG, VIEW6_CONFIG, VIEW7_CONFIG, VIEW8_CONFIG, VIEW9_CONFIG,
+    MeasureConfig, ViewConfig, VIEW1_CONFIG, VIEW2_CONFIG, VIEW3_CONFIG,
+    DISCOVER_SCALE,
     # Data structures
     Subspace, DataScope, MetaInsightCandidate,
     # Enumeration
@@ -298,48 +297,50 @@ def save_all_view_diagnostics(all_diagnostics: dict, output_path: str):
 # =============================================================================
 
 if __name__ == "__main__":
-    # Test budgets: ~10 minutes total
-    # For production runs increase to 900/600/600/900
+    # A TRUNCATED QUEUE IS THE ONE UNSCOREABLE FAILURE. Every other outcome is
+    # a result; a budget that cuts the queue silently changes what a view is
+    # able to find, and the run then looks like a smaller answer rather than a
+    # broken one. The AP deployment learned this three times: view4 at 60s
+    # produced 661 candidates on one run and 863 on the next with an identical
+    # top-15 (iteration 2); view4 at 120s EXHAUSTED its budget and returned
+    # fewer candidates than it had at 60s (iteration 3); view2 at 120s
+    # truncated at 523 of ~11,000 scopes because the machine was loaded, having
+    # drained in 49.8s on the same budget a week earlier (iteration 5).
     #
-    # view4 was raised from 60s to 120s in iteration 2. Its queue was measured
-    # to drain at ~103s; at 60s the cap fell in a machine-dependent place
-    # (661 vs 863 candidates across two runs) while leaving the top-15
-    # identical entry for entry. This is a reproducibility fix, not a results
-    # one — see DISCOVER_CALIBRATION_SCORECARD.md 4.6.
+    # So budgets start generous, the loop's exit condition is the proof, and
+    # the report states each view's ACTUAL drain time. `run_engine` leaves the
+    # loop only when the queue is empty or the budget is gone, so an elapsed
+    # time strictly under the budget IS the drain proof — and a view that ends
+    # at its budget is a FAIL to be re-run higher, never a smaller result.
     #
-    # ITERATION 3: view4 goes to 600s. At 120s it EXHAUSTED the budget and
-    # returned 590 candidates — fewer than iteration 1's 661 and 863 at 60s —
-    # because `unpaid_share` is a sixth measure and throughput fell to ~20.4
-    # scopes/s. A full drain was projected at 450s+; the actual drain time is
-    # recorded in the iteration-3 report. Views 6-8 get 300s: none is wider
-    # than view4 and view8 has only four dimensions, but a truncated queue is
-    # the one failure mode that silently changes what a new view can find, so
-    # they start generous and the report says what each actually used.
+    # PR&DW budgets (WP-D2 T3). The two cheap views run FIRST, deliberately:
+    # they drain in about a minute between them, which proves the ranking and
+    # the report's prompt path on real candidates before hours are committed to
+    # view1. Their candidate files are written as each view finishes, so an
+    # interrupted run still leaves them behind.
+    #
+    # view1 is the wide one and it is expensive in a way the brief's starting
+    # budget of 900s did not anticipate. Measured on this drop before mining:
+    # 13,495 subspaces enumerated, 2,438 surviving the 1% impact prune, and
+    # 880,752 data scopes behind them, against a measured throughput of about
+    # 150 scopes/s for pattern detection alone. That is ~5,900s of detection
+    # before a single HDP is evaluated. 900s would have truncated the queue at
+    # roughly a sixth of it, and a truncated queue is the one unscoreable
+    # failure. The budget is therefore raised to 18,000s so the view can drain
+    # and the drain time can be MEASURED rather than guessed.
+    #
+    # This is an escalation, not a fix: WP-D2's brief sets a 1,800s ceiling for
+    # view1, and the measurement says the honest number is several times that.
+    # The configs are NOT trimmed to make the queue smaller -- which dimensions
+    # or measures view1 can afford to lose is a calibration decision for the
+    # operator, not the implementer's. See WPD2_REPORT.md §2.
     ALL_CONFIGS = [
-        ("view1", VIEW1_CONFIG, 300),
-        # ITERATION 5: view2 goes to 600s, for the same reason view4 did in
-        # iteration 3. At 120s its queue TRUNCATED on this run — 523 of roughly
-        # 11,000 scopes, 1,301s of wall clock against a 120s budget, because the
-        # machine was heavily loaded while view2 was mining (view1 ran 2.8x its
-        # iteration-4 time in the same window; every view after view2 ran within
-        # 1.1-1.7x). A truncated queue silently changes what a view can find,
-        # which is the one failure mode that must never be scored, so the budget
-        # is raised and the report states it. This is a reproducibility fix, not
-        # a results one: at 120s on an unloaded machine view2 drained in 49.8s
-        # in iteration 4.
-        ("view2", VIEW2_CONFIG, 600),
+        ("view2", VIEW2_CONFIG, 300),
         ("view3", VIEW3_CONFIG, 120),
-        ("view4", VIEW4_CONFIG, 600),
-        ("view5", VIEW5_CONFIG, 120),
-        ("view6", VIEW6_CONFIG, 300),
-        ("view7", VIEW7_CONFIG, 300),
-        ("view8", VIEW8_CONFIG, 300),
-        # ITERATION 5: view9 is 91 rows over two dimensions. Its queue is a few
-        # dozen scopes, so 60s is generous rather than tight — the budget exists
-        # to bound the run, not to truncate it, and the report states the drain
-        # time as it does for every other view.
-        ("view9", VIEW9_CONFIG, 60),
+        ("view1", VIEW1_CONFIG, 18000),
     ]
+
+    print(f"DISCOVER_SCALE={DISCOVER_SCALE}")
 
     os.makedirs(os.path.join(BASE_DIR, "metainsights"), exist_ok=True)
     os.makedirs(os.path.join(BASE_DIR, "reports"),      exist_ok=True)

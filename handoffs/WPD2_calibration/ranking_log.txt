@@ -1,0 +1,24 @@
+
+Loading C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\1223e392-2b26-45c2-82d4-ecbde6125d84\scratchpad\mirror\Insights\metainsights\view1_candidates.json ...
+  3,139 candidates loaded
+  3,139 after pre-filter
+  15 selected for top-15
+
+Loading C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\1223e392-2b26-45c2-82d4-ecbde6125d84\scratchpad\mirror\Insights\metainsights\view2_candidates.json ...
+  110 candidates loaded
+  110 after pre-filter
+  15 selected for top-15
+
+Loading C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\1223e392-2b26-45c2-82d4-ecbde6125d84\scratchpad\mirror\Insights\metainsights\view3_candidates.json ...
+  5 candidates loaded
+  5 after pre-filter
+  3 selected for top-15
+Layer 2P report -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\1223e392-2b26-45c2-82d4-ecbde6125d84\scratchpad\mirror\Insights\reports\layer2p_raw_explorer.txt
+Layer 3P report -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\1223e392-2b26-45c2-82d4-ecbde6125d84\scratchpad\mirror\Insights\reports\layer3p_ranked_dashboard.txt
+
+======================================================================
+Phase 5 Summary
+======================================================================
+  view1: 15 selected from 3,139  | TotalUse=11.6889  | types: ATTRIBUTION, EVENNESS, LAST_TWO, OUTSTANDING_1, OUTSTANDING_LAST, TOP_TWO
+  view2: 15 selected from 110  | TotalUse=4.1263  | types: CHANGE_POINT, OUTSTANDING_1, SEASONALITY, TOP_TWO, TREND
+  view3: 3 selected from 5  | TotalUse=0.8940  | types: EVENNESS, TREND

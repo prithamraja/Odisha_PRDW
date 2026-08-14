@@ -45,6 +45,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from phase2_engine import (
     # Config & data structures
     MeasureConfig, ViewConfig, VIEW1_CONFIG,
+    # The one scale switch, defined next to VIEW1_CONFIG and imported here so
+    # all three views read the same flag (D15 / mapping doc §6)
+    DISCOVER_SCALE, _STATEWIDE,
     Subspace, DataScope, Highlight, BasicDataPattern,
     # Data scope utilities
     apply_subspace, generate_subspaces, generate_data_scopes,
@@ -67,341 +70,143 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # =============================================================================
-# ADDITIONAL VIEW CONFIGS (Views 2, 3, 4)
+# ADDITIONAL VIEW CONFIGS (Views 2, 3)
 # =============================================================================
+# Domain: Odisha Panchayati Raj & Drinking Water. Built by
+# domain_pack_prdw/views/. Three views ship in v1 and there is no view 4-9:
+# mapping doc §4.4 rules out an equity or journey view on this drop (no
+# beneficiary-grain data exists anywhere in it, `activity_nsap` has zero rows,
+# and the SC/ST components are near-empty), and the asset dimensions fold into
+# view1 because activity_asset is 1:1 with activities. If statewide NSAP or
+# beneficiary tables arrive, a fourth view is a pack addition, not a redesign.
+#
+# The scale switch is imported from phase2_engine, next to VIEW1_CONFIG, so all
+# three views read one flag. See the comment there.
 
-# Domain: Andhra Pradesh RTGS Decision Aid. Built by domain_pack_rtgs/views/.
+# view2 is the only view with a temporal axis, and that is the point of §5. The
+# activity tables carry a reporting artifact at FY 2023-24 (costless activities
+# begin being recorded, so activity counts jump ~8x); the cashbook does not —
+# payments run 156/138/92/93/96/111 million rupees across the same six years.
+# So ALL temporal mining happens here, on cash and sanction measures, over the
+# full 72-month window.
+#
+# `fiscal_year` is deliberately in BOTH lists: as a categorical dimension it
+# filters ("within 2024-2025, how do the months behave"), and as a temporal
+# dimension it is a six-point series the trend and change-point evaluators can
+# read. The engine offers it as a breakdown from both lists, so a handful of
+# data scopes are enumerated twice per subspace; the pattern cache serves the
+# repeat and the HDP dedup set drops the duplicate candidate, so the cost is
+# enumeration time on a 1,440-row view and nothing else.
+_VIEW2_GEO_DIMS = ["district_name", "block_name"] if _STATEWIDE else [
+    "gp_name", "block_name", "district_name",
+]
 
-# ITERATION 2: the spine is the 1,100-farmer PM-KISAN roster, so no dimension
-# carries the 'NOT_IN_PMKISAN' literal any more; and two rate-shaped AVG
-# measures arrive, because the engine describes the distribution of one measure
-# and a rate cannot be assembled from a dimension at query time.
 VIEW2_CONFIG = ViewConfig(
-    name="Farmer 360",
-    parquet_path=os.path.join(BASE_DIR, "views_rtgs", "view2_farmer_360.parquet"),
+    name="Geo-Month Cash Cube",
+    parquet_path=os.path.join(BASE_DIR, "views_prdw", "view2_geo_month_cube.parquet"),
 
-    dimensions=[
-        "district",            # 13 values
-        "gender",              # 2 values
-        "category",            # 4 values
-        "ekyc_status",         # 2 values — Completed, Pending
-        "beneficiary_status",  # 3 values — Included, Excluded, Pending
-        "land_size_class",     # 4 values — Marginal .. Medium (Large is empty)
+    dimensions=_VIEW2_GEO_DIMS + [
+        "fiscal_year",   # 6 values — categorical here, temporal below
     ],
-    temporal_dimensions=[],
 
+    temporal_dimensions=[
+        "month",         # 72 values — '2020-04' .. '2026-03', the full cashbook window
+        "quarter",       # 24 values — '2020-Q2' .. '2026-Q1', calendar quarters
+        "fiscal_year",   # 6 values  — April-March, derived from the calendar month
+    ],
+
+    # All SUM. The cube is zero-filled on a full GP x month cross join, so a
+    # month with no transactions is a real zero rather than a missing row —
+    # 259 of the 1,440 cells exist only because of that fill, and they are
+    # exactly the silent months a finding should be able to see.
     measures=[
-        MeasureConfig("scheme_count",           "avg"),  # schemes per farmer — a rate, must be averaged
-        MeasureConfig("in_pm_kisan",            "sum"),  # membership counts per scheme
-        MeasureConfig("in_agriculture",         "sum"),
-        MeasureConfig("in_horticulture",        "sum"),
-        MeasureConfig("in_fisheries",           "sum"),
-        MeasureConfig("in_sericulture",         "sum"),
-        MeasureConfig("in_markfed",             "sum"),
-        MeasureConfig("in_ryss",                "sum"),
-        MeasureConfig("ekyc_pending_rate",      "avg"),  # share of the slice awaiting eKYC
-        # ITERATION 5 — `agri_share_of_input_pair` is retired. It measured
-        # correctly and could not rank: NULL for 714 of 1,100 farmers, three
-        # candidates in 1,452, no ranked finding. The question moves to
-        # VIEW9_CONFIG, at the grain where the share is dense.
-        MeasureConfig("total_benefit_amount",   "sum"),  # lifetime INR across all schemes
-        MeasureConfig("land_acres",             "sum"),
-        # same column as land_acres, averaged — acres per farmer. The duplicate-
-        # column pattern (cf. benefit_amount_mean, subsidy_mean). The summed
-        # form alone let a headcount fact ("BC and OC hold the largest land
-        # base") be read as equity; this is the proportional counterpart.
-        MeasureConfig("land_acres_mean",        "avg"),
-        MeasureConfig("farmer_count",           "sum"),
+        MeasureConfig("payment_amount",              "sum"),  # CASHBOOK rupees out
+        MeasureConfig("receipt_amount",              "sum"),  # CASHBOOK rupees in
+        MeasureConfig("payment_count",               "sum"),  # vouchers out
+        MeasureConfig("receipt_count",               "sum"),  # vouchers in
+        MeasureConfig("activity_linked_expenditure", "sum"),  # SPENT rupees tied to activities
+        MeasureConfig("sanctions_count",             "sum"),  # sanctions, by sanction month
+        MeasureConfig("sanctioned_amount",           "sum"),  # SANCTIONED rupees, by month
     ],
 
-    impact_measures=["farmer_count", "total_benefit_amount", "land_acres"],
-    max_subspace_depth=2,
+    impact_measures=[
+        "payment_amount",  # financial exposure
+        "payment_count",   # volume signal
+    ],
+
+    # Depth 1 at both scales (§6). The cube has only geography and fiscal year
+    # to filter on, and a depth-2 subspace over two geography levels is either
+    # redundant (a GP determines its block and district) or too thin to clear
+    # the impact prune.
+    max_subspace_depth=1,
     tau=0.5,
     min_impact=0.01,
     min_hdp_size=3,
-    extremum_ratio=0.80,   # ITERATION 3 — see VIEW1_CONFIG and ViewConfig
+    # 0.67 default — see VIEW1_CONFIG. Every measure here is volumetric.
 )
+
+# view3 is the institutional comparison table: one row per GP per fiscal year,
+# all 20 GPs x all 6 years, INCLUDING the GP-years with nothing recorded. The
+# zeros are the point — Chikilli carries 640 activities and zero administrative
+# approvals across all six of its rows, and an inner join would have deleted
+# the most interesting row in the table.
+#
+# fiscal_year is temporal-only here, not a filter: with 120 rows a depth-2
+# subspace that pinned a year as well as a geography would leave the engine
+# nothing to break down.
+_VIEW3_GEO_DIMS = ["district_name", "block_name"] if _STATEWIDE else [
+    "gp_name", "block_name", "district_name",
+]
 
 VIEW3_CONFIG = ViewConfig(
-    name="Agriculture Crop Registrations",
-    parquet_path=os.path.join(BASE_DIR, "views_rtgs", "view3_agri_crop.parquet"),
+    name="GP Performance",
+    parquet_path=os.path.join(BASE_DIR, "views_prdw", "view3_gp_performance.parquet"),
 
-    dimensions=[
-        "cropnameeng",      # 10 values
-        "season",           # 2 values — Kharif, Rabi
-        "district",         # 13 values
-        "cropstatus",       # 4 values — Approved, Pending, Under Review, Damaged
-        "social_status",    # 4 values
-        "cultivator_type",  # 2 values — Owner, Tenant
-    ],
+    dimensions=_VIEW3_GEO_DIMS,
+
     temporal_dimensions=[
-        # ITERATION 2: 3 values — 2023-2025. The 2026 rows are excluded in the
-        # view: the drop ends 2026-07-31, so every crop fell in that part year
-        # and no series could be monotone over the full axis.
-        "cropyear",
+        "fiscal_year",   # 6 values — 2020-2021 .. 2025-2026
     ],
 
+    # All SUM, at GP-year grain. n_tech_approvals totals 2,095 rather than the
+    # 2,134 technical-approval records: 39 sit on activities with no
+    # administrative approval and `v_approval` hangs the technical approval off
+    # the administrative one. Carried unchanged so Ask and Discover report the
+    # same number (WP-D1 §4).
     measures=[
-        MeasureConfig("subsidyamount",    "sum"),   # INR of input subsidy
-        MeasureConfig("subsidy_mean",     "avg"),   # same column, per-registration average
-        MeasureConfig("nonsubsidyamount", "sum"),   # farmer's own contribution
-        MeasureConfig("record_count",     "sum"),
+        MeasureConfig("n_plans",               "sum"),  # GPDP plans (Main + Supplementary)
+        MeasureConfig("n_activities",          "sum"),  # activities planned
+        MeasureConfig("n_costed",              "sum"),
+        MeasureConfig("n_costless",            "sum"),
+        MeasureConfig("planned_cost",          "sum"),  # PLANNED rupees
+        MeasureConfig("sanctioned_total",      "sum"),  # SANCTIONED rupees
+        MeasureConfig("expenditure_total",     "sum"),  # SPENT rupees
+        MeasureConfig("overspend_vs_plan",     "sum"),  # SIGNED: spent minus planned
+        MeasureConfig("overspend_vs_sanction", "sum"),  # SIGNED: spent minus sanctioned
+        MeasureConfig("payment_amount",        "sum"),  # CASHBOOK rupees out
+        MeasureConfig("receipt_amount",        "sum"),  # CASHBOOK rupees in
+        MeasureConfig("n_admin_approvals",     "sum"),  # sanction records
+        MeasureConfig("n_tech_approvals",      "sum"),  # sanction records — 2,095, see above
+        MeasureConfig("n_completed",           "sum"),  # 17 sample-wide — near-degenerate
+        MeasureConfig("n_ongoing",             "sum"),
+        MeasureConfig("n_abandoned",           "sum"),
+        MeasureConfig("n_with_evidence",       "sum"),
+        MeasureConfig("evidence_uploads",      "sum"),  # geotagged photo uploads
     ],
 
-    impact_measures=["record_count", "subsidyamount", "nonsubsidyamount"],
-    max_subspace_depth=2,
+    impact_measures=[
+        "n_activities",       # volume signal
+        "expenditure_total",  # financial exposure (SPENT basis, complete here)
+    ],
+
+    # Depth 1 at sample scale on 120 rows; depth 2 statewide (§6), where ~41k
+    # rows across 30 districts and 314 blocks make a two-filter subspace both
+    # populated enough to clear the impact prune and specific enough to matter.
+    max_subspace_depth=2 if _STATEWIDE else 1,
     tau=0.5,
     min_impact=0.01,
     min_hdp_size=3,
-    extremum_ratio=0.80,   # ITERATION 3 — see VIEW1_CONFIG and ViewConfig
-)
-
-VIEW4_CONFIG = ViewConfig(
-    name="MARKFED Procurement",
-    parquet_path=os.path.join(BASE_DIR, "views_rtgs", "view4_markfed_procurement.parquet"),
-
-    dimensions=[
-        "crop_name",       # 10 values
-        "district",        # 13 values
-        "season",          # 2 values
-        "gender",          # 2 values
-        "caste",           # 4 values
-        "payment_status",  # 3 values — Approved, Pending, Under Review
-    ],
-    temporal_dimensions=[
-        # ITERATION 2: proc_year is gone — 4 values of which the first and last
-        # were part years, redundant with proc_month, which has 28 points and
-        # handles the truncation.
-        "proc_month",      # 28 values — 2023-08 .. 2026-07
-    ],
-
-    measures=[
-        MeasureConfig("amount_paid",      "sum"),   # INR paid to farmers
-        MeasureConfig("amount_paid_mean", "avg"),   # same column, per-transaction average
-        MeasureConfig("procured_qty",     "sum"),   # quintals procured
-        MeasureConfig("unpaid_count",     "sum"),   # transactions not yet Approved
-        MeasureConfig("unpaid_share",     "avg"),   # same flag averaged — share of the slice unpaid
-        MeasureConfig("txn_count",        "sum"),
-    ],
-
-    impact_measures=["txn_count", "amount_paid", "procured_qty"],
-    max_subspace_depth=2,
-    tau=0.5,
-    min_impact=0.01,
-    min_hdp_size=3,
-    extremum_ratio=0.80,   # ITERATION 3 — see VIEW1_CONFIG and ViewConfig
-)
-
-# ITERATION 2 — the equity cube. One row per district x social category x
-# scheme, every measure already normalised by the PM-KISAN roster population of
-# the cell. Absolute totals cannot answer "is this group reached in proportion
-# to its size" — the smallest group's total is the smallest by construction —
-# so the proportional forms are carried as first-class AVG measures. Each row is
-# already an aggregate, so the engine's AVG over a slice is that slice's mean
-# rate across cells.
-#
-# No temporal dimension: the cube is a cross-section, and its rupee figures
-# pool the whole span.
-VIEW5_CONFIG = ViewConfig(
-    name="Equity Cube",
-    parquet_path=os.path.join(BASE_DIR, "views_rtgs", "view5_equity_cube.parquet"),
-
-    dimensions=[
-        "district",   # 13 values
-        "category",   # 4 values
-        "scheme",     # 6 values — the AP state schemes; PM-KISAN is the denominator
-    ],
-    temporal_dimensions=[],
-
-    measures=[
-        # ITERATION 3 — population is AVERAGED, not summed. It is a constant per
-        # district x category cell repeated against each of the six schemes, so
-        # a SUM over any slice that spans schemes counts the same farmers six
-        # times: iteration 2's report said 2,988 Backward Class farmers where
-        # the true figure is 498. AVG over a constant returns the constant, so
-        # the same slice now yields the true population whether it spans one
-        # scheme or all six. The glossary says the column is never additive.
-        MeasureConfig("population",           "avg"),  # roster farmers behind the cell
-        MeasureConfig("enrolled",             "sum"),  # of them, enrolled in this scheme
-        MeasureConfig("coverage_rate",        "avg"),  # enrolled / population
-        MeasureConfig("rupees_per_capita",    "avg"),  # cell INR / population
-        MeasureConfig("representation_index", "avg"),  # benefit share / population share; 1.0 = parity
-        # land share / population share; 1.0 = proportional. Constant per
-        # district x category cell and repeated across the six scheme rows, so
-        # it takes `population`'s non-additive treatment: avg, never summed.
-        MeasureConfig("land_share_index",     "avg"),
-    ],
-
-    # Impact is always a SUM of the measure over the slice against its total,
-    # independent of how the measure is aggregated for description. For
-    # `population` that ratio is still the cell's share of the cube, because
-    # numerator and denominator repeat across the six schemes identically.
-    impact_measures=["population", "enrolled"],
-    max_subspace_depth=2,
-    tau=0.5,
-    min_impact=0.01,
-    min_hdp_size=3,
-    extremum_ratio=0.80,   # ITERATION 3 — see VIEW1_CONFIG and ViewConfig
-)
-
-
-# =============================================================================
-# ITERATION 3 — VIEWS 6, 7, 8
-# =============================================================================
-# The operator's model of the programme is verticals (Agriculture,
-# Horticulture, Sericulture, Fisheries) over a cross-functional spine (PM-KISAN
-# + Survey_Land_Records), with MARKFED as the market that links the two. Views
-# 1-5 covered the verticals and the spine's equity face. These three cover the
-# three joins that were still unmined: a vertical's own pipeline (view6), the
-# vertical-to-market handoff (view7), and the spine's internal consistency
-# (view8). Sericulture, Fisheries and RySS got no standalone view: they are
-# registration-heavy files with no question family of their own, and a view
-# ships only with a question family AND at least one findable story.
-
-# One row per micro-irrigation sanction. The only file in the drop that records
-# what was sanctioned AND what was released, so the only place the pipeline
-# question can be asked.
-VIEW6_CONFIG = ViewConfig(
-    name="Horticulture Sanction Pipeline",
-    parquet_path=os.path.join(BASE_DIR, "views_rtgs", "view6_horti_pipeline.parquet"),
-
-    dimensions=[
-        "district",   # 12 values — YSR Kadapa has no horticulture rows at all
-        "gender",     # 2 values
-        "category",   # 4 values
-        "status",     # 3 values — Approved, Pending, Under Review
-        "crop",       # 10 values — a farmer attribute, fully populated
-    ],
-    temporal_dimensions=[],
-
-    measures=[
-        MeasureConfig("subsidy_amt",        "sum"),  # INR sanctioned
-        MeasureConfig("subsidy_amt_mean",   "avg"),  # same column, typical sanction
-        MeasureConfig("balance_to_release", "sum"),  # INR still to go out
-        MeasureConfig("released_amount",    "sum"),  # INR actually released
-        MeasureConfig("release_rate",       "avg"),  # released / sanctioned, per row
-        MeasureConfig("stalled_flag",       "avg"),  # share with >=90% still held
-        MeasureConfig("beneficiary_count",  "sum"),
-    ],
-
-    impact_measures=["beneficiary_count", "subsidy_amt", "balance_to_release"],
-    max_subspace_depth=2,
-    tau=0.5,
-    min_impact=0.01,
-    min_hdp_size=3,
-    extremum_ratio=0.80,
-)
-
-# One row per farmer who appears in BOTH the input-subsidy register and the
-# procurement file — the only population whose realisation ratio is defined.
-VIEW7_CONFIG = ViewConfig(
-    name="Input Subsidy to Market Realisation",
-    parquet_path=os.path.join(BASE_DIR, "views_rtgs", "view7_input_to_market.parquet"),
-
-    dimensions=[
-        "district",         # 13 values
-        "category",         # 4 values
-        "gender",           # 2 values
-        "crop",             # 10 values — see the view description: intensity,
-                            # never switching, because crop is a farmer attribute
-        "land_size_class",  # 4 values
-    ],
-    temporal_dimensions=[],
-
-    measures=[
-        MeasureConfig("input_subsidy",     "sum"),   # INR paid to plant
-        MeasureConfig("procured_qty",      "sum"),   # quintals bought back
-        MeasureConfig("procurement_value", "sum"),   # INR paid for the harvest
-        MeasureConfig("realization_ratio", "avg"),   # INR back per INR in, per farmer
-        MeasureConfig("land_acres",        "sum"),
-        MeasureConfig("farmer_count",      "sum"),
-    ],
-
-    impact_measures=["farmer_count", "procurement_value", "input_subsidy"],
-    max_subspace_depth=2,
-    tau=0.5,
-    min_impact=0.01,
-    min_hdp_size=3,
-    extremum_ratio=0.80,
-)
-
-# One row per roster farmer: what they declare against what the revenue record
-# carries. See the view SQL for the khata join's production caveat.
-VIEW8_CONFIG = ViewConfig(
-    name="Land Record Integrity",
-    parquet_path=os.path.join(BASE_DIR, "views_rtgs", "view8_land_integrity.parquet"),
-
-    dimensions=[
-        "district",         # 13 values
-        "category",         # 4 values
-        "gender",           # 2 values
-        "land_size_class",  # 4 values
-    ],
-    temporal_dimensions=[],
-
-    measures=[
-        MeasureConfig("declared_acres",     "sum"),  # acres claimed in PM-KISAN
-        MeasureConfig("recorded_acres",     "sum"),  # acres on the revenue record
-        MeasureConfig("discrepancy_ratio",  "avg"),  # declared / recorded, per farmer
-        MeasureConfig("over_declared_flag", "avg"),  # share declaring >10% more
-        MeasureConfig("farmer_count",       "sum"),
-    ],
-
-    impact_measures=["farmer_count", "declared_acres", "recorded_acres"],
-    max_subspace_depth=2,
-    tau=0.5,
-    min_impact=0.01,
-    min_hdp_size=3,
-    extremum_ratio=0.80,
-)
-
-
-# =============================================================================
-# ITERATION 5 — VIEW 9
-# =============================================================================
-# The scheme-mix cube: one row per district x scheme, carrying the share of the
-# district's benefit rupees that flows through each scheme. It exists because a
-# district's programme mix is a property of the DISTRICT and two attempts to
-# read it at farmer grain failed on the grain rather than on the pattern — the
-# first diluted (1.12x against an injected 2.02x), the second was correct and
-# too sparse to rank (NULL for 714 of 1,100 farmers). See the view SQL header.
-#
-# The cube is small on purpose: two dimensions and 91 rows. That bounds what it
-# can find — with `district` and `scheme` the only dimensions, a depth-2
-# subspace leaves no breakdown, so every candidate is an HDP extended along one
-# dimension with the other as the breakdown — and it is the whole point. This
-# view answers one question and is not asked to answer others.
-#
-# No temporal dimension: the mix pools the whole span, as view5's does.
-VIEW9_CONFIG = ViewConfig(
-    name="District Scheme Mix",
-    parquet_path=os.path.join(BASE_DIR, "views_rtgs", "view9_scheme_mix.parquet"),
-
-    dimensions=[
-        "district",   # 13 values
-        "scheme",     # 7 values — all seven, PM-KISAN included: this decomposes
-                      # a rupee total rather than measuring coverage
-    ],
-    temporal_dimensions=[],
-
-    measures=[
-        # The scheme's share of its district's benefit rupees, one value per
-        # cell. AVERAGED: a slice of one cell returns that cell's own share, and
-        # a slice spanning cells returns their mean share.
-        MeasureConfig("benefit_share",  "avg"),
-        MeasureConfig("total_benefit",  "sum"),   # the rupees behind the share
-    ],
-
-    # Impact is always a SUM against the view total, whatever the description
-    # aggregation is. `total_benefit` is the honest denominator here: a slice's
-    # impact is the share of programme money it covers. `benefit_share` is not
-    # an impact measure — summing shares measures nothing.
-    impact_measures=["total_benefit"],
-    max_subspace_depth=2,
-    tau=0.5,
-    min_impact=0.01,
-    min_hdp_size=3,
-    extremum_ratio=0.80,
+    # 0.67 default — see VIEW1_CONFIG. Every measure here is volumetric.
 )
 
 

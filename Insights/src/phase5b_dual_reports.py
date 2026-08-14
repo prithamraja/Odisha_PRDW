@@ -35,7 +35,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 from phase2_engine import MetaInsightCandidate, Subspace, load_candidates
-from phase4a_engine import VIEW1_CONFIG, VIEW2_CONFIG, VIEW3_CONFIG, VIEW4_CONFIG, ViewConfig
+from phase4a_engine import VIEW1_CONFIG, VIEW2_CONFIG, VIEW3_CONFIG, ViewConfig
 from phase5_ranking import rank_metainsights, prefilter_candidates
 from phase5b_report import VIEW_DESCRIPTIONS, enrich_candidates_with_stats
 from discover_config import DISCOVER_PROSE_MODEL
@@ -43,11 +43,12 @@ from discover_config import DISCOVER_PROSE_MODEL
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(os.path.dirname(BASE_DIR), ".env"))
 
+# The view registry. Three views in the PR&DW deployment (WP-D2 T1); the AP and
+# UP configs it used to carry are gone from phase4a_engine.
 ALL_CONFIGS = {
     "view1": VIEW1_CONFIG,
     "view2": VIEW2_CONFIG,
     "view3": VIEW3_CONFIG,
-    "view4": VIEW4_CONFIG,
 }
 
 # Fixed conciseness parameters
@@ -102,7 +103,7 @@ def rescore_candidates(candidates: list, gamma: float) -> list:
 
 def generate_dual_rankings():
     """Load candidates, rescore with gamma=0.1 and 0.5, rank both."""
-    views = ["view1", "view2", "view3", "view4"]
+    views = list(ALL_CONFIGS)
     overview_ranked = {}
     actionable_ranked = {}
 
@@ -300,12 +301,9 @@ def generate_dual_reports(
 ):
     client = OpenAI()
 
-    view_order = [
-        ("view1", "Claims Processing & Treatment Patterns"),
-        ("view2", "District-Level Monthly Performance Trends"),
-        ("view3", "Hospital Infrastructure & Specialty Capacity"),
-        ("view4", "Beneficiary Enrolment & Scheme Uptake"),
-    ]
+    # Titles come from the one registry that also feeds the prompts and the
+    # prose gate, so a renamed view cannot leave a stale title behind here.
+    view_order = [(v, VIEW_DESCRIPTIONS[v]["title"]) for v in ALL_CONFIGS]
 
     # --- Overview Report ---
     overview_sections = [

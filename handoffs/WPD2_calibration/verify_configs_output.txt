@@ -1,0 +1,116 @@
+
+=== 1. imports ===
+  [PASS] all nine pipeline modules import
+
+=== 2. registries hold exactly the three PR&DW views ===
+  [PASS] phase5b_report.VIEW_CONFIGS  -- ['view1', 'view2', 'view3']
+  [PASS] phase5b_report.VIEW_DESCRIPTIONS
+  [PASS] phase5b_dual_reports.ALL_CONFIGS
+  [PASS] phase5c_global_feed.VIEWS
+  [PASS] no VIEW4..9_CONFIG survives on phase4a_engine
+  [PASS] phase5c_gamma_reports.discover_views sees exactly three
+
+=== 3. every config column is glossed, united and SUM ===
+  [PASS] view1: all 41 config columns glossed  -- missing=[]
+  [PASS] view1: no glossary entry without a config column  -- extra=[]
+  [PASS] view1: every measure has a unit
+  [PASS] view1: every measure is SUM
+  [PASS] view1: extremum_ratio at the 0.67 default
+  [PASS] view1: impact measures are measures
+  [PASS] view1: no LGD code column is a dimension
+  [PASS] view2: all 13 config columns glossed  -- missing=[]
+  [PASS] view2: no glossary entry without a config column  -- extra=[]
+  [PASS] view2: every measure has a unit
+  [PASS] view2: every measure is SUM
+  [PASS] view2: extremum_ratio at the 0.67 default
+  [PASS] view2: impact measures are measures
+  [PASS] view2: no LGD code column is a dimension
+  [PASS] view3: all 22 config columns glossed  -- missing=[]
+  [PASS] view3: no glossary entry without a config column  -- extra=[]
+  [PASS] view3: every measure has a unit
+  [PASS] view3: every measure is SUM
+  [PASS] view3: extremum_ratio at the 0.67 default
+  [PASS] view3: impact measures are measures
+  [PASS] view3: no LGD code column is a dimension
+
+=== 4. the prose gate's expectations are satisfiable ===
+  [PASS] every view has a deterministic reading note
+  [PASS] every view has a vocabulary entry
+  [PASS] view1: denied regexes and prose phrases are in step
+  [PASS] view2: denied regexes and prose phrases are in step
+  [PASS] view3: denied regexes and prose phrases are in step
+
+=== 5. DISCOVER_SCALE flips the marked blocks and nothing else ===
+  [PASS] the switch is read from the environment
+  [PASS] view1: temporal does not move with scale
+  [PASS] view1: measures does not move with scale
+  [PASS] view1: impact does not move with scale
+  [PASS] view1: tau does not move with scale
+  [PASS] view1: min_impact does not move with scale
+  [PASS] view1: min_hdp does not move with scale
+  [PASS] view1: ratio does not move with scale
+  [PASS] view2: temporal does not move with scale
+  [PASS] view2: measures does not move with scale
+  [PASS] view2: impact does not move with scale
+  [PASS] view2: tau does not move with scale
+  [PASS] view2: min_impact does not move with scale
+  [PASS] view2: min_hdp does not move with scale
+  [PASS] view2: ratio does not move with scale
+  [PASS] view3: temporal does not move with scale
+  [PASS] view3: measures does not move with scale
+  [PASS] view3: impact does not move with scale
+  [PASS] view3: tau does not move with scale
+  [PASS] view3: min_impact does not move with scale
+  [PASS] view3: min_hdp does not move with scale
+  [PASS] view3: ratio does not move with scale
+  [PASS] view1 statewide drops gp_name and block_name only
+  [PASS] view2 statewide dims
+  [PASS] view3 statewide dims
+  [PASS] view3 depth 1 sample / 2 statewide
+  [PASS] view1 depth 1 sample / 2 statewide
+  [PASS] view2 depth 1 both
+
+=== 6. no AP/UP vocabulary survives the prompt path ===
+  [PASS] phase5b_report.py: 'Andhra' x0
+  [PASS] phase5b_report.py: 'PM-KISAN' x0
+  [PASS] phase5b_report.py: 'MARKFED' x0
+  [PASS] phase5b_report.py: 'APMIP' x0
+  [PASS] phase5b_report.py: 'RTGS' x0
+  [PASS] phase5b_report.py: 'Rythu' x0
+  [PASS] phase5b_report.py: 'Sericulture' x0
+  [PASS] phase5b_report.py: 'Horticulture' x0
+  [PASS] phase5b_report.py: 'quintal' x0
+  [PASS] phase5b_report.py: 'Kharif' x0
+  [PASS] phase5b_report.py: 'Rabi' x0
+  [PASS] phase5b_report.py: 'farmer' x0
+  [PASS] phase5b_report.py: 'PM-JAY' x0
+  [PASS] phase5b_report.py: 'Uttar' x0
+  [PASS] phase5b_report.py: 'Cardiology' x0
+  [PASS] phase5b_report.py: 'eKYC' x0
+  [PASS] phase5b_report.py: 'khata' x0
+  [PASS] view1: built prompt is free of AP vocabulary  -- []
+  [PASS] view2: built prompt is free of AP vocabulary  -- []
+  [PASS] view3: built prompt is free of AP vocabulary  -- []
+
+=== 7. the FY 2023-24 caveat predicate ===
+  [PASS] view1: activity count by FY, across the boundary
+  [PASS] view1: activity count by FY, all after the boundary
+  [PASS] view1: activity count by FY, all before it
+  [PASS] view1: a RUPEE measure across the boundary
+  [PASS] view1: photo uploads are not an activity count
+  [PASS] view1: HDP whose members are years, straddling
+  [PASS] view1: HDP over years, all after the boundary
+  [PASS] view1: fiscal_year as a FILTER makes no comparison
+  [PASS] view2: view2 is artifact-free
+  [PASS] view3: view3 costless count across the boundary
+  [PASS] view3: approvals are steady across the boundary
+  [PASS] view3: plans are not activities
+  [PASS] view1: measure-extending HDP including a count
+  [PASS] view1: measure-extending HDP, rupees only
+  [PASS] view2 has no activity-count measure
+  [PASS] no qualifying finding -> no caveat sentence
+  [PASS] a qualifying finding -> the caveat sentence, verbatim
+  [PASS] still exactly one reading-note marker
+
+============================================================
+0 failure(s)

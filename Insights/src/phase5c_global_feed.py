@@ -116,19 +116,27 @@ from phase5_ranking import (  # noqa: E402
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CSV_DIR = os.path.join(BASE_DIR, "rtgs_csv")
 
-VIEWS = ["view1", "view2", "view3", "view4", "view5", "view6", "view7",
-         "view8", "view9"]
+# =============================================================================
+# WP-D2 NOTE — THIS FILE IS NOT RUNNABLE ON PR&DW YET, AND THAT IS DELIBERATE
+# =============================================================================
+# WP-D2 updated the two view registries below to the three Odisha PR&DW views
+# and emptied LINEAGE, because AP lineage applied to PR&DW columns would be
+# wrong rather than merely absent. Everything else here is still the AP
+# deployment's: FARMER_REACH_SQL weights each view by how many PM-KISAN roster
+# farmers it can speak about, over CSVs in `rtgs_csv/` that this deployment does
+# not have. PR&DW has no beneficiary identity anywhere in its drop (mapping doc
+# §4.4), so its coverage weighting has to be designed, not translated — which
+# view weight is honest when the units are Gram Panchayats, activities and
+# rupees is a WP-D3 decision, and D16 forbids WP-D2 changing the feed's shape.
+# Until WP-D3 makes that call, `compute_coverage_weights()` raises on the
+# missing CSVs and no global feed is produced. phase5b_report then writes the
+# per-view sections only, which is its documented no-feed path.
+VIEWS = ["view1", "view2", "view3"]
 
 VIEW_TITLES = {
-    "view1": "Scheme Benefits",
-    "view2": "Farmer 360",
-    "view3": "Agriculture Input-Subsidy Register",
-    "view4": "MARKFED Procurement",
-    "view5": "Equity Cube",
-    "view6": "Horticulture Sanction Pipeline",
-    "view7": "Input Subsidy to Market Realisation",
-    "view8": "Land Record Integrity",
-    "view9": "District Scheme Mix",
+    "view1": "Activity Lifecycle",
+    "view2": "Geo-Month Cash Cube",
+    "view3": "GP Performance",
 }
 
 TOP_K = 50
@@ -196,82 +204,16 @@ FARMER_REACH_SQL = {
 # views consume a source column, this says which source concept a view column
 # came from. A view column missing from the map falls back to its own name,
 # which can only make dedup miss a merge, never invent one.
-LINEAGE = {
-    "view1": {
-        "scheme": "scheme", "district": "district", "gender": "gender",
-        "category": "caste", "status": "status",
-        "benefit_amount": "benefit", "benefit_amount_mean": "benefit",
-        "land_acres": "land", "benefit_count": "rows",
-    },
-    "view2": {
-        "district": "district", "gender": "gender", "category": "caste",
-        "ekyc_status": "ekyc", "beneficiary_status": "beneficiary_status",
-        "land_size_class": "land",
-        "scheme_count": "scheme_membership",
-        "in_pm_kisan": "scheme_membership", "in_agriculture": "scheme_membership",
-        "in_horticulture": "scheme_membership", "in_fisheries": "scheme_membership",
-        "in_sericulture": "scheme_membership", "in_markfed": "scheme_membership",
-        "in_ryss": "scheme_membership",
-        "ekyc_pending_rate": "ekyc",
-        "total_benefit_amount": "benefit", "land_acres": "land",
-        "farmer_count": "rows",
-    },
-    "view3": {
-        "cropnameeng": "crop", "season": "season", "district": "district",
-        "cropstatus": "status", "social_status": "caste",
-        "cultivator_type": "cultivator_type", "cropyear": "crop_year",
-        "subsidyamount": "benefit", "subsidy_mean": "benefit",
-        "nonsubsidyamount": "farmer_contribution", "record_count": "rows",
-    },
-    "view4": {
-        "crop_name": "crop", "district": "district", "season": "season",
-        "gender": "gender", "caste": "caste", "payment_status": "status",
-        "proc_month": "procurement_date",
-        "amount_paid": "procurement_value", "amount_paid_mean": "procurement_value",
-        "procured_qty": "procured_qty",
-        "unpaid_count": "status", "unpaid_share": "status", "txn_count": "rows",
-    },
-    "view5": {
-        "district": "district", "category": "caste", "scheme": "scheme",
-        "population": "roster_population", "enrolled": "scheme_membership",
-        "coverage_rate": "scheme_membership",
-        "rupees_per_capita": "benefit", "representation_index": "benefit",
-    },
-    "view6": {
-        "district": "district", "gender": "gender", "category": "caste",
-        "status": "status", "crop": "crop",
-        "subsidy_amt": "benefit", "subsidy_amt_mean": "benefit",
-        "balance_to_release": "release_split",
-        "released_amount": "release_split", "release_rate": "release_split",
-        "stalled_flag": "release_split", "beneficiary_count": "rows",
-    },
-    "view7": {
-        "district": "district", "category": "caste", "gender": "gender",
-        "crop": "crop", "land_size_class": "land",
-        "input_subsidy": "benefit", "procured_qty": "procured_qty",
-        "procurement_value": "procurement_value",
-        "realization_ratio": "realisation",
-        "land_acres": "land", "farmer_count": "rows",
-    },
-    "view8": {
-        "district": "district", "category": "caste", "gender": "gender",
-        "land_size_class": "land",
-        "declared_acres": "land", "recorded_acres": "recorded_land",
-        "discrepancy_ratio": "land_discrepancy",
-        "over_declared_flag": "land_discrepancy", "farmer_count": "rows",
-    },
-    # view9's two measures are the same benefit rupees view1 pays out, one
-    # totalled and one expressed as a share of the district's total. They map to
-    # `benefit` for the same reason view5's rupees_per_capita and
-    # representation_index do: the lineage records where a number CAME FROM, not
-    # what arithmetic the view did to it. A view1 finding and a view9 finding
-    # about the same schemes' money should be recognised as one story.
-    "view9": {
-        "district": "district", "scheme": "scheme",
-        "benefit_share": "benefit", "total_benefit": "benefit",
-    },
+LINEAGE: dict = {
+    # EMPTY, WP-D2. The AP map that lived here named AP columns (`cropnameeng`,
+    # `ekyc_status`, `benefit_amount`); none of them exists in a PR&DW view, so
+    # every lookup would have fallen through anyway — and any that did NOT fall
+    # through would have merged two findings on a name collision rather than on
+    # shared lineage. The PR&DW map is WP-D3's to write, from
+    # `domain_pack_prdw/crosswalk.csv`, which already records the direction this
+    # needs (`used_in_views` per source column). Until then `_lineage` maps every
+    # column to itself: dedup can miss a merge, which is the safe failure.
 }
-
 
 def _lineage(view: str, column: str) -> str:
     """The source concept a view column reads. Unknown names map to themselves,
