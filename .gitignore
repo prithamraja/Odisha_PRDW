@@ -13,9 +13,3 @@ __pycache__/
 # Office lock files
 ~$*
 
-# Data files — too large / Drive-synced; distributed out-of-band
-*.duckdb
-
-# Node / frontend (separate workstream, ~20k files — excluded entirely for now)
-node_modules/
-frontend/
