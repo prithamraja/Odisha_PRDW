@@ -8,15 +8,29 @@ Question we are answering BEFORE any refactor:
   crowd the top-30?
 
 Usage:
-  cd Chatbot/backend
-  python recall_eval.py                # English topics from the gold CSV
-  python recall_eval.py --k 30         # change the headline K
-  python recall_eval.py --refresh      # ignore cached catalog embeddings
+  cd Chatbot
+  python recall_eval.py --yes          # questions from the gold CSV
+  python recall_eval.py --k 30 --yes   # change the headline K
+  python recall_eval.py --refresh --yes  # ignore cached catalog embeddings
+
+THIS SPENDS MONEY, so it requires --yes (or PRDW_EVAL_CONFIRM=1) and prints its
+call estimate first. WP-2 found a test suite quietly making paid calls whenever
+a key happened to sit in `.env`; a harness that embeds the whole catalogue plus
+every gold question on a bare `python recall_eval.py` is the same trap one layer
+up (standing discipline §3a).
+
+MANY VECTORS PER TEMPLATE (WP-4 T4b). The index is built the way the SHIPPED
+retriever builds it — one vector per abstract question AND one per paraphrase,
+all mapped to the same query_id, scored as the MAX over a template's vectors,
+with k counting DISTINCT query_ids. The earlier one-vector-per-id build measured
+a retriever this system does not have: decision D2 replaced AP's per-scope
+sibling templates with scope-phrased paraphrases, so paraphrases are how a
+block- or GP-phrased question reaches its consolidated template at all.
 
 Notes:
-  - Uses the English `topic` column as the query proxy. This FLATTERS retrieval
-    (topics are phrased like the catalog). The number that actually matters —
-    Hindi/Hinglish recall — needs a labelled multilingual set we don't have yet.
+  - Uses the gold `topic` column as the query proxy. English rows FLATTER
+    retrieval (they are phrased like the catalog); the Odia and code-mixed rows
+    in the gold set are the ones that measure anything hard.
   - Catalog embeddings are cached to .tmp/catalog_embeddings.json so reruns are
     free; pass --refresh after editing the catalogs.
 """
@@ -40,20 +54,34 @@ from openai import OpenAI
 
 from query_router.dashboard_catalog import DASHBOARD_CATALOG
 from query_router.template_catalog  import TEMPLATE_CATALOG
-from query_router.intent_catalog    import INTENT_LOOKUP
+from query_router.unanswerable_catalog import UNANSWERABLE_CATALOG
 from query_router.config            import EMBEDDING_MODEL, ABSTRACTION_MODEL
+from eval_spend                     import confirm_spend
+
+# DEFENDED, because this module is the last consumer of the retired AP retrieval
+# layer (WP-4a §6.3). WP-3's T5/T6/T7 commit is titled "retire the AP retrieval
+# layer"; `intent_catalog.py` happens to have survived it, holding zero entries.
+# Whoever finishes that retirement should not discover it by this harness dying
+# at import on the morning of an eval run.
+try:
+    from query_router.intent_catalog import INTENT_LOOKUP
+except Exception:                                            # pragma: no cover
+    INTENT_LOOKUP = {}
 
 HERE       = Path(__file__).parent
 CSV_PATH   = HERE.parent / "test_questions_query_mapping.csv"
 CACHE_PATH = HERE / ".tmp" / "catalog_embeddings.json"
 HINGLISH_PATH = HERE / ".tmp" / "topics_hinglish.json"
 
-# ── query_id → representative intent family (for the crowding metric) ──────────
-# INTENT_LOOKUP maps (intent, entityset) -> query_id. Invert it so we can label
-# each catalog entry with the intent(s) it can serve.
+# The AP crowding metric read the intent families out of INTENT_LOOKUP. That
+# table is EMPTY here — the PR&DW catalogue is retrieved template-direct — so
+# the section printed "mean: 0.0, max: 0" on every run, which reads as "no
+# crowding measured" when nothing was measured at all. WP-4a §6.1 shows the
+# opposite is true: the workbook ships nine entries where four would do.
 QID_TO_INTENTS: dict[str, set[str]] = defaultdict(set)
 for (intent, _entities), qid in INTENT_LOOKUP.items():
     QID_TO_INTENTS[qid].add(intent)
+INTENT_FAMILIES_AVAILABLE = bool(QID_TO_INTENTS)
 
 
 def _clean_template(text: str) -> str:
@@ -62,14 +90,36 @@ def _clean_template(text: str) -> str:
     return re.sub(r"\{(\w+?)\}", r"\1", text)
 
 
-def build_catalog() -> dict[str, str]:
-    """query_id -> natural-language question used for embedding."""
-    catalog: dict[str, str] = {}
+def build_index() -> tuple[list[str], list[str], dict[str, str]]:
+    """The retrieval index, built exactly as `VectorRetriever` builds it.
+
+    Returns `(texts, vec_qids, display)` — one entry in the first two lists per
+    EMBEDDED VECTOR, so a template with six scope paraphrases contributes seven.
+    `display` is one question per distinct query_id, for the miss report.
+
+    The known-unanswerables are indexed alongside the templates because the
+    router indexes them: an officer's beneficiary question has to retrieve
+    before it can be refused with a documented reason.
+    """
+    texts: list[str] = []
+    vec_qids: list[str] = []
+    display: dict[str, str] = {}
+
+    def add(qid: str, question: str, paraphrases) -> None:
+        display[qid] = question
+        for text in (question, *(paraphrases or [])):
+            cleaned = _clean_template(text).strip()
+            if cleaned:
+                texts.append(cleaned)
+                vec_qids.append(qid)
+
     for qid, entry in DASHBOARD_CATALOG.items():
-        catalog[qid] = entry["question"]
+        add(qid, entry["question"], entry.get("paraphrases"))
     for tid, entry in TEMPLATE_CATALOG.items():
-        catalog[tid] = _clean_template(entry["abstract_question"])
-    return catalog
+        add(tid, entry["abstract_question"], entry.get("paraphrases"))
+    for qid, entry in UNANSWERABLE_CATALOG.items():
+        add(qid, entry["question"], entry.get("paraphrases"))
+    return texts, vec_qids, display
 
 
 def embed_batch(client: OpenAI, texts: list[str]) -> list[list[float]]:
@@ -82,20 +132,25 @@ def embed_batch(client: OpenAI, texts: list[str]) -> list[list[float]]:
     return out
 
 
-def load_or_build_catalog_embeddings(client: OpenAI, catalog: dict[str, str],
-                                     refresh: bool) -> dict[str, list[float]]:
+def load_or_build_catalog_embeddings(
+    client: OpenAI, texts: list[str], refresh: bool
+) -> list[list[float]]:
+    """One vector per INDEX ENTRY, cached against the exact text list.
+
+    Keyed on the texts themselves, so editing a question OR adding a paraphrase
+    invalidates the cache rather than silently scoring against a stale index.
+    """
     if CACHE_PATH.exists() and not refresh:
         cached = json.loads(CACHE_PATH.read_text(encoding="utf-8"))
-        if set(cached.get("questions", {})) == set(catalog) and \
-           all(cached["questions"][q] == catalog[q] for q in catalog):
-            return {q: cached["vectors"][q] for q in catalog}
-    ids   = list(catalog)
-    vecs  = embed_batch(client, [catalog[q] for q in ids])
-    store = {q: v for q, v in zip(ids, vecs)}
+        if (cached.get("model") == EMBEDDING_MODEL
+                and cached.get("texts") == texts):
+            return cached["vectors"]
+    vecs = embed_batch(client, texts)
     CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
     CACHE_PATH.write_text(json.dumps(
-        {"model": EMBEDDING_MODEL, "questions": catalog, "vectors": store}), encoding="utf-8")
-    return store
+        {"model": EMBEDDING_MODEL, "texts": texts, "vectors": vecs}),
+        encoding="utf-8")
+    return vecs
 
 
 def _dot(a: list[float], b: list[float]) -> float:
@@ -106,20 +161,39 @@ def _norm(a: list[float]) -> float:
     return sum(x * x for x in a) ** 0.5
 
 
-def cosine_rank(qvec: list[float], catalog_vecs: dict[str, list[float]]) -> list[str]:
+def cosine_rank(
+    qvec: list[float], vectors: list[list[float]], vec_qids: list[str]
+) -> tuple[list[str], list[str]]:
+    """(distinct query_ids best-first, raw vector owners best-first).
+
+    The first list is what the router's k counts: a template scores as its
+    BEST-matching vector and appears once. The second is kept so crowding can be
+    measured — how much of the raw ranking a single template's paraphrases
+    occupy before the candidate list is deduplicated.
+    """
     qn = _norm(qvec) or 1.0
-    scored = [(qid, _dot(qvec, v) / (qn * (_norm(v) or 1.0)))
-              for qid, v in catalog_vecs.items()]
-    scored.sort(key=lambda t: t[1], reverse=True)
-    return [qid for qid, _ in scored]
+    scored = sorted(
+        ((qid, _dot(qvec, v) / (qn * (_norm(v) or 1.0)))
+         for qid, v in zip(vec_qids, vectors)),
+        key=lambda t: t[1], reverse=True,
+    )
+    raw = [qid for qid, _ in scored]
+    seen: set[str] = set()
+    distinct = [q for q in raw if not (q in seen or seen.add(q))]
+    return distinct, raw
 
 
+# Domain-corrected for PR&DW (WP-4). The AP prompt asked for health-insurance
+# questions and named PM-JAY, TAT and LAMA — run against this catalogue it would
+# have produced fluent questions about the wrong subject entirely and reported
+# the resulting recall as a multilingual measurement.
 _HINGLISH_SYS = (
-    "You convert English descriptions of health-insurance data questions into "
-    "natural Hinglish — the romanized Hindi-English mix an Indian government "
-    "official would actually type into a chatbot. Keep place names, specialty "
-    "codes, scheme terms (PM-JAY, TAT, LAMA) as-is. Make it sound like a real "
-    "typed question, not a literal translation. Return ONLY a JSON object "
+    "You convert English descriptions of PANCHAYAT data questions into natural "
+    "Hinglish — the romanized Hindi-English mix an Odisha Panchayati Raj & "
+    "Drinking Water official would actually type into a chatbot. Keep place "
+    "names, fiscal years and scheme terms (GPDP, SBM, LSDG, SFC, XV Finance "
+    "Commission, GP, block, district) as-is. Make it sound like a real typed "
+    "question, not a literal translation. Return ONLY a JSON object "
     'mapping each input index (as a string) to its Hinglish question.'
 )
 
@@ -167,25 +241,53 @@ def load_gold() -> list[dict]:
     return rows
 
 
+def _duplicate_question_groups(display: dict[str, str]) -> list[list[str]]:
+    """Distinct ids whose cleaned question text is IDENTICAL.
+
+    The crowding the catalogue ships with, independent of any query: WP-4a §6.1
+    found nine workbook rows where four would do (EXP-010/026/030 all read "How
+    many activities have expenditure under {Focus_Area} in {Date_Range}?").
+    Every one of them consumes a slot in every top-K it reaches.
+    """
+    by_text: dict[str, list[str]] = defaultdict(list)
+    for qid, question in display.items():
+        by_text[_clean_template(question).strip().lower()].append(qid)
+    return [sorted(ids) for ids in by_text.values() if len(ids) > 1]
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--k", type=int, default=30)
     ap.add_argument("--lang", choices=["english", "hinglish"], default="english")
     ap.add_argument("--refresh", action="store_true")
+    ap.add_argument("--yes", action="store_true",
+                    help="confirm the paid run (or set PRDW_EVAL_CONFIRM=1)")
     args = ap.parse_args()
 
-    client   = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-    catalog  = build_catalog()
-    print(f"Catalog: {len(catalog)} entries "
-          f"({sum(k.startswith('D') for k in catalog)} D, "
-          f"{sum(k.startswith('T') for k in catalog)} T)")
+    texts, vec_qids, display = build_index()
+    gold = load_gold()
+    scorable_n = sum(1 for g in gold if g["gold"] in display)
+    cached = CACHE_PATH.exists() and not args.refresh
+    confirm_spend(
+        "recall_eval",
+        [(f"catalogue embeddings ({len(texts)} vectors over "
+          f"{len(display)} entries)", 0 if cached else -(-len(texts) // 256)),
+         (f"query embeddings ({scorable_n} gold questions)",
+          -(-scorable_n // 256)),
+         *([(f"Hinglish translation of {scorable_n} topics",
+             -(-scorable_n // 20))] if args.lang == "hinglish" else [])],
+        confirmed=args.yes,
+    )
 
-    cat_vecs = load_or_build_catalog_embeddings(client, catalog, args.refresh)
-    gold     = load_gold()
+    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+    print(f"Index: {len(display)} entries, {len(texts)} vectors "
+          f"({len(texts) - len(display)} from paraphrases)")
+
+    vectors  = load_or_build_catalog_embeddings(client, texts, args.refresh)
 
     # Gold rows whose query_code isn't in the current catalog can't be scored.
-    missing  = [g for g in gold if g["gold"] not in catalog]
-    scorable = [g for g in gold if g["gold"] in catalog]
+    missing  = [g for g in gold if g["gold"] not in display]
+    scorable = [g for g in gold if g["gold"] in display]
     print(f"Gold rows: {len(gold)} | scorable: {len(scorable)} | "
           f"gold id not in catalog: {len(missing)}")
     if missing:
@@ -203,23 +305,45 @@ def main() -> None:
     Ks       = sorted({5, 10, 20, args.k})
     hits     = {k: 0 for k in Ks}
     ranks    = []
-    crowd    = []   # same-family entries among top-K per query
+    crowd    = []   # raw vector slots spent to reach K DISTINCT query_ids
+    dup_hits = []   # duplicate-question ids sharing the top-K with the gold
     misses   = []
 
+    dup_groups = _duplicate_question_groups(display)
+    dup_of = {qid: set(group) - {qid}
+              for group in dup_groups for qid in group}
+
     for g, qv in zip(scorable, q_vecs):
-        ranked   = cosine_rank(qv, cat_vecs)
+        ranked, raw = cosine_rank(qv, vectors, vec_qids)
         gold_id  = g["gold"]
-        rank     = ranked.index(gold_id)          # 0-based
+        rank     = ranked.index(gold_id)          # 0-based, distinct ids
         ranks.append(rank)
         for k in Ks:
             if rank < k:
                 hits[k] += 1
-        # crowding: of the top-K, how many share the gold's intent family?
-        gold_intents = QID_TO_INTENTS.get(gold_id, set())
-        topk = ranked[:args.k]
-        same = sum(1 for qid in topk
-                   if QID_TO_INTENTS.get(qid, set()) & gold_intents)
-        crowd.append(same)
+
+        # CROWDING, measured two ways that both cost real top-K room.
+        #
+        # 1. Paraphrase crowding: how many RAW vectors the retriever has to walk
+        #    to collect K distinct query_ids. K exactly means no paraphrase ever
+        #    displaced another template; the excess is the price of the D2
+        #    scope-paraphrase design, which is the number this harness exists to
+        #    keep honest.
+        seen: set[str] = set()
+        consumed = 0
+        for qid in raw:
+            consumed += 1
+            seen.add(qid)
+            if len(seen) == args.k:
+                break
+        crowd.append(consumed - args.k)
+
+        # 2. Duplicate-row crowding: sibling entries with IDENTICAL question
+        #    text that reached the same top-K (WP-4a §6.1). These are distinct
+        #    ids, so the dedup above cannot help — each one really does take a
+        #    slot, and the reranker then sees a tie it cannot break on meaning.
+        dup_hits.append(len(dup_of.get(gold_id, set()) & set(ranked[:args.k])))
+
         if rank >= args.k:
             misses.append((g["topic"], gold_id, rank))
 
@@ -235,10 +359,29 @@ def main() -> None:
     print("\n── Gold-answer rank (0-based) ──")
     print(f"  median: {pct(0.5)}   p90: {pct(0.9)}   p99: {pct(0.99)}   worst: {ranks[-1]}")
 
-    print(f"\n── Crowding: same-intent-family entries in top-{args.k} ──")
+    print(f"\n── Crowding 1: extra raw vectors walked to reach {args.k} "
+          f"distinct ids ──")
+    print("  (0 = no paraphrase ever displaced another template)")
     c = Counter(crowd)
     print(f"  mean: {sum(crowd)/len(crowd):.1f}   max: {max(crowd)}")
     print(f"  distribution: " + ", ".join(f"{k}:{c[k]}" for k in sorted(c)))
+
+    print(f"\n── Crowding 2: identical-question siblings in top-{args.k} ──")
+    print(f"  the catalogue ships {len(dup_groups)} groups of duplicate "
+          f"question text ({sum(len(g) for g in dup_groups)} entries where "
+          f"{len(dup_groups)} would do)")
+    for group in dup_groups:
+        print(f"    {', '.join(group)}")
+    d = Counter(dup_hits)
+    print(f"  mean: {sum(dup_hits)/len(dup_hits):.2f}   max: {max(dup_hits)}")
+    print(f"  distribution: " + ", ".join(f"{k}:{d[k]}" for k in sorted(d)))
+
+    if not INTENT_FAMILIES_AVAILABLE:
+        print("\n  note: the AP intent-family crowding metric is REMOVED, not "
+              "measured-as-zero. INTENT_LOOKUP holds 0 entries here (PR&DW "
+              "retrieves template-direct), so it printed 'mean: 0.0' on every "
+              "run and read as evidence of a clean catalogue — see Crowding 2 "
+              "for the opposite.")
 
     if misses:
         print(f"\n── Misses (gold outside top-{args.k}) — {len(misses)} ──")

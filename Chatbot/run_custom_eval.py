@@ -15,7 +15,14 @@ from uuid import uuid4
 
 HERE = Path(__file__).resolve().parent
 os.chdir(HERE)
-os.environ.setdefault("DATA_DIR", str(HERE.parent.parent / "RTGS_Data" / "flat"))
+# The DuckDB sample, not AP's flat parquet drop. The previous default was
+# `HERE.parent.parent / "RTGS_Data" / "flat"` — a path OUTSIDE this repo
+# (WP-1 report §7.2), so a stray RTGS_Data/ in the shared Drive parent would
+# have pointed this at another project's data. Fixed alongside run_full_eval's
+# copy of the same line (WP-4 T4e); `eval_questions_custom.json` does not exist
+# in this repo, so this harness is dormant until someone writes one.
+os.environ.setdefault("DB_ENGINE", "duckdb_file")
+os.environ.setdefault("DB_PATH", "data/panchayat_1.duckdb")
 
 if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")

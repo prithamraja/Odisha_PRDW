@@ -1,12 +1,22 @@
 """
-End-to-end eval: replay the sample-question sheet through the real /query
-endpoint (vector retrieve -> rerank -> entity extraction -> SQL on the flat
-parquet drop), one fresh session per question, and record what came back.
+End-to-end eval: replay the gold question set through the real /query endpoint
+(vector retrieve -> rerank -> entity extraction -> SQL on the DuckDB sample),
+one fresh session per question, and record what came back.
 
-  DATA_DIR=<repo>/RTGS_Data/flat  python run_full_eval.py
+  python run_full_eval.py --yes
 
 Writes eval_full_results.jsonl (one record per question, streamed as it runs).
+
+THIS SPENDS MONEY — every question is an embed + a rerank + an extraction — so
+it requires --yes (or PRDW_EVAL_CONFIRM=1) and prints its call estimate first.
+See eval_spend.py for why that guard exists.
+
+FOLLOW-UP FRAGMENTS DEPEND ON FILE ORDER. A spec carrying `"session": "prev"`
+reuses the session of the IMMEDIATELY PRECEDING record, which is what puts the
+frame on screen that the fragment leans on. `build_eval_questions.py --check`
+enforces the ordering; do not sort this file.
 """
+import argparse
 import os
 import sys
 import io
@@ -17,14 +27,17 @@ from uuid import uuid4
 
 HERE = Path(__file__).resolve().parent
 os.chdir(HERE)
-os.environ.setdefault("DATA_DIR", str(HERE.parent.parent / "RTGS_Data" / "flat"))
+
+# The DuckDB sample, not AP's flat parquet drop. The previous default was
+# `HERE.parent.parent / "RTGS_Data" / "flat"` — a path OUTSIDE this repo
+# (WP-1 report §7.2): a stray RTGS_Data/ landing in the shared Drive parent
+# would have silently pointed the eval at another project's data. The engine and
+# path now match what `.env.example` documents for PR&DW.
+os.environ.setdefault("DB_ENGINE", "duckdb_file")
+os.environ.setdefault("DB_PATH", "data/panchayat_1.duckdb")
 
 if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-
-from fastapi.testclient import TestClient
-
-import main  # noqa: E402  (imports after env setup on purpose)
 
 QUESTIONS = json.loads((HERE / "eval_questions_full.json").read_text(encoding="utf-8"))
 OUT = HERE / "eval_full_results.jsonl"
@@ -36,9 +49,15 @@ def slim_rows(rows, keep=3):
     return len(rows), rows[:keep]
 
 
-def run():
+def run(out_path: Path = OUT):
+    # Imported here, AFTER the spend guard has run: importing main constructs
+    # the OpenAI client and building the retriever embeds the whole catalogue,
+    # so a module-scope import would spend before anyone confirmed anything.
+    from fastapi.testclient import TestClient
+    import main
+
     records = []
-    with TestClient(main.app) as client, OUT.open("w", encoding="utf-8") as out:
+    with TestClient(main.app) as client, out_path.open("w", encoding="utf-8") as out:
         prev_session = None
         for i, spec in enumerate(QUESTIONS, 1):
             if spec.get("session") == "prev" and prev_session:
@@ -90,8 +109,29 @@ def run():
             label = rec.get("query_id") or rec.get("tier") or rec.get("error", "?")[:40]
             print(f"[{i:>2}/{len(QUESTIONS)}] {label:<12} {spec['q'][:70]}")
 
-    print(f"\nWrote {OUT} ({len(records)} records)")
+    print(f"\nWrote {out_path} ({len(records)} records)")
+    return records
+
+
+def main_cli() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--yes", action="store_true",
+                    help="confirm the paid run (or set PRDW_EVAL_CONFIRM=1)")
+    ap.add_argument("--out", type=Path, default=OUT,
+                    help="results file (the consistency runner passes one per replay)")
+    args = ap.parse_args()
+
+    from eval_spend import confirm_spend
+    n = len(QUESTIONS)
+    confirm_spend(
+        "run_full_eval",
+        [("catalogue embedding index (cached after the first build)", 1),
+         (f"per question: 1 embed + 1 rerank + 1 extraction x {n}", 3 * n),
+         ("follow-up classification on the 13 fragment rows", 13)],
+        confirmed=args.yes,
+    )
+    run(args.out)
 
 
 if __name__ == "__main__":
-    run()
+    main_cli()

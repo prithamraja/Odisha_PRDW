@@ -1,28 +1,43 @@
 """
 Routing regression eval for the template-direct path (retrieve -> rerank).
 
-Replays the 79 hand-labelled sample questions of AP_ASK_RERANK_HANDOFF.md
-Appendix A through exactly the pipeline router._route_vector uses --
-normalize() -> retriever.retrieve_scored(q, VECTOR_TOP_K) -> zone() -> rerank() --
-and scores the picked query_id against the gold label.
+Replays the WP-4a gold set through exactly the pipeline router._route_vector
+uses -- normalize() -> retriever.retrieve_scored(q, VECTOR_TOP_K) -> zone() ->
+rerank() -- and scores the picked query_id against the gold label.
 
 It stops at the routing decision: no entity extraction, no SQL, no database.
 That is the point -- it isolates the reranker so a description change can be
-measured without data or binding noise. One run costs 79 query embeddings plus
-79 rerank calls; catalog embeddings come from the .tmp cache.
+measured without data or binding noise. One run costs one query embedding plus
+one rerank call per row; catalog embeddings come from the .tmp cache.
 
-  cd Chatbot/backend
-  python rerank_eval.py --out ../../eval_baseline.json
-  python rerank_eval.py --out ../../eval_after.json
-  python rerank_eval.py --compare ../../eval_baseline.json ../../eval_after.json
+  cd Chatbot
+  python rerank_eval.py --out ../eval_baseline.json --yes
+  python rerank_eval.py --out ../eval_after.json --yes
+  python rerank_eval.py --compare ../eval_baseline.json ../eval_after.json
+
+THE GOLD SET IS THE REPO'S, NOT AP'S (WP-4 T4d). This harness previously carried
+79 hand-labelled AP questions in a `GOLD_RAW` docstring block -- PM-KISAN
+farmers, eKYC status, MARKFED procurement -- scored against query_ids
+(`Q001`, `F09`, `G03-S`) that no longer exist in this catalogue. Every row
+would have missed, and the number meant nothing. Rows now come from
+`eval/gold/*.jsonl`, the same source `run_full_eval` and `recall_eval` read, so
+the three harnesses cannot disagree about what the right answer is.
+
+WHICH ROWS. Everything with a retrieval target, which is everything except the
+FOLLOW-UP FRAGMENTS: "and Khajuripada?" has no subject of its own and only means
+something with the previous question's frame on screen, which this harness
+deliberately does not have. Known-unanswerables ARE included -- they are in the
+retrieval index on purpose, so "did the router retrieve the right documented
+refusal?" is a reranker question like any other -- and so are the out-of-domain
+rows, whose gold is `no_match`.
 
 Verdicts:
-  hit       picked == gold, or picked is in the row's also_acceptable list
-  partial   row marked `partial` (the catalog can only approximate it) and the
+  hit       picked == gold, or picked is in the row's `acc` list
+  partial   row marked `partial` (a clarification IS the right answer) and the
             router either picked an acceptable id or returned no_match with the
-            gold id among its clarify chips
+            gold id among its near-misses
   miss      anything else
-  excluded  rows whose gold is a known catalog gap -- reported, not scored
+  excluded  rows marked `excluded` in the gold set -- reported, not scored
 """
 import os
 import io
@@ -45,114 +60,44 @@ from query_router.dashboard_catalog import DASHBOARD_CATALOG
 from query_router.preprocessor import normalize
 from query_router.reranker import rerank
 from query_router.template_catalog import TEMPLATE_CATALOG
+from query_router.unanswerable_catalog import UNANSWERABLE_CATALOG
 from query_router.vector_retriever import VectorRetriever
+from eval_spend import confirm_spend
 from query_router.zones import zone
 
-# ── Gold set — Appendix A of AP_ASK_RERANK_HANDOFF.md ─────────────────────────
-# question | gold | also_acceptable | note      ("partial" in the note marks a
-# row the catalog can only approximate; see the module docstring.)
-GOLD_RAW = """
-How many beneficiaries are registered in PM-KISAN? | Q001 | M01 |
-What is the eKYC status of Ramesh Naidu? | F01 | |
-Which farmers have eKYC still pending? | V05 | |
-Whose beneficiary status is Pending (not yet Included)? | V06 | |
-What is the total cultivable area (hectares) of all PM-KISAN beneficiaries? | G03-S | M01 |
-When was the last installment paid to Lakshmi Devi, and how much? | F01 | |
-Give the category (caste) breakdown of PM-KISAN beneficiaries. | G04-S | |
-How many male vs female beneficiaries? | G05-S | |
-Who has the largest landholding in PM-KISAN? | R01 | |
-How many distinct districts do beneficiaries come from? | M01 | G01-S, Q017 |
-Which crop did Ramesh Naidu take input subsidy for, and in which season? | F02 | |
-Who received the highest input subsidy and how much? | R02 | |
-List farmers who took subsidy in the Rabi season. | V01 | |
-What is the total subsidy amount disbursed? | M01 | G10-S |
-Which district received the highest single input subsidy? | R04 | |
-What is the district code (dcode) for Guntur in the data? | M03 | |
-What is the average input subsidy per farmer? | Q056 | M01 |
-Is Ramesh Naidu a horticulture (APMIP) beneficiary? | F03 | |
-What micro-irrigation subsidy amount did Venkateswarlu G avail? | F03 | |
-What is the land EXTENT recorded for Suresh Reddy in horticulture? | F03 | |
-How many horticulture beneficiaries are there? | Q147 | G21-S |
-Which farmers are registered in Fisheries? | S07 | G25-S |
-Does Padma Sri appear in the Fisheries data? | F04 | |
-How much was paid (amount_paid) to Lakshmi Devi in Fisheries? | F04 | |
-What cocoon quantity is recorded for Ramesh Naidu? | F05 | |
-Which PM-KISAN farmers are NOT in Sericulture? | S01 | S02 |
-What is the net incentive for Padma Sri? | F05 | |
-Which crop did MARKFED procure from Nagaraju P? | F06 | |
-Who received the highest MARKFED payment? | R03 | |
-Are all 10 PM-KISAN farmers present in MARKFED? | S01 | | wording predates the 1,100-farmer drop
-Is Mohan Rao an RySS (natural farming) member? | F07 | |
-What ACREAGE is recorded for Suresh Reddy in RySS? | F07 | |
-What is the khata number of Ramesh Naidu in land records? | F08 | |
-Who is the pattadar in Kolakaluru village? | V07 | |
-How many land records are there, and do they carry Aadhaar? | M02 | |
-Which farmers receive AP scheme benefits but are NOT in PM-KISAN? | Q059 | |
-Which PM-KISAN farmers never took an input subsidy? | S01 | Q036 |
-Which farmer participates in ALL six AP schemes? | Q114 | Q148 | Q148 answers this without the scheme_count binding hazard (all six STATE schemes, no numeric slot); Q114 needs scheme_count=6, which now means six of seven
-How many schemes is Venkateswarlu G enrolled in? | F09 | Q125 |
-Show the complete profile of Aadhaar 726018159083 across all datasets. | Q124 | |
-What are Anjamma's total benefits across all schemes? | F12 | |
-Who gets the highest input subsidy per acre of land? | Q094 | |
-Ramesh Naidu's land shows 1.30 in PM-KISAN and 3.20 in MARKFED — is this a discrepancy? | F11 | |
-Which Krishna-district farmers got a horticulture subsidy? | Q040 | |
-Which farmers are in Fisheries but not Sericulture? | S02 | | HARD GATE - the motivating defect
-Which female farmers received MARKFED payments? | V04 | |
-How many input-subsidy farmers also sold produce to MARKFED? | Q118 | Q098 |
-Which RySS natural-farming members still take input subsidies? | Q117 | |
-Which farmers have eKYC pending yet receive scheme benefits? | G37-S | |
-Is Lakshmi Devi's mobile number consistent across all datasets? | F10 | |
-Which district has the most total scheme participations? | S05 | |
-Which ST farmers exist, and which schemes cover them? | S06 | |
-Are there land records for farmers missing from PM-KISAN? | M06 | |
-List Aadhaar numbers in Fisheries that don't exist in PM-KISAN. | Q135 | S03 |
-Survey has no Aadhaar — link Ramesh Naidu's land record to his PM-KISAN entry. | F13 | F08, F01, F11 |
-What crops are grown by farmers whose eKYC is pending? | V08 | |
-How many farmers are in each dataset? | M02 | Q005 |
-Which datasets is Kiran Kumar missing from? | F09 | |
-Rank farmers by number of schemes enrolled. | S04 | |
-Do any farmers receive PM-KISAN + all 6 AP schemes? | Q148 | Q114, Q113 |
-What is the distribution of farmers by beneficiary_status and ekyc_status per district, and which districts have a Pending backlog? | G02-S | |
-What is the distribution of declared area_hectares by category (SC/ST/BC/OC)? | Q149 | Q027, G04-S |
-What is the total subsidy amount by season, and what is the subsidy-to-farmer-contribution ratio (subsidyamount vs nonsubsidyamount)? | Q150 | Q090 |
-What is the total Subsidy Amt released vs BALANCE_AMOUNT_TO_RELEASE still pending per beneficiary? | M04 | |
-How many beneficiaries have random inspection pending or under review? | G46-S | G23-S |
-Which beneficiaries have sanctioned but stalled subsidies? | G22-S | Q132 |
-How many FCS members exist per district? | G25-S | |
-What is the procurement payment per farmer and which farmer/district leads? | Q151 | R03, G14-S, Q111 |
-How many APCNF members are enrolled and what is the total acreage under natural farming? | G28-S | |
-Which farmers have a crop registered in eCrop but no seed-subsidy record for the same season - registered cultivation that never converted to input support? | M05 | |
-Which farmers' PM-KISAN declared area exceeds their Survey Land Records - and is their subsidy per acre also elevated? | M07 | Q082 |
-Which Aadhaar numbers have multiple transactionids for the same seed, season, and cropyear - duplicate subsidy draws? | M08 | Q068 |
-Which records show a pattadar different from the recorded cultivator for the same survey number? | M09 | Q074 |
-Which Aadhaar numbers appear both as fisheries registrants and crop input-subsidy recipients? | Q122 | |
-Which PM-KISAN farmers which have been excluded are still receiving AP scheme benefits? | Q128 | |
-Which small/marginal farmers (area_hectares below 1 ha) appear in no AP scheme dataset at all - the most-entitled least-reached segment? | Q152 | G35-S, Q036 |
-Which registered crops are marked as Damaged? | V02 | |
-How many farmers have discrepancies in their caste category? | G41-S | |
-How many farmers have discrepancies in their land amount? | G42-S | |
-"""
+# ── Gold set — eval/gold/*.jsonl, via the same reader the builder uses ────────
+
+GOLD_DIR = Path(__file__).resolve().parent.parent / "eval" / "gold"
+
+# A fragment has no subject of its own; scoring it without its frame measures
+# the failure this harness cannot reproduce rather than the reranker.
+_NO_RETRIEVAL_TARGET = {"followup"}
 
 
 def load_gold() -> list[dict]:
+    """The gold rows that have something for retrieval to find.
+
+    Read straight off the JSONL rather than through `eval_questions_full.json`,
+    so a stale build of that file cannot silently change what this measures.
+    """
     rows = []
-    for line in GOLD_RAW.strip().splitlines():
-        line = line.strip()
-        if not line:
-            continue
-        parts = [p.strip() for p in line.split("|")]
-        while len(parts) < 4:
-            parts.append("")
-        question, gold, also, note = parts[0], parts[1], parts[2], parts[3]
-        acceptable = [a.strip() for a in also.split(",") if a.strip()]
-        rows.append({
-            "question": question,
-            "gold": gold,
-            "acceptable": acceptable,
-            "note": note,
-            "partial": "partial" in note.lower(),
-            "excluded": "exclude from accuracy gate" in note.lower(),
-        })
+    for path in sorted(GOLD_DIR.glob("*.jsonl")):
+        for line in path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            rec = json.loads(line)
+            if rec.get("case_type") in _NO_RETRIEVAL_TARGET:
+                continue
+            rows.append({
+                "id": rec["id"],
+                "question": rec["q"],
+                "gold": rec["gold"],
+                "acceptable": list(rec.get("acc") or []),
+                "note": rec.get("notes", ""),
+                "partial": bool(rec.get("partial")),
+                "excluded": bool(rec.get("excluded")),
+            })
     return rows
 
 
@@ -171,7 +116,11 @@ def score_row(row: dict, picked: str, near_misses: list[str]) -> str:
 
 def run(out_path: Path | None, limit: int | None) -> dict:
     client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-    retriever = VectorRetriever(client, DASHBOARD_CATALOG, TEMPLATE_CATALOG)
+    # The unanswerables are indexed here for the same reason main.py indexes
+    # them: 19 gold rows expect a DOCUMENTED refusal, and an entry that is not
+    # in the index can never be retrieved, let alone reranked.
+    retriever = VectorRetriever(client, DASHBOARD_CATALOG, TEMPLATE_CATALOG,
+                                UNANSWERABLE_CATALOG)
     gold = load_gold()
     if limit:
         gold = gold[:limit]
@@ -189,6 +138,7 @@ def run(out_path: Path | None, limit: int | None) -> dict:
         verdict = score_row(row, picked, near_misses)
 
         results.append({
+            "id": row["id"],
             "question": row["question"],
             "gold": row["gold"],
             "acceptable": row["acceptable"],
@@ -270,11 +220,21 @@ def main() -> None:
     ap.add_argument("--out", type=Path, help="write per-row results JSON here")
     ap.add_argument("--limit", type=int, help="only run the first N questions")
     ap.add_argument("--compare", nargs=2, type=Path, metavar=("BEFORE", "AFTER"))
+    ap.add_argument("--yes", action="store_true",
+                    help="confirm the paid run (or set PRDW_EVAL_CONFIRM=1)")
     args = ap.parse_args()
 
     if args.compare:
         compare(*args.compare)
         return
+
+    n = len(load_gold()[:args.limit] if args.limit else load_gold())
+    confirm_spend(
+        "rerank_eval",
+        [("catalogue embedding index (cached after the first build)", 1),
+         (f"per row: 1 embed + 1 rerank x {n}", 2 * n)],
+        confirmed=args.yes,
+    )
     run(args.out, args.limit)
 
 

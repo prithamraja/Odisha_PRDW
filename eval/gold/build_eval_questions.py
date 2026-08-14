@@ -132,7 +132,12 @@ def check_against_catalogue(recs: list[dict]) -> tuple[list[str], list[str]]:
         notes.append(f"catalogue cross-check SKIPPED ({type(exc).__name__}: {exc})")
         return problems, notes
 
-    known = set(T) | set(D)
+    # WP-4 T3: an unanswerable id is a legitimate GOLD, not only a provenance
+    # ref. The router retrieves these entries and serves the workbook's own
+    # reason for declining, returning that query_id — so naming the id says
+    # "declined for the RIGHT documented reason", which `no_match` cannot
+    # express (WP-4a §5).
+    known = set(T) | set(D) | set(U)
     notes.append(f"catalogue: {len(T)} templates, {len(D)} dashboards, "
                  f"{len(U)} unanswerable")
 
@@ -145,6 +150,14 @@ def check_against_catalogue(recs: list[dict]) -> tuple[list[str], list[str]]:
         if ref and ref not in U:
             problems.append(f"{rid}: unanswerable_ref {ref} is not in "
                             f"UNANSWERABLE_CATALOG")
+        if rec.get("case_type") == "unanswerable":
+            if gold not in U:
+                problems.append(
+                    f"{rid}: an unanswerable row's gold must be an "
+                    f"UNANSWERABLE_CATALOG id (got {gold!r})")
+            elif ref and ref != gold:
+                problems.append(
+                    f"{rid}: gold {gold} and unanswerable_ref {ref} disagree")
         if gold in T:
             slots = {s["name"] for s in T[gold]["param_slots"]}
             for k in rec.get("expected_entities", {}):

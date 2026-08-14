@@ -999,7 +999,7 @@
  {
   "n": 1039,
   "q": "2025-26 re kaun kaun blockre GPDP anumodan re barambar bilamba huachi?",
-  "gold": "no_match",
+  "gold": "PLN-022",
   "acc": [],
   "partial": false,
   "excluded": false,
@@ -1014,13 +1014,13 @@
   "entity_surface": [],
   "answerability": "No",
   "sme_review": true,
-  "notes": "No submission deadline and no 'consistently delayed' rule exist in the DB. Honest refusal; offering PLN-010 (user-supplied deadline) as a chip is a bonus, silently routing to PLN-020 is the failure.",
+  "notes": "No submission deadline and no 'consistently delayed' rule exist in the DB. Honest refusal; offering PLN-010 (user-supplied deadline) as a chip is a bonus, silently routing to PLN-020 is the failure. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
   "unanswerable_ref": "PLN-022"
  },
  {
   "n": 1040,
   "q": "Which themes have remained consistently among the top priorities over the last five years?",
-  "gold": "no_match",
+  "gold": "PLN-041",
   "acc": [],
   "partial": false,
   "excluded": false,
@@ -1035,13 +1035,13 @@
   "entity_surface": [],
   "answerability": "No",
   "sme_review": false,
-  "notes": "'Consistently among the top priorities' is undefined. PLN-038 gives the series; answering AS IF PLN-038 were the question is a wrong route.",
+  "notes": "'Consistently among the top priorities' is undefined. PLN-038 gives the series; answering AS IF PLN-038 were the question is a wrong route. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
   "unanswerable_ref": "PLN-041"
  },
  {
   "n": 1041,
   "q": "Attabira me kitni activities dusre panchayat tier ko delegate hui 2025-26 me?",
-  "gold": "no_match",
+  "gold": "PLU-005",
   "acc": [],
   "partial": false,
   "excluded": false,
@@ -1056,7 +1056,7 @@
   "entity_surface": [],
   "answerability": "No",
   "sme_review": false,
-  "notes": "activity_delegation.is_delegated is 100% NULL.",
+  "notes": "activity_delegation.is_delegated is 100% NULL. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
   "unanswerable_ref": "PLU-005"
  },
  {
@@ -1906,7 +1906,7 @@
  {
   "n": 1233,
   "q": "How many waste collection vehicles were repaired in 2024-25?",
-  "gold": "no_match",
+  "gold": "SBM-SWM-033",
   "acc": [],
   "partial": false,
   "excluded": false,
@@ -1921,7 +1921,7 @@
   "entity_surface": [],
   "answerability": "No",
   "sme_review": false,
-  "notes": "No repair flag; Maintenance + vehicle keyword returns zero rows in every year. Routing to SBM-SWM-034 (vehicle expenditure) would be a confidently wrong answer.",
+  "notes": "No repair flag; Maintenance + vehicle keyword returns zero rows in every year. Routing to SBM-SWM-034 (vehicle expenditure) would be a confidently wrong answer. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
   "unanswerable_ref": "SBM-SWM-033"
  },
  {
@@ -2456,7 +2456,7 @@
  {
   "n": 1421,
   "q": "What is the fund allocated under XV Finance Commission at ZP, Block and GP tiers in Khordha for 2025-26?",
-  "gold": "no_match",
+  "gold": "SCH-004",
   "acc": [],
   "partial": false,
   "excluded": false,
@@ -2471,7 +2471,7 @@
   "entity_surface": [],
   "answerability": "No",
   "sme_review": false,
-  "notes": "gram_panchayat holds GP-tier rows only; no ZP or block tier exists to split by. Routing to SCH-001/SCH-010 would answer a different question.",
+  "notes": "gram_panchayat holds GP-tier rows only; no ZP or block tier exists to split by. Routing to SCH-001/SCH-010 would answer a different question. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
   "unanswerable_ref": "SCH-004"
  },
  {
@@ -3637,7 +3637,7 @@
  {
   "n": 1621,
   "q": "What are the stage-wise completion dates for asset 509018477?",
-  "gold": "no_match",
+  "gold": "PHY-002",
   "acc": [],
   "partial": false,
   "excluded": false,
@@ -3652,13 +3652,13 @@
   "entity_surface": [],
   "answerability": "No",
   "sme_review": false,
-  "notes": "No stage-wise completion dates exist anywhere in the DB.",
+  "notes": "No stage-wise completion dates exist anywhere in the DB. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
   "unanswerable_ref": "PHY-002"
  },
  {
   "n": 1622,
   "q": "Which assets in Attabira have not advanced a stage in the last 90 days?",
-  "gold": "no_match",
+  "gold": "PHY-005",
   "acc": [],
   "partial": false,
   "excluded": false,
@@ -3673,7 +3673,7 @@
   "entity_surface": [],
   "answerability": "No",
   "sme_review": false,
-  "notes": "Requires stage-transition dates, which are not recorded.",
+  "notes": "Requires stage-transition dates, which are not recorded. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
   "unanswerable_ref": "PHY-005"
  },
  {
@@ -3965,7 +3965,7 @@
  {
   "n": 1712,
   "q": "Which suspended activities in Attabira have payment vouchers dated after suspension in 2025-26?",
-  "gold": "no_match",
+  "gold": "ALR-006",
   "acc": [],
   "partial": false,
   "excluded": false,
@@ -3980,13 +3980,13 @@
   "entity_surface": [],
   "answerability": "No",
   "sme_review": false,
-  "notes": "No suspension status or date exists; WORK ABANDONED is the nearest and carries no date. ALR-005 is the tempting wrong route.",
+  "notes": "No suspension status or date exists; WORK ABANDONED is the nearest and carries no date. ALR-005 is the tempting wrong route. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
   "unanswerable_ref": "ALR-006"
  },
  {
   "n": 1713,
   "q": "Which GPs in Khordha have a resource envelope allocation but no uploaded plan for 2025-26?",
-  "gold": "no_match",
+  "gold": "ALR-010",
   "acc": [],
   "partial": false,
   "excluded": false,
@@ -4001,13 +4001,13 @@
   "entity_surface": [],
   "answerability": "No",
   "sme_review": false,
-  "notes": "No resource-envelope table exists. PLN-005 is the tempting wrong route.",
+  "notes": "No resource-envelope table exists. PLN-005 is the tempting wrong route. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
   "unanswerable_ref": "ALR-010"
  },
  {
   "n": 1714,
   "q": "Which activities in Begunia have been ongoing longer than their planned duration in 2025-26?",
-  "gold": "no_match",
+  "gold": "ALR-007",
   "acc": [],
   "partial": false,
   "excluded": false,
@@ -4024,13 +4024,13 @@
   ],
   "answerability": "No",
   "sme_review": false,
-  "notes": "Double trap: unanswerable question AND an unloaded block. Either an honest can't-answer or an unknown-entity clarification is acceptable; a routed answer about some other block is not.",
+  "notes": "Double trap: unanswerable question AND an unloaded block. Either an honest can't-answer or an unknown-entity clarification is acceptable; a routed answer about some other block is not. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
   "unanswerable_ref": "ALR-007"
  },
  {
   "n": 1715,
   "q": "How many beneficiary records in Andhrua are missing the village field for 2024-25?",
-  "gold": "no_match",
+  "gold": "DQY-005",
   "acc": [],
   "partial": false,
   "excluded": false,
@@ -4045,7 +4045,7 @@
   "entity_surface": [],
   "answerability": "Dropped",
   "sme_review": false,
-  "notes": "From the DROPPED list. activity_nsap has 0 rows, so there are no beneficiary records to audit. DQY-002/DQY-003 (other missing-field checks) are the tempting wrong routes.",
+  "notes": "From the DROPPED list. activity_nsap has 0 rows, so there are no beneficiary records to audit. DQY-002/DQY-003 (other missing-field checks) are the tempting wrong routes. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
   "unanswerable_ref": "DQY-005"
  },
  {
@@ -4483,7 +4483,7 @@
  {
   "n": 1857,
   "q": "What is the average unit cost of tap connections across Khordha for 2025-26?",
-  "gold": "no_match",
+  "gold": "AST-010",
   "acc": [],
   "partial": false,
   "excluded": false,
@@ -4498,13 +4498,13 @@
   "entity_surface": [],
   "answerability": "No",
   "sme_review": false,
-  "notes": "asset_unit_cost is 100% NULL. AST-007 (category expenditure) is the tempting wrong route and would answer a different question with real-looking money.",
+  "notes": "asset_unit_cost is 100% NULL. AST-007 (category expenditure) is the tempting wrong route and would answer a different question with real-looking money. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
   "unanswerable_ref": "AST-010"
  },
  {
   "n": 1858,
   "q": "What are the unit count and unit cost of assets created under activity 125711758?",
-  "gold": "no_match",
+  "gold": "AST-005",
   "acc": [],
   "partial": false,
   "excluded": false,
@@ -4519,13 +4519,13 @@
   "entity_surface": [],
   "answerability": "No",
   "sme_review": false,
-  "notes": "asset_unit_count and asset_unit_cost are both 100% NULL.",
+  "notes": "asset_unit_count and asset_unit_cost are both 100% NULL. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
   "unanswerable_ref": "AST-005"
  },
  {
   "n": 1859,
   "q": "Where are the assets under activity 125711758 located, and how many units at each location?",
-  "gold": "no_match",
+  "gold": "AST-004",
   "acc": [],
   "partial": false,
   "excluded": false,
@@ -4540,7 +4540,7 @@
   "entity_surface": [],
   "answerability": "No",
   "sme_review": false,
-  "notes": "All four asset_loc_* columns are 100% NULL.",
+  "notes": "All four asset_loc_* columns are 100% NULL. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
   "unanswerable_ref": "AST-004"
  },
  {
@@ -4886,7 +4886,7 @@
  {
   "n": 1956,
   "q": "Which GPs in Attabira could reach the next PAI grade with the smallest score improvement, and on which themes are they weakest?",
-  "gold": "no_match",
+  "gold": "DSS-004",
   "acc": [],
   "partial": false,
   "excluded": false,
@@ -4901,13 +4901,13 @@
   "entity_surface": [],
   "answerability": "No",
   "sme_review": false,
-  "notes": "PAI grades and scores are absent from the database entirely.",
+  "notes": "PAI grades and scores are absent from the database entirely. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
   "unanswerable_ref": "DSS-004"
  },
  {
   "n": 1971,
   "q": "How many beneficiaries received benefits under Swachh Bharat Mission in Andhrua during 2024-25?",
-  "gold": "no_match",
+  "gold": "BEN-001",
   "acc": [],
   "partial": false,
   "excluded": false,
@@ -4924,13 +4924,13 @@
   ],
   "answerability": "Dropped",
   "sme_review": false,
-  "notes": "The single most dangerous shape in the set: fully bindable entities over a table with zero rows. SBM-* activity counts are the tempting wrong route and would return an activity count dressed as a beneficiary count.",
+  "notes": "The single most dangerous shape in the set: fully bindable entities over a table with zero rows. SBM-* activity counts are the tempting wrong route and would return an activity count dressed as a beneficiary count. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
   "unanswerable_ref": "BEN-001"
  },
  {
   "n": 1972,
   "q": "Bhubaneswar block ke GPs me kitne beneficiary hain 2024-25 me?",
-  "gold": "no_match",
+  "gold": "BEN-003",
   "acc": [],
   "partial": false,
   "excluded": false,
@@ -4945,13 +4945,13 @@
   "entity_surface": [],
   "answerability": "Dropped",
   "sme_review": false,
-  "notes": "",
+  "notes": "WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
   "unanswerable_ref": "BEN-003"
  },
  {
   "n": 1973,
   "q": "What is the village-wise count of beneficiaries in Andhrua under NSAP for 2024-2025?",
-  "gold": "no_match",
+  "gold": "BEN-002",
   "acc": [],
   "partial": false,
   "excluded": false,
@@ -4966,13 +4966,13 @@
   "entity_surface": [],
   "answerability": "Dropped",
   "sme_review": false,
-  "notes": "Names NSAP explicitly — the table exists in the schema and is empty.",
+  "notes": "Names NSAP explicitly — the table exists in the schema and is empty. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
   "unanswerable_ref": "BEN-002"
  },
  {
   "n": 1974,
   "q": "2024-2025 ରେ ଆନ୍ଧ୍ରୁଆରେ କେତେ ହିତାଧିକାରୀ ପେନସନ ପାଇଛନ୍ତି?",
-  "gold": "no_match",
+  "gold": "BEN-010",
   "acc": [],
   "partial": false,
   "excluded": false,
@@ -4987,7 +4987,7 @@
   "entity_surface": [],
   "answerability": "Dropped",
   "sme_review": true,
-  "notes": "Odia-script beneficiary question. The refusal copy must be as clear in Odia as in English, or an officer reads a decline as a system error.",
+  "notes": "Odia-script beneficiary question. The refusal copy must be as clear in Odia as in English, or an officer reads a decline as a system error. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
   "unanswerable_ref": "BEN-010"
  },
  {

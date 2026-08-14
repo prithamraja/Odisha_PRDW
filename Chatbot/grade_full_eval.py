@@ -2,13 +2,30 @@
 Grade eval_full_results.jsonl.
 
 Buckets per question:
-  hit             answered with the gold (or acceptable) template
-  partial         partial-row: clarified/missed but the gold question was offered as a chip
-  clarify         router asked a question instead of answering (chips/prompt recorded)
-  wrong_template  answered, but with a template outside the gold set
-  fallback        no answer, no useful clarification
-  error           HTTP/exception
-  new             unlabelled question -- listed for manual judgement
+  hit                   answered with the gold (or acceptable) template, or
+                        declined with the gold known-unanswerable
+  partial               partial-row: clarified/missed but the gold question was
+                        offered as a chip
+  clarify               router asked a question instead of answering
+  wrong_template        answered, but with a template outside the gold set
+  wrong_refusal         declined with a documented reason, but the WRONG one
+  declined_generically  declined without retrieving the documented refusal —
+                        right outcome, wrong reason
+  refusal_with_rows     a served refusal carried a result set; see below
+  fallback              no answer, no useful clarification
+  error                 HTTP/exception
+  new                   unlabelled question -- listed for manual judgement
+
+REFUSALS ARE GRADED ON THEIR REASON (WP-4 T3). The 19 known-unanswerable gold
+rows name the UNANSWERABLE_CATALOG id rather than `no_match`, because "the
+database cannot answer this, and here is the workbook's own reason" is a
+different outcome from "nothing matched" — which is exactly the distinction
+unanswerable_catalog exists to make, and which `no_match` collapses.
+
+An honest refusal leaves `result` as None, NEVER an empty list. If one ever
+sets n_rows the row lands in `refusal_with_rows` rather than being silently
+mis-bucketed — the single coupling that would flip all 19 rows at once. WP-5's
+gates file asserts the same thing (WP-4a §5).
 """
 import io
 import json
@@ -22,6 +39,16 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from query_router.template_catalog import TEMPLATE_CATALOG  # noqa: E402
 from query_router.dashboard_catalog import DASHBOARD_CATALOG  # noqa: E402
+from query_router.unanswerable_catalog import UNANSWERABLE_CATALOG  # noqa: E402
+
+# The tiers main.py ACTUALLY puts in the response. RouteTier's values are
+# "tier1"/"tier2" and the operation path sets the literal "operation"; the AP
+# build tested for "tier1_dashboard"/"tier2_template", which are the ENUM MEMBER
+# names, not the values. That first clause was therefore always false for a
+# template answer and grading survived only on the `n_rows is not None`
+# fallback — so a template answer that legitimately returns NO rows was
+# misgraded (WP-4a §6.4). 21 of the 346 templates return zero rows by design.
+ANSWER_TIERS = ("tier1", "tier2", "operation")
 
 # question text -> query_id, to map clarify chips back to templates
 Q_TO_ID = {}
@@ -66,15 +93,31 @@ def grade(rec):
     if rec.get("excluded"):
         return "excluded"
 
-    if qid and tier in ("tier1_dashboard", "tier2_template", "operation") or (
-        qid and rec.get("n_rows") is not None
-    ):
+    # A SERVED REFUSAL is not an answer and must not be graded as one. The
+    # router retrieves a known-unanswerable, returns its query_id and leaves
+    # `result` as None — so it arrives here with a query_id and a fallback tier.
+    # Checked BEFORE the answer branch, because a refusal that ever set n_rows
+    # would otherwise be read as a template answer whose id is not a template.
+    if qid in UNANSWERABLE_CATALOG:
+        if rec.get("n_rows") is not None:
+            # The one coupling that silently flips every unanswerable row to
+            # wrong_template (WP-4a §5, destined for WP-5's gates). An honest
+            # refusal has NO result set — not an empty one.
+            return "refusal_with_rows"
+        return "hit" if qid in ok else "wrong_refusal"
+
+    if qid and tier in ANSWER_TIERS or (qid and rec.get("n_rows") is not None):
         return "hit" if qid in ok else "wrong_template"
 
     # no direct answer
     offered = set(chip_ids(rec))
     if gold == "no_match":
         return "hit"  # gold behaviour IS declining
+    if gold in UNANSWERABLE_CATALOG:
+        # Gold names a documented refusal and the router declined WITHOUT
+        # retrieving it — right outcome, wrong reason. Distinguishable on
+        # purpose: that is the whole point of the T3 upgrade.
+        return "declined_generically"
     if offered & ok:
         return "partial" if rec.get("partial") else "clarify_gold_offered"
     if clar:
@@ -93,15 +136,23 @@ def main():
 
     print(f"total: {len(recs)}")
     for k in ("hit", "partial", "clarify_gold_offered", "clarify", "wrong_template",
+              "wrong_refusal", "declined_generically", "refusal_with_rows",
               "fallback", "error", "excluded", "new"):
         if k in buckets:
             print(f"  {k:<22} {len(buckets[k])}")
 
-    for k in ("wrong_template", "clarify", "clarify_gold_offered", "partial", "fallback", "error"):
+    for k in ("wrong_template", "wrong_refusal", "declined_generically",
+              "refusal_with_rows", "clarify", "clarify_gold_offered", "partial",
+              "fallback", "error"):
         for r in buckets.get(k, []):
             extra = ""
-            if k == "wrong_template":
+            if k in ("wrong_template", "wrong_refusal"):
                 extra = f" gold={r['gold']} picked={r['query_id']}"
+            elif k == "declined_generically":
+                extra = f" gold={r['gold']} (refusal not retrieved)"
+            elif k == "refusal_with_rows":
+                extra = (f" gold={r['gold']} n_rows={r.get('n_rows')} — a served "
+                         f"refusal must leave result as None, never []")
             elif k in ("clarify", "clarify_gold_offered", "partial"):
                 clar = r.get("clarification") or {}
                 extra = f" gold={r.get('gold')} reason={clar.get('reason')} prompt={clar.get('prompt','')[:60]!r}"

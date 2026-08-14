@@ -1,12 +1,44 @@
 """End-to-end proof that a period named in the question reaches the SQL.
 
-The unit tests pin the extractor; these pin the wiring — that a derived window
-survives routing, date-filter injection and parameter binding, that the UI's
-explicit range still outranks it, and that the window a response *reports* is
-the window its rows were *computed over*.
+The unit tests pin `date_phrase` in isolation; these pin the WIRING — that a
+fiscal year an officer states survives routing, validation and parameter
+binding, and that the window a response reports is the window its rows were
+computed over.
 
-Runs the real app against the flat Parquet drop and the real router, so it needs
-OPENAI_API_KEY and RTGS_Data/flat; it skips cleanly without them.
+PORTED FROM AP, AND HALF OF IT RETIRED (WP-4 T4e)
+    The AP suite proved a `date_filter` INJECTION: the router appended a
+    `BETWEEN ? AND ?` predicate to the SQL and spliced the two date values ahead
+    of a trailing `LIMIT ?`. Decision D9 removes that machinery here. Odisha's
+    fiscal year is the VARCHAR `'2024-2025'`, `date_kind: "year"` compares
+    integers, and `tests/test_catalog_execution.py` asserts that not one of the
+    346 templates carries a `date_filter` at all. So three of the five AP tests
+    had nothing to test:
+
+      · "a year in the question sets the window and changes the answer"  →  the
+        PR&DW analogue is the same officer intent served a different way: the
+        year binds as the ORDINARY `$date_range` SLOT. Rewritten, not dropped.
+      · "the derived window survives a template with its own LIMIT placeholder"
+        →  retired. `$top_n` and `$date_range` are both NAMED parameters bound
+        from a dict; there is no positional splice left to get wrong, and
+        test_param_binding.py covers the binding itself.
+      · "a follow-up requeries over the derived window"  →  retired here and
+        covered better elsewhere: with no date_filter, a follow-up carries the
+        year as a bound param, which test_zones_and_followups.py pins.
+
+    What survives is the request-window contract, which is real on both paths:
+    the UI's explicit range always wins, and an unstated period gets the
+    documented default.
+
+THE PATH LANDMINE IS GONE (WP-1 report §7.2). This file used to compute
+`parents[1].parents[1] / "RTGS_Data" / "flat"`, which since the Chatbot/
+flattening resolves OUTSIDE this repo — a stray RTGS_Data/ landing in the shared
+Drive parent would have silently pointed these tests at another project's data,
+and the suite would have "passed". It now reads this repo's own DuckDB sample.
+
+OPT-IN, like test_followup_fragment.py: these drive the real router, which
+embeds, reranks and extracts through the OpenAI API. A suite that quietly makes
+paid calls whenever a key happens to sit in `.env` is not one anyone can run
+freely (WP-2 report §7.1).
 """
 import os
 import unittest
@@ -15,34 +47,34 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 _BACKEND = Path(__file__).resolve().parents[1]
-_FLAT = _BACKEND.parents[1] / "RTGS_Data" / "flat"
+_DB_PATH = _BACKEND / "data" / "panchayat_1.duckdb"
 
-# main.py loads this on import, but the skip decision below needs the key first.
 load_dotenv(_BACKEND / ".env")
 
-# db_factory reads DATA_DIR at import time, so it must be set before `import main`.
-if _FLAT.is_dir():
-    os.environ["DATA_DIR"] = str(_FLAT)
+# db_factory reads these at import time, so they must be set before `import main`.
+os.environ.setdefault("DB_ENGINE", "duckdb_file")
+os.environ.setdefault("DB_PATH", "data/panchayat_1.duckdb")
 
+_LIVE = os.environ.get("PRDW_LIVE_ROUTING") == "1"
 _SKIP = None
-if not _FLAT.is_dir():
-    _SKIP = f"flat Parquet drop not present at {_FLAT}"
+if not _LIVE:
+    _SKIP = ("live routing is opt-in: set PRDW_LIVE_ROUTING=1 (costs money, "
+             "requires OPENAI_API_KEY)")
+elif not _DB_PATH.exists():
+    _SKIP = f"no sample database at {_DB_PATH}"
 elif not os.environ.get("OPENAI_API_KEY"):
     _SKIP = "OPENAI_API_KEY not set — the router is disabled without it"
 
-SUBSIDY_BY_MANDAL = "How much input subsidy went to each mandal of {} district"
-KRISHNA_2024 = SUBSIDY_BY_MANDAL.format("Krishna") + " in 2024?"
-KRISHNA_UNDATED = SUBSIDY_BY_MANDAL.format("Krishna") + "?"
-
-# R03 — the one template carrying its own `LIMIT ?` alongside a date_filter.
-# Its placeholders bind by position in the SQL text, so an injected date
-# predicate lands ahead of the LIMIT and must be spliced, not appended. A
-# question-derived window has to survive that splice like any other.
-MARKFED_TOP_2024 = "Who received the 5 highest MARKFED payments in 2024?"
+# EXP-001: total actual expenditure, filterable at every tier, `$date_range`
+# required. The fiscal year is the whole subject of these tests, so the question
+# names one and nothing else that could move the answer.
+EXPENDITURE_BY_GP = "What is the total actual expenditure incurred by each GP"
+FY_2024 = EXPENDITURE_BY_GP + " in 2024-25?"
+FY_2023 = EXPENDITURE_BY_GP + " in 2023-24?"
 
 
 @unittest.skipIf(_SKIP is not None, _SKIP or "")
-class DateFromQuestionEndpointTests(unittest.TestCase):
+class FiscalYearFromQuestionTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         from fastapi.testclient import TestClient
@@ -62,82 +94,56 @@ class DateFromQuestionEndpointTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200, response.text)
         return response.json()
 
-    # 1 — the bug this pack closes
-    def test_year_in_the_question_sets_the_window_and_changes_the_answer(self):
-        derived = self.ask(KRISHNA_2024)
-        self.assertEqual(derived["query_id"], "G10-D")
-        self.assertEqual(derived["date_range"]["start_date"], "2024-01-01")
-        self.assertEqual(derived["date_range"]["end_date"], "2024-12-31")
-        self.assertTrue(derived["date_range"]["derived_from_question"])
-        self.assertFalse(derived["date_range"]["is_default"])
-        self.assertTrue(derived["date_filter_applied"])
+    # 1 — the D9 analogue of the AP "year sets the window" test
+    def test_an_abbreviated_year_binds_the_full_stored_string(self):
+        """`'2024-25'` matches NOTHING in a column holding `'2024-2025'` — it
+        binds successfully and returns zero rows with no error anywhere. That
+        silent failure is why date_phrase exists, and this is the proof it runs
+        on the serving path and not only in the unit tests."""
+        payload = self.ask(FY_2024)
+        bound = {e["slot"]: e["value"] for e in payload.get("entities") or []}
+        self.assertEqual(bound.get("date_range"), "2024-2025")
+        self.assertTrue(payload["result"], "the bound year matched no rows")
 
-        # Same question over the default window: if the rows matched, the
-        # derived window would be decorative.
-        default = self.ask(KRISHNA_UNDATED)
-        self.assertEqual(default["query_id"], "G10-D")
-        self.assertEqual(default["date_range"]["start_date"], self.default_start)
-        self.assertNotEqual(derived["result"], default["result"])
+    def test_a_different_year_changes_the_answer(self):
+        """If both years returned the same rows the binding would be
+        decorative — the filter has to actually be doing something."""
+        this_year = self.ask(FY_2024)
+        last_year = self.ask(FY_2023)
+        self.assertEqual(this_year["query_id"], last_year["query_id"])
+        self.assertNotEqual(this_year["result"], last_year["result"])
 
-        farmers = lambda rows: sum(int(r["farmers"]) for r in rows)
-        self.assertLess(farmers(derived["result"]), farmers(default["result"]))
+    def test_the_echoed_question_names_the_year_that_was_bound(self):
+        """The user reads their own words back and assumes the answer matched
+        them (T2d). A `{date_range}` surviving into the echo, or a year other
+        than the bound one, is the same class of defect as the wrong rows."""
+        payload = self.ask(FY_2024)
+        description = payload.get("query_description") or ""
+        self.assertIn("2024-2025", description)
+        self.assertNotIn("{", description)
 
-    # 2 — the UI always wins
-    def test_explicit_request_range_overrides_the_question(self):
-        payload = self.ask(
-            KRISHNA_2024, start_date="2025-01-01", end_date="2025-12-31"
-        )
+    # 2 — the UI always wins (unchanged from AP; the contract is the same)
+    def test_an_explicit_request_range_is_reported_as_the_window(self):
+        payload = self.ask(FY_2024, start_date="2025-01-01", end_date="2025-12-31")
         self.assertEqual(payload["date_range"]["start_date"], "2025-01-01")
         self.assertEqual(payload["date_range"]["end_date"], "2025-12-31")
-        self.assertFalse(payload["date_range"].get("derived_from_question", False))
         self.assertFalse(payload["date_range"]["is_default"])
 
     # 3 — regression: nothing named anywhere still gets the default window
     def test_no_dates_anywhere_keeps_the_default_window(self):
-        payload = self.ask(KRISHNA_UNDATED)
+        payload = self.ask("How many activities are planned?")
         self.assertEqual(payload["date_range"]["start_date"], self.default_start)
         self.assertEqual(payload["date_range"]["end_date"], self.default_end)
         self.assertTrue(payload["date_range"]["is_default"])
-        self.assertFalse(payload["date_range"]["derived_from_question"])
 
-    # 4 — compatible with the LIMIT-plus-date bind-order splice
-    def test_derived_window_survives_a_template_with_its_own_limit_placeholder(self):
-        payload = self.ask(MARKFED_TOP_2024)
-        self.assertEqual(payload["query_id"], "R03")
-        self.assertEqual(payload["date_range"]["start_date"], "2024-01-01")
-        self.assertEqual(payload["date_range"]["end_date"], "2024-12-31")
-        self.assertTrue(payload["date_range"]["derived_from_question"])
-        self.assertTrue(payload["date_filter_applied"])
-        # The LIMIT still binds to 5 — proof the date values did not displace it.
-        self.assertEqual(len(payload["result"]), 5)
-
-    # 5 — the derived window carries into follow-ups
-    def test_followup_requeries_over_the_derived_window_not_the_default(self):
-        session = "test-derived-window-followup"
-        first = self.ask(KRISHNA_2024, session_id=session, reset_context=True)
-        self.assertEqual(
-            first["context_frame"]["time_range"]["start"], "2024-01-01"
-        )
-
-        followup = self.ask("compare with Guntur district", session_id=session)
-        self.assertEqual(followup["tier"], "operation")
-        self.assertEqual(followup["operation_mode"], "requery")
-
-        # The re-queried comparison ran over 2024, and the response says 2024.
-        self.assertEqual(followup["date_range"]["start_date"], "2024-01-01")
-        self.assertEqual(followup["date_range"]["end_date"], "2024-12-31")
-        self.assertFalse(followup["date_range"]["is_default"])
-
-        # The original district's rows must be unchanged by the comparison —
-        # they came from the same 2024 window, not a silently re-defaulted one.
-        baseline = {r["geography"]: r["farmers"] for r in first["result"]}
-        carried = {
-            r["geography"]: r["farmers"]
-            for r in followup["result"]
-            if r.get("compared_district") == "Krishna"
-        }
-        self.assertTrue(carried, "comparison returned no rows for the original district")
-        self.assertEqual(carried, {k: v for k, v in baseline.items() if k in carried})
+    def test_no_template_applies_a_date_filter_on_the_serving_path(self):
+        """Decision D9, asserted where it would actually bite. `date_kind:
+        "year"` compares INTEGERS against a column holding '2024-2025'; an
+        injection here raises a binder error rather than answering wrongly, but
+        only once someone asks."""
+        for message in (FY_2024, FY_2023, "How many activities are planned?"):
+            with self.subTest(message=message):
+                self.assertFalse(self.ask(message).get("date_filter_applied"))
 
 
 if __name__ == "__main__":

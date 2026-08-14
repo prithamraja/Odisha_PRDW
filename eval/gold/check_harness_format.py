@@ -116,7 +116,16 @@ try:
             base.update(tier="clarify", query_id=None, n_rows=None,
                         clarification={"reason": "missing_parameter",
                                        "prompt": "Which year?", "options": []})
-        else:   # cannot_answer / graceful_fallback -> gold is "no_match"
+        elif behave == "cannot_answer":
+            # WP-4 T3: the correct outcome for these 19 is a SERVED REFUSAL —
+            # the router retrieved the known-unanswerable entry and returned its
+            # query_id with the workbook's own reason. `result` stays None, so
+            # n_rows is None; an empty LIST here is the coupling that would flip
+            # every one of them to a failure, and grade() now says so out loud
+            # instead of mis-bucketing them.
+            base.update(tier="fallback", query_id=spec["gold"], n_rows=None,
+                        clarification=None)
+        else:   # graceful_fallback (out-of-domain) -> gold is "no_match"
             base.update(tier="fallback", query_id=None, n_rows=None,
                         clarification=None)
         return base
