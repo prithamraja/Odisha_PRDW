@@ -17,6 +17,7 @@ frame on screen that the fragment leans on. `build_eval_questions.py --check`
 enforces the ordering; do not sort this file.
 """
 import argparse
+import logging
 import os
 import sys
 import io
@@ -49,6 +50,38 @@ def slim_rows(rows, keep=3):
     return len(rows), rows[:keep]
 
 
+def _capture_router_log(out_path: Path) -> logging.Handler:
+    """Route `query_router`'s INFO records to a file beside the results.
+
+    WITHOUT THIS, HALF OF WHAT T4 IS ASKED TO REPORT DOES NOT EXIST. Three of the
+    router's decisions are recorded only as `logging.info`, and nothing in this
+    harness ever configured logging — so the default WARNING level dropped every
+    one of them, silently:
+
+      * `_log_fiscal_year_disagreement` — the evidence D30.4 asks for, and the
+        whole basis for deciding whether the deterministic `$date_range` reader
+        can be promoted from a fallback to a prefill;
+      * `_order_paired_fiscal_years` — every replay where the extractor handed
+        over the two years backwards, which is the defect WP-4's replays were
+        silently serving;
+      * `_refusal_precedence` — which documented refusals were reached, and
+        whether by rank or by the reranker's own near-miss list.
+
+    A `logging.info` nobody collects is a measurement that was never taken.
+    """
+    log_path = out_path.with_suffix(".router.log")
+    handler = logging.FileHandler(log_path, mode="w", encoding="utf-8")
+    handler.setFormatter(logging.Formatter("%(asctime)s %(name)s %(message)s"))
+    handler.setLevel(logging.INFO)
+    logger = logging.getLogger("query_router")
+    logger.setLevel(logging.INFO)
+    logger.addHandler(handler)
+    # The extraction-unavailable warnings live under the same package, so they
+    # land here too; `propagate` is left alone so nothing else changes.
+    print(f"router log -> {log_path}")
+    return handler
+
+
 def run(out_path: Path = OUT):
     # Imported here, AFTER the spend guard has run: importing main constructs
     # the OpenAI client and building the retriever embeds the whole catalogue,
@@ -61,6 +94,7 @@ def run(out_path: Path = OUT):
     # (D28.8). Reset per replay, so the consistency runner's three passes report
     # three separate totals rather than a growing sum.
     meter().reset()
+    log_handler = _capture_router_log(out_path)
 
     records = []
     with TestClient(main.app) as client, out_path.open("w", encoding="utf-8") as out:
@@ -120,6 +154,9 @@ def run(out_path: Path = OUT):
             out.flush()
             label = rec.get("query_id") or rec.get("tier") or rec.get("error", "?")[:40]
             print(f"[{i:>2}/{len(QUESTIONS)}] {label:<12} {spec['q'][:70]}")
+
+    logging.getLogger("query_router").removeHandler(log_handler)
+    log_handler.close()
 
     print(f"\nWrote {out_path} ({len(records)} records)")
 

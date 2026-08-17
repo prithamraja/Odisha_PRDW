@@ -53,7 +53,6 @@ from .zones             import (
 from .dashboard_catalog import DASHBOARD_CATALOG
 from .unanswerable_catalog import UNANSWERABLE_CATALOG, refusal_for
 from .fragment_reroute   import drill_target, templates_share_subject
-from .date_phrase        import resolve_fiscal_years
 from .sql_params         import NAMED, param_style
 from .suggestions       import elicitation_chips
 from .config            import (
@@ -498,7 +497,8 @@ def _order_paired_fiscal_years(
 
 
 def _log_fiscal_year_disagreement(
-    user_query: str, slot: str, entity_type: str, extracted: str
+    user_query: str, slot: str, entity_type: str, extracted: str,
+    validator: EntityValidator,
 ) -> None:
     """Record where the extractor and the deterministic reader differ.
 
@@ -508,20 +508,43 @@ def _log_fiscal_year_disagreement(
     figures. That change would alter calls that currently succeed, so it wants a
     log behind it rather than an argument. Pure regex, no network: costs nothing
     to leave on.
+
+    BOTH SIDES ARE RESOLVED BEFORE THEY ARE COMPARED, through the validator, which
+    is the only way the comparison means anything. The first version compared the
+    extractor's RAW SURFACE FORM against a resolved value and mirrored the pair
+    split the wrong way round, so it logged a disagreement every time an officer
+    wrote a year the way officers write years:
+
+        extractor='2023-24'  date_phrase='2023-2024'   <- the same year
+        extractor='2024-25'  date_phrase='2024-2025'   <- the same year, and the
+                                                          pair mirror inverted too
+
+    Both agree; `date_phrase` exists precisely to map one onto the other (D9).
+    Left as it was, D30.4's "zero disagreements -> promote to prefill" test could
+    never have passed, and the log would have argued the opposite of the truth.
     """
     try:
-        years = resolve_fiscal_years(user_query, ())
-    except Exception:                                        # pragma: no cover
-        return
-    if not years:
-        return
-    # The pair split `_validate_fiscal_year` applies, mirrored so a comparison
-    # question is not logged as a disagreement with itself.
-    expected = years[-1] if (len(years) > 1 and entity_type.endswith("_2")) else years[0]
-    if str(extracted).strip() != expected:
+        from_question = validator.validate(user_query, entity_type)
+    except Exception:
+        return          # nothing year-shaped in the text — nothing to compare
+    try:
+        from_extractor = validator.validate(extracted, entity_type)
+    except Exception:
+        # The extractor produced something the validator cannot resolve at all.
+        # That is a disagreement of the loudest kind and the ordinary path is
+        # about to clarify on it; record it and let that happen.
         _log.info(
-            "fiscal-year disagreement on %s: extractor=%r date_phrase=%r query=%r",
-            slot, extracted, expected, user_query[:120],
+            "fiscal-year disagreement on %s: extractor=%r (UNRESOLVABLE) "
+            "date_phrase=%r query=%r",
+            slot, extracted, from_question.resolved_value, user_query[:120],
+        )
+        return
+    if from_extractor.resolved_value != from_question.resolved_value:
+        _log.info(
+            "fiscal-year disagreement on %s: extractor=%r -> %r  "
+            "date_phrase -> %r  query=%r",
+            slot, extracted, from_extractor.resolved_value,
+            from_question.resolved_value, user_query[:120],
         )
 
 
@@ -800,7 +823,8 @@ def _fill_slots_or_clarify(
                     validated.append(recovered)
                     continue
             else:
-                _log_fiscal_year_disagreement(user_query, slot, etype, raw_val)
+                _log_fiscal_year_disagreement(user_query, slot, etype, raw_val,
+                                              validator)
 
         if raw_val is None:
             # A slot the question implies is filled from its declared default

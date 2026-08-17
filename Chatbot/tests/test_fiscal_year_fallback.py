@@ -281,6 +281,63 @@ class FiscalYearFallbackTests(unittest.TestCase):
             [("date_range", "2024-2025")],
         )
 
+    # ── The disagreement log D30.4 is decided on ───────────────────────────────
+
+    def _disagreements(self, query, slot, entity_type, extracted):
+        with self.assertLogs("query_router.router", level="INFO") as cm:
+            # A guaranteed record, so assertLogs never fails for want of output.
+            router._log.info("probe")
+            router._log_fiscal_year_disagreement(
+                query, slot, entity_type, extracted, self.validator)
+        return [line for line in cm.output if "disagreement" in line]
+
+    def test_an_abbreviated_year_is_not_a_disagreement(self):
+        """THE BUG THIS PINS. The check compared the extractor's RAW SURFACE FORM
+        against a RESOLVED value, so '2023-24' vs '2023-2024' logged as a
+        disagreement — and `date_phrase` exists precisely to map one onto the
+        other (D9). Every officer writing a year the normal way produced a false
+        positive, which would have made D30.4's "zero disagreements → promote to
+        prefill" test unpassable and argued the opposite of the truth."""
+        for extracted in ("2023-24", "FY 2023-24", "2023-2024"):
+            with self.subTest(extracted=extracted):
+                self.assertEqual(
+                    self._disagreements(
+                        "How many activities were planned in 2023-24?",
+                        "date_range", "fiscal_year", extracted),
+                    [], f"{extracted!r} and '2023-2024' are the same year")
+
+    def test_the_pair_mirror_matches_the_validator(self):
+        """The old mirror gave `_2` the LATER year, the opposite of what
+        `_validate_fiscal_year` does — so a comparison question logged both slots
+        as disagreeing with themselves."""
+        query = "Compare 2023-24 with 2024-25"
+        self.assertEqual(
+            self._disagreements(query, "date_range", "fiscal_year", "2024-25"), [])
+        self.assertEqual(
+            self._disagreements(query, "date_range_2", "fiscal_year_2", "2023-24"), [])
+
+    def test_a_real_disagreement_is_still_logged(self):
+        """The log has to keep working, or it proves nothing by being empty."""
+        found = self._disagreements(
+            "How many activities were planned in 2023-24?",
+            "date_range", "fiscal_year", "2024-25")
+        self.assertEqual(len(found), 1)
+        self.assertIn("2024-2025", found[0])
+        self.assertIn("2023-2024", found[0])
+
+    def test_an_unresolvable_extraction_is_logged_loudly(self):
+        found = self._disagreements(
+            "How many activities were planned in 2023-24?",
+            "date_range", "fiscal_year", "the year before last")
+        self.assertEqual(len(found), 1)
+        self.assertIn("UNRESOLVABLE", found[0])
+
+    def test_a_question_with_no_year_logs_nothing(self):
+        self.assertEqual(
+            self._disagreements("GPDP status?", "date_range", "fiscal_year",
+                                "2024-25"),
+            [], "there is nothing in the text to disagree with")
+
     # ── Blast radius ──────────────────────────────────────────────────────────
 
     def test_no_other_slot_type_is_recovered_from_the_text(self):

@@ -134,6 +134,27 @@ def embed_batch(client: OpenAI, texts: list[str]) -> list[list[float]]:
     return out
 
 
+def cache_is_usable(texts: list[str], refresh: bool) -> bool:
+    """Whether the cached index will actually be REUSED for these texts.
+
+    THE SPEND ESTIMATE HAS TO ASK THIS, not just whether the file exists. WP-4c
+    added 25 paraphrases to the unanswerable catalogue; the cache file was still
+    there, the guard printed "0 (cached)" for the catalogue and "~1 calls" in
+    total, and the run then made 10 — because `load_or_build_catalog_embeddings`
+    correctly rejected the stale cache a moment later. An estimate that is wrong
+    by an order of magnitude is worse than no estimate: the whole point of the
+    guard is that a reader can decide whether to press go.
+    """
+    if refresh or not CACHE_PATH.exists():
+        return False
+    try:
+        cached = json.loads(CACHE_PATH.read_text(encoding="utf-8"))
+    except Exception:                                        # pragma: no cover
+        return False
+    return (cached.get("model") == EMBEDDING_MODEL
+            and cached.get("texts") == texts)
+
+
 def load_or_build_catalog_embeddings(
     client: OpenAI, texts: list[str], refresh: bool
 ) -> list[list[float]]:
@@ -142,11 +163,8 @@ def load_or_build_catalog_embeddings(
     Keyed on the texts themselves, so editing a question OR adding a paraphrase
     invalidates the cache rather than silently scoring against a stale index.
     """
-    if CACHE_PATH.exists() and not refresh:
-        cached = json.loads(CACHE_PATH.read_text(encoding="utf-8"))
-        if (cached.get("model") == EMBEDDING_MODEL
-                and cached.get("texts") == texts):
-            return cached["vectors"]
+    if cache_is_usable(texts, refresh):
+        return json.loads(CACHE_PATH.read_text(encoding="utf-8"))["vectors"]
     vecs = embed_batch(client, texts)
     CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
     CACHE_PATH.write_text(json.dumps(
@@ -271,7 +289,9 @@ def main() -> None:
     texts, vec_qids, display = build_index()
     gold = load_gold()
     scorable_n = sum(1 for g in gold if g["gold"] in display)
-    cached = CACHE_PATH.exists() and not args.refresh
+    # Whether the cache will be USED, not whether it exists — see
+    # `cache_is_usable` for the run where those two answers differed by 9 calls.
+    cached = cache_is_usable(texts, args.refresh)
     confirm_spend(
         "recall_eval",
         [(f"catalogue embeddings ({len(texts)} vectors over "
