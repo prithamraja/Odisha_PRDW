@@ -1,0 +1,19 @@
+﻿gamma   view   K  kept  left  new  twin pairs before  after
+  0.1  view1  30    26     4    4                  3      0
+  0.1  view2  30    30     0    0                  0      0
+  0.1  view3   2     2     0    0                  0      0
+  0.3  view1  30    26     4    4                  3      0
+  0.3  view2  30    30     0    0                  0      0
+  0.3  view3   2     2     0    0                  0      0
+  0.5  view1  30    26     4    4                  3      0
+  0.5  view2  30    30     0    0                  0      0
+  0.5  view3   2     2     0    0                  0      0
+  0.7  view1  30    28     2    2                  2      0
+  0.7  view2  30    30     0    0                  0      0
+  0.7  view3   2     2     0    0                  0      0
+  0.9  view1  30    28     2    2                  2      0
+  0.9  view2  30    30     0    0                  0      0
+  0.9  view3   2     2     0    0                  0      0
+
+total slots changed across all 15 (gamma, view) lists: 16
+total twin pairs: before=13  after=0

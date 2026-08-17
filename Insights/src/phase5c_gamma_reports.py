@@ -47,7 +47,10 @@ from openai import OpenAI
 
 import phase4a_engine
 from phase2_engine import load_candidates
-from phase5_ranking import rank_metainsights, prefilter_candidates
+# WP-D3b §4.3: the ONE ranking path, imported rather than reassembled here. The
+# three steps used to be spelled out below as prefilter + rank, which silently
+# dropped the A2 twin merge the executive path runs -- see `merge_prefilter_rank`.
+from phase5_ranking import merge_prefilter_rank
 # The run identity is defined ONCE, in the feed writer, and imported here: the
 # whole point of it is that the feed and the editions agree, and two
 # implementations of "which candidate set is this" would eventually not.
@@ -446,17 +449,19 @@ def main(argv: list | None = None):
         print(f"GAMMA = {gamma}")
         print(f"{'='*60}")
 
-        # Step 1: rescore + rank
+        # Step 1: rescore + rank. `rescore_candidates` deep-copies, so the merge
+        # inside `merge_prefilter_rank` cannot leak its `merged_twins` annotation
+        # back into `raw_candidates` and reach the next gamma.
         ranked = {}
         for view_name, _, _, _ in views:
             rescored = rescore_candidates(
                 raw_candidates[view_name], gamma, s_stars[view_name]
             )
-            filtered = prefilter_candidates(rescored, max_candidates=5000)
-            ranked[view_name] = rank_metainsights(filtered, k=K_PER_VIEW)
+            ranked[view_name], n_merged, _ = merge_prefilter_rank(
+                rescored, k=K_PER_VIEW, max_candidates=5000)
             n_exc = sum(1 for c in ranked[view_name] if c.exceptions)
             print(f"  {view_name}: {len(ranked[view_name])} ranked, "
-                  f"{n_exc} with exceptions")
+                  f"{n_exc} with exceptions, {n_merged:,} twins merged (A2)")
 
         # Step 2: enrich with the printable figures
         print("  Enriching with stats ...")

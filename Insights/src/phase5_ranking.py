@@ -325,6 +325,46 @@ def rank_metainsights(candidates: list, k: int = 15) -> list:
     return selected
 
 
+def merge_prefilter_rank(
+    candidates: list,
+    k: int = 15,
+    max_candidates: int = RANKING_PREFILTER_CAP,
+) -> tuple:
+    """THE ranking path. Twin merge (A2) -> pre-filter -> greedy rank.
+
+    WP-D3b §4.3. This function exists because the three steps were previously
+    assembled TWICE, in two files, and the two assemblies disagreed. This file's
+    `__main__` -- the executive-report path -- merged twins first. The gamma
+    editions' path in `phase5c_gamma_reports.py` called `prefilter` and `rank`
+    directly and so never merged at all, and the operator comparing the two
+    suites was reading 2-3 pairs of near-duplicate view1 findings per edition
+    that the calibrated pipeline removes. Neither path was wrong about its own
+    three lines; there simply was no shared path for A2 to live in. There is now,
+    and a third caller cannot repeat the omission without deliberately
+    reassembling the steps by hand.
+
+    ORDER IS LOAD-BEARING, and it is the reason this is a function rather than a
+    call moved into `rank_metainsights`. A2 runs BEFORE the pre-filter so that a
+    twin cannot occupy one of the `max_candidates` slots its own survivor already
+    holds -- merging after the cut would let a loser displace a real finding and
+    then be discarded, which costs the top-k a slot for nothing.
+
+    Callers that rescore first (the gamma path) merge their RESCORED candidates,
+    not the raw ones, which is deliberate: `merge_twin_candidates` keeps the
+    higher-scored twin, and at a given gamma "higher-scored" has to mean higher
+    at that gamma. The gamma penalty falls on findings with no exceptions, so
+    which of an OUTSTANDING_1/ATTRIBUTION pair survives is exactly the kind of
+    actionability trade-off the knob is there to express.
+
+    Returns (ranked, n_merged, merged) -- the top-k, how many twins were
+    collapsed, and the post-merge candidate pool, which the layer-2P/3P reports
+    need because it is the pool the ranking actually saw.
+    """
+    merged, n_merged = merge_twin_candidates(candidates)
+    filtered = prefilter_candidates(merged, max_candidates=max_candidates)
+    return rank_metainsights(filtered, k=k), n_merged, merged
+
+
 # =============================================================================
 # PART 4: NATURAL LANGUAGE SUMMARIES
 # =============================================================================
@@ -635,16 +675,14 @@ if __name__ == "__main__":
         candidates = load_candidates(path)
         print(f"  {len(candidates):,} candidates loaded")
 
-        # A2 runs BEFORE the pre-filter, so a twin cannot occupy one of the
-        # 5,000 slots its survivor already holds.
-        candidates, n_merged = merge_twin_candidates(candidates)
+        # The three steps live in `merge_prefilter_rank` now, so the gamma path
+        # runs the same ones in the same order (WP-D3b). This path's output is
+        # unchanged -- byte-identical `*_ranked.json` is the done-check.
+        ranked, n_merged, candidates = merge_prefilter_rank(
+            candidates, k=k, max_candidates=RANKING_PREFILTER_CAP)
         print(f"  {n_merged:,} OUTSTANDING_1/ATTRIBUTION twins merged (A2) "
               f"-> {len(candidates):,}")
-
-        filtered = prefilter_candidates(candidates, max_candidates=RANKING_PREFILTER_CAP)
-        print(f"  {len(filtered):,} after pre-filter")
-
-        ranked = rank_metainsights(filtered, k=k)
+        print(f"  {min(len(candidates), RANKING_PREFILTER_CAP):,} after pre-filter")
         print(f"  {len(ranked)} selected for top-{k}")
 
         all_candidates[view_name] = candidates

@@ -236,12 +236,17 @@ def main() -> int:
           "view3 statewide dims")
     check(sample["view3"]["depth"] == 1 and state["view3"]["depth"] == 2,
           "view3 depth 1 sample / 2 statewide")
-    # D25 (WP-D2b): the sample runs view1 at depth 1 -- 13,322 of its 13,495
-    # depth-2 subspaces average ~37 rows at 20 GPs and put 880,752 data scopes
-    # behind a queue that drained neither in time nor in memory. Statewide keeps
-    # depth 2 and is compute-gated.
-    check(sample["view1"]["depth"] == 1 and state["view1"]["depth"] == 2,
-          "view1 depth 1 sample / 2 statewide")
+    # D29 (calibration session 2) SUPERSEDES D25 here. D25 ratified depth 1 for
+    # the sample because the depth-2 queue drained neither in time nor in memory
+    # -- 880,752 data scopes behind 13,495 subspaces. WP-D2c's A1 exclusions and
+    # the worker pool changed that arithmetic: the depth-2 sample now drains in
+    # 5,208.9 s of a 36,000 s budget across five workers, and nine of view1's
+    # fifteen findings at depth 2 are new. So depth 2 is the sample default too,
+    # and the sample/statewide split no longer says anything about view1's depth.
+    # This assertion was the last place D25 survived; WP-D3 §4.1 reported it as
+    # the one stale check in an otherwise green gate.
+    check(sample["view1"]["depth"] == state["view1"]["depth"] == 2,
+          "view1 depth 2 both (D29)")
     check(sample["view2"]["depth"] == state["view2"]["depth"] == 1, "view2 depth 1 both")
 
     print("\n=== 6. no AP/UP vocabulary survives the prompt path ===")

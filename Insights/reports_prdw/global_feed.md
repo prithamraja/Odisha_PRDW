@@ -1,6 +1,6 @@
 # Top findings across the programme
 
-*Generated 2026-08-17T08:56:36Z from candidate set `a7f991c1df3771f9` (6 candidate files).*
+*Generated 2026-08-17T10:26:15Z from candidate set `a7f991c1df3771f9` (6 candidate files).*
 
 The 3 analytical views are ranked internally, each against its own total. This table is the cross-view feed: one ordering of everything the analysis found, so the front page is not decided by which view a finding happened to come from.
 

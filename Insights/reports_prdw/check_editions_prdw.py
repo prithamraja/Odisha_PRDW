@@ -30,6 +30,10 @@ purity. It makes no API call and no network call.
                              and the same run stamp. This is the stale-editions
                              lesson as an assertion: a suite that fails here is
                              a mixed suite whatever else is true of it
+  (f) EARMARK ELEVATED    -- D29 says the XV FC earmark is elevated, not
+                             footnoted, so EVERY carrier's measured figures have
+                             to reach the model's own prose and not just the
+                             deterministic note
 
 Usage:
     python Insights/reports_prdw/check_editions_prdw.py --base Insights
@@ -105,8 +109,12 @@ def main() -> int:
         for view_name, config, _, _ in views:
             rescored = gam.rescore_candidates(raw[view_name], gamma,
                                               s_stars[view_name])
-            filtered = gam.prefilter_candidates(rescored, max_candidates=5000)
-            ranked = gam.rank_metainsights(filtered, k=gam.K_PER_VIEW)
+            # WP-D3b: the shared path, the same one the generator calls, so this
+            # re-derivation cannot drift from what the sections were written
+            # from. It replaced prefilter + rank spelled out here, which is the
+            # very omission WP-D3b fixed in the generator (WPD3 §4.3).
+            ranked, _, _ = gam.merge_prefilter_rank(
+                rescored, k=gam.K_PER_VIEW, max_candidates=5000)
             as_dicts = [c.to_dict() if hasattr(c, "to_dict") else c
                         for c in ranked]
             per_view[view_name] = p5b.enrich_candidates_with_stats(
@@ -211,21 +219,38 @@ def main() -> int:
         for vn, title, lines in prose_gate.split_sections(md):
             if vn is None or vn not in enriched_map:
                 continue
-            carriers = [c for c in enriched_map[vn]
+            carriers = [(i + 1, c) for i, c in enumerate(enriched_map[vn])
                         if isinstance(c.get("stats"), dict)
                         and "earmark_framing" in c["stats"]]
             if not carriers:
                 continue
-            share = carriers[0]["stats"]["earmark_framing"][
-                "on_the_two_earmarked_purposes"]
-            outside = carriers[0]["stats"]["earmark_framing"][
-                "amount_outside_them"]
             prose = "\n".join(ln for _, ln in lines if not ln.startswith(">"))
-            check(share in prose and outside in prose,
-                  f"{label} / {title}: the earmarked share and the amount "
-                  f"outside it appear in the PROSE, not only the note",
-                  f"share {share} in prose={share in prose}, "
-                  f"outside {outside} in prose={outside in prose}")
+
+            # WP-D3b, tightening WP-D3's own §3 recommendation. This asserted
+            # carriers[0] only -- "at least one earmark carrier reaches the
+            # prose". Where an edition ranks two (gamma 0.7 and 0.9 each carry a
+            # general-public slice at 95.0% / Rs 39.06 lakh AND the whole view at
+            # 97.6% / Rs 42.61 lakh), the weaker check passes on the first and
+            # says nothing about the second, so a carrier could be silently
+            # dropped from the prose and the gate would stay green. Every carrier
+            # must now reach it. Distinct (share, amount) pairs are what is
+            # checked, not carrier count: two findings measuring the same scope
+            # produce the same two figures and one appearance answers for both.
+            seen = {}
+            for rank, c in carriers:
+                framing = c["stats"]["earmark_framing"]
+                pair = (framing["on_the_two_earmarked_purposes"],
+                        framing["amount_outside_them"])
+                seen.setdefault(pair, []).append(rank)
+            for (share, outside), ranks in sorted(seen.items()):
+                ranks_txt = ", ".join(f"#{r}" for r in ranks)
+                check(share in prose and outside in prose,
+                      f"{label} / {title}: earmark carrier {ranks_txt} "
+                      f"({share}) reaches the PROSE, not only the note",
+                      f"share {share} in prose={share in prose}, "
+                      f"outside {outside} in prose={outside in prose}")
+            print(f"      ({label} / {title}: {len(carriers)} carrier(s), "
+                  f"{len(seen)} distinct figure pair(s))")
 
     # ------------------------------------------------------------------ (e)
     print("\n=== (e) one candidate set behind every artefact ===")

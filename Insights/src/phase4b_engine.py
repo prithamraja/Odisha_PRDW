@@ -693,16 +693,20 @@ if __name__ == "__main__":
     # view1. Their candidate files are written as each view finishes, so an
     # interrupted run still leaves them behind.
     #
-    # view1's budget was 18,000s, which was the right number for ONE run and is
-    # now stale in both directions (D26 authorises this edit; WP-D2b E-1
-    # flagged it). It was set when view1 ran at subspace depth 2, where the
-    # measurement was 880,752 data scopes at ~150 scopes/s of detection alone.
-    # D25 then ratified depth 1 for the sample -- 48,792 scopes, drained in
-    # 262.5 s at 185.9 scopes/s -- and WP-D2c's A1 exclusions and worker pool
-    # take it well below that again. 3,600s is twelve times the measured drain
-    # and still generous enough that a loaded machine cannot truncate the
-    # queue. The escalation argument the 18,000 carried is superseded, not
-    # forgotten: it is in WPD2_REPORT.md §2 and in D25, which reversed it.
+    # view1's budget is 36,000s because D29 made subspace depth 2 the SAMPLE
+    # default, and the whole history of this number is a history of the depth it
+    # was sized for. 18,000s was set for depth 2 (880,752 scopes at ~150
+    # scopes/s). D25 then ratified depth 1 -- 48,792 scopes, drained in 262.5 s
+    # -- and 3,600s was twelve times that measured drain. D29 reversed D25, and
+    # 3,600s went stale in the one direction that does not announce itself: the
+    # measured depth-2 drain is 5,208.9 s (2,438 subspaces, 809,554 data scopes,
+    # 155.4 scopes/s across five workers), so a plain `python
+    # Insights/src/phase4b_engine.py` at the committed default TRUNCATED the
+    # queue and returned a smaller answer that looked like a result -- the one
+    # unscoreable failure named at the top of this block. WP-D3 §4.2 found it and
+    # worked around it with --budget 36000; this is the fix, and 36,000s is ~6.9x
+    # the measured drain. The escalation history is superseded, not forgotten:
+    # WPD2_REPORT.md §2 and D25 carry it, and D29 reversed D25.
     #
     # --depth2 restores depth 2 on view1 for the sample run WP-D2c T4 makes,
     # with the budget the depth-2 arithmetic actually needs. It is a flag and
@@ -728,7 +732,7 @@ if __name__ == "__main__":
                     help="write to view{N}{suffix}_candidates.json")
     args = ap.parse_args()
 
-    BUDGETS = {"view1": 3600, "view2": 300, "view3": 120}
+    BUDGETS = {"view1": 36000, "view2": 300, "view3": 120}
     CONFIGS = {"view1": VIEW1_CONFIG, "view2": VIEW2_CONFIG, "view3": VIEW3_CONFIG}
 
     if args.depth2:
