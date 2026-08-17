@@ -1,0 +1,144 @@
+[
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "district_name",
+    "pattern_type": "TREND",
+    "breakdown": "fiscal_year",
+    "measure": "sanctioned_total",
+    "base_subspace": [],
+    "hdp_size": 9,
+    "commonness_sets": [
+      {
+        "highlight": "('DECREASING',)",
+        "pattern_type": "TREND",
+        "members": [
+          "Bargarh",
+          "Koraput",
+          "Cuttack",
+          "Sundargarh",
+          "Malkangiri"
+        ],
+        "count": 5,
+        "proportion": 0.5556
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "Kandhamal",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('INCREASING',)",
+        "pattern_type": "TREND"
+      },
+      {
+        "member_label": "Khordha",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "Ganjam",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "Rayagada",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.245952,
+    "impact": 1.0,
+    "score": 0.245952,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "EVENNESS",
+    "breakdown": "gp_name",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "district_name",
+        "Bargarh"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('EVEN',)",
+        "pattern_type": "EVENNESS",
+        "members": [
+          "n_activities",
+          "n_costless",
+          "expenditure_total",
+          "overspend_vs_plan",
+          "overspend_vs_sanction",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 10,
+        "proportion": 0.5556
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_plans",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "sanctioned_total",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "n_costed",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "planned_cost",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "payment_amount",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "receipt_amount",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_abandoned",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.210456,
+    "impact": 0.241026,
+    "score": 0.050726,
+    "impact_measure_used": "n_activities"
+  }
+]

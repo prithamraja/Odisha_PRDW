@@ -1,0 +1,27 @@
+
+Loading C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\c9c594c5-9826-40ab-8e49-4cd927b3f2e2\scratchpad\mirror\Insights\metainsights\view1_candidates.json ...
+  5,000 candidates loaded
+  884 OUTSTANDING_1/ATTRIBUTION twins merged (A2) -> 4,116
+  4,116 after pre-filter
+  15 selected for top-15
+
+Loading C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\c9c594c5-9826-40ab-8e49-4cd927b3f2e2\scratchpad\mirror\Insights\metainsights\view2_candidates.json ...
+  122 candidates loaded
+  1 OUTSTANDING_1/ATTRIBUTION twins merged (A2) -> 121
+  121 after pre-filter
+  15 selected for top-15
+
+Loading C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\c9c594c5-9826-40ab-8e49-4cd927b3f2e2\scratchpad\mirror\Insights\metainsights\view3_candidates.json ...
+  2 candidates loaded
+  0 OUTSTANDING_1/ATTRIBUTION twins merged (A2) -> 2
+  2 after pre-filter
+  2 selected for top-15
+Layer 2P report -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\c9c594c5-9826-40ab-8e49-4cd927b3f2e2\scratchpad\mirror\Insights\reports\layer2p_raw_explorer.txt
+Layer 3P report -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\c9c594c5-9826-40ab-8e49-4cd927b3f2e2\scratchpad\mirror\Insights\reports\layer3p_ranked_dashboard.txt
+
+======================================================================
+Phase 5 Summary
+======================================================================
+  view1: 15 selected from 4,116  | TotalUse=11.3770  | types: ATTRIBUTION, EVENNESS, LAST_TWO, OUTSTANDING_1, OUTSTANDING_LAST, TOP_TWO
+  view2: 15 selected from 121  | TotalUse=3.9987  | types: CHANGE_POINT, OUTSTANDING_1, SEASONALITY, TREND
+  view3: 2 selected from 2  | TotalUse=0.2967  | types: EVENNESS, TREND

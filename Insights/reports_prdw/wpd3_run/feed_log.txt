@@ -1,0 +1,38 @@
+======================================================================
+PHASE 5c — CROSS-VIEW GLOBAL FEED
+======================================================================
+
+Candidate set a7f991c1df3771f9, stamped 2026-08-17T08:56:36Z (from DISCOVER_RUN_STAMP):
+  view1_candidates.json  890767085988a6c7
+  view1_ranked.json  182ff833849488ca
+  view2_candidates.json  5796d3c8029c5f06
+  view2_ranked.json  44c9638c450d29af
+  view3_candidates.json  a5fa0a1f5f2fa659
+  view3_ranked.json  a5fa0a1f5f2fa659
+
+Coverage weights — EQUAL (D24); coverage measured, not assumed:
+  view1:    20 Gram Panchayats  ->  weight 0.3333
+  view2:    20 Gram Panchayats  ->  weight 0.3333
+  view3:    20 Gram Panchayats  ->  weight 0.3333
+
+Pooling candidates:
+  view1: 15 ranked findings, weight 0.3333
+  view2: 15 ranked findings, weight 0.3333
+  view3: 2 ranked findings, weight 0.3333
+
+  5,124 raw -> 32 ranked-eligible -> 32 distinct lineages (0 merged)
+
+Knobs (fixed by spec): rank decay 0.85, seeds per view 1
+  redundancy: content-gated r; fill charges the single WORST overlap, not the sum
+  3 seeds + 29 filled = 32 of a top-50
+
+Global feed JSON -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\c9c594c5-9826-40ab-8e49-4cd927b3f2e2\scratchpad\mirror\Insights\metainsights\global_feed.json
+Source-set sidecar -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\c9c594c5-9826-40ab-8e49-4cd927b3f2e2\scratchpad\mirror\Insights\metainsights\global_feed_source_set.json
+Global feed markdown -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\c9c594c5-9826-40ab-8e49-4cd927b3f2e2\scratchpad\mirror\Insights\reports_prdw\global_feed.md
+
+Feed composition by view:
+  view1: 15  (seeded)
+  view2: 15  (seeded)
+  view3:  2  (seeded)
+
+  seed check: 3/3 views seeded (all present)

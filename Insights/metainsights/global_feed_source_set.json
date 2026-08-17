@@ -1,0 +1,37 @@
+{
+  "what_this_is": "provenance for global_feed.json and for the gamma editions generated in the same run. It is a sidecar and not a block inside the feed because the feed's JSON structure is a frozen frontend contract (D16); adding a key to it is an operator decision, not an implementation one.",
+  "artefacts": [
+    "metainsights/global_feed.json",
+    "reports_prdw/global_feed.md",
+    "reports_prdw/gamma_{0.1,0.3,0.5,0.7,0.9}_report.md"
+  ],
+  "candidate_set_id": "a7f991c1df3771f9",
+  "generated_at": "2026-08-17T08:56:36Z",
+  "stamp_source": "DISCOVER_RUN_STAMP",
+  "files": {
+    "view1_candidates.json": {
+      "sha256": "890767085988a6c7b61b1694a51e544d977932b1f567c89cae0e017b3643359b",
+      "bytes": 5868996
+    },
+    "view1_ranked.json": {
+      "sha256": "182ff833849488cad3a15c0cec614f903a9ee68bff3175ffe824f8e3262476e1",
+      "bytes": 18430
+    },
+    "view2_candidates.json": {
+      "sha256": "5796d3c8029c5f06efe71fa59ce84c3e9c847335b52b89c0078eb82f0ad2358c",
+      "bytes": 143100
+    },
+    "view2_ranked.json": {
+      "sha256": "44c9638c450d29af03e2981855757c1a603db98272763c695133047d7cf3cd62",
+      "bytes": 16544
+    },
+    "view3_candidates.json": {
+      "sha256": "a5fa0a1f5f2fa659f52d89bff2f7d11dc12beb52aa97afccb92b882effd17ecb",
+      "bytes": 3613
+    },
+    "view3_ranked.json": {
+      "sha256": "a5fa0a1f5f2fa659f52d89bff2f7d11dc12beb52aa97afccb92b882effd17ecb",
+      "bytes": 3613
+    }
+  }
+}

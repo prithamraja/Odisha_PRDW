@@ -1,0 +1,29 @@
+
+=== (a) prose gate ===
+      PASS executive_metainsight_report.md
+      
+      1/1 report(s) clean.
+  [PASS] prose gate: no vocabulary or reading-note problem in any section written  -- 0 problem(s)
+  [PASS] prose_gate exits 0  -- rc=0
+
+=== (b) no hollow sections ===
+  [PASS] Activity Lifecycle - Every Planned Work and Its Money: section carries prose  -- 694 words
+  [PASS] Monthly Money Flows by Gram Panchayat: section carries prose  -- 622 words
+  [PASS] Gram Panchayat Report Card by Year: section carries prose  -- 579 words
+  [PASS] every view has a section in the report  -- []
+
+=== (c) FY 2023-24 caveat scope ===
+  [PASS] Activity Lifecycle - Every Planned Work and Its Money: caveat present == a finding qualifies  -- qualifying ranks=[15], in report=True
+  [PASS] Activity Lifecycle - Every Planned Work and Its Money: the caveat sits inside the deterministic note
+  [PASS] Monthly Money Flows by Gram Panchayat: caveat present == a finding qualifies  -- qualifying ranks=none, in report=False
+  [PASS] Gram Panchayat Report Card by Year: caveat present == a finding qualifies  -- qualifying ranks=none, in report=False
+
+=== (d) every figure traces to engine output ===
+  [PASS] Activity Lifecycle - Every Planned Work and Its Money: 58 figures, all traced
+  [PASS] Monthly Money Flows by Gram Panchayat: 22 figures, all traced
+  [PASS] Gram Panchayat Report Card by Year: 32 figures, all traced
+
+  112/112 quoted figures traced to engine output or to the view's stated facts
+
+============================================================
+0 failure(s)

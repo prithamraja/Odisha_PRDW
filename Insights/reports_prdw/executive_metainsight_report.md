@@ -6,70 +6,102 @@
 
 ---
 
+## Top Findings Across the Programme
+
+Overspending against plan is not confined to a small set of blocks: among costed activities, it is spread across blocks in 27/28 asset categories. Banking Facilities is the sole category without this broad distribution. Overspending against sanction shows the same programme-wide character across districts in 27/28 asset categories, again with Banking Facilities as the exception. The immediate control issue is therefore system-wide, while the Banking Facilities pattern requires separate examination.
+
+### Sanctions, expenditure and payment timing
+
+Sanctioned totals are decreasing over fiscal years in 5/9 districts. **Kandhamal** records an increasing trend, while **Khordha**, **Ganjam** and **Rayagada** show no clear pattern. This is not matched by a general decline in cash activity: activity-linked expenditure increases at every time grain examined and rises over quarters in 6/9 districts. **Bargarh**, **Koraput** and **Cuttack** follow different quarterly patterns.
+
+Timing also matters. Payment counts show a recurring seasonal pattern in 2/3 time grains, and most monthly measures follow a recurring annual cycle. Activity-linked expenditure has a different monthly cycle, while sanction counts and sanctioned amounts do not follow the prevailing pattern. District and block reviews should therefore examine sanctioning, expenditure and payment timelines together rather than treating annual totals as the full picture.
+
+### Plans remain concentrated in early lifecycle stages
+
+Across 18/20 Gram Panchayats, approved activities have the lowest overspending against plan, while ongoing works account for the majority of the amount generated. Approved activities also contain the highest expected beneficiary totals in 18/20 Gram Panchayats. **Boipariguda** and **Laxmipur** are the recurring exceptions, with no clear pattern on these measures.
+
+Taken together, these findings place attention on the movement from approval into execution: a large beneficiary commitment remains attached to approved activities, while the financial amount generated is concentrated among ongoing works. The next sections should establish whether status updates, sanctions and expenditure records present a consistent lifecycle for each activity.
+
+### Classification and local exceptions
+
+For Public Works, “Uncategorised” has the highest number of activities in 19/20 Gram Panchayats; **Govindapur** follows a different pattern. This limits the department’s ability to review which assets are being planned and delivered without returning to activity-level records. Several other exceptions recur—notably **Boipariguda**, **Laxmipur** and **Chikilli**—and warrant direct validation rather than assumptions about local performance. No area was given more weight than another.
+
+### Questions for the next departmental review
+
+1. What explains the programme-wide spread of overspending against both plans and sanctions, and what is different in Banking Facilities?
+2. How do districts reconcile decreasing sanctioned totals with increasing activity-linked expenditure and recurring payment cycles?
+3. What action will Gram Panchayats take to move approved activities through the lifecycle, validate beneficiary records and classify currently uncategorised Public Works?
+
+---
+
 ## Activity Lifecycle - Every Planned Work and Its Money
 
-### Spending Remains Below Both Plan and Sanction
+### XV Finance Commission Tied Grant Requires Sanction-Level Review
 
-The recorded difference between voucher-linked spending and planned cost is Rs -51.96 crore; the negative sign means spending remains below plan. This is not confined to a few locations: for 27 of the 28 asset groupings, the difference is spread across the 16 blocks rather than concentrated in a small set. Banking Facilities is the sole category with no clear block pattern.
+97.6% of the Rs 17.66 crore planned tied grant sits on the two earmarked purposes. The tied part is earmarked—one half for sanitation and maintenance of open-defecation-free status, the other for drinking water supply, rainwater harvesting and water recycling. Rs 42.61 lakh sits outside these two recorded focus areas: Roads accounts for Rs 31.01 lakh, Education Rs 8.05 lakh and Water Conservation Rs 3.55 lakh. The Department should identify which sanction records carry these amounts and under which head each was approved before deciding whether the recorded focus area falls within the earmark.
 
-For activities with sanction records, the difference between spending and sanctioned amounts is Rs -5.02 crore. This is likewise spread across all nine districts for 27 asset groupings, rather than pointing to one district as the sole source of the divergence. District and block reviews therefore need activity-level reconciliation across the sample, not only scrutiny of the largest locations.
+### Planned, Sanctioned and Spent Amounts Are Out of Step
 
-Status records show where much of the planned amount remains. Activities recorded as Activity Approved account for Rs -41.61 crore against plan and 79.6% of all activities. This pattern holds in 18 Gram Panchayats; **Boipariguda** and **Laxmipur** do not show a clear status-level pattern. The only positive status-level total is Rs 18,797 for WORK COMPLETED, which represents 0.1% of activities. With only 17 completed activities recorded, this does not establish repeated positive overspending by particular Gram Panchayats.
+Across costed activities, spending is Rs 51.96 crore below planned cost. This is not concentrated in a small set of blocks or asset categories. **Rangeilunda** has spent 23.1% of planned cost (Rs 2.73 crore spent of Rs 11.84 crore planned cost) and accounts for 7.9% of costed activities. **Kalimela** has spent 23.0% (Rs 1.76 crore spent of Rs 7.65 crore planned cost), against 8.2% of costed activities. Even the higher-utilisation examples remain around half: **Baranga** is at 52.9% (Rs 1.24 crore spent of Rs 2.34 crore planned cost), with 5.9% of costed activities.
 
-### Infrastructure Dominates Planned Untied Funding
+Among activities with a sanction record, spending is Rs 5.02 crore below the sanctioned amount and the difference is again spread across districts rather than belonging to one place. **Ganjam** has spent 73.3% of its sanctioned amount (Rs 4.61 crore spent of Rs 6.30 crore sanctioned amount) and holds 21.4% of all activities. **Cuttack** is at 92.0% (Rs 2.14 crore spent of Rs 2.33 crore sanctioned amount), against 8.7% of all activities. These percentages apply only to activities with sanction records on file.
 
-Theme 6 - Self-sufficient Infrastructure in Village carries Rs 30.07 crore of planned untied funding, or 50.4% of the total, against 36.9% of activities. It is the leading theme in 18 Gram Panchayats. The exceptions require direct review: the Unmapped theme leads in **Boipariguda**, while Theme 4 - Water Sufficient Village leads in **Kalimela**.
+**Chikilli** is the sharpest sanction-record exception: it has Rs 0 sanctioned across every fiscal year while accounting for 5.0% of activities. The data cannot distinguish between no sanctioned amount and no sanction entry; the block should establish which is correct.
 
-Technical sanctions are concentrated in sanitation and drinking water in every fiscal year. Sanitation has technical sanction recorded for 614 activities, representing 29.3% of all technically sanctioned activities, against 16.5% of planned activities. Drinking water has 538 activities, or 25.7% of technical sanctions, against 10.9% of planned activities. This shows where technical-sanction activity is concentrated; it does not establish whether other focus areas lacked approval, since sanction records cover only part of the activity set.
+### Infrastructure Dominates Untied Plans, with Two Local Exceptions
 
-Interpretation of planned tied funding is obstructed by missing descriptions for output types. The largest undescribed output category carries Rs 11.48 crore, or 65.0% of planned tied funding, against 28.5% of activities. A second undescribed category carries Rs 5.49 crore, or 31.1%, against 9.5% of activities. These two categories lead in 18 Gram Panchayats; **Dadhapatna** and **Dutimendi** follow a different pattern. The department must supply the output-type descriptions before officials can judge what this concentration represents.
+Theme 6—Self-sufficient Infrastructure in Village—carries Rs 30.07 crore, or 50.4%, of the Rs 59.64 crore in planned untied funding. This is the leading theme in 18 of the 20 Gram Panchayats. The exceptions require local explanation: **Boipariguda** records Unmapped theme as its leading category, while **Kalimela** records Theme 4—Water Sufficient Village.
 
-### Sanctioning and Recorded Spending Need Reconciliation
+Classification quality limits interpretation. In Public Works, 5,181 activities, or 55.0%, are Uncategorised by asset. **Govindapur** is the only Gram Panchayat where this is not the dominant asset pattern. Planned untied funding is also concentrated in two output categories that have no descriptions on file: Rs 34.88 crore, or 62.1%, and Rs 16.90 crore, or 30.1%. The Department must supply the decode before these allocations can be interpreted.
 
-The Sarpanch is the recorded sanctioning authority for 62.8% of the 2,101 sanction-linked activities. For these records, the difference between spending and sanctioned amounts is Rs -3.24 crore, the largest authority-level negative position in every fiscal year. This requires reconciliation of sanctions and voucher-linked expenditure under the dominant sanctioning office, rather than being treated as an isolated-year issue.
+### Recorded Status and Evidence Need Reconciliation
 
-**Chikilli** records Rs 0 in sanctioned funding across every fiscal year, while accounting for 5.0% of planned activities. The data cannot distinguish between no sanctioned amount and no sanction entry. Officials should establish which of these is true before drawing a delivery conclusion.
+Activities still recorded as Activity Approved have spent only 0.3% of planned cost (Rs 14.00 lakh spent of Rs 41.75 crore planned cost) and comprise 53.9% of costed activities. Ongoing works have spent 85.4% (Rs 24.76 crore spent of Rs 28.99 crore planned cost) and comprise 37.5%. Abandoned works have spent 3.6% (Rs 21.03 lakh spent of Rs 5.85 crore planned cost), against 7.5% of costed activities.
 
-Voucher-linked expenditure is overwhelmingly attached to ongoing works. WORK ONGOING accounts for Rs 28.59 crore, or 93.9% of the Rs 30.43 crore general component spent, while ongoing works represent 16.6% of activities. **Boipariguda** and **Laxmipur** again do not show this clear status pattern. Spending is also recorded against abandoned works—Rs 1.15 crore, or 3.8%—which warrants activity-level checking.
+The only aggregate positive overspend appears among completed works: 100.8% of planned cost was spent (Rs 24.17 lakh spent of Rs 23.98 lakh planned cost). With only 17 activities recorded as completed, this cannot establish whether positive overspend repeatedly occurs in the same Gram Panchayats.
 
-### Evidence on File
+For New/Fresh works, all 6,893 photo uploads sit against one output category with no description on file. This pattern holds in 19 Gram Panchayats; **Chikilli** has no clear pattern. Until the output categories are decoded, officers cannot judge whether evidence is appropriately distributed across different kinds of output.
 
-There are 8,267 geotagged photo uploads across 1,675 activities. New/Fresh works account for 6,893 photo uploads, or 83.4%, broadly in line with their 87.0% share of activities. Maintenance accounts for 1,268 photo uploads, or 15.3%, against 9.5% of activities. Officials should assess evidence coverage work by work; upload totals alone do not show whether each spent activity has adequate evidence.
+### Questions for the Review
 
-At the next review, the officer should ask: Which high-value activities in each block make up the Rs -51.96 crore position against plan and the Rs -5.02 crore position against sanction, and what action is recorded for each? In **Chikilli**, were no amounts sanctioned, or were sanction records not entered? Which Gram Panchayats repeatedly show positive spending above plan or sanction at activity level, and do their sanction records and geotagged photographs support that expenditure?
+1. Which sanctions place tied grant on Roads, Education and Water Conservation, and under which approved head?
+2. Why do **Rangeilunda** and **Kalimela** show spending of only 23.1% and 23.0% of planned cost, and what is the work-wise position of the unspent plans?
+3. Does **Chikilli** genuinely have no sanctioned amount, or are sanction records missing, and when will the asset and output classifications be completed?
 
-> **Reading note:** this view has one row for each of the **12,704 activities** the 20 Gram Panchayats planned, and three of its properties are features of the data rather than results. First, **costless activities** -- training, campaigns and services planned without a cost -- only began being reported in 2023-24, and they are 7,074 of the 12,704 rows, so activity counts rise about eightfold at that boundary for a reporting reason. Second, Sanction records exist for **2,101 of the 12,704 activities** (about one in six), so every sanctioned-basis figure -- sanctioned amounts, approval counts, and overspend against sanction -- describes that subset only. An activity with no sanction record is **not** shown to be unapproved; it is shown to have no record on file. Third, only **17 activities are marked WORK COMPLETED** in the whole sample, so completion rates here measure recording practice, not delivery. Activity-count comparisons across FY 2023-24 reflect a change in reporting completeness (costless activities begin being recorded), not a change in activity.
+> **Reading note:** this view has one row for each of the **12,704 activities** the 20 Gram Panchayats planned, and three of its properties are features of the data rather than results. First, **costless activities** -- training, campaigns and services planned without a cost -- only began being reported in 2023-24, and they are 7,074 of the 12,704 rows, so activity counts rise about eightfold at that boundary for a reporting reason. Second, Sanction records exist for **2,101 of the 12,704 activities** (about one in six), so every sanctioned-basis figure -- sanctioned amounts, approval counts, and overspend against sanction -- describes that subset only. An activity with no sanction record is **not** shown to be unapproved; it is shown to have no record on file. Third, only **17 activities are marked WORK COMPLETED** in the whole sample, so completion rates here measure recording practice, not delivery. Activity-count comparisons across FY 2023-24 reflect a change in reporting completeness (costless activities begin being recorded), not a change in activity. On the tied grant specifically: the XV Finance Commission's tied grant is earmarked for sanitation and for drinking water, and **97.6%** of the **Rs 17.66 crore** of tied grant in this data sits on those two focus areas. **Rs 42.61 lakh** sits outside them -- Roads (Rs 31.01 lakh), Education (Rs 8.05 lakh), Water Conservation (Rs 3.55 lakh). Whether those purposes fall inside the earmark is for the department to say; this analysis reports the split and does not establish a breach.
 
 
 ---
 
 ## Monthly Money Flows by Gram Panchayat
 
-### Payments remain concentrated at the year-end
+### Linkage to Planned Activities Is Improving Unevenly
 
-Cashbook payments and receipts follow a recurring annual cycle, whether measured in rupees or voucher counts. March concentrates payments in every year. The pattern is therefore not one isolated closing-month surge: payment activity repeatedly bunches around the fiscal year-end rather than moving evenly through the year.
+The strongest apparent rise concerns the share of cashbook payments recorded against planned activities, not an equivalent rise in total cashbook outflow. It should therefore be read as greater completeness in linking vouchers to activities, not as growth in spending or delivery.
 
-The same annual rhythm appears in both inflows and outflows. District and block officials should therefore show whether March vouchers relate to transactions initiated earlier and whether pending payments and receipts are being reviewed before the final quarter. Sanctions do not follow the same clear monthly pattern, although sanction counts rise when viewed by quarter and fiscal year. This difference in timing warrants scrutiny of whether sanctions and cashbook payments are moving through the GPDP cycle in an orderly sequence.
+This improvement is not uniform. Quarterly linked expenditure shows an increasing pattern in Khordha, Ganjam, Kandhamal, Sundargarh, Malkangiri and Rayagada, while **Bargarh**, **Koraput** and **Cuttack** follow different patterns. At block level, the same increasing pattern appears in nine of 16 blocks. The exceptions are **Barpali**, **Bheden**, **Rangeilunda**, **Boipariguda**, **Baranga**, **Tangi Choudwar** and **Attabira**.
 
-### Bhubaneswar dominates voucher processing
+These exceptions warrant a record-level check. The department should establish whether vouchers in these blocks are being linked consistently to planned activities and whether the linkage is being entered in the same month as the cashbook payment.
 
-**Bhubaneswar block** recorded 2,135 vouchers, accounting for 25.0% of the 8,529 vouchers in the full period. It had the highest payment-voucher count in five of the six fiscal years; 2024-2025 was the exception, when no block stood clearly apart.
+### Cashbook Movement Remains Concentrated Around the Financial Year-End
 
-This is a concentration of transaction volume, not by itself a measure of performance. Nevertheless, one block handling a quarter of all payment vouchers warrants a transaction-level review: whether the volume is spread across its Gram Panchayats and months, whether repeated small payments account for it, and whether March carries an unusually large part. At the other end, **Lahunipara block** recorded 181 vouchers and **Balisankara block** recorded 178 vouchers. These lower counts cannot establish weak delivery on their own; officials need to confirm whether fewer transactions were actually made or whether cashbook entry was incomplete.
+Payment amounts, receipt amounts and their voucher counts all follow a recurring annual cycle. March concentrates payments every year. This confirms that cashbook movement is not steady through the year: a substantial part of payment processing remains clustered at the financial year-end.
 
-### District and block money flows do not rank alike
+Payment voucher volumes also show a persistent block-level concentration. **Bhubaneswar** Block recorded 2,135 vouchers, accounting for 25.0% of the 8,529 vouchers in the full period. It had the highest payment count in five of the six financial years; 2024-2025 was the exception, when no single block clearly stood out. This is an absolute voucher count rather than a performance rate, but its persistence merits review of whether the year-end concentration is especially pronounced within Bhubaneswar Block.
 
-In 2025-2026, **Ganjam district** held the largest totals for several measures, including cashbook payments and receipts, but it also accounted for 26.1% of the 1,985 vouchers in scope. The more comparable measure is a typical month for one Gram Panchayat: Ganjam recorded Rs 7.78 lakh, based on 48 GP-months, while **Cuttack district** recorded Rs 7.58 lakh, based on 24 GP-months, and **Khordha district** recorded Rs 5.49 lakh, based on 36 GP-months. Ganjam therefore remains prominent after allowing for the number of Gram Panchayats and months, but Cuttack is close on monthly payment intensity.
+Receipt counts show the same broad annual rhythm. The data therefore points to a common cashbook cycle for both inflows and outflows, but it does not by itself establish whether individual receipts were followed promptly by payments. That question requires examination of the months between the peaks.
 
-Within **Bargarh district**, **Bheden block** is the clearest cashbook outlier. A typical month for one Gram Panchayat recorded Rs 8.74 lakh in payments, compared with Rs 2.28 lakh in **Barpali block** and Rs 2.22 lakh in **Attabira block**. These averages cover 72, 144 and 72 GP-months respectively. Bheden also accounted for 57.2% of Bargarh’s 1,546 vouchers, so part of its larger cashbook total is transaction volume. In contrast, Barpali recorded the highest sanction count and sanctioned amount in the district. The review should reconcile this difference between where sanctions are recorded and where cashbook transactions are concentrated.
+### Ganjam and Bargarh Move Differently from Their Peers
 
-### Sharp shifts require record-level explanation
+In 2025-2026, **Ganjam** stood out on total receipts, payments, receipt vouchers, sanctions and expenditure linked to planned activities. Its size within the sample matters: Ganjam accounts for 26.1% of the 1,985 vouchers in that year, compared with 28.6% for Khordha. The more comparable measure is a typical month for one Gram Panchayat. On that basis, Ganjam recorded Rs 7.78 lakh, just above Cuttack at Rs 7.58 lakh and ahead of Khordha at Rs 5.49 lakh. This indicates unusually high monthly cashbook outflow per sampled Gram Panchayat in Ganjam, rather than merely a large district total.
 
-**Ganjam district** shows a marked break in August 2020 across cashbook payment and receipt amounts and counts. Its sanction count and sanctioned amount shifted in October 2020. These dates identify a change in the recorded series but do not establish what caused it. The underlying vouchers and sanction registers should be checked around these months to distinguish a genuine operational shift from a change in recording practice.
+Ganjam also shows a sharp timing shift. Payments, receipts and their voucher counts changed around **2020-08**; sanctions changed around **2020-10**; and recorded linkage to planned activities changed around **2020-11**. These different dates should be reconciled against the underlying cashbooks and sanction registers. The data does not show whether they represent changes in actual financial activity or changes in entry practice.
 
-### Questions for the departmental review
+Within Bargarh district, **Bheden** Block accounts for 57.2% of the 1,546 vouchers and records Rs 8.74 lakh in a typical month for one Gram Panchayat, compared with Rs 2.28 lakh in Barpali and Rs 2.22 lakh in Attabira. Yet **Barpali** stands out instead for sanctions and expenditure linked to planned activities. Cashbook intensity, sanctioning and activity linkage are therefore not pointing to the same block.
 
-First, why does **Bhubaneswar block** account for 2,135 vouchers and 25.0% of all payment vouchers, and how are those vouchers distributed across Gram Panchayats and months? Second, in **Bargarh district**, how do officials reconcile Bheden’s much higher monthly cashbook payments with Barpali’s lead in recorded sanctions? Third, what changed in **Ganjam district** around August and October 2020, and do the underlying cashbooks and sanction registers confirm the shifts visible in the monthly data?
+### Questions for the Departmental Review
+
+First, why do **Bargarh**, **Koraput**, **Cuttack** and the seven named blocks show a different activity-linkage pattern: are vouchers not being linked, or are links being entered differently? Second, what changed in **Ganjam** around 2020-08, 2020-10 and 2020-11, and do the cashbook and sanction registers support those separate shifts? Third, which Gram Panchayats account for the repeated March payment concentration in **Bhubaneswar** Block, and what payments could have been processed earlier in the year?
 
 > **Reading note:** this view's time axis is the **cashbook's own 72 months** (April 2020 to March 2026), and a Gram Panchayat month with no transactions is present as a row of zeros rather than absent -- 259 of the 1,440 cells are such months. Two consequences follow. Sanctions are counted by **sanction month**, so the **2,040** sanctions dated inside the window are here and **61** dated outside it are not; the yearly report card counts the full 2,101 by fiscal year, and both totals are correct for their own axis. And **March concentrates payments every year** -- 2,040 of the 8,529 payment vouchers fall in a March -- which is the fiscal-year end, a known property of government cash flow. On activity-linked expenditure specifically: the cashbook's total outflow did **not** grow across these six years (**Rs 15.60 crore** in 2020-21 against **Rs 11.12 crore** in 2025-26), while the share of it carrying a link to a planned activity rose from **2.7%** to **53.2%**, and the number of recorded activity-voucher links rose from **30** to **2,122**. A rise in activity-linked expenditure is therefore a rise in recording completeness unless the cashbook total rises with it. A dated event overlaps this section: the period this finding is restricted to falls inside and the shift this finding reports falls in the months just after the COVID-19 first-wave lockdown (2020-03 to 2020-06). The national COVID-19 lockdown was imposed on 25 March 2020 and unwound in phases through June 2020. Public works and Gram Panchayat office operations across Odisha were restricted for most of that window. The dates coincide; this analysis does not establish that one produced the other.
 
@@ -78,31 +110,31 @@ First, why does **Bhubaneswar block** account for 2,135 vouchers and 25.0% of al
 
 ## Gram Panchayat Report Card by Year
 
-### Recorded Sanctions Are Declining in Most Districts
+### Sanctioned Value Is Falling in Most Districts
 
-Recorded sanctioned amounts show a decreasing trajectory across fiscal years in Bargarh, Koraput, Cuttack, Sundargarh and Malkangiri. This is the clearest cross-district pattern in the yearly report cards and should be tested against each district’s sanction registers and pending proposals.
+The value of sanctions on record shows a downward direction in five of the nine districts: Bargarh, Koraput, Cuttack, Sundargarh and Malkangiri. Across the full sample, sanctioned value totals Rs 28.84 crore. It was highest in 2020-2021 at Rs 6.13 crore, representing 21.2% of the total, compared with Rs 3.57 crore in 2025-2026, representing 12.4%. The movement was not uninterrupted: sanctioned value stood at Rs 4.45 crore in 2022-2023, Rs 4.56 crore in 2023-2024 and Rs 4.63 crore in 2024-2025.
 
-Across the sample, the sanctioned amount was highest in 2020-2021 at Rs 6.13 crore, representing 21.2% of the Rs 28.84 crore recorded across all six fiscal years. It was Rs 5.51 crore in 2021-2022, or 19.1%, and reached its lowest annual level in 2025-2026 at Rs 3.57 crore, or 12.4%. The path was not uniformly downward: recorded sanctions stood at Rs 4.45 crore in 2022-2023, Rs 4.56 crore in 2023-2024 and Rs 4.63 crore in 2024-2025.
+**Kandhamal** is the clear exception, where sanctioned value is increasing. **Khordha**, **Ganjam** and **Rayagada** show no consistent direction. These exceptions should be examined separately rather than treated as part of a statewide movement.
 
-**Kandhamal** is the important exception, with an increasing trajectory in recorded sanctioned amounts. **Khordha**, **Ganjam** and **Rayagada** show no clear direction. These exceptions require different review questions: Kandhamal should explain what changed in its sanction pipeline, while the other three districts should account for the year-to-year movement GP by GP. As sanction records cover only a limited part of the activity base, the department must also establish whether these trajectories represent actual sanctioning or the completeness of sanction entry.
+This is a trend in sanctions recorded in the system, not proof that sanctioning itself has declined. Sanction records cover only about one activity in six. Districts must therefore establish whether the falling values represent fewer or lower-value sanctions, or whether sanctions are not being entered and linked to the relevant activities.
 
-### Bargarh’s Activity and Delivery Measures Are Not Concentrated in One GP
+### Bargarh: Similar Workloads, Different Conversion of Plans into Spending
 
-Bargarh district contains 3,062 activities in this report card. The activity base is spread relatively evenly among Bheden at 27.4%, Hirlipali at 25.4%, Bandhpali at 23.8% and Bhatigaon at 23.4%. Several other measures—including expenditure, administrative and technical sanction counts, ongoing activities, activities with photographs and photograph uploads—are also spread across these four Gram Panchayats rather than concentrated in one.
+The four sampled Gram Panchayats in Bargarh account for broadly similar shares of the district’s 3,062 activities: Bheden 27.4%, Hirlipali 25.4%, Bandhpali 23.8% and Bhatigaon 23.4%. Activity counts, expenditure, administrative and technical sanction records, ongoing works, activities with evidence and evidence uploads are also broadly spread across the four Gram Panchayats. This does not show that performance is healthy; it shows that no single Gram Panchayat accounts for the district-wide pattern.
 
-This does not mean performance is satisfactory or that the signed differences between spending and plans or sanctions are small. It means that no single Gram Panchayat accounts for the pattern. Review action in Bargarh should therefore cover Bheden, Hirlipali, Bandhpali and Bhatigaon rather than treating one GP as the sole source of concern.
+The more useful distinction is how much planned cost was converted into spending. **Bheden** spent 22.4% of its planned cost (Rs 1.62 crore spent of Rs 7.22 crore planned cost). **Bandhpali** spent 41.9% (Rs 1.40 crore spent of Rs 3.34 crore planned cost), while **Hirlipali** spent 48.3% (Rs 1.19 crore spent of Rs 2.46 crore planned cost). **Bhatigaon** recorded the highest utilization at 57.7% (Rs 1.24 crore spent of Rs 2.14 crore planned cost).
 
-There are also important exceptions within Bargarh. The number of GPDP plans, sanctioned amount and completed activities show no common distribution across the four Gram Panchayats. Planned cost, costed activities, cashbook payments, cashbook receipts and abandoned activities follow a different distribution from the measures that are evenly spread. Officials should reconcile these differences at GP-year level: a broadly similar activity load does not establish that planned money, recorded sanctions and cashbook movement are aligned.
+The activity shares show that these are similarly substantial planning workloads, while the utilization percentages show different rates of conversion into spending. Bheden therefore requires the closest review of its annual plan-to-spending position. The data does not identify whether the remaining planned value concerns works awaiting sanction, works not started, works under execution, or incomplete financial recording; the Gram Panchayat and block must reconcile those stages.
 
-### Photograph Evidence Must Be Tested Against Spending
+### Evidence Must Be Tested Against Spending
 
-In Bargarh, both activities with at least one geotagged photograph and total photograph uploads are spread across all four Gram Panchayats. This rules out a simple explanation in which evidence uploading is confined to one GP. It does not establish that expenditure is adequately evidenced: upload counts do not show whether the higher-value works, or the relevant fiscal year’s spending, have photographs on file.
+In Bargarh, activities with geotagged evidence and evidence uploads are broadly spread across Bandhpali, Bhatigaon, Bheden and Hirlipali. This rules out a simple explanation in which one Gram Panchayat alone accounts for the district’s evidence position. It does not establish that the evidence is sufficient for the money spent.
 
-The review should therefore compare expenditure and evidence within each GP-year, especially where cashbook payments follow a different distribution from activity and evidence counts.
+The review should compare each Gram Panchayat’s annual spending with the activities carrying at least one geotagged photograph. Particular attention should go to GP-years where expenditure is recorded but evidence is absent or thin, and to whether photographs correspond to the relevant activity and stage of work.
 
 ### Questions for the Departmental Review
 
-First, why do Bargarh, Koraput, Cuttack, Sundargarh and Malkangiri show decreasing recorded sanctioned amounts, and do district sanction registers confirm the same trajectory? Second, what accounts for Kandhamal’s increasing pattern and the absence of a clear pattern in Khordha, Ganjam and Rayagada? Third, in Bheden, Hirlipali, Bandhpali and Bhatigaon, do GP-year records reconcile planned activities, sanctions, cashbook payments and geotagged evidence, or are approvals and photographs missing from the system?
+For Bargarh, Koraput, Cuttack, Sundargarh and Malkangiri, does the decline in sanctioned value represent actual sanctioning decisions, or sanctions that have not been entered and linked to activities? What accounts for Kandhamal’s opposite trajectory, and can the district produce the corresponding activity-wise sanction records? In Bargarh, what is the year-wise position of the unspent planned cost in Bheden, and which expenditures across all four sampled Gram Panchayats do not yet have adequate geotagged evidence on file?
 
 > **Reading note:** this view is a full grid -- all 20 Gram Panchayats against all 6 fiscal years, 120 rows -- so a **zero is a recorded zero**, not a missing row. It can mean either that nothing happened or that nothing was recorded, and this view cannot tell those apart. **Completion recording effectively ceased after 2022-23**: the 17 activities ever marked WORK COMPLETED fall 3 / 6 / 6 across 2020-21 to 2022-23, then 0, 2 and 0 across the three years since. No comparison of Gram Panchayats on completions can be supported by this column, and trend patterns on it are reported in the data-quality annex rather than as findings. Sanction records exist for **2,101 of the 12,704 activities** (about one in six), so every sanctioned-basis figure -- sanctioned amounts, approval counts, and overspend against sanction -- describes that subset only. An activity with no sanction record is **not** shown to be unapproved; it is shown to have no record on file. `n_tech_approvals` totals **2,095**, not the 2,134 technical-approval records in the source: 39 sit on activities that have no administrative approval, and the approval view hangs the technical approval off the administrative one. The Ask chatbot reports the same 2,095, so the two systems agree.
 

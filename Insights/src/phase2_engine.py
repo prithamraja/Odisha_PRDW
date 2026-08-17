@@ -274,27 +274,43 @@ VIEW1_CONFIG = ViewConfig(
         "total_cost",    # financial exposure (PLANNED basis, the only near-complete one)
     ],
 
-    # D25 (WP-D2b): the SAMPLE runs at depth 1; statewide keeps depth 2.
+    # D29 (WP-D3 T0a): depth 2 at BOTH scales. One number, no branch.
     #
-    # WP-D2 measured this view at depth 2 rather than estimating it. 13,322 of
-    # the 13,495 enumerated subspaces are depth-2, and at 20 GPs those two-filter
-    # slices average ~37 rows — statistically fragile, and the source of nothing
-    # this sample can support. The full queue behind them is 880,752 data scopes,
-    # which breaks two things at once: the never-evict QueryCache/PatternCache
-    # (3.94 GB of process memory at 1.7% of the queue, on a 15.7 GB machine) and
-    # the ranker (~800k projected candidates against a 5,000 pre-filter). Depth 1
-    # is 127 subspaces / 48,792 scopes — an 18x cut, and the only knob on this
-    # view with an order of magnitude in it. What it costs is every two-filter
-    # slice ("within Bargarh district, among costless activities ..."); all 17
-    # dimensions and all 24 measures are kept.
+    # This is the operator's ratification of the depth-2 sample run, made on
+    # measurement rather than on argument: calibration session 2 labelled all
+    # nine of the findings that only depth 2 can produce REAL, and one of them
+    # (the XV FC tied-grant earmark deviation) is the strongest compliance
+    # finding in the set. Depth 1 could not have found it — it needs a slice, a
+    # dimension varied inside the slice, and a breakdown.
     #
-    # STATEWIDE KEEPS DEPTH 2 and is compute-gated: at ~6,800 GPs a two-filter
-    # subspace is populated and specific rather than fragile, and the geography
+    # HISTORY, because the reasons for depth 1 were good ones and both of them
+    # were retired by measurement, not overruled. D25 (WP-D2b) set the sample to
+    # depth 1 on two walls WP-D2 had measured at depth 2: the never-evict
+    # QueryCache/PatternCache reached 3.94 GB at 1.7% of the queue on a 15.7 GB
+    # machine, and ~800k projected candidates faced a 5,000-candidate
+    # pre-filter. WP-D2c removed both. Bounded caches with a worker pool ran the
+    # full 809,554-scope depth-2 queue to EMPTY in 5,544 s at 0.57 GB per worker
+    # across five workers, and the candidate store is bounded at the ranker's own
+    # prefilter cap, so the store dropping 60,488 candidates is lossless —
+    # `prefilter_candidates` would have dropped them a step later. The 2,438
+    # subspaces that survive the 1% impact prune are all ≥1%-impact slices, so
+    # the "~37 rows, statistically fragile" objection applies to the 11,057
+    # subspaces the prune already removes, not to the ones actually mined.
+    #
+    # WHAT IT COSTS: ~92 minutes per re-mine of this view (measured, 5 workers),
+    # accepted by the operator as the price of the conditional findings.
+    #
+    # CAUTION FOR WHOEVER RUNS IT: phase4b_engine's default view1 time budget is
+    # 3,600 s, which was sized for the depth-1 drain and is now BELOW the
+    # depth-2 drain. Pass `--budget 36000`. A truncated queue is the one
+    # unscoreable failure (that file's own entry-point comment says so).
+    #
+    # STATEWIDE is unchanged in substance and still compute-gated: at ~6,800 GPs
+    # a two-filter subspace is populated and specific, and the geography
     # dimensions drop to district_name (see _VIEW1_GEO_DIMS), which is most of
     # the enumeration. It must not be run before the statewide checklist is
-    # cleared — the engine-scaling WP and its provisioning — because the cache
-    # and ranker walls above are scale walls, not sample walls.
-    max_subspace_depth=2 if _STATEWIDE else 1,
+    # cleared.
+    max_subspace_depth=2,
     tau=0.5,
     min_impact=0.01,
     min_hdp_size=3,

@@ -1,0 +1,1749 @@
+{
+  "weighting": {
+    "basis": "EQUAL across views (D24). Every view covers every Gram Panchayat in the drop by construction, so population coverage cannot distinguish them; `reach` is the distinct Gram Panchayats each view holds rows for, measured, and it is the same for all three",
+    "formula": "global_score = view_weight x within_view_score x 0.85^(view_rank - 1); each view's best finding is seeded unconditionally",
+    "redundancy": "fill-stage marginal gain = global_score - min(global_score, worst), worst = max over the selected set of min(item, selected) x r; r is gated on shared measure / breakdown / non-trivial subspace lineage",
+    "rank_decay": 0.85,
+    "seeds_per_view": 1,
+    "reach": {
+      "view1": 20,
+      "view2": 20,
+      "view3": 20
+    },
+    "weights": {
+      "view1": 0.333333,
+      "view2": 0.333333,
+      "view3": 0.333333
+    }
+  },
+  "dedup": {
+    "loaded": 5124,
+    "eligible": 32,
+    "merged": 0,
+    "deduped": 32
+  },
+  "feed": [
+    {
+      "rank": 1,
+      "view": "view1",
+      "view_title": "Activity Lifecycle",
+      "view_rank": 1,
+      "is_seed": true,
+      "global_score": 0.292001,
+      "within_view_score": 0.876002,
+      "conciseness": 0.876002,
+      "impact": 1.0,
+      "pattern_type": "EVENNESS",
+      "extending_strategy": "subspace",
+      "extending_dimension": "asset_category_label",
+      "breakdown": "block_name",
+      "measure": "overspend_vs_plan",
+      "base_subspace": [
+        [
+          "is_costless",
+          "Costed"
+        ]
+      ],
+      "hdp_size": 28,
+      "commonness_sets": [
+        {
+          "highlight": "('EVEN',)",
+          "pattern_type": "EVENNESS",
+          "members": [
+            "Uncategorised",
+            "Buildings",
+            "Recreational Facilities",
+            "Drinking water supply structure",
+            "Water Sources & Structures",
+            "Roads, Bridges & Culverts",
+            "Community Sanitation",
+            "Plastic Waste Management",
+            "Solid Waste Management",
+            "Sanitation & Sewerage Facilities",
+            "Liquid Waste Management",
+            "Household Sanitation",
+            "Movable Sanitation Asset",
+            "Faecal Sludge Management",
+            "Education Facilities",
+            "Office Equipment",
+            "Medical & Health Facilities",
+            "Land",
+            "Irrigation Sources",
+            "Computers and peripherals",
+            "Electrification",
+            "Drinking water supply equipment",
+            "Pond & Reservoir",
+            "Other Public/Social",
+            "Electrical Installation and Equipment",
+            "Medical Supplies",
+            "Grey water management"
+          ],
+          "count": 27,
+          "proportion": 0.9643
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "Banking Facilities",
+          "category": "NO_PATTERN",
+          "highlight": null,
+          "pattern_type": "NO_PATTERN"
+        }
+      ],
+      "summary": "Across nearly all asset_category_label values (27/28), overspend_vs_plan is spread evenly across block_name values -- it belongs to all of them and no single block_name accounts for it. Uneven only in: Banking Facilities (not evenly spread) -- this is about how the total is spread, not about how much any one of them spends"
+    },
+    {
+      "rank": 2,
+      "view": "view2",
+      "view_title": "Geo-Month Cash Cube",
+      "view_rank": 1,
+      "is_seed": true,
+      "global_score": 0.240352,
+      "within_view_score": 0.721057,
+      "conciseness": 0.721057,
+      "impact": 1.0,
+      "pattern_type": "TREND",
+      "extending_strategy": "breakdown",
+      "extending_dimension": "temporal_grain",
+      "breakdown": "(varies)",
+      "measure": "activity_linked_expenditure",
+      "base_subspace": [],
+      "hdp_size": 3,
+      "commonness_sets": [
+        {
+          "highlight": "('INCREASING',)",
+          "pattern_type": "TREND",
+          "members": [
+            "month",
+            "quarter",
+            "fiscal_year"
+          ],
+          "count": 3,
+          "proportion": 1.0
+        }
+      ],
+      "exceptions": [],
+      "summary": "Across all temporal_grain values, activity_linked_expenditure is increasing over (varies)"
+    },
+    {
+      "rank": 3,
+      "view": "view3",
+      "view_title": "GP Performance",
+      "view_rank": 1,
+      "is_seed": true,
+      "global_score": 0.081984,
+      "within_view_score": 0.245952,
+      "conciseness": 0.245952,
+      "impact": 1.0,
+      "pattern_type": "TREND",
+      "extending_strategy": "subspace",
+      "extending_dimension": "district_name",
+      "breakdown": "fiscal_year",
+      "measure": "sanctioned_total",
+      "base_subspace": [],
+      "hdp_size": 9,
+      "commonness_sets": [
+        {
+          "highlight": "('DECREASING',)",
+          "pattern_type": "TREND",
+          "members": [
+            "Bargarh",
+            "Koraput",
+            "Cuttack",
+            "Sundargarh",
+            "Malkangiri"
+          ],
+          "count": 5,
+          "proportion": 0.5556
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "Kandhamal",
+          "category": "HIGHLIGHT_CHANGE",
+          "highlight": "('INCREASING',)",
+          "pattern_type": "TREND"
+        },
+        {
+          "member_label": "Khordha",
+          "category": "NO_PATTERN",
+          "highlight": null,
+          "pattern_type": "NO_PATTERN"
+        },
+        {
+          "member_label": "Ganjam",
+          "category": "NO_PATTERN",
+          "highlight": null,
+          "pattern_type": "NO_PATTERN"
+        },
+        {
+          "member_label": "Rayagada",
+          "category": "NO_PATTERN",
+          "highlight": null,
+          "pattern_type": "NO_PATTERN"
+        }
+      ],
+      "summary": "Across most district_name values (5/9), sanctioned_total is decreasing over fiscal_year. Exceptions: Kandhamal (sanctioned_total is increasing over fiscal_year); Khordha (no clear pattern); Ganjam (no clear pattern) and 1 others"
+    },
+    {
+      "rank": 4,
+      "view": "view1",
+      "view_title": "Activity Lifecycle",
+      "view_rank": 2,
+      "is_seed": false,
+      "global_score": 0.248201,
+      "within_view_score": 0.876002,
+      "conciseness": 0.876002,
+      "impact": 1.0,
+      "pattern_type": "EVENNESS",
+      "extending_strategy": "subspace",
+      "extending_dimension": "asset_category_label",
+      "breakdown": "district_name",
+      "measure": "overspend_vs_sanction",
+      "base_subspace": [],
+      "hdp_size": 28,
+      "commonness_sets": [
+        {
+          "highlight": "('EVEN',)",
+          "pattern_type": "EVENNESS",
+          "members": [
+            "Uncategorised",
+            "Buildings",
+            "Recreational Facilities",
+            "Drinking water supply structure",
+            "Water Sources & Structures",
+            "Roads, Bridges & Culverts",
+            "Community Sanitation",
+            "Plastic Waste Management",
+            "Solid Waste Management",
+            "Sanitation & Sewerage Facilities",
+            "Liquid Waste Management",
+            "Household Sanitation",
+            "Movable Sanitation Asset",
+            "Faecal Sludge Management",
+            "Education Facilities",
+            "Office Equipment",
+            "Medical & Health Facilities",
+            "Land",
+            "Irrigation Sources",
+            "Computers and peripherals",
+            "Electrification",
+            "Drinking water supply equipment",
+            "Pond & Reservoir",
+            "Other Public/Social",
+            "Electrical Installation and Equipment",
+            "Medical Supplies",
+            "Grey water management"
+          ],
+          "count": 27,
+          "proportion": 0.9643
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "Banking Facilities",
+          "category": "NO_PATTERN",
+          "highlight": null,
+          "pattern_type": "NO_PATTERN"
+        }
+      ],
+      "summary": "Across nearly all asset_category_label values (27/28), overspend_vs_sanction is spread evenly across district_name values -- it belongs to all of them and no single district_name accounts for it. Uneven only in: Banking Facilities (not evenly spread) -- this is about how the total is spread, not about how much any one of them spends"
+    },
+    {
+      "rank": 5,
+      "view": "view1",
+      "view_title": "Activity Lifecycle",
+      "view_rank": 3,
+      "is_seed": false,
+      "global_score": 0.193268,
+      "within_view_score": 0.802496,
+      "conciseness": 0.840223,
+      "impact": 0.955098,
+      "pattern_type": "TOP_TWO",
+      "extending_strategy": "subspace",
+      "extending_dimension": "gp_name",
+      "breakdown": "output_type_label",
+      "measure": "fund_untied_total",
+      "base_subspace": [
+        [
+          "activity_type_label",
+          "Public Works"
+        ]
+      ],
+      "hdp_size": 20,
+      "commonness_sets": [
+        {
+          "highlight": "('Code 101', 'Code 105')",
+          "pattern_type": "TOP_TWO",
+          "members": [
+            "Andhrua",
+            "Bandhpali",
+            "Barimunda",
+            "Bhatigaon",
+            "Bheden",
+            "Biswamathpur",
+            "Boipariguda",
+            "Chikilli",
+            "Dadhapatna",
+            "Dutimendi",
+            "Govindapur",
+            "Hirlipali",
+            "Itipur",
+            "Kalimela",
+            "Kalyansinghpur",
+            "Karuabahal",
+            "Laxmipur",
+            "Mendarajpur",
+            "Sharagada"
+          ],
+          "count": 19,
+          "proportion": 0.95
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "Haldikudar",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        }
+      ],
+      "summary": "Across nearly all gp_name values (19/20), Code 101 and Code 105 lead in fund_untied_total among output_type_label values. Exception: Haldikudar (different pattern)"
+    },
+    {
+      "rank": 6,
+      "view": "view2",
+      "view_title": "Geo-Month Cash Cube",
+      "view_rank": 2,
+      "is_seed": false,
+      "global_score": 0.18058,
+      "within_view_score": 0.63734,
+      "conciseness": 0.63734,
+      "impact": 1.0,
+      "pattern_type": "OUTSTANDING_1",
+      "extending_strategy": "subspace",
+      "extending_dimension": "fiscal_year",
+      "breakdown": "block_name",
+      "measure": "payment_count",
+      "base_subspace": [],
+      "hdp_size": 6,
+      "commonness_sets": [
+        {
+          "highlight": "('Bhubaneswar',)",
+          "pattern_type": "OUTSTANDING_1",
+          "members": [
+            "2020-2021",
+            "2021-2022",
+            "2022-2023",
+            "2023-2024",
+            "2025-2026"
+          ],
+          "count": 5,
+          "proportion": 0.8333
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "2024-2025",
+          "category": "NO_PATTERN",
+          "highlight": null,
+          "pattern_type": "NO_PATTERN"
+        }
+      ],
+      "summary": "Across most fiscal_year values (5/6), Bhubaneswar has the highest payment_count among block_name values. Exception: 2024-2025 (no clear pattern)"
+    },
+    {
+      "rank": 7,
+      "view": "view1",
+      "view_title": "Activity Lifecycle",
+      "view_rank": 4,
+      "is_seed": false,
+      "global_score": 0.164278,
+      "within_view_score": 0.802496,
+      "conciseness": 0.840223,
+      "impact": 0.955098,
+      "pattern_type": "OUTSTANDING_1",
+      "extending_strategy": "subspace",
+      "extending_dimension": "gp_name",
+      "breakdown": "asset_category_label",
+      "measure": "n_activities",
+      "base_subspace": [
+        [
+          "activity_type_label",
+          "Public Works"
+        ]
+      ],
+      "hdp_size": 20,
+      "commonness_sets": [
+        {
+          "highlight": "('Uncategorised',)",
+          "pattern_type": "OUTSTANDING_1",
+          "members": [
+            "Andhrua",
+            "Bandhpali",
+            "Barimunda",
+            "Bhatigaon",
+            "Bheden",
+            "Biswamathpur",
+            "Boipariguda",
+            "Chikilli",
+            "Dadhapatna",
+            "Dutimendi",
+            "Haldikudar",
+            "Hirlipali",
+            "Itipur",
+            "Kalimela",
+            "Kalyansinghpur",
+            "Karuabahal",
+            "Laxmipur",
+            "Mendarajpur",
+            "Sharagada"
+          ],
+          "count": 19,
+          "proportion": 0.95
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "Govindapur",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        }
+      ],
+      "summary": "Across nearly all gp_name values (19/20), Uncategorised has the highest n_activities among asset_category_label values. Exception: Govindapur (different pattern)"
+    },
+    {
+      "rank": 8,
+      "view": "view1",
+      "view_title": "Activity Lifecycle",
+      "view_rank": 5,
+      "is_seed": false,
+      "global_score": 0.128475,
+      "within_view_score": 0.738354,
+      "conciseness": 0.738354,
+      "impact": 1.0,
+      "pattern_type": "OUTSTANDING_LAST",
+      "extending_strategy": "subspace",
+      "extending_dimension": "gp_name",
+      "breakdown": "status_label",
+      "measure": "overspend_vs_plan",
+      "base_subspace": [
+        [
+          "is_costless",
+          "Costed"
+        ]
+      ],
+      "hdp_size": 20,
+      "commonness_sets": [
+        {
+          "highlight": "('Activity Approved',)",
+          "pattern_type": "OUTSTANDING_LAST",
+          "members": [
+            "Andhrua",
+            "Bandhpali",
+            "Barimunda",
+            "Bhatigaon",
+            "Bheden",
+            "Biswamathpur",
+            "Chikilli",
+            "Dadhapatna",
+            "Dutimendi",
+            "Govindapur",
+            "Haldikudar",
+            "Hirlipali",
+            "Itipur",
+            "Kalimela",
+            "Kalyansinghpur",
+            "Karuabahal",
+            "Mendarajpur",
+            "Sharagada"
+          ],
+          "count": 18,
+          "proportion": 0.9
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "Boipariguda",
+          "category": "NO_PATTERN",
+          "highlight": null,
+          "pattern_type": "NO_PATTERN"
+        },
+        {
+          "member_label": "Laxmipur",
+          "category": "NO_PATTERN",
+          "highlight": null,
+          "pattern_type": "NO_PATTERN"
+        }
+      ],
+      "summary": "Across nearly all gp_name values (18/20), Activity Approved has the lowest overspend_vs_plan among status_label values. Exception: Boipariguda (no clear pattern); Laxmipur (no clear pattern)"
+    },
+    {
+      "rank": 9,
+      "view": "view2",
+      "view_title": "Geo-Month Cash Cube",
+      "view_rank": 3,
+      "is_seed": false,
+      "global_score": 0.117457,
+      "within_view_score": 0.487712,
+      "conciseness": 0.487712,
+      "impact": 1.0,
+      "pattern_type": "SEASONALITY",
+      "extending_strategy": "breakdown",
+      "extending_dimension": "temporal_grain",
+      "breakdown": "(varies)",
+      "measure": "payment_count",
+      "base_subspace": [],
+      "hdp_size": 3,
+      "commonness_sets": [
+        {
+          "highlight": "('PERIOD_12',)",
+          "pattern_type": "SEASONALITY",
+          "members": [
+            "month",
+            "quarter"
+          ],
+          "count": 2,
+          "proportion": 0.6667
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "fiscal_year",
+          "category": "NO_PATTERN",
+          "highlight": null,
+          "pattern_type": "NO_PATTERN"
+        }
+      ],
+      "summary": "Across most temporal_grain values (2/3), payment_count shows seasonal pattern (PERIOD_12) over (varies). Exception: fiscal_year (no clear pattern)"
+    },
+    {
+      "rank": 10,
+      "view": "view1",
+      "view_title": "Activity Lifecycle",
+      "view_rank": 6,
+      "is_seed": false,
+      "global_score": 0.109204,
+      "within_view_score": 0.738354,
+      "conciseness": 0.738354,
+      "impact": 1.0,
+      "pattern_type": "ATTRIBUTION",
+      "extending_strategy": "subspace",
+      "extending_dimension": "gp_name",
+      "breakdown": "status_label",
+      "measure": "gen_amount",
+      "base_subspace": [
+        [
+          "is_costless",
+          "Costed"
+        ]
+      ],
+      "hdp_size": 20,
+      "commonness_sets": [
+        {
+          "highlight": "('WORK ONGOING',)",
+          "pattern_type": "ATTRIBUTION",
+          "members": [
+            "Andhrua",
+            "Bandhpali",
+            "Barimunda",
+            "Bhatigaon",
+            "Bheden",
+            "Biswamathpur",
+            "Chikilli",
+            "Dadhapatna",
+            "Dutimendi",
+            "Govindapur",
+            "Haldikudar",
+            "Hirlipali",
+            "Itipur",
+            "Kalimela",
+            "Kalyansinghpur",
+            "Karuabahal",
+            "Mendarajpur",
+            "Sharagada"
+          ],
+          "count": 18,
+          "proportion": 0.9
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "Boipariguda",
+          "category": "NO_PATTERN",
+          "highlight": null,
+          "pattern_type": "NO_PATTERN"
+        },
+        {
+          "member_label": "Laxmipur",
+          "category": "NO_PATTERN",
+          "highlight": null,
+          "pattern_type": "NO_PATTERN"
+        }
+      ],
+      "summary": "Across nearly all gp_name values (18/20), WORK ONGOING accounts for the majority of gen_amount among status_label values. Exception: Boipariguda (no clear pattern); Laxmipur (no clear pattern)"
+    },
+    {
+      "rank": 11,
+      "view": "view2",
+      "view_title": "Geo-Month Cash Cube",
+      "view_rank": 4,
+      "is_seed": false,
+      "global_score": 0.099839,
+      "within_view_score": 0.487712,
+      "conciseness": 0.487712,
+      "impact": 1.0,
+      "pattern_type": "TREND",
+      "extending_strategy": "subspace",
+      "extending_dimension": "district_name",
+      "breakdown": "quarter",
+      "measure": "activity_linked_expenditure",
+      "base_subspace": [],
+      "hdp_size": 9,
+      "commonness_sets": [
+        {
+          "highlight": "('INCREASING',)",
+          "pattern_type": "TREND",
+          "members": [
+            "Khordha",
+            "Ganjam",
+            "Kandhamal",
+            "Sundargarh",
+            "Malkangiri",
+            "Rayagada"
+          ],
+          "count": 6,
+          "proportion": 0.6667
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "Bargarh",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        },
+        {
+          "member_label": "Koraput",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        },
+        {
+          "member_label": "Cuttack",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        }
+      ],
+      "summary": "Across most district_name values (6/9), activity_linked_expenditure is increasing over quarter. Exception: Bargarh (different pattern); Koraput (different pattern); Cuttack (different pattern)"
+    },
+    {
+      "rank": 12,
+      "view": "view1",
+      "view_title": "Activity Lifecycle",
+      "view_rank": 7,
+      "is_seed": false,
+      "global_score": 0.092823,
+      "within_view_score": 0.738354,
+      "conciseness": 0.738354,
+      "impact": 1.0,
+      "pattern_type": "OUTSTANDING_1",
+      "extending_strategy": "subspace",
+      "extending_dimension": "gp_name",
+      "breakdown": "status_label",
+      "measure": "beneficiaries_expected",
+      "base_subspace": [],
+      "hdp_size": 20,
+      "commonness_sets": [
+        {
+          "highlight": "('Activity Approved',)",
+          "pattern_type": "OUTSTANDING_1",
+          "members": [
+            "Andhrua",
+            "Bandhpali",
+            "Barimunda",
+            "Bhatigaon",
+            "Bheden",
+            "Biswamathpur",
+            "Chikilli",
+            "Dadhapatna",
+            "Dutimendi",
+            "Govindapur",
+            "Haldikudar",
+            "Hirlipali",
+            "Itipur",
+            "Kalimela",
+            "Kalyansinghpur",
+            "Karuabahal",
+            "Mendarajpur",
+            "Sharagada"
+          ],
+          "count": 18,
+          "proportion": 0.9
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "Boipariguda",
+          "category": "NO_PATTERN",
+          "highlight": null,
+          "pattern_type": "NO_PATTERN"
+        },
+        {
+          "member_label": "Laxmipur",
+          "category": "NO_PATTERN",
+          "highlight": null,
+          "pattern_type": "NO_PATTERN"
+        }
+      ],
+      "summary": "Across nearly all gp_name values (18/20), Activity Approved has the highest beneficiaries_expected among status_label values. Exception: Boipariguda (no clear pattern); Laxmipur (no clear pattern)"
+    },
+    {
+      "rank": 13,
+      "view": "view1",
+      "view_title": "Activity Lifecycle",
+      "view_rank": 8,
+      "is_seed": false,
+      "global_score": 0.0789,
+      "within_view_score": 0.738354,
+      "conciseness": 0.738354,
+      "impact": 1.0,
+      "pattern_type": "OUTSTANDING_1",
+      "extending_strategy": "subspace",
+      "extending_dimension": "gp_name",
+      "breakdown": "theme",
+      "measure": "fund_untied_total",
+      "base_subspace": [
+        [
+          "is_costless",
+          "Costed"
+        ]
+      ],
+      "hdp_size": 20,
+      "commonness_sets": [
+        {
+          "highlight": "('Theme 6 - Self-sufficient Infrastructure in Village',)",
+          "pattern_type": "OUTSTANDING_1",
+          "members": [
+            "Andhrua",
+            "Bandhpali",
+            "Barimunda",
+            "Bhatigaon",
+            "Bheden",
+            "Biswamathpur",
+            "Chikilli",
+            "Dadhapatna",
+            "Dutimendi",
+            "Govindapur",
+            "Haldikudar",
+            "Hirlipali",
+            "Itipur",
+            "Kalyansinghpur",
+            "Karuabahal",
+            "Laxmipur",
+            "Mendarajpur",
+            "Sharagada"
+          ],
+          "count": 18,
+          "proportion": 0.9
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "Boipariguda",
+          "category": "HIGHLIGHT_CHANGE",
+          "highlight": "('Unmapped theme',)",
+          "pattern_type": "OUTSTANDING_1"
+        },
+        {
+          "member_label": "Kalimela",
+          "category": "HIGHLIGHT_CHANGE",
+          "highlight": "('Theme 4 - Water Sufficient Village',)",
+          "pattern_type": "OUTSTANDING_1"
+        }
+      ],
+      "summary": "Across nearly all gp_name values (18/20), Theme 6 - Self-sufficient Infrastructure in Village has the highest fund_untied_total among theme values. Exception: Boipariguda (Unmapped theme has the highest fund_untied_total among theme values); Kalimela (Theme 4 - Water Sufficient Village has the highest fund_untied_total among theme values)"
+    },
+    {
+      "rank": 14,
+      "view": "view1",
+      "view_title": "Activity Lifecycle",
+      "view_rank": 9,
+      "is_seed": false,
+      "global_score": 0.066363,
+      "within_view_score": 0.730632,
+      "conciseness": 0.840223,
+      "impact": 0.869569,
+      "pattern_type": "OUTSTANDING_LAST",
+      "extending_strategy": "subspace",
+      "extending_dimension": "gp_name",
+      "breakdown": "output_type_label",
+      "measure": "overspend_vs_sanction",
+      "base_subspace": [
+        [
+          "work_type_label",
+          "New/Fresh"
+        ]
+      ],
+      "hdp_size": 20,
+      "commonness_sets": [
+        {
+          "highlight": "('Code 101',)",
+          "pattern_type": "OUTSTANDING_LAST",
+          "members": [
+            "Andhrua",
+            "Bandhpali",
+            "Barimunda",
+            "Bhatigaon",
+            "Bheden",
+            "Biswamathpur",
+            "Boipariguda",
+            "Dadhapatna",
+            "Dutimendi",
+            "Govindapur",
+            "Haldikudar",
+            "Hirlipali",
+            "Itipur",
+            "Kalimela",
+            "Kalyansinghpur",
+            "Karuabahal",
+            "Laxmipur",
+            "Mendarajpur",
+            "Sharagada"
+          ],
+          "count": 19,
+          "proportion": 0.95
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "Chikilli",
+          "category": "NO_PATTERN",
+          "highlight": null,
+          "pattern_type": "NO_PATTERN"
+        }
+      ],
+      "summary": "Across nearly all gp_name values (19/20), Code 101 has the lowest overspend_vs_sanction among output_type_label values. Exception: Chikilli (no clear pattern)"
+    },
+    {
+      "rank": 15,
+      "view": "view1",
+      "view_title": "Activity Lifecycle",
+      "view_rank": 10,
+      "is_seed": false,
+      "global_score": 0.056409,
+      "within_view_score": 0.730632,
+      "conciseness": 0.840223,
+      "impact": 0.869569,
+      "pattern_type": "ATTRIBUTION",
+      "extending_strategy": "subspace",
+      "extending_dimension": "gp_name",
+      "breakdown": "output_type_label",
+      "measure": "evidence_uploads",
+      "base_subspace": [
+        [
+          "work_type_label",
+          "New/Fresh"
+        ]
+      ],
+      "hdp_size": 20,
+      "commonness_sets": [
+        {
+          "highlight": "('Code 101',)",
+          "pattern_type": "ATTRIBUTION",
+          "members": [
+            "Andhrua",
+            "Bandhpali",
+            "Barimunda",
+            "Bhatigaon",
+            "Bheden",
+            "Biswamathpur",
+            "Boipariguda",
+            "Dadhapatna",
+            "Dutimendi",
+            "Govindapur",
+            "Haldikudar",
+            "Hirlipali",
+            "Itipur",
+            "Kalimela",
+            "Kalyansinghpur",
+            "Karuabahal",
+            "Laxmipur",
+            "Mendarajpur",
+            "Sharagada"
+          ],
+          "count": 19,
+          "proportion": 0.95
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "Chikilli",
+          "category": "NO_PATTERN",
+          "highlight": null,
+          "pattern_type": "NO_PATTERN"
+        }
+      ],
+      "summary": "Across nearly all gp_name values (19/20), Code 101 accounts for the majority of evidence_uploads among output_type_label values. Exception: Chikilli (no clear pattern)"
+    },
+    {
+      "rank": 16,
+      "view": "view2",
+      "view_title": "Geo-Month Cash Cube",
+      "view_rank": 5,
+      "is_seed": false,
+      "global_score": 0.055149,
+      "within_view_score": 0.316944,
+      "conciseness": 0.316944,
+      "impact": 1.0,
+      "pattern_type": "SEASONALITY",
+      "extending_strategy": "measure",
+      "extending_dimension": "measure",
+      "breakdown": "month",
+      "measure": "(varies)",
+      "base_subspace": [],
+      "hdp_size": 9,
+      "commonness_sets": [
+        {
+          "highlight": "('PERIOD_12',)",
+          "pattern_type": "SEASONALITY",
+          "members": [
+            "payment_amount",
+            "receipt_amount",
+            "payment_count",
+            "receipt_count",
+            "payment_amount_mean",
+            "receipt_amount_mean"
+          ],
+          "count": 6,
+          "proportion": 0.6667
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "activity_linked_expenditure",
+          "category": "HIGHLIGHT_CHANGE",
+          "highlight": "('PERIOD_3',)",
+          "pattern_type": "SEASONALITY"
+        },
+        {
+          "member_label": "sanctions_count",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        },
+        {
+          "member_label": "sanctioned_amount",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        }
+      ],
+      "summary": "Across most measure values (6/9), (varies) shows seasonal pattern (PERIOD_12) over month. Exception: activity_linked_expenditure ((varies) shows seasonal pattern (PERIOD_3) over month); sanctions_count (different pattern); sanctioned_amount (different pattern)"
+    },
+    {
+      "rank": 17,
+      "view": "view1",
+      "view_title": "Activity Lifecycle",
+      "view_rank": 11,
+      "is_seed": false,
+      "global_score": 0.047319,
+      "within_view_score": 0.721057,
+      "conciseness": 0.721057,
+      "impact": 1.0,
+      "pattern_type": "LAST_TWO",
+      "extending_strategy": "subspace",
+      "extending_dimension": "activity_for_label",
+      "breakdown": "output_type_label",
+      "measure": "overspend_vs_plan",
+      "base_subspace": [],
+      "hdp_size": 4,
+      "commonness_sets": [
+        {
+          "highlight": "('Code 101', 'Code 105')",
+          "pattern_type": "LAST_TWO",
+          "members": [
+            "ALL/ General public",
+            "General",
+            "sc",
+            "st"
+          ],
+          "count": 4,
+          "proportion": 1.0
+        }
+      ],
+      "exceptions": [],
+      "summary": "Across all activity_for_label values, Code 101 and Code 105 are lowest in overspend_vs_plan among output_type_label values"
+    },
+    {
+      "rank": 18,
+      "view": "view1",
+      "view_title": "Activity Lifecycle",
+      "view_rank": 12,
+      "is_seed": false,
+      "global_score": 0.040221,
+      "within_view_score": 0.721057,
+      "conciseness": 0.721057,
+      "impact": 1.0,
+      "pattern_type": "TOP_TWO",
+      "extending_strategy": "subspace",
+      "extending_dimension": "activity_for_label",
+      "breakdown": "focus_area_name",
+      "measure": "fund_tied_total",
+      "base_subspace": [
+        [
+          "is_costless",
+          "Costed"
+        ]
+      ],
+      "hdp_size": 4,
+      "commonness_sets": [
+        {
+          "highlight": "('Drinking water', 'Sanitation')",
+          "pattern_type": "TOP_TWO",
+          "members": [
+            "ALL/ General public",
+            "General",
+            "sc",
+            "st"
+          ],
+          "count": 4,
+          "proportion": 1.0
+        }
+      ],
+      "exceptions": [],
+      "summary": "Across all activity_for_label values, Drinking water and Sanitation lead in fund_tied_total among focus_area_name values"
+    },
+    {
+      "rank": 19,
+      "view": "view1",
+      "view_title": "Activity Lifecycle",
+      "view_rank": 13,
+      "is_seed": false,
+      "global_score": 0.034188,
+      "within_view_score": 0.721057,
+      "conciseness": 0.721057,
+      "impact": 1.0,
+      "pattern_type": "OUTSTANDING_LAST",
+      "extending_strategy": "subspace",
+      "extending_dimension": "fiscal_year",
+      "breakdown": "gp_name",
+      "measure": "fund_sanctioned_total",
+      "base_subspace": [],
+      "hdp_size": 6,
+      "commonness_sets": [
+        {
+          "highlight": "('Chikilli',)",
+          "pattern_type": "OUTSTANDING_LAST",
+          "members": [
+            "2023-2024",
+            "2024-2025",
+            "2025-2026",
+            "2021-2022",
+            "2020-2021",
+            "2022-2023"
+          ],
+          "count": 6,
+          "proportion": 1.0
+        }
+      ],
+      "exceptions": [],
+      "summary": "Across all fiscal_year values, Chikilli has the lowest fund_sanctioned_total among gp_name values"
+    },
+    {
+      "rank": 20,
+      "view": "view2",
+      "view_title": "Geo-Month Cash Cube",
+      "view_rank": 6,
+      "is_seed": false,
+      "global_score": 0.029456,
+      "within_view_score": 0.199158,
+      "conciseness": 0.199158,
+      "impact": 1.0,
+      "pattern_type": "SEASONALITY",
+      "extending_strategy": "subspace",
+      "extending_dimension": "district_name",
+      "breakdown": "quarter",
+      "measure": "activity_linked_expenditure",
+      "base_subspace": [],
+      "hdp_size": 9,
+      "commonness_sets": [
+        {
+          "highlight": "('PERIOD_12',)",
+          "pattern_type": "SEASONALITY",
+          "members": [
+            "Khordha",
+            "Bargarh",
+            "Ganjam",
+            "Koraput",
+            "Cuttack"
+          ],
+          "count": 5,
+          "proportion": 0.5556
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "Sundargarh",
+          "category": "HIGHLIGHT_CHANGE",
+          "highlight": "('PERIOD_6',)",
+          "pattern_type": "SEASONALITY"
+        },
+        {
+          "member_label": "Rayagada",
+          "category": "HIGHLIGHT_CHANGE",
+          "highlight": "('PERIOD_3',)",
+          "pattern_type": "SEASONALITY"
+        },
+        {
+          "member_label": "Kandhamal",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        },
+        {
+          "member_label": "Malkangiri",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        }
+      ],
+      "summary": "Across most district_name values (5/9), activity_linked_expenditure shows seasonal pattern (PERIOD_12) over quarter. Exceptions: Sundargarh (activity_linked_expenditure shows seasonal pattern (PERIOD_6) over quarter); Rayagada (activity_linked_expenditure shows seasonal pattern (PERIOD_3) over quarter); Kandhamal (different pattern) and 1 others"
+    },
+    {
+      "rank": 21,
+      "view": "view1",
+      "view_title": "Activity Lifecycle",
+      "view_rank": 14,
+      "is_seed": false,
+      "global_score": 0.02906,
+      "within_view_score": 0.721057,
+      "conciseness": 0.721057,
+      "impact": 1.0,
+      "pattern_type": "OUTSTANDING_LAST",
+      "extending_strategy": "subspace",
+      "extending_dimension": "fiscal_year",
+      "breakdown": "tied_untied",
+      "measure": "gen_amount",
+      "base_subspace": [],
+      "hdp_size": 6,
+      "commonness_sets": [
+        {
+          "highlight": "('Other',)",
+          "pattern_type": "OUTSTANDING_LAST",
+          "members": [
+            "2023-2024",
+            "2024-2025",
+            "2025-2026",
+            "2021-2022",
+            "2020-2021",
+            "2022-2023"
+          ],
+          "count": 6,
+          "proportion": 1.0
+        }
+      ],
+      "exceptions": [],
+      "summary": "Across all fiscal_year values, Other has the lowest gen_amount among tied_untied values"
+    },
+    {
+      "rank": 22,
+      "view": "view1",
+      "view_title": "Activity Lifecycle",
+      "view_rank": 15,
+      "is_seed": false,
+      "global_score": 0.024701,
+      "within_view_score": 0.721057,
+      "conciseness": 0.721057,
+      "impact": 1.0,
+      "pattern_type": "TOP_TWO",
+      "extending_strategy": "subspace",
+      "extending_dimension": "fiscal_year",
+      "breakdown": "status_label",
+      "measure": "n_activities",
+      "base_subspace": [],
+      "hdp_size": 6,
+      "commonness_sets": [
+        {
+          "highlight": "('Activity Approved', 'WORK ONGOING')",
+          "pattern_type": "TOP_TWO",
+          "members": [
+            "2023-2024",
+            "2024-2025",
+            "2025-2026",
+            "2021-2022",
+            "2020-2021",
+            "2022-2023"
+          ],
+          "count": 6,
+          "proportion": 1.0
+        }
+      ],
+      "exceptions": [],
+      "summary": "Across all fiscal_year values, Activity Approved and WORK ONGOING lead in n_activities among status_label values"
+    },
+    {
+      "rank": 23,
+      "view": "view2",
+      "view_title": "Geo-Month Cash Cube",
+      "view_rank": 7,
+      "is_seed": false,
+      "global_score": 0.061313,
+      "within_view_score": 0.487712,
+      "conciseness": 0.487712,
+      "impact": 1.0,
+      "pattern_type": "SEASONALITY",
+      "extending_strategy": "breakdown",
+      "extending_dimension": "temporal_grain",
+      "breakdown": "(varies)",
+      "measure": "receipt_count",
+      "base_subspace": [],
+      "hdp_size": 3,
+      "commonness_sets": [
+        {
+          "highlight": "('PERIOD_12',)",
+          "pattern_type": "SEASONALITY",
+          "members": [
+            "month",
+            "quarter"
+          ],
+          "count": 2,
+          "proportion": 0.6667
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "fiscal_year",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        }
+      ],
+      "summary": "Across most temporal_grain values (2/3), receipt_count shows seasonal pattern (PERIOD_12) over (varies). Exception: fiscal_year (different pattern)"
+    },
+    {
+      "rank": 24,
+      "view": "view2",
+      "view_title": "Geo-Month Cash Cube",
+      "view_rank": 8,
+      "is_seed": false,
+      "global_score": 0.052116,
+      "within_view_score": 0.487712,
+      "conciseness": 0.487712,
+      "impact": 1.0,
+      "pattern_type": "TREND",
+      "extending_strategy": "breakdown",
+      "extending_dimension": "temporal_grain",
+      "breakdown": "(varies)",
+      "measure": "sanctions_count",
+      "base_subspace": [],
+      "hdp_size": 3,
+      "commonness_sets": [
+        {
+          "highlight": "('INCREASING',)",
+          "pattern_type": "TREND",
+          "members": [
+            "quarter",
+            "fiscal_year"
+          ],
+          "count": 2,
+          "proportion": 0.6667
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "month",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        }
+      ],
+      "summary": "Across most temporal_grain values (2/3), sanctions_count is increasing over (varies). Exception: month (different pattern)"
+    },
+    {
+      "rank": 25,
+      "view": "view3",
+      "view_title": "GP Performance",
+      "view_rank": 2,
+      "is_seed": false,
+      "global_score": 0.014372,
+      "within_view_score": 0.050726,
+      "conciseness": 0.210456,
+      "impact": 0.241026,
+      "pattern_type": "EVENNESS",
+      "extending_strategy": "measure",
+      "extending_dimension": "measure",
+      "breakdown": "gp_name",
+      "measure": "(varies)",
+      "base_subspace": [
+        [
+          "district_name",
+          "Bargarh"
+        ]
+      ],
+      "hdp_size": 18,
+      "commonness_sets": [
+        {
+          "highlight": "('EVEN',)",
+          "pattern_type": "EVENNESS",
+          "members": [
+            "n_activities",
+            "n_costless",
+            "expenditure_total",
+            "overspend_vs_plan",
+            "overspend_vs_sanction",
+            "n_admin_approvals",
+            "n_tech_approvals",
+            "n_ongoing",
+            "n_with_evidence",
+            "evidence_uploads"
+          ],
+          "count": 10,
+          "proportion": 0.5556
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "n_plans",
+          "category": "NO_PATTERN",
+          "highlight": null,
+          "pattern_type": "NO_PATTERN"
+        },
+        {
+          "member_label": "sanctioned_total",
+          "category": "NO_PATTERN",
+          "highlight": null,
+          "pattern_type": "NO_PATTERN"
+        },
+        {
+          "member_label": "n_completed",
+          "category": "NO_PATTERN",
+          "highlight": null,
+          "pattern_type": "NO_PATTERN"
+        },
+        {
+          "member_label": "n_costed",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        },
+        {
+          "member_label": "planned_cost",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        },
+        {
+          "member_label": "payment_amount",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        },
+        {
+          "member_label": "receipt_amount",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        },
+        {
+          "member_label": "n_abandoned",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        }
+      ],
+      "summary": "Across most measure values (10/18), (varies) is evenly distributed across gp_name values. Uneven only in: n_plans (not evenly spread); sanctioned_total (not evenly spread); n_completed (not evenly spread) and 5 others -- this is about how the total is spread, not about how much any one of them spends"
+    },
+    {
+      "rank": 26,
+      "view": "view2",
+      "view_title": "Geo-Month Cash Cube",
+      "view_rank": 9,
+      "is_seed": false,
+      "global_score": 0.04073,
+      "within_view_score": 0.448419,
+      "conciseness": 0.448419,
+      "impact": 1.0,
+      "pattern_type": "TREND",
+      "extending_strategy": "subspace",
+      "extending_dimension": "block_name",
+      "breakdown": "quarter",
+      "measure": "activity_linked_expenditure",
+      "base_subspace": [],
+      "hdp_size": 16,
+      "commonness_sets": [
+        {
+          "highlight": "('INCREASING',)",
+          "pattern_type": "TREND",
+          "members": [
+            "Bhubaneswar",
+            "Khallikote",
+            "Khajuripada",
+            "Lahunipara",
+            "Kalimela",
+            "Kalyansingpur",
+            "Balisankara",
+            "Laxmipur",
+            "Sheragada"
+          ],
+          "count": 9,
+          "proportion": 0.5625
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "Barpali",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        },
+        {
+          "member_label": "Bheden",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        },
+        {
+          "member_label": "Rangeilunda",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        },
+        {
+          "member_label": "Boipariguda",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        },
+        {
+          "member_label": "Baranga",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        },
+        {
+          "member_label": "Tangi Choudwar",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        },
+        {
+          "member_label": "Attabira",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        }
+      ],
+      "summary": "Across most block_name values (9/16), activity_linked_expenditure is increasing over quarter. Exceptions: Barpali (different pattern); Bheden (different pattern); Rangeilunda (different pattern) and 4 others"
+    },
+    {
+      "rank": 27,
+      "view": "view2",
+      "view_title": "Geo-Month Cash Cube",
+      "view_rank": 10,
+      "is_seed": false,
+      "global_score": 0.009296,
+      "within_view_score": 0.120408,
+      "conciseness": 0.487712,
+      "impact": 0.246884,
+      "pattern_type": "CHANGE_POINT",
+      "extending_strategy": "measure",
+      "extending_dimension": "measure",
+      "breakdown": "month",
+      "measure": "(varies)",
+      "base_subspace": [
+        [
+          "district_name",
+          "Ganjam"
+        ]
+      ],
+      "hdp_size": 9,
+      "commonness_sets": [
+        {
+          "highlight": "('2020-08',)",
+          "pattern_type": "CHANGE_POINT",
+          "members": [
+            "payment_amount",
+            "receipt_amount",
+            "payment_count",
+            "receipt_count",
+            "payment_amount_mean",
+            "receipt_amount_mean"
+          ],
+          "count": 6,
+          "proportion": 0.6667
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "activity_linked_expenditure",
+          "category": "HIGHLIGHT_CHANGE",
+          "highlight": "('2020-11',)",
+          "pattern_type": "CHANGE_POINT"
+        },
+        {
+          "member_label": "sanctions_count",
+          "category": "HIGHLIGHT_CHANGE",
+          "highlight": "('2020-10',)",
+          "pattern_type": "CHANGE_POINT"
+        },
+        {
+          "member_label": "sanctioned_amount",
+          "category": "HIGHLIGHT_CHANGE",
+          "highlight": "('2020-10',)",
+          "pattern_type": "CHANGE_POINT"
+        }
+      ],
+      "summary": "Across most measure values (6/9), (varies) has a significant shift at 2020-08 in month. Exception: activity_linked_expenditure ((varies) has a significant shift at 2020-11 in month); sanctions_count ((varies) has a significant shift at 2020-10 in month); sanctioned_amount ((varies) has a significant shift at 2020-10 in month)"
+    },
+    {
+      "rank": 28,
+      "view": "view2",
+      "view_title": "Geo-Month Cash Cube",
+      "view_rank": 11,
+      "is_seed": false,
+      "global_score": 0.007449,
+      "within_view_score": 0.113508,
+      "conciseness": 0.487712,
+      "impact": 0.232735,
+      "pattern_type": "OUTSTANDING_1",
+      "extending_strategy": "measure",
+      "extending_dimension": "measure",
+      "breakdown": "district_name",
+      "measure": "(varies)",
+      "base_subspace": [
+        [
+          "fiscal_year",
+          "2025-2026"
+        ]
+      ],
+      "hdp_size": 9,
+      "commonness_sets": [
+        {
+          "highlight": "('Ganjam',)",
+          "pattern_type": "OUTSTANDING_1",
+          "members": [
+            "payment_amount",
+            "receipt_amount",
+            "receipt_count",
+            "activity_linked_expenditure",
+            "sanctions_count",
+            "sanctioned_amount"
+          ],
+          "count": 6,
+          "proportion": 0.6667
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "payment_count",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        },
+        {
+          "member_label": "payment_amount_mean",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        },
+        {
+          "member_label": "receipt_amount_mean",
+          "category": "TYPE_CHANGE",
+          "highlight": null,
+          "pattern_type": "OTHER_PATTERN"
+        }
+      ],
+      "summary": "Across most measure values (6/9), Ganjam has the highest (varies) among district_name values. Exception: payment_count (different pattern); payment_amount_mean (different pattern); receipt_amount_mean (different pattern)"
+    },
+    {
+      "rank": 29,
+      "view": "view2",
+      "view_title": "Geo-Month Cash Cube",
+      "view_rank": 12,
+      "is_seed": false,
+      "global_score": 0.00619,
+      "within_view_score": 0.11097,
+      "conciseness": 0.487712,
+      "impact": 0.227533,
+      "pattern_type": "TREND",
+      "extending_strategy": "breakdown",
+      "extending_dimension": "temporal_grain",
+      "breakdown": "(varies)",
+      "measure": "sanctioned_amount",
+      "base_subspace": [
+        [
+          "fiscal_year",
+          "2020-2021"
+        ]
+      ],
+      "hdp_size": 3,
+      "commonness_sets": [
+        {
+          "highlight": "('INCREASING',)",
+          "pattern_type": "TREND",
+          "members": [
+            "month",
+            "quarter"
+          ],
+          "count": 2,
+          "proportion": 0.6667
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "fiscal_year",
+          "category": "NO_PATTERN",
+          "highlight": null,
+          "pattern_type": "NO_PATTERN"
+        }
+      ],
+      "summary": "Across most temporal_grain values (2/3), sanctioned_amount is increasing over (varies). Exception: fiscal_year (no clear pattern)"
+    },
+    {
+      "rank": 30,
+      "view": "view2",
+      "view_title": "Geo-Month Cash Cube",
+      "view_rank": 13,
+      "is_seed": false,
+      "global_score": 0.008558,
+      "within_view_score": 0.180497,
+      "conciseness": 0.721057,
+      "impact": 0.250322,
+      "pattern_type": "TREND",
+      "extending_strategy": "breakdown",
+      "extending_dimension": "temporal_grain",
+      "breakdown": "(varies)",
+      "measure": "activity_linked_expenditure",
+      "base_subspace": [
+        [
+          "block_name",
+          "Bhubaneswar"
+        ]
+      ],
+      "hdp_size": 3,
+      "commonness_sets": [
+        {
+          "highlight": "('INCREASING',)",
+          "pattern_type": "TREND",
+          "members": [
+            "month",
+            "quarter",
+            "fiscal_year"
+          ],
+          "count": 3,
+          "proportion": 1.0
+        }
+      ],
+      "exceptions": [],
+      "summary": "Across all temporal_grain values, activity_linked_expenditure is increasing over (varies)"
+    },
+    {
+      "rank": 31,
+      "view": "view2",
+      "view_title": "Geo-Month Cash Cube",
+      "view_rank": 14,
+      "is_seed": false,
+      "global_score": 0.003563,
+      "within_view_score": 0.088405,
+      "conciseness": 0.487712,
+      "impact": 0.181264,
+      "pattern_type": "OUTSTANDING_1",
+      "extending_strategy": "measure",
+      "extending_dimension": "measure",
+      "breakdown": "block_name",
+      "measure": "(varies)",
+      "base_subspace": [
+        [
+          "district_name",
+          "Bargarh"
+        ]
+      ],
+      "hdp_size": 9,
+      "commonness_sets": [
+        {
+          "highlight": "('Bheden',)",
+          "pattern_type": "OUTSTANDING_1",
+          "members": [
+            "payment_amount",
+            "receipt_amount",
+            "payment_count",
+            "receipt_count",
+            "payment_amount_mean",
+            "receipt_amount_mean"
+          ],
+          "count": 6,
+          "proportion": 0.6667
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "activity_linked_expenditure",
+          "category": "HIGHLIGHT_CHANGE",
+          "highlight": "('Barpali',)",
+          "pattern_type": "OUTSTANDING_1"
+        },
+        {
+          "member_label": "sanctions_count",
+          "category": "HIGHLIGHT_CHANGE",
+          "highlight": "('Barpali',)",
+          "pattern_type": "OUTSTANDING_1"
+        },
+        {
+          "member_label": "sanctioned_amount",
+          "category": "HIGHLIGHT_CHANGE",
+          "highlight": "('Barpali',)",
+          "pattern_type": "OUTSTANDING_1"
+        }
+      ],
+      "summary": "Across most measure values (6/9), Bheden has the highest (varies) among block_name values. Exception: activity_linked_expenditure (Barpali has the highest (varies) among block_name values); sanctions_count (Barpali has the highest (varies) among block_name values); sanctioned_amount (Barpali has the highest (varies) among block_name values)"
+    },
+    {
+      "rank": 32,
+      "view": "view2",
+      "view_title": "Geo-Month Cash Cube",
+      "view_rank": 15,
+      "is_seed": false,
+      "global_score": 0.002827,
+      "within_view_score": 0.082515,
+      "conciseness": 0.487712,
+      "impact": 0.169187,
+      "pattern_type": "TREND",
+      "extending_strategy": "breakdown",
+      "extending_dimension": "temporal_grain",
+      "breakdown": "(varies)",
+      "measure": "payment_amount_mean",
+      "base_subspace": [
+        [
+          "fiscal_year",
+          "2024-2025"
+        ]
+      ],
+      "hdp_size": 3,
+      "commonness_sets": [
+        {
+          "highlight": "('INCREASING',)",
+          "pattern_type": "TREND",
+          "members": [
+            "month",
+            "quarter"
+          ],
+          "count": 2,
+          "proportion": 0.6667
+        }
+      ],
+      "exceptions": [
+        {
+          "member_label": "fiscal_year",
+          "category": "NO_PATTERN",
+          "highlight": null,
+          "pattern_type": "NO_PATTERN"
+        }
+      ],
+      "summary": "Across most temporal_grain values (2/3), payment_amount_mean is increasing over (varies). Exception: fiscal_year (no clear pattern)"
+    }
+  ],
+  "highest_scoring_rejected": []
+}

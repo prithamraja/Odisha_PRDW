@@ -9,20 +9,25 @@ a feed generated from a pre-calibration candidate set is stale by construction.
 **Files in scope (you may write ONLY these):**
 `Insights/src/phase5c_global_feed.py` (paths, view registry, coverage weights —
 **never the emitted JSON structure: D16**), `Insights/src/phase5c_gamma_reports.py`
-(paths, budget-constant unification), `Insights/reports_prdw/**` and
-`Insights/metainsights/**` outputs, `handoffs/WPD3_REPORT.md`.
+(paths, budget-constant unification, AP prompt text → PR&DW),
+`Insights/src/phase2_engine.py` (**one line — the D29-authorized depth-2
+default flip in `VIEW1_CONFIG`'s sample branch, + its comment**),
+`Insights/src/phase5b_report.py` (**T0's two framing additions only: the A8
+utilization companion and the #12 earmark-elevation rule — D29**),
+`Insights/reports_prdw/**` and `Insights/metainsights/**` outputs,
+`handoffs/WPD3_REPORT.md`.
 **DO NOT TOUCH:** everything else — engine, ranking, phase5b, prose gate, pack,
 `discover_config.py` (already pinned by WP-D2), `Data/`, `Chatbot/`, `eval/`,
 `PROJECT_PLAN.md`, `.env`.
 
 **Preconditions — verify all; STOP on any failure:**
 
-- [ ] WP-D2 **workstream** gate closed: calibration session done, any
-      config iterations committed, and the candidate JSONs at
-      ⟦PENDING-WPD2: path + commit hash of the final post-calibration mining
-      run⟧ are the ones this WP feeds from.
-- [ ] ⟦PENDING-WPD2: confirmation that all three view queues DRAINED on that
-      final run — a feed built on a truncated run must not ship⟧.
+- [ ] WP-D2's workstream gate is closed (D28) and both calibration sessions
+      are recorded (D27/D29). **The candidate set this WP feeds from is the
+      fresh re-mine T0 performs at the committed default config** — never a
+      pre-existing package directory.
+- [ ] T0's re-mine must DRAIN on all three views (a feed built on a truncated
+      run must not ship) — this is T0's own done-check, hashes recorded.
 - [ ] Tree clean and committed; local-mirror execution; `.env` key present.
 - [ ] Operator's edition decision recorded below (Facts 6) — if marked
       undecided, STOP.
@@ -69,18 +74,38 @@ together (the stale-editions lesson).
 5. The gamma view registry is discovered (config + candidates + description
    present) — with WP-D2's three views it adapts by itself; verify, don't
    assume.
-6. **Editions to publish:** ⟦PENDING-WPD2/operator: generate the full 5-gamma
-   suite once for the calibration record, then publish
-   ⟦edition list, e.g. "0.5 only"⟧; whatever is published regenerates
-   together, always — never a mix of fresh and stale files⟧.
-7. **Feed handover path:** ⟦PENDING-WPD2/operator: where the frontend
-   workstream expects `global_feed.json` — coordinate with that workstream;
-   if no consumer exists yet, the contract check is against the writer's
-   documented schema only⟧.
+6. **Editions (operator decision, 2026-08-15): generate ALL FIVE gamma
+   editions (0.1 / 0.3 / 0.5 / 0.7 / 0.9), in one run, from T0's candidate
+   set.** None is designated "published" yet — the operator reviews the suite
+   and picks; that pick and every later regeneration follow the
+   all-together rule (never a mix of fresh and stale files). Label each
+   edition's header with its gamma and the shared candidate-set identity.
+7. **Feed handover path (default, operator informed):**
+   `Insights/metainsights/global_feed.json` + its markdown twin in
+   `Insights/reports_prdw/` — the repo is the handover point; the frontend
+   workstream consumes from there, and any future path change is a copy, not
+   a rework. Contract check is against the writer's documented schema (D16).
 8. Deterministic reading notes / caveats (incl. the FY 2023-24 count caveat)
    ride with findings into every edition — verify presence, same as WP-D2 T5c.
 
 ## Tasks
+
+**T0 — Depth-2 default + the two session-2 framings + the canonical re-mine
+(D29).** (a) Flip `VIEW1_CONFIG`'s **sample** branch to `max_subspace_depth=2`
+(one line + comment; the depth-1 rationale comment becomes history, pointer to
+D29). (b) **A8 utilization companion**: where a ranked finding highlights an
+overspend measure, the enrichment attaches the ratio-of-sums
+(Σ`total_expenditure` / Σ`total_cost`, and vs sanction where applicable) for
+the highlighted groups — computed downstream from the num/denom columns (the
+no-materialized-ratios rule holds; engine config untouched), with a prompt
+rule to present the story as utilization percentage, absolute in parens.
+(c) **#12 elevation**: a framing rule stating the XV FC tied-grant earmark so
+the measured deviation (97.6% vs the rule's expected share) reads as
+compliance-relevant, deterministic text, never model-authored. (d) Re-mine all
+three views at the committed config (~92 min for view1; **drain required**),
+re-rank, regenerate the executive report, re-run the config/regression/report
+gates. Record candidate hashes — this is the feed's source set.
+*Done when:* gates green on the regenerated output; hashes in the report.
 
 **T1 — Port paths + weights.** Output paths to `Insights/metainsights/` and
 `Insights/reports_prdw/`; equal view weights (Facts 2–3); registry check

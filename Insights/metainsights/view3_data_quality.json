@@ -1,0 +1,35 @@
+{
+  "displaced_findings": [],
+  "sub_support_measures": [
+    {
+      "measure": "n_abandoned",
+      "breakdown": "fiscal_year",
+      "series_examined": 46,
+      "series_below_guard": 28,
+      "nonzero_points_min": 0,
+      "nonzero_points_max": 6,
+      "guard": "at least 4 non-zero points and at least 33% of the series non-zero",
+      "measure_total_nonzero_rows": 54
+    },
+    {
+      "measure": "n_completed",
+      "breakdown": "fiscal_year",
+      "series_examined": 46,
+      "series_below_guard": 42,
+      "nonzero_points_min": 0,
+      "nonzero_points_max": 4,
+      "guard": "at least 4 non-zero points and at least 33% of the series non-zero",
+      "measure_total_nonzero_rows": 7
+    },
+    {
+      "measure": "n_costless",
+      "breakdown": "fiscal_year",
+      "series_examined": 46,
+      "series_below_guard": 46,
+      "nonzero_points_min": 3,
+      "nonzero_points_max": 3,
+      "guard": "at least 4 non-zero points and at least 33% of the series non-zero",
+      "measure_total_nonzero_rows": 60
+    }
+  ]
+}

@@ -638,6 +638,15 @@ def reading_note_block(view_name: str, findings: list | None = None) -> str:
         note = f"{note} {COUNT_CAVEAT_SENTENCE}"
     if findings and any(f.get("linkage_framing") for f in findings):
         note = f"{note} {LINKAGE_SENTENCE}"
+    # A9 (D29) -- the earmark sentence carries measured figures, so it is taken
+    # from the finding that produced them rather than written out here. The
+    # widest scope wins: an unfiltered finding's block describes the whole view,
+    # which is what a section-level note should say, and `base_subspace` length
+    # is the scope width. One sentence per section however many findings trip it.
+    earmarked = [f for f in (findings or []) if f.get("earmark_sentence")]
+    if earmarked:
+        widest = min(earmarked, key=lambda f: len(f.get("base_subspace") or []))
+        note = f"{note} {widest['earmark_sentence']}"
     for sentence in event_citations(findings or []):
         note = f"{note} {sentence}"
     return f"\n\n{READING_NOTE_MARKER} {note}\n"
@@ -1301,6 +1310,365 @@ def intensity_companion(view_name: str, breakdown: str, measure: str,
 
 
 # =============================================================================
+# STEP 2c: THE UTILIZATION COMPANION (WP-D3 A8, D29)
+# =============================================================================
+# Calibration session 2, on view1's rank-5 finding: "Activity Approved has the
+# LOWEST overspend_vs_plan among status_label values". Labelled real, with a
+# presentation change -- the operator wants the overspend story as a RATIO, not
+# as an absolute, and the reason is visible in one table:
+#
+#     status_label       overspend_vs_plan      spent of planned
+#     Activity Approved  -Rs 41.61 crore        0.3%
+#     WORK ONGOING       -Rs 4.24 crore         85.4%
+#     WORK COMPLETED     +Rs 18,797             100.8%
+#
+# As an absolute, "Activity Approved has the lowest overspend" is mostly a
+# headcount fact -- 10,108 of the 12,704 activities sit in that status, so it
+# holds the largest planned total and therefore the largest shortfall. As a
+# ratio it is the finding the officer needs: money planned against approved
+# activities is essentially unspent, while ongoing work is running at 85% and
+# the seventeen completed works closed at par. Same rows, same columns, no new
+# mining.
+#
+# WHY THIS IS A COMPANION AND NOT A MEASURE. D15's no-materialized-ratios rule
+# holds: a ratio column at activity grain cannot be rolled up (block and
+# district totals would become averages of averages), so the view carries
+# NUMERATOR and DENOMINATOR and the engine mines the SIGNED SUM DIFFERENCE. The
+# ratio is assembled HERE, downstream, from the same two columns the difference
+# is built from -- and as a RATIO OF SUMS (total spent / total planned for the
+# group), never as an average of per-activity ratios, which is the same
+# averages-of-averages error wearing a different hat. Engine config untouched.
+#
+# BASES ARE NOT MIXED. The view SQL's own warning ("MONEY BASES -- never mix
+# them silently") applies to the companion too, so each overspend measure gets
+# the ratio on ITS OWN basis: overspend_vs_plan against planned cost,
+# overspend_vs_sanction against sanctioned amount, and the sanctioned one
+# carries the coverage caveat because it is defined on the ~1-in-6 subset that
+# has a sanction record at all.
+
+# measure -> (numerator measure, denominator measure, what the denominator is).
+# Both views that carry a signed overspend measure carry the two columns behind
+# it, under their own names; keying off the measure rather than the column keeps
+# the map readable against each view's config.
+_UTILIZATION_BASIS = {
+    "view1": {
+        "overspend_vs_plan":     ("total_expenditure", "total_cost",
+                                  "planned cost"),
+        "overspend_vs_sanction": ("total_expenditure", "fund_sanctioned_total",
+                                  "sanctioned amount"),
+    },
+    "view3": {
+        "overspend_vs_plan":     ("expenditure_total", "planned_cost",
+                                  "planned cost"),
+        # NO SANCTIONED ENTRY FOR view3, AND IT IS A GRAIN PROBLEM RATHER THAN A
+        # NULL ONE. view1 is at activity grain, so restricting to the rows that
+        # HAVE a sanction record leaves a numerator and a denominator describing
+        # the same activities. view3 is at Gram-Panchayat x fiscal-year grain: a
+        # cell rolls up sanctioned and unsanctioned activities together, and
+        # `expenditure_total` cannot be narrowed to the sanctioned ones after the
+        # fact. The ratio would put ALL of a cell's spending over only its
+        # RECORDED sanctions and read ~10 points high -- measured on this drop,
+        # FY 2020-21 gives 87.9% that way against a real sanctioned-basis figure
+        # computed at activity grain. That is the silent base mix the view SQL's
+        # own money-bases warning is about, so the figure is not offered at all.
+        # The plan basis is sound at this grain: every activity has a plan, and a
+        # costless activity is planned at zero rather than unrecorded.
+    },
+}
+
+# The sanctioned basis describes the approval subset only, and a utilization
+# percentage is exactly the figure a reader would otherwise generalise.
+_SANCTION_BASIS_CAVEAT = (
+    " This is the sanctioned basis, so it describes only the activities that "
+    "have a sanction record on file (about one in six); it is not a "
+    "programme-wide utilisation rate."
+)
+
+
+def utilization_companion(view_name: str, breakdown: str, measure: str,
+                          base_subspace, groups=None) -> dict | None:
+    """Spend as a share of what was planned (or sanctioned), per group.
+
+    Returns None where the finding is not about a signed overspend measure, or
+    where the view cannot supply both sides of the ratio.
+
+    `groups` is the group labels the writer can actually quote -- the finding's
+    own top values and its highlighted members. A group whose denominator is
+    zero or negative is REPORTED AS SUCH rather than dropped silently: "spent
+    against no planned cost on file" is a real state in this drop (costless
+    activities) and a percentage there would be meaningless or infinite.
+    """
+    basis = _UTILIZATION_BASIS.get(view_name, {}).get(measure)
+    if basis is None:
+        return None
+    num_measure, den_measure, den_words = basis
+
+    config = VIEW_CONFIGS.get(view_name)
+    if config is None or breakdown == "(varies)":
+        return None
+    # NOT OFFERED ON A TIME AXIS, and the reason is timing rather than nulls.
+    # `fiscal_year` is the PLAN year: the year the activity was planned in. A
+    # voucher paid against that activity can be written in any later year, and
+    # `total_expenditure` carries it whenever it was written. So a ratio of the
+    # two by fiscal year reads as "this year's utilisation" while actually
+    # measuring "spending recorded against this plan-year's plans, whenever it
+    # happened" -- for the most recent plan year that reads as catastrophic
+    # under-spending and for the oldest as near-completion, both as artefacts of
+    # where the window ends. `fiscal_year` is named as well as the config's
+    # temporal dimensions because view1 classifies it as CATEGORICAL (D22 routes
+    # temporal mining to view2 only), so the config alone would block it on
+    # view3 and let it through on view1 -- the same axis, two answers.
+    if breakdown == "fiscal_year" or breakdown in config.temporal_dimensions:
+        return None
+
+    df = _view_df(view_name)
+    num_col = config.get_column(num_measure)
+    den_col = config.get_column(den_measure)
+    if any(c not in df.columns for c in (num_col, den_col, breakdown)):
+        return None
+
+    if isinstance(base_subspace, list):
+        for dim_val in base_subspace:
+            dim, val = dim_val[0], dim_val[1]
+            if dim != breakdown and dim in df.columns:
+                df = df[df[dim] == val]
+    if len(df) == 0:
+        return None
+
+    # The sanctioned basis is defined on the rows that HAVE a sanction record.
+    # view1 leaves fund_sanctioned_total null off that subset deliberately (the
+    # view SQL says absence of a record is not a sanction of zero), so the
+    # restriction is the measure's own definition, not a filter of our own.
+    if den_measure in ("fund_sanctioned_total", "sanctioned_total"):
+        df = df[df[den_col].notna()]
+        if len(df) == 0:
+            return None
+
+    agg = df.groupby(breakdown)[[num_col, den_col]].sum()
+    if len(agg) == 0:
+        return None
+
+    wanted = [str(g) for g in groups] if groups else [
+        str(g) for g in agg[den_col].sort_values(ascending=False).head(5).index
+    ]
+
+    values, absolutes = {}, {}
+    for label, row in agg.iterrows():
+        key = str(label)
+        if key not in wanted:
+            continue
+        num, den = float(row[num_col]), float(row[den_col])
+        absolutes[key] = (
+            f"{format_measure(view_name, num_measure, num)} spent of "
+            f"{format_measure(view_name, den_measure, den)} {den_words}"
+        )
+        values[key] = (
+            f"{_num(num / den * 100, 1)}%" if den > 0
+            else f"no {den_words} on file"
+        )
+    if not values:
+        return None
+
+    what = (
+        f"the same money as {measure}, read as a share instead of a difference: "
+        f"how much of each group's {den_words} was actually spent"
+    )
+    return {
+        "basis": den_words,
+        "what_this_is": what + (
+            _SANCTION_BASIS_CAVEAT if den_measure in
+            ("fund_sanctioned_total", "sanctioned_total") else ""
+        ),
+        "how_computed": (
+            f"ratio of sums - the group's total {num_measure} divided by its "
+            f"total {den_measure}. It is NOT an average of per-row ratios and "
+            "the percentages do not add up to anything"
+        ),
+        "utilization_pct": values,
+        "absolutes": absolutes,
+    }
+
+
+# The prose rule for the block above, defined ONCE and interpolated into both
+# prompt paths (this file's build_view_prompt and phase5c_gamma_reports') for the
+# same reason POPULATION_SHARE_RULE is: two copies of a rule about the same stats
+# key drift, and a rule naming a key the enrichment does not emit is worse than
+# no rule at all.
+UTILIZATION_RULE = """2d. AN OVERSPEND OR UNDERSPEND IS A SHARE BEFORE IT IS AN AMOUNT. Where a finding carries 'stats.utilization_companion', the same money is also available as the share of each group's planned (or sanctioned) total that was actually spent.
+   - LEAD WITH THE PERCENTAGE from 'utilization_pct' and put the amount in parentheses after it. Correct: "Money planned against approved-but-not-started activities is 0.3% spent (Rs 14.00 lakh of Rs 41.75 crore)." Wrong: "Approved activities show the largest underspend at Rs 41.61 crore" -- true, and it is mostly a statement about how many activities sit in that status
+   - Copy both figures verbatim, the percentage from 'utilization_pct' and the amount from 'absolutes'. Do not compute a percentage of your own and do not convert the amount
+   - 'how_computed' says these are ratios of sums. They therefore do not add up across groups, and no group's share can be subtracted from another's. Never total them, never average them, and never say a group is "X% behind" another
+   - Where 'basis' is the sanctioned amount, say so in the sentence -- it covers only the activities with a sanction record on file, and 'what_this_is' gives you the wording
+   - Where a group's entry reads "no planned cost on file", that is money spent against activities planned at no cost. Write it as that, never as an infinite or undefined rate, and never as a percentage"""
+
+
+# =============================================================================
+# STEP 2d: THE XV FC TIED-GRANT EARMARK (WP-D3 A9 / D29 -- the #12 elevation)
+# =============================================================================
+# The SME catch of calibration session 2. The engine found "Drinking water and
+# Sanitation lead in fund_tied_total among focus_area_name values" and ranked it
+# twelfth, which is where a TOP_TWO finding about the obvious belongs -- unless
+# you know that the tied grant is earmarked BY RULE, in which case those two
+# focus areas are not merely leading, they are supposed to be the whole of it.
+# The operator knew. The engine cannot: no column in this drop states the
+# earmark, so nothing in the ranking could have promoted the finding, and read
+# as an ordinary league table it says nothing at all.
+#
+# So the RULE is stated here and the DEVIATION is measured here, and the two
+# together are handed to the writer as fixed text. Measured on this drop, over
+# the whole view: 97.6% of the Rs 17.66 crore of tied grant sits on Sanitation
+# and Drinking water, and Rs 42.61 lakh sits on other focus areas. That
+# residue is what the operator asked to have elevated rather than footnoted.
+#
+# WHY NOT A SUPPRESSION OR A RANKING RULE. D28's framing-over-suppression
+# ruling, confirmed by the operator on 2026-08-15, applies in the other
+# direction too: the fix for a finding whose importance the ranking cannot see
+# is to frame it, not to hand-promote it. The finding keeps its rank; what
+# changes is that the section cannot now report it as a league table.
+#
+# WHY THE FIGURES ARE MEASURED AND NOT WRITTEN OUT. Every figure in this file
+# comes off the parquet the findings came from (STEP 0), and this one has to
+# survive a statewide data swap without an edit. The 97.6% below is not a
+# constant; it is what this drop happens to say.
+#
+# WHAT IT MUST NOT SAY. It is a POTENTIAL compliance finding and it is written
+# as one. The department decides which focus areas it treats as falling inside
+# the two earmarked purposes -- the water half of the XV FC tied grant covers
+# rainwater harvesting and water recycling as well as supply, so a focus area
+# such as Water Conservation may well be within it -- and the analysis cannot
+# make that call. The residue is therefore itemised by focus area and put to
+# the officer as a question, never as a verdict.
+
+EARMARK_MEASURE = "fund_tied_total"
+EARMARK_VIEWS = ("view1",)
+EARMARK_DIMENSION = "focus_area_name"
+
+# The two purposes the XV FC tied grant is earmarked for, as `focus_area_name`
+# spells them in this drop. A value not present here is counted as residue and
+# NAMED, so a renaming statewide shows up as a bigger residue with the new name
+# in it rather than as a silently wrong percentage.
+EARMARK_PURPOSES = ("Sanitation", "Drinking water")
+
+EARMARK_RULE_TEXT = (
+    "THE RULE: the XV Finance Commission's grant to rural local bodies is paid "
+    "in two parts, and the TIED part is earmarked -- one half for sanitation "
+    "and maintenance of open-defecation-free status, the other for drinking "
+    "water supply, rainwater harvesting and water recycling. Tied grant money "
+    "on any other purpose is a deviation from the earmark. Every rupee of tied "
+    "grant in this data that carries a scheme name carries this one."
+)
+
+
+def earmark_deviation(view_name: str, base_subspace) -> dict | None:
+    """The tied grant's earmarked share, and the residue itemised by purpose.
+
+    Returns None where the view cannot answer the question. The scope is
+    narrowed by whatever base-subspace filters the view carries, so a finding
+    inside one fiscal year gets that year's figures and not the view's.
+    """
+    if view_name not in EARMARK_VIEWS:
+        return None
+    config = VIEW_CONFIGS.get(view_name)
+    if config is None:
+        return None
+
+    df = _view_df(view_name)
+    column = config.get_column(EARMARK_MEASURE)
+    if column not in df.columns or EARMARK_DIMENSION not in df.columns:
+        return None
+
+    scope = []
+    if isinstance(base_subspace, list):
+        for dim_val in base_subspace:
+            dim, val = dim_val[0], dim_val[1]
+            if dim in df.columns:
+                df = df[df[dim] == val]
+                scope.append(str(val))
+    if len(df) == 0:
+        return None
+
+    by_purpose = df.groupby(EARMARK_DIMENSION)[column].sum()
+    total = float(by_purpose.sum())
+    if total <= 0:
+        return None
+
+    earmarked = float(sum(
+        by_purpose.get(p, 0.0) for p in EARMARK_PURPOSES
+    ))
+    residue = {
+        str(k): format_measure(view_name, EARMARK_MEASURE, float(v))
+        for k, v in by_purpose.sort_values(ascending=False).items()
+        if str(k) not in EARMARK_PURPOSES and float(v) > 0
+    }
+
+    # A share that ROUNDS to 100.0% while a residue exists would contradict the
+    # residue figure printed next to it, and this is the one finding in the file
+    # where that contradiction is expensive. Add decimals until the two agree.
+    share, decimals = earmarked / total * 100, 1
+    while decimals < 4 and total - earmarked > 0 and _num(share, decimals) == _num(100.0, decimals):
+        decimals += 1
+
+    return {
+        "rule": EARMARK_RULE_TEXT,
+        "scope": (" and ".join(scope) + " only") if scope else "the whole view",
+        "tied_grant_total": format_measure(view_name, EARMARK_MEASURE, total),
+        "on_the_two_earmarked_purposes": f"{_num(share, decimals)}%",
+        "amount_on_earmarked_purposes": format_measure(
+            view_name, EARMARK_MEASURE, earmarked),
+        "amount_outside_them": format_measure(
+            view_name, EARMARK_MEASURE, total - earmarked),
+        "outside_them_by_purpose": residue,
+        "how_to_write_it": (
+            "This is the finding, not a league table. Lead with the earmarked "
+            "share and the amount that sits outside it, state the rule in one "
+            "clause so the reader knows why the residue matters, and name the "
+            "focus areas the residue sits on from 'outside_them_by_purpose'. Do "
+            "NOT write it as 'drinking water and sanitation lead' -- under the "
+            "earmark they are supposed to be the whole of it, so a lead is not "
+            "news and the residue is. Do NOT declare a breach, a diversion, a "
+            "misuse or a violation: the department decides which focus areas it "
+            "treats as inside the two earmarked purposes, and the water half of "
+            "the earmark covers rainwater harvesting and recycling as well as "
+            "supply. Close on the operational question -- which sanction "
+            "records put tied grant on these focus areas, and under which head "
+            "were they approved. The section already carries a fixed sentence "
+            "with these figures; do not write your own version of it."
+        ),
+    }
+
+
+def earmark_sentence(block: dict) -> str:
+    """The deterministic reading-note sentence for the earmark, from the same
+    measured block the writer was handed -- so the note and the prose cannot
+    disagree about the figures."""
+    residue = block["outside_them_by_purpose"]
+    named = ", ".join(f"{k} ({v})" for k, v in residue.items())
+    return (
+        "On the tied grant specifically: the XV Finance Commission's tied grant "
+        "is earmarked for sanitation and for drinking water, and "
+        f"**{block['on_the_two_earmarked_purposes']}** of the "
+        f"**{block['tied_grant_total']}** of tied grant in this data sits on "
+        f"those two focus areas. **{block['amount_outside_them']}** sits "
+        f"outside them"
+        + (f" -- {named}" if named else "")
+        + ". Whether those purposes fall inside the earmark is for the "
+        "department to say; this analysis reports the split and does not "
+        "establish a breach."
+    )
+
+
+# The prose rule for the block above. Interpolated into both prompt paths for the
+# same reason as 2b-2d.
+EARMARK_PROMPT_RULE = """2e. THE TIED GRANT IS EARMARKED BY RULE. Where a finding carries 'stats.earmark_framing', it is about the XV Finance Commission tied grant, and 'rule' in that block states the earmark the money is subject to. The block is measured off this data and is the finding's real subject.
+   - MANDATORY COVERAGE. A finding carrying this block MUST appear in your text. It is not one of the findings you may leave out, group away or summarise into a clause, whatever position it holds in the ranking and whatever else you choose to cover. If you are grouping findings thematically, it gets its own headline or its own paragraph. A reader who finishes this section without knowing the earmarked share and the amount outside it has not been told the most consequential thing in the data
+   - This is a COMPLIANCE-RELEVANT finding and it must be reported as one, not as a ranking. Read 'how_to_write_it' in the block and follow it
+   - Lead with 'on_the_two_earmarked_purposes' and 'amount_outside_them', both copied verbatim, and name the focus areas in 'outside_them_by_purpose' with their amounts
+   - State the earmark in one clause so the reader knows why a residue matters at all. Take it from 'rule'; do not paraphrase it into your own words and do not add parts of the rule that are not there
+   - Never write a breach, a diversion, a misuse, a violation or an irregularity. The department decides which purposes fall inside the earmark. Put the residue to the officer as a question about which sanctions carry it and under which head they were approved
+   - The section already carries a fixed sentence with these figures. Do not write your own version of it, and do not write a methodology note about it"""
+
+
+# =============================================================================
 # STEP 2: ENRICH CANDIDATES WITH QUANTITATIVE STATS
 # =============================================================================
 
@@ -1336,13 +1704,13 @@ def _measures_involved(finding: dict) -> set:
 
 
 def _mark_framing_rules(view_name: str, c: dict, config: ViewConfig) -> None:
-    """A3 and A6: the two deterministic framing rules, keyed to the finding.
+    """A3, A6 and A9: the deterministic framing rules, keyed to the finding.
 
-    Both are set on the finding AND handed to the writer inside its stats, and
-    both have a fixed sentence in the section's reading note. The writer is
-    told not to write its own version of either, for the reason every caveat
-    in this file is deterministic: a paraphrase of a caveat is where the damage
-    is done.
+    Each is set on the finding AND handed to the writer inside its stats, and
+    each has a fixed sentence in the section's reading note. The writer is
+    told not to write its own version of any of them, for the reason every
+    caveat in this file is deterministic: a paraphrase of a caveat is where the
+    damage is done.
     """
     stats = c.get("stats") if isinstance(c.get("stats"), dict) else None
 
@@ -1364,6 +1732,21 @@ def _mark_framing_rules(view_name: str, c: dict, config: ViewConfig) -> None:
     c["evenness_framing"] = evenness
     if evenness and stats is not None:
         stats["evenness_framing"] = EVENNESS_FOR_PROMPT
+
+    # A9 (D29) -- the XV FC tied-grant earmark, on any finding about the tied
+    # grant. Not gated on the breakdown: the earmark is a fact about the money,
+    # so a finding about tied grant by Gram Panchayat needs the same context as
+    # the one about tied grant by focus area. The measured block is what makes
+    # the deviation visible; without it the earmark is an assertion.
+    earmark = EARMARK_MEASURE in _measures_involved(c)
+    c["earmark_framing"] = False
+    if earmark:
+        block = earmark_deviation(view_name, c.get("base_subspace"))
+        if block is not None:
+            c["earmark_framing"] = True
+            c["earmark_sentence"] = earmark_sentence(block)
+            if stats is not None:
+                stats["earmark_framing"] = block
 
 
 _TEMPORAL_PATTERN_TYPES = frozenset({
@@ -1411,6 +1794,17 @@ def enrich_candidates_with_stats(
                         view_name, breakdown, member, base_subspace)
                     if companion:
                         c["stats"].setdefault("intensity_companion", companion)
+                        break
+                # ... and the same for the utilization ratio (A8). A
+                # measure-extending HDP whose members include a signed overspend
+                # measure is making a claim about that money on this breakdown,
+                # and the ratio is the honest reading of it whether or not the
+                # aggregation across members can be stated.
+                for member in sorted(_measures_involved(c)):
+                    util = utilization_companion(
+                        view_name, breakdown, member, base_subspace)
+                    if util:
+                        c["stats"].setdefault("utilization_companion", util)
                         break
             _mark_count_caveat(view_name, c)
             _mark_framing_rules(view_name, c, config)
@@ -1505,6 +1899,23 @@ def enrich_candidates_with_stats(
                         highlight_vals[k] = entry
                 if highlight_vals:
                     stats["highlight_values"] = highlight_vals
+
+        # A8 (D29): the utilization ratio behind a signed overspend total. Placed
+        # here rather than with the other companions because it is scoped to the
+        # groups the writer can actually quote — the top values, the bottom
+        # values and the highlighted members. An OUTSTANDING_LAST finding
+        # highlights the group at the BOTTOM of `dist`, which is exactly the one
+        # whose ratio matters ("Activity Approved has the lowest overspend" is
+        # 0.3% utilisation), so the bottom values are not optional here.
+        util_groups = (
+            {str(k) for k in dist.head(5).index}
+            | {str(k) for k in dist.tail(2).index}
+            | set(stats.get("highlight_values", {}))
+        )
+        util = utilization_companion(
+            view_name, breakdown, measure, base_subspace, groups=util_groups)
+        if util:
+            stats["utilization_companion"] = util
 
         # For AVG measures, the sample size behind each average — the base a
         # rate has to be read against (see the view5 thin-cell note).
@@ -1602,6 +2013,10 @@ Write a clear, readable summary of these findings for the programme officer. Fol
    - Where 'rows_behind_each_average' is given, it is the number of records behind each average. If it is small, say so when you quote the average
 
 {POPULATION_SHARE_RULE}
+
+{UTILIZATION_RULE}
+
+{EARMARK_PROMPT_RULE}
 
 3. LANGUAGE:
    - Write in English. Use plain English, no jargon
@@ -1701,11 +2116,11 @@ An officer of the Department of Panchayati Raj & Drinking Water who takes these 
 
 Each analytical area was mined separately, and each was ranked against its own totals. The findings below are the top of a single combined ordering across all of them, so that what a reader meets first is not decided by which area a finding happened to come from.
 
-The combined ordering weights each area by how much of the programme it covers, listed here:
+The combined ordering applies one weight per area, listed here:
 
 {json.dumps(weighting['weights'], indent=2)}
 
-That weighting is a judgement, not a measurement. You do not need to explain it and you must not defend it; if it is worth a sentence, say only that the areas were combined in proportion to how much of the programme each covers.
+{_feed_weighting_sentence(weighting)}
 
 ## The top findings across the programme
 
@@ -1738,6 +2153,43 @@ Write 350-550 words. Rules:
 
 8. FORMATTING: ### for any sub-headers. No bold except for a Gram Panchayat, block or district name that is an exception. Plain prose otherwise.
 """
+
+
+def _feed_weighting_sentence(weighting: dict) -> str:
+    """What the opening section may say about the cross-view weights.
+
+    WP-D3 DISCLOSURE — this is an out-of-allowlist edit to this file, and the
+    reason is that the sentence it replaces became FALSE when D24 was ratified.
+    It read: "the areas were combined in proportion to how much of the programme
+    each covers". PR&DW's weights are EQUAL, because every area covers every
+    Gram Panchayat by construction and coverage therefore cannot distinguish
+    them (phase5c_global_feed's compute_coverage_weights carries the argument).
+    A model told the areas were weighted by coverage will write that they were,
+    and the report's opening section would then contradict the two feed
+    artefacts sitting beside it — while the WP-D3 gate requires the
+    equal-weight choice to be printed honestly in the artefacts.
+    Branching rather than rewording so the sentence stays correct if a future
+    deployment gives the views genuinely different weights.
+    """
+    values = set(weighting.get("weights", {}).values())
+    if len(values) == 1:
+        return (
+            "Those weights are EQUAL, and that is a deliberate editorial choice, "
+            "not an oversight: every area covers every Gram Panchayat in this "
+            "data, so no area speaks for more of the programme than another. The "
+            "ordering below is therefore decided by each finding's own strength "
+            "and its own position within its area. You do not need to explain "
+            "this and you must not defend it. If it is worth a sentence, say "
+            "only that no area was given more weight than another. Never write "
+            "that the areas were weighted by size, by coverage, by spending or "
+            "by importance."
+        )
+    return (
+        "That weighting is a judgement, not a measurement. You do not need to "
+        "explain it and you must not defend it; if it is worth a sentence, say "
+        "only that the areas were combined in proportion to how much of the "
+        "programme each covers."
+    )
 
 
 def _require_content(response, what: str) -> str:

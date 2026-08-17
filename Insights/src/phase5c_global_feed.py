@@ -2,21 +2,24 @@
 # Phase 5c: the cross-view global feed (top-50)
 # =============================================================================
 # Phase 5 ranks WITHIN a view. The Discover surface in the frontend is a single
-# flat feed, so something has to decide what the front page shows across all
-# eight views. This script does that, and it is NOT an engine change: it reads
+# flat feed, so something has to decide what the front page shows across all the
+# views (nine in the AP deployment this design was written for, three in PR&DW —
+# `VIEWS` below is the registry). This script does that, and it is NOT an engine
+# change: it reads
 # the candidates phase 4b already produced and phase 5 already scores, and
 # re-orders them. Detection, scoring and the per-view rankings are untouched.
 #
 # Inputs:
-#   metainsights/view{1-9}_candidates.json
-#   rtgs_csv/*.csv                    (for the coverage weights only)
+#   metainsights/view{N}_ranked.json      (the pool; see build_pool)
+#   metainsights/view{N}_candidates.json  (for the raw count in the header only)
+#   views_prdw/*.parquet                  (for the measured GP coverage figure)
 #
 # Outputs:
-#   metainsights/global_feed.json
-#   reports_rtgs/global_feed.md
+#   metainsights/global_feed.json         <- the frontend contract (D16)
+#   reports_prdw/global_feed.md           <- its readable twin
 #
-# Run from the Metainsights_anomalies directory:
-#   python src/phase5c_global_feed.py
+# Run from the repo root:
+#   python Insights/src/phase5c_global_feed.py
 #
 # -----------------------------------------------------------------------------
 # WHY RAW SCORES CANNOT BE POOLED
@@ -64,7 +67,12 @@
 # They are stated in the output header of both artefacts so a reader can
 # disagree with them.
 #
-# WHICH WEIGHT, AND WHY NOT RUPEES. The iteration-3 spec offered benefit rupees
+# WHICH WEIGHT, AND WHY NOT RUPEES — AP's answer, SUPERSEDED FOR PR&DW by D24
+# (equal weights; the reasoning is at compute_coverage_weights below). Kept
+# because the frontend contract this file emits is the AP one (D16) and the
+# `reach`/`weights` block it prints exists because of the argument below.
+#
+# The iteration-3 spec offered benefit rupees
 # or farmer count. This implementation uses FARMER COUNT: the number of distinct
 # PM-KISAN roster farmers each view's source rows can say something about, as a
 # share of the sum across views. Rupees were rejected for a structural reason,
@@ -104,33 +112,58 @@ import json
 import os
 import sys
 
-import duckdb
-
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+import pandas as pd  # noqa: E402
 
 from phase2_engine import MetaInsightCandidate, load_candidates  # noqa: E402
 from phase5_ranking import (  # noqa: E402
     compute_overlap_ratio, generate_nl_summary,
 )
+# The view configs, from the engine that owns them — the same import phase5b_report
+# makes, so a parquet path is written down in exactly one place. Deliberately NOT
+# imported from phase5b_report: that module loads `.env` and the OpenAI client at
+# import time, and this file makes no API call and needs no key.
+from phase4a_engine import VIEW1_CONFIG, VIEW2_CONFIG, VIEW3_CONFIG  # noqa: E402
+
+VIEW_CONFIGS = {
+    "view1": VIEW1_CONFIG, "view2": VIEW2_CONFIG, "view3": VIEW3_CONFIG,
+}
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CSV_DIR = os.path.join(BASE_DIR, "rtgs_csv")
 
 # =============================================================================
-# WP-D2 NOTE — THIS FILE IS NOT RUNNABLE ON PR&DW YET, AND THAT IS DELIBERATE
+# WP-D3 NOTE — WHAT WAS PORTED, AND WHAT WAS DELIBERATELY NOT
 # =============================================================================
-# WP-D2 updated the two view registries below to the three Odisha PR&DW views
-# and emptied LINEAGE, because AP lineage applied to PR&DW columns would be
-# wrong rather than merely absent. Everything else here is still the AP
-# deployment's: FARMER_REACH_SQL weights each view by how many PM-KISAN roster
-# farmers it can speak about, over CSVs in `rtgs_csv/` that this deployment does
-# not have. PR&DW has no beneficiary identity anywhere in its drop (mapping doc
-# §4.4), so its coverage weighting has to be designed, not translated — which
-# view weight is honest when the units are Gram Panchayats, activities and
-# rupees is a WP-D3 decision, and D16 forbids WP-D2 changing the feed's shape.
-# Until WP-D3 makes that call, `compute_coverage_weights()` raises on the
-# missing CSVs and no global feed is produced. phase5b_report then writes the
-# per-view sections only, which is its documented no-feed path.
+# WP-D2 left this file deliberately unrunnable: it had updated the two view
+# registries below to the three Odisha PR&DW views and emptied LINEAGE, but the
+# coverage weighting was still the AP deployment's — FARMER_REACH_SQL weighting
+# each view by how many PM-KISAN roster farmers it could speak about, over CSVs
+# in `rtgs_csv/` that this deployment does not have. PR&DW carries no
+# beneficiary identity anywhere in its drop (mapping doc §4.4), so the weighting
+# had to be designed rather than translated, and D16 forbade WP-D2 touching the
+# shape to do it.
+#
+# WP-D3 makes that call, ratified as D24: THE WEIGHTS ARE EQUAL. The reasoning
+# is in compute_coverage_weights() below. Three consequences here:
+#
+#   1. FARMER_REACH_SQL and the `rtgs_csv/` dependency are GONE, not ported. The
+#      AP queries counted roster Aadhaars; there is no such column and no such
+#      file in this deployment, and a weight nothing can compute is worse than
+#      one stated plainly. `duckdb` was imported for those queries only and goes
+#      with them — this file now reads nothing but the ranked candidate JSONs.
+#   2. The `reach` figure the weights were derived from is kept and is now the
+#      GP coverage each view has: all three cover all 20 sample Gram Panchayats
+#      by construction (the zero-fill design rule), which is exactly why the
+#      weights are equal. It stays in the JSON and in both artefact headers
+#      because a reader has to be able to check the arithmetic and disagree.
+#   3. Output paths move to this deployment's: `Insights/metainsights/` for the
+#      JSON and `Insights/reports_prdw/` for the markdown twin (Facts 7).
+#
+# THE EMITTED JSON STRUCTURE IS UNCHANGED (D16). Every key the AP writer emitted
+# is emitted here, with the same nesting and the same types; only the values and
+# the descriptive strings inside them are PR&DW's. The frontend is the AP
+# frontend ported, so its parser is the contract and no key may move.
 VIEWS = ["view1", "view2", "view3"]
 
 VIEW_TITLES = {
@@ -138,6 +171,17 @@ VIEW_TITLES = {
     "view2": "Geo-Month Cash Cube",
     "view3": "GP Performance",
 }
+
+# Where each view's rows live, read off the engine's own configs rather than
+# spelled out again — the coverage figure printed in both artefacts has to come
+# from the same parquet the findings came from, and there must be exactly one
+# place a parquet path is written down.
+VIEW_PARQUET = {v: c.parquet_path for v, c in VIEW_CONFIGS.items()}
+
+# The geography key every PR&DW view carries. The LGD code, not the name: it is
+# the identifier the government roster assigns and the one the frontend contract
+# needs, and two Gram Panchayats may share a name.
+GP_KEY = "gp_lgd_code"
 
 TOP_K = 50
 
@@ -149,45 +193,40 @@ RANK_DECAY = 0.85    # global_score = view_weight x score x RANK_DECAY^(rank-1)
 SEEDS_PER_VIEW = 1   # each view's best finding is guaranteed a slot
 
 # -----------------------------------------------------------------------------
-# Coverage weights — how many roster farmers each view can speak about.
+# Coverage weights — EQUAL for PR&DW (D24).
 # -----------------------------------------------------------------------------
-# One query per view over the STAGED SOURCE CSVs, not over the view parquet:
-# the views deliberately drop Aadhaar, so the farmer identity a coverage weight
-# needs only exists upstream. Each query returns a set of roster Aadhaars; the
-# weight is |set| / sum of all nine |set|s. view7 is an intersection and view8
-# a khata join, which is why this is a declared query per view rather than a
-# row count.
+# The AP deployment weighted each view by the number of distinct PM-KISAN roster
+# farmers its source rows could speak about, as a share of the sum across views.
+# That weight did real editorial work there: nine views over seven programme
+# files reached genuinely different populations, spanning 2.6x, and the land
+# records reached farmers no money column could see.
 #
-# ITERATION 5 — view9 reads the whole roster: its cells are built from every
-# roster farmer's benefit rows, so its reach is the roster itself, as view2's
-# and view5's are. A ninth view necessarily dilutes every other weight; the
-# table is printed in both artefacts so the shift is visible, not silent.
-FARMER_REACH_SQL = {
-    "view1": """SELECT DISTINCT aadhaar FROM (
-                  SELECT aadhaar_no AS aadhaar FROM pm_kisan
-                  UNION SELECT aadharno FROM agriculture
-                  UNION SELECT EXTN_AADHARNO FROM horticulture_apmip
-                  UNION SELECT aadhar_no FROM fisheries
-                  UNION SELECT aadhaar_no FROM sericulture
-                  UNION SELECT AADHAAR_NO FROM markfed
-                  UNION SELECT Aadhar_no FROM ryss)
-                WHERE aadhaar IN (SELECT aadhaar_no FROM pm_kisan)""",
-    "view2": "SELECT DISTINCT aadhaar_no FROM pm_kisan",
-    "view3": """SELECT DISTINCT aadharno FROM agriculture
-                WHERE aadharno IN (SELECT aadhaar_no FROM pm_kisan)""",
-    "view4": """SELECT DISTINCT AADHAAR_NO FROM markfed
-                WHERE AADHAAR_NO IN (SELECT aadhaar_no FROM pm_kisan)""",
-    "view5": "SELECT DISTINCT aadhaar_no FROM pm_kisan",
-    "view6": """SELECT DISTINCT EXTN_AADHARNO FROM horticulture_apmip
-                WHERE EXTN_AADHARNO IN (SELECT aadhaar_no FROM pm_kisan)""",
-    "view7": """SELECT DISTINCT aadharno FROM agriculture
-                WHERE aadharno IN (SELECT AADHAAR_NO FROM markfed)
-                  AND aadharno IN (SELECT aadhaar_no FROM pm_kisan)""",
-    "view8": """SELECT DISTINCT p.aadhaar_no FROM pm_kisan p
-                JOIN survey_land_records s
-                  ON CAST(s.khata_no AS VARCHAR) = CAST(p.khata_no AS VARCHAR)""",
-    "view9": "SELECT DISTINCT aadhaar_no FROM pm_kisan",
-}
+# PR&DW has no such spread and no such column. Every one of the three views
+# covers EVERY Gram Panchayat in the drop by construction — the zero-fill design
+# rule (D15) puts a row in for a Gram Panchayat that planned nothing, wrote no
+# voucher and spent nothing, so a GP absent from a view is not possible. There
+# is no beneficiary identity anywhere in the drop (mapping doc §4.4), so there
+# is nothing finer than a Gram Panchayat to count. Population coverage therefore
+# CANNOT distinguish these three views: any honest count of it returns the same
+# number three times, and equality is that answer stated rather than dressed up.
+#
+# The alternatives were considered and rejected for the same reason AP rejected
+# rupees. Row count would weight view1 (12,704 activity rows) at 88x view3 (120
+# GP-year rows) — a statement about grain, not about coverage. Rupees would
+# weight the cashbook view above the performance view, which reads the same money
+# at a different grain. Both would let an arithmetic accident order the front
+# page, which is precisely what the seed-and-decay mechanism exists to prevent.
+#
+# WHAT STILL DOES THE EDITORIAL WORK: seed-one-per-view (every view's best
+# finding on the page by construction) and RANK_DECAY (a view spends its weight
+# on its best findings first). With equal weights the ordering is decided by
+# within-view score and within-view rank, which is the judgement phase5 already
+# made and the only judgement in this pipeline that was calibrated against an
+# SME. That is the honest outcome, not a degraded one.
+#
+# THE WEIGHTS STAY PRINTED, in the JSON header and in the markdown header, as
+# the AP design requires: they are an editorial choice and a reader must be able
+# to disagree with them.
 
 # -----------------------------------------------------------------------------
 # Lineage — which SOURCE column a view column ultimately came from.
@@ -223,24 +262,152 @@ def _lineage(view: str, column: str) -> str:
 
 
 # =============================================================================
+# STEP 0: THE SOURCE-SET IDENTITY (WP-D3 T3)
+# =============================================================================
+# The stale-editions lesson, made mechanical. A feed and a gamma edition are two
+# renderings of ONE mined run, and the failure mode is not that either is wrong
+# — it is that they were rendered from different runs and nothing on either file
+# says so. The AP deployment shipped a suite where two editions disagreed and it
+# took a re-read of every mining log to work out which was stale.
+#
+# So every artefact this WP publishes carries the same two things in its header:
+# a RUN STAMP and a CANDIDATE-SET ID. The ID is a hash over the hashes of the
+# candidate files the artefacts were built from, so two files carrying the same
+# ID were provably built from the same mined output, and a file carrying a
+# different one is stale on sight.
+#
+# The stamp is read from `DISCOVER_RUN_STAMP` when set, the same
+# environment-switch idiom as DISCOVER_SCALE, because the gamma suite and the
+# feed are two processes and a per-process clock would give them two different
+# stamps for one run. Set it once and export it for both:
+#
+#     export DISCOVER_RUN_STAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+#     python Insights/src/phase5c_gamma_reports.py
+#     python Insights/src/phase5c_global_feed.py
+#
+# Unset, it falls back to this process's own UTC clock, which is right for a
+# one-artefact run and wrong for a suite; the header says which it was.
+#
+# WHY THIS IS NOT IN THE FEED JSON. D16 freezes the emitted JSON structure
+# field-by-field, and the frontend parser is the contract. The identity
+# therefore goes in the markdown twin's header, in every gamma edition's header,
+# and in a SIDECAR file beside the JSON (`global_feed_source_set.json`) — a new
+# file rather than a new key, so machine-readable provenance exists without a
+# shape change. Adding a `provenance` block to the contract itself is an
+# operator decision and is flagged as one in the WP report.
+
+SOURCE_SET_SIDECAR = "global_feed_source_set.json"
+
+
+def run_stamp() -> tuple[str, bool]:
+    """(UTC stamp, was it supplied). See the STEP 0 note on why it is shared."""
+    supplied = os.environ.get("DISCOVER_RUN_STAMP")
+    if supplied:
+        return supplied, True
+    import datetime
+    return (datetime.datetime.now(datetime.timezone.utc)
+            .strftime("%Y-%m-%dT%H:%M:%SZ"), False)
+
+
+def _sha256(path: str) -> str:
+    import hashlib
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def source_set_identity() -> dict:
+    """Every candidate file the published artefacts read, with its hash.
+
+    Covers BOTH families: `view{N}_candidates.json`, which the gamma suite
+    re-scores, and `view{N}_ranked.json`, which the feed pools. An artefact built
+    from one but not the other is still built from this run, and the ID has to
+    say so, so both are hashed and both go into it.
+    """
+    import hashlib
+
+    files = {}
+    for view in VIEWS:
+        for kind in ("candidates", "ranked"):
+            name = f"{view}_{kind}.json"
+            path = os.path.join(BASE_DIR, "metainsights", name)
+            if os.path.exists(path):
+                files[name] = {
+                    "sha256": _sha256(path),
+                    "bytes": os.path.getsize(path),
+                }
+
+    # The ID is over the (name, hash) pairs in sorted order, so it does not
+    # depend on filesystem order and a missing file changes it rather than being
+    # quietly skipped.
+    digest = hashlib.sha256()
+    for name in sorted(files):
+        digest.update(f"{name}:{files[name]['sha256']}\n".encode())
+
+    stamp, supplied = run_stamp()
+    return {
+        "candidate_set_id": digest.hexdigest()[:16],
+        "generated_at": stamp,
+        "stamp_source": "DISCOVER_RUN_STAMP" if supplied else "this process's clock",
+        "files": files,
+    }
+
+
+def identity_header_line(identity: dict) -> str:
+    """The one line every published artefact carries, so a stale file is
+    visible without opening a log."""
+    return (
+        f"*Generated {identity['generated_at']} from candidate set "
+        f"`{identity['candidate_set_id']}` "
+        f"({len(identity['files'])} candidate files).*"
+    )
+
+
+# =============================================================================
 # STEP 1: coverage weights
 # =============================================================================
 
 def compute_coverage_weights() -> tuple[dict, dict]:
-    con = duckdb.connect()
-    for name in ("pm_kisan", "agriculture", "horticulture_apmip", "fisheries",
-                 "sericulture", "markfed", "ryss", "survey_land_records"):
-        path = os.path.join(CSV_DIR, f"{name}.csv").replace("\\", "/")
-        con.execute(
-            f"CREATE VIEW {name} AS SELECT * FROM "
-            f"read_csv('{path}', all_varchar=true, header=true)"
-        )
+    """(reach, weights) — the GP coverage of each view, and the equal weights.
+
+    `reach` is read off the view parquet the findings themselves came from, not
+    asserted: it is the number of distinct Gram Panchayats each view holds a row
+    for. The zero-fill rule makes it the same number for all three, and that
+    measured equality is the whole argument for the equal weights — so it is
+    MEASURED, and a future drop where it stops being true will say so here
+    instead of silently keeping weights that no longer follow from anything.
+
+    Shape note (D16): the return is the AP function's return, both dicts keyed by
+    view name, so `write_outputs` and the JSON header are untouched.
+    """
+    import pandas as pd
 
     reach = {}
-    for view, sql in FARMER_REACH_SQL.items():
-        reach[view] = con.execute(f"SELECT count(*) FROM ({sql})").fetchone()[0]
-    total = sum(reach.values())
-    weights = {v: reach[v] / total for v in reach}
+    for view in VIEWS:
+        parquet = VIEW_PARQUET[view]
+        if not os.path.exists(parquet):
+            raise SystemExit(
+                f"{parquet} is missing — build the views before the feed. The "
+                "coverage figure printed in both artefacts is measured off the "
+                "same parquet the findings came from, never assumed."
+            )
+        df = pd.read_parquet(parquet, columns=[GP_KEY])
+        reach[view] = int(df[GP_KEY].nunique())
+
+    n = len(VIEWS)
+    weights = {v: 1.0 / n for v in VIEWS}
+
+    distinct = set(reach.values())
+    if len(distinct) > 1:
+        print(
+            "  NOTE: the three views no longer cover the same number of Gram "
+            f"Panchayats ({reach}). The equal weights are D24's ruling and are "
+            "unchanged, but the argument for them — coverage cannot distinguish "
+            "these views — no longer follows from the data. Take it back to the "
+            "operator before publishing this feed."
+        )
     return reach, weights
 
 
@@ -276,7 +443,7 @@ def build_pool(weights: dict) -> tuple[list, dict]:
     """Load every view's RANKED findings, weight them, dedup by lineage keeping
     the highest global score of each lineage.
 
-    The pool is the eight ranked top-15 lists, not the eight raw candidate
+    The pool is the views' ranked top-15 lists, not their raw candidate
     files. A raw candidate that phase5 did not rank was already judged
     redundant or unimportant WITHIN its own view, by the engine's own criteria,
     and promoting it here would overrule that judgement using nothing but a
@@ -543,7 +710,7 @@ def _row_dict(rank: int, item: dict, seed_ids: set) -> dict:
 
 
 def write_outputs(selected: list, seeds: list, rejected: list, reach: dict,
-                  weights: dict, stats: dict) -> list:
+                  weights: dict, stats: dict, identity: dict) -> list:
     seed_ids = {id(x) for x in seeds}
     rows = [_row_dict(i, item, seed_ids) for i, item in enumerate(selected, 1)]
 
@@ -552,8 +719,11 @@ def write_outputs(selected: list, seeds: list, rejected: list, reach: dict,
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump({
             "weighting": {
-                "basis": "distinct PM-KISAN roster farmers each view's source "
-                         "rows cover, as a share of the sum across views",
+                "basis": "EQUAL across views (D24). Every view covers every "
+                         "Gram Panchayat in the drop by construction, so "
+                         "population coverage cannot distinguish them; `reach` "
+                         "is the distinct Gram Panchayats each view holds rows "
+                         "for, measured, and it is the same for all three",
                 "formula": "global_score = view_weight x within_view_score x "
                            f"{RANK_DECAY}^(view_rank - 1); each view's best "
                            "finding is seeded unconditionally",
@@ -573,8 +743,33 @@ def write_outputs(selected: list, seeds: list, rejected: list, reach: dict,
         }, f, indent=2, default=str)
     print(f"\nGlobal feed JSON -> {json_path}")
 
+    # The provenance sidecar. A NEW FILE, not a new key: the JSON above is the
+    # frozen frontend contract (D16) and nothing may be added to it, but a
+    # consumer still has to be able to check that the feed and the gamma edition
+    # beside it came from one mined run. See the STEP 0 note.
+    sidecar_path = os.path.join(BASE_DIR, "metainsights", SOURCE_SET_SIDECAR)
+    with open(sidecar_path, "w", encoding="utf-8") as f:
+        json.dump({
+            "what_this_is": (
+                "provenance for global_feed.json and for the gamma editions "
+                "generated in the same run. It is a sidecar and not a block "
+                "inside the feed because the feed's JSON structure is a frozen "
+                "frontend contract (D16); adding a key to it is an operator "
+                "decision, not an implementation one."
+            ),
+            "artefacts": [
+                "metainsights/global_feed.json",
+                "reports_prdw/global_feed.md",
+                "reports_prdw/gamma_{0.1,0.3,0.5,0.7,0.9}_report.md",
+            ],
+            **identity,
+        }, f, indent=2)
+    print(f"Source-set sidecar -> {sidecar_path}")
+
     lines = [
         "# Top findings across the programme",
+        "",
+        identity_header_line(identity),
         "",
         f"The {len(VIEWS)} analytical views are ranked internally, each against "
         "its own total. This table is the cross-view feed: one ordering of "
@@ -588,7 +783,7 @@ def write_outputs(selected: list, seeds: list, rejected: list, reach: dict,
         f"**Every area's best finding is on this page by construction.** The "
         f"top finding from each of the {len(VIEWS)} areas is seeded into the "
         f"list unconditionally, so no question family can be dropped just "
-        f"because its area covers fewer farmers than another.",
+        f"because another area happened to score higher.",
         "",
         "**The remaining places are filled by**",
         "",
@@ -608,7 +803,7 @@ def write_outputs(selected: list, seeds: list, rejected: list, reach: dict,
         "findings that both describe the whole programme are not saying the "
         "same thing, they are simply both unfiltered.",
         "",
-        "| view | | farmers covered | weight |",
+        "| view | | Gram Panchayats covered | weight |",
         "|---|---|---:|---:|",
     ]
     for v in VIEWS:
@@ -616,11 +811,19 @@ def write_outputs(selected: list, seeds: list, rejected: list, reach: dict,
                      f"{weights.get(v, 0):.4f} |")
     lines += [
         "",
-        f"Coverage is counted as distinct PM-KISAN roster farmers the view's "
-        f"source rows cover. Benefit rupees were the alternative and were not "
-        f"used: the land records carry no money column, so a rupee weight would "
-        f"hold an entire view at effectively zero and its findings could never "
-        f"reach this page whatever they were.",
+        f"**The weights are equal, and that is a decision.** Coverage is counted "
+        f"as the distinct Gram Panchayats each area holds rows for, and it is the "
+        f"same {reach.get(VIEWS[0], 0):,} for all {len(VIEWS)} of them: a Gram "
+        f"Panchayat that planned nothing, wrote no voucher and spent nothing is "
+        f"still present in every area as a row of zeros, so no area covers more "
+        f"of the state than another. Two alternatives were rejected. Weighting by "
+        f"row count would put the activity area at 88 times the performance area, "
+        f"which is a statement about how finely each one is cut and not about how "
+        f"much of the programme it speaks for. Weighting by rupees would rank the "
+        f"cashbook above the areas that read the same money at a different grain. "
+        f"With equal weights the ordering below is decided by each finding's own "
+        f"score and its own position in its area — the judgements the analysis "
+        f"actually made.",
         "",
         f"Knobs, fixed in the specification and not adjusted after the fact: "
         f"rank decay **{RANK_DECAY}**, seeds per area **{SEEDS_PER_VIEW}**.",
@@ -648,7 +851,7 @@ def write_outputs(selected: list, seeds: list, rejected: list, reach: dict,
             f"{r['pattern_type']} | {r['global_score']:.4f} |"
         )
 
-    md_path = os.path.join(BASE_DIR, "reports_rtgs", "global_feed.md")
+    md_path = os.path.join(BASE_DIR, "reports_prdw", "global_feed.md")
     os.makedirs(os.path.dirname(md_path), exist_ok=True)
     with open(md_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
@@ -661,10 +864,21 @@ def main() -> int:
     print("PHASE 5c — CROSS-VIEW GLOBAL FEED")
     print("=" * 70)
 
+    identity = source_set_identity()
+    if not identity["files"]:
+        raise SystemExit(
+            f"No candidate files in {os.path.join(BASE_DIR, 'metainsights')} — "
+            "mine and rank before building the feed."
+        )
+    print(f"\nCandidate set {identity['candidate_set_id']}, stamped "
+          f"{identity['generated_at']} (from {identity['stamp_source']}):")
+    for name in sorted(identity["files"]):
+        print(f"  {name}  {identity['files'][name]['sha256'][:16]}")
+
     reach, weights = compute_coverage_weights()
-    print("\nCoverage weights (distinct roster farmers per view):")
+    print("\nCoverage weights — EQUAL (D24); coverage measured, not assumed:")
     for v in VIEWS:
-        print(f"  {v}: {reach[v]:>5,} farmers  ->  weight {weights[v]:.4f}")
+        print(f"  {v}: {reach[v]:>5,} Gram Panchayats  ->  weight {weights[v]:.4f}")
 
     print("\nPooling candidates:")
     pool, stats = build_pool(weights)
@@ -680,7 +894,8 @@ def main() -> int:
     print(f"  {len(seeds)} seeds + {len(selected) - len(seeds)} filled "
           f"= {len(selected)} of a top-{TOP_K}")
 
-    rows = write_outputs(selected, seeds, rejected, reach, weights, stats)
+    rows = write_outputs(selected, seeds, rejected, reach, weights, stats,
+                         identity)
 
     if rejected:
         print("\nHighest-scoring candidates NOT selected "

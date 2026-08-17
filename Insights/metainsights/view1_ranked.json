@@ -1,0 +1,735 @@
+[
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "asset_category_label",
+    "pattern_type": "EVENNESS",
+    "breakdown": "block_name",
+    "measure": "overspend_vs_plan",
+    "base_subspace": [
+      [
+        "is_costless",
+        "Costed"
+      ]
+    ],
+    "hdp_size": 28,
+    "commonness_sets": [
+      {
+        "highlight": "('EVEN',)",
+        "pattern_type": "EVENNESS",
+        "members": [
+          "Uncategorised",
+          "Buildings",
+          "Recreational Facilities",
+          "Drinking water supply structure",
+          "Water Sources & Structures",
+          "Roads, Bridges & Culverts",
+          "Community Sanitation",
+          "Plastic Waste Management",
+          "Solid Waste Management",
+          "Sanitation & Sewerage Facilities",
+          "Liquid Waste Management",
+          "Household Sanitation",
+          "Movable Sanitation Asset",
+          "Faecal Sludge Management",
+          "Education Facilities",
+          "Office Equipment",
+          "Medical & Health Facilities",
+          "Land",
+          "Irrigation Sources",
+          "Computers and peripherals",
+          "Electrification",
+          "Drinking water supply equipment",
+          "Pond & Reservoir",
+          "Other Public/Social",
+          "Electrical Installation and Equipment",
+          "Medical Supplies",
+          "Grey water management"
+        ],
+        "count": 27,
+        "proportion": 0.9643
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "Banking Facilities",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.876002,
+    "impact": 1.0,
+    "score": 0.876002,
+    "impact_measure_used": "total_cost"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "asset_category_label",
+    "pattern_type": "EVENNESS",
+    "breakdown": "district_name",
+    "measure": "overspend_vs_sanction",
+    "base_subspace": [],
+    "hdp_size": 28,
+    "commonness_sets": [
+      {
+        "highlight": "('EVEN',)",
+        "pattern_type": "EVENNESS",
+        "members": [
+          "Uncategorised",
+          "Buildings",
+          "Recreational Facilities",
+          "Drinking water supply structure",
+          "Water Sources & Structures",
+          "Roads, Bridges & Culverts",
+          "Community Sanitation",
+          "Plastic Waste Management",
+          "Solid Waste Management",
+          "Sanitation & Sewerage Facilities",
+          "Liquid Waste Management",
+          "Household Sanitation",
+          "Movable Sanitation Asset",
+          "Faecal Sludge Management",
+          "Education Facilities",
+          "Office Equipment",
+          "Medical & Health Facilities",
+          "Land",
+          "Irrigation Sources",
+          "Computers and peripherals",
+          "Electrification",
+          "Drinking water supply equipment",
+          "Pond & Reservoir",
+          "Other Public/Social",
+          "Electrical Installation and Equipment",
+          "Medical Supplies",
+          "Grey water management"
+        ],
+        "count": 27,
+        "proportion": 0.9643
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "Banking Facilities",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.876002,
+    "impact": 1.0,
+    "score": 0.876002,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "gp_name",
+    "pattern_type": "TOP_TWO",
+    "breakdown": "output_type_label",
+    "measure": "fund_untied_total",
+    "base_subspace": [
+      [
+        "activity_type_label",
+        "Public Works"
+      ]
+    ],
+    "hdp_size": 20,
+    "commonness_sets": [
+      {
+        "highlight": "('Code 101', 'Code 105')",
+        "pattern_type": "TOP_TWO",
+        "members": [
+          "Andhrua",
+          "Bandhpali",
+          "Barimunda",
+          "Bhatigaon",
+          "Bheden",
+          "Biswamathpur",
+          "Boipariguda",
+          "Chikilli",
+          "Dadhapatna",
+          "Dutimendi",
+          "Govindapur",
+          "Hirlipali",
+          "Itipur",
+          "Kalimela",
+          "Kalyansinghpur",
+          "Karuabahal",
+          "Laxmipur",
+          "Mendarajpur",
+          "Sharagada"
+        ],
+        "count": 19,
+        "proportion": 0.95
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "Haldikudar",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.840223,
+    "impact": 0.955098,
+    "score": 0.802496,
+    "impact_measure_used": "total_cost"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "gp_name",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "asset_category_label",
+    "measure": "n_activities",
+    "base_subspace": [
+      [
+        "activity_type_label",
+        "Public Works"
+      ]
+    ],
+    "hdp_size": 20,
+    "commonness_sets": [
+      {
+        "highlight": "('Uncategorised',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "Andhrua",
+          "Bandhpali",
+          "Barimunda",
+          "Bhatigaon",
+          "Bheden",
+          "Biswamathpur",
+          "Boipariguda",
+          "Chikilli",
+          "Dadhapatna",
+          "Dutimendi",
+          "Haldikudar",
+          "Hirlipali",
+          "Itipur",
+          "Kalimela",
+          "Kalyansinghpur",
+          "Karuabahal",
+          "Laxmipur",
+          "Mendarajpur",
+          "Sharagada"
+        ],
+        "count": 19,
+        "proportion": 0.95
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "Govindapur",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.840223,
+    "impact": 0.955098,
+    "score": 0.802496,
+    "impact_measure_used": "total_cost"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "gp_name",
+    "pattern_type": "OUTSTANDING_LAST",
+    "breakdown": "status_label",
+    "measure": "overspend_vs_plan",
+    "base_subspace": [
+      [
+        "is_costless",
+        "Costed"
+      ]
+    ],
+    "hdp_size": 20,
+    "commonness_sets": [
+      {
+        "highlight": "('Activity Approved',)",
+        "pattern_type": "OUTSTANDING_LAST",
+        "members": [
+          "Andhrua",
+          "Bandhpali",
+          "Barimunda",
+          "Bhatigaon",
+          "Bheden",
+          "Biswamathpur",
+          "Chikilli",
+          "Dadhapatna",
+          "Dutimendi",
+          "Govindapur",
+          "Haldikudar",
+          "Hirlipali",
+          "Itipur",
+          "Kalimela",
+          "Kalyansinghpur",
+          "Karuabahal",
+          "Mendarajpur",
+          "Sharagada"
+        ],
+        "count": 18,
+        "proportion": 0.9
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "Boipariguda",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "Laxmipur",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.738354,
+    "impact": 1.0,
+    "score": 0.738354,
+    "impact_measure_used": "total_cost"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "gp_name",
+    "pattern_type": "ATTRIBUTION",
+    "breakdown": "status_label",
+    "measure": "gen_amount",
+    "base_subspace": [
+      [
+        "is_costless",
+        "Costed"
+      ]
+    ],
+    "hdp_size": 20,
+    "commonness_sets": [
+      {
+        "highlight": "('WORK ONGOING',)",
+        "pattern_type": "ATTRIBUTION",
+        "members": [
+          "Andhrua",
+          "Bandhpali",
+          "Barimunda",
+          "Bhatigaon",
+          "Bheden",
+          "Biswamathpur",
+          "Chikilli",
+          "Dadhapatna",
+          "Dutimendi",
+          "Govindapur",
+          "Haldikudar",
+          "Hirlipali",
+          "Itipur",
+          "Kalimela",
+          "Kalyansinghpur",
+          "Karuabahal",
+          "Mendarajpur",
+          "Sharagada"
+        ],
+        "count": 18,
+        "proportion": 0.9
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "Boipariguda",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "Laxmipur",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.738354,
+    "impact": 1.0,
+    "score": 0.738354,
+    "impact_measure_used": "total_cost",
+    "merged_twins": [
+      "OUTSTANDING_1"
+    ]
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "gp_name",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "status_label",
+    "measure": "beneficiaries_expected",
+    "base_subspace": [],
+    "hdp_size": 20,
+    "commonness_sets": [
+      {
+        "highlight": "('Activity Approved',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "Andhrua",
+          "Bandhpali",
+          "Barimunda",
+          "Bhatigaon",
+          "Bheden",
+          "Biswamathpur",
+          "Chikilli",
+          "Dadhapatna",
+          "Dutimendi",
+          "Govindapur",
+          "Haldikudar",
+          "Hirlipali",
+          "Itipur",
+          "Kalimela",
+          "Kalyansinghpur",
+          "Karuabahal",
+          "Mendarajpur",
+          "Sharagada"
+        ],
+        "count": 18,
+        "proportion": 0.9
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "Boipariguda",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "Laxmipur",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.738354,
+    "impact": 1.0,
+    "score": 0.738354,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "gp_name",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "theme",
+    "measure": "fund_untied_total",
+    "base_subspace": [
+      [
+        "is_costless",
+        "Costed"
+      ]
+    ],
+    "hdp_size": 20,
+    "commonness_sets": [
+      {
+        "highlight": "('Theme 6 - Self-sufficient Infrastructure in Village',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "Andhrua",
+          "Bandhpali",
+          "Barimunda",
+          "Bhatigaon",
+          "Bheden",
+          "Biswamathpur",
+          "Chikilli",
+          "Dadhapatna",
+          "Dutimendi",
+          "Govindapur",
+          "Haldikudar",
+          "Hirlipali",
+          "Itipur",
+          "Kalyansinghpur",
+          "Karuabahal",
+          "Laxmipur",
+          "Mendarajpur",
+          "Sharagada"
+        ],
+        "count": 18,
+        "proportion": 0.9
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "Boipariguda",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('Unmapped theme',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "Kalimela",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('Theme 4 - Water Sufficient Village',)",
+        "pattern_type": "OUTSTANDING_1"
+      }
+    ],
+    "conciseness": 0.738354,
+    "impact": 1.0,
+    "score": 0.738354,
+    "impact_measure_used": "total_cost"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "gp_name",
+    "pattern_type": "OUTSTANDING_LAST",
+    "breakdown": "output_type_label",
+    "measure": "overspend_vs_sanction",
+    "base_subspace": [
+      [
+        "work_type_label",
+        "New/Fresh"
+      ]
+    ],
+    "hdp_size": 20,
+    "commonness_sets": [
+      {
+        "highlight": "('Code 101',)",
+        "pattern_type": "OUTSTANDING_LAST",
+        "members": [
+          "Andhrua",
+          "Bandhpali",
+          "Barimunda",
+          "Bhatigaon",
+          "Bheden",
+          "Biswamathpur",
+          "Boipariguda",
+          "Dadhapatna",
+          "Dutimendi",
+          "Govindapur",
+          "Haldikudar",
+          "Hirlipali",
+          "Itipur",
+          "Kalimela",
+          "Kalyansinghpur",
+          "Karuabahal",
+          "Laxmipur",
+          "Mendarajpur",
+          "Sharagada"
+        ],
+        "count": 19,
+        "proportion": 0.95
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "Chikilli",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.840223,
+    "impact": 0.869569,
+    "score": 0.730632,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "gp_name",
+    "pattern_type": "ATTRIBUTION",
+    "breakdown": "output_type_label",
+    "measure": "evidence_uploads",
+    "base_subspace": [
+      [
+        "work_type_label",
+        "New/Fresh"
+      ]
+    ],
+    "hdp_size": 20,
+    "commonness_sets": [
+      {
+        "highlight": "('Code 101',)",
+        "pattern_type": "ATTRIBUTION",
+        "members": [
+          "Andhrua",
+          "Bandhpali",
+          "Barimunda",
+          "Bhatigaon",
+          "Bheden",
+          "Biswamathpur",
+          "Boipariguda",
+          "Dadhapatna",
+          "Dutimendi",
+          "Govindapur",
+          "Haldikudar",
+          "Hirlipali",
+          "Itipur",
+          "Kalimela",
+          "Kalyansinghpur",
+          "Karuabahal",
+          "Laxmipur",
+          "Mendarajpur",
+          "Sharagada"
+        ],
+        "count": 19,
+        "proportion": 0.95
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "Chikilli",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.840223,
+    "impact": 0.869569,
+    "score": 0.730632,
+    "impact_measure_used": "n_activities",
+    "merged_twins": [
+      "OUTSTANDING_1"
+    ]
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "activity_for_label",
+    "pattern_type": "LAST_TWO",
+    "breakdown": "output_type_label",
+    "measure": "overspend_vs_plan",
+    "base_subspace": [],
+    "hdp_size": 4,
+    "commonness_sets": [
+      {
+        "highlight": "('Code 101', 'Code 105')",
+        "pattern_type": "LAST_TWO",
+        "members": [
+          "ALL/ General public",
+          "General",
+          "sc",
+          "st"
+        ],
+        "count": 4,
+        "proportion": 1.0
+      }
+    ],
+    "exceptions": [],
+    "conciseness": 0.721057,
+    "impact": 1.0,
+    "score": 0.721057,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "activity_for_label",
+    "pattern_type": "TOP_TWO",
+    "breakdown": "focus_area_name",
+    "measure": "fund_tied_total",
+    "base_subspace": [
+      [
+        "is_costless",
+        "Costed"
+      ]
+    ],
+    "hdp_size": 4,
+    "commonness_sets": [
+      {
+        "highlight": "('Drinking water', 'Sanitation')",
+        "pattern_type": "TOP_TWO",
+        "members": [
+          "ALL/ General public",
+          "General",
+          "sc",
+          "st"
+        ],
+        "count": 4,
+        "proportion": 1.0
+      }
+    ],
+    "exceptions": [],
+    "conciseness": 0.721057,
+    "impact": 1.0,
+    "score": 0.721057,
+    "impact_measure_used": "total_cost"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "fiscal_year",
+    "pattern_type": "OUTSTANDING_LAST",
+    "breakdown": "gp_name",
+    "measure": "fund_sanctioned_total",
+    "base_subspace": [],
+    "hdp_size": 6,
+    "commonness_sets": [
+      {
+        "highlight": "('Chikilli',)",
+        "pattern_type": "OUTSTANDING_LAST",
+        "members": [
+          "2023-2024",
+          "2024-2025",
+          "2025-2026",
+          "2021-2022",
+          "2020-2021",
+          "2022-2023"
+        ],
+        "count": 6,
+        "proportion": 1.0
+      }
+    ],
+    "exceptions": [],
+    "conciseness": 0.721057,
+    "impact": 1.0,
+    "score": 0.721057,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "fiscal_year",
+    "pattern_type": "OUTSTANDING_LAST",
+    "breakdown": "tied_untied",
+    "measure": "gen_amount",
+    "base_subspace": [],
+    "hdp_size": 6,
+    "commonness_sets": [
+      {
+        "highlight": "('Other',)",
+        "pattern_type": "OUTSTANDING_LAST",
+        "members": [
+          "2023-2024",
+          "2024-2025",
+          "2025-2026",
+          "2021-2022",
+          "2020-2021",
+          "2022-2023"
+        ],
+        "count": 6,
+        "proportion": 1.0
+      }
+    ],
+    "exceptions": [],
+    "conciseness": 0.721057,
+    "impact": 1.0,
+    "score": 0.721057,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "fiscal_year",
+    "pattern_type": "TOP_TWO",
+    "breakdown": "status_label",
+    "measure": "n_activities",
+    "base_subspace": [],
+    "hdp_size": 6,
+    "commonness_sets": [
+      {
+        "highlight": "('Activity Approved', 'WORK ONGOING')",
+        "pattern_type": "TOP_TWO",
+        "members": [
+          "2023-2024",
+          "2024-2025",
+          "2025-2026",
+          "2021-2022",
+          "2020-2021",
+          "2022-2023"
+        ],
+        "count": 6,
+        "proportion": 1.0
+      }
+    ],
+    "exceptions": [],
+    "conciseness": 0.721057,
+    "impact": 1.0,
+    "score": 0.721057,
+    "impact_measure_used": "n_activities"
+  }
+]

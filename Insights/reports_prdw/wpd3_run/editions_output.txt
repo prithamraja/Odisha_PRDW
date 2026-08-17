@@ -1,0 +1,125 @@
+========================================================================
+WP-D3 T4b/T4c — EDITION CHECKS
+========================================================================
+  [PASS] all 5 gamma editions exist
+  [PASS] the feed's markdown twin exists
+
+=== (a) prose gate, every edition ===
+      PASS gamma_0.1_report.md
+      PASS gamma_0.3_report.md
+      PASS gamma_0.5_report.md
+      PASS gamma_0.7_report.md
+      PASS gamma_0.9_report.md
+      
+      5/5 report(s) clean.
+  [PASS] prose gate clean on all editions  -- rc=0
+
+=== per-gamma re-derivation of what each section was written from ===
+  gamma 0.1: view1 30, view2 30, view3 2
+  gamma 0.3: view1 30, view2 30, view3 2
+  gamma 0.5: view1 30, view2 30, view3 2
+  gamma 0.7: view1 30, view2 30, view3 2
+  gamma 0.9: view1 30, view2 30, view3 2
+
+=== (b) no hollow section, any edition ===
+  [PASS] gamma 0.1 / Activity Lifecycle - Every Planned Work and Its Money: carries prose  -- 2073 words
+  [PASS] gamma 0.1 / Monthly Money Flows by Gram Panchayat: carries prose  -- 1763 words
+  [PASS] gamma 0.1 / Gram Panchayat Report Card by Year: carries prose  -- 245 words
+  [PASS] gamma 0.3 / Activity Lifecycle - Every Planned Work and Its Money: carries prose  -- 1817 words
+  [PASS] gamma 0.3 / Monthly Money Flows by Gram Panchayat: carries prose  -- 1651 words
+  [PASS] gamma 0.3 / Gram Panchayat Report Card by Year: carries prose  -- 246 words
+  [PASS] gamma 0.5 / Activity Lifecycle - Every Planned Work and Its Money: carries prose  -- 2284 words
+  [PASS] gamma 0.5 / Monthly Money Flows by Gram Panchayat: carries prose  -- 1480 words
+  [PASS] gamma 0.5 / Gram Panchayat Report Card by Year: carries prose  -- 280 words
+  [PASS] gamma 0.7 / Activity Lifecycle - Every Planned Work and Its Money: carries prose  -- 1907 words
+  [PASS] gamma 0.7 / Monthly Money Flows by Gram Panchayat: carries prose  -- 1742 words
+  [PASS] gamma 0.7 / Gram Panchayat Report Card by Year: carries prose  -- 309 words
+  [PASS] gamma 0.9 / Activity Lifecycle - Every Planned Work and Its Money: carries prose  -- 2160 words
+  [PASS] gamma 0.9 / Monthly Money Flows by Gram Panchayat: carries prose  -- 1426 words
+  [PASS] gamma 0.9 / Gram Panchayat Report Card by Year: carries prose  -- 247 words
+
+=== (c)+(d) deterministic caveats ride with the findings ===
+  [PASS] gamma 0.1 / Activity Lifecycle - Every Planned Work and Its Money: FY 2023-24 reporting caveat present == a finding qualifies  -- qualifying=[18, 29], in edition=True
+  [PASS] gamma 0.1 / Activity Lifecycle - Every Planned Work and Its Money: FY 2023-24 reporting caveat sits inside the deterministic note
+  [PASS] gamma 0.1 / Activity Lifecycle - Every Planned Work and Its Money: A6 linkage framing present == a finding qualifies  -- qualifying=none, in edition=False
+  [PASS] gamma 0.1 / Activity Lifecycle - Every Planned Work and Its Money: A9 XV FC earmark present == a finding qualifies  -- qualifying=[8, 25], in edition=True
+  [PASS] gamma 0.1 / Activity Lifecycle - Every Planned Work and Its Money: A9 XV FC earmark sits inside the deterministic note
+  [PASS] gamma 0.1 / Monthly Money Flows by Gram Panchayat: FY 2023-24 reporting caveat present == a finding qualifies  -- qualifying=none, in edition=False
+  [PASS] gamma 0.1 / Monthly Money Flows by Gram Panchayat: A6 linkage framing present == a finding qualifies  -- qualifying=[1, 4, 6, 9, 10, 16, 24], in edition=True
+  [PASS] gamma 0.1 / Monthly Money Flows by Gram Panchayat: A6 linkage framing sits inside the deterministic note
+  [PASS] gamma 0.1 / Monthly Money Flows by Gram Panchayat: A9 XV FC earmark not expected
+  [PASS] gamma 0.1 / Gram Panchayat Report Card by Year: FY 2023-24 reporting caveat present == a finding qualifies  -- qualifying=none, in edition=False
+  [PASS] gamma 0.1 / Gram Panchayat Report Card by Year: A6 linkage framing present == a finding qualifies  -- qualifying=none, in edition=False
+  [PASS] gamma 0.1 / Gram Panchayat Report Card by Year: A9 XV FC earmark not expected
+  [PASS] gamma 0.3 / Activity Lifecycle - Every Planned Work and Its Money: FY 2023-24 reporting caveat present == a finding qualifies  -- qualifying=[18, 29], in edition=True
+  [PASS] gamma 0.3 / Activity Lifecycle - Every Planned Work and Its Money: FY 2023-24 reporting caveat sits inside the deterministic note
+  [PASS] gamma 0.3 / Activity Lifecycle - Every Planned Work and Its Money: A6 linkage framing present == a finding qualifies  -- qualifying=none, in edition=False
+  [PASS] gamma 0.3 / Activity Lifecycle - Every Planned Work and Its Money: A9 XV FC earmark present == a finding qualifies  -- qualifying=[9, 25], in edition=True
+  [PASS] gamma 0.3 / Activity Lifecycle - Every Planned Work and Its Money: A9 XV FC earmark sits inside the deterministic note
+  [PASS] gamma 0.3 / Monthly Money Flows by Gram Panchayat: FY 2023-24 reporting caveat present == a finding qualifies  -- qualifying=none, in edition=False
+  [PASS] gamma 0.3 / Monthly Money Flows by Gram Panchayat: A6 linkage framing present == a finding qualifies  -- qualifying=[1, 4, 6, 9, 10, 16, 26], in edition=True
+  [PASS] gamma 0.3 / Monthly Money Flows by Gram Panchayat: A6 linkage framing sits inside the deterministic note
+  [PASS] gamma 0.3 / Monthly Money Flows by Gram Panchayat: A9 XV FC earmark not expected
+  [PASS] gamma 0.3 / Gram Panchayat Report Card by Year: FY 2023-24 reporting caveat present == a finding qualifies  -- qualifying=none, in edition=False
+  [PASS] gamma 0.3 / Gram Panchayat Report Card by Year: A6 linkage framing present == a finding qualifies  -- qualifying=none, in edition=False
+  [PASS] gamma 0.3 / Gram Panchayat Report Card by Year: A9 XV FC earmark not expected
+  [PASS] gamma 0.5 / Activity Lifecycle - Every Planned Work and Its Money: FY 2023-24 reporting caveat present == a finding qualifies  -- qualifying=[20, 26, 28], in edition=True
+  [PASS] gamma 0.5 / Activity Lifecycle - Every Planned Work and Its Money: FY 2023-24 reporting caveat sits inside the deterministic note
+  [PASS] gamma 0.5 / Activity Lifecycle - Every Planned Work and Its Money: A6 linkage framing present == a finding qualifies  -- qualifying=none, in edition=False
+  [PASS] gamma 0.5 / Activity Lifecycle - Every Planned Work and Its Money: A9 XV FC earmark present == a finding qualifies  -- qualifying=[13], in edition=True
+  [PASS] gamma 0.5 / Activity Lifecycle - Every Planned Work and Its Money: A9 XV FC earmark sits inside the deterministic note
+  [PASS] gamma 0.5 / Monthly Money Flows by Gram Panchayat: FY 2023-24 reporting caveat present == a finding qualifies  -- qualifying=none, in edition=False
+  [PASS] gamma 0.5 / Monthly Money Flows by Gram Panchayat: A6 linkage framing present == a finding qualifies  -- qualifying=[1, 4, 6, 9, 13, 16], in edition=True
+  [PASS] gamma 0.5 / Monthly Money Flows by Gram Panchayat: A6 linkage framing sits inside the deterministic note
+  [PASS] gamma 0.5 / Monthly Money Flows by Gram Panchayat: A9 XV FC earmark not expected
+  [PASS] gamma 0.5 / Gram Panchayat Report Card by Year: FY 2023-24 reporting caveat present == a finding qualifies  -- qualifying=none, in edition=False
+  [PASS] gamma 0.5 / Gram Panchayat Report Card by Year: A6 linkage framing present == a finding qualifies  -- qualifying=none, in edition=False
+  [PASS] gamma 0.5 / Gram Panchayat Report Card by Year: A9 XV FC earmark not expected
+  [PASS] gamma 0.7 / Activity Lifecycle - Every Planned Work and Its Money: FY 2023-24 reporting caveat present == a finding qualifies  -- qualifying=[24, 26, 28], in edition=True
+  [PASS] gamma 0.7 / Activity Lifecycle - Every Planned Work and Its Money: FY 2023-24 reporting caveat sits inside the deterministic note
+  [PASS] gamma 0.7 / Activity Lifecycle - Every Planned Work and Its Money: A6 linkage framing present == a finding qualifies  -- qualifying=none, in edition=False
+  [PASS] gamma 0.7 / Activity Lifecycle - Every Planned Work and Its Money: A9 XV FC earmark present == a finding qualifies  -- qualifying=[19, 23], in edition=True
+  [PASS] gamma 0.7 / Activity Lifecycle - Every Planned Work and Its Money: A9 XV FC earmark sits inside the deterministic note
+  [PASS] gamma 0.7 / Monthly Money Flows by Gram Panchayat: FY 2023-24 reporting caveat present == a finding qualifies  -- qualifying=none, in edition=False
+  [PASS] gamma 0.7 / Monthly Money Flows by Gram Panchayat: A6 linkage framing present == a finding qualifies  -- qualifying=[2, 4, 6, 9, 13, 16], in edition=True
+  [PASS] gamma 0.7 / Monthly Money Flows by Gram Panchayat: A6 linkage framing sits inside the deterministic note
+  [PASS] gamma 0.7 / Monthly Money Flows by Gram Panchayat: A9 XV FC earmark not expected
+  [PASS] gamma 0.7 / Gram Panchayat Report Card by Year: FY 2023-24 reporting caveat present == a finding qualifies  -- qualifying=none, in edition=False
+  [PASS] gamma 0.7 / Gram Panchayat Report Card by Year: A6 linkage framing present == a finding qualifies  -- qualifying=none, in edition=False
+  [PASS] gamma 0.7 / Gram Panchayat Report Card by Year: A9 XV FC earmark not expected
+  [PASS] gamma 0.9 / Activity Lifecycle - Every Planned Work and Its Money: FY 2023-24 reporting caveat present == a finding qualifies  -- qualifying=[24, 26, 28], in edition=True
+  [PASS] gamma 0.9 / Activity Lifecycle - Every Planned Work and Its Money: FY 2023-24 reporting caveat sits inside the deterministic note
+  [PASS] gamma 0.9 / Activity Lifecycle - Every Planned Work and Its Money: A6 linkage framing present == a finding qualifies  -- qualifying=none, in edition=False
+  [PASS] gamma 0.9 / Activity Lifecycle - Every Planned Work and Its Money: A9 XV FC earmark present == a finding qualifies  -- qualifying=[19, 23], in edition=True
+  [PASS] gamma 0.9 / Activity Lifecycle - Every Planned Work and Its Money: A9 XV FC earmark sits inside the deterministic note
+  [PASS] gamma 0.9 / Monthly Money Flows by Gram Panchayat: FY 2023-24 reporting caveat present == a finding qualifies  -- qualifying=none, in edition=False
+  [PASS] gamma 0.9 / Monthly Money Flows by Gram Panchayat: A6 linkage framing present == a finding qualifies  -- qualifying=[2, 4, 6, 9, 15, 17], in edition=True
+  [PASS] gamma 0.9 / Monthly Money Flows by Gram Panchayat: A6 linkage framing sits inside the deterministic note
+  [PASS] gamma 0.9 / Monthly Money Flows by Gram Panchayat: A9 XV FC earmark not expected
+  [PASS] gamma 0.9 / Gram Panchayat Report Card by Year: FY 2023-24 reporting caveat present == a finding qualifies  -- qualifying=none, in edition=False
+  [PASS] gamma 0.9 / Gram Panchayat Report Card by Year: A6 linkage framing present == a finding qualifies  -- qualifying=none, in edition=False
+  [PASS] gamma 0.9 / Gram Panchayat Report Card by Year: A9 XV FC earmark not expected
+
+=== (f) the earmark finding is ELEVATED, not footnoted (D29) ===
+  [PASS] gamma 0.1 / Activity Lifecycle - Every Planned Work and Its Money: the earmarked share and the amount outside it appear in the PROSE, not only the note  -- share 97.6% in prose=True, outside Rs 42.61 lakh in prose=True
+  [PASS] gamma 0.3 / Activity Lifecycle - Every Planned Work and Its Money: the earmarked share and the amount outside it appear in the PROSE, not only the note  -- share 97.6% in prose=True, outside Rs 42.61 lakh in prose=True
+  [PASS] gamma 0.5 / Activity Lifecycle - Every Planned Work and Its Money: the earmarked share and the amount outside it appear in the PROSE, not only the note  -- share 97.6% in prose=True, outside Rs 42.61 lakh in prose=True
+  [PASS] gamma 0.7 / Activity Lifecycle - Every Planned Work and Its Money: the earmarked share and the amount outside it appear in the PROSE, not only the note  -- share 95.0% in prose=True, outside Rs 39.06 lakh in prose=True
+  [PASS] gamma 0.9 / Activity Lifecycle - Every Planned Work and Its Money: the earmarked share and the amount outside it appear in the PROSE, not only the note  -- share 95.0% in prose=True, outside Rs 39.06 lakh in prose=True
+  [PASS] executive report / Activity Lifecycle - Every Planned Work and Its Money: the earmarked share and the amount outside it appear in the PROSE, not only the note  -- share 97.6% in prose=True, outside Rs 42.61 lakh in prose=True
+
+=== (e) one candidate set behind every artefact ===
+  [PASS] gamma_0.1_report.md: carries a candidate-set id
+  [PASS] gamma_0.3_report.md: carries a candidate-set id
+  [PASS] gamma_0.5_report.md: carries a candidate-set id
+  [PASS] gamma_0.7_report.md: carries a candidate-set id
+  [PASS] gamma_0.9_report.md: carries a candidate-set id
+  [PASS] global_feed.md: carries a candidate-set id
+  [PASS] every artefact names the SAME candidate set  -- {0.1: 'a7f991c1df3771f9', 0.3: 'a7f991c1df3771f9', 0.5: 'a7f991c1df3771f9', 0.7: 'a7f991c1df3771f9', 0.9: 'a7f991c1df3771f9', 'global_feed.md': 'a7f991c1df3771f9'}
+  [PASS] and it is the set currently on disk  -- on disk=a7f991c1df3771f9, in artefacts=['a7f991c1df3771f9']
+  [PASS] every artefact carries the SAME run stamp  -- ['2026-08-17T08:56:36Z']
+  [PASS] the feed JSON's provenance sidecar exists (global_feed_source_set.json)
+  [PASS] the sidecar names the same candidate set  -- a7f991c1df3771f9 vs a7f991c1df3771f9
+
+========================================================================
+0 failure(s)

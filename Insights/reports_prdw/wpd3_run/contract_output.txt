@@ -1,0 +1,36 @@
+========================================================================
+WP-D3 T4a — FEED CONTRACT CHECK (D16)
+========================================================================
+  contract  : feed_contract_reference.json (derived 2026-08-17)
+  artefact  : C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\c9c594c5-9826-40ab-8e49-4cd927b3f2e2\scratchpad\mirror\Insights\metainsights\global_feed.json
+  writer    : C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\c9c594c5-9826-40ab-8e49-4cd927b3f2e2\scratchpad\mirror\Insights\src\phase5c_global_feed.py
+
+METHOD 1 — emitted artefact, typed key paths
+  60 contract paths, 53 ours
+  7 path(s) UNEXERCISED — the array holding them is present but empty in one document, so the data could not reach them. Method 2 covers these:
+    unexercised: highest_scoring_rejected[].global_score: number
+    unexercised: highest_scoring_rejected[].marginal_gain: number
+    unexercised: highest_scoring_rejected[].summary: str
+    unexercised: highest_scoring_rejected[].view: str
+    unexercised: highest_scoring_rejected[].view_rank: number
+    unexercised: highest_scoring_rejected[].worst_overlap: number
+    unexercised: highest_scoring_rejected[]: object
+  IDENTICAL — every key path and every type matches (excluding the unexercised paths above)
+
+METHOD 2 — writer source, dict-literal keys in order
+  json_dump_top_level: 4 keys, IDENTICAL and in the same order
+  weighting_block: 7 keys, IDENTICAL and in the same order
+  feed_row: 19 keys, IDENTICAL and in the same order
+  rejected_row: 6 keys, IDENTICAL and in the same order
+
+SHAPE FACTS
+  feed rows          : 32
+  rejected rows      : 0
+  views in `weights` : ['view1', 'view2', 'view3']
+  weights            : {'view1': 0.333333, 'view2': 0.333333, 'view3': 0.333333}
+  reach              : {'view1': 20, 'view2': 20, 'view3': 20}
+  rank_decay         : 0.85
+  seeds_per_view     : 1
+
+========================================================================
+CONTRACT CHECK PASSED — the emitted schema is the AP writer's, field for field, by both methods.

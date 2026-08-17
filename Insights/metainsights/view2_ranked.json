@@ -1,0 +1,662 @@
+[
+  {
+    "extending_strategy": "breakdown",
+    "extending_dimension": "temporal_grain",
+    "pattern_type": "TREND",
+    "breakdown": "(varies)",
+    "measure": "activity_linked_expenditure",
+    "base_subspace": [],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('INCREASING',)",
+        "pattern_type": "TREND",
+        "members": [
+          "month",
+          "quarter",
+          "fiscal_year"
+        ],
+        "count": 3,
+        "proportion": 1.0
+      }
+    ],
+    "exceptions": [],
+    "conciseness": 0.721057,
+    "impact": 1.0,
+    "score": 0.721057,
+    "impact_measure_used": "payment_amount"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "fiscal_year",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "block_name",
+    "measure": "payment_count",
+    "base_subspace": [],
+    "hdp_size": 6,
+    "commonness_sets": [
+      {
+        "highlight": "('Bhubaneswar',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "2020-2021",
+          "2021-2022",
+          "2022-2023",
+          "2023-2024",
+          "2025-2026"
+        ],
+        "count": 5,
+        "proportion": 0.8333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "2024-2025",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.63734,
+    "impact": 1.0,
+    "score": 0.63734,
+    "impact_measure_used": "payment_amount"
+  },
+  {
+    "extending_strategy": "breakdown",
+    "extending_dimension": "temporal_grain",
+    "pattern_type": "SEASONALITY",
+    "breakdown": "(varies)",
+    "measure": "payment_count",
+    "base_subspace": [],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('PERIOD_12',)",
+        "pattern_type": "SEASONALITY",
+        "members": [
+          "month",
+          "quarter"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "fiscal_year",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 1.0,
+    "score": 0.487712,
+    "impact_measure_used": "payment_amount"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "district_name",
+    "pattern_type": "TREND",
+    "breakdown": "quarter",
+    "measure": "activity_linked_expenditure",
+    "base_subspace": [],
+    "hdp_size": 9,
+    "commonness_sets": [
+      {
+        "highlight": "('INCREASING',)",
+        "pattern_type": "TREND",
+        "members": [
+          "Khordha",
+          "Ganjam",
+          "Kandhamal",
+          "Sundargarh",
+          "Malkangiri",
+          "Rayagada"
+        ],
+        "count": 6,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "Bargarh",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "Koraput",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "Cuttack",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 1.0,
+    "score": 0.487712,
+    "impact_measure_used": "payment_amount"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "SEASONALITY",
+    "breakdown": "month",
+    "measure": "(varies)",
+    "base_subspace": [],
+    "hdp_size": 9,
+    "commonness_sets": [
+      {
+        "highlight": "('PERIOD_12',)",
+        "pattern_type": "SEASONALITY",
+        "members": [
+          "payment_amount",
+          "receipt_amount",
+          "payment_count",
+          "receipt_count",
+          "payment_amount_mean",
+          "receipt_amount_mean"
+        ],
+        "count": 6,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "activity_linked_expenditure",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('PERIOD_3',)",
+        "pattern_type": "SEASONALITY"
+      },
+      {
+        "member_label": "sanctions_count",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "sanctioned_amount",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.316944,
+    "impact": 1.0,
+    "score": 0.316944,
+    "impact_measure_used": "payment_amount"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "district_name",
+    "pattern_type": "SEASONALITY",
+    "breakdown": "quarter",
+    "measure": "activity_linked_expenditure",
+    "base_subspace": [],
+    "hdp_size": 9,
+    "commonness_sets": [
+      {
+        "highlight": "('PERIOD_12',)",
+        "pattern_type": "SEASONALITY",
+        "members": [
+          "Khordha",
+          "Bargarh",
+          "Ganjam",
+          "Koraput",
+          "Cuttack"
+        ],
+        "count": 5,
+        "proportion": 0.5556
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "Sundargarh",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('PERIOD_6',)",
+        "pattern_type": "SEASONALITY"
+      },
+      {
+        "member_label": "Rayagada",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('PERIOD_3',)",
+        "pattern_type": "SEASONALITY"
+      },
+      {
+        "member_label": "Kandhamal",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "Malkangiri",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.199158,
+    "impact": 1.0,
+    "score": 0.199158,
+    "impact_measure_used": "payment_amount"
+  },
+  {
+    "extending_strategy": "breakdown",
+    "extending_dimension": "temporal_grain",
+    "pattern_type": "SEASONALITY",
+    "breakdown": "(varies)",
+    "measure": "receipt_count",
+    "base_subspace": [],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('PERIOD_12',)",
+        "pattern_type": "SEASONALITY",
+        "members": [
+          "month",
+          "quarter"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "fiscal_year",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 1.0,
+    "score": 0.487712,
+    "impact_measure_used": "payment_amount"
+  },
+  {
+    "extending_strategy": "breakdown",
+    "extending_dimension": "temporal_grain",
+    "pattern_type": "TREND",
+    "breakdown": "(varies)",
+    "measure": "sanctions_count",
+    "base_subspace": [],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('INCREASING',)",
+        "pattern_type": "TREND",
+        "members": [
+          "quarter",
+          "fiscal_year"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "month",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 1.0,
+    "score": 0.487712,
+    "impact_measure_used": "payment_amount"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "block_name",
+    "pattern_type": "TREND",
+    "breakdown": "quarter",
+    "measure": "activity_linked_expenditure",
+    "base_subspace": [],
+    "hdp_size": 16,
+    "commonness_sets": [
+      {
+        "highlight": "('INCREASING',)",
+        "pattern_type": "TREND",
+        "members": [
+          "Bhubaneswar",
+          "Khallikote",
+          "Khajuripada",
+          "Lahunipara",
+          "Kalimela",
+          "Kalyansingpur",
+          "Balisankara",
+          "Laxmipur",
+          "Sheragada"
+        ],
+        "count": 9,
+        "proportion": 0.5625
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "Barpali",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "Bheden",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "Rangeilunda",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "Boipariguda",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "Baranga",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "Tangi Choudwar",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "Attabira",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.448419,
+    "impact": 1.0,
+    "score": 0.448419,
+    "impact_measure_used": "payment_amount"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "CHANGE_POINT",
+    "breakdown": "month",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "district_name",
+        "Ganjam"
+      ]
+    ],
+    "hdp_size": 9,
+    "commonness_sets": [
+      {
+        "highlight": "('2020-08',)",
+        "pattern_type": "CHANGE_POINT",
+        "members": [
+          "payment_amount",
+          "receipt_amount",
+          "payment_count",
+          "receipt_count",
+          "payment_amount_mean",
+          "receipt_amount_mean"
+        ],
+        "count": 6,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "activity_linked_expenditure",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('2020-11',)",
+        "pattern_type": "CHANGE_POINT"
+      },
+      {
+        "member_label": "sanctions_count",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('2020-10',)",
+        "pattern_type": "CHANGE_POINT"
+      },
+      {
+        "member_label": "sanctioned_amount",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('2020-10',)",
+        "pattern_type": "CHANGE_POINT"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 0.246884,
+    "score": 0.120408,
+    "impact_measure_used": "payment_amount"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "district_name",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "fiscal_year",
+        "2025-2026"
+      ]
+    ],
+    "hdp_size": 9,
+    "commonness_sets": [
+      {
+        "highlight": "('Ganjam',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "payment_amount",
+          "receipt_amount",
+          "receipt_count",
+          "activity_linked_expenditure",
+          "sanctions_count",
+          "sanctioned_amount"
+        ],
+        "count": 6,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "payment_count",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "payment_amount_mean",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "receipt_amount_mean",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 0.232735,
+    "score": 0.113508,
+    "impact_measure_used": "payment_count"
+  },
+  {
+    "extending_strategy": "breakdown",
+    "extending_dimension": "temporal_grain",
+    "pattern_type": "TREND",
+    "breakdown": "(varies)",
+    "measure": "sanctioned_amount",
+    "base_subspace": [
+      [
+        "fiscal_year",
+        "2020-2021"
+      ]
+    ],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('INCREASING',)",
+        "pattern_type": "TREND",
+        "members": [
+          "month",
+          "quarter"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "fiscal_year",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 0.227533,
+    "score": 0.11097,
+    "impact_measure_used": "payment_amount"
+  },
+  {
+    "extending_strategy": "breakdown",
+    "extending_dimension": "temporal_grain",
+    "pattern_type": "TREND",
+    "breakdown": "(varies)",
+    "measure": "activity_linked_expenditure",
+    "base_subspace": [
+      [
+        "block_name",
+        "Bhubaneswar"
+      ]
+    ],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('INCREASING',)",
+        "pattern_type": "TREND",
+        "members": [
+          "month",
+          "quarter",
+          "fiscal_year"
+        ],
+        "count": 3,
+        "proportion": 1.0
+      }
+    ],
+    "exceptions": [],
+    "conciseness": 0.721057,
+    "impact": 0.250322,
+    "score": 0.180497,
+    "impact_measure_used": "payment_count"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "block_name",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "district_name",
+        "Bargarh"
+      ]
+    ],
+    "hdp_size": 9,
+    "commonness_sets": [
+      {
+        "highlight": "('Bheden',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "payment_amount",
+          "receipt_amount",
+          "payment_count",
+          "receipt_count",
+          "payment_amount_mean",
+          "receipt_amount_mean"
+        ],
+        "count": 6,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "activity_linked_expenditure",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('Barpali',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "sanctions_count",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('Barpali',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "sanctioned_amount",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('Barpali',)",
+        "pattern_type": "OUTSTANDING_1"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 0.181264,
+    "score": 0.088405,
+    "impact_measure_used": "payment_count"
+  },
+  {
+    "extending_strategy": "breakdown",
+    "extending_dimension": "temporal_grain",
+    "pattern_type": "TREND",
+    "breakdown": "(varies)",
+    "measure": "payment_amount_mean",
+    "base_subspace": [
+      [
+        "fiscal_year",
+        "2024-2025"
+      ]
+    ],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('INCREASING',)",
+        "pattern_type": "TREND",
+        "members": [
+          "month",
+          "quarter"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "fiscal_year",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 0.169187,
+    "score": 0.082515,
+    "impact_measure_used": "payment_count"
+  }
+]

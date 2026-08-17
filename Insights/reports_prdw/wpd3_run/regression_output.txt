@@ -1,0 +1,68 @@
+
+=== 1. definitional (measure, breakdown) pairs are absent (A1) ===
+  [PASS] view1: no top-15 finding uses an excluded pair
+  [PASS] view1: the exclusion list is populated  -- 32 pairs
+  [PASS] view2: no top-15 finding uses an excluded pair
+  [PASS] view2: the exclusion list is populated  -- 0 pairs
+  [PASS] view3: no top-2 finding uses an excluded pair
+  [PASS] view3: the exclusion list is populated  -- 0 pairs
+
+=== 2. OUTSTANDING_1 / ATTRIBUTION twins are merged (A2) ===
+  [PASS] view1: no twin pair survives into the ranked list
+  [PASS] view2: no twin pair survives into the ranked list
+  [PASS] view3: no twin pair survives into the ranked list
+
+=== 3. no temporal finding rests on sub-support series (A7) ===
+  [PASS] view1: every ranked temporal finding has non-zero support
+  [PASS] view2: every ranked temporal finding has non-zero support
+  [PASS] view3: every ranked temporal finding has non-zero support
+
+=== 4. size-total rankings carry size shares or a per-unit companion (A4 / rule 2b) ===
+  [PASS] view1: every size-total ranking carries its volume context
+  [PASS] view2: every size-total ranking carries its volume context
+  [PASS] view3: every size-total ranking carries its volume context
+
+=== the labelled baseline, row by row (reported, not gated) ===
+
+  spurious: 4 of 11 still say the same thing; 5 still occupy the same slot
+    [same finding] view1 #11: OUTSTANDING_LAST overspend_vs_plan by status_label
+        Across nearly all gp_name values (18/20), Activity Approved has the lowest overspend_vs_plan among s
+    [SLOT ONLY -- the highlight changed] view2 #5: OUTSTANDING_1 (varies) by block_name
+        Across most measure values (4/7), Bhubaneswar has the highest (varies) among block_name values. Exce
+    [same finding] view2 #7: SEASONALITY activity_linked_expenditure by quarter
+        Across most district_name values (5/9), activity_linked_expenditure shows seasonal pattern (PERIOD_1
+    [same finding] view2 #10: OUTSTANDING_1 (varies) by district_name
+        Across most measure values (6/7), Ganjam has the highest (varies) among district_name values. Except
+    [same finding] view3 #3: EVENNESS (varies) by gp_name
+        Across most measure values (10/18), (varies) is evenly distributed across gp_name values. Exceptions
+
+  real: 7 of 15 still say the same thing; 8 still occupy the same slot
+    [SLOT ONLY -- the highlight changed] view1 #7: OUTSTANDING_1 fund_untied_total by theme
+        Across nearly all gp_name values (18/20), Theme 6 - Self-sufficient Infrastructure in Village has th
+    [same finding] view2 #1: TREND activity_linked_expenditure by (varies)
+        Across all temporal_grain values, activity_linked_expenditure is increasing over (varies)
+    [same finding] view2 #4: TREND activity_linked_expenditure by quarter
+        Across most district_name values (6/9), activity_linked_expenditure is increasing over quarter. Exce
+    [same finding] view2 #8: TREND sanctions_count by (varies)
+        Across most temporal_grain values (2/3), sanctions_count is increasing over (varies). Exception: mon
+    [same finding] view2 #11: TREND activity_linked_expenditure by quarter
+        Across most block_name values (9/16), activity_linked_expenditure is increasing over quarter. Except
+    [same finding] view2 #13: CHANGE_POINT (varies) by month
+        Across most measure values (4/7), (varies) has a significant shift at 2020-08 in month. Exception: a
+    [same finding] view2 #14: TREND sanctioned_amount by (varies)
+        Across most temporal_grain values (2/3), sanctioned_amount is increasing over (varies). Exception: f
+    [same finding] view2 #15: TREND activity_linked_expenditure by (varies)
+        Across all temporal_grain values, activity_linked_expenditure is increasing over (varies)
+
+  already-known: 4 of 7 still say the same thing; 4 still occupy the same slot
+    [same finding] view2 #2: OUTSTANDING_1 payment_count by block_name
+        Across most fiscal_year values (5/6), Bhubaneswar has the highest payment_count among block_name val
+    [same finding] view2 #3: SEASONALITY payment_count by (varies)
+        Across most temporal_grain values (2/3), payment_count shows seasonal pattern (PERIOD_12) over (vari
+    [same finding] view2 #6: SEASONALITY (varies) by month
+        Across most measure values (4/7), (varies) shows seasonal pattern (PERIOD_12) over month. Exception:
+    [same finding] view2 #9: SEASONALITY receipt_count by (varies)
+        Across most temporal_grain values (2/3), receipt_count shows seasonal pattern (PERIOD_12) over (vari
+
+============================================================
+0 failure(s)
