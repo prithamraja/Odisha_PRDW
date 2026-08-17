@@ -55,21 +55,28 @@ pre-adaptation baseline `7184d5e` — `git diff 7184d5e -- Chatbot/query_router/
 is empty. Zero threshold changes, as the brief requires. T6 is "not warranted",
 on evidence (§7.1).
 
-### What I need from the PM
+### Operator rulings on this report (received)
 
-1. **A ruling on finding C** (§7.2) — a relative period in a follow-up fragment.
-   It is a silent wrong answer, and the ruling is a genuine design choice rather than
-   a rubber stamp: "last year" in a follow-up can mean one step back from the frame
-   or one step back from the data, the two differ, and the reader already in the tree
-   gives the second — which is why this is not simply a bug fix I could land.
-2. **D30.4: promote the `$date_range` reader from fallback to prefill — I
-   recommend YES**, and §4.3 has the evidence the ruling asked for.
-3. **Note that F2 is now blocking two things**, not one: the 8 Odia-script recall
-   misses *and* two of the four unreachable refusals (§2.3). Same cause, same SME
-   dependency, and it is now the largest single item left.
-4. **T5 was skipped**, correctly: the brief makes it conditional on the operator
-   confirming SME ratification of the 19 Odia-script rows, and that has not
-   happened. §6.
+1. **Finding C — DEFERRED**, revisit later. §7.2 keeps the diagnosis and the design
+   question for whenever it is picked up; no change made.
+2. **D30.4 — PROMOTE the `$date_range` reader to a prefill.** Ratified; first task of
+   the next package, with the extractor kept as a fallback for the slot. Confirmed
+   alongside: **there is no default fiscal year** and the prefill does not introduce
+   one — §4.3 has the inspection and a part-year caution.
+3. **PLN-022 — treat as F2** (option (a)). Settled on a measurement: the same
+   question in English retrieves the refusal at rank 0 and serves it, twice over by
+   two mechanisms, so the refusal logic is sound and only the register fails. The
+   catalogue-level alternative would have covered two templates; those go on the
+   statewide checklist instead. §7.3.
+
+### Still open
+
+* **F2 is now blocking two things**, not one: the 8 Odia-script recall misses *and*
+  all three remaining unreachable refusals (§2.3). Same cause, same SME dependency,
+  and it is the largest single item left.
+* **T5 was skipped**, correctly: the brief makes it conditional on the operator
+  confirming SME ratification of the 19 Odia-script rows, and that has not
+  happened. §6.
 
 ---
 
@@ -556,11 +563,45 @@ consequences, all in favour:
   disagreement;
 * about 160 fewer slots per replay for a model measured at a 12% all-None rate.
 
-**Not implemented, per D30.4** ("do not implement without the operator's
-confirmation"). It is a move of `_fiscal_year_from_text` from the extractor-empty
-branch to a prefill beside `amount_from_text`, plus deleting the then-dead
-re-ordering — best done as the first task of the next package, with a 3x replay to
-prove it.
+**Operator ruling: PROMOTE.** Confirmed, so it becomes the first task of the next
+package: move `_fiscal_year_from_text` from the extractor-empty branch to a prefill
+beside `amount_from_text`, delete the then-dead re-ordering, and prove it with a 3x
+replay. **The extractor stays as a fallback for the slot** rather than being cut out
+entirely — the reader's vocabulary is narrow (it reads "last year" and "this year"
+but not "the year before"), so reader-first-then-extractor is strictly safer than
+either order alone.
+
+**Confirmed alongside, because the operator asked: there is NO default fiscal year,
+and promoting the reader does not introduce one.**
+
+* The only declared default anywhere in the catalogue is `$top_n = 10`;
+  `_DEFAULT_ENTITY_VALUES` is `{'top_n': '10'}` and holds nothing else.
+* `$date_range` is **required on 324 templates** and optional on exactly two
+  (ALR-001, ALR-008 — the D13.3 exception).
+* A question naming no year **clarifies**: "For which date range?", measured at
+  **5 / 4 / 4 times per replay** out of 211 questions (~2%). That is D9 as ruled:
+  required-slot behaviour for v1, revisited from pilot logs if officers turn out to
+  mean the current year.
+* Two places a year appears unasked, neither of them a default: **elicitation chips**
+  pre-fill the most recent loaded year so the chip is tappable (a suggestion, not a
+  bind), and **follow-ups inherit the frame's year** from context — which is 7.2's
+  territory.
+* The prefill changes none of it: the reader returns nothing when the question names
+  no year, so those questions still clarify. It only changes questions where a year
+  IS stated.
+
+**A caution recorded for whenever a default is reconsidered.** The obvious rule,
+"the most recent loaded year", currently points at the THINNEST year in the data:
+
+| FY | activities | expenditure |
+|---|--:|--:|
+| 2023-2024 | 4,607 | 41,929,919 |
+| 2024-2025 | 3,423 | 42,578,450 |
+| **2025-2026** | **2,914** | **25,152,606** |
+
+A silent default to a part-year would answer "how much have we spent?" with a little
+over half the previous year's figure and nothing saying why. "Most recently
+COMPLETE" is the safer rule if a default is ever wanted; not proposed here.
 
 ### 4.4 Finding C in detail — a relative period in a fragment answers the wrong year
 
@@ -732,7 +773,11 @@ If a threshold change is ever argued for, the evidence to bring is a
 distribution of gold-entry retrieval ranks **for ratified phrasing only**. That
 does not exist until the SME reads the Odia rows.
 
-### 7.2 Ruling wanted: a relative period in a follow-up fragment (finding C)
+### 7.2 DEFERRED BY THE OPERATOR — a relative period in a follow-up fragment (finding C)
+
+**Operator ruling: revisit later.** No change made; the defect stands as described and
+this section is the record of it, not an open ask. Everything below is the material a
+later ruling will need.
 
 **The defect:** *"what about last year?"* keeps the frame's year and states it as
 the answer's year. 3/3 stable, one gold row (#1016), and it is the
@@ -822,13 +867,31 @@ outside the window, because its gold question is Odia-transliterated. So this is
 in its consequences but it is worse than the other F2 rows, because the others
 decline while this one *answers*.
 
-**Two candidate rulings**, neither of which I have taken:
-(a) treat it as F2 and leave it until the SME reads the phrasing — it is then fixed
-    by whatever fixes F2;
-(b) suppress a template whose caveat declares its own measure degenerate — a
-    catalogue-level rule ("a template whose caveat says the column is uniformly zero
-    is never a rerank winner"), which is a bigger and more interesting change than
-    this package should make unruled.
+**Operator ruling: (a) — treat it as F2.** Settled by a measurement the operator
+asked for, which shows the refusal logic is not what is broken. The same question in
+three registers:
+
+| phrasing | PLN-022 retrieval rank | served |
+|---|--:|---|
+| the gold row, Odia transliterated | **46** of 376 — outside the window | **PLN-020**, the zeros table |
+| the same question in English | **0** | **PLN-022** — the reranker picks the refusal |
+| English, loose paraphrase (*"which blocks are repeatedly late in approving GPDPs?"*) | **0** | **PLN-022** — via the near-miss rule |
+
+In English it works twice over, through two independent mechanisms — and the third
+case is the near-miss rule (2.3) earning its keep on a phrasing nobody wrote a
+paraphrase for: the reranker returned `no_match` but named PLN-022 among the closest
+candidates, and the refusal was served anyway.
+
+So this is F2 and nothing else, and whatever fixes the Odia registers fixes it.
+
+**The alternative was NOT taken, and the reason is now quantified.** A
+catalogue-level rule ("a template whose caveat declares its own measure uniformly
+zero never wins a rerank") would apply to exactly **two** templates — PLN-020 and
+PLN-021, the only two in the catalogue whose caveat says so. The ~30 SBM templates
+carrying "partial data" caveats are a different family: they return real rows, just
+incomplete ones. A mechanism for two rows is not worth its blast radius, so
+**PLN-020/PLN-021 go on the statewide-arrival checklist instead**, to be re-profiled
+when `approval_date` behaves differently in the full drop.
 
 ### 7.4 Recommendation: put the refusals in the recall measurement
 
