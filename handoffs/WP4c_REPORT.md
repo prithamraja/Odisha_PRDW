@@ -69,14 +69,24 @@ on evidence (§7.1).
    catalogue-level alternative would have covered two templates; those go on the
    statewide checklist instead. §7.3.
 
+4. **Odia set aside for now.** With the Odia-script rows out of scope the same run
+   reads **91.1 / 92.7 / 92.7%** against the 96-97% benchmark, and the in-scope
+   residue is **12 rows** — six of them SME behaviour calls rather than defects.
+   §5.5 has the full list and two consequences: **BEN-003 stops being an F2 row**
+   (it is code-mixed, and code-mixed recall is 100%), and **the critical path
+   becomes the SME behaviour rulings rather than engineering**.
+
 ### Still open
 
-* **F2 is now blocking two things**, not one: the 8 Odia-script recall misses *and*
-  all three remaining unreachable refusals (§2.3). Same cause, same SME dependency,
-  and it is the largest single item left.
+* **The six SME behaviour calls** (§5.5) are now the largest single block, and one of
+  them (#1524) is behaviour the project already ratified being scored as a failure.
+  D20 does not cover WP-4a's gold-set behaviour calls unless the operator extends it.
+* **The engineering residue is four rows** with Odia and the deferred row removed:
+  the superlative flip (#1042, #1404), #1503, and #1026 — plus BEN-003 if its
+  register is ruled in scope. §5.5.
 * **T5 was skipped**, correctly: the brief makes it conditional on the operator
   confirming SME ratification of the 19 Odia-script rows, and that has not
-  happened. §6.
+  happened. §6. It is moot while Odia is deferred.
 
 ---
 
@@ -718,6 +728,59 @@ bar two named rows. Nothing here argues for a threshold change (7.1): the F2 row
 among them are entries whose gold sits a long way outside the window — the eight
 that the recall harness measures are at cosine ranks 34, 43, 57, 65, 127, 129, 219
 and 331 — not entries sitting just outside a band.
+
+### 5.5 The same numbers with Odia set aside (operator scoping, after this run)
+
+**Operator ruling: ignore Odia-related issues for now.** That changes what "remaining
+work" means, so the picture without them:
+
+| | run 1 | run 2 | run 3 | rows scored |
+|---|--:|--:|--:|--:|
+| all rows (the headline) | 85.8% | 87.2% | 87.2% | 211 |
+| **excluding Odia script** | **91.1%** | **92.7%** | **92.7%** | 192 |
+| excluding Odia script and transliterated | 92.1% | 93.2% | 93.8% | 177 |
+
+So against the 96-97% benchmark the in-scope gap is **3 to 4 points — about 12
+rows** — and here they are, all 12 confirmed at >= 2 of 3:
+
+| # | row | lang | class | status |
+|---|---|---|---|---|
+| 1 | #1036 "GPDP status?" | en | SME behaviour call (ambiguity) | needs a ruling, not a fix |
+| 2 | #1411 "SFC vs CFC comparison" | en | SME behaviour call | " |
+| 3 | #1521 "expenditure Andhrua?" | en | SME behaviour call | " |
+| 4 | #1524 "what about Laxmipur?" | en | SME behaviour call | **already the ratified D18.P3 behaviour** — 3.2 |
+| 5 | #1613 lowest completion rate | en | SME behaviour call | needs a ruling |
+| 6 | #1614 high-expenditure not started | en | SME behaviour call | " |
+| 7 | #1042 "aur sabse kam?" | code-mixed | **superlative flip** | real defect, 3/3, deterministic fix available — 5.2 |
+| 8 | #1404 "and the lowest?" | en | **superlative flip** | " |
+| 9 | #1016 "what about last year?" | en | **wrong year** | real defect, 3/3 — DEFERRED by the operator (7.2) |
+| 10 | #1503 "and the unspent amount?" | en | fragment loses the frame's year | real defect, 3/3; adjacent to 7.2 but a distinct path — the fragment carries a measure word, so it re-routes as a new question and the year does not come with it |
+| 11 | #1972 BEN-003 | code-mixed | **refusal not retrieved** | real defect, 3/3 — and **now in scope**, see below |
+| 12 | #1026 Sanitation/Andhrua | code-mixed | unstable route | `clarify / hit / wrong_template` — the only confirmed failure that is not stable |
+
+**Two consequences of the scoping worth stating plainly.**
+
+**BEN-003 is no longer an F2 row.** It is code-mixed, and code-mixed recall is 100% —
+so unlike BEN-010 and PLN-022 its failure is not a register failure. It is the same
+*entry-surface* defect as BEN-001 (2.3), and the scope-free paraphrase that lifted
+BEN-001 from rank 51 to 4 did not move it (64 -> 64): its competition is three
+GPDP-count templates at cosine 0.70/0.69/0.68 against its own 0.49, because the
+Hinglish phrasing *"kitne beneficiary hain"* embeds closer to "how many GPs in a
+block…" than to the entry's English. Fixing it means giving that entry a code-mixed
+retrieval surface — which is F2's option (2) applied to a register the operator has
+NOT deferred. Worth a decision on its own.
+
+**The critical path is now the SME behaviour calls, not engineering.** Six of the 12
+are WP-4a section 4.2 B1-B8 rulings — "does this clarify or default?" — and one of
+those six (#1524) is behaviour the project has already ratified and is scoring as a
+failure. They are not defects and no amount of code closes them. D20 places the
+operator in the SME seat for Discover but says WP-4a's gold-set behaviour calls are
+NOT covered unless the operator says so, so this needs either that extension or an
+external SME.
+
+The engineering residue, with Odia and the deferred row removed, is **four rows**:
+the superlative flip (2), #1503, and #1026 — plus BEN-003 if its register is ruled
+in scope.
 
 ---
 
