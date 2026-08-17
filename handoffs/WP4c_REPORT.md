@@ -19,7 +19,11 @@
 > out of `consistency_results.jsonl`, so the before/after has two intact halves.
 >
 > Commits: `57049be` (T1–T3) · `90a2add` (T2c) · `0637e04` (T4 prep) ·
-> `012b3cf` (T3b hardening) · `f7741fe` · `501be0b`.
+> `012b3cf` (T3b hardening) · `f7741fe` · `501be0b` · `8d69d1c` (the run, and this
+> report). The replay artefacts themselves are **not tracked** —
+> `.gitignore` excludes `Chatbot/eval_full_results*.jsonl` and
+> `eval_full_graded*.json`, as it did for WP-4's, so they live on disk beside the
+> repo and the numbers in §3 are the record.
 > Re-run anything:
 > ```
 > python eval/gold/build_eval_questions.py --check      # gold set + catalogue + pins
