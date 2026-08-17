@@ -12,12 +12,13 @@
 > handoffs/WP4_REPORT.md                       this file
 > ```
 >
-> Commits: `1f9f726` (T2) · `55344ff` (T3+T4) · `5621bc7` (T5/T6).
+> Commits: `1f9f726` (T2) · `55344ff` (T3+T4) · `5621bc7` (T5/T6) · `4a7eea6`
+> (report) · `e3e70ff` (F1 fix + the pair-order bug it exposed).
 > Re-run anything:
 > ```
 > python eval/gold/build_eval_questions.py --check      # gold set + catalogue cross-check
 > python eval/gold/check_harness_format.py              # harness-format gate
-> cd Chatbot && python -m pytest tests -q                # 450 passed / 16 skipped
+> cd Chatbot && python -m pytest tests -q                # 461 passed / 16 skipped
 > cd Chatbot && python tools/build_catalog.py --check    # catalogue vs workbook
 > cd Chatbot && python validate_catalog.py               # 346 executed
 > cd Chatbot && python triage_replays.py eval_full_graded_run{1,2,3}.json
@@ -33,13 +34,16 @@ benchmarks, and the triage says why:
 
 | # | finding | evidence | what it is |
 |---|---|---|---|
-| **F1** | **The entity extractor silently returns nothing on ~25% of calls.** Not a timeout, not a truncation, not a parse failure — `gpt-5.4-mini` with `reasoning_effort: "low"` sometimes stops thinking before it reads the year out of the question. | 12 **identical** calls on one question: 9 returned `date_range="2024-2025"`, **3 returned `None`**. All `finish_reason=stop`, all valid JSON, no exceptions. The three nulls spent **40/49/52 reasoning tokens**; every success spent **80–201**. | A **model-behaviour defect**, and per D17 a model decision is the operator's. **Filed, not fixed** — see §5.1. |
+| **F1** | **The entity extractor silently returns nothing on ~25% of calls.** Not a timeout, not a truncation, not a parse failure — `gpt-5.4-mini` with `reasoning_effort: "low"` sometimes stops thinking before it reads the year out of the question. | 12 **identical** calls on one question: 9 returned `date_range="2024-2025"`, **3 returned `None`**. All `finish_reason=stop`, all valid JSON, no exceptions. The three nulls spent **40/49/52 reasoning tokens**; every success spent **80–201**. | **FIXED** in `e3e70ff` — with a deterministic fallback, not a model change: the reader was already in the tree and unreachable. §5.1. |
 | **F2** | **Odia script does not retrieve.** recall@30 is 100% in English, 100% code-mixed, 100% transliterated Odia, and **52.9% in Odia script**. Every single recall miss in the set is an Odia-script row. | §3.1. 8 of 17 Odia rows fall outside the top 30; two land at rank 220 and 330 of 376. | A real retrieval defect, **compounded by an SME dependency**: WP-4a §4.3 flags all 19 Odia rows as unratified phrasing, so we cannot yet tell "the retriever cannot read Odia" from "these sentences are not what an officer would write". |
 
 F1 alone accounts for **55 of the 73 confirmed failures**. It is the `top_n`
 problem again, one layer down: a uniform, artificial loss that makes the router
 look far worse than it is, and exactly the thing WP-4a §5.2 warned must not be
-answered by re-tuning anything.
+answered by re-tuning anything. **It is now fixed** (§5.1), and fixing it
+surfaced a silent wrong-answer bug in the year-pair split that no eval number
+would ever have caught (§5.1a) — but **every figure in §3 was measured before
+both**, so the accuracy line below stands until a re-run replaces it.
 
 **Nothing was tuned.** `query_router/config.py` has not been touched since the
 pre-adaptation baseline commit `7184d5e` — provable with `git log`. Zero
@@ -47,8 +51,10 @@ threshold changes, as the brief requires.
 
 ### What I need from the PM
 
-1. **Ratify a fix for F1** (§5.1 has three options and a recommendation). It
-   gates any meaningful accuracy number, so WP-4c cannot start without it.
+1. **Authorise a re-run of the full eval.** F1 is fixed (§5.1) and 5.1a fixes
+   a silent wrong-answer bug found alongside it, but every number in §3.3 was
+   measured before both. Nothing else here is worth acting on until the eval is
+   re-run, and no threshold may move until it is.
 2. **Note that F2 is now the second SME-blocking item**, alongside the WP-4a §4
    list — and the cheapest one to unblock, since it needs a native reader for
    half a day, not a metric ruling.
@@ -63,11 +69,11 @@ threshold changes, as the brief requires.
 | # | gate item | status |
 |---|---|---|
 | 1 | Integration committed; `--check` and the harness gate green from the committed tree | **PASS** — see §1.1, with one correction to the brief |
-| 2 | D18 fixes in via the generator; execution oracle still 346/346; suite green with updated pins | **PASS** — 450 passed / 16 skipped (baseline 391/28); oracle 346/346; `validate_catalog` all clear |
+| 2 | D18 fixes in via the generator; execution oracle still 346/346; suite green with updated pins | **PASS** — 461 passed / 16 skipped (baseline 391/28); oracle 346/346; `validate_catalog` all clear |
 | 3 | All three paid runs completed with spend recorded; consistency replays done | **PASS** — §3, §4 |
 | 4 | Every reported failure replay-confirmed and classified; zero threshold changes | **PASS** — §5; `config.py` unchanged since `7184d5e` |
 | 5 | The 23 AP endpoint tests no longer reference paths outside the repo | **PASS** — §2.7 |
-| — | **Accuracy against the two benchmarks** | **FAIL — 62.2% against 96–97%**, root-caused to F1 and F2 |
+| — | **Accuracy against the two benchmarks** | **FAIL — 62.2% against 96–97%**, root-caused to F1 and F2. F1 is fixed post-run (§5.1); the ceiling that implies is 86–88%, and only a re-run settles it |
 
 ### 1.1 A correction to the brief: T1 was already done
 
@@ -401,7 +407,7 @@ not acted on.
 
 | class | count | disposition |
 |---|--:|---|
-| **(i) real defect — extraction returns nothing** (F1) | **55** | Filed, §5.1. Root cause proven in isolation. **Not fixed** — model behaviour, D17 says operator. |
+| **(i) real defect — extraction returns nothing** (F1) | **55** | **FIXED**, §5.1 — 87.6% of them recover the gold year deterministically. Re-run to confirm. |
 | **(i) real defect — Odia-script retrieval** (F2) | **13** | Filed, §5.1. Also **(iv)**: all 13 are rows WP-4a §4.3 flagged as unratified phrasing. |
 | **(i) real defect — refusal not retrieved** | 3 | §5.2. `BEN-001`, `BEN-003`, `PLN-022` decline, but generically. |
 | **(i) real defect — follow-up fragment** | 2 | §5.2. `#1003 "and Khajuripada?"`, `#1016 "what about last year?"`. |
@@ -435,22 +441,98 @@ the user is asked *"For which date range?"* about a question in which they
 plainly stated the year. That swallow should log and re-raise or return a
 distinct sentinel, whatever else is decided.
 
-**Three options, for the operator:**
+**A correction to the mechanism, before the fix.** I first wrote that the model
+"stops thinking before it reads the question". That over-reads the data. What is
+established is a clean *correlation* — the three nulls at 40/49/52 reasoning
+tokens, the nine successes at 80–201, no overlap — but with n=3 nulls the
+causality is not established, and a model that decides early there is nothing to
+extract would spend fewer tokens for that reason rather than the reverse. It
+matters practically: "raise `reasoning_effort`" only helps if under-thinking is
+the *cause*.
 
-1. **Raise `reasoning_effort` to `"medium"` on the extractor.** One line.
-   Directly targets the measured cause. Costs latency and tokens on every call.
-2. **Retry once when every slot comes back `None` and the question is
-   non-empty.** Also one line, cheaper on average (only ~25% of calls pay), and
-   it also defends against the swallowed-exception case. Slight risk of masking
-   a genuine "nothing was named".
-3. **Change the extraction model.** Largest blast radius; needs the D17
-   completion-budget check on whatever replaces it.
+**FIXED in `e3e70ff` — with a deterministic fallback, not a model change.**
 
-**My recommendation: (2) then (1) if it is not enough** — a null-response retry
-is the narrowest change that addresses both defects, and it degrades to
-today's behaviour rather than to something new. **Whichever is chosen, the full
-eval must be re-run before any accuracy number is quoted**, and no threshold may
-move until it is.
+The reader was already in the tree and unreachable. `date_phrase` is a
+word-bounded regex pass built in WP-2 for exactly this mapping, and
+`EntityValidator._validate_fiscal_year` already calls it, already consults the
+loaded years for relative phrases, and already splits a two-year phrase across
+the paired slots. It only ever received **the string the extractor produced**,
+so a null meant it was never consulted. The router now hands it **the question**
+when the extractor comes back empty.
+
+Measured against WP-4's own recorded failures, three replays pooled (n=178):
+
+| outcome | |
+|---|--:|
+| year recovered, matches gold | **87.6%** |
+| not recovered — the year lives in the *frame*, not the sentence (all follow-up fragments) | 8.4% |
+| correctly nothing to find | 3.9% |
+| **wrong year** | **0** |
+
+Per replay that clears 55 / 48 / 53 stalls, a ceiling of **86.1% / 87.6% /
+87.6%** against the 59.8% / 64.6% / 62.2% measured. A ceiling, not a
+prediction — clearing the stall does not guarantee the row then routes
+correctly, and **only a re-run settles it**.
+
+Three properties made this the right shape:
+
+* **A fallback, not a prefill.** It runs only where extraction produced
+  nothing, so no call that works today can change. `amount_from_text` takes the
+  prefill approach for rupee figures and this could follow later —
+  `_log_fiscal_year_disagreement` records where the two readers differ, which is
+  the evidence that decision needs.
+* **Deterministic**, so unlike a retry it adds no replay variance to a
+  measurement whose variance is the problem.
+* **Placed ahead of the declared defaults** (evidence from the user's own text
+  beats a system-supplied value) **and ahead of the `optional` check**, because
+  ALR-001/ALR-008 carry an optional `$date_range` where binding NULL answers
+  across every loaded year about a question that named one — a silent wrong
+  answer rather than a visible stall.
+
+One gotcha worth knowing: `EntityNotFound` is swallowed deliberately. Letting it
+propagate renders *"I couldn't find a date range called '<the entire
+question>'"* — the officer's sentence quoted back as a malformed value, strictly
+worse than the stall it replaces.
+
+**What it does not fix.** It covers `$date_range` — 177 of the 179 observed
+null-asks, so nearly all the measured damage. The model unreliability underneath
+is untouched, there is no equivalent deterministic reader for a theme or a
+scheme, and the bare `except Exception` swallow above still needs addressing on
+its own account. If the wobble ever shifts to a categorical slot there is no
+backstop. **The full eval must still be re-run before any accuracy number is
+quoted, and no threshold may move until it is.**
+
+### 5.1a A silent wrong-answer bug the fix walked into
+
+Prototyping F1's fallback surfaced a **pre-existing** defect that would
+otherwise have been inherited.
+
+`_validate_fiscal_year` split a two-year phrase as `$date_range` = **earlier**,
+`$date_range_2` = **later**. Every one of the five paired templates binds the
+opposite —
+
+```
+COUNT(*) FILTER (WHERE v.fiscal_year = $date_range_2) AS activities_year1,
+COUNT(*) FILTER (WHERE v.fiscal_year = $date_range)   AS activities_year2,
+COUNT(*) FILTER (WHERE v.fiscal_year = $date_range)
+- COUNT(*) FILTER (WHERE v.fiscal_year = $date_range_2) AS change_in_activities
+```
+
+— and their question text agrees: *"between {date_range_2} and {date_range}"*.
+PLN-039, PLN-040 and TRD-004 compute `$date_range − $date_range_2`, so the old
+order **inverts the sign**: *"which themes showed the greatest increase"* answers
+with the greatest **decline**, silently, in a table that looks entirely normal.
+That is the confidently-wrong class this project exists to prevent.
+
+It stayed hidden because the extractor normally assigns the two slots itself and
+got it right; the split only fires when **one string carries both years** — which
+is exactly what the fallback hands over. Fixed in `e3e70ff`, with the direction
+now pinned against the SQL, so a future template that reverses the convention
+fails loudly instead of answering backwards.
+
+**Worth noting for WP-5's gates:** this is a defect no eval number would ever
+have caught, because the eval's gold rows were authored from the same reading the
+extractor happened to produce. It was found by reading the SQL.
 
 ### 5.2 Behaviour gaps for a ruling
 
@@ -523,10 +605,14 @@ Which WP-4a §4 items now have eval evidence attached:
 
 ## 7. What WP-4c does next
 
-1. **Rule on F1 and apply it** (§5.1). Nothing else is worth doing first.
-2. **Re-run the full eval** — three replays, same harnesses, same gold set — and
-   only then compare against 96–97%. The numbers in §3.3 are a measurement of
-   the extractor, not of the router.
+1. **Re-run the full eval** — three replays, same harnesses, same gold set —
+   and only then compare against 96–97%. The numbers in §3.3 were measured
+   before F1 and 5.1a were fixed; they are a measurement of the extractor, not
+   of the router. Nothing else is worth doing first.
+2. **Read `_log_fiscal_year_disagreement`'s output from that run.** If the
+   deterministic reader never disagrees with a successful extraction, promote it
+   from a fallback to a prefill (the `amount_from_text` pattern) and drop the
+   slot from the extractor's job entirely.
 3. **Get the 19 Odia-script rows read by a native speaker** before drawing any
    conclusion about F2. Then, if the phrasing is ratified, F2 is a retrieval
    change (an Odia paraphrase set, or a multilingual embedding model) and needs
