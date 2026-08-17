@@ -64,6 +64,13 @@ from phase2_engine import (
     compute_conciseness, compute_impact, score_candidate,
     # Output helper (save_candidates unchanged)
     save_candidates,
+    # WP-D2c: determinism (canonical ordering + content hash), the bounded
+    # candidate store, and the one prefilter constant the store is bound at
+    canonical_sort, candidates_content_hash, TopKStore, RANKING_PREFILTER_CAP,
+    # WP-D2c A7: the non-zero-support guard behind the data-quality routing
+    temporal_support, temporal_support_ok,
+    # WP-D2c A3: the signed money measures the EVENNESS reframing keys on
+    SIGNED_MONEY_MEASURES,
 )
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -119,6 +126,20 @@ VIEW2_CONFIG = ViewConfig(
     # month with no transactions is a real zero rather than a missing row —
     # 259 of the 1,440 cells exist only because of that fill, and they are
     # exactly the silent months a finding should be able to see.
+    # WP-D2c A4 adds the two intensity measures at the end. Calibration session
+    # 1, ruling 4: four of view2's fifteen findings were place rankings that
+    # rank places by how many Gram Panchayats they contain -- Ganjam leads on
+    # everything because Ganjam holds 4 of the sample's 20 GPs. The operator's
+    # instruction was "let's think about a denominator", and the view's own
+    # grain IS the denominator: one row per GP per month, so the MEAN of the
+    # same rupee column over the same rows is rupees per GP-month, which is
+    # size-free by construction.
+    #
+    # They are ALIASES, not new columns (`column=`): the pack's view SQL is
+    # untouched and no number is recomputed anywhere -- payment_amount_mean is
+    # payment_amount, averaged instead of totalled. AP's benefit_amount_mean is
+    # the precedent. The size-total findings stay minable; the report prefers
+    # the intensity phrasing (phase5b, rule 2c).
     measures=[
         MeasureConfig("payment_amount",              "sum"),  # CASHBOOK rupees out
         MeasureConfig("receipt_amount",              "sum"),  # CASHBOOK rupees in
@@ -127,6 +148,8 @@ VIEW2_CONFIG = ViewConfig(
         MeasureConfig("activity_linked_expenditure", "sum"),  # SPENT rupees tied to activities
         MeasureConfig("sanctions_count",             "sum"),  # sanctions, by sanction month
         MeasureConfig("sanctioned_amount",           "sum"),  # SANCTIONED rupees, by month
+        MeasureConfig("payment_amount_mean", "avg", column="payment_amount"),
+        MeasureConfig("receipt_amount_mean", "avg", column="receipt_amount"),
     ],
 
     impact_measures=[
@@ -426,6 +449,17 @@ def evaluate_trend(distribution: pd.Series) -> Optional[Highlight]:
     values = dist.values.astype(float)
     x      = np.arange(len(values))
     rho, p = stats.spearmanr(x, values)
+
+    # A constant series -- most often an all-zero one -- has no rank
+    # correlation at all, and scipy says so with NaN. NaN fails BOTH rejection
+    # tests below, because every comparison against NaN is False, so the
+    # evaluator was returning DECREASING (rho > 0 is also False) for series
+    # that never moved. That is how 17 of view3's 20 Gram Panchayats came to
+    # have a "declining completion trend" on a column with 17 events in it
+    # (WP-D2c A7). The support guard displaces those candidates; this stops the
+    # evaluator asserting a direction it did not measure.
+    if np.isnan(rho) or np.isnan(p):
+        return None
 
     if p >= 0.05 or abs(rho) < 0.5:
         return None

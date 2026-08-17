@@ -7,23 +7,23 @@
   [PASS] prose_gate exits 0  -- rc=0
 
 === (b) no hollow sections ===
-  [PASS] Activity Lifecycle - Every Planned Work and Its Money: section carries prose  -- 721 words
-  [PASS] Monthly Money Flows by Gram Panchayat: section carries prose  -- 624 words
-  [PASS] Gram Panchayat Report Card by Year: section carries prose  -- 574 words
+  [PASS] Activity Lifecycle - Every Planned Work and Its Money: section carries prose  -- 680 words
+  [PASS] Monthly Money Flows by Gram Panchayat: section carries prose  -- 633 words
+  [PASS] Gram Panchayat Report Card by Year: section carries prose  -- 571 words
   [PASS] every view has a section in the report  -- []
 
 === (c) FY 2023-24 caveat scope ===
-  [PASS] Activity Lifecycle - Every Planned Work and Its Money: caveat present == a finding qualifies  -- qualifying ranks=[12, 13], in report=True
+  [PASS] Activity Lifecycle - Every Planned Work and Its Money: caveat present == a finding qualifies  -- qualifying ranks=[15], in report=True
   [PASS] Activity Lifecycle - Every Planned Work and Its Money: the caveat sits inside the deterministic note
   [PASS] Monthly Money Flows by Gram Panchayat: caveat present == a finding qualifies  -- qualifying ranks=none, in report=False
   [PASS] Gram Panchayat Report Card by Year: caveat present == a finding qualifies  -- qualifying ranks=none, in report=False
 
 === (d) every figure traces to engine output ===
-  [PASS] Activity Lifecycle - Every Planned Work and Its Money: 43 figures, all traced
-  [PASS] Monthly Money Flows by Gram Panchayat: 24 figures, all traced
-  [PASS] Gram Panchayat Report Card by Year: 22 figures, all traced
+  [PASS] Activity Lifecycle - Every Planned Work and Its Money: 38 figures, all traced
+  [PASS] Monthly Money Flows by Gram Panchayat: 27 figures, all traced
+  [PASS] Gram Panchayat Report Card by Year: 20 figures, all traced
 
-  89/89 quoted figures traced to engine output or to the view's stated facts
+  85/85 quoted figures traced to engine output or to the view's stated facts
 
 ============================================================
 0 failure(s)

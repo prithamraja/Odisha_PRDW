@@ -27,7 +27,7 @@ import time
 import heapq
 from typing import Optional
 from dataclasses import dataclass, field
-from collections import Counter
+from collections import Counter, OrderedDict
 
 import numpy as np
 import pandas as pd
@@ -41,9 +41,23 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 @dataclass
 class MeasureConfig:
-    """A measure with its aggregation type (sum or avg)."""
+    """A measure with its aggregation type (sum or avg).
+
+    `column` lets a measure NAME differ from the parquet COLUMN it reads. An
+    intensity measure is the same rupee column as its total, aggregated
+    differently -- `payment_amount_mean` is `payment_amount` averaged over
+    GP-months (WP-D2c A4). Carrying that as an alias keeps the pack's view SQL
+    untouched: the column already exists, and what changes is how the engine
+    aggregates it. `None` means the measure reads the column of its own name,
+    which is every measure that shipped before this.
+    """
     name: str
     agg: str = "sum"   # "sum" or "avg"
+    column: Optional[str] = None
+
+    @property
+    def source_column(self) -> str:
+        return self.column or self.name
 
 
 @dataclass
@@ -61,6 +75,52 @@ class ViewConfig:
     tau: float = 0.5             # commonness proportion threshold
     min_impact: float = 0.01     # prune subspaces below this impact
     min_hdp_size: int = 3        # minimum HDP members to form a MetaInsight
+
+    # --- WP-D2c A1: definitional (measure, breakdown) pairs ---------------
+    # Calibration session 1, ruling 1: some measure x dimension pairs are
+    # circular by construction, and breaking that measure down by that
+    # dimension can only ever rediscover how the column was built. Four of
+    # view1's fifteen top-ranked findings were of this class ("New/Fresh has
+    # the highest trainees_total among work_type_label values" -- training
+    # detail attaches only to New/Fresh activities).
+    #
+    # The pair is skipped at SCOPE GENERATION, which is the only place that
+    # removes it everywhere at once: the scope never exists, so no pattern, no
+    # HDP member and no measure-extending sibling can carry it. A dimension in
+    # an excluded pair remains fully minable as a FILTER -- "within New/Fresh
+    # activities, how do trainee numbers fall across Gram Panchayats" is a real
+    # question, and it is the breakdown, not the slice, that is circular.
+    excluded_pairs: tuple = ()   # tuple of (measure, breakdown) pairs
+
+    # --- WP-D2c A7: minimum non-zero support for temporal patterns --------
+    # A trend over a series that is almost all zeros is a statement about
+    # recording, not about the programme. view3's top two findings were TRENDs
+    # on `n_completed`, a column carrying 17 non-zero events in the whole
+    # sample: 18 of its 20 per-Gram-Panchayat series have at most two non-zero
+    # years out of six, and an all-zero series makes Spearman's rho undefined,
+    # which the evaluator was reading as a decreasing trend.
+    #
+    # Both thresholds are read off this drop by sweeping them (WPD2c_REPORT
+    # §1, A7), not chosen by taste:
+    #
+    #   the FLOOR of 4 is the longest minimum any temporal evaluator imposes on
+    #   its own input (TREND needs 4 points), so a series with fewer real
+    #   observations than that is being read by an evaluator that would have
+    #   refused it outright had the zeros been absent rather than recorded.
+    #
+    #   the FRACTION was swept at 0.50, 1/3 and 0.25 on view2. At 0.50 twelve
+    #   candidates are displaced, and all twelve are single-Gram-Panchayat
+    #   monthly cash series carrying 34 to 56 non-zero months out of 72 -- real
+    #   series, wrongly caught. At 1/3 and at 0.25 the number is zero and the
+    #   candidate set is identical, so the data is flat across that range and
+    #   1/3 is the top of the flat. `n_completed` fails at every value tried,
+    #   because 18 of its 20 per-Gram-Panchayat series have at most two
+    #   non-zero years and cannot clear the floor at any fraction.
+    #
+    # Candidates whose members mostly fail are not dropped: they are marked and
+    # routed to the run's data-quality list (operator ruling, session 1 item 7).
+    min_temporal_nonzero: int = 4              # absolute non-zero points required
+    min_temporal_nonzero_frac: float = 1 / 3   # ... and as a share of the series
 
     # How far the extremum evaluators require the extreme value to stand clear
     # of its nearest neighbour. OUTSTANDING_LAST takes it directly (the minimum
@@ -85,6 +145,26 @@ class ViewConfig:
             if m.name == measure_name:
                 return m.agg
         return "sum"
+
+    def get_column(self, measure_name: str) -> str:
+        """The parquet column a measure reads. Its own name unless aliased."""
+        for m in self.measures:
+            if m.name == measure_name:
+                return m.source_column
+        return measure_name
+
+    def is_excluded(self, measure: str, breakdown: str) -> bool:
+        """Is this (measure, breakdown) pair definitional? See excluded_pairs."""
+        return (measure, breakdown) in self._excluded_set
+
+    @property
+    def _excluded_set(self) -> frozenset:
+        # built once, on first use; the tuple is fixed at construction
+        cached = self.__dict__.get("_excluded_cache")
+        if cached is None:
+            cached = frozenset(tuple(p) for p in self.excluded_pairs)
+            self.__dict__["_excluded_cache"] = cached
+        return cached
 
 
 # =============================================================================
@@ -218,6 +298,92 @@ VIEW1_CONFIG = ViewConfig(
     tau=0.5,
     min_impact=0.01,
     min_hdp_size=3,
+
+    # WP-D2c A1. Thirty-two definitional pairs, of which six come from
+    # calibration session 1 (marked) and the rest from the audit the brief asks
+    # for -- the same class, found by measurement rather than by eye.
+    #
+    # THE TEST, run over the built view (WPD2c_REPORT §1 carries the table).
+    # A pair qualifies under either of two measured rules:
+    #
+    #   (a) THE MEASURE IS THE DIMENSION VALUE, RESTATED. It is non-zero on at
+    #       least 99% of the rows carrying one dimension value and on at most
+    #       1% of every other row, so the column is that value's indicator with
+    #       a number attached. `is_ongoing` is 1 exactly when status_label is
+    #       WORK ONGOING; `fund_abandoned_total` is the money on abandoned
+    #       works. The 1% tolerance is not slack for its own sake: 19 rupees of
+    #       `fund_abandoned_total` sit on WORK ONGOING rows, which is a data
+    #       defect and not a reason to keep mining the tautology.
+    #
+    #   (b) A CHILD TABLE CONFINED TO ONE VALUE. Every non-zero value of the
+    #       measure sits in ONE dimension value, and at least 100 rows carry it
+    #       -- training detail exists only for New/Fresh activities, on 1,034
+    #       of them. Coverage inside that value is low, which is what makes it
+    #       a child table rather than rule (a), and the breakdown is circular
+    #       all the same.
+    #
+    # WHAT THE TEST DELIBERATELY LEAVES MINABLE. Nineteen further pairs have
+    # single-value support on a near-empty column -- `st_amount` has two
+    # non-zero rows in the whole sample and therefore looks "confined" to
+    # whichever value those two rows happen to hold. That is sparsity, not
+    # construction, and excluding it would hide a data-quality signal behind a
+    # rule about definitions. It is reported instead (§1). Eighteen more sit at
+    # 99.5-99.9% of mass in one value without being confined to it: real
+    # concentration, and the finding is the concentration.
+    #
+    # And the rule does NOT reach the size artifact next door to it. "Activity
+    # Approved has the lowest overspend_vs_plan among status values" holds 80%
+    # of the shortfall in a status holding 79.6% of the activities -- that is
+    # arithmetic, not a definition, and the answer to it is the volume share
+    # the report now attaches to every total (phase5b, rule 2b), not a silent
+    # deletion from the search space.
+    #
+    # The two `fund_untied_total` pairs are the one entry the audit does NOT
+    # support on its own -- untied money spreads across seven fund components
+    # (49.6% in the largest). They are in on the session's authority: a measure
+    # named for one side of a classification, broken down BY that
+    # classification, is circular whatever the residue looks like.
+    excluded_pairs=(
+        # --- child tables that attach to exactly one dimension value ---
+        ("trainees_total",         "work_type_label"),        # session 1
+        ("trainees_total",         "output_type_label"),
+        ("trainees_total",         "asset_category_label"),
+        ("beneficiaries_expected", "work_type_label"),        # session 1
+        ("beneficiaries_expected", "output_type_label"),
+        ("beneficiaries_expected", "asset_category_label"),
+        # --- the tied/untied classification, broken down by itself ---
+        ("fund_tied_total",        "fund_component_name"),    # session 1
+        ("fund_tied_total",        "tied_untied"),            # session 1
+        ("fund_tied_total",        "sanctioned_scheme_name"),
+        ("fund_untied_total",      "fund_component_name"),    # session 1
+        ("fund_untied_total",      "tied_untied"),            # session 1
+        # --- measures that ARE a status, broken down by the status column ---
+        ("is_completed",           "status_label"),
+        ("is_ongoing",             "status_label"),
+        ("is_started",             "status_label"),   # started = ongoing + completed
+        ("is_abandoned",           "status_label"),
+        ("is_under_approval",      "status_label"),
+        ("fund_abandoned_total",   "status_label"),   # the money on abandoned works
+        # --- money and evidence against the costed/costless split: a costless
+        #     activity has no cost, no sanction, no voucher and no photograph,
+        #     so every one of these ranks 'Costed' first by construction
+        ("total_cost",             "is_costless"),
+        ("fund_tied_total",        "is_costless"),
+        ("fund_untied_total",      "is_costless"),
+        ("fund_abandoned_total",   "is_costless"),
+        ("work_proposed_cost",     "is_costless"),
+        ("fund_sanctioned_total",  "is_costless"),
+        ("total_expenditure",      "is_costless"),
+        ("gen_amount",             "is_costless"),
+        ("overspend_vs_plan",      "is_costless"),
+        ("overspend_vs_sanction",  "is_costless"),
+        ("is_abandoned",           "is_costless"),
+        ("is_admin_approved",      "is_costless"),
+        ("has_technical_approval", "is_costless"),
+        ("has_progress_evidence",  "is_costless"),
+        ("evidence_uploads",       "is_costless"),
+    ),
+
     # extremum_ratio is deliberately NOT set: it stays at the 0.67 default.
     # AP raised every view to 0.80 because its findings were proportional (an
     # equity index at 0.75 of parity was being rejected by a bar built for
@@ -321,7 +487,8 @@ def generate_subspaces(config: ViewConfig, df: pd.DataFrame) -> list:
 def generate_data_scopes(subspace: Subspace, config: ViewConfig) -> list:
     """
     For a given subspace, enumerate all valid (breakdown, measure) combinations.
-    Breakdown dimensions that are already used as filters are excluded.
+    Breakdown dimensions that are already used as filters are excluded, and so
+    are the view's definitional (measure, breakdown) pairs (A1).
     """
     filtered_dims = {dim for dim, _ in subspace.filters}
     available_breakdowns = [
@@ -332,6 +499,7 @@ def generate_data_scopes(subspace: Subspace, config: ViewConfig) -> list:
         DataScope(subspace, breakdown, measure)
         for breakdown in available_breakdowns
         for measure in config.measure_names
+        if not config.is_excluded(measure, breakdown)
     ]
 
 
@@ -397,33 +565,72 @@ def query_data_scope(df: pd.DataFrame, data_scope: DataScope, config: ViewConfig
     if len(filtered) == 0:
         return pd.Series(dtype=float)
     agg_type = config.get_agg(data_scope.measure)
+    column   = config.get_column(data_scope.measure)
     if agg_type == "avg":
-        result = filtered.groupby(data_scope.breakdown)[data_scope.measure].mean()
+        result = filtered.groupby(data_scope.breakdown)[column].mean()
     else:
-        result = filtered.groupby(data_scope.breakdown)[data_scope.measure].sum()
+        result = filtered.groupby(data_scope.breakdown)[column].sum()
     return result.sort_index()
 
 
 class QueryCache:
-    """LRU-less cache for groupby query results keyed by DataScope."""
+    """Cache for groupby query results keyed by DataScope.
 
-    def __init__(self):
-        self._cache: dict = {}
-        self._aug_cache: dict = {}  # augmented 2-col groupby cache
+    WP-D2c T3 gives it a bound. It was never-evict, and never-evict is what put
+    3.94 GB of process memory behind 1.7% of view1's depth-2 queue (WP-D2 §2) --
+    the wall that stopped that run, and a wall that arrives with scale rather
+    than with time. `max_entries=None` keeps the original behaviour exactly, so
+    every measurement taken before this change still reproduces; a number turns
+    on least-recently-used eviction, and `evictions` records what it cost.
+    """
+
+    def __init__(self, max_entries: Optional[int] = None):
+        self._cache: "OrderedDict" = OrderedDict()
+        self._aug_cache: "OrderedDict" = OrderedDict()  # augmented 2-col groupby
+        self.max_entries = max_entries
         self.hits = 0
         self.misses = 0
+        self.evictions = 0
+
+    def _evict(self):
+        if self.max_entries is None:
+            return
+        while len(self._cache) > self.max_entries:
+            self._cache.popitem(last=False)
+            self.evictions += 1
+        # the augmented cache holds far fewer, far larger frames; it gets an
+        # eighth of the budget so one wide two-column groupby cannot hold the
+        # whole allowance on its own
+        aug_cap = max(16, self.max_entries // 8)
+        while len(self._aug_cache) > aug_cap:
+            self._aug_cache.popitem(last=False)
+            self.evictions += 1
 
     def get(self, data_scope: DataScope) -> Optional[pd.Series]:
         key = (data_scope.subspace, data_scope.breakdown, data_scope.measure)
         if key in self._cache:
             self.hits += 1
+            if self.max_entries is not None:
+                self._cache.move_to_end(key)
             return self._cache[key]
         self.misses += 1
         return None
 
+    def peek(self, data_scope: DataScope) -> Optional[pd.Series]:
+        """The cached series without counting a hit or a miss.
+
+        The A7 support guard reads series the pattern evaluators have already
+        fetched. Counting those reads as cache hits would inflate the hit rate
+        the diagnostics report -- the guard is not doing the mining's work.
+        """
+        return self._cache.get(
+            (data_scope.subspace, data_scope.breakdown, data_scope.measure)
+        )
+
     def put(self, data_scope: DataScope, result: pd.Series):
         key = (data_scope.subspace, data_scope.breakdown, data_scope.measure)
         self._cache[key] = result
+        self._evict()
 
     def prefetch_subspace_hdp(
         self,
@@ -459,13 +666,14 @@ class QueryCache:
             if len(filtered) == 0 or ext_dim not in filtered.columns:
                 return
             agg_type = config.get_agg(measure)
+            column   = config.get_column(measure)
             if agg_type == "avg":
                 self._aug_cache[aug_key] = (
-                    filtered.groupby([breakdown, ext_dim])[measure].mean()
+                    filtered.groupby([breakdown, ext_dim])[column].mean()
                 )
             else:
                 self._aug_cache[aug_key] = (
-                    filtered.groupby([breakdown, ext_dim])[measure].sum()
+                    filtered.groupby([breakdown, ext_dim])[column].sum()
                 )
 
         aug_result = self._aug_cache[aug_key]
@@ -487,6 +695,7 @@ class QueryCache:
             self._cache[scope_key] = member_series
             # Count as a hit since the augmented query did the work
             self.hits += 1
+        self._evict()
 
     @property
     def hit_rate(self) -> float:
@@ -495,28 +704,72 @@ class QueryCache:
 
 
 class PatternCache:
-    """Cache for pattern evaluation results keyed by (DataScope, pattern_type)."""
+    """Cache for pattern evaluation results keyed by (DataScope, pattern_type).
 
-    def __init__(self):
-        self._cache: dict = {}
+    Bounded the same way as QueryCache, and for the same reason. Its entries
+    are small (a pattern type and a highlight tuple), so it is not the memory
+    wall the query cache is -- but at 880,752 scopes x 11 pattern types the
+    key tuples alone are hundreds of megabytes.
+    """
+
+    def __init__(self, max_entries: Optional[int] = None):
+        self._cache: "OrderedDict" = OrderedDict()
+        self.max_entries = max_entries
         self.hits = 0
         self.misses = 0
+        self.evictions = 0
 
     def get(self, data_scope: DataScope, pattern_type: str) -> Optional[BasicDataPattern]:
         key = (data_scope, pattern_type)
         if key in self._cache:
             self.hits += 1
+            if self.max_entries is not None:
+                self._cache.move_to_end(key)
             return self._cache[key]
         self.misses += 1
         return None
 
     def put(self, data_scope: DataScope, pattern_type: str, pattern: BasicDataPattern):
         self._cache[(data_scope, pattern_type)] = pattern
+        if self.max_entries is not None:
+            while len(self._cache) > self.max_entries:
+                self._cache.popitem(last=False)
+                self.evictions += 1
 
     @property
     def hit_rate(self) -> float:
         total = self.hits + self.misses
         return self.hits / total if total > 0 else 0.0
+
+
+# =============================================================================
+# WP-D2c A7 — non-zero support behind a temporal series
+# =============================================================================
+# A time series that is almost entirely zeros will still hand a trend detector
+# something to fit. `n_completed` is the case that produced the ruling: 17
+# non-zero events in 120 GP-years, and 17 of view3's 20 per-GP series were
+# reported as DECREASING because Spearman's rho on an all-zero series is NaN
+# and NaN fails every rejection test it is compared against.
+#
+# The guard is applied at the HDP, not at the scope: a finding is displaced
+# when the members that BOTH carry the common pattern AND have enough non-zero
+# points no longer make a commonness set. That keeps a genuine pattern with a
+# few thin members, and drops a pattern that exists only because its members
+# are empty.
+
+def temporal_support(distribution: pd.Series) -> tuple:
+    """(points, non-zero points) in a series, NaN excluded."""
+    dist = distribution.dropna()
+    return len(dist), int((dist != 0).sum())
+
+
+def temporal_support_ok(distribution: pd.Series, config: ViewConfig) -> bool:
+    """Does this series carry enough non-zero points to be read as a series?"""
+    n, nz = temporal_support(distribution)
+    if n == 0:
+        return False
+    return (nz >= config.min_temporal_nonzero
+            and nz >= config.min_temporal_nonzero_frac * n)
 
 
 def evaluate_outstanding_1(
@@ -684,11 +937,13 @@ def extend_subspace(
 def extend_measure(data_scope: DataScope, config: ViewConfig) -> list:
     """
     Generate a sibling HDP group by varying the measure while keeping
-    subspace and breakdown fixed.
+    subspace and breakdown fixed. Definitional pairs (A1) are not siblings:
+    the excluded scope does not exist, so it cannot be an HDP member either.
     """
     siblings = [
         DataScope(data_scope.subspace, data_scope.breakdown, m)
         for m in config.measure_names
+        if not config.is_excluded(m, data_scope.breakdown)
     ]
     if len(siblings) >= config.min_hdp_size:
         return [("measure", "measure", siblings)]
@@ -704,6 +959,7 @@ def extend_breakdown(data_scope: DataScope, config: ViewConfig) -> list:
     siblings = [
         DataScope(data_scope.subspace, b, data_scope.measure)
         for b in config.temporal_dimensions
+        if not config.is_excluded(data_scope.measure, b)
     ]
     if len(siblings) >= config.min_hdp_size:
         return [("breakdown", "temporal_grain", siblings)]
@@ -750,8 +1006,27 @@ class MetaInsightCandidate:
     score: float = 0.0
     impact_measure_used: str = ""
 
+    # WP-D2c A7: set when the temporal series behind this candidate's
+    # commonness are too sparse to read as series. The candidate is NOT
+    # discarded -- run_engine routes it to the run's data-quality list.
+    low_temporal_support: bool = False
+    support_note: str = ""
+
+    # WP-D2c A2: twin merge (phase5_ranking). The label of the candidate this
+    # one absorbed, so the merge is visible on the finding rather than only in
+    # a log.
+    merged_twins: list = field(default_factory=list)
+
+    # WP-D2c T3: the identity the mining loop deduplicates on -- the HDP's
+    # member subspaces, its pattern type, breakdown and measure. It used to
+    # live only in run_engine's local `evaluated_hdps` set, which works while
+    # there is one loop; with the queue sharded across processes each shard has
+    # its own set, so the key travels ON the candidate and the merge does the
+    # last deduplication pass. Never serialised.
+    dedup_key: Optional[int] = None
+
     def to_dict(self) -> dict:
-        return {
+        d = {
             "extending_strategy":  self.extending_strategy,
             "extending_dimension": self.extending_dimension,
             "pattern_type":        self.pattern_type,
@@ -766,6 +1041,38 @@ class MetaInsightCandidate:
             "score":               round(self.score, 6),
             "impact_measure_used": self.impact_measure_used,
         }
+        if self.low_temporal_support:
+            d["low_temporal_support"] = True
+            d["support_note"] = self.support_note
+        if self.merged_twins:
+            d["merged_twins"] = self.merged_twins
+        return d
+
+    def canonical_key(self) -> str:
+        """A stable, content-derived identity for this candidate.
+
+        Two candidates that say the same thing produce the same key whatever
+        order they were mined in, and the key orders ties in the output file.
+        Everything in it is sorted: the base subspace is a frozenset, and the
+        member lists come out of a partition whose order follows the order the
+        HDP was enumerated in -- which is exactly what parallel mining is
+        allowed to change.
+        """
+        subspace = ";".join(sorted(f"{k}={v}" for k, v in self.base_subspace.filters))
+        commonness = "|".join(sorted(
+            f"{cs['pattern_type']}~{cs['highlight']}~"
+            + ",".join(sorted(str(m) for m in cs["members"]))
+            for cs in self.commonness_sets
+        ))
+        exceptions = "|".join(sorted(
+            f"{e['member_label']}~{e['category']}~{e['highlight']}"
+            for e in self.exceptions
+        ))
+        return "||".join([
+            self.extending_strategy, self.extending_dimension, self.pattern_type,
+            self.breakdown, self.measure, subspace, str(self.hdp_size),
+            commonness, exceptions,
+        ])
 
 
 def evaluate_hdp(
@@ -883,6 +1190,43 @@ def evaluate_hdp(
     else:
         base_subspace = ref_scope.subspace
 
+    # -- A7: is the commonness carried by series with real non-zero support? --
+    low_support, support_note = False, ""
+    if pattern_type in TEMPORAL_ONLY_TYPES:
+        supported = {}
+        for p in patterns:
+            series = query_cache.peek(p.data_scope)
+            if series is None:
+                # the pattern came from the pattern cache and the query cache
+                # has since evicted its series. Recomputing is the only honest
+                # answer: treating a missing series as unsupported would let
+                # cache pressure decide which findings are data-quality items.
+                series = query_data_scope(df, p.data_scope, config)
+                query_cache.put(p.data_scope, series)
+            supported[p.data_scope] = temporal_support_ok(series, config)
+        top = max(commonness_sets, key=lambda cs: cs["count"])
+        common_scopes = [
+            p.data_scope for p in patterns
+            if p.pattern_type == top["pattern_type"]
+            and str(p.highlight) == top["highlight"]
+        ]
+        n_supported = sum(1 for ds in common_scopes if supported.get(ds))
+        if n_supported / n <= config.tau:
+            low_support = True
+            nonzeros = sorted(
+                temporal_support(query_cache.peek(ds))[1]
+                for ds in common_scopes if query_cache.peek(ds) is not None
+            )
+            support_note = (
+                f"{n_supported} of the {top['count']} members carrying this "
+                f"pattern have at least {config.min_temporal_nonzero} non-zero "
+                f"points and at least "
+                f"{config.min_temporal_nonzero_frac:.0%} of their series "
+                f"non-zero; non-zero points per member run "
+                f"{nonzeros[0] if nonzeros else 0}-"
+                f"{nonzeros[-1] if nonzeros else 0}"
+            )
+
     return MetaInsightCandidate(
         extending_strategy=extending_strategy,
         extending_dimension=extending_dimension,
@@ -894,6 +1238,8 @@ def evaluate_hdp(
         exceptions=exceptions,
         hdp_size=n,
         hdp_member_subspaces=[ds.subspace for ds in hdp_scopes],
+        low_temporal_support=low_support,
+        support_note=support_note,
     )
 
 
@@ -1148,11 +1494,104 @@ def run_engine(config: ViewConfig, time_budget_seconds: int = 600) -> tuple:
     return candidates, diagnostics
 
 
+# The ranking stage keeps only this many candidates by score before it runs the
+# greedy selector (phase5_ranking.prefilter_candidates). It lives here because
+# the mining stage now bounds its own candidate store to the same number: at
+# this K the bound is LOSSLESS, since the ranker was never going to look below
+# it. One constant, so the two cannot drift apart and quietly start discarding
+# candidates the ranker would have read.
+RANKING_PREFILTER_CAP = 5000
+
+# WP-D2c A3. Measures that are a SIGNED difference between two money bases:
+# negative means unspent, positive means spent beyond. They need their own
+# EVENNESS wording, because "evenly distributed" reads as a compliment on a
+# measure whose whole magnitude is a shortfall. Named here, next to the
+# configs, so the ranker's template and the report's framing rule cannot drift
+# apart on which measures they mean.
+SIGNED_MONEY_MEASURES = frozenset({"overspend_vs_plan", "overspend_vs_sanction"})
+
+
+class TopKStore:
+    """The mining loop's candidate store: the best K by score, deduplicated.
+
+    WP-D2c T3. The store was a plain list that grew for as long as the queue
+    ran -- 14,172 candidates and climbing when view1's depth-2 run was stopped,
+    against a projection of ~800,000. Two things then break at once: the list
+    itself, and the ranker behind it, which reads only the top 5,000 by score
+    and never looks lower.
+
+    So the bound is set AT the ranker's own prefilter (RANKING_PREFILTER_CAP)
+    and at that value it is LOSSLESS: every candidate this store drops is one
+    `prefilter_candidates` would have dropped a step later, so the ranked
+    top-15 is provably the same list. Lower values are allowed and are NOT
+    lossless -- raw-score top ranks cluster near-twins (calibration session 1),
+    and the greedy ranker needs breadth below them to find diverse candidates.
+
+    Eviction is by (score, canonical_key), so which candidate goes when scores
+    tie is a property of the findings and not of the order they arrived in.
+    Deduplication is by `dedup_key`: one loop can keep a set of every HDP it
+    has evaluated, but several sharded loops each keep their own, and the same
+    HDP reached from two shards must still produce one candidate.
+    """
+
+    def __init__(self, k: int = RANKING_PREFILTER_CAP):
+        self.k = k
+        self._by_key: dict = {}
+        self._heap: list = []
+        self.dropped = 0
+        self.duplicates = 0
+
+    def add(self, candidate) -> None:
+        # a candidate mined outside run_engine carries no HDP key; its own
+        # content is then its identity, which is the same test one step later
+        key = (candidate.dedup_key if candidate.dedup_key is not None
+               else candidate.canonical_key())
+        if key in self._by_key:
+            self.duplicates += 1
+            return
+        entry = (candidate.score, candidate.canonical_key(), key)
+        self._by_key[key] = candidate
+        heapq.heappush(self._heap, entry)
+        if self.k is not None and len(self._heap) > self.k:
+            _, _, evicted = heapq.heappop(self._heap)
+            self._by_key.pop(evicted, None)
+            self.dropped += 1
+
+    def items(self) -> list:
+        """Everything held, in canonical order."""
+        return canonical_sort(list(self._by_key.values()))
+
+    def __len__(self) -> int:
+        return len(self._by_key)
+
+
+def canonical_sort(candidates: list) -> list:
+    """Score-descending, ties broken by content. See canonical_key.
+
+    `sort` on score alone is stable, which means the output order carries the
+    order the candidates were mined in -- and that is exactly what parallel
+    mining, cache eviction and a re-ordered parquet are allowed to change.
+    Ordering ties by content makes the candidate file a function of the
+    findings and nothing else.
+    """
+    return sorted(candidates, key=lambda c: (-c.score, c.canonical_key()))
+
+
+def candidates_content_hash(candidates: list) -> str:
+    """SHA-256 over the canonical keys and scores, order-independent."""
+    import hashlib
+    h = hashlib.sha256()
+    for c in canonical_sort(candidates):
+        h.update(f"{c.score:.9f}|{c.canonical_key()}\n".encode("utf-8"))
+    return h.hexdigest()
+
+
 def save_candidates(candidates: list, output_path: str):
-    """Serialise all MetaInsight candidates to JSON."""
+    """Serialise all MetaInsight candidates to JSON, in canonical order."""
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
-        json.dump([c.to_dict() for c in candidates], f, indent=2, default=str)
+        json.dump([c.to_dict() for c in canonical_sort(candidates)], f,
+                  indent=2, default=str)
     print(f"Saved {len(candidates):,} candidates -> {output_path}")
 
 
@@ -1177,6 +1616,9 @@ def load_candidates(path: str) -> list:
             impact=d["impact"],
             score=d["score"],
             impact_measure_used=d["impact_measure_used"],
+            low_temporal_support=d.get("low_temporal_support", False),
+            support_note=d.get("support_note", ""),
+            merged_twins=list(d.get("merged_twins", [])),
         )
         candidates.append(c)
     return candidates

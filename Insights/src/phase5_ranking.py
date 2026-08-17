@@ -28,7 +28,10 @@ import json
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from phase2_engine import MetaInsightCandidate, Subspace, load_candidates
+from phase2_engine import (
+    MetaInsightCandidate, Subspace, load_candidates,
+    RANKING_PREFILTER_CAP, SIGNED_MONEY_MEASURES,
+)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -199,11 +202,86 @@ def compute_total_use_approx(selected: list) -> float:
     return total
 
 
-def prefilter_candidates(candidates: list, max_candidates: int = 5000) -> list:
-    """Keep only top-N by score. Low scorers have near-zero chance of selection."""
+def prefilter_candidates(candidates: list, max_candidates: int = RANKING_PREFILTER_CAP) -> list:
+    """Keep only top-N by score. Low scorers have near-zero chance of selection.
+
+    The mining stage now bounds its own store at this same number
+    (phase2_engine.RANKING_PREFILTER_CAP), which is why that bound is lossless:
+    everything the store drops, this would have dropped.
+    """
     if len(candidates) <= max_candidates:
         return candidates
     return sorted(candidates, key=lambda c: c.score, reverse=True)[:max_candidates]
+
+
+# =============================================================================
+# PART 2b: TWIN MERGE (WP-D2c A2)
+# =============================================================================
+# Calibration session 1, ruling 2. OUTSTANDING_1 and ATTRIBUTION are different
+# tests -- one is a z-score against the rest of the distribution, the other a
+# share of the total -- and on a concentrated distribution both fire on the
+# same value. The reader then meets the same sentence twice:
+#
+#   "... New/Fresh has the highest trainees_total among work_type_label values"
+#   "... New/Fresh accounts for the majority of trainees_total among ..."
+#
+# Four such pairs sat in the 33 findings the operator labelled, and in each
+# case the second one was labelled a twin of the first. They are ONE finding
+# and they are merged here, before ranking: the higher-scored survives, carries
+# the other's pattern type in `merged_twins`, and the loser is gone -- so it
+# cannot take a second slot in the top-15 and cannot be charged an overlap
+# penalty against its own twin either.
+#
+# The merge is deliberately narrow. It requires the same subspace family (same
+# base subspace, same extending strategy and dimension), the same breakdown and
+# measure, the same highlight, and the same member set -- the four things that
+# make two candidates the same sentence. Near-twins that differ in measure or
+# breakdown (view1 ranks 1/2, view2 ranks 1/15) tell one story to a reader but
+# are not identical findings; collapsing those is a presentation decision, and
+# the overlap term already prices them. NO overlap weight was changed by this
+# WP: the ranking math is untouched, and this is a deduplication in front of it.
+
+_TWIN_TYPES = frozenset({"OUTSTANDING_1", "ATTRIBUTION"})
+
+
+def _twin_key(mi: MetaInsightCandidate):
+    """What makes two candidates the same sentence. See above."""
+    commonness = tuple(sorted(
+        (cs["highlight"], tuple(sorted(str(m) for m in cs["members"])))
+        for cs in mi.commonness_sets
+    ))
+    return (
+        frozenset(mi.base_subspace.filters),
+        mi.extending_strategy,
+        mi.extending_dimension,
+        mi.breakdown,
+        mi.measure,
+        commonness,
+    )
+
+
+def merge_twin_candidates(candidates: list) -> tuple:
+    """Collapse OUTSTANDING_1/ATTRIBUTION twins. Returns (kept, n_merged)."""
+    best: dict = {}
+    passthrough = []
+    for mi in candidates:
+        if mi.pattern_type not in _TWIN_TYPES:
+            passthrough.append(mi)
+            continue
+        key = _twin_key(mi)
+        incumbent = best.get(key)
+        if incumbent is None:
+            best[key] = mi
+            continue
+        winner, loser = (
+            (incumbent, mi) if incumbent.score >= mi.score else (mi, incumbent)
+        )
+        winner.merged_twins = sorted(set(
+            list(winner.merged_twins) + list(loser.merged_twins) + [loser.pattern_type]
+        ))
+        best[key] = winner
+    merged = len(candidates) - len(passthrough) - len(best)
+    return passthrough + list(best.values()), merged
 
 
 def rank_metainsights(candidates: list, k: int = 15) -> list:
@@ -265,7 +343,19 @@ def _pattern_type_to_text(
         "OUTSTANDING_LAST": lambda: f"{hl[0]} has the lowest {measure} among {breakdown} values",
         "TOP_TWO":          lambda: f"{hl[0]} and {hl[1]} lead in {measure} among {breakdown} values",
         "LAST_TWO":         lambda: f"{hl[0]} and {hl[1]} are lowest in {measure} among {breakdown} values",
-        "EVENNESS":         lambda: f"{measure} is evenly distributed across {breakdown} values",
+        # WP-D2c A3. A signed money measure gets its own wording. "Evenly
+        # distributed" is a neutral sentence about a shape, and on
+        # overspend_vs_plan -- Rs 51.96 crore of it, all negative -- the reader
+        # is being told that a shortfall is SYSTEMIC, which is the opposite of
+        # neutral. The operator's instruction was to make the text pop: lead
+        # with the fact that there is no concentration to chase, because that
+        # is what changes what an officer does about it.
+        "EVENNESS":         lambda: (
+            f"{measure} is spread evenly across {breakdown} values -- it belongs "
+            f"to all of them and no single {breakdown} accounts for it"
+            if measure in SIGNED_MONEY_MEASURES else
+            f"{measure} is evenly distributed across {breakdown} values"
+        ),
         "ATTRIBUTION":      lambda: f"{hl[0]} accounts for the majority of {measure} among {breakdown} values",
         "TREND":            lambda: f"{measure} is {hl[0].lower()} over {breakdown}",
         "OUTLIER":          lambda: (
@@ -314,6 +404,14 @@ def generate_nl_summary(candidate: MetaInsightCandidate) -> str:
 
     if candidate.exceptions:
         n_exc = len(candidate.exceptions)
+        # WP-D2c A3, second half. On an EVENNESS finding the exceptions are
+        # about the SHAPE of the distribution and nothing else. Written as
+        # "Exception: Banking Facilities (no clear pattern)" beside a systemic
+        # shortfall, they read as "Banking Facilities is fine" -- the operator
+        # flagged exactly that sentence. The excepted member is one where the
+        # measure is NOT evenly spread; whether it is high or low is not in
+        # this finding.
+        even = cs["pattern_type"] == "EVENNESS"
         exc_descs = []
         for e in candidate.exceptions[:3]:
             if e["category"] == "HIGHLIGHT_CHANGE":
@@ -323,14 +421,27 @@ def generate_nl_summary(candidate: MetaInsightCandidate) -> str:
                 )
                 exc_descs.append(f"{e['member_label']} ({exc_text})")
             elif e["category"] == "TYPE_CHANGE":
-                exc_descs.append(f"{e['member_label']} (different pattern)")
+                exc_descs.append(
+                    f"{e['member_label']} (a different shape of distribution)"
+                    if even else f"{e['member_label']} (different pattern)"
+                )
             else:
-                exc_descs.append(f"{e['member_label']} (no clear pattern)")
+                exc_descs.append(
+                    f"{e['member_label']} (not evenly spread)"
+                    if even else f"{e['member_label']} (no clear pattern)"
+                )
 
+        label = "Uneven only in" if even else "Exception"
+        plural = "Uneven only in" if even else "Exceptions"
         if n_exc <= 3:
-            summary += f". Exception: {'; '.join(exc_descs)}"
+            summary += f". {label}: {'; '.join(exc_descs)}"
         else:
-            summary += f". Exceptions: {'; '.join(exc_descs)} and {n_exc - 3} others"
+            summary += f". {plural}: {'; '.join(exc_descs)} and {n_exc - 3} others"
+        if even:
+            summary += (
+                " -- this is about how the total is spread, not about how much "
+                "any one of them spends"
+            )
 
     return summary
 
@@ -524,7 +635,13 @@ if __name__ == "__main__":
         candidates = load_candidates(path)
         print(f"  {len(candidates):,} candidates loaded")
 
-        filtered = prefilter_candidates(candidates, max_candidates=5000)
+        # A2 runs BEFORE the pre-filter, so a twin cannot occupy one of the
+        # 5,000 slots its survivor already holds.
+        candidates, n_merged = merge_twin_candidates(candidates)
+        print(f"  {n_merged:,} OUTSTANDING_1/ATTRIBUTION twins merged (A2) "
+              f"-> {len(candidates):,}")
+
+        filtered = prefilter_candidates(candidates, max_candidates=RANKING_PREFILTER_CAP)
         print(f"  {len(filtered):,} after pre-filter")
 
         ranked = rank_metainsights(filtered, k=k)

@@ -1,0 +1,209 @@
+view1 at subspace DEPTH 2 (WP-D2c T4)
+DISCOVER_SCALE=sample
+
+======================================================================
+VIEW: Activity Lifecycle
+======================================================================
+Loading C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\b3a49dd2-1d20-4999-9b87-d5264656907e\scratchpad\mirror\Insights\views_prdw\view1_activity_lifecycle.parquet ...
+  12,704 rows x 70 cols  (canonical row order, fingerprint 28c27286da30ec7f)
+
+Pattern types: 6 categorical, 5 temporal  (11 total)
+Excluded (measure, breakdown) pairs: 32  (A1)
+
+Generating subspaces ...
+  depth-0: 1  depth-1: 172  depth-2: 13322  total: 13,495
+Building priority queue ...
+  2,438 subspaces retained after impact pruning (min=0.01); 809,554 data scopes behind them
+
+Mining (budget: 36000s, workers: 5, top-K: 5000) ...
+  queue sharded 5 ways: [487, 488, 488, 488, 487] subspaces per worker
+  5,000 scopes | 5,847 patterns | 3,289 MetaInsights | 467.7s elapsed
+  5,000 scopes | 6,006 patterns | 3,901 MetaInsights | 541.1s elapsed
+  5,000 scopes | 5,592 patterns | 3,809 MetaInsights | 585.2s elapsed
+  5,000 scopes | 5,927 patterns | 4,316 MetaInsights | 590.1s elapsed
+  5,000 scopes | 5,812 patterns | 5,000 MetaInsights | 613.1s elapsed
+  10,000 scopes | 12,255 patterns | 5,000 MetaInsights | 808.8s elapsed
+  10,000 scopes | 11,977 patterns | 4,956 MetaInsights | 809.5s elapsed
+  10,000 scopes | 11,734 patterns | 5,000 MetaInsights | 922.4s elapsed
+  10,000 scopes | 11,017 patterns | 5,000 MetaInsights | 935.4s elapsed
+  10,000 scopes | 11,231 patterns | 5,000 MetaInsights | 959.7s elapsed
+  15,000 scopes | 16,283 patterns | 5,000 MetaInsights | 1108.1s elapsed
+  15,000 scopes | 15,662 patterns | 5,000 MetaInsights | 1177.8s elapsed
+  15,000 scopes | 17,957 patterns | 5,000 MetaInsights | 1180.5s elapsed
+  15,000 scopes | 17,924 patterns | 5,000 MetaInsights | 1275.6s elapsed
+  20,000 scopes | 21,218 patterns | 5,000 MetaInsights | 1317.0s elapsed
+  20,000 scopes | 21,316 patterns | 5,000 MetaInsights | 1362.5s elapsed
+  15,000 scopes | 17,267 patterns | 5,000 MetaInsights | 1368.9s elapsed
+  20,000 scopes | 23,464 patterns | 5,000 MetaInsights | 1442.8s elapsed
+  25,000 scopes | 27,322 patterns | 5,000 MetaInsights | 1565.9s elapsed
+  25,000 scopes | 26,738 patterns | 5,000 MetaInsights | 1577.6s elapsed
+  25,000 scopes | 27,839 patterns | 5,000 MetaInsights | 1581.7s elapsed
+  20,000 scopes | 22,930 patterns | 5,000 MetaInsights | 1628.3s elapsed
+  20,000 scopes | 22,631 patterns | 5,000 MetaInsights | 1684.5s elapsed
+  30,000 scopes | 31,430 patterns | 5,000 MetaInsights | 1720.2s elapsed
+  30,000 scopes | 32,536 patterns | 5,000 MetaInsights | 1780.6s elapsed
+  30,000 scopes | 32,371 patterns | 5,000 MetaInsights | 1801.1s elapsed
+  25,000 scopes | 27,776 patterns | 5,000 MetaInsights | 1827.3s elapsed
+  35,000 scopes | 35,236 patterns | 5,000 MetaInsights | 1834.8s elapsed
+  35,000 scopes | 37,073 patterns | 5,000 MetaInsights | 1949.5s elapsed
+  35,000 scopes | 37,204 patterns | 5,000 MetaInsights | 1951.6s elapsed
+  40,000 scopes | 39,314 patterns | 5,000 MetaInsights | 1964.7s elapsed
+  25,000 scopes | 27,670 patterns | 5,000 MetaInsights | 2028.8s elapsed
+  30,000 scopes | 31,707 patterns | 5,000 MetaInsights | 2079.0s elapsed
+  45,000 scopes | 43,609 patterns | 5,000 MetaInsights | 2100.8s elapsed
+  40,000 scopes | 40,926 patterns | 5,000 MetaInsights | 2116.8s elapsed
+  50,000 scopes | 48,546 patterns | 5,000 MetaInsights | 2244.2s elapsed
+  45,000 scopes | 44,673 patterns | 5,000 MetaInsights | 2247.7s elapsed
+  40,000 scopes | 41,771 patterns | 5,000 MetaInsights | 2267.8s elapsed
+  35,000 scopes | 35,767 patterns | 5,000 MetaInsights | 2342.1s elapsed
+  55,000 scopes | 52,305 patterns | 5,000 MetaInsights | 2368.6s elapsed
+  50,000 scopes | 48,022 patterns | 5,000 MetaInsights | 2377.9s elapsed
+  30,000 scopes | 33,028 patterns | 5,000 MetaInsights | 2407.7s elapsed
+  45,000 scopes | 45,987 patterns | 5,000 MetaInsights | 2466.6s elapsed
+  55,000 scopes | 51,299 patterns | 5,000 MetaInsights | 2503.5s elapsed
+  60,000 scopes | 56,527 patterns | 5,000 MetaInsights | 2560.6s elapsed
+  40,000 scopes | 40,228 patterns | 5,000 MetaInsights | 2582.5s elapsed
+  35,000 scopes | 37,277 patterns | 5,000 MetaInsights | 2640.3s elapsed
+  60,000 scopes | 55,542 patterns | 5,000 MetaInsights | 2670.7s elapsed
+  65,000 scopes | 60,392 patterns | 5,000 MetaInsights | 2695.9s elapsed
+  50,000 scopes | 50,358 patterns | 5,000 MetaInsights | 2706.9s elapsed
+  45,000 scopes | 44,752 patterns | 5,000 MetaInsights | 2791.5s elapsed
+  70,000 scopes | 64,107 patterns | 5,000 MetaInsights | 2809.2s elapsed
+  65,000 scopes | 59,486 patterns | 5,000 MetaInsights | 2821.4s elapsed
+  55,000 scopes | 54,049 patterns | 5,000 MetaInsights | 2913.2s elapsed
+  75,000 scopes | 67,982 patterns | 5,000 MetaInsights | 2934.1s elapsed
+  40,000 scopes | 43,097 patterns | 5,000 MetaInsights | 2959.8s elapsed
+  70,000 scopes | 63,200 patterns | 5,000 MetaInsights | 2965.6s elapsed
+  50,000 scopes | 49,405 patterns | 5,000 MetaInsights | 3051.6s elapsed
+  80,000 scopes | 71,724 patterns | 5,000 MetaInsights | 3053.4s elapsed
+  60,000 scopes | 57,771 patterns | 5,000 MetaInsights | 3108.5s elapsed
+  75,000 scopes | 67,063 patterns | 5,000 MetaInsights | 3154.4s elapsed
+  85,000 scopes | 75,064 patterns | 5,000 MetaInsights | 3162.7s elapsed
+  45,000 scopes | 47,903 patterns | 5,000 MetaInsights | 3210.9s elapsed
+  80,000 scopes | 70,542 patterns | 5,000 MetaInsights | 3271.7s elapsed
+  90,000 scopes | 79,208 patterns | 5,000 MetaInsights | 3273.6s elapsed
+  55,000 scopes | 53,376 patterns | 5,000 MetaInsights | 3309.0s elapsed
+  65,000 scopes | 62,740 patterns | 5,000 MetaInsights | 3352.4s elapsed
+  95,000 scopes | 82,358 patterns | 5,000 MetaInsights | 3379.3s elapsed
+  85,000 scopes | 74,570 patterns | 5,000 MetaInsights | 3405.5s elapsed
+  50,000 scopes | 52,413 patterns | 5,000 MetaInsights | 3408.8s elapsed
+  100,000 scopes | 85,333 patterns | 5,000 MetaInsights | 3467.3s elapsed
+  70,000 scopes | 66,252 patterns | 5,000 MetaInsights | 3470.4s elapsed
+  60,000 scopes | 57,578 patterns | 5,000 MetaInsights | 3513.8s elapsed
+  90,000 scopes | 77,849 patterns | 5,000 MetaInsights | 3520.8s elapsed
+  105,000 scopes | 89,008 patterns | 5,000 MetaInsights | 3568.1s elapsed
+  55,000 scopes | 56,762 patterns | 5,000 MetaInsights | 3593.2s elapsed
+  75,000 scopes | 70,264 patterns | 5,000 MetaInsights | 3616.6s elapsed
+  95,000 scopes | 80,749 patterns | 5,000 MetaInsights | 3617.9s elapsed
+  110,000 scopes | 92,618 patterns | 5,000 MetaInsights | 3723.5s elapsed
+  60,000 scopes | 60,927 patterns | 5,000 MetaInsights | 3737.6s elapsed
+  100,000 scopes | 84,514 patterns | 5,000 MetaInsights | 3760.2s elapsed
+  80,000 scopes | 74,056 patterns | 5,000 MetaInsights | 3778.7s elapsed
+  65,000 scopes | 61,676 patterns | 5,000 MetaInsights | 3805.1s elapsed
+  115,000 scopes | 95,629 patterns | 5,000 MetaInsights | 3814.1s elapsed
+  105,000 scopes | 88,456 patterns | 5,000 MetaInsights | 3876.1s elapsed
+  85,000 scopes | 78,107 patterns | 5,000 MetaInsights | 3881.8s elapsed
+  120,000 scopes | 99,217 patterns | 5,000 MetaInsights | 3901.0s elapsed
+  70,000 scopes | 64,986 patterns | 5,000 MetaInsights | 3909.6s elapsed
+  65,000 scopes | 64,986 patterns | 5,000 MetaInsights | 3946.4s elapsed
+  125,000 scopes | 102,254 patterns | 5,000 MetaInsights | 3979.8s elapsed
+  110,000 scopes | 92,517 patterns | 5,000 MetaInsights | 3980.5s elapsed
+  90,000 scopes | 81,863 patterns | 5,000 MetaInsights | 3981.3s elapsed
+  75,000 scopes | 68,717 patterns | 5,000 MetaInsights | 4016.7s elapsed
+  130,000 scopes | 105,513 patterns | 5,000 MetaInsights | 4055.4s elapsed
+  115,000 scopes | 95,599 patterns | 5,000 MetaInsights | 4059.0s elapsed
+  80,000 scopes | 71,362 patterns | 5,000 MetaInsights | 4098.3s elapsed
+  95,000 scopes | 85,288 patterns | 5,000 MetaInsights | 4118.4s elapsed
+  135,000 scopes | 108,756 patterns | 5,000 MetaInsights | 4134.4s elapsed
+  120,000 scopes | 98,457 patterns | 5,000 MetaInsights | 4135.1s elapsed
+  70,000 scopes | 69,797 patterns | 5,000 MetaInsights | 4137.3s elapsed
+  85,000 scopes | 74,468 patterns | 5,000 MetaInsights | 4191.8s elapsed
+  125,000 scopes | 101,109 patterns | 5,000 MetaInsights | 4205.3s elapsed
+  140,000 scopes | 111,552 patterns | 5,000 MetaInsights | 4206.0s elapsed
+  100,000 scopes | 89,086 patterns | 5,000 MetaInsights | 4209.2s elapsed
+  75,000 scopes | 72,781 patterns | 5,000 MetaInsights | 4253.1s elapsed
+  145,000 scopes | 114,301 patterns | 5,000 MetaInsights | 4278.6s elapsed
+  90,000 scopes | 78,154 patterns | 5,000 MetaInsights | 4286.7s elapsed
+  130,000 scopes | 105,143 patterns | 5,000 MetaInsights | 4301.8s elapsed
+  105,000 scopes | 92,464 patterns | 5,000 MetaInsights | 4309.2s elapsed
+  150,000 scopes | 117,095 patterns | 5,000 MetaInsights | 4349.3s elapsed
+  80,000 scopes | 76,139 patterns | 5,000 MetaInsights | 4366.7s elapsed
+  95,000 scopes | 81,357 patterns | 5,000 MetaInsights | 4382.7s elapsed
+  135,000 scopes | 108,182 patterns | 5,000 MetaInsights | 4394.1s elapsed
+  110,000 scopes | 95,497 patterns | 5,000 MetaInsights | 4398.5s elapsed
+  155,000 scopes | 119,544 patterns | 5,000 MetaInsights | 4415.0s elapsed
+  140,000 scopes | 111,247 patterns | 5,000 MetaInsights | 4476.7s elapsed
+  115,000 scopes | 98,749 patterns | 5,000 MetaInsights | 4479.7s elapsed
+  160,000 scopes | 122,410 patterns | 5,000 MetaInsights | 4487.4s elapsed
+  100,000 scopes | 84,320 patterns | 5,000 MetaInsights | 4495.7s elapsed
+  85,000 scopes | 79,520 patterns | 5,000 MetaInsights | 4527.8s elapsed
+  120,000 scopes | 102,038 patterns | 5,000 MetaInsights | 4560.1s elapsed
+  145,000 scopes | 114,824 patterns | 5,000 MetaInsights | 4565.3s elapsed
+  105,000 scopes | 87,401 patterns | 5,000 MetaInsights | 4577.2s elapsed
+  90,000 scopes | 82,653 patterns | 5,000 MetaInsights | 4627.0s elapsed
+  125,000 scopes | 105,754 patterns | 5,000 MetaInsights | 4630.3s elapsed
+  150,000 scopes | 118,015 patterns | 5,000 MetaInsights | 4631.6s elapsed
+  110,000 scopes | 90,511 patterns | 5,000 MetaInsights | 4654.3s elapsed
+  155,000 scopes | 120,565 patterns | 5,000 MetaInsights | 4690.4s elapsed
+  130,000 scopes | 108,719 patterns | 5,000 MetaInsights | 4692.3s elapsed
+  115,000 scopes | 93,267 patterns | 5,000 MetaInsights | 4722.7s elapsed
+  95,000 scopes | 87,023 patterns | 5,000 MetaInsights | 4753.4s elapsed
+  160,000 scopes | 123,638 patterns | 5,000 MetaInsights | 4760.1s elapsed
+  135,000 scopes | 112,196 patterns | 5,000 MetaInsights | 4768.4s elapsed
+  120,000 scopes | 96,046 patterns | 5,000 MetaInsights | 4793.4s elapsed
+  140,000 scopes | 114,915 patterns | 5,000 MetaInsights | 4832.8s elapsed
+  100,000 scopes | 90,839 patterns | 5,000 MetaInsights | 4837.0s elapsed
+  125,000 scopes | 99,097 patterns | 5,000 MetaInsights | 4855.0s elapsed
+  145,000 scopes | 118,563 patterns | 5,000 MetaInsights | 4909.9s elapsed
+  105,000 scopes | 93,776 patterns | 5,000 MetaInsights | 4911.9s elapsed
+  130,000 scopes | 101,142 patterns | 5,000 MetaInsights | 4915.4s elapsed
+  150,000 scopes | 121,547 patterns | 5,000 MetaInsights | 4977.8s elapsed
+  135,000 scopes | 104,210 patterns | 5,000 MetaInsights | 4984.4s elapsed
+  110,000 scopes | 96,955 patterns | 5,000 MetaInsights | 4986.2s elapsed
+  155,000 scopes | 124,693 patterns | 5,000 MetaInsights | 5045.1s elapsed
+  140,000 scopes | 107,163 patterns | 5,000 MetaInsights | 5080.1s elapsed
+  115,000 scopes | 100,313 patterns | 5,000 MetaInsights | 5086.4s elapsed
+  160,000 scopes | 127,938 patterns | 5,000 MetaInsights | 5115.2s elapsed
+  145,000 scopes | 109,236 patterns | 5,000 MetaInsights | 5134.3s elapsed
+  120,000 scopes | 103,008 patterns | 5,000 MetaInsights | 5151.2s elapsed
+  150,000 scopes | 111,699 patterns | 5,000 MetaInsights | 5180.7s elapsed
+  125,000 scopes | 106,228 patterns | 5,000 MetaInsights | 5199.1s elapsed
+  155,000 scopes | 114,435 patterns | 5,000 MetaInsights | 5222.3s elapsed
+  160,000 scopes | 117,231 patterns | 5,000 MetaInsights | 5260.5s elapsed
+  130,000 scopes | 109,173 patterns | 5,000 MetaInsights | 5269.2s elapsed
+  135,000 scopes | 111,711 patterns | 5,000 MetaInsights | 5322.3s elapsed
+  140,000 scopes | 114,390 patterns | 5,000 MetaInsights | 5355.8s elapsed
+  145,000 scopes | 117,275 patterns | 5,000 MetaInsights | 5400.8s elapsed
+  150,000 scopes | 120,380 patterns | 5,000 MetaInsights | 5434.4s elapsed
+  155,000 scopes | 123,350 patterns | 5,000 MetaInsights | 5492.5s elapsed
+  160,000 scopes | 125,822 patterns | 5,000 MetaInsights | 5524.4s elapsed
+
+Mining complete in 5544.0s
+  Queue drained:         True
+  Scopes evaluated:      809,554
+  Throughput:            146.0 scopes/s
+  Patterns found:        623,023
+  HDPs evaluated:        1,249,810
+  HDPs skipped (dedup):  1,101,938
+  HDP dedup hit rate:    46.9%
+  MetaInsights found:    5,000
+  Data-quality (A7):     0
+  Query cache hit rate:  96.2%
+  Pattern cache rate:    14.8%
+  Cache evictions:       6,997,130 query / 12,713,115 pattern
+  Store dropped / dup:   60,488 / 0
+  Peak worker memory:    0.57 GB
+  Top score:             0.8760
+  Candidate hash:        2bfbc790281a695cbb16c1a108b79abe
+
+  Candidates by pattern type:
+    OUTSTANDING_1       : 1,516
+    ATTRIBUTION         : 1,128
+    EVENNESS            : 1,124
+    TOP_TWO             : 728
+    OUTSTANDING_LAST    : 349
+    LAST_TWO            : 155
+Saved 5,000 candidates -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\b3a49dd2-1d20-4999-9b87-d5264656907e\scratchpad\mirror\Insights\metainsights\view1_depth2_candidates.json
+Saved 0 displaced findings and 0 sub-support measures -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\b3a49dd2-1d20-4999-9b87-d5264656907e\scratchpad\mirror\Insights\metainsights\view1_depth2_data_quality.json
+
+Combined diagnostics -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\b3a49dd2-1d20-4999-9b87-d5264656907e\scratchpad\mirror\Insights\reports\engine_diagnostics_all_views.txt

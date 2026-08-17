@@ -17,10 +17,42 @@ domain_pack_prdw/
 ├── views/                the three §4 views -> three Parquet files
 ├── validation.yaml       checks + post-view grains (the 2nd sample-scale file)
 ├── crosswalk.csv         §7 materialised: 182 staged columns -> role
+├── known_events.csv      dated real-world events the reading notes may cite
 ├── build_crosswalk.py    regenerates crosswalk.csv + runs the T5 gate checks
 ├── check_ask_parity.py   diffs view1 against Ask's own v_activity
 └── README.md             this file
 ```
+
+## `known_events.csv` — context the data does not carry
+
+Added in **WP-D2c (A5)**, on calibration session 1 ruling 5. The operator read
+view2's August 2020 change point and its FY 2020-21 ramp and said one word:
+COVID. Nothing in this dataset knows that. The engine can find a shift in a
+month; it cannot know what else was happening that month, and the report's
+hardest rule (`phase5b_report.py`, prompt rule 4b) forbids the model from
+supplying a cause — a rule that exists because an earlier deployment invented
+one and was wrong.
+
+So the events are **data, not prose**: four columns — `event`, `start_month`
+(`YYYY-MM`), `end_month`, `note` — read by `phase5b_report.known_events()`. A
+finding earns a citation only on a date test, never on a resemblance:
+
+- a `CHANGE_POINT`, `OUTLIER` or `UNIMODALITY` highlight whose month, quarter or
+  fiscal year falls inside an event window, **or within three months after it**
+  (a resumption is as dated as an interruption, and the Ganjam shift is at
+  2020-08 against a window that closes in 2020-06); or
+- a finding whose own subspace pins a month, quarter or fiscal year overlapping
+  the window.
+
+The citation is appended to the section's deterministic reading note, states
+the overlap as an overlap of dates, and prints the `note` column verbatim. It
+never says the event caused the pattern, and the model never writes it.
+
+**Adding events is an operator/SME job, not an engine change.** The file ships
+with the COVID first-wave window and two `TODO(SME)` template rows, which the
+loader skips: any row whose `event` begins `TODO(SME)`, or whose months are not
+`YYYY-MM`, is ignored, so a half-filled row cannot reach a report. Cyclones and
+election dates are the obvious next entries and the department has them.
 
 The two `.py` files are **maintenance scripts, not pipeline**: `build_views.py`
 never reads them, and the pack itself stays declarative YAML + SQL. They exist

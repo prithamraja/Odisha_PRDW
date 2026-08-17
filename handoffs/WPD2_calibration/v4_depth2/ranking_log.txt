@@ -1,8 +1,8 @@
 
 Loading C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\b3a49dd2-1d20-4999-9b87-d5264656907e\scratchpad\mirror\Insights\metainsights\view1_candidates.json ...
-  2,969 candidates loaded
-  489 OUTSTANDING_1/ATTRIBUTION twins merged (A2) -> 2,480
-  2,480 after pre-filter
+  5,000 candidates loaded
+  884 OUTSTANDING_1/ATTRIBUTION twins merged (A2) -> 4,116
+  4,116 after pre-filter
   15 selected for top-15
 
 Loading C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\b3a49dd2-1d20-4999-9b87-d5264656907e\scratchpad\mirror\Insights\metainsights\view2_candidates.json ...
@@ -22,6 +22,6 @@ Layer 3P report -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-
 ======================================================================
 Phase 5 Summary
 ======================================================================
-  view1: 15 selected from 2,480  | TotalUse=11.2122  | types: ATTRIBUTION, EVENNESS, LAST_TWO, OUTSTANDING_1, OUTSTANDING_LAST, TOP_TWO
+  view1: 15 selected from 4,116  | TotalUse=11.3770  | types: ATTRIBUTION, EVENNESS, LAST_TWO, OUTSTANDING_1, OUTSTANDING_LAST, TOP_TWO
   view2: 15 selected from 121  | TotalUse=3.9987  | types: CHANGE_POINT, OUTSTANDING_1, SEASONALITY, TREND
   view3: 2 selected from 2  | TotalUse=0.2967  | types: EVENNESS, TREND

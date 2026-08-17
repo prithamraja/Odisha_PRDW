@@ -3,28 +3,28 @@ LAYER 2P -- RAW METAINSIGHT EXPLORER
 ======================================================================
 
 ======================================================================
-VIEW: view1  |  Total candidates: 2,480
+VIEW: view1  |  Total candidates: 4,116
 ======================================================================
 
 Score distribution:
-  Max=0.8760  Median=0.2308  Min=0.0006  Mean=0.2997
+  Max=0.8760  Median=0.5480  Min=0.3888  Mean=0.5690
 
   Pattern Type                 Total   Actionable  Top Score
   ---------------------------------------------------------
-  ATTRIBUTION                    716          634     0.7384
-  TOP_TWO                        672          620     0.7384
-  OUTSTANDING_1                  498          458     0.7384
-  EVENNESS                       267          150     0.8760
-  OUTSTANDING_LAST               195          166     0.7384
-  LAST_TWO                       132          129     0.7211
+  ATTRIBUTION                  1,128          821     0.7384
+  EVENNESS                     1,124          556     0.8760
+  TOP_TWO                        728          552     0.8025
+  OUTSTANDING_1                  632          503     0.8025
+  OUTSTANDING_LAST               349          256     0.7384
+  LAST_TWO                       155          143     0.7211
 
   Zero candidates: ['TREND', 'OUTLIER', 'SEASONALITY', 'CHANGE_POINT', 'UNIMODALITY']
 
 Extending strategies:
-  subspace: 1,505
-  measure: 975
+  subspace: 4,056
+  measure: 60
 
-Universal: 323  |  Actionable: 2,157
+Universal: 1,285  |  Actionable: 2,831
 
 ======================================================================
 VIEW: view2  |  Total candidates: 121

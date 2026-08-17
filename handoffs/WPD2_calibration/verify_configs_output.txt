@@ -14,24 +14,101 @@
   [PASS] view1: all 41 config columns glossed  -- missing=[]
   [PASS] view1: no glossary entry without a config column  -- extra=[]
   [PASS] view1: every measure has a unit
-  [PASS] view1: every measure is SUM
+  [PASS] view1: every measure is SUM or AVG
+  [PASS] view1: every AVG measure is a named _mean alias  -- []
+  [PASS] view1: every AVG measure aliases a measure of this view
+  [PASS] view1: no impact measure is an alias (impact is always SUM)
   [PASS] view1: extremum_ratio at the 0.67 default
   [PASS] view1: impact measures are measures
   [PASS] view1: no LGD code column is a dimension
-  [PASS] view2: all 13 config columns glossed  -- missing=[]
+  [PASS] view2: all 15 config columns glossed  -- missing=[]
   [PASS] view2: no glossary entry without a config column  -- extra=[]
   [PASS] view2: every measure has a unit
-  [PASS] view2: every measure is SUM
+  [PASS] view2: every measure is SUM or AVG
+  [PASS] view2: every AVG measure is a named _mean alias  -- ['payment_amount_mean', 'receipt_amount_mean']
+  [PASS] view2: every AVG measure aliases a measure of this view
+  [PASS] view2: no impact measure is an alias (impact is always SUM)
   [PASS] view2: extremum_ratio at the 0.67 default
   [PASS] view2: impact measures are measures
   [PASS] view2: no LGD code column is a dimension
   [PASS] view3: all 22 config columns glossed  -- missing=[]
   [PASS] view3: no glossary entry without a config column  -- extra=[]
   [PASS] view3: every measure has a unit
-  [PASS] view3: every measure is SUM
+  [PASS] view3: every measure is SUM or AVG
+  [PASS] view3: every AVG measure is a named _mean alias  -- []
+  [PASS] view3: every AVG measure aliases a measure of this view
+  [PASS] view3: no impact measure is an alias (impact is always SUM)
   [PASS] view3: extremum_ratio at the 0.67 default
   [PASS] view3: impact measures are measures
   [PASS] view3: no LGD code column is a dimension
+
+=== 3b. WP-D2c A1: the definitional-pair exclusions ===
+  [PASS] view1: every excluded pair names a real measure  -- []
+  [PASS] view1: every excluded pair names a real dimension  -- []
+  [PASS] view1: no duplicate excluded pair
+  [PASS] view1: trainees_total is still minable by some breakdown
+  [PASS] view1: trainees_total is still minable by some breakdown
+  [PASS] view1: trainees_total is still minable by some breakdown
+  [PASS] view1: beneficiaries_expected is still minable by some breakdown
+  [PASS] view1: beneficiaries_expected is still minable by some breakdown
+  [PASS] view1: beneficiaries_expected is still minable by some breakdown
+  [PASS] view1: fund_tied_total is still minable by some breakdown
+  [PASS] view1: fund_tied_total is still minable by some breakdown
+  [PASS] view1: fund_tied_total is still minable by some breakdown
+  [PASS] view1: fund_untied_total is still minable by some breakdown
+  [PASS] view1: fund_untied_total is still minable by some breakdown
+  [PASS] view1: is_completed is still minable by some breakdown
+  [PASS] view1: is_ongoing is still minable by some breakdown
+  [PASS] view1: is_started is still minable by some breakdown
+  [PASS] view1: is_abandoned is still minable by some breakdown
+  [PASS] view1: is_under_approval is still minable by some breakdown
+  [PASS] view1: fund_abandoned_total is still minable by some breakdown
+  [PASS] view1: total_cost is still minable by some breakdown
+  [PASS] view1: fund_tied_total is still minable by some breakdown
+  [PASS] view1: fund_untied_total is still minable by some breakdown
+  [PASS] view1: fund_abandoned_total is still minable by some breakdown
+  [PASS] view1: work_proposed_cost is still minable by some breakdown
+  [PASS] view1: fund_sanctioned_total is still minable by some breakdown
+  [PASS] view1: total_expenditure is still minable by some breakdown
+  [PASS] view1: gen_amount is still minable by some breakdown
+  [PASS] view1: overspend_vs_plan is still minable by some breakdown
+  [PASS] view1: overspend_vs_sanction is still minable by some breakdown
+  [PASS] view1: is_abandoned is still minable by some breakdown
+  [PASS] view1: is_admin_approved is still minable by some breakdown
+  [PASS] view1: has_technical_approval is still minable by some breakdown
+  [PASS] view1: has_progress_evidence is still minable by some breakdown
+  [PASS] view1: evidence_uploads is still minable by some breakdown
+  [PASS] view2: every excluded pair names a real measure  -- []
+  [PASS] view2: every excluded pair names a real dimension  -- []
+  [PASS] view2: no duplicate excluded pair
+  [PASS] view3: every excluded pair names a real measure  -- []
+  [PASS] view3: every excluded pair names a real dimension  -- []
+  [PASS] view3: no duplicate excluded pair
+  [PASS] view1: the session's six pairs are in  -- 32 pairs
+  [PASS] view1: session pair trainees_total x work_type_label
+  [PASS] view1: session pair beneficiaries_expected x work_type_label
+  [PASS] view1: session pair fund_tied_total x fund_component_name
+  [PASS] view1: session pair fund_tied_total x tied_untied
+  [PASS] view1: session pair fund_untied_total x fund_component_name
+  [PASS] view1: session pair fund_untied_total x tied_untied
+  [PASS] view1: scope generation emits no excluded pair
+
+=== 3c. WP-D2c A7: the temporal support guard ===
+  [PASS] view1: support thresholds are set  -- 4 points / 33%
+  [PASS] view2: support thresholds are set  -- 4 points / 33%
+  [PASS] view3: support thresholds are set  -- 4 points / 33%
+  [PASS] view3: the sample still carries 17 recorded completions
+  [PASS] view3: n_completed's per-GP series fail the guard  -- 19 of 20 fail
+  [PASS] view3: a real series still clears the guard (n_activities by FY)
+
+=== 3d. WP-D2c A5: the known-events table ===
+  [PASS] known_events.csv loads at least one usable event  -- ['COVID-19 first-wave lockdown']
+  [PASS] TODO(SME) template rows are skipped
+  [PASS] the COVID first-wave window is present
+  [PASS] a change point in the recovery window cites the event
+  [PASS] a change point three years later cites nothing
+  [PASS] a finding pinned to FY 2020-2021 cites the event
+  [PASS] the citation states coincidence, never causation
 
 === 4. the prose gate's expectations are satisfiable ===
   [PASS] every view has a deterministic reading note
@@ -49,6 +126,8 @@
   [PASS] view1: min_impact does not move with scale
   [PASS] view1: min_hdp does not move with scale
   [PASS] view1: ratio does not move with scale
+  [PASS] view1: excluded does not move with scale
+  [PASS] view1: support does not move with scale
   [PASS] view2: temporal does not move with scale
   [PASS] view2: measures does not move with scale
   [PASS] view2: impact does not move with scale
@@ -56,6 +135,8 @@
   [PASS] view2: min_impact does not move with scale
   [PASS] view2: min_hdp does not move with scale
   [PASS] view2: ratio does not move with scale
+  [PASS] view2: excluded does not move with scale
+  [PASS] view2: support does not move with scale
   [PASS] view3: temporal does not move with scale
   [PASS] view3: measures does not move with scale
   [PASS] view3: impact does not move with scale
@@ -63,6 +144,8 @@
   [PASS] view3: min_impact does not move with scale
   [PASS] view3: min_hdp does not move with scale
   [PASS] view3: ratio does not move with scale
+  [PASS] view3: excluded does not move with scale
+  [PASS] view3: support does not move with scale
   [PASS] view1 statewide drops gp_name and block_name only
   [PASS] view2 statewide dims
   [PASS] view3 statewide dims

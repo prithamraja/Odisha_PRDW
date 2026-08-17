@@ -3,21 +3,21 @@ LAYER 3P -- RANKED PER-VIEW DASHBOARD
 ======================================================================
 
 ======================================================================
-VIEW: view1  |  Selected 15 from 2,480 candidates
+VIEW: view1  |  Selected 15 from 4,116 candidates
 ======================================================================
 
 Diversity:
   Pattern types (6): ATTRIBUTION, EVENNESS, LAST_TWO, OUTSTANDING_1, OUTSTANDING_LAST, TOP_TWO
   Extending dims (4): activity_for_label, asset_category_label, fiscal_year, gp_name
-  Measures (10): beneficiaries_expected, evidence_uploads, fund_sanctioned_total, fund_tied_total, fund_untied_total, gen_amount, has_technical_approval, n_activities +2 more
+  Measures (9): beneficiaries_expected, evidence_uploads, fund_sanctioned_total, fund_tied_total, fund_untied_total, gen_amount, n_activities, overspend_vs_plan +1 more
 
-TotalUse: 11.2122  |  Sum of scores: 11.2122  |  Redundancy penalty: 0.0000
+TotalUse: 11.3770  |  Sum of scores: 11.3770  |  Redundancy penalty: 0.0000
 
 --- Ranked MetaInsights ---
 
   #1  score=0.8760  (conciseness=0.8760, impact=1.0000)
     subspace on asset_category_label  |  EVENNESS  |  breakdown=block_name  |  measure=overspend_vs_plan
-    Subspace: {*}  |  HDP: 28
+    Subspace: {is_costless:Costed}  |  HDP: 28
     Commonness: [EVENNESS] ('EVEN',)  (27/28 = 96%)
       Members: Uncategorised, Buildings, Recreational Facilities, Drinking water supply structure, Water Sources & Structures, Roads, Bridges & Culverts +21 more
     Exceptions (1):
@@ -33,9 +33,27 @@ TotalUse: 11.2122  |  Sum of scores: 11.2122  |  Redundancy penalty: 0.0000
       Banking Facilities        NO_PATTERN           
     >> Across nearly all asset_category_label values (27/28), overspend_vs_sanction is spread evenly across district_name values -- it belongs to all of them and no single district_name accounts for it. Uneven only in: Banking Facilities (not evenly spread) -- this is about how the total is spread, not about how much any one of them spends
 
-  #3  score=0.7384  (conciseness=0.7384, impact=1.0000)
+  #3  score=0.8025  (conciseness=0.8402, impact=0.9551)
+    subspace on gp_name  |  TOP_TWO  |  breakdown=output_type_label  |  measure=fund_untied_total
+    Subspace: {activity_type_label:Public Works}  |  HDP: 20
+    Commonness: [TOP_TWO] ('Code 101', 'Code 105')  (19/20 = 95%)
+      Members: Andhrua, Bandhpali, Barimunda, Bhatigaon, Bheden, Biswamathpur +13 more
+    Exceptions (1):
+      Haldikudar                TYPE_CHANGE          
+    >> Across nearly all gp_name values (19/20), Code 101 and Code 105 lead in fund_untied_total among output_type_label values. Exception: Haldikudar (different pattern)
+
+  #4  score=0.8025  (conciseness=0.8402, impact=0.9551)
+    subspace on gp_name  |  OUTSTANDING_1  |  breakdown=asset_category_label  |  measure=n_activities
+    Subspace: {activity_type_label:Public Works}  |  HDP: 20
+    Commonness: [OUTSTANDING_1] ('Uncategorised',)  (19/20 = 95%)
+      Members: Andhrua, Bandhpali, Barimunda, Bhatigaon, Bheden, Biswamathpur +13 more
+    Exceptions (1):
+      Govindapur                TYPE_CHANGE          
+    >> Across nearly all gp_name values (19/20), Uncategorised has the highest n_activities among asset_category_label values. Exception: Govindapur (different pattern)
+
+  #5  score=0.7384  (conciseness=0.7384, impact=1.0000)
     subspace on gp_name  |  OUTSTANDING_LAST  |  breakdown=status_label  |  measure=overspend_vs_plan
-    Subspace: {*}  |  HDP: 20
+    Subspace: {is_costless:Costed}  |  HDP: 20
     Commonness: [OUTSTANDING_LAST] ('Activity Approved',)  (18/20 = 90%)
       Members: Andhrua, Bandhpali, Barimunda, Bhatigaon, Bheden, Biswamathpur +12 more
     Exceptions (2):
@@ -43,19 +61,9 @@ TotalUse: 11.2122  |  Sum of scores: 11.2122  |  Redundancy penalty: 0.0000
       Laxmipur                  NO_PATTERN           
     >> Across nearly all gp_name values (18/20), Activity Approved has the lowest overspend_vs_plan among status_label values. Exception: Boipariguda (no clear pattern); Laxmipur (no clear pattern)
 
-  #4  score=0.7384  (conciseness=0.7384, impact=1.0000)
-    subspace on gp_name  |  TOP_TWO  |  breakdown=output_type_label  |  measure=fund_tied_total
-    Subspace: {*}  |  HDP: 20
-    Commonness: [TOP_TWO] ('Code 101', 'Code 105')  (18/20 = 90%)
-      Members: Andhrua, Bandhpali, Barimunda, Bhatigaon, Bheden, Biswamathpur +12 more
-    Exceptions (2):
-      Dadhapatna                TYPE_CHANGE          
-      Dutimendi                 TYPE_CHANGE          
-    >> Across nearly all gp_name values (18/20), Code 101 and Code 105 lead in fund_tied_total among output_type_label values. Exception: Dadhapatna (different pattern); Dutimendi (different pattern)
-
-  #5  score=0.7384  (conciseness=0.7384, impact=1.0000)
+  #6  score=0.7384  (conciseness=0.7384, impact=1.0000)
     subspace on gp_name  |  ATTRIBUTION  |  breakdown=status_label  |  measure=gen_amount
-    Subspace: {*}  |  HDP: 20
+    Subspace: {is_costless:Costed}  |  HDP: 20
     Commonness: [ATTRIBUTION] ('WORK ONGOING',)  (18/20 = 90%)
       Members: Andhrua, Bandhpali, Barimunda, Bhatigaon, Bheden, Biswamathpur +12 more
     Exceptions (2):
@@ -63,7 +71,7 @@ TotalUse: 11.2122  |  Sum of scores: 11.2122  |  Redundancy penalty: 0.0000
       Laxmipur                  NO_PATTERN           
     >> Across nearly all gp_name values (18/20), WORK ONGOING accounts for the majority of gen_amount among status_label values. Exception: Boipariguda (no clear pattern); Laxmipur (no clear pattern)
 
-  #6  score=0.7384  (conciseness=0.7384, impact=1.0000)
+  #7  score=0.7384  (conciseness=0.7384, impact=1.0000)
     subspace on gp_name  |  OUTSTANDING_1  |  breakdown=status_label  |  measure=beneficiaries_expected
     Subspace: {*}  |  HDP: 20
     Commonness: [OUTSTANDING_1] ('Activity Approved',)  (18/20 = 90%)
@@ -73,9 +81,9 @@ TotalUse: 11.2122  |  Sum of scores: 11.2122  |  Redundancy penalty: 0.0000
       Laxmipur                  NO_PATTERN           
     >> Across nearly all gp_name values (18/20), Activity Approved has the highest beneficiaries_expected among status_label values. Exception: Boipariguda (no clear pattern); Laxmipur (no clear pattern)
 
-  #7  score=0.7384  (conciseness=0.7384, impact=1.0000)
+  #8  score=0.7384  (conciseness=0.7384, impact=1.0000)
     subspace on gp_name  |  OUTSTANDING_1  |  breakdown=theme  |  measure=fund_untied_total
-    Subspace: {*}  |  HDP: 20
+    Subspace: {is_costless:Costed}  |  HDP: 20
     Commonness: [OUTSTANDING_1] ('Theme 6 - Self-sufficient Infrastructure in Village',)  (18/20 = 90%)
       Members: Andhrua, Bandhpali, Barimunda, Bhatigaon, Bheden, Biswamathpur +12 more
     Exceptions (2):
@@ -83,61 +91,58 @@ TotalUse: 11.2122  |  Sum of scores: 11.2122  |  Redundancy penalty: 0.0000
       Kalimela                  HIGHLIGHT_CHANGE     ('Theme 4 - Water Sufficient Village',)
     >> Across nearly all gp_name values (18/20), Theme 6 - Self-sufficient Infrastructure in Village has the highest fund_untied_total among theme values. Exception: Boipariguda (Unmapped theme has the highest fund_untied_total among theme values); Kalimela (Theme 4 - Water Sufficient Village has the highest fund_untied_total among theme values)
 
-  #8  score=0.7211  (conciseness=0.7211, impact=1.0000)
+  #9  score=0.7306  (conciseness=0.8402, impact=0.8696)
+    subspace on gp_name  |  OUTSTANDING_LAST  |  breakdown=output_type_label  |  measure=overspend_vs_sanction
+    Subspace: {work_type_label:New/Fresh}  |  HDP: 20
+    Commonness: [OUTSTANDING_LAST] ('Code 101',)  (19/20 = 95%)
+      Members: Andhrua, Bandhpali, Barimunda, Bhatigaon, Bheden, Biswamathpur +13 more
+    Exceptions (1):
+      Chikilli                  NO_PATTERN           
+    >> Across nearly all gp_name values (19/20), Code 101 has the lowest overspend_vs_sanction among output_type_label values. Exception: Chikilli (no clear pattern)
+
+  #10  score=0.7306  (conciseness=0.8402, impact=0.8696)
+    subspace on gp_name  |  ATTRIBUTION  |  breakdown=output_type_label  |  measure=evidence_uploads
+    Subspace: {work_type_label:New/Fresh}  |  HDP: 20
+    Commonness: [ATTRIBUTION] ('Code 101',)  (19/20 = 95%)
+      Members: Andhrua, Bandhpali, Barimunda, Bhatigaon, Bheden, Biswamathpur +13 more
+    Exceptions (1):
+      Chikilli                  NO_PATTERN           
+    >> Across nearly all gp_name values (19/20), Code 101 accounts for the majority of evidence_uploads among output_type_label values. Exception: Chikilli (no clear pattern)
+
+  #11  score=0.7211  (conciseness=0.7211, impact=1.0000)
     subspace on activity_for_label  |  LAST_TWO  |  breakdown=output_type_label  |  measure=overspend_vs_plan
     Subspace: {*}  |  HDP: 4
     Commonness: [LAST_TWO] ('Code 101', 'Code 105')  (4/4 = 100%)
       Members: ALL/ General public, General, sc, st
     >> Across all activity_for_label values, Code 101 and Code 105 are lowest in overspend_vs_plan among output_type_label values
 
-  #9  score=0.7211  (conciseness=0.7211, impact=1.0000)
+  #12  score=0.7211  (conciseness=0.7211, impact=1.0000)
+    subspace on activity_for_label  |  TOP_TWO  |  breakdown=focus_area_name  |  measure=fund_tied_total
+    Subspace: {is_costless:Costed}  |  HDP: 4
+    Commonness: [TOP_TWO] ('Drinking water', 'Sanitation')  (4/4 = 100%)
+      Members: ALL/ General public, General, sc, st
+    >> Across all activity_for_label values, Drinking water and Sanitation lead in fund_tied_total among focus_area_name values
+
+  #13  score=0.7211  (conciseness=0.7211, impact=1.0000)
     subspace on fiscal_year  |  OUTSTANDING_LAST  |  breakdown=gp_name  |  measure=fund_sanctioned_total
     Subspace: {*}  |  HDP: 6
     Commonness: [OUTSTANDING_LAST] ('Chikilli',)  (6/6 = 100%)
       Members: 2023-2024, 2024-2025, 2025-2026, 2021-2022, 2020-2021, 2022-2023
     >> Across all fiscal_year values, Chikilli has the lowest fund_sanctioned_total among gp_name values
 
-  #10  score=0.7211  (conciseness=0.7211, impact=1.0000)
-    subspace on fiscal_year  |  OUTSTANDING_LAST  |  breakdown=sanction_authority  |  measure=overspend_vs_sanction
-    Subspace: {*}  |  HDP: 6
-    Commonness: [OUTSTANDING_LAST] ('Sarpanch',)  (6/6 = 100%)
-      Members: 2023-2024, 2024-2025, 2025-2026, 2021-2022, 2020-2021, 2022-2023
-    >> Across all fiscal_year values, Sarpanch has the lowest overspend_vs_sanction among sanction_authority values
-
-  #11  score=0.7211  (conciseness=0.7211, impact=1.0000)
+  #14  score=0.7211  (conciseness=0.7211, impact=1.0000)
     subspace on fiscal_year  |  OUTSTANDING_LAST  |  breakdown=tied_untied  |  measure=gen_amount
     Subspace: {*}  |  HDP: 6
     Commonness: [OUTSTANDING_LAST] ('Other',)  (6/6 = 100%)
       Members: 2023-2024, 2024-2025, 2025-2026, 2021-2022, 2020-2021, 2022-2023
     >> Across all fiscal_year values, Other has the lowest gen_amount among tied_untied values
 
-  #12  score=0.7211  (conciseness=0.7211, impact=1.0000)
-    subspace on fiscal_year  |  TOP_TWO  |  breakdown=focus_area_name  |  measure=has_technical_approval
-    Subspace: {*}  |  HDP: 6
-    Commonness: [TOP_TWO] ('Drinking water', 'Sanitation')  (6/6 = 100%)
-      Members: 2023-2024, 2024-2025, 2025-2026, 2021-2022, 2020-2021, 2022-2023
-    >> Across all fiscal_year values, Drinking water and Sanitation lead in has_technical_approval among focus_area_name values
-
-  #13  score=0.7211  (conciseness=0.7211, impact=1.0000)
+  #15  score=0.7211  (conciseness=0.7211, impact=1.0000)
     subspace on fiscal_year  |  TOP_TWO  |  breakdown=status_label  |  measure=n_activities
     Subspace: {*}  |  HDP: 6
     Commonness: [TOP_TWO] ('Activity Approved', 'WORK ONGOING')  (6/6 = 100%)
       Members: 2023-2024, 2024-2025, 2025-2026, 2021-2022, 2020-2021, 2022-2023
     >> Across all fiscal_year values, Activity Approved and WORK ONGOING lead in n_activities among status_label values
-
-  #14  score=0.7211  (conciseness=0.7211, impact=1.0000)
-    subspace on fiscal_year  |  TOP_TWO  |  breakdown=work_type_label  |  measure=evidence_uploads
-    Subspace: {*}  |  HDP: 6
-    Commonness: [TOP_TWO] ('Maintenance', 'New/Fresh')  (6/6 = 100%)
-      Members: 2023-2024, 2024-2025, 2025-2026, 2021-2022, 2020-2021, 2022-2023
-    >> Across all fiscal_year values, Maintenance and New/Fresh lead in evidence_uploads among work_type_label values
-
-  #15  score=0.7211  (conciseness=0.7211, impact=1.0000)
-    subspace on activity_for_label  |  OUTSTANDING_1  |  breakdown=asset_category_label  |  measure=n_activities
-    Subspace: {*}  |  HDP: 4
-    Commonness: [OUTSTANDING_1] ('Uncategorised',)  (4/4 = 100%)
-      Members: ALL/ General public, General, sc, st
-    >> Across all activity_for_label values, Uncategorised has the highest n_activities among asset_category_label values
 
 
 ======================================================================

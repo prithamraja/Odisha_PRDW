@@ -1,0 +1,4 @@
+event,start_month,end_month,note
+COVID-19 first-wave lockdown,2020-03,2020-06,"The national COVID-19 lockdown was imposed on 25 March 2020 and unwound in phases through June 2020. Public works and Gram Panchayat office operations across Odisha were restricted for most of that window."
+TODO(SME) cyclone or other event name,YYYY-MM,YYYY-MM,"Template row -- ignored by the loader while the event name begins TODO(SME). Fill in the event, the first and last month it covers, and one or two sentences of dated, checkable fact. The note is printed VERBATIM in the report, so it must contain no interpretation of the findings and no claim about what the event caused."
+TODO(SME) state or panchayat election,YYYY-MM,YYYY-MM,"Template row. Panchayat elections move sanctioning and spending in ways that show up as change points; the department knows the dates and this data does not."

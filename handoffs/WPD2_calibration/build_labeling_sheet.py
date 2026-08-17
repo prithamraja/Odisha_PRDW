@@ -63,10 +63,32 @@ def fmt_stats(c: dict) -> str:
     return "; ".join(bits)
 
 
+def finding_signature(c: dict) -> tuple:
+    """What makes two ranked findings the same finding across two runs.
+
+    Used by --compare-ranked to mark the entries a deeper run FOUND that the
+    shallower one could not (WP-D2c T4). Deliberately not the score: the same
+    finding can rank differently when the pool around it changes.
+    """
+    commonness = tuple(sorted(
+        (cs.get("highlight", ""), tuple(sorted(str(m) for m in cs.get("members", []))))
+        for cs in c.get("commonness_sets") or []
+    ))
+    return (
+        c["pattern_type"], c["measure"], c["breakdown"],
+        c["extending_strategy"], c["extending_dimension"],
+        tuple(sorted(tuple(f) for f in (c.get("base_subspace") or []))),
+        commonness,
+    )
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--base", required=True)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--compare-ranked", default=None,
+                    help="a directory of {view}_ranked.json from an earlier run; "
+                         "findings absent from it are marked new_in_this_run")
     args = ap.parse_args()
 
     base = os.path.abspath(args.base)
@@ -89,12 +111,33 @@ def main() -> int:
         summaries = [generate_nl_summary(c) for c in load_candidates(ranked_path)]
         title = p5b.VIEW_DESCRIPTIONS[view_name]["title"]
 
+        previous = set()
+        if args.compare_ranked:
+            prev_path = os.path.join(args.compare_ranked, f"{view_name}_ranked.json")
+            if os.path.exists(prev_path):
+                with io.open(prev_path, encoding="utf-8") as f:
+                    previous = {finding_signature(c) for c in json.load(f)}
+
         md = [f"# {title} -- top {len(enriched)} findings\n",
               f"*View `{view_name}`, {cfg.name}. Ranked by the phase 5 greedy "
               f"selector (score = conciseness x impact), redundancy-penalised.*\n"]
 
         for i, c in enumerate(enriched):
             rank = i + 1
+            # WP-D2c: what the deterministic rules did to this finding, so the
+            # operator can see the calibration actions on the sheet itself
+            framing = []
+            if c.get("evenness_framing"):
+                framing.append("evenness reframed (A3)")
+            if c.get("linkage_framing"):
+                framing.append("recording-completeness framing (A6)")
+            if (c.get("stats") or {}).get("intensity_companion"):
+                framing.append("per-GP-month companion (A4)")
+            if (c.get("stats") or {}).get("size_share"):
+                framing.append("size shares attached (2b)")
+            new_here = (args.compare_ranked is not None
+                        and previous
+                        and finding_signature(c) not in previous)
             rows.append({
                 "view": view_name,
                 "view_title": title,
@@ -116,6 +159,9 @@ def main() -> int:
                 "conciseness": round(c["conciseness"], 4),
                 "impact": round(c["impact"], 4),
                 "fy_2023_24_caveat": "yes" if c.get("reporting_caveat") else "",
+                "merged_twin": ", ".join(c.get("merged_twins") or []),
+                "framing_applied": "; ".join(framing),
+                "new_in_this_run": "yes" if new_here else "",
             })
 
             md += [
@@ -134,6 +180,14 @@ def main() -> int:
             if c.get("reporting_caveat"):
                 md.append("- **FY 2023-24 reporting caveat applies** "
                           "(activity counts compared across the boundary)")
+            if framing:
+                md.append(f"- deterministic framing: {'; '.join(framing)}")
+            if c.get("merged_twins"):
+                md.append(f"- **twin merged in** (A2): also found as "
+                          f"{', '.join(c['merged_twins'])} on the same members")
+            if new_here:
+                md.append("- **NEW IN THIS RUN** -- not present in the "
+                          "comparison run's top-15")
             md.append("\n**label:** `real` / `already-known` / `spurious`  ->  "
                       "________________\n")
 

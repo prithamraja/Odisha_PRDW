@@ -79,12 +79,112 @@ def main() -> int:
               f"extra={sorted(gloss - set(cols))}")
         units = set(phase5b_report._UNITS[name])
         check(set(cfg.measure_names) == units, f"{name}: every measure has a unit")
-        check(all(m.agg == "sum" for m in cfg.measures), f"{name}: every measure is SUM")
+        # WP-D2c A4 puts the first two AVG measures in this deployment. Every
+        # other measure is still SUM, and an AVG one must be an ALIAS of a
+        # column that is already in the view -- an intensity measure is the
+        # same money seen per unit, never a new number.
+        avg = [m for m in cfg.measures if m.agg == "avg"]
+        check(all(m.agg in ("sum", "avg") for m in cfg.measures),
+              f"{name}: every measure is SUM or AVG")
+        check(all(m.name.endswith("_mean") and m.column for m in avg),
+              f"{name}: every AVG measure is a named _mean alias",
+              str([m.name for m in avg]))
+        check(all(m.column in cfg.measure_names for m in avg),
+              f"{name}: every AVG measure aliases a measure of this view")
+        check(not [m for m in cfg.measures
+                   if m.name in cfg.impact_measures and m.column],
+              f"{name}: no impact measure is an alias (impact is always SUM)")
         check(cfg.extremum_ratio == 0.67, f"{name}: extremum_ratio at the 0.67 default")
         check(set(cfg.impact_measures) <= set(cfg.measure_names),
               f"{name}: impact measures are measures")
         check(not [d for d in cfg.dimensions if d.endswith("_code")],
               f"{name}: no LGD code column is a dimension")
+
+    print("\n=== 3b. WP-D2c A1: the definitional-pair exclusions ===")
+    for name, cfg in CFG.items():
+        dims = set(cfg.dimensions) | set(cfg.temporal_dimensions)
+        bad_measure = [p for p in cfg.excluded_pairs if p[0] not in cfg.measure_names]
+        bad_dim     = [p for p in cfg.excluded_pairs if p[1] not in dims]
+        check(not bad_measure, f"{name}: every excluded pair names a real measure",
+              str(bad_measure))
+        check(not bad_dim, f"{name}: every excluded pair names a real dimension",
+              str(bad_dim))
+        check(len(set(cfg.excluded_pairs)) == len(cfg.excluded_pairs),
+              f"{name}: no duplicate excluded pair")
+        # the exclusion must not remove a whole measure or a whole dimension
+        # from the view: it removes a pairing, and both sides stay minable
+        for m, d in cfg.excluded_pairs:
+            others = [b for b in dims if not cfg.is_excluded(m, b)]
+            check(bool(others), f"{name}: {m} is still minable by some breakdown")
+    v1 = CFG["view1"]
+    check(len(v1.excluded_pairs) >= 6, "view1: the session's six pairs are in",
+          f"{len(v1.excluded_pairs)} pairs")
+    for pair in [("trainees_total", "work_type_label"),
+                 ("beneficiaries_expected", "work_type_label"),
+                 ("fund_tied_total", "fund_component_name"),
+                 ("fund_tied_total", "tied_untied"),
+                 ("fund_untied_total", "fund_component_name"),
+                 ("fund_untied_total", "tied_untied")]:
+        check(v1.is_excluded(*pair), f"view1: session pair {pair[0]} x {pair[1]}")
+    scopes = phase2_engine.generate_data_scopes(
+        phase2_engine.Subspace(frozenset()), v1)
+    check(not [s for s in scopes if v1.is_excluded(s.measure, s.breakdown)],
+          "view1: scope generation emits no excluded pair")
+
+    print("\n=== 3c. WP-D2c A7: the temporal support guard ===")
+    import pandas as _pd
+    for name, cfg in CFG.items():
+        check(cfg.min_temporal_nonzero >= 4 and 0 < cfg.min_temporal_nonzero_frac <= 1,
+              f"{name}: support thresholds are set",
+              f"{cfg.min_temporal_nonzero} points / "
+              f"{cfg.min_temporal_nonzero_frac:.0%}")
+    v3 = CFG["view3"]
+    df3 = _pd.read_parquet(v3.parquet_path)
+    completions = df3.groupby("gp_name")["n_completed"].apply(
+        lambda s: int((s != 0).sum()))
+    check(int(df3["n_completed"].sum()) == 17,
+          "view3: the sample still carries 17 recorded completions")
+    fails_guard = sum(
+        1 for gp in df3.gp_name.unique()
+        if not phase2_engine.temporal_support_ok(
+            df3[df3.gp_name == gp].groupby("fiscal_year")["n_completed"].sum(), v3))
+    check(fails_guard >= 18,
+          "view3: n_completed's per-GP series fail the guard",
+          f"{fails_guard} of {df3.gp_name.nunique()} fail")
+    healthy = df3.groupby("fiscal_year")["n_activities"].sum()
+    check(phase2_engine.temporal_support_ok(healthy, v3),
+          "view3: a real series still clears the guard (n_activities by FY)")
+
+    print("\n=== 3d. WP-D2c A5: the known-events table ===")
+    events = phase5b_report.known_events()
+    check(len(events) >= 1, "known_events.csv loads at least one usable event",
+          str([e["event"] for e in events]))
+    check(not [e for e in events if e["event"].startswith("TODO(SME)")],
+          "TODO(SME) template rows are skipped")
+    covid = [e for e in events if "COVID" in e["event"]]
+    check(len(covid) == 1, "the COVID first-wave window is present")
+    if covid:
+        ganjam = {"pattern_type": "CHANGE_POINT", "measure": "(varies)",
+                  "breakdown": "month", "base_subspace": [],
+                  "commonness_sets": [{"pattern_type": "CHANGE_POINT",
+                                       "highlight": "('2020-08',)",
+                                       "members": ["payment_amount"]}],
+                  "exceptions": []}
+        quiet = dict(ganjam, commonness_sets=[{"pattern_type": "CHANGE_POINT",
+                                               "highlight": "('2023-05',)",
+                                               "members": ["payment_amount"]}])
+        fy = {"pattern_type": "TREND", "measure": "sanctioned_amount",
+              "breakdown": "(varies)",
+              "base_subspace": [["fiscal_year", "2020-2021"]],
+              "commonness_sets": [], "exceptions": []}
+        check(len(phase5b_report.event_citations([ganjam])) == 1,
+              "a change point in the recovery window cites the event")
+        check(phase5b_report.event_citations([quiet]) == [],
+              "a change point three years later cites nothing")
+        check(len(phase5b_report.event_citations([fy])) == 1,
+              "a finding pinned to FY 2020-2021 cites the event")
+        check("does not establish" in phase5b_report.event_citations([ganjam])[0],
+              "the citation states coincidence, never causation")
 
     print("\n=== 4. the prose gate's expectations are satisfiable ===")
     check(set(phase5b_report.READING_NOTES) == set(CFG),
@@ -107,7 +207,10 @@ def main() -> int:
         "              'temporal': c.temporal_dimensions, 'measures': c.measure_names,\n"
         "              'impact': c.impact_measures, 'depth': c.max_subspace_depth,\n"
         "              'tau': c.tau, 'min_impact': c.min_impact,\n"
-        "              'min_hdp': c.min_hdp_size, 'ratio': c.extremum_ratio}\n"
+        "              'min_hdp': c.min_hdp_size, 'ratio': c.extremum_ratio,\n"
+        "              'excluded': [list(p) for p in c.excluded_pairs],\n"
+        "              'support': [c.min_temporal_nonzero,\n"
+        "                          c.min_temporal_nonzero_frac]}\n"
         "print(json.dumps(out))\n"
     )
 
@@ -123,7 +226,7 @@ def main() -> int:
           "the switch is read from the environment")
     for n in CFG:
         for key in ("temporal", "measures", "impact", "tau", "min_impact",
-                    "min_hdp", "ratio"):
+                    "min_hdp", "ratio", "excluded", "support"):
             check(sample[n][key] == state[n][key], f"{n}: {key} does not move with scale")
     check(state["view1"]["dims"] == ["district_name"] + sample["view1"]["dims"][3:],
           "view1 statewide drops gp_name and block_name only")

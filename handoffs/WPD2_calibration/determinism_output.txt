@@ -1,0 +1,450 @@
+
+=== 1. two runs of the same view agree, byte for byte ===
+
+======================================================================
+VIEW: Activity Lifecycle
+======================================================================
+Loading C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\b3a49dd2-1d20-4999-9b87-d5264656907e\scratchpad\mirror\Insights\views_prdw\view1_activity_lifecycle.parquet ...
+  12,704 rows x 70 cols  (canonical row order, fingerprint 28c27286da30ec7f)
+
+Pattern types: 6 categorical, 5 temporal  (11 total)
+Excluded (measure, breakdown) pairs: 32  (A1)
+
+Generating subspaces ...
+  depth-0: 1  depth-1: 172  depth-2: 0  total: 173
+Building priority queue ...
+  SUBSET: the 40 highest-impact subspaces only
+  40 subspaces retained after impact pruning (min=0.01); 14,171 data scopes behind them
+
+Mining (budget: 36000s, workers: 1, top-K: 5000) ...
+  5,000 scopes | 6,699 patterns | 1,844 MetaInsights | 64.9s elapsed
+  10,000 scopes | 13,556 patterns | 2,084 MetaInsights | 86.8s elapsed
+
+Mining complete in 102.2s
+  Queue drained:         True
+  Scopes evaluated:      14,171
+  Throughput:            138.6 scopes/s
+  Patterns found:        18,460
+  HDPs evaluated:        14,378
+  HDPs skipped (dedup):  28,729
+  HDP dedup hit rate:    66.6%
+  MetaInsights found:    2,240
+  Data-quality (A7):     0
+  Query cache hit rate:  98.1%
+  Pattern cache rate:    31.4%
+  Cache evictions:       0 query / 0 pattern
+  Store dropped / dup:   0 / 0
+  Peak worker memory:    0.53 GB
+  Top score:             0.8760
+  Candidate hash:        bf1381eeeab929f42ad9e5c722964ecb
+
+  Candidates by pattern type:
+    OUTSTANDING_1       : 711
+    ATTRIBUTION         : 518
+    TOP_TWO             : 508
+    EVENNESS            : 265
+    OUTSTANDING_LAST    : 142
+    LAST_TWO            : 96
+Saved 2,240 candidates -> C:\Users\prith\AppData\Local\Temp\wpd2c_determinism_2ccow8l8\view1_run1.json
+
+======================================================================
+VIEW: Activity Lifecycle
+======================================================================
+Loading C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\b3a49dd2-1d20-4999-9b87-d5264656907e\scratchpad\mirror\Insights\views_prdw\view1_activity_lifecycle.parquet ...
+  12,704 rows x 70 cols  (canonical row order, fingerprint 28c27286da30ec7f)
+
+Pattern types: 6 categorical, 5 temporal  (11 total)
+Excluded (measure, breakdown) pairs: 32  (A1)
+
+Generating subspaces ...
+  depth-0: 1  depth-1: 172  depth-2: 0  total: 173
+Building priority queue ...
+  SUBSET: the 40 highest-impact subspaces only
+  40 subspaces retained after impact pruning (min=0.01); 14,171 data scopes behind them
+
+Mining (budget: 36000s, workers: 1, top-K: 5000) ...
+  5,000 scopes | 6,699 patterns | 1,844 MetaInsights | 72.1s elapsed
+  10,000 scopes | 13,556 patterns | 2,084 MetaInsights | 95.6s elapsed
+
+Mining complete in 114.0s
+  Queue drained:         True
+  Scopes evaluated:      14,171
+  Throughput:            124.4 scopes/s
+  Patterns found:        18,460
+  HDPs evaluated:        14,378
+  HDPs skipped (dedup):  28,729
+  HDP dedup hit rate:    66.6%
+  MetaInsights found:    2,240
+  Data-quality (A7):     0
+  Query cache hit rate:  98.1%
+  Pattern cache rate:    31.4%
+  Cache evictions:       0 query / 0 pattern
+  Store dropped / dup:   0 / 0
+  Peak worker memory:    0.55 GB
+  Top score:             0.8760
+  Candidate hash:        bf1381eeeab929f42ad9e5c722964ecb
+
+  Candidates by pattern type:
+    OUTSTANDING_1       : 711
+    ATTRIBUTION         : 518
+    TOP_TWO             : 508
+    EVENNESS            : 265
+    OUTSTANDING_LAST    : 142
+    LAST_TWO            : 96
+Saved 2,240 candidates -> C:\Users\prith\AppData\Local\Temp\wpd2c_determinism_2ccow8l8\view1_run2.json
+  [PASS] view1: content hash stable across two runs  -- bf1381eeeab929f4 vs bf1381eeeab929f4
+  [PASS] view1: candidate FILE identical across two runs  -- 08ecbdd7d845644e vs 08ecbdd7d845644e
+
+======================================================================
+VIEW: Geo-Month Cash Cube
+======================================================================
+Loading C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\b3a49dd2-1d20-4999-9b87-d5264656907e\scratchpad\mirror\Insights\views_prdw\view2_geo_month_cube.parquet ...
+  1,440 rows x 17 cols  (canonical row order, fingerprint e6163e73eb520b01)
+
+Pattern types: 6 categorical, 5 temporal  (11 total)
+
+Generating subspaces ...
+  depth-0: 1  depth-1: 51  depth-2: 0  total: 52
+Building priority queue ...
+  52 subspaces retained after impact pruning (min=0.01); 2,763 data scopes behind them
+
+Mining (budget: 36000s, workers: 1, top-K: 5000) ...
+
+Mining complete in 36.1s
+  Queue drained:         True
+  Scopes evaluated:      2,763
+  Throughput:            76.5 scopes/s
+  Patterns found:        2,044
+  HDPs evaluated:        2,220
+  HDPs skipped (dedup):  4,062
+  HDP dedup hit rate:    64.7%
+  MetaInsights found:    122
+  Data-quality (A7):     0
+  Query cache hit rate:  96.7%
+  Pattern cache rate:    47.6%
+  Cache evictions:       0 query / 0 pattern
+  Store dropped / dup:   0 / 0
+  Peak worker memory:    0.51 GB
+  Top score:             0.7211
+  Candidate hash:        007731eb7043cbd1718a90e62e987196
+
+  Candidates by pattern type:
+    TREND               : 48
+    SEASONALITY         : 40
+    OUTLIER             : 14
+    OUTSTANDING_1       : 9
+    UNIMODALITY         : 5
+    CHANGE_POINT        : 4
+    ATTRIBUTION         : 1
+    TOP_TWO             : 1
+Saved 122 candidates -> C:\Users\prith\AppData\Local\Temp\wpd2c_determinism_2ccow8l8\view2_run1.json
+
+======================================================================
+VIEW: Geo-Month Cash Cube
+======================================================================
+Loading C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\b3a49dd2-1d20-4999-9b87-d5264656907e\scratchpad\mirror\Insights\views_prdw\view2_geo_month_cube.parquet ...
+  1,440 rows x 17 cols  (canonical row order, fingerprint e6163e73eb520b01)
+
+Pattern types: 6 categorical, 5 temporal  (11 total)
+
+Generating subspaces ...
+  depth-0: 1  depth-1: 51  depth-2: 0  total: 52
+Building priority queue ...
+  52 subspaces retained after impact pruning (min=0.01); 2,763 data scopes behind them
+
+Mining (budget: 36000s, workers: 1, top-K: 5000) ...
+
+Mining complete in 38.0s
+  Queue drained:         True
+  Scopes evaluated:      2,763
+  Throughput:            72.7 scopes/s
+  Patterns found:        2,044
+  HDPs evaluated:        2,220
+  HDPs skipped (dedup):  4,062
+  HDP dedup hit rate:    64.7%
+  MetaInsights found:    122
+  Data-quality (A7):     0
+  Query cache hit rate:  96.7%
+  Pattern cache rate:    47.6%
+  Cache evictions:       0 query / 0 pattern
+  Store dropped / dup:   0 / 0
+  Peak worker memory:    0.43 GB
+  Top score:             0.7211
+  Candidate hash:        007731eb7043cbd1718a90e62e987196
+
+  Candidates by pattern type:
+    TREND               : 48
+    SEASONALITY         : 40
+    OUTLIER             : 14
+    OUTSTANDING_1       : 9
+    UNIMODALITY         : 5
+    CHANGE_POINT        : 4
+    ATTRIBUTION         : 1
+    TOP_TWO             : 1
+Saved 122 candidates -> C:\Users\prith\AppData\Local\Temp\wpd2c_determinism_2ccow8l8\view2_run2.json
+  [PASS] view2: content hash stable across two runs  -- 007731eb7043cbd1 vs 007731eb7043cbd1
+  [PASS] view2: candidate FILE identical across two runs  -- 5796d3c8029c5f06 vs 5796d3c8029c5f06
+
+======================================================================
+VIEW: GP Performance
+======================================================================
+Loading C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\b3a49dd2-1d20-4999-9b87-d5264656907e\scratchpad\mirror\Insights\views_prdw\view3_gp_performance.parquet ...
+  120 rows x 26 cols  (canonical row order, fingerprint c6971add1737d646)
+
+Pattern types: 6 categorical, 5 temporal  (11 total)
+
+Generating subspaces ...
+  depth-0: 1  depth-1: 45  depth-2: 0  total: 46
+Building priority queue ...
+  46 subspaces retained after impact pruning (min=0.01); 2,502 data scopes behind them
+
+Mining (budget: 36000s, workers: 1, top-K: 5000) ...
+
+Mining complete in 8.6s
+  Queue drained:         True
+  Scopes evaluated:      2,502
+  Throughput:            291.1 scopes/s
+  Patterns found:        562
+  HDPs evaluated:        419
+  HDPs skipped (dedup):  775
+  HDP dedup hit rate:    64.9%
+  MetaInsights found:    2
+  Data-quality (A7):     0
+  Query cache hit rate:  96.2%
+  Pattern cache rate:    22.5%
+  Cache evictions:       0 query / 0 pattern
+  Store dropped / dup:   0 / 0
+  Peak worker memory:    0.42 GB
+  Top score:             0.2460
+  Candidate hash:        6b20b5acdf5817da69a1e8dd56b3008f
+
+  Candidates by pattern type:
+    EVENNESS            : 1
+    TREND               : 1
+Saved 2 candidates -> C:\Users\prith\AppData\Local\Temp\wpd2c_determinism_2ccow8l8\view3_run1.json
+
+======================================================================
+VIEW: GP Performance
+======================================================================
+Loading C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\b3a49dd2-1d20-4999-9b87-d5264656907e\scratchpad\mirror\Insights\views_prdw\view3_gp_performance.parquet ...
+  120 rows x 26 cols  (canonical row order, fingerprint c6971add1737d646)
+
+Pattern types: 6 categorical, 5 temporal  (11 total)
+
+Generating subspaces ...
+  depth-0: 1  depth-1: 45  depth-2: 0  total: 46
+Building priority queue ...
+  46 subspaces retained after impact pruning (min=0.01); 2,502 data scopes behind them
+
+Mining (budget: 36000s, workers: 1, top-K: 5000) ...
+
+Mining complete in 8.4s
+  Queue drained:         True
+  Scopes evaluated:      2,502
+  Throughput:            298.2 scopes/s
+  Patterns found:        562
+  HDPs evaluated:        419
+  HDPs skipped (dedup):  775
+  HDP dedup hit rate:    64.9%
+  MetaInsights found:    2
+  Data-quality (A7):     0
+  Query cache hit rate:  96.2%
+  Pattern cache rate:    22.5%
+  Cache evictions:       0 query / 0 pattern
+  Store dropped / dup:   0 / 0
+  Peak worker memory:    0.41 GB
+  Top score:             0.2460
+  Candidate hash:        6b20b5acdf5817da69a1e8dd56b3008f
+
+  Candidates by pattern type:
+    EVENNESS            : 1
+    TREND               : 1
+Saved 2 candidates -> C:\Users\prith\AppData\Local\Temp\wpd2c_determinism_2ccow8l8\view3_run2.json
+  [PASS] view3: content hash stable across two runs  -- 6b20b5acdf5817da vs 6b20b5acdf5817da
+  [PASS] view3: candidate FILE identical across two runs  -- a5fa0a1f5f2fa659 vs a5fa0a1f5f2fa659
+
+=== 2. 4 workers produce what one process produces ===
+
+======================================================================
+VIEW: Activity Lifecycle
+======================================================================
+Loading C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\b3a49dd2-1d20-4999-9b87-d5264656907e\scratchpad\mirror\Insights\views_prdw\view1_activity_lifecycle.parquet ...
+  12,704 rows x 70 cols  (canonical row order, fingerprint 28c27286da30ec7f)
+
+Pattern types: 6 categorical, 5 temporal  (11 total)
+Excluded (measure, breakdown) pairs: 32  (A1)
+
+Generating subspaces ...
+  depth-0: 1  depth-1: 172  depth-2: 0  total: 173
+Building priority queue ...
+  SUBSET: the 40 highest-impact subspaces only
+  40 subspaces retained after impact pruning (min=0.01); 14,171 data scopes behind them
+
+Mining (budget: 36000s, workers: 4, top-K: 5000) ...
+  queue sharded 4 ways: [10, 10, 10, 10] subspaces per worker
+
+Mining complete in 105.4s
+  Queue drained:         True
+  Scopes evaluated:      14,171
+  Throughput:            134.5 scopes/s
+  Patterns found:        18,460
+  HDPs evaluated:        19,995
+  HDPs skipped (dedup):  23,112
+  HDP dedup hit rate:    53.6%
+  MetaInsights found:    2,240
+  Data-quality (A7):     0
+  Query cache hit rate:  97.2%
+  Pattern cache rate:    24.8%
+  Cache evictions:       0 query / 0 pattern
+  Store dropped / dup:   0 / 0
+  Peak worker memory:    0.47 GB
+  Top score:             0.8760
+  Candidate hash:        bf1381eeeab929f42ad9e5c722964ecb
+
+  Candidates by pattern type:
+    OUTSTANDING_1       : 711
+    ATTRIBUTION         : 518
+    TOP_TWO             : 508
+    EVENNESS            : 265
+    OUTSTANDING_LAST    : 142
+    LAST_TWO            : 96
+  [PASS] view1: parallel content hash equals the single-process one (subset of 40 subspaces)  -- bf1381eeeab929f4 vs bf1381eeeab929f4
+  [PASS] view1: same candidate count  -- 2240 vs 2240
+
+======================================================================
+VIEW: Geo-Month Cash Cube
+======================================================================
+Loading C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\b3a49dd2-1d20-4999-9b87-d5264656907e\scratchpad\mirror\Insights\views_prdw\view2_geo_month_cube.parquet ...
+  1,440 rows x 17 cols  (canonical row order, fingerprint e6163e73eb520b01)
+
+Pattern types: 6 categorical, 5 temporal  (11 total)
+
+Generating subspaces ...
+  depth-0: 1  depth-1: 51  depth-2: 0  total: 52
+Building priority queue ...
+  52 subspaces retained after impact pruning (min=0.01); 2,763 data scopes behind them
+
+Mining (budget: 36000s, workers: 4, top-K: 5000) ...
+  queue sharded 4 ways: [20, 16, 9, 7] subspaces per worker
+
+Mining complete in 26.9s
+  Queue drained:         True
+  Scopes evaluated:      2,763
+  Throughput:            102.8 scopes/s
+  Patterns found:        2,044
+  HDPs evaluated:        2,345
+  HDPs skipped (dedup):  3,937
+  HDP dedup hit rate:    62.7%
+  MetaInsights found:    122
+  Data-quality (A7):     0
+  Query cache hit rate:  95.2%
+  Pattern cache rate:    44.6%
+  Cache evictions:       0 query / 0 pattern
+  Store dropped / dup:   0 / 0
+  Peak worker memory:    0.44 GB
+  Top score:             0.7211
+  Candidate hash:        007731eb7043cbd1718a90e62e987196
+
+  Candidates by pattern type:
+    TREND               : 48
+    SEASONALITY         : 40
+    OUTLIER             : 14
+    OUTSTANDING_1       : 9
+    UNIMODALITY         : 5
+    CHANGE_POINT        : 4
+    ATTRIBUTION         : 1
+    TOP_TWO             : 1
+  [PASS] view2: parallel content hash equals the single-process one  -- 007731eb7043cbd1 vs 007731eb7043cbd1
+  [PASS] view2: same candidate count  -- 122 vs 122
+
+======================================================================
+VIEW: GP Performance
+======================================================================
+Loading C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\b3a49dd2-1d20-4999-9b87-d5264656907e\scratchpad\mirror\Insights\views_prdw\view3_gp_performance.parquet ...
+  120 rows x 26 cols  (canonical row order, fingerprint c6971add1737d646)
+
+Pattern types: 6 categorical, 5 temporal  (11 total)
+
+Generating subspaces ...
+  depth-0: 1  depth-1: 45  depth-2: 0  total: 46
+Building priority queue ...
+  46 subspaces retained after impact pruning (min=0.01); 2,502 data scopes behind them
+
+Mining (budget: 36000s, workers: 4, top-K: 5000) ...
+  queue sharded 4 ways: [20, 16, 9, 1] subspaces per worker
+
+Mining complete in 8.3s
+  Queue drained:         True
+  Scopes evaluated:      2,502
+  Throughput:            302.8 scopes/s
+  Patterns found:        562
+  HDPs evaluated:        467
+  HDPs skipped (dedup):  727
+  HDP dedup hit rate:    60.9%
+  MetaInsights found:    2
+  Data-quality (A7):     0
+  Query cache hit rate:  91.8%
+  Pattern cache rate:    17.7%
+  Cache evictions:       0 query / 0 pattern
+  Store dropped / dup:   0 / 0
+  Peak worker memory:    0.44 GB
+  Top score:             0.2460
+  Candidate hash:        6b20b5acdf5817da69a1e8dd56b3008f
+
+  Candidates by pattern type:
+    EVENNESS            : 1
+    TREND               : 1
+  [PASS] view3: parallel content hash equals the single-process one  -- 6b20b5acdf5817da vs 6b20b5acdf5817da
+  [PASS] view3: same candidate count  -- 2 vs 2
+
+=== 3. a second BUILD of the same view mines the same candidates ===
+  build A aa5cf4aa86fd6faa  view2_geo_month_cube.parquet
+  build B 830f5ba8ee106b2d  v2_buildB.parquet
+  [PASS] view2: the two builds really are different files (otherwise this proves nothing)
+
+======================================================================
+VIEW: Geo-Month Cash Cube
+======================================================================
+Loading C:/Users/prith/AppData/Local/Temp/claude/i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW/b3a49dd2-1d20-4999-9b87-d5264656907e/scratchpad/v2_buildB.parquet ...
+  1,440 rows x 17 cols  (canonical row order, fingerprint e6163e73eb520b01)
+
+Pattern types: 6 categorical, 5 temporal  (11 total)
+
+Generating subspaces ...
+  depth-0: 1  depth-1: 51  depth-2: 0  total: 52
+Building priority queue ...
+  52 subspaces retained after impact pruning (min=0.01); 2,763 data scopes behind them
+
+Mining (budget: 36000s, workers: 1, top-K: 5000) ...
+
+Mining complete in 38.1s
+  Queue drained:         True
+  Scopes evaluated:      2,763
+  Throughput:            72.6 scopes/s
+  Patterns found:        2,044
+  HDPs evaluated:        2,220
+  HDPs skipped (dedup):  4,062
+  HDP dedup hit rate:    64.7%
+  MetaInsights found:    122
+  Data-quality (A7):     0
+  Query cache hit rate:  96.7%
+  Pattern cache rate:    47.6%
+  Cache evictions:       0 query / 0 pattern
+  Store dropped / dup:   0 / 0
+  Peak worker memory:    0.44 GB
+  Top score:             0.7211
+  Candidate hash:        007731eb7043cbd1718a90e62e987196
+
+  Candidates by pattern type:
+    TREND               : 48
+    SEASONALITY         : 40
+    OUTLIER             : 14
+    OUTSTANDING_1       : 9
+    UNIMODALITY         : 5
+    CHANGE_POINT        : 4
+    ATTRIBUTION         : 1
+    TOP_TWO             : 1
+  [PASS] view2: candidates are identical across two builds  -- 007731eb7043cbd1 vs 007731eb7043cbd1
+
+============================================================
+0 failure(s)

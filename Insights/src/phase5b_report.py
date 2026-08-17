@@ -18,8 +18,10 @@
 # =============================================================================
 
 import os
+import re
 import sys
 import ast
+import csv
 import json
 
 import pandas as pd
@@ -33,6 +35,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from phase4a_engine import (
     VIEW1_CONFIG, VIEW2_CONFIG, VIEW3_CONFIG,
     ViewConfig,
+    # WP-D2c A3: the one list of signed money measures, shared with the ranker
+    SIGNED_MONEY_MEASURES,
 )
 from discover_config import DISCOVER_PROSE_MODEL, DISCOVER_MAX_COMPLETION_TOKENS
 
@@ -139,6 +143,10 @@ _UNITS = {
         "payment_count": "vouchers", "receipt_count": "vouchers",
         "activity_linked_expenditure": "rupees",
         "sanctions_count": "sanctions", "sanctioned_amount": "rupees",
+        # WP-D2c A4. Rupees either way -- the unit does not change when the
+        # aggregation does, and `how_aggregated` in the stats is what tells the
+        # writer this one is a per-GP-month rate rather than a total.
+        "payment_amount_mean": "rupees", "receipt_amount_mean": "rupees",
     },
     "view3": {
         "n_plans": "plans",
@@ -258,6 +266,17 @@ READING_NOTES = {
         "years, 120 rows -- so a **zero is a recorded zero**, not a missing row. "
         "It can mean either that nothing happened or that nothing was recorded, "
         "and this view cannot tell those apart. "
+        # WP-D2c A7. The operator's ruling on view3's two displaced findings:
+        # keep the completion story, reframed as data quality. The trends that
+        # carried it are no longer mined -- a series of six zeros cannot be
+        # read as a decline -- so the statement is made here, from the counts,
+        # where it cannot depend on a pattern that should not have been found.
+        "**Completion recording effectively ceased after 2022-23**: the 17 "
+        "activities ever marked WORK COMPLETED fall 3 / 6 / 6 across 2020-21 to "
+        "2022-23, then 0, 2 and 0 across the three years since. No comparison "
+        "of Gram Panchayats on completions can be supported by this column, and "
+        "trend patterns on it are reported in the data-quality annex rather "
+        "than as findings. "
         + _SANCTION_COVERAGE
         + " `n_tech_approvals` totals **2,095**, not the 2,134 technical-approval "
         "records in the source: 39 sit on activities that have no administrative "
@@ -325,6 +344,72 @@ COUNT_CAVEAT_FOR_PROMPT = (
 )
 
 
+# =============================================================================
+# A3 -- EVENNESS on a signed money measure
+# =============================================================================
+# Calibration session 1, ruling 3, on the finding the operator called the most
+# interesting in the set: Rs 51.96 crore of underspend, spread evenly across
+# every Gram Panchayat in 27 of 28 asset categories. The engine wrote it as
+# "overspend_vs_plan is evenly distributed across gp_name values. Exception:
+# Banking Facilities (no clear pattern)" -- a neutral sentence about a shape,
+# with an exception clause that reads as praise for the excepted category.
+#
+# Both halves are wrong for a signed money measure. Evenness on a shortfall is
+# the FINDING: there is no concentration to chase, no small set of Gram
+# Panchayats to call in, and the shortfall is a property of the programme
+# rather than of any place in it. And the exception is about the SPREAD, not
+# about the level -- Banking Facilities is where the shortfall is unevenly
+# spread, which says nothing whatever about whether it spends well.
+
+EVENNESS_FOR_PROMPT = (
+    "EVENNESS ON A SIGNED MONEY MEASURE. This finding says the measure is "
+    "spread EVENLY -- not that it is small, and not that it is fine. Lead with "
+    "the magnitude from 'stats.total' and then with the absence of "
+    "concentration: the money belongs to every group in the breakdown and no "
+    "one of them accounts for it. That is what makes it actionable, because it "
+    "rules out the small set of places an officer would otherwise go looking "
+    "for. The exceptions are the groups where the measure is NOT evenly spread "
+    "-- they are about the SHAPE of the distribution and say nothing about how "
+    "much any of them spends. Never write an exception here as good or bad "
+    "behaviour, and never call an even spread a balanced or healthy one."
+)
+
+# =============================================================================
+# A6 -- activity-linked expenditure is a recording measure before it is a
+#       spending measure
+# =============================================================================
+# Calibration session 1, ruling 6. Four of view2's fifteen findings were rises
+# in `activity_linked_expenditure` -- read straight, "spending on planned works
+# is growing". The cashbook says otherwise: total outflow did not rise across
+# the same six years, and what rose was the share of it that carries a link to
+# a planned activity. Every figure below is measured off this drop (view2 by
+# fiscal year; the link count from `activity_voucher`).
+
+LINKAGE_MEASURE = "activity_linked_expenditure"
+
+LINKAGE_SENTENCE = (
+    "On activity-linked expenditure specifically: the cashbook's total outflow "
+    "did **not** grow across these six years (**Rs 15.60 crore** in 2020-21 "
+    "against **Rs 11.12 crore** in 2025-26), while the share of it carrying a "
+    "link to a planned activity rose from **2.7%** to **53.2%**, and the number "
+    "of recorded activity-voucher links rose from **30** to **2,122**. A rise "
+    "in activity-linked expenditure is therefore a rise in recording "
+    "completeness unless the cashbook total rises with it."
+)
+
+LINKAGE_FOR_PROMPT = (
+    "RECORDING-COMPLETENESS FRAMING ON THIS FINDING: it is about "
+    "activity_linked_expenditure, which is the part of the cashbook that has "
+    "been LINKED to a planned activity. Linking practice grew steeply over "
+    "this window while the cashbook total did not, so a rise here is first of "
+    "all a rise in how completely the link was recorded. Present it that way. "
+    "Do not describe it as growth in spending, in delivery or in execution, "
+    "and do not describe a flat or falling one as a decline in spending -- for "
+    "those groups the linking practice is what has not moved. The section "
+    "already carries a fixed sentence with the figures; do not write your own."
+)
+
+
 def activity_count_measures(view_name: str) -> set:
     """The view's measures whose UNIT is activities, read off _UNITS."""
     return {m for m, unit in _UNITS.get(view_name, {}).items() if unit == "activities"}
@@ -381,6 +466,158 @@ def count_caveat_applies(view_name: str, finding: dict, fiscal_years=None) -> bo
     return bool(years & _FY_PRE_2023) and bool(years & _FY_FROM_2023)
 
 
+# =============================================================================
+# KNOWN EVENTS -- context the data does not carry (WP-D2c A5)
+# =============================================================================
+# Calibration session 1, ruling 5. The operator looked at view2's August 2020
+# change point and its FY 2020-21 ramp and said "COVID". The engine cannot know
+# that, and rule 4b of the prompt forbids the model from supplying it -- an
+# invented cause is the error this pipeline guards hardest against.
+#
+# So the events are a table the department owns, in the domain pack, and the
+# citation is a DATE TEST rather than a judgement: a change point inside an
+# event window (or within the three months after it, because a resumption is as
+# dated as an interruption) or a finding whose own slice pins a period that
+# overlaps one. The note prints verbatim, in the deterministic reading note,
+# and says the dates coincide -- never that the event caused the pattern.
+
+KNOWN_EVENTS_PATH = os.path.join(
+    BASE_DIR, "domain_pack_prdw", "known_events.csv")
+
+# How long after an event ends a dated shift may still be attached to it. The
+# COVID window closes 2020-06 and view2's Ganjam change point is at 2020-08.
+_EVENT_RECOVERY_MONTHS = 3
+
+_MONTH_RE = re.compile(r"^(\d{4})-(\d{2})$")
+_QUARTER_RE = re.compile(r"^(\d{4})-Q([1-4])$")
+_FY_RE = re.compile(r"^(\d{4})-(\d{4})$")
+
+
+def _month_index(year: int, month: int) -> int:
+    return year * 12 + (month - 1)
+
+
+def _period_bounds(label) -> tuple | None:
+    """(first month index, last month index) for '2020-08', '2020-Q3', '2024-2025'."""
+    s = str(label).strip()
+    m = _MONTH_RE.match(s)
+    if m:
+        i = _month_index(int(m.group(1)), int(m.group(2)))
+        return i, i
+    m = _QUARTER_RE.match(s)
+    if m:
+        first = _month_index(int(m.group(1)), (int(m.group(2)) - 1) * 3 + 1)
+        return first, first + 2
+    m = _FY_RE.match(s)
+    if m and int(m.group(2)) == int(m.group(1)) + 1:
+        first = _month_index(int(m.group(1)), 4)      # April-March
+        return first, first + 11
+    return None
+
+
+_known_events_cache: list | None = None
+
+
+def known_events(path: str | None = None) -> list:
+    """The pack's event table. Unfilled TODO(SME) rows are skipped."""
+    global _known_events_cache
+    if path is None and _known_events_cache is not None:
+        return _known_events_cache
+    events = []
+    target = path or KNOWN_EVENTS_PATH
+    if os.path.exists(target):
+        with open(target, encoding="utf-8-sig", newline="") as f:
+            for row in csv.DictReader(f):
+                name = (row.get("event") or "").strip()
+                start = _period_bounds((row.get("start_month") or "").strip())
+                end = _period_bounds((row.get("end_month") or "").strip())
+                if not name or name.startswith("TODO(SME)") or not start or not end:
+                    continue
+                events.append({
+                    "event": name,
+                    "start_label": row["start_month"].strip(),
+                    "end_label": row["end_month"].strip(),
+                    "start": start[0],
+                    "end": end[1],
+                    "note": (row.get("note") or "").strip(),
+                })
+    events.sort(key=lambda e: (e["start"], e["event"]))
+    if path is None:
+        _known_events_cache = events
+    return events
+
+
+# The temporal pattern types whose highlight IS a date.
+_DATED_HIGHLIGHT_TYPES = frozenset({"CHANGE_POINT", "OUTLIER", "UNIMODALITY"})
+
+
+def _finding_periods(finding: dict) -> list:
+    """Every dated period this finding points AT: highlights and its own slice."""
+    periods = []
+    for cs in finding.get("commonness_sets") or []:
+        if cs.get("pattern_type") in _DATED_HIGHLIGHT_TYPES:
+            try:
+                hl = ast.literal_eval(cs.get("highlight") or "()")
+            except (ValueError, SyntaxError):
+                hl = ()
+            for item in (hl if isinstance(hl, tuple) else ()):
+                for part in (item if isinstance(item, tuple) else (item,)):
+                    bounds = _period_bounds(part)
+                    if bounds:
+                        periods.append((bounds, "the shift this finding reports"))
+    for exc in finding.get("exceptions") or []:
+        if exc.get("pattern_type") in _DATED_HIGHLIGHT_TYPES and exc.get("highlight"):
+            try:
+                hl = ast.literal_eval(exc["highlight"])
+            except (ValueError, SyntaxError):
+                hl = ()
+            for item in (hl if isinstance(hl, tuple) else ()):
+                for part in (item if isinstance(item, tuple) else (item,)):
+                    bounds = _period_bounds(part)
+                    if bounds:
+                        periods.append((bounds, "an exception in this finding"))
+    for dim_val in finding.get("base_subspace") or []:
+        bounds = _period_bounds(dim_val[1])
+        if bounds:
+            periods.append((bounds, "the period this finding is restricted to"))
+    return periods
+
+
+def event_citations(findings: list, events: list | None = None) -> list:
+    """The deterministic event sentences for a section's findings."""
+    events = known_events() if events is None else events
+    if not events:
+        return []
+    # One sentence per EVENT, not per finding and not per kind of overlap. A
+    # section that touches the same window twice -- a change point just after
+    # it and a fiscal year inside it -- was printing the whole note twice.
+    hits: dict = {}
+    for finding in findings or []:
+        for (first, last), what in _finding_periods(finding):
+            for ev in events:
+                during = first <= ev["end"] and last >= ev["start"]
+                after = ev["end"] < first <= ev["end"] + _EVENT_RECOVERY_MONTHS
+                if not (during or after):
+                    continue
+                slot = hits.setdefault(ev["event"], {"ev": ev, "what": {}})
+                slot["what"].setdefault(
+                    what, "inside" if during else "in the months just after")
+
+    out = []
+    for name in sorted(hits):
+        ev, what = hits[name]["ev"], hits[name]["what"]
+        clauses = " and ".join(
+            f"{w} falls {when}" for w, when in sorted(what.items())
+        )
+        out.append(
+            f"A dated event overlaps this section: {clauses} the {ev['event']} "
+            f"({ev['start_label']} to {ev['end_label']}). {ev['note']} The dates "
+            f"coincide; this analysis does not establish that one produced the "
+            f"other."
+        )
+    return out
+
+
 def reading_note_block(view_name: str, findings: list | None = None) -> str:
     """The view's reading note as a markdown blockquote, or "" if it has none.
 
@@ -391,13 +628,18 @@ def reading_note_block(view_name: str, findings: list | None = None) -> str:
     them trips §5.2's test, the reporting-artifact sentence joins THIS note
     rather than becoming a second blockquote -- the prose gate expects exactly
     one marker per section, and a second callout would also read as two separate
-    caveats where there is one set of conditions on reading the section.
+    caveats where there is one set of conditions on reading the section. The
+    A5 event citations and the A6 linkage sentence join it for the same reason.
     """
     note = READING_NOTES.get(view_name)
     if not note:
         return ""
     if findings and any(f.get("reporting_caveat") for f in findings):
         note = f"{note} {COUNT_CAVEAT_SENTENCE}"
+    if findings and any(f.get("linkage_framing") for f in findings):
+        note = f"{note} {LINKAGE_SENTENCE}"
+    for sentence in event_citations(findings or []):
+        note = f"{note} {sentence}"
     return f"\n\n{READING_NOTE_MARKER} {note}\n"
 
 
@@ -764,6 +1006,18 @@ VIEW_DESCRIPTIONS = {
                 "UNIT: rupees, TOTALLED. SANCTIONED basis, by sanction month - "
                 "the same 2,040 sanctions as sanctions_count."
             ),
+            # WP-D2c A4, transcribed verbatim from the brief's Appendix.
+            "payment_amount_mean": (
+                "UNIT: rupees, AVERAGED per GP-month. The same rupee column as "
+                "payment_amount, normalised by GP-months: the typical monthly "
+                "outflow of one Gram Panchayat in the group, independent of how "
+                "many GPs or months the group contains. Use this, not the total, "
+                "to compare places of different size."
+            ),
+            "receipt_amount_mean": (
+                "UNIT: rupees, AVERAGED per GP-month. As payment_amount_mean, "
+                "for inflows."
+            ),
         },
     },
     "view3": {
@@ -876,23 +1130,37 @@ _VOLUME_MEASURE = {
     "view3": "n_activities",
 }
 
-# Which BREAKDOWNS get the comparison: the geography spine, where size varies
-# by an order of magnitude between members. A breakdown by theme or status is
-# not a size question in the same way -- those are properties of the work, and
-# "roads carry the most money" is the finding, not a confound.
+# Which BREAKDOWNS get the comparison. It was the geography spine only, on the
+# argument that a breakdown by theme or status is a property of the work rather
+# than a size question. Calibration session 1 refuted that on two of its own
+# findings: "Activity Approved has the LOWEST overspend_vs_plan among status
+# values" and "Maintenance and New/Fresh are lowest in overspend_vs_plan among
+# work types" were both labelled spurious with the same note -- unspent money
+# sits where most activities sit. Those are the geography confound exactly, on
+# a non-geography axis, and the reader had no volume figure to see it with.
+#
+# So the comparison now travels with EVERY categorical breakdown of a total.
+# Where the volume is evenly spread the block simply shows that, and rule 2b
+# already requires the model to say so plainly rather than to hunt for a gap.
+# Temporal breakdowns are excluded: a month is not bigger than another month in
+# the sense this measures, and the view's own reading note handles the calendar.
 _SIZE_CONFOUND_BREAKDOWNS = {"gp_name", "block_name", "district_name"}
 
 # The prose rule that goes with the block above. Defined ONCE and imported by
 # phase5c_gamma_reports, for the same reason the enrichment function is shared:
 # two copies of a rule about the same stats key drift, and a rule that names a
 # key the enrichment does not emit is worse than no rule at all.
-POPULATION_SHARE_RULE = """2b. SIZE IS NOT PERFORMANCE. Where a finding carries 'stats.size_share', it is a TOTAL broken down by Gram Panchayat, block or district, and that block gives each place's share of the volume behind those totals. A total across places of different sizes ranks them by SIZE: the biggest planner holds the biggest total almost by definition.
-   - Whenever you quote such a total, quote the place's share of the volume alongside it, from 'share_of_volume', in the same sentence. Correct: "Chikilli accounts for 10.9% of spending, against 5.0% of the activities planned." The reader now knows which part is size and which part is not
+POPULATION_SHARE_RULE = """2b. SIZE IS NOT PERFORMANCE. Where a finding carries 'stats.size_share', it is a TOTAL broken down by some group -- a Gram Panchayat, a block, a district, a work type, a status -- and that block gives each group's share of the volume behind those totals. A total across groups of different sizes ranks them by SIZE: the biggest planner holds the biggest total almost by definition, and so does the status that most activities sit in.
+   - Whenever you quote such a total, quote the group's share of the volume alongside it, from 'share_of_volume', in the same sentence. Correct: "Chikilli accounts for 10.9% of spending, against 5.0% of the activities planned." The reader now knows which part is size and which part is not
    - Wrong: "Chikilli and Badakodanda lead on spending, Kuluma trails." True, and it reads as a delivery gap when it may be a headcount fact
-   - The smallest Gram Panchayat will have the smallest total of everything. That is arithmetic, not a finding, and it must never be written as though it were one. Do not call such a split a gap, a shortfall, an imbalance, an under-performance or a disparity
-   - When the two shares are close, SAY SO PLAINLY -- "in proportion to what it planned", "in line with its share of the work". A place carrying its numerical share is a real and reportable result, not a failure to find something, and matching is the common case here
+   - The smallest Gram Panchayat will have the smallest total of everything, and the largest category will have the largest. That is arithmetic, not a finding, and it must never be written as though it were one. Do not call such a split a gap, a shortfall, an imbalance, an under-performance or a disparity
+   - When the two shares are close, SAY SO PLAINLY -- "in proportion to what it planned", "in line with its share of the work". A group carrying its numerical share is a real and reportable result, not a failure to find something, and matching is the common case here
    - Only call a divergence a gap when the two shares actually diverge, and say by how much using the figures given. That IS the finding when it happens, and it is the one to lead with
-   - Copy the percentages verbatim like every other figure. 'scope' tells you which slice the share describes and 'volume_in_scope' how much volume is behind it. If 'base_not_narrowed_by' is present, the share covers a WIDER slice than the finding does -- name the slice you are describing so the reader is not misled"""
+   - Copy the percentages verbatim like every other figure. 'scope' tells you which slice the share describes and 'volume_in_scope' how much volume is behind it. If 'base_not_narrowed_by' is present, the share covers a WIDER slice than the finding does -- name the slice you are describing so the reader is not misled
+
+2c. PREFER THE PER-UNIT FIGURE WHERE ONE IS OFFERED. Where a finding carries 'stats.intensity_companion', the same rupees are also available as an average per Gram Panchayat per month, which does not grow with the number of Gram Panchayats a place contains.
+   - Quote the companion figure alongside the total whenever you rank places, and prefer it when you say which place stands out. A district leading on total outflow because it holds four of the sample's twenty Gram Panchayats is not a finding; a district whose typical Gram Panchayat moves more money each month than its neighbours' is
+   - Copy those figures verbatim too, and keep the words that come with them: one is a total, the other is a typical month for one Gram Panchayat. Never add them together and never present one as the other"""
 
 
 _view_df_cache: dict = {}
@@ -909,18 +1177,21 @@ def _view_df(view_name: str) -> pd.DataFrame:
 
 
 def volume_share(view_name: str, breakdown: str, measure: str, base_subspace) -> dict | None:
-    """Each place's share of the view's volume, for a geography breakdown.
+    """Each group's share of the view's volume, for a categorical breakdown.
 
-    Returns None when the comparison does not apply -- a non-geography
-    breakdown, a view with no volume column, or a finding that is ALREADY about
-    the volume measure, where the share would just restate the finding.
+    Returns None when the comparison does not apply -- a temporal breakdown, a
+    view with no volume column, or a finding that is ALREADY about the volume
+    measure, where the share would just restate the finding.
 
     The scope is narrowed by whichever base-subspace filters the view carries;
     a filter it cannot honour is NAMED in the returned block rather than
     silently ignored, because a share quoted against the wrong base is exactly
     the error this is here to stop.
     """
-    if breakdown not in _SIZE_CONFOUND_BREAKDOWNS:
+    config = VIEW_CONFIGS.get(view_name)
+    if config is None or breakdown in config.temporal_dimensions:
+        return None
+    if breakdown == "(varies)":
         return None
     volume = _VOLUME_MEASURE.get(view_name)
     if volume is None or volume == measure:
@@ -971,6 +1242,65 @@ def volume_share(view_name: str, breakdown: str, measure: str, base_subspace) ->
 
 
 # =============================================================================
+# STEP 2b: THE INTENSITY COMPANION (WP-D2c A4)
+# =============================================================================
+# The size-share block above lets a reader SEE the confound. The intensity
+# companion removes it: the same rupees per Gram Panchayat per month, which is
+# what the operator asked for when they said "let's think about a denominator".
+# It is offered only where the view has an AVG-aggregated alias of the very
+# column the finding totals -- view2's payment_amount_mean and
+# receipt_amount_mean -- so the two figures are the same money, not two
+# measures that happen to be near each other.
+
+_INTENSITY_COMPANION = {
+    "view2": {"payment_amount": "payment_amount_mean",
+              "receipt_amount": "receipt_amount_mean"},
+}
+
+
+def intensity_companion(view_name: str, breakdown: str, measure: str,
+                        base_subspace) -> dict | None:
+    """The per-GP-month average behind a money total, by the same breakdown."""
+    companion = _INTENSITY_COMPANION.get(view_name, {}).get(measure)
+    if companion is None:
+        return None
+    config = VIEW_CONFIGS.get(view_name)
+    if config is None or breakdown in config.temporal_dimensions or breakdown == "(varies)":
+        return None
+
+    df = _view_df(view_name)
+    column = config.get_column(companion)
+    if column not in df.columns or breakdown not in df.columns:
+        return None
+    if isinstance(base_subspace, list):
+        for dim_val in base_subspace:
+            dim, val = dim_val[0], dim_val[1]
+            if dim != breakdown and dim in df.columns:
+                df = df[df[dim] == val]
+    if len(df) == 0:
+        return None
+
+    means = df.groupby(breakdown)[column].mean().sort_values(ascending=False)
+    rows  = df.groupby(breakdown)[column].size()
+    return {
+        "measure": companion,
+        "what_this_is": (
+            f"the same rupees as {measure}, averaged per Gram Panchayat per "
+            "month instead of totalled - a typical month for one Gram "
+            "Panchayat, which does not grow with how many of them a group holds"
+        ),
+        "how_aggregated": "averaged across rows - a per-unit figure, not a total",
+        "values": {
+            str(k): format_measure(view_name, companion, v)
+            for k, v in means.head(5).items()
+        },
+        "gp_months_behind_each_average": {
+            str(k): _num(int(rows[k]), 0) for k in means.head(5).index
+        },
+    }
+
+
+# =============================================================================
 # STEP 2: ENRICH CANDIDATES WITH QUANTITATIVE STATS
 # =============================================================================
 
@@ -986,6 +1316,59 @@ def _mark_count_caveat(view_name: str, c: dict, fiscal_years=None) -> None:
     c["reporting_caveat"] = applies
     if applies and isinstance(c.get("stats"), dict):
         c["stats"]["reporting_artifact"] = COUNT_CAVEAT_FOR_PROMPT
+
+
+def _measures_involved(finding: dict) -> set:
+    """The measure(s) a finding ASSERTS something about.
+
+    For a measure-extending HDP that is the commonness members only, not the
+    exceptions: view2's "six of nine measures peak in March" is not a finding
+    about activity-linked expenditure just because linked expenditure is the
+    one that does something else.
+    """
+    measure = finding.get("measure")
+    if measure and measure != "(varies)":
+        return {measure}
+    members = set()
+    for cs in finding.get("commonness_sets") or []:
+        members.update(str(m) for m in cs.get("members", []))
+    return members
+
+
+def _mark_framing_rules(view_name: str, c: dict, config: ViewConfig) -> None:
+    """A3 and A6: the two deterministic framing rules, keyed to the finding.
+
+    Both are set on the finding AND handed to the writer inside its stats, and
+    both have a fixed sentence in the section's reading note. The writer is
+    told not to write its own version of either, for the reason every caveat
+    in this file is deterministic: a paraphrase of a caveat is where the damage
+    is done.
+    """
+    stats = c.get("stats") if isinstance(c.get("stats"), dict) else None
+
+    # A6 -- activity-linked expenditure, on any temporal reading of it
+    temporal = (
+        c.get("pattern_type") in _TEMPORAL_PATTERN_TYPES
+        or c.get("breakdown") in list(config.temporal_dimensions) + ["(varies)"]
+    )
+    linkage = LINKAGE_MEASURE in _measures_involved(c) and temporal
+    c["linkage_framing"] = linkage
+    if linkage and stats is not None:
+        stats["linkage_framing"] = LINKAGE_FOR_PROMPT
+
+    # A3 -- EVENNESS on a signed money measure
+    evenness = (
+        c.get("pattern_type") == "EVENNESS"
+        and bool(_measures_involved(c) & SIGNED_MONEY_MEASURES)
+    )
+    c["evenness_framing"] = evenness
+    if evenness and stats is not None:
+        stats["evenness_framing"] = EVENNESS_FOR_PROMPT
+
+
+_TEMPORAL_PATTERN_TYPES = frozenset({
+    "TREND", "OUTLIER", "SEASONALITY", "CHANGE_POINT", "UNIMODALITY",
+})
 
 def enrich_candidates_with_stats(
     view_name: str,
@@ -1009,7 +1392,28 @@ def enrich_candidates_with_stats(
         # Skip measure/breakdown-extending HDPs where aggregation is ambiguous
         if measure == "(varies)" or breakdown == "(varies)":
             c["stats"] = {"note": "Varies across members -- see individual patterns"}
+            # ... but the size confound does NOT vary with the measure. "Ganjam
+            # has the highest (varies) among district_name values" is a place
+            # ranking whatever it ranks on, and calibration session 1 labelled
+            # exactly that finding size-driven -- Ganjam holds 4 of the 20
+            # sample Gram Panchayats. The volume shares behind the breakdown
+            # are the same figures for every member of the HDP, so they can be
+            # given here even when the aggregation cannot (A4 / rule 2b).
+            if breakdown != "(varies)":
+                size_share = volume_share(view_name, breakdown, measure, base_subspace)
+                if size_share:
+                    c["stats"]["size_share"] = size_share
+                # and the same for the per-GP-month companion: where the HDP's
+                # members include a money total that has one, the size-free
+                # version of that member is the figure the reader needs
+                for member in sorted(_measures_involved(c)):
+                    companion = intensity_companion(
+                        view_name, breakdown, member, base_subspace)
+                    if companion:
+                        c["stats"].setdefault("intensity_companion", companion)
+                        break
             _mark_count_caveat(view_name, c)
+            _mark_framing_rules(view_name, c, config)
             enriched.append(c)
             continue
 
@@ -1023,21 +1427,25 @@ def enrich_candidates_with_stats(
         if len(filtered) == 0:
             c["stats"] = {"note": "No data after filtering"}
             _mark_count_caveat(view_name, c)
+            _mark_framing_rules(view_name, c, config)
             enriched.append(c)
             continue
 
-        # Aggregate using the measure's configured agg type
+        # Aggregate using the measure's configured agg type, off the column the
+        # measure reads -- an intensity measure is an alias of its total (A4)
         agg_type = config.get_agg(measure)
+        column   = config.get_column(measure)
         if agg_type == "avg":
-            dist = filtered.groupby(breakdown)[measure].mean()
+            dist = filtered.groupby(breakdown)[column].mean()
         else:
-            dist = filtered.groupby(breakdown)[measure].sum()
+            dist = filtered.groupby(breakdown)[column].sum()
 
         dist = dist.dropna().sort_values(ascending=False)
 
         if len(dist) == 0:
             c["stats"] = {"note": "No data after filtering"}
             _mark_count_caveat(view_name, c)
+            _mark_framing_rules(view_name, c, config)
             enriched.append(c)
             continue
 
@@ -1074,6 +1482,12 @@ def enrich_candidates_with_stats(
             if size_share:
                 stats["size_share"] = size_share
 
+            # ... and where the same rupees exist as a per-GP-month average,
+            # the size-free figure travels with the total (A4).
+            companion = intensity_companion(view_name, breakdown, measure, base_subspace)
+            if companion:
+                stats["intensity_companion"] = companion
+
         # Highlight-specific stats
         if c.get("commonness_sets"):
             cs = c["commonness_sets"][0]
@@ -1095,7 +1509,7 @@ def enrich_candidates_with_stats(
         # For AVG measures, the sample size behind each average — the base a
         # rate has to be read against (see the view5 thin-cell note).
         if agg_type == "avg":
-            counts = filtered.groupby(breakdown)[measure].count()
+            counts = filtered.groupby(breakdown)[column].count()
             counts = counts.reindex(dist.head(5).index).dropna()
             stats["rows_behind_each_average"] = {
                 str(k): _num(int(v), 0) for k, v in counts.items()
@@ -1108,6 +1522,7 @@ def enrich_candidates_with_stats(
             view_name, c,
             list(dist.index) if breakdown == "fiscal_year" else None,
         )
+        _mark_framing_rules(view_name, c, config)
         enriched.append(c)
 
     return enriched
@@ -1224,7 +1639,7 @@ Write a clear, readable summary of these findings for the programme officer. Fol
    - Connect related findings into a narrative
    - Use specific figures from the 'stats' field, copied verbatim per rule 2: cite actual values, and the 'share_of_total' string where one is given. If stats.highlight_values is present, always cite those figures
    - Keep each money figure on the basis its glossary entry gives it -- PLANNED (what the action plan proposed), SANCTIONED (what was approved) or SPENT (what left the cashbook against a voucher). They are three different numbers about the same work, and swapping them silently is the most damaging error you can make here. Name the basis in the sentence
-   - Where a finding carries 'stats.reporting_artifact', read it before writing a word about that finding
+   - Where a finding carries 'stats.reporting_artifact', 'stats.linkage_framing' or 'stats.evenness_framing', read it before writing a word about that finding. Each is a fixed instruction about how that finding must be presented, it is there because presenting it the obvious way would be wrong, and the section already carries the matching fixed sentence -- so follow it and do not write your own version of it
    - End with 2-3 specific follow-up questions the officer should raise at the next departmental review
 
 9. FORMATTING RULES (strictly follow these):
@@ -1354,11 +1769,89 @@ def _require_content(response, what: str) -> str:
     )
 
 
+# =============================================================================
+# THE DATA-QUALITY ANNEX (WP-D2c A7) -- deterministic, not LLM-authored
+# =============================================================================
+# Operator ruling, calibration session 1 item 7: a trend on a column with
+# almost no non-zero events is a recording observation and it STAYS VISIBLE as
+# one. It does not belong in the performance narrative -- "completions are
+# declining across 17 of 20 Gram Panchayats" is a sentence about a form nobody
+# filled in -- and it does not belong in a log file either, because the
+# department's data-quality report is one of the things this analysis is for.
+#
+# So it is a section of the report, written from `*_data_quality.json` by this
+# function and not by the model. It carries no view title, so the prose gate
+# reads it as prose outside the per-view sections -- which is what it is.
+
+def data_quality_annex(all_data_quality: dict) -> str:
+    """The annex, or "" when the mining run displaced nothing."""
+    if not any(dq.get("displaced_findings") or dq.get("sub_support_measures")
+               for dq in all_data_quality.values()):
+        return ""
+
+    lines = [
+        "\n## Data-Quality Annex\n",
+        "\nThis section is generated from the mining run's own record, not "
+        "written up from the findings. It lists what the analysis declined to "
+        "report as a finding, and why -- so that a column nobody is filling in "
+        "is visible as a recording problem rather than absent from the report "
+        "or, worse, present in it as a performance result.\n",
+    ]
+    for view_name, dq in all_data_quality.items():
+        displaced = dq.get("displaced_findings") or []
+        measures  = dq.get("sub_support_measures") or []
+        if not displaced and not measures:
+            continue
+        title = VIEW_DESCRIPTIONS[view_name]["title"]
+        lines.append(f"\n### {title}\n")
+
+        for m in measures:
+            lines.append(
+                f"\n- **`{m['measure']}` over {m['breakdown']}** carries too "
+                f"little non-zero data to support a time pattern: of the "
+                f"{m['series_examined']} series the engine would read, "
+                f"{m['series_below_guard']} fall below the guard "
+                f"({m['guard']}), with between {m['nonzero_points_min']} and "
+                f"{m['nonzero_points_max']} non-zero points each. The column is "
+                f"non-zero on {m['measure_total_nonzero_rows']} of the view's "
+                f"rows. A time pattern over a series that is mostly zeros "
+                f"describes the recording, so none is reported as a finding."
+            )
+        for d in displaced:
+            common = d.get("commonness_sets") or [{}]
+            highlight = common[0].get("highlight", "")
+            lines.append(
+                f"\n- **{d['pattern_type']} on `{d['measure']}` over "
+                f"{d['breakdown']}** {highlight}, across "
+                f"{common[0].get('count', 0)} of {d['hdp_size']} "
+                f"{d['extending_dimension']} values, was displaced from the "
+                f"findings: {d.get('support_note', '')}."
+            )
+    lines.append("\n")
+    return "".join(lines)
+
+
+def load_data_quality(base_dir: str, view_names) -> dict:
+    """Read the mining run's data-quality files. Missing files are not errors:
+    a view mined before this WP simply has none."""
+    out = {}
+    for view_name in view_names:
+        path = os.path.join(base_dir, "metainsights", f"{view_name}_data_quality.json")
+        if not os.path.exists(path):
+            continue
+        with open(path, encoding="utf-8") as f:
+            payload = json.load(f)
+        if isinstance(payload, dict):
+            out[view_name] = payload
+    return out
+
+
 def generate_executive_report(
     all_ranked: dict,
     all_configs: dict,
     output_path: str,
     global_feed: dict | None = None,
+    all_data_quality: dict | None = None,
 ) -> str:
     """Generate the full executive report using Claude."""
     client = OpenAI()
@@ -1425,6 +1918,14 @@ def generate_executive_report(
         report_sections.append(reading_note_block(view_name, enriched))
         report_sections.append("\n\n---\n")
 
+    # A7's annex closes the report: deterministic, model-free, and present only
+    # when the run actually displaced something.
+    if all_data_quality:
+        annex = data_quality_annex(all_data_quality)
+        if annex:
+            report_sections.append(annex)
+            report_sections.append("\n---\n")
+
     full_report = "".join(report_sections)
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
@@ -1474,7 +1975,12 @@ if __name__ == "__main__":
     # The PR&DW report lands in reports_prdw/, beside the pack's validation and
     # profile reports, so it cannot overwrite another deployment's.
     md_path = os.path.join(BASE_DIR, "reports_prdw", "executive_metainsight_report.md")
-    generate_executive_report(all_ranked, all_configs, md_path, global_feed)
+    all_data_quality = load_data_quality(BASE_DIR, views)
+    if all_data_quality:
+        print(f"Loaded the data-quality record for "
+              f"{', '.join(all_data_quality)} (A7)")
+    generate_executive_report(all_ranked, all_configs, md_path, global_feed,
+                              all_data_quality)
 
     import md_to_pdf
     md_to_pdf.convert(md_path, md_path.replace(".md", ".pdf"))
