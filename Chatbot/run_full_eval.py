@@ -158,6 +158,19 @@ def run(out_path: Path = OUT):
     logging.getLogger("query_router").removeHandler(log_handler)
     log_handler.close()
 
+    # REWRITTEN FROM MEMORY AT THE END, and this is not belt-and-braces. The
+    # streamed append above is what survives a crash mid-replay, but this repo
+    # lives in a Google Drive folder (D6) and the sync layer mangled the streamed
+    # file on both of WP-4c's first two replays: replay 1 came back with a record
+    # written twice plus an orphan fragment, replay 2 lost FOUR questions to two
+    # unrecoverable fragments. `records` is authoritative — it is what actually
+    # ran — so the file is replaced with it once the run is over. A results file
+    # that silently holds 207 of 211 questions is an accuracy figure that lies.
+    out_path.write_text(
+        "".join(json.dumps(r, ensure_ascii=False, default=str) + "\n"
+                for r in records),
+        encoding="utf-8")
+
     print(f"\nWrote {out_path} ({len(records)} records)")
 
     # Spend and extraction outcomes, next to the results they belong to. The
