@@ -672,32 +672,56 @@ ruling is 6 rows** — four fragments, one code-mixed refusal, one unstable rout
 The one `wrong_entities` row, stable 3/3, and a silent wrong answer. Root-caused;
 fix proposed in 7.2.
 
-### 5.2 A new stable defect: the superlative flip
+### 5.2 A new stable defect: an operation computed on a table the question truncated
 
-Two rows, 3/3 each, and the same mechanism:
+**A correction to my own first reading.** I filed this as a "superlative flip" — the
+fragment failing to hop to the sibling template — and said the catalogue carries no
+relation expressing that hop. That was wrong, and the raw records say so: the
+verdict is `tier=operation`, not a template re-serve. What actually happens is worse
+and more general.
 
 ```
-#1027 "Which focus area has the highest number of planned activities in 2024-25?" -> PLN-052
-#1042 "aur sabse kam?"   ("and the lowest?")                          -> PLN-052   WRONG
-                                                                 gold  PLN-053
+#1403 "Which focus area has the highest planned expenditure in 2024-25?"
+      -> BUD-022, top_n = 1   (a BARE SUPERLATIVE binds top_n=1, by design)
+      -> the displayed table is ONE ROW: Drinking water, 42,118,474 — the highest
 
-#1403 "Which focus area has the highest planned expenditure in 2024-25?"          -> BUD-022
-#1404 "and the lowest?"                                               -> BUD-022   WRONG
-                                                                 gold  BUD-023
+#1404 "and the lowest?"
+      -> tier = operation, query_description = None
+      -> answer: "Lowest planned_cost: 42,118,474 (focus area name: Drinking water)."
 ```
 
-The catalogue carries each highest/lowest pair as two separate templates
-(PLN-052/PLN-053, BUD-022/BUD-023). Reversing the superlative is therefore not a
-slot edit at all — it is a hop to a sibling template — and nothing in the follow-up
-machinery expresses that relation: `drill_target` maps geography tiers and nothing
-else, so whichever path handles the fragment can only re-serve the frame's own
-template. Observed outcome, 3/3 in both cases: the officer asks for the opposite of
-what they get, under an echo that reads "highest".
+**Drinking water is the highest.** The follow-up classifier read "and the lowest?" as
+an *operation on the displayed table*, the operations layer computed the minimum of
+that table perfectly correctly, and the table had one row — so the minimum of the top
+one is the top one. The sentence is true of the table and false of the question, and
+#1042 ("aur sabse kam?") is the same thing in Hinglish: *"Bottom 1 rows by
+planned_cost. Poverty allevation programme leads with 3,581,500."*
 
-Not fixed — it is a new finding, outside T2's ruled scope, and the fix wants a
-decision about how sibling templates are related in the catalogue (a
-`inverse_of` field emitted by the generator would do it deterministically).
-Recommended for the next package (7.5).
+**Three properties make this the worst-behaved defect left.**
+
+1. **There is no echo.** The operations path emits a computed sentence instead of
+   restating the question, so `query_description` is `None` — measured at 1 / 4 / 3
+   served answers per replay with no echo at all, and these rows are among them. Every
+   other confidently-wrong row in this run at least prints the question it actually
+   answered (#1016 says "in 2024-2025", which an attentive reader catches). Here the
+   only disclosure D3 provides is absent.
+2. **Nothing checks that the table was truncated.** `frame.bound_params` carries
+   `top_n: '1'` — the information is right there — but the operations layer never
+   consults it. Any population-dependent operation (min, max, bottom_n, average,
+   share-of-total) over a frame produced under a `$top_n` is computed on a truncated
+   view and presented as if on the whole.
+3. **Its real frequency is far above its 2-in-211 gold frequency.** 91 templates carry
+   `$top_n`, a bare superlative binds it to 1, and "which GP spent the most?" followed
+   by "and the lowest?" is about as natural a pair as this system will ever see.
+
+**The fix is small and the machinery already exists.** `run_operation` already has
+both `OperationMode.REQUERY` (re-run through the template) and
+`OperationMode.REJECTED` (explain instead of answering), and `_requery_for_frame` is
+already wired in `main.py`. The guard is: if the frame's `bound_params` carries a
+`top_n` and the operation's answer depends on the whole population, re-query without
+the limit, or reject with the reason — never compute it on the truncated table.
+
+Recommended as the one fix to make before a v1 pilot (§7.6).
 
 ### 5.3 Gold-set changes made in this package
 
@@ -966,6 +990,61 @@ never been measured for retrieval at all.
 Not changed here, because it moves the recall denominator mid-comparison and the
 brief asks for a per-language table against WP-4's. Recommended as a WP-5 gate item:
 report refusal recall as its own line rather than folding it into the headline.
+
+### 7.6 Is this good enough for a v1? — assessment
+
+**Yes, for a pilot, with one fix first and three disclosures.** The reasoning, since
+the operator asked for a judgement rather than a number.
+
+**The number that decides it is not accuracy, it is the confidently-wrong rate** —
+how often the system asserts something untrue, as against asking:
+
+| | correct | asked / declined | **confidently WRONG** |
+|---|--:|--:|--:|
+| all rows | 85.8 / 87.2 / 87.2% | 10.9 / 9.0 / 9.5% | **3.3 / 3.8 / 3.3%** |
+| Odia script excluded | 91.1 / 92.7 / 92.7% | 5.7 / 4.2 / 4.2% | **3.1 / 3.1 / 3.1%** |
+| Odia script + translit excluded | 92.1 / 93.2 / 93.8% | 6.2 / 4.5 / 4.0% | **1.7 / 2.3 / 2.3%** |
+
+The failure mode is overwhelmingly "it asked" rather than "it lied", which is the
+right way round for a v1 and is the point of the whole clarify design. And of the
+confidently-wrong rows, **all but one are follow-up FRAGMENTS** (#1016, #1042, #1404,
+#1624) — the standalone-question surface, which is what an officer mostly uses, is
+close to clean.
+
+**The one fix I would want first: the §5.2 guard.** Not because it is two gold rows,
+but because it is the only remaining class that is wrong AND silent AND likely — no
+echo, a plausible sentence, and a trigger ("highest…" then "and the lowest?") that a
+pilot will hit in its first week. Both escape hatches already exist in the operations
+layer, so this is a guard rather than a feature.
+
+**What I would NOT block a v1 on:**
+
+* **The six SME behaviour calls** (§5.5). Clarifying is the safe failure mode, and a
+  pilot is exactly the evidence D9 and D18.P3 said to revisit them from. Shipping
+  with them open is better than guessing them closed.
+* **Odia**, per the operator's scoping — but see the disclosure below.
+* **#1016 and #1503.** Real, but both print the year they answered, so they disclose
+  to an attentive reader. Weaker than a fix; not silent.
+* **Thresholds and the categorical retry.** No evidence supports either (§7.1, §4.2).
+
+**Three disclosures the pilot needs, none of them optional:**
+
+1. **Odia-script questions reach the right answer about half the time** (52.9%
+   recall). Either keep Odia-typing officers out of the pilot or tell them to use
+   English or transliteration — transliterated Odia retrieves at 100%.
+2. **Every percentage divides by the 20 loaded GPs**, not the official roster (a
+   standing risk, PROJECT_PLAN §6). On a 20-GP sample that is the difference between
+   a statistic and an anecdote.
+3. **Follow-up fragments are the weak surface.** A relative period ("last year") may
+   answer about the year already on screen (§7.2, deferred).
+
+**One thing that is not about answer quality but I would still want.** WP-5 does not
+exist yet, so "gate-green is a single command" is not true: the five checks in this
+report's header have to be run and read by hand. For a v1 that will be revised, the
+risk is not a wrong answer today but an unnoticed regression tomorrow — and this
+package added three value-level checks (direction pins, `wrong_entities`, refusal
+reachability) precisely so that regressions in the confidently-wrong class cannot
+hide. They only help if something runs them.
 
 ### 7.5 The smaller items, for the next package
 
