@@ -122,6 +122,74 @@ def _as_number(value):
         return None
 
 
+def read_records(path):
+    """The replay's records, repairing split lines and duplicated writes.
+
+    WHY THIS IS NOT PARANOIA. The repo lives in a Google Drive folder (D6), and
+    `run_full_eval` appends one JSON line per question and flushes each time. In
+    WP-4c's replay 1 the sync layer left a record split across two lines and one
+    record written twice — 213 lines for 211 questions, with a fragment in the
+    middle:
+
+        {"n": 1984, …            <- truncated
+        mple": null, "date_range"…  <- the rest of it
+        {"n": 1984, …            <- and then the whole record again
+
+    A `json.loads` per line dies on the fragment. Skipping the bad line silently
+    is the worse failure, though: it drops a question from the denominator and
+    reports the result as if the whole set had run.
+
+    So: split lines are rejoined where the halves are adjacent, records are
+    deduplicated by `n` keeping the last complete one, leftover fragments are
+    dropped — and every repair is PRINTED. Then the recovered `n`s are checked
+    against `eval_questions_full.json`, and a genuinely missing question raises
+    rather than being graded around. In WP-4c's replay 1 the orphan turned out to
+    be a redundant copy of a record that was also present in full, so nothing was
+    lost; that is a conclusion the check earns rather than assumes.
+    """
+    lines = [l for l in path.read_text(encoding="utf-8").split("\n") if l.strip()]
+    records, rejoined, orphans, i = [], 0, 0, 0
+    while i < len(lines):
+        try:
+            records.append(json.loads(lines[i]))
+            i += 1
+            continue
+        except json.JSONDecodeError:
+            pass
+        # A record split across two adjacent lines: head + tail.
+        if i + 1 < len(lines):
+            try:
+                records.append(json.loads(lines[i] + lines[i + 1]))
+                rejoined += 1
+                i += 2
+                continue
+            except json.JSONDecodeError:
+                pass
+        orphans += 1
+        i += 1
+
+    by_n, duplicated = {}, 0
+    for rec in records:
+        if rec["n"] in by_n:
+            duplicated += 1
+        by_n[rec["n"]] = rec
+
+    if rejoined or duplicated or orphans:
+        print(f"  {path.name}: {len(lines)} lines -> {len(by_n)} questions "
+              f"(rejoined {rejoined} split, dropped {duplicated} duplicate "
+              f"write(s) and {orphans} orphan fragment(s) — Drive sync artefact, "
+              f"see read_records)")
+    expected = {spec["n"] for spec in json.loads(
+        (HERE / "eval_questions_full.json").read_text(encoding="utf-8"))}
+    missing = sorted(expected - set(by_n))
+    if missing:
+        raise ValueError(
+            f"{path.name}: {len(missing)} question(s) have no recoverable record "
+            f"({missing[:10]}). Grading a subset and reporting it as the whole "
+            f"set is how an accuracy figure lies; re-run the replay.")
+    return list(by_n.values())
+
+
 def _matches(row, pinned):
     """True when every pinned column is present in `row` and equal to it."""
     if not pinned:
@@ -307,8 +375,7 @@ def main():
     out_path = args.out_path or args.in_path.with_name(
         args.in_path.stem.replace("results", "graded") + ".json")
 
-    recs = [json.loads(l) for l in
-            args.in_path.read_text(encoding="utf-8").splitlines() if l.strip()]
+    recs = read_records(args.in_path)
     buckets = {}
     for r in recs:
         v = grade(r)
