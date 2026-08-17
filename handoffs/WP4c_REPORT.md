@@ -47,7 +47,7 @@ whole gap, and what is left is small, named and mostly one thing.
 |---|---|---|---|
 | **A** | **The §5.1a pair inversion was LIVE, not latent.** WP-4 reported it as a defect the fallback would have walked into. Its own replays were serving it: on every paired-year row in all three runs the extractor delivered `date_range=2023-2024, date_range_2=2024-2025`, so PLN-039 answered *"which themes showed the greatest **increase**"* with `change_in_activities = +663` for a theme that **fell by 663**. Every one graded `hit`. | Read off `eval_full_results_run{1,2,3}.jsonl`, then reproduced by re-grading them against the new direction pins: `wrong_direction` 3 / 3 / 2. | **FIXED** (`_order_paired_fiscal_years`) and now eval-visible at three layers. §2.4 |
 | **B** | **The documented refusals were never RETRIEVED.** WP-4 §5.2 read the symptom as the reranker losing to `ambiguous_templates`. The reranker was never handed the candidate: BEN-001 sits at **rank 51 of 376** against the gold question that is almost word-for-word its own, outside the 30-candidate window. Cause: a template carries 6.1 index vectors, the 13 dropped beneficiary rows carried **one**, and that one is three-fifths workbook filler ("a given Scheme in a given GP Name during a given Plan Year"). | Measured ranks before/after, §2.3. | **FIXED in the generator for BEN-001** — rank 51 → 4, and 0/3 → **3/3 hit** across the replays. **BEN-003, BEN-010 and PLN-022 did not move**: code-mixed, Odia script and Odia-transliterated respectively, so all three are **F2**, SME-gated under D28.2. §2.3 |
-| **C** | **A relative period in a follow-up fragment silently answers the wrong year.** *"what about last year?"* over a 2024-2025 answer binds `date_range = 2024-2025` and echoes it as the year asked for. Right template, right GP, wrong year, stated confidently. WP-4 §5.2 filed this as "a retrieval-confidence question"; it is not. *"and for 2023-24?"* — an explicit year — works. | New `wrong_entities` bucket; fires on exactly 1 row in 211, and that row graded `hit` before. §4.4 | **ROOT-CAUSED, NOT FIXED — needs a ruling.** The deterministic reader for it already exists. No ruling covers time fragments and D28.6 reserved these rows for a decision after re-measurement. §7.2 |
+| **C** | **A relative period in a follow-up fragment silently answers the wrong year.** *"what about last year?"* over a 2024-2025 answer binds `date_range = 2024-2025` and echoes it as the year asked for. Right template, right GP, wrong year, stated confidently. WP-4 §5.2 filed this as "a retrieval-confidence question"; it is not. *"and for 2023-24?"* — an explicit year — works. | New `wrong_entities` bucket; fires on exactly 1 row in 211, and that row graded `hit` before. §4.4 | **ROOT-CAUSED, NOT FIXED — needs a ruling**, and the ruling has real content: a relative period in a follow-up is ambiguous between conversation-relative and data-relative, and the existing reader gives the data-relative answer, which is the wrong one here. §7.2 |
 | **D** | **The disagreement log D30.4 turns on could not have worked.** It compared the extractor's raw surface form against a resolved value and mirrored the pair split backwards, so `'2023-24'` vs `'2023-2024'` logged as a disagreement — every officer writing a year the normal way. Nothing was collecting the log either: the three router decisions T4 asks about are `logging.info` and no harness configured logging. | Found by running two questions before the paid sweep. `0637e04`. | **FIXED**, and the analysis it enables is in §4.3 — with a clean answer for D30.4. |
 
 **Nothing was tuned.** `query_router/config.py` has not been touched since the
@@ -58,8 +58,10 @@ on evidence (§7.1).
 ### What I need from the PM
 
 1. **A ruling on finding C** (§7.2) — a relative period in a follow-up fragment.
-   It is a silent wrong answer, the fix is deterministic and ~10 lines, and it
-   changes documented follow-up behaviour, which is why it is not already in.
+   It is a silent wrong answer, and the ruling is a genuine design choice rather than
+   a rubber stamp: "last year" in a follow-up can mean one step back from the frame
+   or one step back from the data, the two differ, and the reader already in the tree
+   gives the second — which is why this is not simply a bug fix I could land.
 2. **D30.4: promote the `$date_range` reader from fallback to prefill — I
    recommend YES**, and §4.3 has the evidence the ruling asked for.
 3. **Note that F2 is now blocking two things**, not one: the 8 Odia-script recall
@@ -744,20 +746,76 @@ for a decision after re-measurement. WP-4 declined the analogous bound-tier chan
 for the same reason and the PM ratified that judgement in D28.4; consistency says
 propose rather than implement.
 
-**The fix, if ruled in.** In `main.py`, before the frame-edit path: if the fragment
-is a period-only fragment and the frame's template carries a `$date_range` slot,
-resolve the phrase with `resolve_fiscal_years(message, validator.fiscal_years())`
-and emit `FrameEdit(slot="date_range", value=<resolved>)`. Deterministic, no LLM, no
-new parser — the same reader F1's fallback already uses. Pin with #1016 (relative)
-and #1624 (explicit, must not regress), and re-run.
+**What the ruling actually has to settle — and a correction to my own first
+proposal.** I first wrote that the fix is to resolve the phrase with
+`resolve_fiscal_years(message, validator.fiscal_years())`. **That would not fix it**,
+and checking is what showed why:
+
+```
+loaded years: 2020-2021 … 2025-2026
+resolve_fiscal_years("what about last year?", known)  ->  '2024-2025'
+```
+
+The reader resolves a relative phrase against **the data** — "last year" means the
+year before the most recent loaded year. The frame in #1016 is already on 2024-2025,
+so a data-relative reading returns the year it is already showing, which is exactly
+the wrong value the bug produces today. The gold row expects 2023-2024, i.e. **the
+year before the FRAME's**.
+
+So the decision is not "apply the existing reader"; it is:
+
+**In a follow-up, is a relative period relative to the CONVERSATION or to the DATA?**
+
+D9 and D11.1 settle it for a standalone question — data-relative, and
+`_elicitation_defaults` uses the most recent loaded year. Nothing settles it for a
+follow-up, and the two readings differ by a year whenever the frame is not on the
+latest year.
+
+* **Conversation-relative** (what #1016's gold expects, and what a person means):
+  "last year" = one step back from the frame's `$date_range`. Deterministic, needs
+  the frame's year as the anchor rather than the registry's last entry.
+* **Data-relative** (consistent with the standalone rule): "last year" always means
+  the same year regardless of what is on screen — defensible, but it makes the
+  follow-up a no-op whenever the frame is already there, which is the current
+  behaviour and reads as the system ignoring the question.
+
+A third option, and the conservative one: **clarify instead of resolving.** D9
+already makes an unstated year ask rather than guess, so "which year did you mean?"
+with year chips is in keeping and cannot be wrong. It costs a round trip on a common
+follow-up.
+
+Whichever is chosen, the reader's vocabulary is narrow and worth knowing: "last
+year" and "this year" resolve, **"the year before" does not** (returns nothing). Pin
+with #1016 (relative) and #1624 (explicit — it works today and must not regress).
 
 ### 7.3 Ruling wanted: PLN-022 is answered with a table of zeros
 
 PLN-022 ("which blocks consistently experience delays in GPDP approvals") is a
-documented unanswerable. In 3 of 3 replays it is answered with **PLN-020**, whose own
-caveat reads *"pending_approvals is 0 everywhere because approval_date is always
-populated"* — so the officer gets a table of zeros for every block, correctly
-labelled, and no indication that the question they asked cannot be answered.
+documented unanswerable. In 3 of 3 replays it is answered with **PLN-020**. This is
+what the officer actually sees, verbatim from the run:
+
+```
+Which Blocks have the highest number of pending GPDP approvals in 2025-2026 (10)?
+
+Note: pending_approvals is 0 everywhere because approval_date is always populated.
+
+block_name    pending_approvals   gps_with_plan
+Bhubaneswar                   0               3
+Barpali                       0               2
+Rangeilunda                   0               2
+```
+
+**The caveat IS rendered** — D3 is doing its job, and this is less bad than "a table
+of zeros served as an answer". An earlier draft of this report said there was "no
+indication"; that was wrong, and the correction matters for how the ruling should
+weigh it.
+
+What remains wrong is narrower but real: the note explains why the COLUMN is zero,
+not that the question the officer asked ("consistently delayed") cannot be answered
+at all for want of a deadline and a business rule. A reader who takes the table at
+face value concludes no block has a delay problem. The workbook's own answer —
+PLN-022's documented reason, plus PLN-010 with a user-supplied `$deadline` as the
+closest answerable form — is never offered.
 
 The refusal-precedence rule (2.3) cannot fire: PLN-022 is at retrieval rank 46, far
 outside the window, because its gold question is Odia-transliterated. So this is F2
