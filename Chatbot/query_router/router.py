@@ -1850,7 +1850,8 @@ def _serve_query_id(
 
 
 def _refusal_precedence(
-    scored: list[tuple[str, str, float]], picked: str | None
+    scored: list[tuple[str, str, float]], picked: str | None,
+    near_misses: list[str] | None = None,
 ) -> str | None:
     """The known-unanswerable that should be served instead of `picked`, or None.
 
@@ -1871,24 +1872,43 @@ def _refusal_precedence(
     Against a NO-MATCH verdict no margin is needed: the alternative is a generic
     decline, so this can only ever replace "I failed" with "here is why this
     cannot be answered". It can never displace an answer.
+
+    AND on a no-match verdict, the RERANKER'S OWN NEAR-MISS LIST counts as well
+    as rank 0. Rule 10 asks it, when nothing can answer the query, to name the
+    ids that come closest; naming a documented refusal there while also returning
+    `no_match` is a contradiction, and it resolves in favour of the refusal —
+    "the closest thing is the entry that says this cannot be answered" is an
+    answer, and offering that entry as one of three tappable suggestions instead
+    is not. Nothing arbitrary is being read off the ranking: this is the semantic
+    layer's own judgement, taken at its word.
     """
     if not scored:
         return None
+    by_id = {qid: s for qid, _q, s in scored}
     top_qid, _question, top_score = scored[0]
-    if top_qid not in UNANSWERABLE_CATALOG or top_qid == picked:
-        return None
-    if top_score < NO_MATCH_LOWER_THRESHOLD:
-        # Below the floor nothing is a match, including this. The generic miss
-        # path — which offers the nearest questions — is the honest answer.
-        return None
-    if picked and picked != "no_match":
-        picked_score = next((s for qid, _q, s in scored if qid == picked), None)
-        if (picked_score is not None
-                and top_score - picked_score < CLARIFY_SCORE_MARGIN):
+
+    if top_qid in UNANSWERABLE_CATALOG and top_qid != picked:
+        if top_score < NO_MATCH_LOWER_THRESHOLD:
+            # Below the floor nothing is a match, including this. The generic
+            # miss path — which offers the nearest questions — is honest.
             return None
-    _log.info("refusal precedence: serving %s (retrieval rank 0, score %.4f) "
-              "instead of %r", top_qid, top_score, picked)
-    return top_qid
+        if picked and picked != "no_match":
+            picked_score = by_id.get(picked)
+            if (picked_score is not None
+                    and top_score - picked_score < CLARIFY_SCORE_MARGIN):
+                return None
+        _log.info("refusal precedence: serving %s (retrieval rank 0, score %.4f) "
+                  "instead of %r", top_qid, top_score, picked)
+        return top_qid
+
+    if picked and picked != "no_match":
+        return None
+    for qid in near_misses or ():
+        if qid in UNANSWERABLE_CATALOG and by_id.get(qid, 0.0) >= NO_MATCH_LOWER_THRESHOLD:
+            _log.info("refusal precedence: the reranker returned no_match but "
+                      "named %s as a near miss — serving the documented reason", qid)
+            return qid
+    return None
 
 
 def _reading_chips(
@@ -1962,7 +1982,7 @@ def _route_vector(
     # branch is where BEN-001 and BEN-003 spent all three WP-4 replays; and
     # before the serving call, because PLN-022 was answered with a zero-filled
     # near-miss instead.
-    refusal = _refusal_precedence(scored, query_id)
+    refusal = _refusal_precedence(scored, query_id, near_misses)
     if refusal is not None:
         return _serve_unanswerable(refusal, user_query, normalized, start,
                                    template_map)

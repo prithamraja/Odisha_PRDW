@@ -53,6 +53,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "alternative": 'PLN-010',
         "paraphrases": [
             'Which Blocks consistently experience delays in GPDP approvals in FY 2025-26?',
+            'Which Blocks consistently experience delays in GPDP approvals?',
         ],
     },
 
@@ -66,6 +67,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "alternative": 'PLN-022',
         "paraphrases": [
             'Which Districts consistently experience delays in GPDP approvals in FY 2025-26?',
+            'Which Districts consistently experience delays in GPDP approvals?',
         ],
     },
 
@@ -104,6 +106,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'How many activities in Attabira are delegated to another panchayat tier for execution in 2025-26?',
+            'How many activities are delegated to another panchayat tier for execution?',
         ],
     },
 
@@ -116,6 +119,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'What is the fund allocated under XV Finance Commission at ZP, Block, and GP tiers in Khordha for 2025-26?',
+            'What is the fund allocated under a given Scheme at ZP, Block, and GP tiers?',
         ],
     },
 
@@ -140,6 +144,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'Which assets in Attabira have not advanced a stage in the last 90 days?',
+            'Which assets have not advanced a stage in the last a given Threshold days?',
         ],
     },
 
@@ -176,6 +181,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'What is the average unit cost of tap connections across Khordha for 2025-26?',
+            'What is the average unit cost of a given Asset Sub Category?',
         ],
     },
 
@@ -188,6 +194,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'Which overhead tank assets in Khordha have a unit cost more than 50 percent above the district average in FY 2025-26?',
+            'Which a given Asset Sub Category assets have a unit cost more than a given Threshold percent above the district average?',
         ],
     },
 
@@ -200,6 +207,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'How many such vehicles have been repaired in FY 2025-26?',
+            'How many such vehicles have been repaired?',
         ],
     },
 
@@ -212,6 +220,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'Which suspended activities in Attabira have payment vouchers dated after suspension in FY 2025-26?',
+            'Which suspended activities have payment vouchers dated after suspension?',
         ],
     },
 
@@ -224,6 +233,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'Which activities in Begunia have been ongoing longer than their planned duration in FY 2025-26?',
+            'Which activities have been ongoing longer than their planned duration?',
         ],
     },
 
@@ -236,6 +246,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'Which GPs in Khordha have a resource envelope allocation but no uploaded plan for 2025-26?',
+            'Which GPs have a resource envelope allocation but no uploaded plan?',
         ],
     },
 
@@ -248,6 +259,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'Which GPs in Attabira could reach the next PAI grade with the smallest score improvement, and on which themes are they weakest in FY 2025-26?',
+            'Which GPs could reach the next PAI grade with the smallest score improvement, and on which themes are they weakest?',
         ],
     },
 
@@ -259,6 +271,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            'How many beneficiaries received benefits under a given Scheme?',
         ],
     },
 
@@ -270,6 +283,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            'What is the village-wise count of beneficiaries under a given Scheme?',
         ],
     },
 
@@ -281,6 +295,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            'How many beneficiaries are recorded across GPs under a given Scheme?',
         ],
     },
 
@@ -292,6 +307,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            'What is the cash versus kind split of benefits distributed?',
         ],
     },
 
@@ -303,6 +319,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            'What is the total cash benefit quantum distributed under a given Scheme?',
         ],
     },
 
@@ -314,6 +331,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            'How many beneficiaries received benefits for each stated purpose?',
         ],
     },
 
@@ -325,6 +343,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            'Which scheme has the most recorded beneficiaries?',
         ],
     },
 
@@ -336,6 +355,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            'Which GPs have no recorded beneficiaries under a given Scheme?',
         ],
     },
 
@@ -347,6 +367,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            'List the beneficiaries of a given Scheme with village and benefit details.',
         ],
     },
 
@@ -358,6 +379,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            'How many beneficiaries are recorded under each pension scheme?',
         ],
     },
 
@@ -369,6 +391,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            'Compare beneficiary counts under a given Scheme between a given Block and a given Block 2.',
         ],
     },
 
@@ -380,6 +403,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            'How has the beneficiary count under a given Scheme changed?',
         ],
     },
 
@@ -391,6 +415,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Data Quality',
         "source": 'Dropped',
         "paraphrases": [
+            'How many beneficiary records are missing the village field?',
         ],
     },
 }

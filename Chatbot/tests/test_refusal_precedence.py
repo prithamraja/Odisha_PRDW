@@ -103,6 +103,97 @@ class RefusalPrecedenceTests(unittest.TestCase):
     def test_nothing_retrieved_is_handled(self):
         self.assertIsNone(router._refusal_precedence([], "no_match"))
 
+    # ── The reranker's own near-miss list, on a no-match verdict ──────────────
+
+    def test_a_refusal_named_as_a_near_miss_is_served(self):
+        """BEN-001's post-fix shape: the scope-free paraphrase brings it into the
+        window at rank 1, so rank 0 alone would not reach it. If the reranker
+        returns no_match and names it among the CLOSEST candidates, that is a
+        contradiction — and "the closest thing is the entry that says this cannot
+        be answered" is an answer."""
+        buried = _scored((NEAR_MISS, "…?", 0.63), (REFUSAL, REFUSAL_Q, 0.60))
+        self.assertEqual(
+            router._refusal_precedence(buried, "no_match", [REFUSAL]), REFUSAL)
+
+    def test_a_near_miss_refusal_does_NOT_overrule_a_served_template(self):
+        """Only on a no-match verdict. A positive pick stands unless the refusal
+        actually out-ranked it (the rank-0 rule above)."""
+        buried = _scored((NEAR_MISS, "…?", 0.63), (REFUSAL, REFUSAL_Q, 0.60))
+        self.assertIsNone(
+            router._refusal_precedence(buried, NEAR_MISS, [REFUSAL]))
+
+    def test_a_near_miss_below_the_floor_is_still_not_a_match(self):
+        weak = _scored((NEAR_MISS, "…?", 0.35),
+                       (REFUSAL, REFUSAL_Q, NO_MATCH_LOWER_THRESHOLD - 0.01))
+        self.assertIsNone(
+            router._refusal_precedence(weak, "no_match", [REFUSAL]))
+
+    def test_answerable_near_misses_change_nothing(self):
+        buried = _scored((NEAR_MISS, "…?", 0.63))
+        self.assertIsNone(
+            router._refusal_precedence(buried, "no_match", [NEAR_MISS]))
+
+
+class RefusalRetrievalSurfaceTests(unittest.TestCase):
+    """The actual root cause: a refusal that is not RETRIEVED cannot be reached
+    by anything downstream, however good the reranker's instructions are.
+
+    Measured in WP-4c against the gold questions that are almost word-for-word
+    the entries' own, over a 30-candidate window on a 376-entry index:
+
+        BEN-001  rank 51 of 376   BEN-003  rank 64   PLN-022  rank 46
+
+    all outside the window, so the reranker never saw them. The cause is an
+    asymmetry of index surface, not of wording quality: a template carries 6.1
+    vectors on average (abstract question, example question with real values, one
+    scope line per tier — D2), while the 13 Dropped rows carried exactly one, and
+    that one is mostly the workbook's "a given Scheme in a given GP Name during a
+    given Plan Year" filler. `tools/build_catalog.scope_free_question` adds the
+    missing shape. After: rank 1, rank 12, rank 0.
+    """
+
+    def test_every_unanswerable_has_more_than_one_index_vector(self):
+        """One vector of workbook prose is what put BEN-001 at rank 51."""
+        thin = [qid for qid, e in UNANSWERABLE_CATALOG.items()
+                if not (e.get("paraphrases") or [])]
+        self.assertEqual(thin, [], "these entries have a single index vector, "
+                                   "which is how a documented refusal becomes "
+                                   "unreachable")
+
+    def test_the_scope_free_line_drops_the_place_and_the_period(self):
+        from tools.build_catalog import scope_free_question
+        self.assertEqual(
+            scope_free_question("How many beneficiaries received benefits under "
+                                "a given Scheme in a given GP Name during a "
+                                "given Plan Year?"),
+            "How many beneficiaries received benefits under a given Scheme?")
+
+    def test_it_keeps_the_measure_and_the_non_geographic_parameters(self):
+        """Only geography and period go. The SCHEME is the subject of BEN-001 and
+        removing it would leave a question about nothing."""
+        from tools.build_catalog import scope_free_question
+        stripped = scope_free_question(
+            "Which assets in a given Block have not advanced a stage in the "
+            "last a given Threshold days?")
+        self.assertIn("Threshold days", stripped)
+        self.assertNotIn("Block", stripped)
+
+    def test_a_question_naming_no_parameter_gets_no_second_line(self):
+        """PLN-041 says "over the last five years" in words — there is no second
+        shape of it, and inventing one would be padding the index."""
+        from tools.build_catalog import scope_free_question
+        self.assertIsNone(scope_free_question(
+            "Which themes have remained consistently among the top priorities "
+            "over the last five years?"))
+
+    def test_paraphrases_are_deduplicated_against_the_question(self):
+        for qid, entry in UNANSWERABLE_CATALOG.items():
+            with self.subTest(qid=qid):
+                texts = [entry["question"], *entry["paraphrases"]]
+                lowered = [t.strip().lower() for t in texts]
+                self.assertEqual(len(lowered), len(set(lowered)),
+                                 "a duplicate vector is index weight for nothing")
+
 
 class RefusalChipTests(unittest.TestCase):
     """"Reachable as a chip" — the other half of the brief."""

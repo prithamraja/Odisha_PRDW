@@ -488,6 +488,58 @@ def to_prose(question: str) -> str:
     ).strip()
 
 
+# ── Retrieval surface for the questions with no SQL ───────────────────────────
+#
+# A known-unanswerable row carries no parameterised SQL, so it has no
+# {placeholders} and the workbook writes its parameters out as PROSE: "…under a
+# given Scheme in a given GP Name during a given Plan Year?". That sentence is
+# what gets embedded, and it does not retrieve. Measured (WP-4c T2c) against the
+# gold question that is almost word-for-word its own:
+#
+#   BEN-001  "How many beneficiaries received benefits under Swachh Bharat
+#             Mission in Andhrua during 2024-25?"   ->  rank 51 of 376
+#
+# outside the top-30 window, so the reranker never saw the entry and the
+# documented refusal could not be reached at all. Same for BEN-003 (64) and
+# PLN-022 (46). The cause is a plain asymmetry of index surface: a TEMPLATE
+# carries 6.1 vectors on average — abstract question, example question with real
+# values, one scope line per tier it can filter on (D2) — while the 13 Dropped
+# rows carried exactly ONE, and that one is three-fifths filler. The Dropped
+# sheet has no Parameterized or Example column to draw on, so the generator has
+# to make the surface itself.
+#
+# IT STRIPS THE SCOPE, which is the same thing SCOPE_SUFFIX does for templates
+# from the other direction: an officer names the place and the year, so the
+# catalogue's copy of them adds nothing and dilutes the measure words that do the
+# matching. Measured after: BEN-001 rank 1, BEN-003 rank 12, PLN-022 rank 0.
+#
+# A paraphrase can only ever RAISE the entry it belongs to — the retriever scores
+# an entry as the MAX over its vectors — so this cannot cost any other row its
+# place except by out-ranking it, which is the intended effect.
+
+_GIVEN_PERIOD = re.compile(
+    r"\s*\b(?:in|for|during|over)\s+a\s+given\s+"
+    r"(?:Plan\s+Year|Date\s+Range|year)\b", re.I)
+_GIVEN_GEO = re.compile(
+    r"\s*\b(?:in|for|of|across|at)\s+a\s+given\s+"
+    r"(?:District|Block(?:\s+2)?|GP\s+Name(?:\s+2)?)\b", re.I)
+
+
+def scope_free_question(question: str) -> str | None:
+    """The question with its geography and period prose removed, or None.
+
+    None when nothing was removed — PLN-041 ("…over the last five years?") names
+    no parameter, so there is no second shape of it to index.
+    """
+    stripped = _GIVEN_GEO.sub("", _GIVEN_PERIOD.sub("", question or ""))
+    stripped = re.sub(r"\s{2,}", " ", stripped).strip().rstrip(" ,")
+    if not stripped or stripped.lower() == (question or "").strip().lower():
+        return None
+    if not stripped.endswith(("?", ".")):
+        stripped += "?"
+    return stripped[0].upper() + stripped[1:]
+
+
 def build_paraphrases(row: dict, abstract: str, slots: list[dict]) -> list[str]:
     """Extra retrieval surface for one template, deduplicated.
 
@@ -1256,6 +1308,25 @@ def build_templates(sheets: dict) -> tuple[str, list[str], dict]:
     return body, findings, stats
 
 
+def _unanswerable_paraphrases(question: str, extra: list[str]) -> list[str]:
+    """Index surface for one unanswerable entry, deduplicated, order stable.
+
+    The workbook's own alternative wordings first where it has any, then the
+    scope-free line (see `scope_free_question` for why it exists and what it
+    measured).
+    """
+    out: list[str] = []
+    for candidate in [*extra, scope_free_question(question)]:
+        if not candidate:
+            continue
+        if candidate.strip().lower() == (question or "").strip().lower():
+            continue
+        if any(candidate.strip().lower() == seen.strip().lower() for seen in out):
+            continue
+        out.append(candidate.strip())
+    return out
+
+
 def build_unanswerable(sheets: dict) -> tuple[str, int]:
     """The 17 'No' rows plus the 13 Dropped beneficiary questions."""
     entries: list[str] = []
@@ -1281,11 +1352,10 @@ def build_unanswerable(sheets: dict) -> tuple[str, int]:
         }
         if alternatives:
             entry["alternative"] = alternatives[0]
-        entry["paraphrases"] = [
-            p for p in [to_prose(text(row["Parameterized Question"])),
-                        text(row["Example Question"])]
-            if p and p.lower() != entry["question"].lower()
-        ]
+        entry["paraphrases"] = _unanswerable_paraphrases(
+            entry["question"],
+            [to_prose(text(row["Parameterized Question"])),
+             text(row["Example Question"])])
         entries.append(emit_unanswerable(qid, entry))
         count += 1
 
@@ -1298,7 +1368,11 @@ def build_unanswerable(sheets: dict) -> tuple[str, int]:
             "module": text(row["Module"]),
             "submodule": text(row["Module"]),
             "source": "Dropped",
-            "paraphrases": [],
+            # The Dropped sheet has five columns and none of them is a
+            # Parameterized or Example question, so the scope-free line is the
+            # only extra surface available — and it is the one that mattered.
+            "paraphrases": _unanswerable_paraphrases(
+                to_prose(text(row["Original Question"])), []),
         }
         entries.append(emit_unanswerable(qid, entry))
         count += 1
