@@ -122,15 +122,75 @@ def _as_number(value):
         return None
 
 
+def _matches(row, pinned):
+    """True when every pinned column is present in `row` and equal to it."""
+    if not pinned:
+        return False
+    for column, want in pinned.items():
+        if column not in row:
+            return False
+        if isinstance(want, str):
+            if str(row[column]).strip() != want.strip():
+                return False
+            continue
+        got_n, want_n = _as_number(row[column]), _as_number(want)
+        if got_n is None or abs(got_n - want_n) > max(0.01, abs(want_n) * 1e-6):
+            return False
+    return True
+
+
+def _sign(value):
+    return 0 if value is None or abs(value) < 1e-9 else (1 if value > 0 else -1)
+
+
+def _year_column_pairs(pin):
+    """[(year1_column, year2_column)] from the pin's year_columns mapping.
+
+    `activities_year1` -> date_range_2 and `activities_year2` -> date_range makes
+    one pair; TRD-001 and TRD-002 declare two pairs each.
+    """
+    by_stem = {}
+    for column, slot in (pin.get("year_columns") or {}).items():
+        stem = re.sub(r"_year[12]$", "", column)
+        by_stem.setdefault(stem, {})[slot] = column
+    return [(cols["date_range_2"], cols["date_range"])
+            for cols in by_stem.values()
+            if {"date_range_2", "date_range"} <= set(cols)]
+
+
 def direction_verdict(rec):
     """None (nothing to check / it holds) or a one-line description of the break.
 
-    Checked against the FIRST returned row, which is the one the pin was computed
-    for: every paired template has a deterministic ORDER BY, and `rows_sample`
-    keeps the first three rows. A run that returned nothing to look at is not
-    evidence of a direction error, so it is left to the ordinary buckets.
+    IT CHECKS DIRECTION, NOT MAGNITUDE, and the distinction is load-bearing. The
+    obvious implementation — compare the returned row to the pinned row value by
+    value — reports a break whenever anything else about the query differed, and
+    the most likely "anything else" is a geography slot that did not bind: TRD-004
+    is pinned for Bhubaneswar block, so an unbound block gives state-wide figures
+    that match nothing. That is a SCOPE defect, which the ordinary buckets and the
+    echo already surface, and calling it a sign inversion would be a worse error
+    than the one this exists to catch.
+
+    So two scale-free properties are tested, both of them exactly what an
+    inverted `$date_range`/`$date_range_2` pair breaks:
+
+      * every change column carries the sign the pin says it does;
+      * for each year1/year2 column pair, the change BETWEEN the two years runs in
+        the pinned direction.
+
+    Exact values are pinned too, but where they belong: in
+    `tests/test_paired_year_direction.py`, which executes the SQL with the pinned
+    parameters and can therefore demand equality.
+
+    Checked against the FIRST returned row — every paired template has a
+    deterministic ORDER BY and `rows_sample` keeps the first three. A run with no
+    rows to look at is not evidence of a direction error and is left alone.
     """
-    pin = rec.get("gold_direction_pin") or PIN_BY_N.get(rec.get("n"))
+    # THE GOLD SET WINS over the copy on the record. The record's copy makes a
+    # results file self-describing, but the built spec file is where the contract
+    # is maintained — so re-grading an older replay applies the CURRENT pin, which
+    # is how WP-4's three replays were shown to have been serving an inverted pair
+    # all along while grading clean.
+    pin = PIN_BY_N.get(rec.get("n")) or rec.get("gold_direction_pin")
     if not pin:
         return None
     sample = rec.get("rows_sample") or []
@@ -138,28 +198,44 @@ def direction_verdict(rec):
         return None
     row, expected = sample[0], pin.get("first_row") or {}
     breaks = []
+
+    # POSITIVE IDENTIFICATION FIRST, because it is the only test that catches
+    # PLN-039 and PLN-040. Their ORDER BY is on the change column, so under an
+    # inverted pair the top row is still a POSITIVE change for "greatest
+    # increase" — it is simply a different theme, the one that actually declined
+    # most. Every sign and direction test passes; the answer is still backwards.
+    # `inverted_row` is what the template returns with the two years exchanged
+    # (computed with the pin, asserted by test_paired_year_direction), so matching
+    # it is not a heuristic: it says the pair arrived swapped, and a scope slot
+    # that failed to bind cannot reproduce those exact figures.
+    inverted = pin.get("inverted_row") or {}
+    if inverted and _matches(row, inverted) and not _matches(row, expected):
+        return ("the paired years arrived INVERTED — the row returned is exactly "
+                "what this template gives with $date_range and $date_range_2 "
+                f"exchanged: {json.dumps(inverted, default=str)[:200]}")
+
     for column, want in expected.items():
-        got = row.get(column)
-        if column not in row:
-            breaks.append(f"{column} missing")
+        if not column.startswith("change") or column not in row:
             continue
-        if isinstance(want, str):
-            if str(got).strip() != want.strip():
-                breaks.append(f"{column}={got!r} (pinned {want!r})")
+        want_sign, got_sign = _sign(_as_number(want)), _sign(_as_number(row[column]))
+        if want_sign and got_sign and want_sign != got_sign:
+            breaks.append(f"{column}={row[column]} but the pin says it is "
+                          f"{'positive' if want_sign > 0 else 'negative'} "
+                          f"({want})")
+
+    for earlier, later in _year_column_pairs(pin):
+        if not {earlier, later} <= set(row) or not {earlier, later} <= set(expected):
             continue
-        got_n, want_n = _as_number(got), _as_number(want)
-        if got_n is None or abs(got_n - want_n) > max(0.01, abs(want_n) * 1e-6):
-            breaks.append(f"{column}={got} (pinned {want})")
-    if not breaks:
-        return None
-    inverted = all(
-        _as_number(row.get(a)) is not None
-        and _as_number(row.get(a)) == _as_number(expected.get(b))
-        for a, b in (("activities_year1", "activities_year2"),
-                     ("activities_year2", "activities_year1"))
-        if a in expected and b in expected)
-    lead = ("the paired years arrived INVERTED: " if inverted else "")
-    return lead + "; ".join(breaks)
+        want_sign = _sign(_as_number(expected[later]) - _as_number(expected[earlier]))
+        got_sign = _sign(_as_number(row[later]) - _as_number(row[earlier]))
+        if want_sign and got_sign and want_sign != got_sign:
+            breaks.append(
+                f"{earlier}={row[earlier]} {later}={row[later]} run "
+                f"{'up' if got_sign > 0 else 'down'} where the pin runs "
+                f"{'up' if want_sign > 0 else 'down'} "
+                f"({expected[earlier]} -> {expected[later]}) — the paired years "
+                f"look INVERTED")
+    return "; ".join(breaks) or None
 
 
 def grade(rec):

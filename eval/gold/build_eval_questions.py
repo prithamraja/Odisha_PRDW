@@ -205,11 +205,23 @@ def _check_direction_pin(rec: dict, template: dict, slots: set[str]) -> list[str
     problems: list[str] = []
     sql = template["sql_template"]
 
-    for field in ("why", "params", "year_columns", "first_row"):
+    for field in ("why", "params", "year_columns", "first_row", "inverted_row"):
         if field not in pin:
             problems.append(f"{rid}: direction_pin missing {field!r}")
     if problems:
         return problems
+
+    # `inverted_row` is what the template returns with the two years exchanged.
+    # It is the only test that catches PLN-039 and PLN-040, whose ORDER BY is on
+    # the change column — under an inverted pair their top row is still a
+    # positive change for "greatest increase", just a different theme. Identical
+    # to `first_row` would mean the pin cannot tell the two apart at all.
+    if pin["inverted_row"] == pin["first_row"]:
+        problems.append(f"{rid}: direction_pin's inverted_row is identical to "
+                        f"first_row, so it can detect nothing")
+    if set(pin["inverted_row"]) != set(pin["first_row"]):
+        problems.append(f"{rid}: direction_pin's inverted_row and first_row "
+                        f"describe different columns")
 
     for name in pin["params"]:
         if name not in slots:

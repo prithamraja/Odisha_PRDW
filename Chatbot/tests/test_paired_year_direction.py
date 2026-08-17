@@ -139,6 +139,32 @@ class PairedYearDirectionTests(unittest.TestCase):
                     f"{rec['gold']}: inverting the pair changed nothing the pin "
                     f"looks at, so the pin cannot catch an inversion")
 
+    def test_the_pinned_inverted_row_is_what_the_swap_actually_returns(self):
+        """`inverted_row` is what `grade_full_eval` matches against to say "the
+        pair arrived swapped" POSITIVELY, rather than inferring it from a
+        mismatch. It is the only check that catches PLN-039 and PLN-040 — their
+        ORDER BY is on the change column, so under an inverted pair the top row is
+        still a positive change for "greatest increase", just a different theme,
+        and every sign test passes on an answer that is backwards.
+
+        Which means this row has to be right, so it is executed rather than
+        trusted."""
+        for rec in self.pinned:
+            pin = rec["expected_result"]["direction_pin"]
+            inverted_params = dict(pin["params"])
+            inverted_params["date_range"], inverted_params["date_range_2"] = (
+                inverted_params["date_range_2"], inverted_params["date_range"])
+            with self.subTest(gold=rec["gold"]):
+                actual = self._first_row(rec["gold"], inverted_params)
+                for column, expected in pin["inverted_row"].items():
+                    if isinstance(expected, str):
+                        self.assertEqual(actual[column], expected)
+                    else:
+                        self.assertAlmostEqual(
+                            _num(actual[column]), float(expected), places=2,
+                            msg=f"{rec['gold']}.{column}: inverted_row no longer "
+                                f"matches what the swap returns")
+
     def test_a_change_column_carries_the_sign_of_the_later_year(self):
         """The property the whole thing exists for, stated once: where a template
         computes a change, it is later minus earlier."""

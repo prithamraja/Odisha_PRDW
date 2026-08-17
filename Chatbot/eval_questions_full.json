@@ -662,7 +662,13 @@
      "activities_year2": 188,
      "change_in_activities": 7
     },
-    "source": "executed read-only against Chatbot/data/panchayat_1.duckdb (WP-4c T3b); agrees with AI_Chatbot_Questions.xlsx Test Report on the rows that sheet carries"
+    "source": "executed read-only against Chatbot/data/panchayat_1.duckdb (WP-4c T3b); agrees with AI_Chatbot_Questions.xlsx Test Report on the rows that sheet carries",
+    "inverted_row": {
+     "theme": "Theme 6 - Self-sufficient Infrastructure in Village",
+     "activities_year1": 1173,
+     "activities_year2": 1836,
+     "change_in_activities": 663
+    }
    }
   }
  },
@@ -1177,7 +1183,13 @@
      "activities_year2": 1173,
      "change_in_activities": -663
     },
-    "source": "executed read-only against Chatbot/data/panchayat_1.duckdb (WP-4c T3b); agrees with AI_Chatbot_Questions.xlsx Test Report on the rows that sheet carries"
+    "source": "executed read-only against Chatbot/data/panchayat_1.duckdb (WP-4c T3b); agrees with AI_Chatbot_Questions.xlsx Test Report on the rows that sheet carries",
+    "inverted_row": {
+     "theme": "Theme 1 - Poverty Free and Enhanced Livelihoods Village",
+     "activities_year1": 188,
+     "activities_year2": 181,
+     "change_in_activities": -7
+    }
    }
   }
  },
@@ -4736,7 +4748,13 @@
      "change_amount": -474665.81,
      "change_pct": -7.88
     },
-    "source": "executed read-only against Chatbot/data/panchayat_1.duckdb (WP-4c T3b); agrees with AI_Chatbot_Questions.xlsx Test Report on the rows that sheet carries"
+    "source": "executed read-only against Chatbot/data/panchayat_1.duckdb (WP-4c T3b); agrees with AI_Chatbot_Questions.xlsx Test Report on the rows that sheet carries",
+    "inverted_row": {
+     "expenditure_year1": 5550255.0,
+     "expenditure_year2": 6024920.81,
+     "change_amount": 474665.81,
+     "change_pct": 8.55
+    }
    }
   }
  },
@@ -4815,7 +4833,14 @@
      "expenditure_year1": 19117864.0,
      "expenditure_year2": 15207331.6
     },
-    "source": "executed read-only against Chatbot/data/panchayat_1.duckdb (WP-4c T3b); agrees with AI_Chatbot_Questions.xlsx Test Report on the rows that sheet carries"
+    "source": "executed read-only against Chatbot/data/panchayat_1.duckdb (WP-4c T3b); agrees with AI_Chatbot_Questions.xlsx Test Report on the rows that sheet carries",
+    "inverted_row": {
+     "theme": "Theme 6 - Self-sufficient Infrastructure in Village",
+     "approved_cost_year1": 35803908.0,
+     "approved_cost_year2": 76210208.0,
+     "expenditure_year1": 15207331.6,
+     "expenditure_year2": 19117864.0
+    }
    }
   }
  },
@@ -4940,7 +4965,14 @@
      "started_year1": 129,
      "started_year2": 110
     },
-    "source": "executed read-only against Chatbot/data/panchayat_1.duckdb (WP-4c T3b); agrees with AI_Chatbot_Questions.xlsx Test Report on the rows that sheet carries"
+    "source": "executed read-only against Chatbot/data/panchayat_1.duckdb (WP-4c T3b); agrees with AI_Chatbot_Questions.xlsx Test Report on the rows that sheet carries",
+    "inverted_row": {
+     "theme": "Theme 6 - Self-sufficient Infrastructure in Village",
+     "planned_year1": 1173,
+     "planned_year2": 1836,
+     "started_year1": 110,
+     "started_year2": 129
+    }
    }
   }
  },
