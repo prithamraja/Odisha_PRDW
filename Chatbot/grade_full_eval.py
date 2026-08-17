@@ -10,6 +10,8 @@ Buckets per question:
   wrong_template        answered, but with a template outside the gold set
   wrong_direction       answered with the RIGHT template and the wrong sign — the
                         paired-year slots arrived inverted (D30.3); see below
+  wrong_entities        answered with the RIGHT template and a slot bound to a
+                        value the gold contradicts; see below
   wrong_refusal         declined with a documented reason, but the WRONG one
   declined_generically  declined without retrieving the documented refusal —
                         right outcome, wrong reason
@@ -109,6 +111,61 @@ def _load_direction_pins() -> dict:
 PIN_BY_N = _load_direction_pins()
 
 
+def _load_specs() -> dict:
+    """The built gold specs by question number, or {} if unreadable."""
+    path = HERE / "eval_questions_full.json"
+    try:
+        return {spec["n"]: spec
+                for spec in json.loads(path.read_text(encoding="utf-8"))}
+    except Exception:                                        # pragma: no cover
+        return {}
+
+
+SPEC_BY_N = _load_specs()
+EXPECTED_ENTITIES_BY_N = {n: s["expected_entities"] for n, s in SPEC_BY_N.items()
+                          if s.get("expected_entities")}
+
+
+def acceptable_ids(rec):
+    """The ids that count as right for this question.
+
+    THE GOLD SET WINS over the copy `run_full_eval` wrote onto the record, for the
+    same reason it wins on direction pins: the spec file is where the contract is
+    maintained, so a corrected `acc` applies to replays already on disk instead of
+    requiring 211 questions to be re-run. `read_records` has already checked that
+    the results file and the spec file describe the same question set.
+    """
+    spec = SPEC_BY_N.get(rec.get("n")) or {}
+    gold = spec.get("gold", rec.get("gold"))
+    acc = spec.get("acc", rec.get("acc")) or []
+    return gold, {gold, *acc} if gold else set()
+
+
+def entity_contradictions(rec):
+    """Slots the run BOUND to something the gold says is a different value.
+
+    CONTRADICTIONS ONLY, never absences. A slot the router left unbound is
+    already visible — the question clarifies, or an optional filter is off and
+    the echo says so. A slot bound to the WRONG value is the invisible case: the
+    query_id is right, the table looks normal, and the eval calls it a hit.
+
+    Measured on WP-4c's replay 1 this fires on exactly one row in 211, and that
+    row was graded `hit`: #1016 "what about last year?" over a 2024-2025 answer
+    kept 2024-2025 and echoed it as the year asked for. The gold row says
+    2023-2024 in as many words ("swap $date_range to known[-2]"). One
+    false-positive-free check for one real silent wrong answer is a good trade;
+    the same reasoning as the direction pins (D30.3), one layer up.
+    """
+    want = EXPECTED_ENTITIES_BY_N.get(rec.get("n")) or {}
+    if not want:
+        return []
+    got = {e["slot"]: str(e["value"]) for e in (rec.get("entities") or [])
+           if isinstance(e, dict) and "slot" in e}
+    return [f"{slot}={got[slot]!r} but the gold says {str(value)!r}"
+            for slot, value in want.items()
+            if slot in got and got[slot] != str(value)]
+
+
 def _as_number(value):
     """The harness serialises Decimals with `default=str`, so a money column
     arrives as "5550255.00". Compare numerically or the pin never matches."""
@@ -122,7 +179,7 @@ def _as_number(value):
         return None
 
 
-def read_records(path):
+def read_records(path, allow_subset=False):
     """The replay's records, repairing split lines and duplicated writes.
 
     WHY THIS IS NOT PARANOIA. The repo lives in a Google Drive folder (D6), and
@@ -182,11 +239,17 @@ def read_records(path):
     expected = {spec["n"] for spec in json.loads(
         (HERE / "eval_questions_full.json").read_text(encoding="utf-8"))}
     missing = sorted(expected - set(by_n))
-    if missing:
+    if missing and not allow_subset:
         raise ValueError(
             f"{path.name}: {len(missing)} question(s) have no recoverable record "
             f"({missing[:10]}). Grading a subset and reporting it as the whole "
-            f"set is how an accuracy figure lies; re-run the replay.")
+            f"set is how an accuracy figure lies; re-run the replay, or pass "
+            f"--allow-subset if this replay predates the current gold set.")
+    if missing:
+        print(f"  SUBSET: {len(missing)} question(s) in the current gold set were "
+              f"not in this replay ({missing[:10]}) — percentages below are over "
+              f"{len(by_n)} questions, not {len(expected)}. This is the flag you "
+              f"asked for; it is not a clean comparison.")
     return list(by_n.values())
 
 
@@ -309,8 +372,7 @@ def direction_verdict(rec):
 def grade(rec):
     if rec.get("error"):
         return "error"
-    gold = rec.get("gold")
-    ok = {gold, *(rec.get("acc") or [])} if gold else set()
+    gold, ok = acceptable_ids(rec)
     qid = rec.get("query_id")
     tier = rec.get("tier")
     clar = rec.get("clarification")
@@ -343,6 +405,12 @@ def grade(rec):
         if broken:
             rec["direction_break"] = broken
             return "wrong_direction"
+        # Right template, right direction — and the right values? A bound value
+        # that contradicts the gold is the same class of defect one layer up.
+        contradictions = entity_contradictions(rec)
+        if contradictions:
+            rec["entity_contradictions"] = contradictions
+            return "wrong_entities"
         return "hit"
 
     # no direct answer
@@ -371,11 +439,14 @@ def main():
     ap.add_argument("--in", dest="in_path", type=Path,
                     default=HERE / "eval_full_results.jsonl")
     ap.add_argument("--out", dest="out_path", type=Path, default=None)
+    ap.add_argument("--allow-subset", action="store_true",
+                    help="grade a replay that predates the current gold set, "
+                         "reporting over the questions it actually contains")
     args = ap.parse_args()
     out_path = args.out_path or args.in_path.with_name(
         args.in_path.stem.replace("results", "graded") + ".json")
 
-    recs = read_records(args.in_path)
+    recs = read_records(args.in_path, allow_subset=args.allow_subset)
     buckets = {}
     for r in recs:
         v = grade(r)
@@ -384,18 +455,22 @@ def main():
 
     print(f"{args.in_path.name}: total {len(recs)}")
     for k in ("hit", "partial", "clarify_gold_offered", "clarify", "wrong_template",
-              "wrong_direction", "wrong_refusal", "declined_generically",
-              "refusal_with_rows", "fallback", "error", "excluded", "new"):
+              "wrong_direction", "wrong_entities", "wrong_refusal",
+              "declined_generically", "refusal_with_rows", "fallback", "error",
+              "excluded", "new"):
         if k in buckets:
             print(f"  {k:<22} {len(buckets[k])}")
 
-    for k in ("wrong_template", "wrong_direction", "wrong_refusal",
-              "declined_generically", "refusal_with_rows", "clarify",
-              "clarify_gold_offered", "partial", "fallback", "error"):
+    for k in ("wrong_template", "wrong_direction", "wrong_entities",
+              "wrong_refusal", "declined_generically", "refusal_with_rows",
+              "clarify", "clarify_gold_offered", "partial", "fallback", "error"):
         for r in buckets.get(k, []):
             extra = ""
             if k in ("wrong_template", "wrong_refusal"):
                 extra = f" gold={r['gold']} picked={r['query_id']}"
+            elif k == "wrong_entities":
+                extra = (f" gold={r['gold']} — RIGHT template, WRONG value: "
+                         f"{'; '.join(r.get('entity_contradictions') or [])}")
             elif k == "wrong_direction":
                 extra = (f" gold={r['gold']} — RIGHT template, WRONG sign: "
                          f"{r.get('direction_break')}")

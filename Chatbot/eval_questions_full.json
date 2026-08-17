@@ -55,7 +55,9 @@
   "n": 1003,
   "q": "and Khajuripada?",
   "gold": "PLN-001",
-  "acc": [],
+  "acc": [
+   "PLN-003"
+  ],
   "partial": false,
   "excluded": false,
   "src": "WP4a-gold/planning",
@@ -72,7 +74,7 @@
   "entity_surface": [],
   "answerability": "Yes",
   "sme_review": false,
-  "notes": "Bare block name. Must keep the prior question's subject (GPDP upload count) and swap only $block_name.",
+  "notes": "Bare block name. Must keep the prior question's subject (GPDP upload count) and swap only $block_name. PLN-003 ADDED to acc by WP-4c T4: G1002, this row's prior, already accepts PLN-003 as an equally legitimate reading of 'status' at block scope — so when the prior is served as PLN-003, a fragment that correctly keeps that subject was being graded wrong_template for doing exactly its job. A follow-up's acceptable set has to be at least as wide as its prior's.",
   "session": "prev",
   "prior_id": "G1002"
  },
