@@ -933,11 +933,27 @@ class EntityValidator:
 
         years = resolve_fiscal_years(raw_text, known)
         # A paired slot takes the OTHER end of a two-year phrase: "compare the
-        # last two years" fills $date_range with the earlier and $date_range_2
-        # with the later, which is the only reading a comparison template has.
+        # last two years" has to fill both slots from one string.
+        #
+        # THE DIRECTION IS THE CATALOGUE'S, NOT A GUESS, and it is the opposite
+        # of what this comment used to claim. All five paired templates bind
+        # `$date_range_2` as **year1** and `$date_range` as **year2**, and three
+        # of them compute the difference as `$date_range - $date_range_2`:
+        #
+        #     COUNT(*) FILTER (WHERE fiscal_year = $date_range_2) AS activities_year1,
+        #     COUNT(*) FILTER (WHERE fiscal_year = $date_range)   AS activities_year2,
+        #     ... $date_range - $date_range_2 AS change_in_activities
+        #
+        # Their question text agrees: "between {date_range_2} and {date_range}".
+        # So `$date_range` is the LATER year. Filling it with the earlier one
+        # inverts the sign of every change/increase/decline template — PLN-039
+        # would answer "greatest increase" with the greatest DECREASE, silently.
+        # Pinned by tests/test_fiscal_year_fallback.py against the SQL itself, so
+        # a future template that reverses the convention fails loudly here rather
+        # than answering backwards.
         # (`resolve_fiscal_years` returns them oldest-first.)
         if len(years) > 1:
-            years = years[-1:] if entity_type != base_type else years[:1]
+            years = years[:1] if entity_type != base_type else years[-1:]
 
         for candidate in years:
             stored = self._by_norm.get(base_type, {}).get(_collapse_ws(candidate))

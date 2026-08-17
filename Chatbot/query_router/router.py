@@ -54,6 +54,7 @@ from .zones             import (
 from .dashboard_catalog import DASHBOARD_CATALOG
 from .unanswerable_catalog import UNANSWERABLE_CATALOG, refusal_for
 from .fragment_reroute   import drill_target, templates_share_subject
+from .date_phrase        import resolve_fiscal_years
 from .sql_params         import NAMED, param_style
 from .suggestions       import elicitation_chips
 from .config            import (
@@ -310,6 +311,10 @@ _DEFAULT_ENTITY_VALUES: dict[str, str] = {
 # days / activity-count readings of `threshold` still reach the extractor.
 _AMOUNT_ENTITY_TYPES = frozenset({"amount_threshold", "threshold"})
 
+# The slots a DETERMINISTIC reader can recover when the extractor comes back
+# empty. See _fiscal_year_from_text() for why this exists at all.
+_FISCAL_YEAR_ENTITY_TYPES = frozenset({"fiscal_year", "fiscal_year_2"})
+
 # A rupee amount stated outright — "above ₹1 lakh", "more than 50,000",
 # "over 2.5 crore". Reading it here means the frequent case never depends on the
 # LLM at all: not just deterministic arithmetic (the validator handles that),
@@ -383,6 +388,80 @@ def _extract_slot_values(
         if etype in _CONSTANT_ENTITY_TYPES:
             raw[slot] = _CONSTANT_ENTITY_TYPES[etype]
     return raw
+
+
+def _fiscal_year_from_text(
+    user_query: str, slot: str, entity_type: str, validator: EntityValidator
+) -> ExtractedEntity | None:
+    """The fiscal year read straight off the user's own question, or None.
+
+    WHY THIS EXISTS (WP-4 finding F1). The extractor returns a well-formed
+    `{"date_range": null}` on roughly a quarter of calls — measured over 12
+    IDENTICAL calls: nine read the year, three did not, every one of them
+    `finish_reason=stop` with valid JSON and no exception. The model is not
+    failing; it is answering "this question names no fiscal year" about a
+    sentence containing '2024-2025'. Under D9 `$date_range` is required on 344
+    of the 346 templates, so each of those became "For which date range?" asked
+    of an officer who had already said it — 30% of the eval set.
+
+    THE READER WAS ALREADY HERE. `date_phrase` is a word-bounded regex pass
+    built in WP-2 for exactly this mapping, and `_validate_fiscal_year` already
+    calls it, consults the loaded years for relative phrases, and splits a
+    two-year phrase across `$date_range` / `$date_range_2` by entity type. It
+    was simply never reachable: it received the string the EXTRACTOR produced,
+    so a null meant it was never consulted. All this does is hand it the
+    question instead. Measured against WP-4's failures: 55 of 62 recovered with
+    the gold value, zero wrong.
+
+    A FALLBACK, NOT A PREFILL. It runs only where the extractor produced
+    nothing, so no call that works today can change; `amount_from_text` takes
+    the prefill approach for rupee figures and this could follow it later, on
+    the evidence of the disagreement log below.
+    """
+    try:
+        entity = validator.validate(user_query, entity_type)
+    except (EntityNotFound, ClarificationNeeded):
+        # Genuinely no year in the text — which is a legitimate outcome ("GPDP
+        # status?"), so the caller falls through to the ordinary missing-slot
+        # clarification. Swallowed deliberately: letting EntityNotFound out here
+        # would render "I couldn't find a date range called '<the entire
+        # question>'", quoting the officer's sentence back as a bad value.
+        return None
+    entity.slot_name = slot
+    # The raw value is the whole question at this point, which is true but
+    # unhelpful in an echo or a pending state. Say where the value came from.
+    entity.raw_value = f"{entity.resolved_value} (read from the question)"
+    _log.info("date_range recovered deterministically for %s: %r",
+              slot, entity.resolved_value)
+    return entity
+
+
+def _log_fiscal_year_disagreement(
+    user_query: str, slot: str, entity_type: str, extracted: str
+) -> None:
+    """Record where the extractor and the deterministic reader differ.
+
+    This is the evidence that decides whether the reader can be promoted from a
+    FALLBACK to a PREFILL — read the year first and drop the slot from the
+    extractor's job entirely, the way `amount_from_text` already does for rupee
+    figures. That change would alter calls that currently succeed, so it wants a
+    log behind it rather than an argument. Pure regex, no network: costs nothing
+    to leave on.
+    """
+    try:
+        years = resolve_fiscal_years(user_query, ())
+    except Exception:                                        # pragma: no cover
+        return
+    if not years:
+        return
+    # The pair split `_validate_fiscal_year` applies, mirrored so a comparison
+    # question is not logged as a disagreement with itself.
+    expected = years[-1] if (len(years) > 1 and entity_type.endswith("_2")) else years[0]
+    if str(extracted).strip() != expected:
+        _log.info(
+            "fiscal-year disagreement on %s: extractor=%r date_phrase=%r query=%r",
+            slot, extracted, expected, user_query[:120],
+        )
 
 
 def optional_slots(param_slots: list[dict]) -> set[str]:
@@ -644,6 +723,24 @@ def _fill_slots_or_clarify(
 
     for slot in slot_type:
         raw_val = raw_entities.get(slot)
+        etype = slot_type[slot]
+
+        if etype in _FISCAL_YEAR_ENTITY_TYPES:
+            if raw_val is None:
+                # WP-4 F1: the extractor said nothing. Read the question
+                # ourselves before asking the user for something they said.
+                # Ahead of the defaults deliberately — evidence from the user's
+                # own text beats any value the system supplies — and ahead of
+                # the `optional` check too, because ALR-001/ALR-008 carry an
+                # optional $date_range (D13.3) where binding NULL would answer
+                # across every year about a question that named one.
+                recovered = _fiscal_year_from_text(user_query, slot, etype, validator)
+                if recovered is not None:
+                    validated.append(recovered)
+                    continue
+            else:
+                _log_fiscal_year_disagreement(user_query, slot, etype, raw_val)
+
         if raw_val is None:
             # A slot the question implies is filled from its declared default
             # rather than clarified for. Applied here, in the one place every
