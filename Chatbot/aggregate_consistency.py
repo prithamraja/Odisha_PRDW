@@ -1,22 +1,33 @@
 """
-Aggregate consistency_results.jsonl into a per-question x per-run mapping
+Aggregate a consistency_results*.jsonl into a per-question x per-run mapping
 table:
 
-  consistency_table.csv — one row per question, one column per run
+  consistency_table*.csv — one row per question, one column per run
   (query_id mapped to), then consistency (modal count / runs), modal
   query_id, and the NL wording of the modal template for validation.
 
 Cells: query_id; "CLARIFY:<reason>" when the pipeline asked instead of
 answering; "ERR" on transport/HTTP errors.
+
+  python aggregate_consistency.py                              # WP-4's file
+  python aggregate_consistency.py consistency_results_wp4c.jsonl
+
+The argument exists because `run_consistency_eval --tag` keeps one work
+package's replays out of another's file, and the two must not be aggregated
+together: replay 1 of a 209-question gold set and replay 1 of a 211-question one
+would read as instability on two questions that were simply not asked yet.
 """
 import csv
 import json
+import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-IN = HERE / "consistency_results.jsonl"
-OUT = HERE / "consistency_table.csv"
+IN = Path(sys.argv[1]) if len(sys.argv) > 1 else HERE / "consistency_results.jsonl"
+if not IN.is_absolute():
+    IN = HERE / IN
+OUT = HERE / (IN.stem.replace("consistency_results", "consistency_table") + ".csv")
 
 records = [json.loads(l) for l in IN.read_text(encoding="utf-8").splitlines() if l.strip()]
 

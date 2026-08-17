@@ -641,7 +641,29 @@
    "test_status": "PASS",
    "params_used": "{\"date_range\": \"2024-2025\", \"date_range_2\": \"2023-2024\", \"district_name\": null, \"block_name\": null, \"gp_name\": null, \"top_n\": 10}",
    "sample_output": "                                                  theme  activities_year1  activities_year2  change_in_activities\nTheme 1 - Poverty Free and Enhanced Livelihoods Village               181               188                     7\n                     Theme 4 - Water Sufficient Village               475               440                   -35\n                                         Unmapped theme               262               211                   -51",
-   "source": "AI_Chatbot_Questions.xlsx : Test Report sheet"
+   "source": "AI_Chatbot_Questions.xlsx : Test Report sheet",
+   "direction_pin": {
+    "why": "PLN-039 computes $date_range - $date_range_2 and orders it DESC, so an inverted pair answers \"greatest increase\" with the greatest DECLINE. WP-4's own replays did exactly that on all three runs (date_range=2023-2024, date_range_2=2024-2025 -> change_in_activities=+663 for a theme that fell by 663) and the row still graded `hit`, because route-graded evals never look at a value.",
+    "params": {
+     "date_range": "2024-2025",
+     "date_range_2": "2023-2024",
+     "district_name": null,
+     "block_name": null,
+     "gp_name": null,
+     "top_n": 10
+    },
+    "year_columns": {
+     "activities_year1": "date_range_2",
+     "activities_year2": "date_range"
+    },
+    "first_row": {
+     "theme": "Theme 1 - Poverty Free and Enhanced Livelihoods Village",
+     "activities_year1": 181,
+     "activities_year2": 188,
+     "change_in_activities": 7
+    },
+    "source": "executed read-only against Chatbot/data/panchayat_1.duckdb (WP-4c T3b); agrees with AI_Chatbot_Questions.xlsx Test Report on the rows that sheet carries"
+   }
   }
  },
  {
@@ -1105,6 +1127,59 @@
   "notes": "T2(e)(i)+(ii) — fragment x tier collision x SLOT CONSTRAINT. Laxmipur resolves as both a block and a GP, but PLN-003 has no $gp_name slot, so exactly one reading is executable: serve it rather than asking. The echo must name the tier ('Laxmipur (block)') because the bare name was ambiguous. Under the old widest-first walk the tier was chosen before the template's slots were consulted.",
   "session": "prev",
   "prior_id": "G1043"
+ },
+ {
+  "n": 1045,
+  "q": "Which themes showed the greatest decline in planned activities between 2023-24 and 2024-25?",
+  "gold": "PLN-040",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4c-gold/planning",
+  "id": "G1045",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range_2": "2023-2024",
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [
+   "two fiscal years in one question"
+  ],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": "Added by WP-4c T3b (D30.3). PLN-040 is PLN-039's mirror and had no gold row, so the pair-order inversion was invisible on the decline side of the pair. Crosses the 2023-24 step-change in reporting completeness, so the caveat matters as much as the number.",
+  "expected_result": {
+   "row_count": 7,
+   "test_status": "PASS",
+   "params_used": "{\"date_range\": \"2024-2025\", \"date_range_2\": \"2023-2024\", \"district_name\": null, \"block_name\": null, \"gp_name\": null, \"top_n\": 10}",
+   "source": "executed read-only against Chatbot/data/panchayat_1.duckdb (WP-4c T3b); agrees with AI_Chatbot_Questions.xlsx Test Report on the rows that sheet carries",
+   "direction_pin": {
+    "why": "PLN-040 is PLN-039's mirror: same columns, ORDER BY change ASC. An inverted pair answers \"greatest decline\" with the greatest increase. It had no gold row at all until WP-4c, so the eval could not have seen it either way.",
+    "params": {
+     "date_range": "2024-2025",
+     "date_range_2": "2023-2024",
+     "district_name": null,
+     "block_name": null,
+     "gp_name": null,
+     "top_n": 10
+    },
+    "year_columns": {
+     "activities_year1": "date_range_2",
+     "activities_year2": "date_range"
+    },
+    "first_row": {
+     "theme": "Theme 6 - Self-sufficient Infrastructure in Village",
+     "activities_year1": 1836,
+     "activities_year2": 1173,
+     "change_in_activities": -663
+    },
+    "source": "executed read-only against Chatbot/data/panchayat_1.duckdb (WP-4c T3b); agrees with AI_Chatbot_Questions.xlsx Test Report on the rows that sheet carries"
+   }
+  }
  },
  {
   "n": 1201,
@@ -4638,7 +4713,32 @@
   "entity_surface": [],
   "answerability": "Yes",
   "sme_review": false,
-  "notes": "Crosses the 2023-24 step-change in reporting completeness — the answer must carry that caveat rather than report a spurious jump."
+  "notes": "Crosses the 2023-24 step-change in reporting completeness — the answer must carry that caveat rather than report a spurious jump.",
+  "expected_result": {
+   "params_used": "{\"date_range\": \"2024-2025\", \"date_range_2\": \"2023-2024\", \"district_name\": null, \"block_name\": \"Bhubaneswar\", \"gp_name\": null}",
+   "source": "executed read-only against Chatbot/data/panchayat_1.duckdb (WP-4c T3b); agrees with AI_Chatbot_Questions.xlsx Test Report on the rows that sheet carries",
+   "direction_pin": {
+    "why": "TRD-004 computes $date_range - $date_range_2 as both an amount and a percentage, so an inverted pair reports a FALL of Rs 4.75 lakh as a RISE of the same amount. WP-4's replays did, in all three runs (change_amount=+474665.81).",
+    "params": {
+     "date_range": "2024-2025",
+     "date_range_2": "2023-2024",
+     "district_name": null,
+     "block_name": "Bhubaneswar",
+     "gp_name": null
+    },
+    "year_columns": {
+     "expenditure_year1": "date_range_2",
+     "expenditure_year2": "date_range"
+    },
+    "first_row": {
+     "expenditure_year1": 6024920.81,
+     "expenditure_year2": 5550255.0,
+     "change_amount": -474665.81,
+     "change_pct": -7.88
+    },
+    "source": "executed read-only against Chatbot/data/panchayat_1.duckdb (WP-4c T3b); agrees with AI_Chatbot_Questions.xlsx Test Report on the rows that sheet carries"
+   }
+  }
  },
  {
   "n": 1905,
@@ -4692,7 +4792,31 @@
    "test_status": "PASS",
    "params_used": "{\"date_range\": \"2024-2025\", \"date_range_2\": \"2023-2024\", \"district_name\": null, \"block_name\": null, \"gp_name\": null}",
    "sample_output": "                                              theme  approved_cost_year1  approved_cost_year2  expenditure_year1  expenditure_year2\nTheme 6 - Self-sufficient Infrastructure in Village           76210208.0           35803908.0        19117864.00         15207331.6\n                 Theme 4 - Water Sufficient Village           58470253.0           43521476.0        11616799.00         13577107.0\n                 Theme 5 - Clean and Green Village            35537459.0           18246099.0         7183942.81          9663306.0",
-   "source": "AI_Chatbot_Questions.xlsx : Test Report sheet"
+   "source": "AI_Chatbot_Questions.xlsx : Test Report sheet",
+   "direction_pin": {
+    "why": "TRD-002 has four year-suffixed columns and no change column: an inverted pair reports 2024-25's approved cost under approved_cost_year1 and 2023-24's under approved_cost_year2, with nothing in the answer to say so.",
+    "params": {
+     "date_range": "2024-2025",
+     "date_range_2": "2023-2024",
+     "district_name": null,
+     "block_name": null,
+     "gp_name": null
+    },
+    "year_columns": {
+     "approved_cost_year1": "date_range_2",
+     "approved_cost_year2": "date_range",
+     "expenditure_year1": "date_range_2",
+     "expenditure_year2": "date_range"
+    },
+    "first_row": {
+     "theme": "Theme 6 - Self-sufficient Infrastructure in Village",
+     "approved_cost_year1": 76210208.0,
+     "approved_cost_year2": 35803908.0,
+     "expenditure_year1": 19117864.0,
+     "expenditure_year2": 15207331.6
+    },
+    "source": "executed read-only against Chatbot/data/panchayat_1.duckdb (WP-4c T3b); agrees with AI_Chatbot_Questions.xlsx Test Report on the rows that sheet carries"
+   }
   }
  },
  {
@@ -4766,6 +4890,59 @@
   "answerability": "Yes",
   "sme_review": false,
   "notes": "Two-way tier collision plus an unstated comparison subject. Expected: clarify the tier (and ideally the measure), never a silent block-vs-block answer."
+ },
+ {
+  "n": 1910,
+  "q": "Compare the activities planned and started theme-wise between 2023-24 and 2024-25.",
+  "gold": "TRD-001",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4c-gold/trends_comparison",
+  "id": "G1910",
+  "bracket": "Trends & Comparison",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range_2": "2023-2024",
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "Added by WP-4c T3b (D30.3). The fifth $date_range_2 template, and the only one with no change column at all: an inverted pair just swaps the contents of planned_year1/planned_year2. Theme mapping covers 17 of 30 focus areas (caveat).",
+  "expected_result": {
+   "row_count": 7,
+   "test_status": "PASS",
+   "params_used": "{\"date_range\": \"2024-2025\", \"date_range_2\": \"2023-2024\", \"district_name\": null, \"block_name\": null, \"gp_name\": null}",
+   "source": "executed read-only against Chatbot/data/panchayat_1.duckdb (WP-4c T3b); agrees with AI_Chatbot_Questions.xlsx Test Report on the rows that sheet carries",
+   "direction_pin": {
+    "why": "TRD-001 carries no change column, so an inverted pair shows only as the year1 and year2 columns swapping their contents while the table looks entirely normal — and ORDER BY planned_year2 DESC silently changes which year the ranking is by. It had no gold row until WP-4c.",
+    "params": {
+     "date_range": "2024-2025",
+     "date_range_2": "2023-2024",
+     "district_name": null,
+     "block_name": null,
+     "gp_name": null
+    },
+    "year_columns": {
+     "planned_year1": "date_range_2",
+     "planned_year2": "date_range",
+     "started_year1": "date_range_2",
+     "started_year2": "date_range"
+    },
+    "first_row": {
+     "theme": "Theme 6 - Self-sufficient Infrastructure in Village",
+     "planned_year1": 1836,
+     "planned_year2": 1173,
+     "started_year1": 129,
+     "started_year2": 110
+    },
+    "source": "executed read-only against Chatbot/data/panchayat_1.duckdb (WP-4c T3b); agrees with AI_Chatbot_Questions.xlsx Test Report on the rows that sheet carries"
+   }
+  }
  },
  {
   "n": 1951,

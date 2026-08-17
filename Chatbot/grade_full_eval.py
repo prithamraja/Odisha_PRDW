@@ -8,6 +8,8 @@ Buckets per question:
                         offered as a chip
   clarify               router asked a question instead of answering
   wrong_template        answered, but with a template outside the gold set
+  wrong_direction       answered with the RIGHT template and the wrong sign — the
+                        paired-year slots arrived inverted (D30.3); see below
   wrong_refusal         declined with a documented reason, but the WRONG one
   declined_generically  declined without retrieving the documented refusal —
                         right outcome, wrong reason
@@ -26,6 +28,18 @@ An honest refusal leaves `result` as None, NEVER an empty list. If one ever
 sets n_rows the row lands in `refusal_with_rows` rather than being silently
 mis-bucketed — the single coupling that would flip all 19 rows at once. WP-5's
 gates file asserts the same thing (WP-4a §5).
+
+A RIGHT TEMPLATE CAN STILL BE A WRONG ANSWER (D30.3, WP-4c T3b). Five templates
+carry both `$date_range` and `$date_range_2`; `$date_range_2` is year1 and three
+of them compute `$date_range - $date_range_2`. Swap the pair and PLN-039 answers
+"which themes showed the greatest INCREASE" with the greatest decline — right
+query_id, right row count, plausible table, inverted sign. This grader used to
+call that a `hit`, and did: in all three WP-4 replays every paired row arrived
+with `date_range=2023-2024, date_range_2=2024-2025` and scored clean. Gold rows
+for those five now carry `expected_result.direction_pin`, and a row whose first
+returned row contradicts its pin lands in `wrong_direction` instead. This is the
+only check in the harness that reads a VALUE rather than a route, and it is here
+because that is the only place the defect is visible.
 """
 import io
 import json
@@ -78,6 +92,76 @@ def chip_ids(rec):
     return ids
 
 
+# Direction pins, keyed by question number. Read from the built spec file rather
+# than required on the result record, so WP-4's existing replays can be re-graded
+# against the pins without being re-run. `run_full_eval` also copies the pin onto
+# each record it writes, which is what makes a results file self-contained.
+def _load_direction_pins() -> dict:
+    path = HERE / "eval_questions_full.json"
+    try:
+        specs = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:                                        # pragma: no cover
+        return {}
+    return {spec["n"]: pin for spec in specs
+            if (pin := (spec.get("expected_result") or {}).get("direction_pin"))}
+
+
+PIN_BY_N = _load_direction_pins()
+
+
+def _as_number(value):
+    """The harness serialises Decimals with `default=str`, so a money column
+    arrives as "5550255.00". Compare numerically or the pin never matches."""
+    if isinstance(value, bool) or value is None:
+        return None
+    if isinstance(value, (int, float)):
+        return float(value)
+    try:
+        return float(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+
+
+def direction_verdict(rec):
+    """None (nothing to check / it holds) or a one-line description of the break.
+
+    Checked against the FIRST returned row, which is the one the pin was computed
+    for: every paired template has a deterministic ORDER BY, and `rows_sample`
+    keeps the first three rows. A run that returned nothing to look at is not
+    evidence of a direction error, so it is left to the ordinary buckets.
+    """
+    pin = rec.get("gold_direction_pin") or PIN_BY_N.get(rec.get("n"))
+    if not pin:
+        return None
+    sample = rec.get("rows_sample") or []
+    if not sample or not isinstance(sample[0], dict):
+        return None
+    row, expected = sample[0], pin.get("first_row") or {}
+    breaks = []
+    for column, want in expected.items():
+        got = row.get(column)
+        if column not in row:
+            breaks.append(f"{column} missing")
+            continue
+        if isinstance(want, str):
+            if str(got).strip() != want.strip():
+                breaks.append(f"{column}={got!r} (pinned {want!r})")
+            continue
+        got_n, want_n = _as_number(got), _as_number(want)
+        if got_n is None or abs(got_n - want_n) > max(0.01, abs(want_n) * 1e-6):
+            breaks.append(f"{column}={got} (pinned {want})")
+    if not breaks:
+        return None
+    inverted = all(
+        _as_number(row.get(a)) is not None
+        and _as_number(row.get(a)) == _as_number(expected.get(b))
+        for a, b in (("activities_year1", "activities_year2"),
+                     ("activities_year2", "activities_year1"))
+        if a in expected and b in expected)
+    lead = ("the paired years arrived INVERTED: " if inverted else "")
+    return lead + "; ".join(breaks)
+
+
 def grade(rec):
     if rec.get("error"):
         return "error"
@@ -107,7 +191,15 @@ def grade(rec):
         return "hit" if qid in ok else "wrong_refusal"
 
     if qid and tier in ANSWER_TIERS or (qid and rec.get("n_rows") is not None):
-        return "hit" if qid in ok else "wrong_template"
+        if qid not in ok:
+            return "wrong_template"
+        # Right template, and now: right direction? Only the five paired-year
+        # templates carry a pin, so this is a no-op for every other row.
+        broken = direction_verdict(rec)
+        if broken:
+            rec["direction_break"] = broken
+            return "wrong_direction"
+        return "hit"
 
     # no direct answer
     offered = set(chip_ids(rec))
@@ -149,18 +241,21 @@ def main():
 
     print(f"{args.in_path.name}: total {len(recs)}")
     for k in ("hit", "partial", "clarify_gold_offered", "clarify", "wrong_template",
-              "wrong_refusal", "declined_generically", "refusal_with_rows",
-              "fallback", "error", "excluded", "new"):
+              "wrong_direction", "wrong_refusal", "declined_generically",
+              "refusal_with_rows", "fallback", "error", "excluded", "new"):
         if k in buckets:
             print(f"  {k:<22} {len(buckets[k])}")
 
-    for k in ("wrong_template", "wrong_refusal", "declined_generically",
-              "refusal_with_rows", "clarify", "clarify_gold_offered", "partial",
-              "fallback", "error"):
+    for k in ("wrong_template", "wrong_direction", "wrong_refusal",
+              "declined_generically", "refusal_with_rows", "clarify",
+              "clarify_gold_offered", "partial", "fallback", "error"):
         for r in buckets.get(k, []):
             extra = ""
             if k in ("wrong_template", "wrong_refusal"):
                 extra = f" gold={r['gold']} picked={r['query_id']}"
+            elif k == "wrong_direction":
+                extra = (f" gold={r['gold']} — RIGHT template, WRONG sign: "
+                         f"{r.get('direction_break')}")
             elif k == "declined_generically":
                 extra = f" gold={r['gold']} (refusal not retrieved)"
             elif k == "refusal_with_rows":

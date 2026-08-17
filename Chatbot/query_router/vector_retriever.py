@@ -29,6 +29,7 @@ from pathlib import Path
 import numpy as np
 
 from .config import EMBEDDING_MODEL
+from .llm_usage import record_call
 
 _CACHE_PATH = Path(__file__).parent.parent / ".tmp" / "catalog_index.json"
 
@@ -116,6 +117,7 @@ class VectorRetriever:
         for i in range(0, len(texts), B):
             resp = self.client.embeddings.create(
                 model=EMBEDDING_MODEL, input=texts[i:i + B])
+            record_call("embed_index", EMBEDDING_MODEL, resp)
             out.extend(d.embedding for d in resp.data)
         return np.array(out, dtype=np.float32)
 
@@ -133,6 +135,7 @@ class VectorRetriever:
         so k is a budget of candidate templates, not of embedded strings.
         """
         resp = self.client.embeddings.create(model=EMBEDDING_MODEL, input=[query])
+        record_call("embed_query", EMBEDDING_MODEL, resp)
         qv = np.array(resp.data[0].embedding, dtype=np.float32)
         qv = qv / (np.linalg.norm(qv) or 1.0)
         scores = self._matrix @ qv                       # cosine (rows normalised)

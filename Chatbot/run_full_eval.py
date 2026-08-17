@@ -55,6 +55,12 @@ def run(out_path: Path = OUT):
     # so a module-scope import would spend before anyone confirmed anything.
     from fastapi.testclient import TestClient
     import main
+    from query_router.llm_usage import meter
+
+    # WP-4 could not state a token figure because nothing recorded `usage`
+    # (D28.8). Reset per replay, so the consistency runner's three passes report
+    # three separate totals rather than a growing sum.
+    meter().reset()
 
     records = []
     with TestClient(main.app) as client, out_path.open("w", encoding="utf-8") as out:
@@ -72,6 +78,12 @@ def run(out_path: Path = OUT):
             rec = {"n": spec["n"], "q": spec["q"], "gold": spec.get("gold"),
                    "acc": spec.get("acc", []), "partial": spec.get("partial", False),
                    "excluded": spec.get("excluded", False), "src": spec.get("src")}
+            # D30.3: carried onto the record so a results file states its own
+            # direction contract. `grade_full_eval` falls back to looking the pin
+            # up by `n`, so an older results file can still be re-graded.
+            pin = (spec.get("expected_result") or {}).get("direction_pin")
+            if pin:
+                rec["gold_direction_pin"] = pin
             try:
                 resp = client.post("/query", json=payload, timeout=120)
                 if resp.status_code != 200:
@@ -110,6 +122,15 @@ def run(out_path: Path = OUT):
             print(f"[{i:>2}/{len(QUESTIONS)}] {label:<12} {spec['q'][:70]}")
 
     print(f"\nWrote {out_path} ({len(records)} records)")
+
+    # Spend and extraction outcomes, next to the results they belong to. The
+    # sidecar rather than the results file itself because it is per-RUN, not
+    # per-question, and because the triage reads the results file line by line.
+    print(meter().report(f"{out_path.name}: token spend"))
+    usage_path = out_path.with_suffix(".usage.json")
+    usage_path.write_text(
+        json.dumps(meter().snapshot(), indent=1), encoding="utf-8")
+    print(f"Wrote {usage_path}")
     return records
 
 

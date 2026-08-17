@@ -11,6 +11,7 @@ from .config import (
     LLM_MAX_TOKENS_CLASSIFY, REASONING_MODELS,
 )
 from .intent_catalog import INTENT_LIST_BY_DOMAIN
+from .llm_usage import record_call
 
 # ── Domain descriptions ──────────────────────────────────────────────────────
 
@@ -586,6 +587,7 @@ def classify_intent(query: str, client: OpenAI) -> tuple[str, str]:
             kwargs["max_tokens"] = LLM_MAX_TOKENS_CLASSIFY
 
         resp = client.chat.completions.create(**kwargs)
+        record_call("classify", ABSTRACTION_MODEL, resp)
         parsed = json.loads(resp.choices[0].message.content.strip())
 
         domain = parsed.get("domain", "no_match").upper().replace("-", "_")

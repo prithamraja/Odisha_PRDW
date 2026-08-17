@@ -62,6 +62,7 @@ from query_router.reranker import rerank
 from query_router.template_catalog import TEMPLATE_CATALOG
 from query_router.unanswerable_catalog import UNANSWERABLE_CATALOG
 from query_router.vector_retriever import VectorRetriever
+from query_router.llm_usage import meter
 from eval_spend import confirm_spend
 from query_router.zones import zone
 
@@ -115,6 +116,7 @@ def score_row(row: dict, picked: str, near_misses: list[str]) -> str:
 
 
 def run(out_path: Path | None, limit: int | None) -> dict:
+    meter().reset()                     # D28.8 — per-run totals, not cumulative
     client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
     # The unanswerables are indexed here for the same reason main.py indexes
     # them: 19 gold rows expect a DOCUMENTED refusal, and an entry that is not
@@ -176,7 +178,11 @@ def run(out_path: Path | None, limit: int | None) -> dict:
             print(f"  gold={r['gold']:<6} picked={r['picked']:<9} "
                   f"rank={r['gold_retrieval_rank']} {r['question'][:70]}")
 
-    payload = {"summary": summary, "results": results}
+    # Recorded IN the payload, so an A/B comparison can price the two arms as
+    # well as score them — which is the whole question in T5's transliteration
+    # vs paraphrase-index choice.
+    print(meter().report("rerank_eval: token spend"))
+    payload = {"summary": summary, "usage": meter().snapshot(), "results": results}
     if out_path:
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(json.dumps(payload, indent=1), encoding="utf-8")

@@ -33,6 +33,7 @@ from .config import (
     LLM_TIMEOUT_SECONDS,
     REASONING_MODELS,
 )
+from .llm_usage import record_call, record_extraction
 
 _log = logging.getLogger(__name__)
 
@@ -210,6 +211,89 @@ def refresh_prompt_enums(registry_values) -> str:
 _EXTRACTION_PROMPT = build_prompt(lambda _slot: [], warn=False)
 
 
+# ── The sentinel (D28.1 / D30.2) ──────────────────────────────────────────────
+
+class ExtractionUnavailable(dict):
+    """All-None slots that mean THE EXTRACTOR DID NOT ANSWER.
+
+    WHY THIS IS A TYPE AND NOT A FLAG. The old code ended `except Exception:
+    return {s: None for s in slots}` — so a timeout, a 429, an auth failure and a
+    truncated response were all indistinguishable from the model reading the
+    question and reporting that the user named nothing. The officer then got
+    "For which date range?" about a sentence in which they had plainly stated the
+    year, and nothing anywhere said an API call had failed. WP-4 §5.1 found this
+    sitting next to F1 and it survived F1's fix; D30.2 makes closing it a task in
+    its own right.
+
+    IT IS STILL A DICT OF NULLS, deliberately. Every caller reads
+    `raw.get(slot)`, and the right *behaviour* on an API failure is unchanged:
+    the deterministic `$date_range` fallback should absolutely still run (it is
+    exactly the right response to a call that never happened), and a genuinely
+    missing slot should still clarify. What changes is that the cause is now
+    attributable — in the log, in the meter, and to any caller that cares enough
+    to ask `isinstance(raw, ExtractionUnavailable)`.
+
+    `cause` is one of a small closed vocabulary (see `_CAUSE_BY_EXC_NAME` and
+    the parse branches below), so the eval can count causes rather than grep
+    strings.
+    """
+    __slots__ = ("cause", "detail")
+
+    def __init__(self, slots, cause: str, detail: str = ""):
+        super().__init__({s: None for s in slots})
+        self.cause = cause
+        self.detail = detail
+
+    def __repr__(self) -> str:                               # pragma: no cover
+        return (f"ExtractionUnavailable(cause={self.cause!r}, "
+                f"slots={list(self)!r})")
+
+
+def extraction_failed(raw) -> bool:
+    """True when an all-None result was an API/parse failure, not an answer."""
+    return isinstance(raw, ExtractionUnavailable)
+
+
+# Exception class name → cause, walked over the MRO so a provider subclass we
+# have never seen still lands on its family. Names rather than imported classes:
+# the openai package reorganises these between majors, and an ImportError here
+# would take the extractor down to fix a logging label.
+_CAUSE_BY_EXC_NAME = {
+    "APITimeoutError":       "timeout",
+    "APIConnectionError":    "connection",
+    "RateLimitError":        "rate_limit",
+    "AuthenticationError":   "auth",
+    "PermissionDeniedError": "auth",
+    "NotFoundError":         "bad_request",
+    "BadRequestError":       "bad_request",
+    "UnprocessableEntityError": "bad_request",
+    "InternalServerError":   "server_error",
+    "APIStatusError":        "api_status",
+    "APIError":              "api_error",
+    "JSONDecodeError":       "bad_json",
+}
+
+
+def _cause_of(exc: BaseException) -> str:
+    for klass in type(exc).__mro__:
+        cause = _CAUSE_BY_EXC_NAME.get(klass.__name__)
+        if cause is not None:
+            return cause
+    return "unexpected_error"
+
+
+def _unavailable(slots, cause: str, detail: str, user_query: str
+                 ) -> ExtractionUnavailable:
+    """Log the failure with its cause, meter it, and hand back the sentinel."""
+    _log.warning(
+        "entity extraction UNAVAILABLE (%s): %s | slots=%s | query=%r — "
+        "these nulls are an API/parse failure, NOT 'the user named nothing'",
+        cause, detail, list(slots), (user_query or "")[:120],
+    )
+    record_extraction(slots, None, cause=cause, query=user_query)
+    return ExtractionUnavailable(slots, cause, detail)
+
+
 def extract_entities(
     user_query: str,
     slots: list[str],
@@ -221,6 +305,9 @@ def extract_entities(
     slots: flat list of entity type names e.g. ["district", "fiscal_year"]
     intent: the classified intent name (provides context for better extraction)
     Returns dict mapping slot_name → raw string value (or None if not found).
+
+    On an API or parse failure the return is an `ExtractionUnavailable` — still
+    a dict of nulls, so every caller behaves as before, but carrying the cause.
     """
     if not slots:
         return {}
@@ -228,28 +315,67 @@ def extract_entities(
     slot_lines = "\n".join(f'- "{s}"' for s in slots)
     intent_context = f"The query was classified as intent: {intent}" if intent else ""
 
+    kwargs = dict(
+        model=EXTRACTION_MODEL,
+        timeout=LLM_TIMEOUT_SECONDS,
+        messages=[{
+            "role": "user",
+            "content": _EXTRACTION_PROMPT.format(
+                query=user_query,
+                slot_lines=slot_lines,
+                intent_context=intent_context,
+            )
+        }],
+        response_format={"type": "json_object"},
+    )
+    if EXTRACTION_MODEL in REASONING_MODELS:
+        kwargs["max_completion_tokens"] = 2000
+        kwargs["extra_body"] = {"reasoning_effort": "low"}
+    else:
+        kwargs["temperature"] = LLM_TEMPERATURE
+        kwargs["max_tokens"] = LLM_MAX_TOKENS_EXTRACT
+
     try:
-        kwargs = dict(
-            model=EXTRACTION_MODEL,
-            timeout=LLM_TIMEOUT_SECONDS,
-            messages=[{
-                "role": "user",
-                "content": _EXTRACTION_PROMPT.format(
-                    query=user_query,
-                    slot_lines=slot_lines,
-                    intent_context=intent_context,
-                )
-            }],
-            response_format={"type": "json_object"},
-        )
-        if EXTRACTION_MODEL in REASONING_MODELS:
-            kwargs["max_completion_tokens"] = 2000
-            kwargs["extra_body"] = {"reasoning_effort": "low"}
-        else:
-            kwargs["temperature"] = LLM_TEMPERATURE
-            kwargs["max_tokens"] = LLM_MAX_TOKENS_EXTRACT
         resp = client.chat.completions.create(**kwargs)
-        parsed = json.loads(resp.choices[0].message.content.strip())
-        return {s: parsed.get(s) for s in slots}
-    except Exception:
-        return {s: None for s in slots}
+    except Exception as exc:
+        return _unavailable(slots, _cause_of(exc),
+                            f"{type(exc).__name__}: {exc}", user_query)
+
+    # THE CALL AND THE PARSE ARE SEPARATE `try`s on purpose. Wrapping both in one
+    # is how a JSON error came to look like a timeout came to look like an empty
+    # question; they are three different faults with three different fixes.
+    try:
+        choice = resp.choices[0]
+        content = choice.message.content or ""
+        finish = getattr(choice, "finish_reason", None)
+    except Exception as exc:
+        return _unavailable(slots, "malformed_response",
+                            f"{type(exc).__name__}: {exc}", user_query)
+
+    usage = record_call("extraction", EXTRACTION_MODEL, resp, finish_reason=finish)
+    reasoning = usage.reasoning_tokens if usage is not None else None
+
+    if not content.strip():
+        # A reasoning model that spent its entire completion budget thinking
+        # emits `finish_reason="length"` with no content at all — the failure
+        # mode D17 exists for, and one no eval would otherwise distinguish from
+        # an empty answer.
+        cause = "truncated" if finish == "length" else "empty_response"
+        return _unavailable(slots, cause, f"finish_reason={finish!r}", user_query)
+
+    try:
+        parsed = json.loads(content)
+    except Exception as exc:
+        cause = "truncated" if finish == "length" else "bad_json"
+        return _unavailable(slots, cause,
+                            f"{type(exc).__name__}: {exc} | finish_reason={finish!r}",
+                            user_query)
+
+    if not isinstance(parsed, dict):
+        return _unavailable(slots, "bad_json",
+                            f"top-level {type(parsed).__name__}, expected object",
+                            user_query)
+
+    result = {s: parsed.get(s) for s in slots}
+    record_extraction(slots, result, reasoning_tokens=reasoning, query=user_query)
+    return result

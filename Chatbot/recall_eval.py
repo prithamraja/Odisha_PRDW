@@ -56,6 +56,7 @@ from query_router.dashboard_catalog import DASHBOARD_CATALOG
 from query_router.template_catalog  import TEMPLATE_CATALOG
 from query_router.unanswerable_catalog import UNANSWERABLE_CATALOG
 from query_router.config            import EMBEDDING_MODEL, ABSTRACTION_MODEL
+from query_router.llm_usage         import meter, record_call
 from eval_spend                     import confirm_spend
 
 # DEFENDED, because this module is the last consumer of the retired AP retrieval
@@ -128,6 +129,7 @@ def embed_batch(client: OpenAI, texts: list[str]) -> list[list[float]]:
     for i in range(0, len(texts), B):
         chunk = texts[i:i + B]
         resp = client.embeddings.create(model=EMBEDDING_MODEL, input=chunk)
+        record_call("embed", EMBEDDING_MODEL, resp)
         out.extend(d.embedding for d in resp.data)
     return out
 
@@ -218,6 +220,7 @@ def translate_to_hinglish(client: OpenAI, topics: list[str], refresh: bool) -> l
                 {"role": "user", "content": json.dumps(payload, ensure_ascii=False)},
             ],
         )
+        record_call("hinglish", ABSTRACTION_MODEL, resp)
         parsed = json.loads(resp.choices[0].message.content)
         for j in range(len(chunk)):
             out[i + j] = parsed.get(str(j), chunk[j])
@@ -405,6 +408,10 @@ def main() -> None:
         print(f"\n── Misses (gold outside top-{args.k}) — {len(misses)} ──")
         for topic, gid, rank in misses[:20]:
             print(f"  rank {rank:>3}  {gid:>5}  {topic[:70]}")
+
+    # D28.8. A cached catalogue index reports zero embedding calls here, which is
+    # information rather than a gap: it says the cache did its job.
+    print(meter().report("recall_eval: token spend"))
 
 
 if __name__ == "__main__":

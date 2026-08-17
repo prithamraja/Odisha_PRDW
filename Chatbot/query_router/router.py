@@ -45,7 +45,6 @@ from .zones             import (
     candidate_chips,
     candidate_replies,
     corrected_query_chips,
-    question_chips,
     readable_question,
     resolved_question,
     unfilled_phrases,
@@ -58,8 +57,10 @@ from .date_phrase        import resolve_fiscal_years
 from .sql_params         import NAMED, param_style
 from .suggestions       import elicitation_chips
 from .config            import (
+    CLARIFY_SCORE_MARGIN,
     MAX_CLARIFY_OPTIONS,
     MAX_MISS_SUGGESTIONS,
+    NO_MATCH_LOWER_THRESHOLD,
     RESULT_CACHE_DEFAULT_TTL,
     USE_VECTOR_RETRIEVAL,
     VECTOR_TOP_K,
@@ -436,6 +437,66 @@ def _fiscal_year_from_text(
     return entity
 
 
+def _order_paired_fiscal_years(
+    validated: list[ExtractedEntity], slot_type: dict[str, str]
+) -> None:
+    """`$date_range` is the LATER year of a pair. Enforced, not hoped for.
+
+    WHY THIS EXISTS, AND WHY `e3e70ff` DID NOT CLOSE IT. All five paired
+    templates bind `$date_range_2` as **year1** and `$date_range` as **year2**,
+    three of them compute `$date_range - $date_range_2`, and their question text
+    reads "between {date_range_2} and {date_range}" — so `$date_range` is the
+    later year (pinned against the SQL in `test_fiscal_year_fallback`). WP-4 §5.1a
+    fixed `_validate_fiscal_year`'s split of ONE string carrying two years, on the
+    stated understanding that "the extractor normally assigns the two slots
+    itself and got it right".
+
+    IT DID NOT. Read off WP-4's own recorded replays, on every paired-template
+    row in all three runs:
+
+        run1/2/3  PLN-039, TRD-002, TRD-004
+                  date_range = 2023-2024, date_range_2 = 2024-2025
+
+    which is backwards, and the served table proves the cost — PLN-039 answered
+    "which themes showed the greatest INCREASE" with
+    `change_in_activities = +663` for Theme 6, which actually **declined by 663**.
+    All three rows graded `hit`, because route-graded evals do not look at values.
+
+    The cause is a rule collision, not a wobble: the extraction prompt defines the
+    pair by MENTION ORDER ("'2024-25 vs 2023-24' → fiscal_year='2024-25',
+    fiscal_year_2='2023-24'") while the catalogue defines it CHRONOLOGICALLY, and
+    the question text happens to name the earlier year first. Stable in all three
+    replays, which is exactly what a prompt/schema conflict looks like.
+
+    So the ordering is imposed here rather than asked for: it is a property of the
+    SQL, and no phrasing of a prompt can be trusted to reproduce a property of
+    the SQL. Both slots must be bound for anything to happen — a single year is
+    not a pair, and nothing else about extraction changes.
+    """
+    if not ({"date_range", "date_range_2"} <= set(slot_type)):
+        return
+    if slot_type.get("date_range") not in _FISCAL_YEAR_ENTITY_TYPES:
+        return
+    by_slot = {e.slot_name: e for e in validated}
+    later, earlier = by_slot.get("date_range"), by_slot.get("date_range_2")
+    if later is None or earlier is None:
+        return
+    # The stored form is 'YYYY-YYYY', so lexicographic order IS chronological.
+    if str(later.resolved_value) >= str(earlier.resolved_value):
+        return
+    _log.info(
+        "paired fiscal years arrived inverted and were re-ordered: "
+        "date_range=%r date_range_2=%r → date_range=%r date_range_2=%r "
+        "($date_range is the later year; three paired templates compute "
+        "$date_range - $date_range_2, so the old order inverts the sign)",
+        later.resolved_value, earlier.resolved_value,
+        earlier.resolved_value, later.resolved_value,
+    )
+    later.resolved_value, earlier.resolved_value = (
+        earlier.resolved_value, later.resolved_value)
+    later.raw_value, earlier.raw_value = earlier.raw_value, later.raw_value
+
+
 def _log_fiscal_year_disagreement(
     user_query: str, slot: str, entity_type: str, extracted: str
 ) -> None:
@@ -791,6 +852,8 @@ def _fill_slots_or_clarify(
             clarify.pending = _pending(slot, e.candidates)
             return [], clarify
 
+    _order_paired_fiscal_years(validated, slot_type)
+
     if missing:
         # Required slot empty → pause and ask, never execute broken SQL. The
         # pending state carries everything already resolved, so answering this
@@ -997,7 +1060,7 @@ def _no_match(
     result.clarification = Clarification(
         reason="no_match",
         prompt="I can't answer that exactly, but I can answer these:",
-        options=question_chips(scored, MAX_MISS_SUGGESTIONS, fill),
+        options=_reading_chips(scored, MAX_MISS_SUGGESTIONS, fill),
     )
     return result
 
@@ -1209,6 +1272,19 @@ def serve_frame_edit(
     Execute a follow-up as an edit to the current frame (spec Section 4, v1):
     swap one bound parameter and/or change the date range, within the same
     template. Raises ValueError / EntityNotFound on edits that can't apply.
+
+    AN OPTIONAL SLOT THE FRAME DOES NOT BIND STAYS UNBOUND (WP-4c T2b). This
+    used to raise `missing '<slot>' in the current context` for any slot absent
+    from `bound_params` — a rule inherited from AP, where every slot was
+    required and a frame therefore bound all of them. Under D2 it is the normal
+    case: `bound_params` only ever holds slots that VALIDATED, so a state-wide
+    EXP-001 frame binds `date_range` alone and its three optional geography
+    slots are absent by design. The old rule therefore made every state-wide
+    frame uneditable, and "what about Laxmipur?" fell through to an LLM re-route
+    of the frame's question plus the fragment — measured in WP-4's replays as the
+    path G1524 actually took, which is also why the tier check never saw it.
+    Leaving the slot unbound is what D2 means by optional: the filter is simply
+    off, which is exactly the state the frame was already in.
     """
     template = template_map.get(frame.template_id)
     if template is None:
@@ -1223,6 +1299,7 @@ def serve_frame_edit(
             f"(it has: {', '.join(slot_types) or 'none'})"
         )
 
+    optional = optional_slots(template["param_slots"])
     person_bound = _person_bound_slots(template["param_slots"])
     entities: list[ExtractedEntity] = []
     for name, etype in slot_types.items():
@@ -1232,6 +1309,8 @@ def serve_frame_edit(
         else:
             current = frame.bound_params.get(name)
             if current is None:
+                if name in optional:
+                    continue          # the filter was off and stays off (D2)
                 raise ValueError(f"missing '{name}' in the current context")
             if name in person_bound:
                 # The frame stores a string; a person-bound slot needs the
@@ -1284,20 +1363,31 @@ def serve_drill_hop(
     served, because "Laxmipur" alone does not.
 
     None means "no hop applies" — no sibling for this slot, a value that isn't a
-    real place of that kind, or a sibling whose other slots the frame can't fill
-    (a state-wide frame cannot reach a -M template, which also needs the
-    district). Every one of those falls through to the contextual re-route.
+    real place of that kind, or a REQUIRED slot the frame cannot fill. Every one
+    of those falls through to the contextual re-route.
+
+    An OPTIONAL slot the frame does not bind is left unbound, for the same reason
+    `serve_frame_edit` now leaves it unbound: under D2 `bound_params` holds only
+    the slots that validated, so a state-wide frame legitimately has none of its
+    three geography slots, and refusing to hop on that basis retired the
+    deterministic path for exactly the frames it was written for. (The AP rule it
+    replaces — "a state-wide frame cannot reach a -M template, which also needs
+    the district" — was about per-scope SIBLING templates, which D2 removed: the
+    hop target is now the frame's own template with one more filter on.)
     """
     target = drill_target(frame.template_id, edit_slot)
     template = template_map.get(target) if target else None
     if template is None:
         return None
 
+    optional = optional_slots(template["param_slots"])
     entities: list[ExtractedEntity] = []
     try:
         for name, etype in _template_slot_types(template).items():
             raw = edit_value if name == edit_slot else frame.bound_params.get(name)
             if raw is None:
+                if name in optional:
+                    continue
                 return None
             entity = validator.validate(raw, etype)
             entity.slot_name = name
@@ -1728,6 +1818,108 @@ def _serve_query_id(
     )
 
 
+# ── A documented refusal must be reachable (D28.5, WP-4c T2c) ─────────────────
+#
+# THE DEFECT, from WP-4's three replays. Four of the 19 known-unanswerable gold
+# rows never reached their `UNANSWERABLE_CATALOG` entry: BEN-001 (3/3) and
+# BEN-003 (2/3) got "I couldn't match that exactly. Did you mean one of these?"
+# offering IHHL templates; BEN-003's third replay and BEN-010 got the
+# broad-question elicitation; and PLN-022 was ANSWERED with PLN-020 (2/3) —
+# a template whose own caveat reads "pending_approvals is 0 everywhere because
+# approval_date is always populated", i.e. a table of zeros served as the answer
+# to "which blocks are consistently delayed". The other 15 rows work, so the
+# machinery is right and the mechanism is narrow.
+#
+# THE MECHANISM. A refusal's fate rests entirely on one LLM judgement, and the
+# reranker's own rule set resolves against it: rule 9 says "if one of those
+# matches the user's intent, return it", rule 10 says "if NONE of the candidates
+# can answer the query exactly, return no_match". A candidate captioned CANNOT BE
+# ANSWERED satisfies rule 10 by construction, and rule 10 is the one that wins —
+# which is why the failure is 3/3 stable rather than a wobble. Both zone branches
+# then render that same entry as an ordinary question chip: a tappable suggestion
+# of a question the database cannot answer, whose tap reproduces the identical
+# clarification. The refusal was in the candidate list the whole time.
+#
+# THE FIX IS DETERMINISTIC, because the evidence is. Retrieval rank is not a
+# judgement call: if the single closest thing in the whole index to what the
+# officer typed is the catalogue's own statement that this question has no
+# answer, that statement is the answer. So a rank-0 refusal takes precedence over
+# a no-match verdict outright, and over a rerank pick only when retrieval can
+# actually tell them apart (see the margin below). Everything else stays a
+# clarification — with the refusal labelled as one.
+
+
+def _refusal_precedence(
+    scored: list[tuple[str, str, float]], picked: str | None
+) -> str | None:
+    """The known-unanswerable that should be served instead of `picked`, or None.
+
+    RANK 0 AND NOTHING WEAKER. "Somewhere in the top 30" is not evidence — the
+    unanswerables are 30 of 376 index entries and one is near almost anything.
+    Rank 0 means no catalogue entry, answerable or not, matched the question more
+    closely.
+
+    AGAINST A RERANK PICK, THE MARGIN APPLIES. `CLARIFY_SCORE_MARGIN` is already
+    this codebase's definition of "retrieval cannot separate these two"; inside
+    it, overruling the semantic layer with the surface layer would be exactly the
+    embedding-order bias the reranker exists to correct. Outside it, the two
+    layers genuinely disagree about whether the question is answerable at all,
+    and the catalogue's documented "no" is the safer of the two — a near-miss
+    that measures something else is the confidently-wrong class this project
+    exists to prevent, and PLN-020's all-zero table is what it looks like.
+
+    Against a NO-MATCH verdict no margin is needed: the alternative is a generic
+    decline, so this can only ever replace "I failed" with "here is why this
+    cannot be answered". It can never displace an answer.
+    """
+    if not scored:
+        return None
+    top_qid, _question, top_score = scored[0]
+    if top_qid not in UNANSWERABLE_CATALOG or top_qid == picked:
+        return None
+    if top_score < NO_MATCH_LOWER_THRESHOLD:
+        # Below the floor nothing is a match, including this. The generic miss
+        # path — which offers the nearest questions — is the honest answer.
+        return None
+    if picked and picked != "no_match":
+        picked_score = next((s for qid, _q, s in scored if qid == picked), None)
+        if (picked_score is not None
+                and top_score - picked_score < CLARIFY_SCORE_MARGIN):
+            return None
+    _log.info("refusal precedence: serving %s (retrieval rank 0, score %.4f) "
+              "instead of %r", top_qid, top_score, picked)
+    return top_qid
+
+
+def _reading_chips(
+    candidates: list[tuple[str, str, float]],
+    limit: int,
+    fill: dict[str, str] | None = None,
+) -> list[Chip]:
+    """`question_chips`, with a documented refusal labelled as one.
+
+    An unanswerable entry offered as a plain suggestion reads as a question the
+    system is inviting the user to ask, and tapping it produces the same
+    clarification it came from. Labelled, the chip is an offer to explain — and
+    its send_text is still the entry's own question, which retrieves at rank 0 on
+    the way back in and is therefore SERVED as the refusal by
+    `_refusal_precedence`. The loop closes without an LLM in it.
+    """
+    chips: list[Chip] = []
+    seen: set[str] = set()
+    for qid, question, _score in candidates:
+        text = readable_question(question, fill)
+        if text in seen:
+            continue
+        seen.add(text)
+        label = (f"Why I can't answer: {text}"
+                 if qid in UNANSWERABLE_CATALOG else text)
+        chips.append(Chip(label=label, send_text=text))
+        if len(chips) == limit:
+            break
+    return chips
+
+
 # ── Front-end A: template-direct (vector retrieve → rerank) ───────────────────
 
 def _route_vector(
@@ -1747,6 +1939,10 @@ def _route_vector(
             template_map=template_map,
         )
     if score_zone == "ambiguous":
+        # No refusal override here, deliberately: this zone IS "the top two are
+        # within the margin", so a rank-0 refusal has not out-matched anything.
+        # It is offered as a labelled reading instead, which is what makes it
+        # reachable at all (D28.5).
         fill = _extract_fill_values(
             user_query, [qid for qid, _, _ in scored],
             template_map, validator, openai_client,
@@ -1754,12 +1950,22 @@ def _route_vector(
         return _clarify(
             "ambiguous_templates",
             "I can read that a few ways — which of these did you mean?",
-            question_chips(scored, MAX_CLARIFY_OPTIONS, fill),
+            _reading_chips(scored, MAX_CLARIFY_OPTIONS, fill),
             user_query, normalized, start,
         )
 
     candidates = [(qid, q) for qid, q, _ in scored]
     query_id, near_misses = rerank(user_query, candidates, openai_client)
+
+    # The catalogue's own "this cannot be answered", when it is the closest thing
+    # in the index to the question asked. Before the branch below, because that
+    # branch is where BEN-001 and BEN-003 spent all three WP-4 replays; and
+    # before the serving call, because PLN-022 was answered with a zero-filled
+    # near-miss instead.
+    refusal = _refusal_precedence(scored, query_id)
+    if refusal is not None:
+        return _serve_unanswerable(refusal, user_query, normalized, start,
+                                   template_map)
 
     if query_id == "no_match" or (
         query_id not in DASHBOARD_CATALOG
@@ -1781,7 +1987,7 @@ def _route_vector(
             return _clarify(
                 "ambiguous_templates",
                 "I couldn't match that exactly. Did you mean one of these?",
-                question_chips(picked, MAX_CLARIFY_OPTIONS, fill),
+                _reading_chips(picked, MAX_CLARIFY_OPTIONS, fill),
                 user_query, normalized, start,
             )
         # The LLM offered no near-misses (off-topic or broad) — go through the

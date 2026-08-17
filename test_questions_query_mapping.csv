@@ -36,6 +36,7 @@ PLN-001,GPDP status?,Planning,en
 PLN-001,How many GPs in Laxmipur uploaded the GPDP in 2024-25?,Planning,en
 PLU-001,Bheden ka plan status 2024-25?,Planning,code_mixed
 PLN-003,What percentage of Gram Panchayats in each block uploaded their GPDP in 2024-2025?,Planning,en
+PLN-040,Which themes showed the greatest decline in planned activities between 2023-24 and 2024-25?,Planning,en
 SBM-GWM-003,How many community soak pits have been planned in 2024-25?,Sanitation (SBM),en
 SBM-GWM-006,How many soak pits were completed in 2024-2025?,Sanitation (SBM),en
 SBM-GWM-002,What is the expenditure on Grey Water Management activities in 2024-25?,Sanitation (SBM),en
@@ -165,6 +166,7 @@ TRD-002,Compare the approved cost and expenditure theme-wise between 2023-24 and
 TRD-005,Khordha ka activity completion rate saalon me kaise badla?,Trends & Comparison,code_mixed
 TRD-006,Andhrua ra barsa bhittire mota kharcha kete?,Trends & Comparison,odia_translit
 TRD-011,Compare Laxmipur and Kalimela for 2024-25.,Trends & Comparison,en
+TRD-001,Compare the activities planned and started theme-wise between 2023-24 and 2024-25.,Trends & Comparison,en
 DSS-006,Bhubaneswar ke kaun se GP me sabse zyada paisa bacha hua hai 2024-25 me?,Decision Support,code_mixed
 DSS-005,2024-2025 re Bhubaneswar re kaun chalu kama manjuri rashira 25 percent tharu kama kharcha karichi?,Decision Support,odia_translit
 DSS-002,Which blocks in Khordha combine high pending sanctions with low expenditure in 2024-25?,Decision Support,en

@@ -16,6 +16,7 @@ import json
 from openai import OpenAI
 
 from .config import RERANK_MODEL, LLM_TEMPERATURE, LLM_TIMEOUT_SECONDS, REASONING_MODELS
+from .llm_usage import record_call
 from .rerank_context import DESC_BY_QID
 from .template_catalog import TEMPLATE_CATALOG
 from .unanswerable_catalog import UNANSWERABLE_CATALOG
@@ -185,6 +186,7 @@ def rerank(query: str, candidates: list[tuple[str, str]], client: OpenAI) -> tup
             kwargs["max_tokens"] = 80
 
         resp = client.chat.completions.create(**kwargs)
+        record_call("rerank", RERANK_MODEL, resp)
         data = json.loads(resp.choices[0].message.content.strip())
         return parse_rerank_response(data, valid_ids)
 

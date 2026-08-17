@@ -3,6 +3,7 @@ load_dotenv()
 
 import os
 import json
+import re
 import time
 from uuid import uuid4
 from datetime import date
@@ -83,9 +84,29 @@ from query_router.preprocessor      import normalize
 from query_router.zones             import readable_question
 
 # A bare place name is read as the widest scope it validates as — "Bhubaneswar"
-# is a district before it is the block of the same name. A frame that already
-# binds that scope is skipped, so a district-scoped question reads "in Barpali?"
-# as the block it must be.
+# is a district before it is the block of the same name.
+#
+# TIER PRECEDENCE IS NO LONGER A SILENT PICK (D28.4, WP-4c T2b). This list used
+# to be walked widest-first with any tier the frame ALREADY BOUND skipped, so a
+# GP-scoped question read "what about Laxmipur?" as the block it was not: only
+# block and district competed, block won, and the drill hop then bound the OLD GP
+# together with the NEW block, returned zero rows and abandoned the follow-up
+# (operator report, 2026-08-13). The bound tier now COMPETES, as a replacement
+# reading — "the same question for Laxmipur GP" is at least as likely as "…for
+# Laxmipur block" — and the rule is:
+#
+#   one viable reading   -> serve it, and name the tier in the echo when the
+#                           NAME was ambiguous;
+#   two or more          -> the tier-qualified clarification (D18.P3: ask which
+#                           place, never infer which tier);
+#   the user said which  -> "in Laxmipur block?" is not ambiguous. An explicit
+#                           tier noun in the message settles it and nothing is
+#                           asked.
+#
+# A reading at one tier DROPS any bound geography NARROWER than it, because
+# "what about Laxmipur block?" over an Andhrua-GP answer means the block, not
+# Andhrua-inside-Laxmipur. Wider bound scopes are kept: a district on screen
+# still contains the block just named.
 #
 # PAIRED, because the two halves are no longer the same word and mixing them is
 # silent: a context frame keys `bound_params` by the workbook's BIND NAME
@@ -330,28 +351,89 @@ def _fragment_top_match(
     return scored[0][0], readable_question(scored[0][1], fill)
 
 
-def _fragment_tiers(frame: ContextFrame, message: str) -> list[tuple[str, str]]:
-    """Every (slot, resolved value) a bare place fragment could mean.
+# The tier the user named OUT LOUD, if they named one. "in Laxmipur block?" is
+# not an ambiguous message, and asking "did you mean the block or the GP?" about
+# it makes the officer repeat a word they already typed.
+#
+# Phrase-level rather than token-level because "panchayat" belongs to two tiers:
+# bare it means the gram panchayat, but "panchayat samiti" IS the block, so the
+# GP pattern refuses it in front of `samiti`.
+_TIER_PHRASES: tuple[tuple[str, "re.Pattern[str]"], ...] = (
+    ("district_name", re.compile(r"\b(districts?|zillas?|zp)\b")),
+    ("block_name",    re.compile(r"\b(blocks?|samitis?)\b")),
+    ("gp_name",       re.compile(r"\b(gps?|gram\s+panchayats?|"
+                                 r"panchayats?(?!\s+samiti)|villages?)\b")),
+)
 
-    Widest first, and NOT yet filtered by what the frame can execute — the
-    caller needs both readings to tell "this name is ambiguous" from "this name
-    is a block". Slots the frame already has bound are skipped: those are
-    executable edits, which are the classifier's job.
+
+def _tier_named_in(message: str) -> set[str]:
+    """The geography slots whose tier noun the message actually says."""
+    text = (message or "").lower()
+    return {slot for slot, pattern in _TIER_PHRASES if pattern.search(text)}
+
+
+def _place_readings(frame: ContextFrame, phrase: str) -> list[tuple[str, str]]:
+    """Every (slot, resolved value) a place phrase could mean, widest first.
+
+    NOT filtered by what the frame can execute — the caller needs the whole set
+    to tell "this name is ambiguous" from "this name is a block".
+
+    A tier the frame ALREADY BINDS is included, as a replacement reading (D28.4).
+    It used to be skipped, on the reasoning that a bound slot is an executable
+    edit and therefore the classifier's job; but this function is only reached
+    when the classifier did not produce one, and dropping the reading is what
+    made a GP-scoped frame read a GP-and-block name as the block. Whether a
+    reading replaces a bound value or adds a new filter is `slot in
+    frame.bound_params`, which the caller can ask directly.
     """
+    readings: list[tuple[str, str]] = []
+    for slot, entity_type in GEO_TIERS_WIDEST_FIRST:
+        try:
+            readings.append(
+                (slot, _validator.validate(phrase, entity_type).resolved_value))
+        except Exception:
+            continue
+    return readings
+
+
+def _fragment_tiers(frame: ContextFrame, message: str) -> list[tuple[str, str]]:
+    """`_place_readings` for a message that is nothing but a place and/or date."""
     if not is_slot_only_fragment(message, _geo_tokens):
         return []
     phrase = fragment_place_phrase(message, _geo_tokens)
     if not phrase:
         return []
-    tiers: list[tuple[str, str]] = []
-    for slot, entity_type in GEO_TIERS_WIDEST_FIRST:
-        if slot in frame.bound_params:
-            continue
-        try:
-            tiers.append((slot, _validator.validate(phrase, entity_type).resolved_value))
-        except Exception:
-            continue
-    return tiers
+    return _place_readings(frame, phrase)
+
+
+def _scope_for_reading(frame: ContextFrame, slot: str) -> dict[str, str]:
+    """The frame's bound parameters with any geography NARROWER than `slot`
+    dropped.
+
+    "what about Laxmipur?" read as a block, over an answer already scoped to
+    Andhrua GP, means the block — not Andhrua-inside-Laxmipur, which is the
+    zero-row bind the drill hop used to produce and then abandon. Wider scopes
+    stay: a district on screen still contains the block just named.
+    """
+    order = list(GEO_SLOTS_WIDEST_FIRST)
+    narrower = set(order[order.index(slot) + 1:]) if slot in order else set()
+    return {name: value for name, value in frame.bound_params.items()
+            if name not in narrower and name != slot}
+
+
+def _narrowed_frame(frame: ContextFrame, slot: str | None) -> ContextFrame:
+    """The frame as the serving paths should see it for a reading at `slot`.
+
+    `serve_drill_hop` and `serve_frame_edit` both read `bound_params` directly,
+    so dropping the narrower geography in the CHIP alone would leave the served
+    answer computing the very combination the chip promised not to.
+    """
+    if not slot or slot not in GEO_SLOTS_WIDEST_FIRST:
+        return frame
+    scoped = _scope_for_reading(frame, slot)
+    if scoped == frame.bound_params:
+        return frame
+    return frame.model_copy(update={"bound_params": scoped})
 
 
 def _tier_reading_chip(frame: ContextFrame, slot: str, value: str) -> tuple[str, str]:
@@ -363,17 +445,76 @@ def _tier_reading_chip(frame: ContextFrame, slot: str, value: str) -> tuple[str,
     into the sentence so the re-route cannot land on the other tier; where the
     question has no placeholder for that slot the scope is APPENDED rather than
     silently dropped, the same rule `suggestions._chip_for` follows.
+
+    The narrower bound geography is dropped from the fill, so the chip states the
+    scope the answer will actually be computed over.
     """
     noun = TIER_NOUNS.get(slot, "")
     label = f"{value} ({noun})" if noun else str(value)
     template = _template_map.get(frame.template_id) or {}
-    fill = {**frame.bound_params, slot: f"{value} {noun}".strip()}
+    fill = {**_scope_for_reading(frame, slot), slot: f"{value} {noun}".strip()}
     question = drill_question(frame.template_id, fill, _template_map) or (
         template.get("abstract_question") or frame.template_question or str(value)
     )
     if str(value) not in question:
         question = f"{question.rstrip('?. ')} in {value} {noun}".strip() + "?"
     return label, question
+
+
+def _tier_collision(
+    frame: ContextFrame, readings: list[tuple[str, str]], message: str
+) -> Optional[RouteResult]:
+    """The tier-qualified clarification, when more than one reading is viable.
+
+    ONE FUNCTION, BOTH PATHS (D28.3). The D18.P3 ruling is about behaviour, not
+    about which code read the fragment: whether the LLM follow-up classifier
+    produced the edit or `_fragment_reading` read it deterministically, a name
+    belonging to two tiers the frame can both execute is a question to ask, not a
+    coin flip to serve. In WP-4's replays G1524 bypassed the check every time
+    because the classifier answered first.
+    """
+    viable = _viable_readings(frame, readings, message)
+    if len(viable) < 2:
+        return None
+    return tier_collision_clarify(
+        frame_question=frame.template_question,
+        readings=[_tier_reading_chip(frame, slot, value) for slot, value in viable],
+        user_query=message,
+    )
+
+
+def _tier_collision_for_edit(
+    frame: ContextFrame, edit, message: str
+) -> Optional[RouteResult]:
+    """The same check, for an edit the LLM classifier produced.
+
+    The classifier hands over ONE (slot, value) — it has already picked a tier,
+    silently, from a name that may belong to two. So the value is re-read against
+    every tier here: if more than one is viable, what the classifier produced was
+    a guess, and D28.3 says ask.
+
+    Nothing fires unless the edit is geographic, the value resolves at two or
+    more tiers the frame can execute, and the user did not name a tier out loud.
+    """
+    slot, value = getattr(edit, "slot", None), getattr(edit, "value", None)
+    if slot not in GEO_SLOTS_WIDEST_FIRST or not value:
+        return None
+    return _tier_collision(frame, _place_readings(frame, str(value)), message)
+
+
+def _viable_readings(
+    frame: ContextFrame, readings: list[tuple[str, str]], message: str
+) -> list[tuple[str, str]]:
+    """The readings that compete: executable by the frame's template, and not
+    ruled out by a tier the user named explicitly."""
+    executable = executable_geo_slots(frame.template_id)
+    viable = [(slot, value) for slot, value in readings if slot in executable]
+    named = _tier_named_in(message)
+    if len(named) == 1:
+        explicit = [reading for reading in viable if reading[0] in named]
+        if explicit:
+            return explicit
+    return viable
 
 
 def _fragment_reading(
@@ -411,16 +552,10 @@ def _fragment_reading(
     tiers = _fragment_tiers(frame, message)
     if not tiers:
         return None, None, False
-    executable = executable_geo_slots(frame.template_id)
-    fitting = [(slot, value) for slot, value in tiers if slot in executable]
+    fitting = _viable_readings(frame, tiers, message)
 
     if len(fitting) > 1:
-        return None, tier_collision_clarify(
-            frame_question=frame.template_question,
-            readings=[_tier_reading_chip(frame, slot, value)
-                      for slot, value in fitting],
-            user_query=message,
-        ), False
+        return None, _tier_collision(frame, tiers, message), False
 
     if fitting:
         slot, value = fitting[0]
@@ -443,7 +578,11 @@ def _reroute_unexecutable_edit(
     """Items 1–3 for a slot edit the current template has no parameter for."""
     fill = {edit.slot: edit.value} if edit.slot and edit.value else {}
 
-    # Item 2 — deterministic drill hop to the mapped sibling.
+    # Item 2 — deterministic drill hop to the mapped sibling, over the scope this
+    # reading implies: geography narrower than the named tier is dropped, or the
+    # hop binds the old GP together with the new block, returns nothing, and
+    # abandons a follow-up it could have answered (D28.4).
+    frame = _narrowed_frame(frame, edit.slot)
     hop = serve_drill_hop(
         frame, edit.slot, edit.value,
         template_map=_template_map, cache_conn=get_adapter(), validator=_validator,
@@ -737,7 +876,17 @@ def query_endpoint(req: QueryRequest):
                     operation_mode=op_result.mode.value,
                 )
 
-        if decision.kind == "frame_edit" and decision.edit is not None:
+        # D28.3 — the tier check belongs on the CLASSIFIER path too. Applied
+        # before either serving branch, because both bypassed it: an executable
+        # `frame_edit` was served outright, and an `unexecutable_edit` went
+        # straight to the re-route without `_fragment_reading` ever running. That
+        # second route is the one G1524 took in all three WP-4 replays.
+        if decision.kind in ("frame_edit", "unexecutable_edit") and decision.edit:
+            result = _tier_collision_for_edit(
+                current_frame, decision.edit, req.message
+            )
+
+        if result is None and decision.kind == "frame_edit" and decision.edit is not None:
             edit = decision.edit
             edit_start, edit_end = start_date, end_date
             if edit.start_date and edit.end_date:
@@ -747,7 +896,7 @@ def query_endpoint(req: QueryRequest):
                 edit_end   = current_frame.time_range.end
             try:
                 result = serve_frame_edit(
-                    current_frame,
+                    _narrowed_frame(current_frame, edit.slot),
                     edit_slot=edit.slot,
                     edit_value=edit.value,
                     template_map=_template_map,

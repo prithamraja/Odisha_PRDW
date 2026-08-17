@@ -19,6 +19,7 @@ from openai import OpenAI
 from pydantic import BaseModel
 
 from .config import RERANK_MODEL, LLM_TEMPERATURE, LLM_TIMEOUT_SECONDS, REASONING_MODELS
+from .llm_usage import record_call
 from .models import ColumnMetadata, ContextFrame, OperationRequest
 from .operations import OPERATIONS, _match_column_name, filter_type_error
 from .template_catalog import TEMPLATE_CATALOG
@@ -155,6 +156,7 @@ def classify_followup(
             kwargs["max_tokens"] = 250
 
         resp = client.chat.completions.create(**kwargs)
+        record_call("followup", RERANK_MODEL, resp)
         data = json.loads(resp.choices[0].message.content.strip())
     except Exception:
         return FollowupDecision(kind="new_question")

@@ -62,15 +62,16 @@ class FiscalYearFallbackTests(unittest.TestCase):
         except Exception:                                    # pragma: no cover
             pass
 
-    def _fill(self, query_id, user_query, raw_entities):
+    def _fill(self, query_id, user_query, raw_entities, defaults=None):
         """The real validation path, with the extractor's output handed in."""
         template = self.templates[query_id]
         slot_type = router._template_slot_types(template)
+        declared = router.slot_defaults(template["param_slots"])
         return router._fill_slots_or_clarify(
             query_id, slot_type, raw_entities, self.validator,
             user_query, "normalized", 0.0,
             optional=router.optional_slots(template["param_slots"]),
-            defaults=router.slot_defaults(template["param_slots"]),
+            defaults={**declared, **(defaults or {})},
         )
 
     # ── The defect, closed ────────────────────────────────────────────────────
@@ -203,6 +204,82 @@ class FiscalYearFallbackTests(unittest.TestCase):
                 _, clarify = self._fill(QID, query, {"date_range": None})
                 self.assertIsNotNone(clarify, "a rupee figure is not a year")
                 self.assertEqual(clarify.clarification.reason, "missing_parameter")
+
+    # ── The two documented gotchas, pinned (WP-4c T1c) ────────────────────────
+
+    def test_the_question_beats_a_declared_default(self):
+        """ORDER MATTERS, and this is the half the ordering tests missed.
+
+        The fallback runs AHEAD of `defaults` deliberately: evidence from the
+        officer's own sentence beats any value the system supplies. Reversed, a
+        template that ever declares a `$date_range` default would answer about
+        the default year while the question named another — the same silent
+        wrong answer the optional-slot ordering avoids, arriving through the
+        other door. No shipped template declares one today; this is what stops a
+        future generator change making it true quietly.
+        """
+        validated, clarify = self._fill(
+            QID, STATES_A_YEAR, {"date_range": None},
+            defaults={"date_range": "2020-2021"},
+        )
+        self.assertIsNone(clarify)
+        self.assertEqual(
+            {e.slot_name: e.resolved_value for e in validated}["date_range"],
+            "2024-2025",
+            "the year in the question must beat the declared default",
+        )
+
+    def test_the_default_still_applies_when_the_question_names_no_year(self):
+        """The other side of the same ordering: the fallback recovers nothing,
+        so the declared default is reached exactly as before."""
+        validated, clarify = self._fill(
+            QID, STATES_NO_YEAR, {"date_range": None},
+            defaults={"date_range": "2020-2021"},
+        )
+        self.assertIsNone(clarify, "a declared default fills the slot")
+        self.assertEqual(
+            {e.slot_name: e.resolved_value for e in validated}["date_range"],
+            "2020-2021",
+        )
+
+    def test_the_officers_sentence_is_never_quoted_back_as_a_bad_value(self):
+        """`EntityNotFound` is swallowed in `_fiscal_year_from_text` for one
+        reason: the raw value handed to the validator is THE WHOLE QUESTION, so
+        letting it propagate renders "I couldn't find a date range called
+        '<the entire question>'". That is strictly worse than the stall it
+        replaces, and it is a wrong-looking answer rather than a missing one.
+
+        Pinned at the function AND at the clarification, because the swallow is
+        invisible from either side alone.
+        """
+        from query_router.entity_validator import EntityNotFound
+
+        with self.assertRaises(EntityNotFound):
+            self.validator.validate(STATES_NO_YEAR, "fiscal_year")
+
+        self.assertIsNone(router._fiscal_year_from_text(
+            STATES_NO_YEAR, "date_range", "fiscal_year", self.validator))
+
+        _, clarify = self._fill(QID, STATES_NO_YEAR, {"date_range": None})
+        self.assertEqual(clarify.clarification.reason, "missing_parameter")
+        self.assertNotEqual(clarify.clarification.reason, "unknown_entity")
+        self.assertNotIn("couldn't find", clarify.clarification.prompt)
+
+    def test_the_fallback_runs_on_the_UNAVAILABLE_sentinel_too(self):
+        """D30.2: "the deterministic fallback may still run on the sentinel (it
+        is exactly the right response to an API failure)". A year the officer
+        typed is recoverable from the question whether the extractor timed out
+        or merely declined to read it."""
+        from query_router.entity_extractor import ExtractionUnavailable
+
+        raw = ExtractionUnavailable(["date_range", "district_name", "block_name"],
+                                    "timeout", "APITimeoutError")
+        validated, clarify = self._fill(QID, STATES_A_YEAR, raw)
+        self.assertIsNone(clarify, "an API failure must not cost a stated year")
+        self.assertEqual(
+            [(e.slot_name, e.resolved_value) for e in validated],
+            [("date_range", "2024-2025")],
+        )
 
     # ── Blast radius ──────────────────────────────────────────────────────────
 

@@ -46,11 +46,11 @@ if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
 OUT = HERE / "consistency_results.jsonl"
 
 
-def load_done() -> set:
+def load_done(path: Path = OUT) -> set:
     """(run, n) pairs already recorded, so a crashed sweep resumes."""
     done = set()
-    if OUT.exists():
-        for line in OUT.read_text(encoding="utf-8").splitlines():
+    if path.exists():
+        for line in path.read_text(encoding="utf-8").splitlines():
             try:
                 r = json.loads(line)
                 done.add((r["run"], r["n"]))
@@ -63,15 +63,28 @@ def main_cli() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--runs", type=int, default=3,
                     help="replays (WP-4 T5c asks for 3)")
+    ap.add_argument("--tag", default="",
+                    help="suffix the artefacts, so one work package's replays "
+                         "never append to another's (WP-4c: --tag wp4c)")
     ap.add_argument("--yes", action="store_true",
                     help="confirm the paid run (or set PRDW_EVAL_CONFIRM=1)")
     args = ap.parse_args()
+
+    # ONE PACKAGE'S REPLAYS MUST NOT APPEND TO ANOTHER'S. This file is
+    # append-only and resumable, keyed on (run, n), and `aggregate_consistency`
+    # groups by run number — so re-running after the gold set changed would have
+    # mixed WP-4's 209-question replay 1 with WP-4c's 211-question replay 1 and
+    # reported the difference as routing instability. `--tag` keeps the
+    # generations separate, and leaves the earlier package's raw files exactly as
+    # they were committed, which is what a before/after needs.
+    tag = f"_{args.tag}" if args.tag else ""
+    out_path = HERE / f"consistency_results{tag}.jsonl"
 
     import run_full_eval
     from eval_spend import confirm_spend
 
     n_q = len(run_full_eval.QUESTIONS)
-    done = load_done()
+    done = load_done(out_path)
     remaining = [r for r in range(1, args.runs + 1)
                  if not all((r, spec["n"]) in done for spec in run_full_eval.QUESTIONS)]
     confirm_spend(
@@ -82,10 +95,12 @@ def main_cli() -> None:
         confirmed=args.yes,
     )
 
-    with OUT.open("a", encoding="utf-8") as out:
+    with out_path.open("a", encoding="utf-8") as out:
         for run_no in remaining:
             started = time.time()
-            per_run = HERE / f"eval_full_results_run{run_no}.jsonl"
+            per_run = HERE / f"eval_full_results{tag}_run{run_no}.jsonl"
+            # run_full_eval.run() resets the usage meter itself and writes a
+            # per-replay sidecar, so three replays report three totals (D28.8).
             records = run_full_eval.run(per_run)
             for rec in records:
                 if (run_no, rec["n"]) in done:
@@ -105,7 +120,7 @@ def main_cli() -> None:
             out.flush()
             print(f"replay {run_no}/{args.runs}: {len(records)} questions in "
                   f"{time.time() - started:.0f}s", flush=True)
-    print("DONE — now run: python aggregate_consistency.py")
+    print(f"DONE — now run: python aggregate_consistency.py {out_path.name}")
 
 
 if __name__ == "__main__":

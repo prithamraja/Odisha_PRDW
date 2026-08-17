@@ -165,7 +165,85 @@ def check_against_catalogue(recs: list[dict]) -> tuple[list[str], list[str]]:
                     problems.append(
                         f"{rid}: expected_entities has {k!r} but {gold} has no such "
                         f"slot (slots: {sorted(slots)})")
+            problems += _check_direction_pin(rec, T[gold], slots)
+
+    paired = {qid for qid, t in T.items()
+              if {"date_range", "date_range_2"} <= {s["name"] for s in t["param_slots"]}}
+    pinned = {rec["gold"] for rec in recs
+              if (rec.get("expected_result") or {}).get("direction_pin")}
+    notes.append(f"direction pins: {len(pinned)} of {len(paired)} paired-year "
+                 f"templates covered")
+    if paired - pinned:
+        problems.append(
+            "D30.3: these paired-year templates carry no direction-pinned gold row, "
+            "so an inverted $date_range/$date_range_2 pair would be invisible to the "
+            f"eval: {', '.join(sorted(paired - pinned))}")
     return problems, notes
+
+
+def _check_direction_pin(rec: dict, template: dict, slots: set[str]) -> list[str]:
+    """Structural validation of a `direction_pin` (D30.3, WP-4c T3b).
+
+    THE PIN EXISTS BECAUSE A SIGN INVERSION IS INVISIBLE TO A ROUTE-GRADED EVAL.
+    All five paired templates bind `$date_range_2` as year1 and `$date_range` as
+    year2, and three compute `$date_range - $date_range_2`; swap the pair and
+    "greatest increase" answers with the greatest decline, in a table that looks
+    entirely normal and whose query_id is exactly right. WP-4's replays did that
+    on every paired row in all three runs and graded all of them `hit`.
+
+    This checks only that the pin DESCRIBES the template it is attached to — that
+    its columns and slots exist, and that its arithmetic is self-consistent.
+    Whether the values are TRUE is checked by executing the SQL, in
+    `Chatbot/tests/test_paired_year_direction.py` (always on, no LLM), and whether
+    the ROUTER preserves them is checked by `grade_full_eval`'s `wrong_direction`
+    bucket on every replay.
+    """
+    pin = (rec.get("expected_result") or {}).get("direction_pin")
+    if not pin:
+        return []
+    rid, gold = rec["id"], rec["gold"]
+    problems: list[str] = []
+    sql = template["sql_template"]
+
+    for field in ("why", "params", "year_columns", "first_row"):
+        if field not in pin:
+            problems.append(f"{rid}: direction_pin missing {field!r}")
+    if problems:
+        return problems
+
+    for name in pin["params"]:
+        if name not in slots:
+            problems.append(f"{rid}: direction_pin params name {name!r}, which "
+                            f"{gold} has no slot for")
+    for column, slot in pin["year_columns"].items():
+        if f"AS {column}" not in sql:
+            problems.append(f"{rid}: direction_pin names column {column!r}, which "
+                            f"{gold}'s SQL does not select")
+        if slot not in ("date_range", "date_range_2"):
+            problems.append(f"{rid}: direction_pin maps {column!r} to {slot!r}; only "
+                            f"date_range / date_range_2 are a pair")
+    if set(pin["year_columns"].values()) != {"date_range", "date_range_2"}:
+        problems.append(f"{rid}: direction_pin must map columns to BOTH ends of the "
+                        f"pair, or it pins nothing")
+    for column in pin["year_columns"]:
+        if column not in pin["first_row"]:
+            problems.append(f"{rid}: direction_pin year column {column!r} has no "
+                            f"value in first_row")
+
+    # Self-consistency: a change column pinned alongside its two year columns must
+    # equal year2 - year1, or the pin itself encodes the inversion it exists to
+    # catch.
+    row = pin["first_row"]
+    for change, (a, b) in (("change_in_activities",
+                            ("activities_year1", "activities_year2")),
+                           ("change_amount",
+                            ("expenditure_year1", "expenditure_year2"))):
+        if change in row and a in row and b in row:
+            if abs((row[b] - row[a]) - row[change]) > 0.01:
+                problems.append(
+                    f"{rid}: direction_pin is not self-consistent — {change} is "
+                    f"{row[change]} but {b} - {a} is {row[b] - row[a]}")
+    return problems
 
 
 def write_full(recs: list[dict], out: Path) -> None:

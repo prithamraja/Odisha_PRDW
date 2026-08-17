@@ -442,6 +442,254 @@ class FragmentTierSelectionTests(unittest.TestCase):
         self.assertTrue(name_tier)
 
 
+@unittest.skipIf(not _DB_PATH.exists(), f"no sample database at {_DB_PATH}")
+class TierCollisionOnBothPathsTests(unittest.TestCase):
+    """D28.3 / D28.4, against the real registry — no LLM, no network.
+
+    Two defects the WP-4 replays exposed, both of them about WHICH CODE READ THE
+    FRAGMENT rather than about the reading itself:
+
+    (a) the tier check lived only in `_fragment_reading`, so an edit the LLM
+        follow-up classifier produced never met it. G1524 ("what about
+        Laxmipur?" over a whole-of-state EXP-001 answer) bypassed it in 3 of 3
+        replays and was served as a block without the GP reading ever being
+        offered;
+
+    (b) a tier the frame already BOUND was dropped from the competition, so a
+        GP-scoped question read a GP-and-block name as the block — and the hop
+        then bound the old GP together with the new block, got zero rows and
+        abandoned a follow-up it could have answered (the operator's original
+        screenshot).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import main
+        from db_factory import open_analytical_db
+        from query_router.entity_validator import EntityValidator
+
+        cls.adapter = open_analytical_db(_DB_PATH)
+        cls.main = main
+        main._validator = EntityValidator(cls.adapter)
+        main._template_map = dict(TEMPLATE_CATALOG)
+        main._geo_tokens = set(geo_vocabulary_tokens(
+            *(main._validator.registry_values(etype)
+              for etype in main.GEO_ENTITY_TYPES_WIDEST_FIRST)
+        ))
+
+    @classmethod
+    def tearDownClass(cls):
+        try:
+            cls.adapter.close()
+        except Exception:                                    # pragma: no cover
+            pass
+
+    def _edit(self, slot, value):
+        from query_router.followup_classifier import FrameEdit
+        return FrameEdit(slot=slot, value=value)
+
+    # ── (a) the classifier path ───────────────────────────────────────────────
+
+    def test_the_classifier_path_now_reaches_the_tier_clarification(self):
+        """G1524's exact shape. The classifier commits to ONE tier silently; the
+        value is re-read against all of them, and two viable readings ask."""
+        result = self.main._tier_collision_for_edit(
+            _frame("EXP-001", {"date_range": "2024-2025"}),
+            self._edit("block_name", "Laxmipur"), "what about Laxmipur?")
+        self.assertIsNotNone(result, "the classifier picked a tier by coin flip")
+        self.assertEqual(result.clarification.reason, "tier_collision")
+        self.assertEqual([c.label for c in result.clarification.options][:2],
+                         ["Laxmipur (block)", "Laxmipur (GP)"])
+
+    def test_both_paths_ask_the_same_question(self):
+        """D28.3 is about behaviour, not about which path handled the fragment."""
+        frame = _frame("EXP-001", {"date_range": "2024-2025"})
+        _, deterministic, _ = self.main._fragment_reading(frame, "what about Laxmipur?")
+        classifier = self.main._tier_collision_for_edit(
+            frame, self._edit("gp_name", "Laxmipur"), "what about Laxmipur?")
+        self.assertEqual(
+            [(c.label, c.send_text) for c in deterministic.clarification.options],
+            [(c.label, c.send_text) for c in classifier.clarification.options],
+        )
+
+    def test_an_unambiguous_name_is_never_re_asked(self):
+        result = self.main._tier_collision_for_edit(
+            _frame("PLN-001", {"date_range": "2024-2025"}),
+            self._edit("district_name", "Khordha"), "in Khordha?")
+        self.assertIsNone(result, "Khordha is a district and nothing else")
+
+    def test_a_tier_the_user_named_out_loud_settles_it(self):
+        """"in Laxmipur block?" is not an ambiguous message. Asking "block or
+        GP?" about it makes the officer repeat a word they just typed."""
+        for message in ("what about Laxmipur block?",
+                        "and Laxmipur panchayat samiti?"):
+            with self.subTest(message=message):
+                self.assertIsNone(self.main._tier_collision_for_edit(
+                    _frame("EXP-001", {"date_range": "2024-2025"}),
+                    self._edit("block_name", "Laxmipur"), message))
+
+    def test_the_gp_tier_can_also_be_named_out_loud(self):
+        edit, clarify, _ = self.main._fragment_reading(
+            _frame("EXP-001", {"date_range": "2024-2025"}),
+            "what about Laxmipur GP?")
+        self.assertIsNone(clarify)
+        self.assertEqual((edit.slot, edit.value), ("gp_name", "Laxmipur"))
+
+    def test_panchayat_samiti_is_a_block_not_a_gram_panchayat(self):
+        """The one word that belongs to two tiers: bare "panchayat" is the GP,
+        but "panchayat samiti" IS the block."""
+        self.assertEqual(self.main._tier_named_in("in Laxmipur panchayat samiti?"),
+                         {"block_name"})
+        self.assertEqual(self.main._tier_named_in("in Laxmipur gram panchayat?"),
+                         {"gp_name"})
+
+    def test_a_non_geographic_edit_is_left_alone(self):
+        self.assertIsNone(self.main._tier_collision_for_edit(
+            _frame("EXP-001", {"date_range": "2024-2025"}),
+            self._edit("date_range", "2023-2024"), "and last year?"))
+
+    # ── (b) the bound tier competes ───────────────────────────────────────────
+
+    def test_a_bound_tier_competes_as_a_replacement_reading(self):
+        """The screenshot. EXP-001 already scoped to a GP; "what about
+        Laxmipur?" can mean the block OR the other GP, and both are executable,
+        so the old silent pick becomes a question."""
+        frame = _frame("EXP-001", {"date_range": "2024-2025", "gp_name": "Andhrua"})
+        readings = self.main._fragment_tiers(frame, "what about Laxmipur?")
+        self.assertIn("gp_name", [slot for slot, _ in readings],
+                      "the bound tier was dropped from the competition")
+        _, clarify, _ = self.main._fragment_reading(frame, "what about Laxmipur?")
+        self.assertIsNotNone(clarify)
+        self.assertEqual(clarify.clarification.reason, "tier_collision")
+
+    def test_a_replacement_only_reading_serves_without_asking(self):
+        """One viable reading auto-serves (D28.4). Andhrua is a GP and nothing
+        else, so replacing the bound GP is the only thing it can mean — and this
+        used to fall through to routing the bare fragment on its own."""
+        gp_only = [gp for gp in self.main._validator.registry_values("gp")
+                   if gp not in self.main._validator.registry_values("block")]
+        self.assertTrue(gp_only, "no GP-only name in the sample")
+        name = gp_only[0]
+        frame = _frame("EXP-001", {"date_range": "2024-2025", "gp_name": "Andhrua"})
+        edit, clarify, _ = self.main._fragment_reading(frame, f"what about {name}?")
+        self.assertIsNone(clarify)
+        self.assertEqual(edit.slot, "gp_name")
+
+    def test_a_wider_reading_drops_the_narrower_bound_scope(self):
+        """"Laxmipur block" over an Andhrua-GP answer means the block — not
+        Andhrua-inside-Laxmipur, which is the zero-row bind the hop used to
+        produce and then abandon."""
+        frame = _frame("EXP-001", {"date_range": "2024-2025", "gp_name": "Andhrua"})
+        scope = self.main._scope_for_reading(frame, "block_name")
+        self.assertNotIn("gp_name", scope)
+        self.assertEqual(scope.get("date_range"), "2024-2025",
+                         "only GEOGRAPHY narrower than the reading is dropped")
+        narrowed = self.main._narrowed_frame(frame, "block_name")
+        self.assertNotIn("gp_name", narrowed.bound_params)
+        self.assertIn("gp_name", frame.bound_params, "the frame itself is intact")
+
+    def test_a_wider_bound_scope_is_kept(self):
+        """A district on screen still contains the block just named."""
+        frame = _frame("EXP-001", {"date_range": "2024-2025",
+                                   "district_name": "Khordha"})
+        scope = self.main._scope_for_reading(frame, "block_name")
+        self.assertEqual(scope.get("district_name"), "Khordha")
+
+    def test_the_chip_states_the_scope_the_answer_will_use(self):
+        """A chip promising "…for Laxmipur block" while the answer would be
+        computed for Andhrua-inside-Laxmipur is the echo defect in chip form."""
+        frame = _frame("EXP-001", {"date_range": "2024-2025", "gp_name": "Andhrua"})
+        _, send_text = self.main._tier_reading_chip(frame, "block_name", "Laxmipur")
+        self.assertIn("Laxmipur", send_text)
+        self.assertNotIn("Andhrua", send_text)
+        self.assertNotIn("{", send_text)
+
+
+@unittest.skipIf(not _DB_PATH.exists(), f"no sample database at {_DB_PATH}")
+class OptionalSlotsSurviveAFollowUpTests(unittest.TestCase):
+    """D2's optional slots reach the follow-up paths (WP-4c T2b).
+
+    `serve_frame_edit` raised `missing '<slot>' in the current context` and
+    `serve_drill_hop` returned None for any slot absent from `bound_params` — a
+    rule from AP, where every slot was required so a frame bound all of them.
+    Under D2 `bound_params` holds only what VALIDATED, so a state-wide EXP-001
+    frame binds `date_range` alone; the rule therefore made every state-wide
+    frame uneditable and sent its follow-ups through an LLM re-route instead of
+    the deterministic path written for them.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from db_factory import open_analytical_db
+        from query_router.entity_validator import EntityValidator
+
+        cls.adapter = open_analytical_db(_DB_PATH)
+        cls.validator = EntityValidator(cls.adapter)
+        cls.templates = dict(TEMPLATE_CATALOG)
+
+    @classmethod
+    def tearDownClass(cls):
+        try:
+            cls.adapter.close()
+        except Exception:                                    # pragma: no cover
+            pass
+
+    def _serve(self, slot, value):
+        from query_router.router import serve_frame_edit
+        return serve_frame_edit(
+            _frame("EXP-001", {"date_range": "2024-2025"}),
+            edit_slot=slot, edit_value=value,
+            template_map=self.templates, cache_conn=self.adapter,
+            validator=self.validator, dashboard_results={},
+            dashboard_questions={}, user_query="what about Laxmipur block?",
+            start_date=None, end_date=None,
+        )
+
+    def test_a_state_wide_frame_is_editable(self):
+        result = self._serve("block_name", "Laxmipur")
+        self.assertEqual(result.tier, RouteTier.TIER2_TEMPLATE)
+        bound = {e.slot_name: e.resolved_value for e in (result.entities or [])}
+        self.assertEqual(bound.get("block_name"), "Laxmipur")
+        self.assertEqual(bound.get("date_range"), "2024-2025")
+        self.assertNotIn("gp_name", bound, "an absent optional slot stays absent")
+
+    def test_the_echo_names_the_scope_it_answered_over(self):
+        """The §5.3 defect must not come back through this door: EXP-001's text
+        names only {gp_name} and {date_range}, so a bound block has nowhere to
+        render and used to vanish from the question printed above the answer."""
+        result = self._serve("block_name", "Laxmipur")
+        self.assertIn("Laxmipur", result.query_description or "")
+
+    def test_a_missing_REQUIRED_slot_still_refuses(self):
+        """Only OPTIONAL slots are allowed to be absent. A required one missing
+        from the frame means the edit cannot be executed, and guessing is how a
+        confident wrong answer gets made."""
+        from query_router.router import serve_frame_edit
+        with self.assertRaises(ValueError):
+            serve_frame_edit(
+                _frame("EXP-001", {}),          # no date_range: REQUIRED
+                edit_slot="block_name", edit_value="Laxmipur",
+                template_map=self.templates, cache_conn=self.adapter,
+                validator=self.validator, dashboard_results={},
+                dashboard_questions={}, user_query="what about Laxmipur block?",
+                start_date=None, end_date=None,
+            )
+
+    def test_the_drill_hop_reaches_a_state_wide_frame_too(self):
+        from query_router.router import serve_drill_hop
+        result = serve_drill_hop(
+            _frame("EXP-001", {"date_range": "2024-2025"}),
+            "block_name", "Laxmipur",
+            template_map=self.templates, cache_conn=self.adapter,
+            validator=self.validator, dashboard_results={},
+            dashboard_questions={}, user_query="what about Laxmipur block?",
+            start_date=None, end_date=None,
+        )
+        self.assertIsNotNone(result, "the deterministic hop must not need every "
+                                    "optional slot bound")
+        self.assertEqual(result.tier, RouteTier.TIER2_TEMPLATE)
+
+
 @unittest.skipIf(_SKIP is not None, _SKIP or "")
 class FragmentEndpointTests(unittest.TestCase):
     """The gates, through the real /query handler. Opt-in — see _LIVE above."""
