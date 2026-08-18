@@ -53,6 +53,15 @@ from query_router.pending_resolver  import (
     SERVE_ALTERNATIVE,
     resolve_pending_reply,
 )
+from query_router.interpretation   import (
+    Interpretation,
+    against_frame,
+    against_pending,
+    operation_detail,
+    period_detail,
+    readable_slot,
+    slot_detail,
+)
 from query_router.context_store     import ContextStore, build_context_frame
 from query_router.column_metadata   import build_catalog_column_metadata
 from query_router.operations        import run_operation
@@ -73,11 +82,7 @@ from query_router.fragment_reroute  import (
 )
 from query_router.followup_classifier import FrameEdit
 from query_router.suggestions       import suggest_followups
-from query_router.echo              import (
-    append_caveat,
-    echo_answer,
-    echo_answer_without_caveat,
-)
+from query_router.echo              import append_caveat, echo_answer
 from query_router.unanswerable_catalog import UNANSWERABLE_CATALOG
 from query_router.date_phrase       import extract_date_window
 from query_router.preprocessor      import normalize
@@ -264,6 +269,13 @@ class QueryResponse(BaseModel):
     operation_mode:     Optional[str]        = None  # client | requery | rejected
     clarification:      Optional[Clarification] = None
     suggestions:        Optional[list[Chip]]    = None
+    # WHICH QUESTION THIS ANSWERS, and how the message got there. Every path
+    # that binds a message to the question already on screen stamps it; anything
+    # routed standalone leaves the default, and the UI then draws nothing. See
+    # query_router/interpretation.py — the reading is invisible without this
+    # field, because a frame edit returns an ordinary successful answer that no
+    # client can tell apart from a fresh question.
+    interpretation:     Interpretation = Interpretation()
 
 
 def _looks_like_slot_answer(message: str) -> bool:
@@ -760,6 +772,10 @@ def query_endpoint(req: QueryRequest):
 
     result: RouteResult | None = None
     inherited_scope: dict[str, str] = {}   # geo carried over from the frame
+    # Standalone until a path says otherwise (interpretation.py): a reading that
+    # never binds is correct by omission, and one that forgets to stamp itself
+    # reports no marker rather than a wrong one.
+    interpretation = Interpretation()
 
     # Resume a pending clarification first: the system just asked a question
     # ("For which district?"), so a short reply that answers it resumes the
@@ -822,6 +838,17 @@ def query_endpoint(req: QueryRequest):
                 normalized_query=req.message,
                 total_latency_ms=0.0,
             )
+
+        if result is not None:
+            # The reply was read against the question we paused on — which is
+            # NOT the one the answer will name, so nothing in the response says
+            # so unless we do. Anchored to the pending, because the frame at
+            # this point is some earlier answered question or nothing at all.
+            interpretation = against_pending(pending, {
+                RESUME:            f"answered: {readable_slot(pending.missing_slot)}",
+                SERVE_ALTERNATIVE: "served the wider question offered",
+                REASK:             f"still needs: {readable_slot(pending.missing_slot)}",
+            }.get(resolution.kind))
         # FALLTHROUGH: not an answer to what we asked — treat as a new message.
 
     # Follow-up classification against the current frame (spec Section 4):
@@ -874,6 +901,13 @@ def query_endpoint(req: QueryRequest):
                     latency_ms=(time.monotonic() - followup_started) * 1000,
                     operation=op_result.operation,
                     operation_mode=op_result.mode.value,
+                    # Anchored to the frame the message was CLASSIFIED against,
+                    # not to `frame` above — they are the same question here,
+                    # and reading it off the classification is the habit that
+                    # keeps the marker honest on the paths where they differ.
+                    interpretation=against_frame(
+                        "operation", current_frame, operation_detail(op_result)
+                    ),
                 )
 
         # D28.3 — the tier check belongs on the CLASSIFIER path too. Applied
@@ -885,6 +919,14 @@ def query_endpoint(req: QueryRequest):
             result = _tier_collision_for_edit(
                 current_frame, decision.edit, req.message
             )
+            if result is not None:
+                # Asking which place is still a reading of the message against
+                # the frame — the whole clarification only makes sense as one —
+                # so it is marked like every other fragment reading.
+                interpretation = against_frame(
+                    "fragment_reroute", current_frame,
+                    slot_detail(decision.edit.slot, decision.edit.value),
+                )
 
         if result is None and decision.kind == "frame_edit" and decision.edit is not None:
             edit = decision.edit
@@ -915,6 +957,13 @@ def query_endpoint(req: QueryRequest):
                     derived_from_question = False
                     is_default = False
                 start_date, end_date = edit_start, edit_end
+                # The one path the frontend could never infer: this re-queries
+                # the SAME template and returns an ordinary answer.
+                interpretation = against_frame(
+                    "frame_edit", current_frame,
+                    slot_detail(edit.slot, edit.value)
+                    or period_detail(edit_start, edit_end),
+                )
             except Exception:
                 result = None  # edit didn't apply — fall through to matching
 
@@ -943,11 +992,26 @@ def query_endpoint(req: QueryRequest):
                     # execute. D18.P3: ask which place, not whether they meant
                     # to follow on — that part was never in doubt.
                     result = tier_clarify
+                    interpretation = against_frame(
+                        "fragment_reroute", current_frame,
+                        slot_detail(
+                            "place", fragment_place_phrase(req.message, _geo_tokens)
+                        ),
+                    )
             if result is None and unexecutable is not None:
                 result = _reroute_unexecutable_edit(
                     current_frame, unexecutable, req.message,
                     start_date=start_date, end_date=end_date, session_id=session_id,
                     name_tier=name_tier,
+                )
+                # Whichever of the three readings came back — the deterministic
+                # drill hop, the re-route of the fragment WITH the frame's
+                # question, or the clarification offering both — the fragment
+                # was read against the question on screen. A bare "in ganjam?"
+                # has no subject of its own; the only one available was that one.
+                interpretation = against_frame(
+                    "fragment_reroute", current_frame,
+                    slot_detail(unexecutable.slot, unexecutable.value),
                 )
 
     if result is None:
@@ -987,6 +1051,11 @@ def query_endpoint(req: QueryRequest):
             )
             if narrowed is not None:
                 result, inherited_scope = narrowed
+                interpretation = against_frame(
+                    "scope_inherited", current_frame,
+                    "; ".join(slot_detail(slot, value) or ""
+                              for slot, value in inherited_scope.items()) or None,
+                )
 
             # The fragment guard, on the path where the classifier called the
             # fragment a new question and it routed alone.
@@ -998,6 +1067,12 @@ def query_endpoint(req: QueryRequest):
                 guarded = _fragment_guard(current_frame, result, req.message)
                 if guarded is not None:
                     result = guarded
+                    interpretation = against_frame(
+                        "fragment_reroute", current_frame,
+                        slot_detail(
+                            "place", fragment_place_phrase(req.message, _geo_tokens)
+                        ),
+                    )
 
     # Remember any clarification we just asked, so the next reply can resume it
     if result.pending is not None:
@@ -1019,22 +1094,16 @@ def query_endpoint(req: QueryRequest):
     # Build human-readable answer + next-question chips
     suggestions: list[Chip] | None = None
     if result.tier.value in ("tier1", "tier2"):
-        # Composed so the CAVEAT IS LAST — it is the thing an officer must not
-        # stop reading before. echo_answer already appends it, so the scope note
-        # is inserted ahead of it rather than after.
+        # THE SCOPE NOTE IS GONE FROM THE ANSWER TEXT. It used to read "Answered
+        # for X, carried over from your previous question." — the right
+        # information in the wrong place. The answer body is what an officer
+        # copies, exports and pastes into a report, and a system log embedded in
+        # it reads there as noise. `interpretation` now carries the same fact as
+        # a field, for every binding path rather than this one alone, and the
+        # frontend draws it beside the answer instead of inside it. The chips
+        # below are untouched: "show this state-wide instead" is a sharper
+        # escape than the generic re-ask, and the two coexist.
         answer = echo_answer(result)
-        if inherited_scope:
-            # Inheriting scope silently would be the same class of defect as
-            # answering state-wide silently. Name what was carried and from
-            # where, and lead the chips with the way out.
-            carried = ", ".join(inherited_scope.values())
-            note = (
-                f"Answered for {carried}, carried over from your previous "
-                "question."
-            )
-            answer = append_caveat(
-                f"{echo_answer_without_caveat(result)}\n\n{note}", result.caveat
-            )
         if result.context_frame is not None:
             suggestions = suggest_followups(result.context_frame) or None
         if inherited_scope:
@@ -1072,6 +1141,7 @@ def query_endpoint(req: QueryRequest):
         latency_ms=result.total_latency_ms,
         clarification=result.clarification,
         suggestions=suggestions,
+        interpretation=interpretation,
     )
 
 
@@ -1088,7 +1158,12 @@ def context_reset(req: ContextRequest):
 
 @app.post("/context/pop", response_model=QueryResponse)
 def context_pop(req: ContextRequest):
-    """Breadcrumb back: restore the previous frame and its exact table."""
+    """Breadcrumb back: restore the previous frame and its exact table.
+
+    RESTORATION IS NOT A FOLLOW-UP. There is no new message here to have been
+    read one way or the other, so `interpretation` stays at its `new_question`
+    default and the UI draws no marker on the restored answer.
+    """
     popped = _context_store.pop(req.session_id)
     if popped is None:
         raise HTTPException(status_code=409, detail="No earlier question to go back to.")
@@ -1120,7 +1195,13 @@ def context_pop(req: ContextRequest):
 
 @app.post("/operation", response_model=QueryResponse)
 def operation_endpoint(req: OperationCallRequest):
-    """Typed operation invoked from UI affordances on the current result table."""
+    """Typed operation invoked from UI affordances on the current result table.
+
+    NO MARKER HERE EITHER, unlike the "total?" path through /query. A control
+    tapped ON a table names the table it computes over; nothing was classified,
+    so there is no reading to report and nothing the user could have meant
+    differently. `interpretation` keeps its `new_question` default.
+    """
     if _openai_client is None:
         raise HTTPException(
             status_code=503,

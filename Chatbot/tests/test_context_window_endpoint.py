@@ -218,15 +218,27 @@ class ConversationEndpointTests(unittest.TestCase):
     def test_a_new_question_inherits_the_scope_and_says_so(self):
         """The reproduction: asked inside a conversation about Khordha, a new
         question was answered STATE-WIDE with nothing saying so. Narrowing
-        silently would trade one invisible mismatch for another, so the answer
-        names what was carried and leads the chips with the way out."""
+        silently would trade one invisible mismatch for another, so the carry
+        is named and the chips lead with the way out.
+
+        WHERE IT IS NAMED MOVED. This used to assert the sentence "…carried
+        over from your previous question" inside `answer`; that prose is
+        retired (see query_router/interpretation.py) because the answer body is
+        what an officer copies into a report. The same fact is now the
+        `interpretation` field, which every binding path stamps rather than
+        this one alone. The undo chip below is unchanged.
+        """
         session = "cw-scope"
         self.seed_frame(session)
 
         payload = self.ask("how much was actually spent?", session_id=session)
         self.assertEqual(payload["tier"], "tier2", payload.get("answer"))
         self.assertIn("Khordha", payload["query_description"] or "")
-        self.assertIn("carried over", payload["answer"])
+        self.assertNotIn("carried over", payload["answer"],
+                         "the scope note belongs beside the answer, not in it")
+        self.assertEqual(payload["interpretation"]["kind"], "scope_inherited")
+        self.assertIn("Khordha", payload["interpretation"]["detail"] or "")
+        self.assertTrue(payload["interpretation"]["anchor_question"])
 
         undo = (payload["suggestions"] or [])[0]
         self.assertIn("state-wide", undo["label"].lower())

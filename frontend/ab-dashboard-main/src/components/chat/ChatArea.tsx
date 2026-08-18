@@ -9,7 +9,9 @@ import { Shield, Search, Send, ArrowUpRight } from "lucide-react";
 interface ChatAreaProps {
   messages: Message[];
   isLoading: boolean;
-  onSend: (message: string, fromChip?: boolean) => void;
+  onSend: (message: string, fromChip?: boolean, resetContext?: boolean) => void;
+  // Re-sends a message that was read as a follow-up, with the context reset.
+  onAskAsNewQuestion?: (text: string) => void;
   onDateRangeUpdate?: (messageId: string, startDate: string, endDate: string) => void;
   currentFrame?: ContextFrame | null;
   onContextJumpBack?: (steps: number) => void;
@@ -126,6 +128,7 @@ export function ChatArea({
   messages,
   isLoading,
   onSend,
+  onAskAsNewQuestion,
   onDateRangeUpdate,
   currentFrame,
   onContextJumpBack,
@@ -183,6 +186,9 @@ export function ChatArea({
                 message={msg}
                 onDateRangeUpdate={onDateRangeUpdate}
                 onSend={isLoading ? undefined : onSend}
+                // The MARKER stays while a request is in flight; only the
+                // control it offers is withdrawn.
+                onAskAsNewQuestion={isLoading ? undefined : onAskAsNewQuestion}
               />
             ))}
             {isLoading && <TypingIndicator />}

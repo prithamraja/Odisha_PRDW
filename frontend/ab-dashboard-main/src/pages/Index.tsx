@@ -32,8 +32,12 @@ const Index = () => {
   const [currentFrame, setCurrentFrame] = useState<ContextFrame | null>(null);
 
   const [sessionId] = useState(getOrCreateSessionId);
+  // `resetContext` is the escape from a follow-up reading: it clears the frame
+  // AND the pending state before the message is classified, so the same words
+  // route standalone. The correction is APPENDED — the exchange that was read
+  // as a follow-up stays on screen above it, which is what makes it auditable.
   const handleSend = useCallback(
-    async (content: string, fromChip?: boolean) => {
+    async (content: string, fromChip?: boolean, resetContext?: boolean) => {
       const userMsg: Message = {
         id: generateId(),
         role: "user",
@@ -47,6 +51,7 @@ const Index = () => {
         const res = await sendMessage(content, {
           session_id: sessionId,
           from_chip: fromChip,
+          reset_context: resetContext,
         });
         const botMsg: Message = {
           id: generateId(),
@@ -61,6 +66,7 @@ const Index = () => {
           originalQuery: content,
           clarification: res.clarification,
           suggestions: res.suggestions,
+          interpretation: res.interpretation,
         };
         setMessages((prev) => [...prev, botMsg]);
         setCurrentFrame(res.context_frame ?? null);
@@ -81,6 +87,14 @@ const Index = () => {
       }
     },
     [sessionId]
+  );
+
+  // "Ask as a new question instead" — re-send WHAT THE USER TYPED, not the
+  // echoed catalogue phrasing, with the context reset. Re-sending the echo
+  // would silently substitute a question they never asked.
+  const handleAskAsNewQuestion = useCallback(
+    (text: string) => handleSend(text, false, true),
+    [handleSend]
   );
 
   // The backend pops one frame at a time; jumping to an older entry in the
@@ -146,6 +160,10 @@ const Index = () => {
                   context_frame: res.context_frame,
                   result: res.result,
                   date_range: res.date_range,
+                  // Re-sent through the classifier, so the reading can differ
+                  // from the one this message carried. Leaving the old marker
+                  // in place would caption the new answer with the old reading.
+                  interpretation: res.interpretation,
                   timestamp: Date.now(),
                 }
               : m
@@ -171,6 +189,7 @@ const Index = () => {
               messages={messages}
               isLoading={isLoading}
               onSend={handleSend}
+              onAskAsNewQuestion={handleAskAsNewQuestion}
               onDateRangeUpdate={handleDateRangeUpdate}
               currentFrame={currentFrame}
               onContextJumpBack={handleContextJumpBack}

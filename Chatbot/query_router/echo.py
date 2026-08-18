@@ -49,9 +49,12 @@ def append_caveat(answer: str, caveat: str | None) -> str:
 def echo_answer_without_caveat(result: RouteResult) -> str:
     """The echoed question and the empty-result sentence, and nothing else.
 
-    Exists only for the one caller that has to insert its own line BETWEEN the
-    question and the caveat (the scope-inheritance note). Everything else wants
-    `echo_answer`, which cannot forget the caveat.
+    Split out for callers that have to insert a line BETWEEN the question and
+    the caveat. The one such caller — the scope-inheritance note — was retired
+    when `Interpretation` shipped (the reading is reported beside the answer
+    now, not inside it), so nothing outside this module composes an answer this
+    way today. Anything that starts to should still prefer `echo_answer`, which
+    cannot forget the caveat.
     """
     question = result.query_description or result.query_id or "Query matched."
     if result.result is not None and len(result.result) == 0:

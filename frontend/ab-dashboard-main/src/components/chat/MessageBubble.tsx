@@ -17,6 +17,69 @@ interface MessageBubbleProps {
   // fromChip=true tells the backend the text is a generated catalog question,
   // so it skips the follow-up classifier and routes straight to matching.
   onSend?: (text: string, fromChip?: boolean) => void;
+  // Re-sends this message's original text with the context reset. Undefined
+  // while a request is in flight — the marker stays, the control goes.
+  onAskAsNewQuestion?: (text: string) => void;
+}
+
+/** The reading, when the backend reports one — otherwise null. */
+function boundReading(message: Message) {
+  const interpretation = message.interpretation;
+  if (!interpretation || interpretation.kind === "new_question") return null;
+  if (!interpretation.anchor_question) return null;   // nothing to draw
+  return interpretation;
+}
+
+/**
+ * The interpretation, drawn as a thread: the question already on screen in
+ * gray, the question actually answered indented beneath it. Read top to
+ * bottom, that is the whole reading.
+ *
+ * IT LIVES ON THE ASSISTANT'S ECHO-BACK, NOT ON THE USER'S OWN BUBBLE. Two
+ * reasons, both learned the hard way in the reference implementation: user
+ * messages are appended optimistically, before the answer exists, so a marker
+ * there could only be written retroactively and would visibly pop; and a
+ * right-aligned bubble indents backwards, while this needs room for two full
+ * question lines.
+ */
+function FollowUpThread({
+  anchorQuestion,
+  answer,
+  originalQuery,
+  onAskAsNewQuestion,
+}: {
+  anchorQuestion: string;
+  answer: string;
+  originalQuery?: string;
+  onAskAsNewQuestion?: (text: string) => void;
+}) {
+  return (
+    <div className="max-w-2xl space-y-1">
+      <p className="text-[14px] text-muted-design leading-snug whitespace-pre-wrap break-words">
+        {anchorQuestion}
+      </p>
+      <div className="border-l-2 border-line pl-3 space-y-1">
+        <p className="text-[15px] text-ink leading-relaxed whitespace-pre-wrap break-words">
+          {answer}
+        </p>
+        {/* ~12px. Smaller reads as disclaimer text and gets skipped. */}
+        <p className="text-[12px] text-muted-design">
+          <span aria-hidden="true">↳ </span>read as a follow-up
+          {originalQuery && onAskAsNewQuestion && (
+            <>
+              {" · "}
+              <button
+                onClick={() => onAskAsNewQuestion(originalQuery)}
+                className="underline underline-offset-2 hover:text-ink transition-colors"
+              >
+                Ask as a new question instead
+              </button>
+            </>
+          )}
+        </p>
+      </div>
+    </div>
+  );
 }
 
 function ChipRow({
@@ -374,9 +437,15 @@ function DateRangePill({
   );
 }
 
-export function MessageBubble({ message, onDateRangeUpdate, onSend }: MessageBubbleProps) {
+export function MessageBubble({
+  message,
+  onDateRangeUpdate,
+  onSend,
+  onAskAsNewQuestion,
+}: MessageBubbleProps) {
   const isUser = message.role === "user";
   const hasResult = !!message.result && message.result.length > 0;
+  const reading = isUser ? null : boundReading(message);
   const dateControl =
     !isUser && message.date_filter_applied && message.date_range ? (
       <DateRangePill message={message} onDateRangeUpdate={onDateRangeUpdate} />
@@ -432,9 +501,18 @@ export function MessageBubble({ message, onDateRangeUpdate, onSend }: MessageBub
         )}
 
         {message.content && !isUser && (
-          <div className="text-[15px] text-ink leading-relaxed max-w-2xl">
-            <p className="whitespace-pre-wrap break-words">{message.content.replace(/\*/g, "")}</p>
-          </div>
+          reading ? (
+            <FollowUpThread
+              anchorQuestion={reading.anchor_question!}
+              answer={message.content.replace(/\*/g, "")}
+              originalQuery={message.originalQuery}
+              onAskAsNewQuestion={onAskAsNewQuestion}
+            />
+          ) : (
+            <div className="text-[15px] text-ink leading-relaxed max-w-2xl">
+              <p className="whitespace-pre-wrap break-words">{message.content.replace(/\*/g, "")}</p>
+            </div>
+          )
         )}
 
         {/* Result table — the date-range control rides in its toolbar row */}

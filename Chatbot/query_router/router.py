@@ -1158,7 +1158,15 @@ def requery_template(
 # with the frame's geography bound into the slot the question left empty. The
 # two honesty rules are unchanged:
 #   - it only ever fires when the question named NO geography of its own;
-#   - the answer says the scope was carried over, and ships an undo chip.
+#   - the carry is REPORTED, and ships an undo chip.
+#
+# WHERE THE REPORTING LIVES CHANGED AGAIN. It used to be a sentence appended to
+# the answer text ("Answered for X, carried over from your previous question").
+# That is now `QueryResponse.interpretation` — a field, drawn beside the answer
+# instead of inside it, and stamped by every path that binds a message to the
+# question on screen rather than by this one alone. See
+# query_router/interpretation.py. The undo chip stays: a "show this state-wide
+# instead" chip is a sharper escape than the generic re-ask, and both coexist.
 
 # Deepest first — the narrowest scope the frame can supply is the one the
 # conversation is actually about.

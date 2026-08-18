@@ -44,6 +44,31 @@ export interface ContextFrame extends ContextFrameSnapshot {
 }
 
 
+// Which question the answer answers, and how the message got there. The
+// backend stamps it on every path that binds a message to the question already
+// on screen; "new_question" means it was routed standalone and nothing is drawn.
+//
+// THIS CANNOT BE INFERRED HERE. A frame edit ("and ganjam?") re-queries the
+// same template and comes back as an ordinary successful answer, identical in
+// every other field to a fresh question that happened to match it.
+export type InterpretationKind =
+  | "new_question"
+  | "frame_edit"
+  | "operation"
+  | "fragment_reroute"
+  | "scope_inherited"
+  | "clarification_reply";
+
+export interface Interpretation {
+  kind: InterpretationKind;
+  anchor_question?: string | null;
+  anchor_template_id?: string | null;
+  // A short phrase ("district → Khordha"). Deliberately NOT rendered: the
+  // anchor and the answered question are already stacked one above the other,
+  // so it restates a difference the reader can see.
+  detail?: string | null;
+}
+
 export interface Message {
   id: string;
   role: "user" | "assistant";
@@ -60,6 +85,7 @@ export interface Message {
   operation_mode?: "client" | "requery" | "rejected" | null;
   clarification?: Clarification | null;
   suggestions?: Chip[] | null;
+  interpretation?: Interpretation | null;
 }
 
 export interface Conversation {

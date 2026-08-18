@@ -1,4 +1,4 @@
-import type { Chip, Clarification, ContextFrame } from "@/types/chat";
+import type { Chip, Clarification, ContextFrame, Interpretation } from "@/types/chat";
 
 const API_CONFIG = {
   // Falls back to a local backend on purpose. The previous default was a live
@@ -44,6 +44,9 @@ export interface ChatResponse {
   operation_mode?: "client" | "requery" | "rejected" | null;
   clarification?: Clarification | null;
   suggestions?: Chip[] | null;
+  // Optional on the wire so an older backend (which sends nothing) reads as
+  // "routed standalone" rather than crashing the thread renderer.
+  interpretation?: Interpretation | null;
 }
 
 export interface OperationArgs {
