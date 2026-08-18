@@ -38,7 +38,27 @@ GOLD = Path(__file__).resolve().parent      # eval/gold/
 # during WP-4a: the gold tree was staged outside the repo (WP-3 owned the
 # working tree) while Chatbot/ and the workbook were read from the repo itself.
 REPO = Path(os.environ.get("PRDW_REPO") or GOLD.parent.parent)
-CHATBOT = REPO / "Chatbot"
+
+# THE BACKEND DIRECTORY, RESOLVED RATHER THAN NAMED (WP-5). It was `Chatbot/`
+# through WP-4c and is `Ask/` since the tree was reorganised on 2026-08-18 — a
+# rename that silently broke both gold-set checks, because a hard-coded name
+# does not fail loudly, it just stops finding the catalogue and reports the
+# cross-check as SKIPPED. Both spellings are tried, newest first, and an
+# unresolvable one is named in the error rather than guessed at.
+_BACKEND_DIR_NAMES = ("Ask", "Chatbot")
+
+
+def _backend_dir(repo):
+    for name in _BACKEND_DIR_NAMES:
+        candidate = repo / name
+        if (candidate / "query_router").is_dir():
+            return candidate
+    # Nothing found: return the first spelling so the error a caller raises
+    # names a real path rather than None.
+    return repo / _BACKEND_DIR_NAMES[0]
+
+
+CHATBOT = _backend_dir(REPO)
 
 def _find(name: str, installed: Path) -> Path:
     """Prefer the installed copy (what the harnesses actually read); fall back to

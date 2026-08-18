@@ -36,7 +36,27 @@ HERE = Path(__file__).resolve().parent
 # gold tree is staged outside the repo (as it was during WP-4a, while WP-3 owned
 # the working tree).
 REPO = Path(os.environ.get("PRDW_REPO") or HERE.parent.parent)
-CHATBOT = REPO / "Chatbot"
+
+# THE BACKEND DIRECTORY, RESOLVED RATHER THAN NAMED (WP-5). It was `Chatbot/`
+# through WP-4c and is `Ask/` since the tree was reorganised on 2026-08-18 — a
+# rename that silently broke both gold-set checks, because a hard-coded name
+# does not fail loudly, it just stops finding the catalogue and reports the
+# cross-check as SKIPPED. Both spellings are tried, newest first, and an
+# unresolvable one is named in the error rather than guessed at.
+_BACKEND_DIR_NAMES = ("Ask", "Chatbot")
+
+
+def _backend_dir(repo):
+    for name in _BACKEND_DIR_NAMES:
+        candidate = repo / name
+        if (candidate / "query_router").is_dir():
+            return candidate
+    # Nothing found: return the first spelling so the error a caller raises
+    # names a real path rather than None.
+    return repo / _BACKEND_DIR_NAMES[0]
+
+
+CHATBOT = _backend_dir(REPO)
 
 # Emission order. Follow-ups are adjacent to their prior question inside a file,
 # so only the file order is a choice; keeping it stable keeps `n` stable too.
@@ -54,6 +74,15 @@ BRACKET_FILES = [
     "beneficiaries_dropped.jsonl",
     "out_of_domain.jsonl",
 ]
+
+# The clarification reasons the router can emit, mirrored from `_clarify` call
+# sites in `query_router/router.py` and `main.py`. A gold row's
+# `expected_clarification` (D31.3) must name one of these.
+CLARIFICATION_REASONS = {
+    "ambiguous_fragment", "ambiguous_templates", "broad_question",
+    "known_unanswerable", "missing_parameter", "no_match", "tier_collision",
+    "unknown_entity",
+}
 
 # Question shapes that do not belong in a RETRIEVAL recall measurement:
 # a bare fragment has no retrievable subject of its own, and a question whose
@@ -97,6 +126,26 @@ def check(recs: list[dict]) -> list[str]:
         for flag in ("partial", "excluded"):
             if not isinstance(rec.get(flag, False), bool):
                 problems.append(f"{rid}: {flag} must be a bool")
+
+        # D31.3 — a row may declare the clarification reason that IS its
+        # ratified outcome, which `grade_full_eval` then counts as a pass. It is
+        # validated against the router's own closed vocabulary here, because a
+        # typo would otherwise make the row unpassable in silence: it would
+        # simply never match, and read as the behaviour still being wrong.
+        declared = rec.get("expected_clarification")
+        if declared is not None:
+            names = [declared] if isinstance(declared, str) else list(declared)
+            for name in names:
+                if name not in CLARIFICATION_REASONS:
+                    problems.append(
+                        f"{rid}: expected_clarification {name!r} is not a "
+                        f"clarification reason the router emits "
+                        f"(known: {', '.join(sorted(CLARIFICATION_REASONS))})")
+            if rec.get("expected_behavior") not in (None, "clarify"):
+                problems.append(
+                    f"{rid}: expected_clarification is set but "
+                    f"expected_behavior is {rec.get('expected_behavior')!r} — a "
+                    f"row cannot ratify a clarification it does not expect")
 
         if rec.get("session") == "prev":
             prior = rec.get("prior_id")
@@ -173,6 +222,13 @@ def check_against_catalogue(recs: list[dict]) -> tuple[list[str], list[str]]:
               if (rec.get("expected_result") or {}).get("direction_pin")}
     notes.append(f"direction pins: {len(pinned)} of {len(paired)} paired-year "
                  f"templates covered")
+    snapshot = coverage(recs)
+    notes.append(
+        "categorical expectations (theme/scheme/status — the slot families with "
+        f"no deterministic reader): {snapshot['categorical_expectations_total']}"
+        " across " + ", ".join(
+            f"{slot} {n}" for slot, n
+            in snapshot["categorical_expectations"].items() if n))
     if paired - pinned:
         problems.append(
             "D30.3: these paired-year templates carry no direction-pinned gold row, "
@@ -258,6 +314,102 @@ def _check_direction_pin(rec: dict, template: dict, slots: set[str]) -> list[str
     return problems
 
 
+# Categorical slot families with NO deterministic reader behind them. `theme`,
+# `scheme` and `status` can only ever come from the extractor, which is what
+# makes their count the honest measure of categorical extraction — and what made
+# D30.1's retry decision unrulable while it stood at ten (D31.6, WP-4c 4.2).
+CATEGORICAL_SLOTS = ("theme", "scheme", "scheme_2", "status")
+
+
+def coverage(recs: list[dict]) -> dict:
+    """The counts in README section 8, COMPUTED from the gold files.
+
+    WHY THIS IS DERIVED NOW. `coverage.json` was a snapshot written by hand when
+    the set was authored at 205 rows, and it still said 205 after WP-4c added
+    six and WP-5 added twelve. A coverage table that drifts is worse than none:
+    it is read as the answer to "is this set still balanced?" and it answers
+    about a set that no longer exists. Recomputed on `--install`, and drift is a
+    `--check` failure like any other.
+    """
+    from collections import Counter
+
+    def tally(key):
+        return dict(sorted(Counter(
+            r.get(key) for r in recs if r.get(key)).items()))
+
+    entity_counts = Counter()
+    for rec in recs:
+        for slot in (rec.get("expected_entities") or {}):
+            entity_counts[slot] += 1
+
+    # The two bracket labels that are not catalogue brackets: "Out of domain"
+    # is not in the workbook at all, and "Beneficiaries" is its Dropped sheet.
+    outside = {"Out of domain", "Beneficiaries"}
+
+    snapshot = {
+        "total_questions": len(recs),
+        "in_catalogue_brackets": sum(
+            1 for r in recs if r.get("bracket") not in outside),
+        "by_bracket": tally("bracket"),
+        "by_language": tally("lang"),
+        "by_case_type": tally("case_type"),
+        "by_expected_behavior": tally("expected_behavior"),
+        "dashboard_eligible": sum(1 for r in recs if r.get("dashboard_eligible")),
+        "with_expected_entities": sum(
+            1 for r in recs if r.get("expected_entities")),
+        "with_expected_result": sum(
+            1 for r in recs if r.get("expected_result")),
+        "needing_sme_review": sum(1 for r in recs if r.get("sme_review")),
+        "ratified_clarifications": sum(
+            1 for r in recs if r.get("expected_clarification")),
+        "distinct_workbook_ids_covered": len(
+            {r["gold"] for r in recs if r.get("gold")
+             and r["gold"] != "no_match"}),
+        # The whole point of D31.6: entity expectations, per slot, with the
+        # three reader-less categorical families called out on their own.
+        "entity_expectations": dict(sorted(entity_counts.items())),
+        "entity_expectations_total": sum(entity_counts.values()),
+        "categorical_expectations": {
+            slot: entity_counts.get(slot, 0) for slot in CATEGORICAL_SLOTS},
+        "categorical_expectations_total": sum(
+            entity_counts.get(slot, 0) for slot in CATEGORICAL_SLOTS),
+    }
+    return snapshot
+
+
+def write_coverage(recs: list[dict], out: Path) -> None:
+    """Rewrite the gold-side counts, keeping any catalogue-side ones.
+
+    `catalogue_distribution` describes the WORKBOOK's bracket shares, which is
+    what section 8 compares the gold set's coverage against. It is not derived
+    from the gold files and must survive a rebuild of the ones that are.
+    """
+    stored = {}
+    if out.exists():
+        try:
+            stored = json.loads(out.read_text(encoding="utf-8"))
+        except Exception:                                    # pragma: no cover
+            stored = {}
+    stored.update(coverage(recs))
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(stored, ensure_ascii=False, indent=1),
+                   encoding="utf-8")
+    print(f"wrote {out}")
+
+
+def coverage_drift(recs: list[dict], path: Path) -> list[str]:
+    """Where the stored snapshot disagrees with the gold files it describes."""
+    try:
+        stored = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:                                 # noqa: BLE001
+        return [f"coverage.json unreadable ({type(exc).__name__}: {exc}) — "
+                f"run build_eval_questions.py --install"]
+    fresh = coverage(recs)
+    return [f"coverage.json is stale: {key} says {stored.get(key)!r}, the gold "
+            f"files say {value!r} — run build_eval_questions.py --install"
+            for key, value in fresh.items() if stored.get(key) != value]
+
+
 def write_full(recs: list[dict], out: Path) -> None:
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(recs, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -307,6 +459,10 @@ def main() -> int:
     problems = check(recs)
     cat_problems, cat_notes = check_against_catalogue(recs)
     problems += cat_problems
+    if args.check:
+        # Only on --check: `--install` is the thing that FIXES the drift, so
+        # failing the run before it can write is a loop with no exit.
+        problems += coverage_drift(recs, args.gold_dir / "coverage.json")
     for n in cat_notes:
         print(f"  {n}")
     if problems:
@@ -318,6 +474,8 @@ def main() -> int:
 
     if args.check:
         return 0
+
+    write_coverage(recs, args.gold_dir / "coverage.json")
 
     if args.install:
         write_full(recs, CHATBOT / "eval_questions_full.json")

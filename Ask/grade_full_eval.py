@@ -7,6 +7,9 @@ Buckets per question:
   partial               partial-row: clarified/missed but the gold question was
                         offered as a chip
   clarify               router asked a question instead of answering
+  clarify_as_ratified   router asked a question and ASKING IS THE RATIFIED
+                        BEHAVIOUR for this row — the gold names the
+                        clarification reason it expects; see below
   wrong_template        answered, but with a template outside the gold set
   wrong_direction       answered with the RIGHT template and the wrong sign — the
                         paired-year slots arrived inverted (D30.3); see below
@@ -31,6 +34,24 @@ sets n_rows the row lands in `refusal_with_rows` rather than being silently
 mis-bucketed — the single coupling that would flip all 19 rows at once. WP-5's
 gates file asserts the same thing (WP-4a §5).
 
+RATIFIED BEHAVIOUR MUST NOT COST AN ACCURACY POINT (D31.3, WP-4c 7.5 item 3).
+G1524 — "what about Laxmipur?" over a state-wide expenditure answer — is a
+fragment x tier collision: Laxmipur is BOTH a block and a GP in the 20-GP
+sample and EXP-001 can filter on either, so both readings execute and serving
+one is a coin flip presented as an answer. D18.P3 ruled that the router must
+ask, and must ask the TIER question rather than the generic one. WP-4c's fixes
+made it do exactly that, in 2 of 3 replays against 0 of 3 in WP-4 — and the
+grader scored every one of them a `clarify`, so the project paid an accuracy
+point for shipping the behaviour it had ratified.
+
+The rule is general rather than a special case for one row: a gold row may
+declare `expected_clarification`, naming the clarification reason(s) that ARE
+the ratified outcome for it. A clarification whose reason is on that list lands
+in `clarify_as_ratified`, which `triage_replays.py` counts as passing. A
+clarification for any OTHER reason still lands in `clarify` — the row is pinned
+to the reason, not excused generally, so "asked the tier question" and "asked
+which of four templates you meant" stay different outcomes.
+
 A RIGHT TEMPLATE CAN STILL BE A WRONG ANSWER (D30.3, WP-4c T3b). Five templates
 carry both `$date_range` and `$date_range_2`; `$date_range_2` is year1 and three
 of them compute `$date_range - $date_range_2`. Swap the pair and PLN-039 answers
@@ -53,6 +74,7 @@ if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
+from eval_artefacts import local_twin, publish  # noqa: E402
 from query_router.template_catalog import TEMPLATE_CATALOG  # noqa: E402
 from query_router.dashboard_catalog import DASHBOARD_CATALOG  # noqa: E402
 from query_router.unanswerable_catalog import UNANSWERABLE_CATALOG  # noqa: E402
@@ -369,6 +391,45 @@ def direction_verdict(rec):
     return "; ".join(breaks) or None
 
 
+# The closed vocabulary of clarification reasons the router can emit. A gold row
+# may only declare one of these; `build_eval_questions.py --check` enforces it,
+# so a typo in a gold file cannot quietly become "this row never passes".
+CLARIFICATION_REASONS = {
+    "ambiguous_fragment", "ambiguous_templates", "broad_question",
+    "known_unanswerable", "missing_parameter", "no_match", "tier_collision",
+    "unknown_entity",
+}
+
+
+def expected_clarifications(rec) -> set:
+    """The clarification reasons this gold row ratifies as its own outcome.
+
+    Read off the RECORD first and the built spec second, the same way the
+    direction pins are: a replay recorded before this field existed can then be
+    re-graded against it without being re-run, which is how WP-4c's three
+    replays could be checked against D31.3 at all.
+    """
+    declared = rec.get("expected_clarification")
+    if declared is None:
+        declared = (SPEC_BY_N.get(rec.get("n")) or {}).get(
+            "expected_clarification")
+    if not declared:
+        return set()
+    if isinstance(declared, str):
+        declared = [declared]
+    return {str(d).strip() for d in declared if str(d).strip()}
+
+
+def ratified_clarification(rec, clar) -> bool:
+    """Whether THIS clarification is the behaviour the gold row asked for.
+
+    Pinned to the REASON, not to the fact of clarifying: G1524 ratifies the tier
+    question and nothing else, so the same row asking "which of these four
+    templates did you mean?" is still a failure and still shows up as one.
+    """
+    return (clar or {}).get("reason") in expected_clarifications(rec)
+
+
 def grade(rec):
     if rec.get("error"):
         return "error"
@@ -415,6 +476,15 @@ def grade(rec):
 
     # no direct answer
     offered = set(chip_ids(rec))
+
+    # D31.3 — a clarification the gold row declares as its ratified outcome is
+    # a pass. Checked BEFORE the chip rules, because a tier-collision prompt
+    # offers PLACES ("Laxmipur (block)" / "Laxmipur (GP)") rather than catalogue
+    # questions, so `chip_ids` finds nothing in it and the row would fall
+    # through to a plain `clarify` however right it was.
+    if clar and ratified_clarification(rec, clar):
+        return "clarify_as_ratified"
+
     if gold == "no_match":
         return "hit"  # gold behaviour IS declining
     if gold in UNANSWERABLE_CATALOG:
@@ -454,7 +524,8 @@ def main():
         buckets.setdefault(v, []).append(r)
 
     print(f"{args.in_path.name}: total {len(recs)}")
-    for k in ("hit", "partial", "clarify_gold_offered", "clarify", "wrong_template",
+    for k in ("hit", "partial", "clarify_as_ratified", "clarify_gold_offered",
+              "clarify", "wrong_template",
               "wrong_direction", "wrong_entities", "wrong_refusal",
               "declined_generically", "refusal_with_rows", "fallback", "error",
               "excluded", "new"):
@@ -463,7 +534,8 @@ def main():
 
     for k in ("wrong_template", "wrong_direction", "wrong_entities",
               "wrong_refusal", "declined_generically", "refusal_with_rows",
-              "clarify", "clarify_gold_offered", "partial", "fallback", "error"):
+              "clarify", "clarify_as_ratified", "clarify_gold_offered",
+              "partial", "fallback", "error"):
         for r in buckets.get(k, []):
             extra = ""
             if k in ("wrong_template", "wrong_refusal"):
@@ -479,7 +551,8 @@ def main():
             elif k == "refusal_with_rows":
                 extra = (f" gold={r['gold']} n_rows={r.get('n_rows')} — a served "
                          f"refusal must leave result as None, never []")
-            elif k in ("clarify", "clarify_gold_offered", "partial"):
+            elif k in ("clarify", "clarify_as_ratified", "clarify_gold_offered",
+                       "partial"):
                 clar = r.get("clarification") or {}
                 extra = f" gold={r.get('gold')} reason={clar.get('reason')} prompt={clar.get('prompt','')[:60]!r}"
             elif k == "error":
@@ -500,8 +573,14 @@ def main():
         if rows:
             print(f"    rows: {json.dumps(rows, ensure_ascii=False, default=str)[:220]}")
 
-    out_path.write_text(
+    # D31.7 — written locally and copied in, like every other eval artefact.
+    # A single `write_text` is much less exposed than a flush-per-line stream,
+    # but a 4 MB JSON document landing in a synced folder is the same class of
+    # thing and there is no reason for it to be the exception.
+    local = local_twin(out_path)
+    local.write_text(
         json.dumps(recs, indent=1, ensure_ascii=False), encoding="utf-8")
+    publish(local, out_path)
     print(f"\nWrote {out_path}")
 
 

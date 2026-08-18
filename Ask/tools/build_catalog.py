@@ -540,6 +540,120 @@ def scope_free_question(question: str) -> str | None:
     return stripped[0].upper() + stripped[1:]
 
 
+
+
+# ── The CODE-MIXED retrieval surface (D31.5, WP-5 T4c) ────────────────────────
+#
+# WHAT WP-4c LEFT OPEN. Stripping the scope prose (above) moved BEN-001 from
+# rank 51 to rank 4 against its own gold question and turned 0/3 replays into
+# 3/3. It did nothing for BEN-003, which sat at 64 before and 64 after — because
+# BEN-003's gold question is not English:
+#
+#   BEN-003 catalogue: "How many beneficiaries are recorded across GPs of a
+#                       given Block under a given Scheme for a given Plan Year?"
+#   BEN-003 gold:      "Bhubaneswar block ke GPs me kitne beneficiary hain
+#                       2024-25 me?"
+#
+# WP-4c filed that as F2 and D28.2 gated F2 on SME ratification. D31.5 rules it
+# back IN: code-mixed is not a deferred register — it retrieves at 100% for
+# every ANSWERABLE question in the set — so a documented refusal that cannot be
+# reached in it is an index gap, not a language gap.
+#
+# WHY A FRAME TABLE AND NOT A TRANSLATION. Nothing here translates. An officer
+# typing code-mixed keeps the domain nouns in English — scheme, pension scheme,
+# beneficiary, village, cash, purpose — and switches only the INTERROGATIVE
+# FRAME around them: "kitne … hain?", "sabse zyada … kis … me?". So the rule
+# rewrites the frame and leaves every content word exactly as the workbook wrote
+# it. That is deterministic, inspectable in one table, and cannot invent a
+# domain term the catalogue does not use.
+#
+# IT IS APPLIED TO THE SCOPE-FREE FORM, not the raw question, so the place and
+# the year are already gone — which is right twice over: the officer states them
+# in their own sentence, and "a given Block" has no code-mixed rendering worth
+# indexing.
+#
+# SAFETY. A paraphrase can only ever RAISE the entry it belongs to (an entry
+# scores as the MAX over its vectors), so the worst case is an entry that
+# out-ranks another — which is the intended effect where it happens and is
+# measured for all 30 entries by `refusal_recall.py`, not asserted by argument.
+
+# (pattern, replacement) applied in order to a scope-free question. Every
+# replacement keeps the ORIGINAL noun phrase, captured as \1.
+_HINGLISH_FRAMES: tuple[tuple["re.Pattern[str]", str], ...] = (
+    # "How many beneficiaries received benefits for each stated purpose?"
+    (re.compile(r"^How many (.+?) received benefits(.*?)\??$", re.I),
+     r"Kitne \1 ko benefit mila\2?"),
+    # "How many beneficiaries are recorded under each pension scheme?"
+    (re.compile(r"^How many (.+?) (?:are|is) recorded(.*?)\??$", re.I),
+     r"Kitne \1 darj hain\2?"),
+    # "How many beneficiary records are missing the village field?"
+    (re.compile(r"^How many (.+?)\??$", re.I),
+     r"Kitne \1 hain?"),
+    # "What is the total cash benefit quantum distributed under a given Scheme?"
+    (re.compile(r"^What is the total (.+?)\??$", re.I),
+     r"Total \1 kitna hai?"),
+    # "What is the village-wise count of beneficiaries under a given Scheme?"
+    (re.compile(r"^What is the (.+?)\??$", re.I),
+     r"\1 kya hai?"),
+    # "Which scheme has the most recorded beneficiaries?"
+    (re.compile(r"^Which (.+?) has the most (.+?)\??$", re.I),
+     r"Sabse zyada \2 kis \1 me hain?"),
+    # "Which GPs have no recorded beneficiaries under a given Scheme?"
+    (re.compile(r"^Which (.+?) have no (.+?)\??$", re.I),
+     r"Kin \1 me koi \2 nahi hai?"),
+    (re.compile(r"^Which (.+?)\??$", re.I),
+     r"Kaunse \1?"),
+    # "List the beneficiaries of a given Scheme with village and benefit details."
+    (re.compile(r"^List the (.+?)\.?\??$", re.I),
+     r"\1 ki list dikhao"),
+    # "Compare beneficiary counts under a given Scheme between …"
+    (re.compile(r"^Compare (.+?)\.?\??$", re.I),
+     r"\1 compare karo"),
+    # "How has the beneficiary count under a given Scheme changed?"
+    (re.compile(r"^How has (.+?) changed(.*?)\.?\??$", re.I),
+     r"\1 me kya change aaya\2?"),
+)
+
+# Residual English function words the frames do not consume. Rewritten AFTER a
+# frame matches, never on their own — a sentence that matched no frame is left
+# alone rather than half-converted.
+_HINGLISH_CONNECTIVES: tuple[tuple["re.Pattern[str]", str], ...] = (
+    (re.compile(r"\bunder (?:a given|each) ", re.I), "har "),
+    (re.compile(r"\bunder ", re.I), "ke under "),
+    (re.compile(r"\bacross GPs\b", re.I), "GPs me"),
+    (re.compile(r"\bfor each\b", re.I), "har"),
+    (re.compile(r"\bof a given ", re.I), "ke "),
+    (re.compile(r"\bwith ", re.I), "ke saath "),
+    (re.compile(r"\bbetween ", re.I), "ke beech "),
+    (re.compile(r"\ba given ", re.I), ""),
+    (re.compile(r"\s{2,}"), " "),
+)
+
+
+def code_mixed_question(question: str) -> str | None:
+    """A Hinglish rendering of one refusal question, or None.
+
+    None when no frame matches — a sentence this table does not recognise gets
+    no code-mixed line at all, rather than a half-converted one that would
+    embed as neither register.
+    """
+    text = (question or "").strip()
+    if not text:
+        return None
+    for pattern, replacement in _HINGLISH_FRAMES:
+        rewritten, count = pattern.subn(replacement, text)
+        if not count:
+            continue
+        for connective, into in _HINGLISH_CONNECTIVES:
+            rewritten = connective.sub(into, rewritten)
+        rewritten = re.sub(r"\s+([?.])", r"\1", rewritten).strip()
+        rewritten = re.sub(r"\s{2,}", " ", rewritten)
+        if not rewritten or rewritten.lower() == text.lower():
+            return None
+        return rewritten[0].upper() + rewritten[1:]
+    return None
+
+
 def build_paraphrases(row: dict, abstract: str, slots: list[dict]) -> list[str]:
     """Extra retrieval surface for one template, deduplicated.
 
@@ -1308,15 +1422,33 @@ def build_templates(sheets: dict) -> tuple[str, list[str], dict]:
     return body, findings, stats
 
 
-def _unanswerable_paraphrases(question: str, extra: list[str]) -> list[str]:
+def _unanswerable_paraphrases(
+    question: str, extra: list[str], *, code_mixed: bool = False
+) -> list[str]:
     """Index surface for one unanswerable entry, deduplicated, order stable.
 
     The workbook's own alternative wordings first where it has any, then the
     scope-free line (see `scope_free_question` for why it exists and what it
-    measured).
+    measured), then the code-mixed line where it is asked for.
+
+    `code_mixed` IS GATED TO THE DROPPED SHEET, which is the scope D31.5 rules
+    on: the beneficiary refusals are the entries whose gold questions are typed
+    in that register, and BEN-003 is the one measured stuck outside the window
+    because of it. The frame table itself is general and would fire on most of
+    the 17 "No" rows — on several of them producing a line that differs from the
+    English by one word, which is index weight for no retrieval gain. Widening
+    the gate is a one-line change and should be made the way this one was: on a
+    rank measurement from `refusal_recall.py`, not on the argument that more
+    surface cannot hurt.
     """
     out: list[str] = []
-    for candidate in [*extra, scope_free_question(question)]:
+    # The code-mixed line is built from the SCOPE-FREE form, so the place and
+    # the year are already gone before the frame is switched (D31.5).
+    scope_free = scope_free_question(question)
+    candidates = [*extra, scope_free]
+    if code_mixed:
+        candidates.append(code_mixed_question(scope_free or question))
+    for candidate in candidates:
         if not candidate:
             continue
         if candidate.strip().lower() == (question or "").strip().lower():
@@ -1372,7 +1504,7 @@ def build_unanswerable(sheets: dict) -> tuple[str, int]:
             # Parameterized or Example question, so the scope-free line is the
             # only extra surface available — and it is the one that mattered.
             "paraphrases": _unanswerable_paraphrases(
-                to_prose(text(row["Original Question"])), []),
+                to_prose(text(row["Original Question"])), [], code_mixed=True),
         }
         entries.append(emit_unanswerable(qid, entry))
         count += 1

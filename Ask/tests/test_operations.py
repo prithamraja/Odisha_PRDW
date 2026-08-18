@@ -7,14 +7,18 @@ from query_router.models import (
     ContextFrame,
     OperationMode,
     OperationRequest,
+    OperationResult,
     ResultSetReference,
     TimeRange,
 )
 from query_router.operations import (
     OPERATIONS,
+    _POPULATION_DEPENDENT,
     aggregation_mode,
     run_operation,
+    truncating_limit,
 )
+from query_router.echo import operation_answer, operation_description
 
 
 def make_frame(columns: list[ColumnMetadata], row_count: int = 3) -> ContextFrame:
@@ -409,6 +413,239 @@ class ValueFrequencyTests(unittest.TestCase):
     def test_unknown_column_rejected(self):
         result = self.run_op(operation="count_distinct", column="nonexistent")
         self.assertEqual(result.mode, OperationMode.REJECTED)
+
+
+class TruncatedTableTests(unittest.TestCase):
+    """WP-4c 5.2 / D31.2 - an operation must never be computed on a table the
+    question truncated.
+
+    THE RECORDED SHAPES, from the replay record rather than from imagination:
+
+      #1403 "Which focus area has the highest planned expenditure in 2024-25?"
+            -> BUD-022, top_n = 1. The displayed table is ONE ROW: the highest.
+      #1404 "and the lowest?"
+            -> read as an OPERATION on that table. The minimum of a one-row
+               table is that row, so the answer named the HIGHEST focus area as
+               the lowest, in a sentence with no echo above it.
+      #1042 "aur sabse kam?"  (the same thing in Hinglish)
+            -> "Bottom 1 rows by planned_cost. Poverty allevation programme
+               leads with 3,581,500."
+
+    Both must now re-query or reject. Neither may serve the one-row minimum.
+    """
+
+    FOCUS_COLUMNS = [
+        ColumnMetadata(name="focus_area_name", column_type=ColumnType.DIMENSION),
+        ColumnMetadata(name="planned_cost", column_type=ColumnType.ADDITIVE_VALUE),
+        ColumnMetadata(name="activities", column_type=ColumnType.ADDITIVE_COUNT),
+    ]
+
+    # The population BUD-022 ranks, and the one row `LIMIT 1` left on screen.
+    FULL_ROWS = [
+        {"focus_area_name": "Drinking water", "planned_cost": 42118474.0,
+         "activities": 900},
+        {"focus_area_name": "Sanitation", "planned_cost": 12000000.0,
+         "activities": 400},
+        {"focus_area_name": "Poverty allevation programme",
+         "planned_cost": 3581500.0, "activities": 120},
+    ]
+    TRUNCATED_ROWS = FULL_ROWS[:1]
+
+    def frame(self, top_n="1"):
+        return ContextFrame(
+            template_id="BUD-022",
+            template_question="Which focus area has the highest planned "
+                              "expenditure in 2024-2025?",
+            bound_params={"date_range": "2024-2025", "top_n": top_n},
+            active_filters=[ActiveFilter(dimension="date_range",
+                                         value="2024-2025")],
+            time_range=TimeRange(start=None, end=None, grain="year"),
+            grouping_dimension="focus_area_name",
+            result_set=ResultSetReference(
+                id="rs_bud022", row_count=1, columns=self.FOCUS_COLUMNS),
+        )
+
+    def requery(self, slot, value):
+        self.requeried.append((slot, value))
+        return list(self.FULL_ROWS)
+
+    def setUp(self):
+        self.requeried = []
+
+    def run_op(self, operation, frame=None, rows=None, requery="real", **kw):
+        return run_operation(
+            OperationRequest(operation=operation, **kw),
+            frame if frame is not None else self.frame(),
+            self.TRUNCATED_ROWS if rows is None else rows,
+            requery=self.requery if requery == "real" else requery,
+        )
+
+    # -- The two recorded shapes ---------------------------------------------
+
+    def test_1404_the_lowest_of_a_top_one_table_re_queries(self):
+        """The defect, closed. `min` over the one row left by `LIMIT 1` used to
+        return Drinking water - the HIGHEST - as the lowest."""
+        result = self.run_op("min", column="planned_cost")
+        self.assertEqual(result.mode, OperationMode.REQUERY)
+        self.assertEqual(self.requeried, [("top_n", "1000")],
+                         "the limit is lifted by re-binding $top_n, not removed")
+        self.assertEqual(result.value, 3581500.0)
+        self.assertIn("Poverty allevation programme", result.answer)
+        self.assertNotIn("Drinking water", result.answer,
+                         "the highest must never come back as the lowest")
+
+    def test_1042_bottom_n_of_a_top_one_table_re_queries(self):
+        """"aur sabse kam?" - the Hinglish half of the same pair. `bottom_n`
+        over a top-1 table returned "Bottom 1 rows ... Poverty allevation
+        programme leads", which was true of nothing."""
+        result = self.run_op("bottom_n", column="planned_cost", n=1)
+        self.assertEqual(result.mode, OperationMode.REQUERY)
+        self.assertEqual([r["focus_area_name"] for r in result.result],
+                         ["Poverty allevation programme"])
+
+    def test_neither_shape_can_be_served_from_the_truncated_table(self):
+        """The property that matters is not which of re-query or reject
+        happens - it is that the one-row minimum is never the answer."""
+        for requery in (None, self.requery):
+            for op in ("min", "bottom_n"):
+                with self.subTest(op=op, requery=bool(requery)):
+                    result = self.run_op(op, column="planned_cost",
+                                         requery=requery)
+                    self.assertIn(result.mode, (OperationMode.REQUERY,
+                                                OperationMode.REJECTED))
+                    self.assertNotEqual(result.value, 42118474.0)
+
+    # -- The rejection path --------------------------------------------------
+
+    def test_without_a_requery_hook_it_rejects_and_names_the_truncation(self):
+        result = self.run_op("min", column="planned_cost", requery=None)
+        self.assertEqual(result.mode, OperationMode.REJECTED)
+        self.assertIn("top 1 row", result.answer)
+        self.assertIn("whole population", result.answer)
+
+    def test_a_failing_requery_rejects_rather_than_falling_back(self):
+        """FALLING BACK TO THE TRUNCATED TABLE WOULD BE THE DEFECT AGAIN, with
+        an excuse attached. A re-query that raises must reject."""
+        def boom(slot, value):
+            raise RuntimeError("template is not re-queryable")
+        result = self.run_op("min", column="planned_cost", requery=boom)
+        self.assertEqual(result.mode, OperationMode.REJECTED)
+        self.assertIn("RuntimeError", result.answer)
+
+    def test_an_empty_requery_rejects(self):
+        result = self.run_op("min", column="planned_cost",
+                             requery=lambda slot, value: [])
+        self.assertEqual(result.mode, OperationMode.REJECTED)
+
+    # -- What the guard must NOT do ------------------------------------------
+
+    def test_a_limit_that_never_bound_is_not_a_truncation(self):
+        """`top_n = 10` over a three-row population returns three rows: the
+        LIMIT never bit, the table IS the population, and refusing here would
+        decline a question that has a correct answer."""
+        frame = self.frame(top_n="10")
+        self.assertIsNone(truncating_limit(frame, self.FULL_ROWS))
+        result = self.run_op("min", frame=frame, rows=self.FULL_ROWS,
+                             column="planned_cost")
+        self.assertEqual(result.mode, OperationMode.CLIENT)
+        self.assertEqual(self.requeried, [], "nothing to lift")
+
+    def test_a_frame_with_no_top_n_is_untouched(self):
+        frame = self.frame()
+        frame.bound_params.pop("top_n")
+        self.assertIsNone(truncating_limit(frame, self.TRUNCATED_ROWS))
+        self.assertEqual(
+            self.run_op("min", frame=frame, column="planned_cost").mode,
+            OperationMode.CLIENT)
+
+    def test_count_and_sort_are_not_guarded(self):
+        """`count` answers "the table has N rows", which is a statement about
+        the table; `sort` returns the rows on screen in another order. Neither
+        claims anything about a population, so neither pays for a re-query."""
+        for op in ("count", "sort"):
+            with self.subTest(op=op):
+                result = self.run_op(op, column="planned_cost")
+                self.assertEqual(result.mode, OperationMode.CLIENT)
+        self.assertEqual(self.requeried, [])
+
+    def test_every_population_dependent_operation_is_a_real_operation(self):
+        self.assertTrue(_POPULATION_DEPENDENT <= OPERATIONS)
+        self.assertEqual(
+            OPERATIONS - _POPULATION_DEPENDENT,
+            {"count", "sort", "filter_rows", "compare"},
+            "the unguarded set is a deliberate list, not a leftover - see the "
+            "enumeration in operations.py")
+
+    def test_the_guard_cannot_recurse(self):
+        """The re-query recomputes through `run_operation` itself, so the frame
+        it hands down must no longer carry the limit."""
+        self.run_op("min", column="planned_cost")
+        self.assertEqual(len(self.requeried), 1)
+
+
+class OperationEchoTests(unittest.TestCase):
+    """D31.2 - an operations answer restates what it answered.
+
+    `query_description` was None on this path, which is why #1404 arrived with
+    nothing beside it. Every other confidently-wrong row in WP-4c's replays at
+    least printed the question it answered.
+    """
+
+    def setUp(self):
+        self.case = TruncatedTableTests("run")
+        self.case.setUp()
+
+    def test_the_echo_names_the_operation_the_measure_and_the_period(self):
+        result = run_operation(
+            OperationRequest(operation="min", column="planned_cost"),
+            self.case.frame(), self.case.TRUNCATED_ROWS,
+            requery=self.case.requery)
+        echo = operation_description(self.case.frame(), result)
+        self.assertEqual(
+            echo, "Lowest planned cost among all focus area name, 2024-2025:")
+
+    def test_the_scope_clause_distinguishes_requery_from_client_side(self):
+        """"among all" is only ever written after the full population was
+        fetched. A client-side computation says so."""
+        frame = self.case.frame(top_n="10")
+        client = run_operation(
+            OperationRequest(operation="min", column="planned_cost"),
+            frame, self.case.FULL_ROWS, requery=self.case.requery)
+        self.assertEqual(client.mode, OperationMode.CLIENT)
+        self.assertIn("among the focus area name shown",
+                      operation_description(frame, client))
+
+    def test_the_answer_carries_the_echo_and_the_caveat(self):
+        result = run_operation(
+            OperationRequest(operation="min", column="planned_cost"),
+            self.case.frame(), self.case.TRUNCATED_ROWS,
+            requery=self.case.requery)
+        answer = operation_answer(self.case.frame(), result,
+                                  "Covers only the 20 loaded GPs.")
+        self.assertTrue(answer.startswith("Lowest planned cost"))
+        self.assertIn(result.answer, answer)
+        self.assertIn("Note: Covers only the 20 loaded GPs.", answer)
+
+    def test_a_rejection_gets_no_echo(self):
+        """Restating the question above a sentence explaining why it was not
+        answered reads as though it had been."""
+        result = run_operation(
+            OperationRequest(operation="min", column="planned_cost"),
+            self.case.frame(), self.case.TRUNCATED_ROWS, requery=None)
+        self.assertEqual(result.mode, OperationMode.REJECTED)
+        answer = operation_answer(self.case.frame(), result, None)
+        self.assertEqual(answer, result.answer)
+
+    def test_every_operation_produces_a_non_empty_description(self):
+        """The assertion in main.py refuses to serve an answer without one, so
+        no operation may produce an empty echo."""
+        for op in sorted(OPERATIONS):
+            with self.subTest(op=op):
+                result = OperationResult(
+                    operation=op, mode=OperationMode.CLIENT, answer="x",
+                    column="planned_cost")
+                self.assertTrue(
+                    operation_description(self.case.frame(), result).strip())
 
 
 class OperationSetTests(unittest.TestCase):

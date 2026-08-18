@@ -1,6 +1,6 @@
 # Odisha PR&DW — gold eval set (WP-4a, first draft)
 
-205 questions phrased the way officers actually ask them, each carrying an
+223 questions phrased the way officers actually ask them, each carrying an
 expected route into the signed-off `AI_Chatbot_Questions.xlsx` catalogue and an
 expected *behaviour*. This is what WP-4's recall and end-to-end evals grade
 against.
@@ -220,7 +220,55 @@ official roster (standing denominator caveat).
 
 ## 8. Coverage
 
-### 8.1 By file × language × case type
+### 8.0 The live figures
+
+**`coverage.json` is DERIVED, not remembered.** It was a hand-written snapshot
+of the 205-row authoring set and still said 205 after WP-4c added six rows and
+WP-5 added twelve; a coverage table that drifts is read as the answer to "is
+this set still balanced?" and answers about a set that no longer exists. It is
+recomputed by `build_eval_questions.py --install`, and `--check` fails on drift.
+
+The set is **223 rows** as of WP-5
+(213 in the 10 catalogue brackets), over
+178 distinct workbook ids:
+
+| file | rows |
+|---|--:|
+| `planning.jsonl` | 49 |
+| `sanitation_sbm.jsonl` | 34 |
+| `budgeting_funding.jsonl` | 27 |
+| `expenditure.jsonl` | 24 |
+| `implementation_progress.jsonl` | 26 |
+| `monitoring_alerts_dq.jsonl` | 15 |
+| `sanctions_approvals.jsonl` | 11 |
+| `assets.jsonl` | 11 |
+| `trends_comparison.jsonl` | 10 |
+| `decision_support.jsonl` | 6 |
+| `beneficiaries_dropped.jsonl` | 4 |
+| `out_of_domain.jsonl` | 6 |
+
+| dimension | counts |
+|---|---|
+| language | code_mixed 53 · en 136 · odia 19 · odia_translit 15 |
+| case type | ambiguity 11 · followup 12 · out_of_domain 6 · standard 175 · unanswerable 19 |
+| expected behaviour | answer 175 · cannot_answer 19 · clarify 11 · context_preserving_reroute 12 · graceful_fallback 6 |
+| entity expectations | 324 across 16 slots, on 194 rows |
+| **categorical expectations** | **22** — theme 6 · scheme 9 · scheme_2 1 · status 6 |
+| direction-pinned rows | 45 |
+| ratified clarifications | 1 |
+| needing SME review | 37 |
+
+**The categorical line is the one WP-5 exists to move (D31.6).** `theme`,
+`scheme` and `status` are the three slot families with no deterministic reader
+behind them — `$date_range` has one since D30.4 and `$amount_threshold` has
+`amount_from_text`, so both measure a regex as much as a model. WP-4c 4.2 could
+not rule on D30.1's categorical retry because those three stood at **10**
+expectations between them. They now stand at **22**.
+
+### 8.1 By file × language × case type — THE WP-4a AUTHORING SNAPSHOT (205 rows)
+
+Kept as the record of how the set was originally balanced. For current counts
+read §8.0 or `coverage.json`; this table is not maintained.
 
 | file | n | en | code_mixed | odia | odia_translit | standard | followup | ambiguity | unanswerable | out_of_domain | dash | evid |
 |---|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
@@ -243,8 +291,10 @@ Language: 59.5 % English / 23.9 % code-mixed / 16.6 % Odia (9.3 % script,
 
 ### 8.2 Distribution vs the catalogue
 
-Denominator is the 195 rows in the 10 catalogue brackets; `Beneficiaries` and
-`Out of domain` sit outside it.
+Denominator is the 195 rows in the 10 catalogue brackets AS AUTHORED;
+`Beneficiaries` and `Out of domain` sit outside it. Also a WP-4a snapshot —
+the catalogue shares are unchanged, the gold shares are now over 213 rows
+(§8.0).
 
 | bracket | gold | gold % | catalogue | catalogue % |
 |---|--:|--:|--:|--:|
@@ -305,8 +355,9 @@ Registry behaviour pinned by at least one row each:
 
 The JSONL files are hand-authored content, not generated from the workbook — the
 whole point is that the phrasing is *not* the workbook's. Edit them directly.
-`coverage.json` is a snapshot written when the set was authored; the two harness
-artefacts are derived and rebuildable at any time:
+`coverage.json` and the two harness artefacts are all DERIVED and rebuildable
+at any time — `--check` fails if the stored coverage has drifted from the gold
+files:
 
 ```
 python eval/gold/build_eval_questions.py --install

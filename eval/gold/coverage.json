@@ -1,44 +1,44 @@
 {
- "total_questions": 205,
- "in_catalogue_brackets": 195,
+ "total_questions": 223,
+ "in_catalogue_brackets": 213,
  "by_bracket": {
-  "Planning": 42,
-  "Sanitation (SBM)": 34,
-  "Budgeting & Funding": 22,
-  "Expenditure": 22,
-  "Implementation & Progress": 24,
-  "Monitoring, Alerts & Data Quality": 15,
-  "Sanctions & Approvals": 11,
-  "Assets": 10,
-  "Trends & Comparison": 9,
-  "Decision Support": 6,
+  "Assets": 11,
   "Beneficiaries": 4,
-  "Out of domain": 6
+  "Budgeting & Funding": 27,
+  "Decision Support": 6,
+  "Expenditure": 24,
+  "Implementation & Progress": 26,
+  "Monitoring, Alerts & Data Quality": 15,
+  "Out of domain": 6,
+  "Planning": 49,
+  "Sanctions & Approvals": 11,
+  "Sanitation (SBM)": 34,
+  "Trends & Comparison": 10
  },
  "by_language": {
-  "en": 122,
-  "code_mixed": 49,
+  "code_mixed": 53,
+  "en": 136,
   "odia": 19,
   "odia_translit": 15
  },
  "by_case_type": {
-  "standard": 158,
-  "followup": 11,
   "ambiguity": 11,
-  "unanswerable": 19,
-  "out_of_domain": 6
+  "followup": 12,
+  "out_of_domain": 6,
+  "standard": 175,
+  "unanswerable": 19
  },
  "by_expected_behavior": {
-  "answer": 158,
-  "context_preserving_reroute": 11,
-  "clarify": 11,
+  "answer": 175,
   "cannot_answer": 19,
+  "clarify": 11,
+  "context_preserving_reroute": 12,
   "graceful_fallback": 6
  },
- "dashboard_eligible": 78,
- "with_expected_result": 42,
- "needing_sme_review": 35,
- "distinct_workbook_ids_covered": 164,
+ "dashboard_eligible": 80,
+ "with_expected_result": 45,
+ "needing_sme_review": 37,
+ "distinct_workbook_ids_covered": 178,
  "catalogue_distribution": {
   "Planning": 23.7,
   "Budgeting & Funding": 12.7,
@@ -50,5 +50,33 @@
   "Trends & Comparison": 3.3,
   "Monitoring, Alerts & Data Quality": 6.3,
   "Decision Support": 1.7
- }
+ },
+ "with_expected_entities": 194,
+ "ratified_clarifications": 1,
+ "entity_expectations": {
+  "activity_code": 2,
+  "amount_threshold": 2,
+  "block_name": 42,
+  "block_name_2": 1,
+  "date_range": 183,
+  "date_range_2": 5,
+  "deadline": 1,
+  "district_name": 31,
+  "focus_area": 2,
+  "gp_name": 25,
+  "gp_name_2": 1,
+  "scheme": 9,
+  "scheme_2": 1,
+  "status": 6,
+  "theme": 6,
+  "threshold": 7
+ },
+ "entity_expectations_total": 324,
+ "categorical_expectations": {
+  "theme": 6,
+  "scheme": 9,
+  "scheme_2": 1,
+  "status": 6
+ },
+ "categorical_expectations_total": 22
 }

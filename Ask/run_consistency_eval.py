@@ -81,6 +81,7 @@ def main_cli() -> None:
     out_path = HERE / f"consistency_results{tag}.jsonl"
 
     import run_full_eval
+    from eval_artefacts import appended_artefact
     from eval_spend import confirm_spend
 
     n_q = len(run_full_eval.QUESTIONS)
@@ -95,7 +96,11 @@ def main_cli() -> None:
         confirmed=args.yes,
     )
 
-    with out_path.open("a", encoding="utf-8") as out:
+    # D31.7 — appended on the scratch disk, copied into the repo at the end.
+    # This file is flushed once per replay rather than once per question, but it
+    # is still a streamed write into a Drive-synced folder, which is what
+    # damaged all three of WP-4c's results files.
+    with appended_artefact(out_path, encoding="utf-8") as out:
         for run_no in remaining:
             started = time.time()
             per_run = HERE / f"eval_full_results{tag}_run{run_no}.jsonl"

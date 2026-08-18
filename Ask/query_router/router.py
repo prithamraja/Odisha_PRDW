@@ -311,8 +311,9 @@ _DEFAULT_ENTITY_VALUES: dict[str, str] = {
 # days / activity-count readings of `threshold` still reach the extractor.
 _AMOUNT_ENTITY_TYPES = frozenset({"amount_threshold", "threshold"})
 
-# The slots a DETERMINISTIC reader can recover when the extractor comes back
-# empty. See _fiscal_year_from_text() for why this exists at all.
+# The slots a DETERMINISTIC reader fills BEFORE the extractor is asked, exactly
+# as `amount_from_text` does for rupee figures. See _fiscal_year_from_text() for
+# what promoted it from a fallback to a prefill (D30.4, WP-4c §4.3).
 _FISCAL_YEAR_ENTITY_TYPES = frozenset({"fiscal_year", "fiscal_year_2"})
 
 # A rupee amount stated outright — "above ₹1 lakh", "more than 50,000",
@@ -363,17 +364,36 @@ def _extract_slot_values(
     slot_type: dict[str, str],
     openai_client,
     *,
+    validator: EntityValidator | None = None,
     intent: str | None = None,
 ) -> dict[str, str | None]:
     """extract_entities() over the genuinely user-supplied slots, with the
-    catalog's constant slots filled in afterwards, and rupee amounts read
-    straight out of the text when they are stated plainly."""
+    catalog's constant slots filled in afterwards, and the two things a
+    DETERMINISTIC reader can take off the extractor's hands read straight out of
+    the text: rupee amounts, and the fiscal year.
+
+    READER FIRST, EXTRACTOR SECOND, for both (D30.4, ratified on WP-4c §4.3's
+    disagreement log). A prefilled slot is not in `askable`, so it is never sent
+    — which is the point: about 160 `$date_range` slots per eval replay leave the
+    job of a model measured at a 12% all-None categorical rate. The extractor
+    stays the FALLBACK for the slot rather than being cut out, because the
+    reader's vocabulary is narrow: it resolves "last year" and "this year" but
+    not "the year before", and reader-then-extractor is strictly safer than
+    either order alone.
+
+    `validator` is optional only so the AP-era callers that have none still work;
+    without it the fiscal-year prefill is skipped and the old behaviour stands.
+    """
     prefilled: dict[str, str] = {}
     for slot, etype in slot_type.items():
         if etype in _AMOUNT_ENTITY_TYPES:
             found = amount_from_text(user_query)
             if found is not None:
                 prefilled[slot] = found
+        elif etype in _FISCAL_YEAR_ENTITY_TYPES and validator is not None:
+            year = _fiscal_year_from_text(user_query, etype, validator)
+            if year is not None:
+                prefilled[slot] = year
 
     askable = [
         s for s, etype in slot_type.items()
@@ -383,6 +403,17 @@ def _extract_slot_values(
         extract_entities(user_query, askable, openai_client, intent=intent)
         if askable else {}
     )
+    for slot in askable:
+        if slot_type[slot] in _FISCAL_YEAR_ENTITY_TYPES and raw.get(slot) is not None:
+            # The reader found nothing here and the extractor did. This is the
+            # fallback earning its keep — logged so the next package can decide
+            # whether it still does, the way the disagreement log decided this
+            # one. Quiet is a legitimate answer either way.
+            _log.info(
+                "date_range fell back to the EXTRACTOR (the reader read no year "
+                "in the question): %s=%r query=%r",
+                slot, raw[slot], user_query[:120],
+            )
     raw.update(prefilled)
     for slot, etype in slot_type.items():
         if etype in _CONSTANT_ENTITY_TYPES:
@@ -391,8 +422,8 @@ def _extract_slot_values(
 
 
 def _fiscal_year_from_text(
-    user_query: str, slot: str, entity_type: str, validator: EntityValidator
-) -> ExtractedEntity | None:
+    user_query: str, entity_type: str, validator: EntityValidator
+) -> str | None:
     """The fiscal year read straight off the user's own question, or None.
 
     WHY THIS EXISTS (WP-4 finding F1). The extractor returns a well-formed
@@ -413,87 +444,60 @@ def _fiscal_year_from_text(
     question instead. Measured against WP-4's failures: 55 of 62 recovered with
     the gold value, zero wrong.
 
-    A FALLBACK, NOT A PREFILL. It runs only where the extractor produced
-    nothing, so no call that works today can change; `amount_from_text` takes
-    the prefill approach for rupee figures and this could follow it later, on
-    the evidence of the disagreement log below.
+    A PREFILL SINCE WP-5, NOT A FALLBACK (D30.4, operator-ratified). WP-4c's
+    disagreement log settled it on evidence rather than argument: over three
+    replays the two readers disagreed 26 times, EVERY one of them a paired-year
+    row, and in every one the deterministic reader was the one that was right.
+    On the ~160 single-year questions per replay — relative phrases and Odia
+    numerals included — they agreed exactly. So the slot is read here first and
+    never sent to the extractor when it resolves; `_extract_slot_values` keeps
+    the extractor as the fallback for the narrow band the reader cannot read
+    ("the year before").
+
+    IT INTRODUCES NO DEFAULT. The reader returns None when the question names no
+    year, so a yearless question still reaches the ordinary missing-slot
+    clarification — measured at ~2% of the eval set, which is D9 as ruled.
+
+    Returns the RESOLVED year ('2024-2025'), which is what a prefill has to be:
+    `_fill_slots_or_clarify` validates it like any other supplied value, and the
+    pending state then carries a year rather than the whole question.
     """
     try:
         entity = validator.validate(user_query, entity_type)
     except (EntityNotFound, ClarificationNeeded):
         # Genuinely no year in the text — which is a legitimate outcome ("GPDP
-        # status?"), so the caller falls through to the ordinary missing-slot
-        # clarification. Swallowed deliberately: letting EntityNotFound out here
-        # would render "I couldn't find a date range called '<the entire
-        # question>'", quoting the officer's sentence back as a bad value.
+        # status?"), so the caller falls through to the extractor and then to
+        # the ordinary missing-slot clarification. Swallowed deliberately:
+        # letting EntityNotFound out here would render "I couldn't find a date
+        # range called '<the entire question>'", quoting the officer's sentence
+        # back as a bad value.
         return None
-    entity.slot_name = slot
-    # The raw value is the whole question at this point, which is true but
-    # unhelpful in an echo or a pending state. Say where the value came from.
-    entity.raw_value = f"{entity.resolved_value} (read from the question)"
-    _log.info("date_range recovered deterministically for %s: %r",
-              slot, entity.resolved_value)
-    return entity
+    _log.info("date_range read from the question for %s: %r",
+              entity_type, entity.resolved_value)
+    return str(entity.resolved_value)
 
 
-def _order_paired_fiscal_years(
-    validated: list[ExtractedEntity], slot_type: dict[str, str]
-) -> None:
-    """`$date_range` is the LATER year of a pair. Enforced, not hoped for.
-
-    WHY THIS EXISTS, AND WHY `e3e70ff` DID NOT CLOSE IT. All five paired
-    templates bind `$date_range_2` as **year1** and `$date_range` as **year2**,
-    three of them compute `$date_range - $date_range_2`, and their question text
-    reads "between {date_range_2} and {date_range}" — so `$date_range` is the
-    later year (pinned against the SQL in `test_fiscal_year_fallback`). WP-4 §5.1a
-    fixed `_validate_fiscal_year`'s split of ONE string carrying two years, on the
-    stated understanding that "the extractor normally assigns the two slots
-    itself and got it right".
-
-    IT DID NOT. Read off WP-4's own recorded replays, on every paired-template
-    row in all three runs:
-
-        run1/2/3  PLN-039, TRD-002, TRD-004
-                  date_range = 2023-2024, date_range_2 = 2024-2025
-
-    which is backwards, and the served table proves the cost — PLN-039 answered
-    "which themes showed the greatest INCREASE" with
-    `change_in_activities = +663` for Theme 6, which actually **declined by 663**.
-    All three rows graded `hit`, because route-graded evals do not look at values.
-
-    The cause is a rule collision, not a wobble: the extraction prompt defines the
-    pair by MENTION ORDER ("'2024-25 vs 2023-24' → fiscal_year='2024-25',
-    fiscal_year_2='2023-24'") while the catalogue defines it CHRONOLOGICALLY, and
-    the question text happens to name the earlier year first. Stable in all three
-    replays, which is exactly what a prompt/schema conflict looks like.
-
-    So the ordering is imposed here rather than asked for: it is a property of the
-    SQL, and no phrasing of a prompt can be trusted to reproduce a property of
-    the SQL. Both slots must be bound for anything to happen — a single year is
-    not a pair, and nothing else about extraction changes.
-    """
-    if not ({"date_range", "date_range_2"} <= set(slot_type)):
-        return
-    if slot_type.get("date_range") not in _FISCAL_YEAR_ENTITY_TYPES:
-        return
-    by_slot = {e.slot_name: e for e in validated}
-    later, earlier = by_slot.get("date_range"), by_slot.get("date_range_2")
-    if later is None or earlier is None:
-        return
-    # The stored form is 'YYYY-YYYY', so lexicographic order IS chronological.
-    if str(later.resolved_value) >= str(earlier.resolved_value):
-        return
-    _log.info(
-        "paired fiscal years arrived inverted and were re-ordered: "
-        "date_range=%r date_range_2=%r → date_range=%r date_range_2=%r "
-        "($date_range is the later year; three paired templates compute "
-        "$date_range - $date_range_2, so the old order inverts the sign)",
-        later.resolved_value, earlier.resolved_value,
-        earlier.resolved_value, later.resolved_value,
-    )
-    later.resolved_value, earlier.resolved_value = (
-        earlier.resolved_value, later.resolved_value)
-    later.raw_value, earlier.raw_value = earlier.raw_value, later.raw_value
+# `_order_paired_fiscal_years` WAS HERE, AND IS DELETED (WP-5 T1).
+#
+# It re-ordered a paired `$date_range` / `$date_range_2` that arrived inverted,
+# because the extraction prompt defines the pair by MENTION ORDER while the
+# catalogue defines it CHRONOLOGICALLY — a rule collision that had PLN-039
+# answering "which themes showed the greatest INCREASE" with a theme that fell
+# by 663, in all three of WP-4's replays.
+#
+# The prefill above removes the collision at its source rather than correcting
+# it downstream. `_validate_fiscal_year` splits one two-year phrase by entity
+# type — `fiscal_year` takes the LATER year, `fiscal_year_2` the earlier — so
+# the reader's split IS the catalogue's convention, and both slots come from one
+# call on one string: the reader fills both or neither, never a mixed pair.
+#
+# WHAT STILL GUARDS IT. The direction is pinned in three places that do not
+# depend on this function: `tests/test_paired_year_direction.py` executes the
+# five paired templates against the sample database, `_validate_fiscal_year`
+# carries the convention with the SQL quoted beside it, and `grade_full_eval`'s
+# `wrong_direction` bucket reads the served VALUES on every replay. The residual
+# case is narrow and named: a paired question the reader cannot read at all, so
+# that both slots come back from the extractor. Reported in WP5_REPORT §2.
 
 
 def _log_fiscal_year_disagreement(
@@ -809,22 +813,23 @@ def _fill_slots_or_clarify(
         raw_val = raw_entities.get(slot)
         etype = slot_type[slot]
 
-        if etype in _FISCAL_YEAR_ENTITY_TYPES:
-            if raw_val is None:
-                # WP-4 F1: the extractor said nothing. Read the question
-                # ourselves before asking the user for something they said.
-                # Ahead of the defaults deliberately — evidence from the user's
-                # own text beats any value the system supplies — and ahead of
-                # the `optional` check too, because ALR-001/ALR-008 carry an
-                # optional $date_range (D13.3) where binding NULL would answer
-                # across every year about a question that named one.
-                recovered = _fiscal_year_from_text(user_query, slot, etype, validator)
-                if recovered is not None:
-                    validated.append(recovered)
-                    continue
-            else:
-                _log_fiscal_year_disagreement(user_query, slot, etype, raw_val,
-                                              validator)
+        if etype in _FISCAL_YEAR_ENTITY_TYPES and raw_val is not None:
+            # THE READER IS NO LONGER CALLED HERE (WP-5 T1). It ran as a PREFILL
+            # in `_extract_slot_values`, ahead of the extractor, so a fiscal-year
+            # slot that arrives with a value arrives from one of exactly two
+            # places: the reader, or the extractor on the narrow band the reader
+            # cannot read. Calling it a second time on the same string cannot
+            # produce a different answer, and a second call site is how "which
+            # reader won?" stops being answerable.
+            #
+            # The disagreement log stays, and staying QUIET is now its result
+            # rather than its input: it fires only if a value the reader did not
+            # supply resolves differently from what the reader reads in the same
+            # sentence, which the prefill makes structurally impossible. WP-4c
+            # §4.3 is the run that earned the promotion; this is what keeps it
+            # honest if a future path starts supplying the slot from elsewhere.
+            _log_fiscal_year_disagreement(user_query, slot, etype, raw_val,
+                                          validator)
 
         if raw_val is None:
             # A slot the question implies is filled from its declared default
@@ -876,8 +881,6 @@ def _fill_slots_or_clarify(
             clarify.pending = _pending(slot, e.candidates)
             return [], clarify
 
-    _order_paired_fiscal_years(validated, slot_type)
-
     if missing:
         # Required slot empty → pause and ask, never execute broken SQL. The
         # pending state carries everything already resolved, so answering this
@@ -913,7 +916,9 @@ def _extract_fill_values(
     if not slot_type:
         return {}
     try:
-        raw = _extract_slot_values(user_query, slot_type, openai_client)
+        raw = _extract_slot_values(
+            user_query, slot_type, openai_client, validator=validator
+        )
     except Exception:
         return {}
     fill: dict[str, str] = {}
@@ -2059,7 +2064,8 @@ def _route_vector(
         slot_type = _template_slot_types(template_map[query_id])
         if slot_type:
             raw_entities = _extract_slot_values(
-                user_query, slot_type, openai_client, intent=intent
+                user_query, slot_type, openai_client,
+                validator=validator, intent=intent,
             )
             validated_entities, clarify_result = _fill_slots_or_clarify(
                 query_id, slot_type, raw_entities, validator,

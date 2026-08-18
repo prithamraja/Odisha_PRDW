@@ -37,6 +37,10 @@ PLN-001,How many GPs in Laxmipur uploaded the GPDP in 2024-25?,Planning,en
 PLU-001,Bheden ka plan status 2024-25?,Planning,code_mixed
 PLN-003,What percentage of Gram Panchayats in each block uploaded their GPDP in 2024-2025?,Planning,en
 PLN-040,Which themes showed the greatest decline in planned activities between 2023-24 and 2024-25?,Planning,en
+PLN-031,Which GPs planned the most activities under the Water Sufficient Village theme in 2024-25?,Planning,en
+PLN-032,Which Gram Panchayats have not planned any activities under Theme 8 in 2024-25?,Planning,en
+PLN-032,Child Friendly Village theme ke under 2024-25 me kaunse GP ne koi activity plan nahi ki?,Planning,code_mixed
+PLN-031,2024-25 me Poverty Free and Enhanced Livelihoods Village theme ke under sabse zyada activities kis GP ne plan ki?,Planning,code_mixed
 SBM-GWM-003,How many community soak pits have been planned in 2024-25?,Sanitation (SBM),en
 SBM-GWM-006,How many soak pits were completed in 2024-2025?,Sanitation (SBM),en
 SBM-GWM-002,What is the expenditure on Grey Water Management activities in 2024-25?,Sanitation (SBM),en
@@ -89,6 +93,11 @@ FND-007,Which GPs in Bhubaneswar have sanctioned activities but no SC/ST earmark
 BUD-002,2024-2025 ରେ ପ୍ରତ୍ୟେକ ପାଣ୍ଠି ଉତ୍ସରୁ କେତେ ଅର୍ଥ ମିଳିଛି?,Budgeting & Funding,odia
 FND-009,Which scheme funds the largest number of activities in Bhubaneswar in 2024-2025?,Budgeting & Funding,en
 SCH-005,2024-2025 re kaun scheme re sabuthara adhika kharcha heichi Bhubaneswar block re?,Budgeting & Funding,odia_translit
+SCH-002,Which activities of Andhrua are funded under Own Funds in 2024-25?,Budgeting & Funding,en
+SCH-003,What is the total estimated cost of activities under the 14th Finance Commission in Bhubaneswar for 2023-24?,Budgeting & Funding,en
+SCH-006,Which GPs in Bhubaneswar have no activities under the 4th State Finance Scheme in 2024-25?,Budgeting & Funding,en
+SCH-009,Khordha me XV Finance Commission ke under activities ka status breakdown kya hai 2024-25 me?,Budgeting & Funding,code_mixed
+SCH-011,What is the district-wise activity count under the 5th State Finance Commission for 2024-25?,Budgeting & Funding,en
 EXP-001,What is the total actual expenditure incurred by each GP in 2024-25?,Expenditure,en
 EXP-003,What percentage of the planned expenditure has been utilised in 2024-2025?,Expenditure,en
 EXP-004,2024-25 me total kitna paisa unspent reh gaya?,Expenditure,code_mixed
@@ -131,6 +140,8 @@ IMP-007,Which themes have the largest implementation gap between planned and ini
 PHY-001,What physical-progress evidence has been recorded for activity 125711758?,Implementation & Progress,en
 PHY-004,2024-2025 re Bhubaneswar block re kete kama ra physical progress evidence achi?,Implementation & Progress,odia_translit
 STS-003,2024-2025 re Bhubaneswar block re kete kama sarichi?,Implementation & Progress,odia_translit
+STS-003,How many activities in Bhubaneswar are under approval for 2024-25?,Implementation & Progress,en
+STS-003,2023-24 me Bhubaneswar me kitni activities approved status me hain?,Implementation & Progress,code_mixed
 ALR-001,Which administratively approved activities in Bhubaneswar still have zero expenditure 90 days after sanction?,"Monitoring, Alerts & Data Quality",en
 ALR-002,Khordha me kaun si activities ka kharcha admin approved cost se zyada ho gaya 2024-25 me?,"Monitoring, Alerts & Data Quality",code_mixed
 ALR-004,Which activities in Khordha have a technically approved cost higher than the administratively approved cost in 2024-2025?,"Monitoring, Alerts & Data Quality",en
@@ -157,6 +168,7 @@ AST-006,Bhubaneswar me 2024-25 me kitne immovable asset bane?,Assets,code_mixed
 AST-007,Which asset category received the highest expenditure in Khordha for 2024-25?,Assets,en
 AST-009,Bhubaneswar ke kaun se GP ne 2024-25 me koi asset nahi banaya?,Assets,code_mixed
 AST-012,How has the number of assets created per year in Bhubaneswar changed?,Assets,en
+AST-008,How many assets were created under the Self-sufficient Infrastructure in Village theme in Bhubaneswar for 2024-25?,Assets,en
 TRD-011,"Compare activity counts, expenditure and completion rates between Bhubaneswar and Barpali for 2024-25.",Trends & Comparison,en
 TRD-010,"Compare planned expenditure, actual expenditure and completion rate between Andhrua and Barimunda for 2024-2025.",Trends & Comparison,en
 TRD-012,How does Khordha compare with the state average on expenditure per GP and completion rate for 2024-25?,Trends & Comparison,en

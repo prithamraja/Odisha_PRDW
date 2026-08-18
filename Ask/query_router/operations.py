@@ -53,6 +53,110 @@ _NUMERIC_OPS = {
 _MEASURE_TYPES = set(_AGGREGATION_POLICY)
 
 
+# ── The truncation guard (WP-4c §5.2, decision D31.2) ────────────────────────
+#
+# THE DEFECT IT CLOSES, verbatim from the replay record:
+#
+#   #1403 "Which focus area has the highest planned expenditure in 2024-25?"
+#         -> BUD-022 with top_n = 1 (a bare superlative binds it, by design)
+#         -> the displayed table is ONE ROW: Drinking water, the highest
+#   #1404 "and the lowest?"
+#         -> read as an OPERATION on the displayed table
+#         -> "Lowest planned_cost: 42,118,474 (focus area name: Drinking water)."
+#
+# Drinking water is the HIGHEST. The minimum of a one-row table is that row, so
+# the sentence is true of the table and false of the question, and the officer is
+# handed a superlative that is exactly inverted. #1042 is the same thing in
+# Hinglish. `frame.bound_params` carried `top_n: '1'` the whole time; nothing
+# consulted it.
+#
+# The information needed to refuse was always present, so this is a guard rather
+# than a feature: 91 templates carry `$top_n`, a bare superlative binds it to 1,
+# and "which GP spent the most?" followed by "and the lowest?" is about as
+# natural a pair as this system will ever see.
+_TOP_N_SLOT = "top_n"
+
+# The re-query LIMIT. Not "unlimited": the operator ruling of 2026-08-13 keeps
+# the `$top_n` ceiling at 1,000 and clarifies rather than answers above it, so
+# lifting a truncation means going to the ceiling, not past it. `LIMIT NULL` is
+# unbounded in DuckDB, which is the opposite of a page size and is exactly what
+# `slot_defaults` exists to prevent.
+_UNTRUNCATED_TOP_N = "1000"
+
+# WHICH OPERATIONS THE LIMIT CAN LIE TO. The test is not "does it aggregate" but
+# "is its answer a claim about a POPULATION" — because a claim about a
+# population computed over a slice of it is wrong however correctly it was
+# computed. Enumerated over OPERATIONS above, one decision per entry:
+#
+#   sum, average, share_of_total   a total, or a share of one, taken over a
+#                                  slice is neither.
+#   min, max                       the defect itself. `max` is included even
+#                                  though a top-N-DESCENDING slice does contain
+#                                  the true maximum, because nothing here knows
+#                                  the slice's sort direction — over a bottom-N
+#                                  frame the same call is wrong.
+#   top_n, bottom_n                "bottom 1 of the top 1" is #1042 exactly.
+#   percent_change                 first-to-last across a truncated span.
+#   median, stdev, percentile,     distribution statistics of a slice. Their
+#   range                          narration does say "across the N rows shown",
+#                                  which is a disclosure and not a defence: the
+#                                  question asked was about the population.
+#   mode, count_distinct           the commonest value, and how many distinct
+#                                  values exist, are both population facts.
+#
+# NOT guarded, deliberately:
+#
+#   count                          its entire answer is "The table has N rows" —
+#                                  a statement about the table, which is what
+#                                  the table is.
+#   sort, filter_rows              re-order and select the displayed rows, and
+#                                  claim nothing beyond the rows on screen.
+#   compare                        re-queries by construction already.
+_POPULATION_DEPENDENT = frozenset({
+    "sum", "average", "share_of_total", "min", "max", "top_n", "bottom_n",
+    "percent_change", "median", "stdev", "percentile", "range",
+    "mode", "count_distinct",
+})
+
+
+def truncating_limit(frame: ContextFrame, rows: list[dict]) -> int | None:
+    """The `$top_n` that actually CUT this table, or None.
+
+    None in three cases, and the third is the one worth naming: a frame with no
+    `$top_n` at all, a `$top_n` that is not a number, and a `$top_n` the result
+    never reached. `top_n = 10` over a seven-row population returns seven rows,
+    the LIMIT never bound, and the table IS the population — so guarding it
+    would refuse a question that has a correct answer to give. Fewer rows than
+    the limit is proof the limit did not bite.
+    """
+    raw = (frame.bound_params or {}).get(_TOP_N_SLOT)
+    if raw is None:
+        return None
+    try:
+        limit = int(str(raw).strip())
+    except (TypeError, ValueError):
+        return None
+    if limit <= 0 or len(rows) < limit:
+        return None
+    return limit
+
+
+def _truncation_rejected(op: str, limit: int, why: str) -> OperationResult:
+    """Explain instead of answering. The reason NAMES THE TRUNCATION, because a
+    generic "I can't do that" leaves the officer believing the table is the
+    population — which is the belief that made the defect dangerous."""
+    rows = f"{limit} row{'s' if limit != 1 else ''}"
+    return _rejected(
+        op,
+        f"The table on screen is the top {rows} of a longer result, so a "
+        f"{op.replace('_', ' ')} taken over it would describe those {rows} "
+        f"rather than the whole population — which is how a 'lowest' comes back "
+        f"naming the highest. I could not recompute it over the full result "
+        f"({why}). Ask the question directly, naming how many rows you want, so "
+        f"it is computed from base data.",
+    )
+
+
 def aggregation_mode(column: ColumnMetadata, table_columns: list[ColumnMetadata]) -> str:
     """Client-vs-requery decision for aggregating one column of the table."""
     if column.column_type not in _MEASURE_TYPES:
@@ -183,6 +287,44 @@ def run_operation(
 
     if op == "compare":
         return _compare(request, frame, rows, requery)
+
+    # THE TRUNCATION GUARD (D31.2). Before any population-dependent number is
+    # computed, ask whether the table it would be computed over is the whole
+    # population. Placed here rather than inside each implementation so a new
+    # operation cannot be added past it: everything below this line either
+    # states a fact about the displayed rows and says so, or has been re-queried
+    # over the full result.
+    limit = truncating_limit(frame, rows)
+    if limit is not None and op in _POPULATION_DEPENDENT:
+        if requery is None:
+            return _truncation_rejected(
+                op, limit, "re-query is not available right now")
+        try:
+            full_rows = requery(_TOP_N_SLOT, _UNTRUNCATED_TOP_N)
+        except Exception as ex:
+            return _truncation_rejected(
+                op, limit, f"{type(ex).__name__}: {ex}")
+        if not full_rows:
+            return _truncation_rejected(
+                op, limit, "the re-query returned nothing")
+        # Recompute on the full result, through this same function, so the
+        # operation's own implementation is untouched and stays the single
+        # definition of what a minimum is. The frame handed down no longer
+        # carries the limit, so the guard cannot recurse.
+        lifted = frame.model_copy(update={
+            "bound_params": {k: v for k, v in (frame.bound_params or {}).items()
+                             if k != _TOP_N_SLOT},
+        })
+        result = run_operation(request, lifted, full_rows, requery=requery)
+        if result.mode is not OperationMode.REJECTED:
+            result = result.model_copy(update={
+                "mode": OperationMode.REQUERY,
+                "answer": (
+                    f"{result.answer} (Recomputed over all {len(full_rows):,} "
+                    f"rows: the table on screen was the top {limit}.)"
+                ),
+            })
+        return result
 
     # These two target any column (dimensions included), so they resolve their
     # own column instead of going through the numeric default below.

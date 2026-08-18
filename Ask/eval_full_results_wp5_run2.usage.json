@@ -1,0 +1,96 @@
+{
+ "totals": {
+  "calls": 623,
+  "prompt_tokens": 1549421,
+  "completion_tokens": 39857,
+  "reasoning_tokens": 25184,
+  "cached_prompt_tokens": 66304,
+  "total_tokens": 1589278
+ },
+ "by_site": {
+  "embed_query": {
+   "calls": 212,
+   "model": "text-embedding-3-large",
+   "prompt_tokens": 6323,
+   "completion_tokens": 0,
+   "reasoning_tokens": 0,
+   "cached_prompt_tokens": 0,
+   "total_tokens": 6323
+  },
+  "rerank": {
+   "calls": 200,
+   "model": "gpt-5.4-mini",
+   "prompt_tokens": 1166006,
+   "completion_tokens": 16681,
+   "reasoning_tokens": 9620,
+   "cached_prompt_tokens": 62464,
+   "total_tokens": 1182687
+  },
+  "extraction": {
+   "calls": 198,
+   "model": "gpt-5.4-mini",
+   "prompt_tokens": 360408,
+   "completion_tokens": 20278,
+   "reasoning_tokens": 13833,
+   "cached_prompt_tokens": 3840,
+   "total_tokens": 380686
+  },
+  "followup": {
+   "calls": 13,
+   "model": "gpt-5.4-mini",
+   "prompt_tokens": 16684,
+   "completion_tokens": 2898,
+   "reasoning_tokens": 1731,
+   "cached_prompt_tokens": 0,
+   "total_tokens": 19582
+  }
+ },
+ "extraction": {
+  "extraction_calls": 198,
+  "unavailable_calls": 0,
+  "unavailable_causes": {},
+  "all_none_answered": 72,
+  "all_none_rate_answered": 0.3636,
+  "by_slot_family": {
+   "date": {
+    "asked": 11,
+    "null": 11,
+    "null_rate": 1.0
+   },
+   "place": {
+    "asked": 551,
+    "null": 439,
+    "null_rate": 0.7967
+   },
+   "categorical": {
+    "asked": 55,
+    "null": 27,
+    "null_rate": 0.4909
+   },
+   "numeric": {
+    "asked": 80,
+    "null": 48,
+    "null_rate": 0.6
+   },
+   "other": {
+    "asked": 1,
+    "null": 0,
+    "null_rate": 0.0
+   }
+  },
+  "reasoning_tokens_when_all_none": {
+   "n": 72,
+   "min": 4,
+   "max": 218,
+   "median": 63,
+   "mean": 73.8
+  },
+  "reasoning_tokens_when_read": {
+   "n": 126,
+   "min": 6,
+   "max": 313,
+   "median": 64,
+   "mean": 67.6
+  }
+ }
+}

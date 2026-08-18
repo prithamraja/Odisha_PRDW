@@ -272,6 +272,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'Dropped',
         "paraphrases": [
             'How many beneficiaries received benefits under a given Scheme?',
+            'Kitne beneficiaries ko benefit mila har Scheme?',
         ],
     },
 
@@ -284,6 +285,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'Dropped',
         "paraphrases": [
             'What is the village-wise count of beneficiaries under a given Scheme?',
+            'Village-wise count of beneficiaries har Scheme kya hai?',
         ],
     },
 
@@ -296,6 +298,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'Dropped',
         "paraphrases": [
             'How many beneficiaries are recorded across GPs under a given Scheme?',
+            'Kitne beneficiaries darj hain GPs me har Scheme?',
         ],
     },
 
@@ -308,6 +311,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'Dropped',
         "paraphrases": [
             'What is the cash versus kind split of benefits distributed?',
+            'Cash versus kind split of benefits distributed kya hai?',
         ],
     },
 
@@ -320,6 +324,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'Dropped',
         "paraphrases": [
             'What is the total cash benefit quantum distributed under a given Scheme?',
+            'Total cash benefit quantum distributed har Scheme kitna hai?',
         ],
     },
 
@@ -332,6 +337,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'Dropped',
         "paraphrases": [
             'How many beneficiaries received benefits for each stated purpose?',
+            'Kitne beneficiaries ko benefit mila har stated purpose?',
         ],
     },
 
@@ -344,6 +350,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'Dropped',
         "paraphrases": [
             'Which scheme has the most recorded beneficiaries?',
+            'Sabse zyada recorded beneficiaries kis scheme me hain?',
         ],
     },
 
@@ -356,6 +363,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'Dropped',
         "paraphrases": [
             'Which GPs have no recorded beneficiaries under a given Scheme?',
+            'Kin GPs me koi recorded beneficiaries har Scheme nahi hai?',
         ],
     },
 
@@ -368,6 +376,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'Dropped',
         "paraphrases": [
             'List the beneficiaries of a given Scheme with village and benefit details.',
+            'Beneficiaries ke Scheme ke saath village and benefit details ki list dikhao',
         ],
     },
 
@@ -380,6 +389,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'Dropped',
         "paraphrases": [
             'How many beneficiaries are recorded under each pension scheme?',
+            'Kitne beneficiaries darj hain har pension scheme?',
         ],
     },
 
@@ -392,6 +402,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'Dropped',
         "paraphrases": [
             'Compare beneficiary counts under a given Scheme between a given Block and a given Block 2.',
+            'Beneficiary counts har Scheme ke beech Block and Block 2 compare karo',
         ],
     },
 
@@ -404,6 +415,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'Dropped',
         "paraphrases": [
             'How has the beneficiary count under a given Scheme changed?',
+            'The beneficiary count har Scheme me kya change aaya?',
         ],
     },
 
@@ -416,6 +428,7 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'Dropped',
         "paraphrases": [
             'How many beneficiary records are missing the village field?',
+            'Kitne beneficiary records are missing the village field hain?',
         ],
     },
 }

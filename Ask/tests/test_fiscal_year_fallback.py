@@ -30,6 +30,7 @@ import unittest
 from pathlib import Path
 
 from query_router import router
+from query_router.entity_extractor import ExtractionUnavailable
 from query_router.models import RouteTier
 
 _BACKEND = Path(__file__).resolve().parents[1]
@@ -63,12 +64,44 @@ class FiscalYearFallbackTests(unittest.TestCase):
             pass
 
     def _fill(self, query_id, user_query, raw_entities, defaults=None):
-        """The real validation path, with the extractor's output handed in."""
+        """The real serving path, with the extractor's output handed in.
+
+        WHAT THIS EXERCISES CHANGED IN WP-5. `$date_range` is a PREFILL now, not
+        an extractor-empty fallback, so a test that called
+        `_fill_slots_or_clarify` directly would be testing a path the router no
+        longer takes. This runs `_extract_slot_values` first — reader, then
+        extractor for whatever is left — and records WHICH SLOTS WERE ACTUALLY
+        ASKED FOR in `self.asked`, which is the property the promotion is worth
+        anything for.
+
+        `raw_entities` stands in for the extractor's reply. Its
+        `ExtractionUnavailable` type survives the stub, because "the call failed"
+        and "the model read nothing" have to stay distinguishable here too.
+        """
         template = self.templates[query_id]
         slot_type = router._template_slot_types(template)
         declared = router.slot_defaults(template["param_slots"])
+
+        asked: list[str] = []
+
+        def _stub_extract(query, slots, client, intent=None):
+            asked.extend(slots)
+            if isinstance(raw_entities, ExtractionUnavailable):
+                return ExtractionUnavailable(slots, raw_entities.cause,
+                                             raw_entities.detail)
+            return {s: raw_entities.get(s) for s in slots}
+
+        real = router.extract_entities
+        router.extract_entities = _stub_extract
+        try:
+            raw = router._extract_slot_values(
+                user_query, slot_type, None, validator=self.validator)
+        finally:
+            router.extract_entities = real
+        self.asked = asked
+
         return router._fill_slots_or_clarify(
-            query_id, slot_type, raw_entities, self.validator,
+            query_id, slot_type, raw, self.validator,
             user_query, "normalized", 0.0,
             optional=router.optional_slots(template["param_slots"]),
             defaults={**declared, **(defaults or {})},
@@ -89,12 +122,15 @@ class FiscalYearFallbackTests(unittest.TestCase):
             [("date_range", "2024-2025")],
         )
 
-    def test_the_recovered_value_says_where_it_came_from(self):
-        """The raw value would otherwise be the entire question, which is true
-        and useless in an echo or a pending state."""
+    def test_the_prefilled_value_never_carries_the_whole_question(self):
+        """The reader validates THE WHOLE QUESTION, so the entity it used to
+        return carried the officer's entire sentence as its raw value — true,
+        and useless in an echo or a pending state. As a prefill it hands over
+        the RESOLVED year instead, so what travels is a year."""
         validated, _ = self._fill(QID, STATES_A_YEAR, {"date_range": None})
-        self.assertIn("read from the question", validated[0].raw_value)
+        self.assertEqual(validated[0].resolved_value, "2024-2025")
         self.assertNotIn("Gram Panchayats", validated[0].raw_value)
+        self.assertIn("2024", validated[0].raw_value)
 
     def test_a_question_with_no_year_still_clarifies_normally(self):
         """The fallback must not invent one — and must not leak the question
@@ -108,14 +144,38 @@ class FiscalYearFallbackTests(unittest.TestCase):
                          "as if it were a malformed value")
         self.assertEqual(clarify.pending.missing_slot, "date_range")
 
-    def test_the_extractor_still_wins_when_it_answers(self):
-        """A FALLBACK, not a prefill: nothing that works today may change."""
+    def test_the_reader_goes_first_and_the_slot_is_never_asked_for(self):
+        """D30.4, the promotion itself. A year the reader can read leaves the
+        extractor's job entirely — ~160 slots per eval replay, on a model
+        measured at a 12% all-None rate."""
         validated, clarify = self._fill(
             QID, "Which GPs have not uploaded their GPDP in 2023-2024?",
             {"date_range": "2023-2024"},
         )
         self.assertIsNone(clarify)
         self.assertEqual(validated[0].resolved_value, "2023-2024")
+        self.assertNotIn("date_range", self.asked,
+                         "the reader resolved it, so it must not be sent")
+        self.assertIn("district_name", self.asked,
+                      "the slots with no deterministic reader still go out")
+
+    def test_the_extractor_is_still_the_fallback_for_the_slot(self):
+        """READER-FIRST-THEN-EXTRACTOR, not reader-only. The reader's vocabulary
+        is narrow — it resolves "last year" and "this year" but not "the year
+        before" — so a phrase it cannot read is still sent, and a year the model
+        recovers from it is still bound."""
+        query = "Which GPs have not uploaded their GPDP the year before last?"
+        self.assertIsNone(
+            router._fiscal_year_from_text(query, "fiscal_year", self.validator),
+            "the premise of this test: the reader cannot read this phrase")
+
+        validated, clarify = self._fill(QID, query, {"date_range": "2023-2024"})
+        self.assertIn("date_range", self.asked,
+                      "a slot the reader could not fill must still be asked for")
+        self.assertIsNone(clarify)
+        self.assertEqual(
+            {e.slot_name: e.resolved_value for e in validated}["date_range"],
+            "2023-2024")
 
     # ── What it inherits from date_phrase for free ────────────────────────────
 
@@ -182,18 +242,39 @@ class FiscalYearFallbackTests(unittest.TestCase):
         carries both years — which is exactly what the fallback hands over.
         """
         paired = self._paired()[0]
-        slot_type = router._template_slot_types(self.templates[paired])
-        validated, clarify = router._fill_slots_or_clarify(
-            paired, slot_type,
-            {s: None for s in slot_type}, self.validator,
-            "Compare 2023-24 with 2024-25", "normalized", 0.0,
-            optional=router.optional_slots(self.templates[paired]["param_slots"]),
-            defaults=router.slot_defaults(self.templates[paired]["param_slots"]),
-        )
+        validated, clarify = self._fill(
+            paired, "Compare 2023-24 with 2024-25", {})
         by_slot = ({e.slot_name: e.resolved_value for e in validated}
                    if clarify is None else dict(clarify.pending.filled))
         self.assertEqual(by_slot.get("date_range_2"), "2023-2024", "year1 = earlier")
         self.assertEqual(by_slot.get("date_range"), "2024-2025", "year2 = later")
+        self.assertNotIn("date_range", self.asked)
+        self.assertNotIn("date_range_2", self.asked)
+
+    def test_the_reader_fills_BOTH_paired_slots_or_neither(self):
+        """WHY `_order_paired_fiscal_years` COULD BE DELETED (WP-5 T1). The
+        re-ordering existed because the extraction prompt orders a pair by
+        MENTION and the catalogue orders it CHRONOLOGICALLY, so a question
+        naming the earlier year first arrived inverted and PLN-039 answered
+        "greatest increase" with the greatest decline.
+
+        The prefill removes the collision at its source, and this is the
+        property that makes that true: both paired slots are read from ONE
+        string by ONE call, split by entity type, so a mixed pair — one slot
+        from the reader, one from the extractor — cannot arise.
+        """
+        for query, expect in (("Compare 2023-24 with 2024-25", True),
+                              ("Compare 2024-25 with 2023-24", True),
+                              ("GPDP status?", False)):
+            with self.subTest(query=query):
+                read = [router._fiscal_year_from_text(query, etype, self.validator)
+                        for etype in ("fiscal_year", "fiscal_year_2")]
+                self.assertEqual([r is not None for r in read], [expect, expect],
+                                 "both slots or neither")
+                if expect:
+                    self.assertGreater(read[0], read[1],
+                                       "$date_range is the LATER year, whichever "
+                                       "order the question named them in")
 
     def test_the_money_and_quantity_guards_still_hold(self):
         """date_phrase refuses to read a rupee figure as a year, and the
@@ -258,7 +339,7 @@ class FiscalYearFallbackTests(unittest.TestCase):
             self.validator.validate(STATES_NO_YEAR, "fiscal_year")
 
         self.assertIsNone(router._fiscal_year_from_text(
-            STATES_NO_YEAR, "date_range", "fiscal_year", self.validator))
+            STATES_NO_YEAR, "fiscal_year", self.validator))
 
         _, clarify = self._fill(QID, STATES_NO_YEAR, {"date_range": None})
         self.assertEqual(clarify.clarification.reason, "missing_parameter")
@@ -270,8 +351,6 @@ class FiscalYearFallbackTests(unittest.TestCase):
         is exactly the right response to an API failure)". A year the officer
         typed is recoverable from the question whether the extractor timed out
         or merely declined to read it."""
-        from query_router.entity_extractor import ExtractionUnavailable
-
         raw = ExtractionUnavailable(["date_range", "district_name", "block_name"],
                                     "timeout", "APITimeoutError")
         validated, clarify = self._fill(QID, STATES_A_YEAR, raw)
@@ -367,16 +446,10 @@ class FiscalYearFallbackTests(unittest.TestCase):
         # ALR-001 also carries a REQUIRED $threshold (a day count), which is
         # genuinely user-supplied and must keep clarifying (D18.P2). Supply it,
         # so what this test measures is the optional year and nothing else.
-        raw = {s: None for s in slot_type}
-        for name, etype in slot_type.items():
-            if etype in ("threshold", "amount_threshold"):
-                raw[name] = "30"
-        validated, clarify = router._fill_slots_or_clarify(
-            qid, slot_type, raw, self.validator,
-            "How many activities are overdue in 2024-2025?", "normalized", 0.0,
-            optional=router.optional_slots(self.templates[qid]["param_slots"]),
-            defaults=router.slot_defaults(self.templates[qid]["param_slots"]),
-        )
+        raw = {name: "30" for name, etype in slot_type.items()
+               if etype in ("threshold", "amount_threshold")}
+        validated, clarify = self._fill(
+            qid, "How many activities are overdue in 2024-2025?", raw)
         self.assertIsNone(clarify, "the year is in the question and the "
                                    "threshold was supplied")
         self.assertEqual(

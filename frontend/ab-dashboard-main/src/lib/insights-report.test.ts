@@ -185,11 +185,16 @@ describe("splitBold", () => {
   });
 });
 
-describe("the bundled AP gamma 0.5 report", () => {
+describe("the bundled Odisha PR&DW gamma 0.5 report", () => {
   const { insights, sections } = parseReport(gamma05);
 
-  it("is the AP report, not the retired PM-JAY UP one", () => {
-    expect(gamma05).toContain("AP RTGS Decision Aid");
+  // Discover renders whatever single .md sits in src/data/insights/. The feed
+  // reads as this department's own findings either way, so a report from an
+  // earlier deployment left in the folder is silently wrong rather than broken.
+  // These assertions pin the bundled report to THIS programme.
+  it("is the Odisha report, not a retired AP or UP one", () => {
+    expect(gamma05).toContain("Odisha PR&DW Decision Aid");
+    expect(gamma05).not.toContain("AP RTGS");
     expect(gamma05).not.toContain("PM-JAY");
   });
 
@@ -198,11 +203,13 @@ describe("the bundled AP gamma 0.5 report", () => {
     expect(insights).toHaveLength(leadlineCount);
   });
 
-  it("discovers the report's nine sections", () => {
-    expect(sections).toHaveLength(9);
-    expect(sections[0].name).toBe("Scheme Benefits Across the Seven Programmes");
+  it("discovers the report's three sections", () => {
+    expect(sections).toHaveLength(3);
+    expect(sections[0].name).toBe(
+      "Activity Lifecycle - Every Planned Work and Its Money"
+    );
     expect(sections.map((s) => s.name)).toContain(
-      "Equity Cube - Reach in Proportion to Population"
+      "Gram Panchayat Report Card by Year"
     );
   });
 
@@ -220,9 +227,12 @@ describe("the bundled AP gamma 0.5 report", () => {
 
     expect(markers).toBeGreaterThan(0);
     expect(noted).toHaveLength(markers);
-    for (const s of noted) {
-      expect(s.readingNote).toContain("PM-KISAN");
-    }
+    // Every section's note has to be the one the generator wrote for THAT
+    // view, not a note that happened to land in scope. The sanction-record
+    // caveat is the one both the lifecycle and report-card views carry.
+    expect(noted.map((s) => s.readingNote).join(" ")).toContain(
+      "2,101 of the 12,704 activities"
+    );
     // The old report had the caveat written by the model as a "### " heading,
     // which the feed then rendered as a numbered finding.
     expect(insights.map((i) => i.leadline)).not.toContain("Reading note for this view");
@@ -257,7 +267,9 @@ describe("the rendered Discover feed", () => {
     expect(container.querySelectorAll("[aria-expanded]")).toHaveLength(
       insights.length
     );
-    expect(container.textContent).toContain("per farmer on the PM-KISAN roster");
+    expect(container.textContent).toContain(
+      "one row for each of the 12,704 activities"
+    );
     expect(noted.length).toBeGreaterThan(0);
     unmount();
   });

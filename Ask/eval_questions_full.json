@@ -731,7 +731,9 @@
   "n": 1042,
   "q": "aur sabse kam?",
   "gold": "PLN-053",
-  "acc": [],
+  "acc": [
+   "PLN-052"
+  ],
   "partial": false,
   "excluded": false,
   "src": "WP4a-gold/planning",
@@ -747,7 +749,7 @@
   "entity_surface": [],
   "answerability": "Yes",
   "sme_review": false,
-  "notes": "Code-mixed direction-flip fragment (two words, no English anchor). The only signal is 'kam' — the subject must come entirely from context.",
+  "notes": "Code-mixed direction-flip fragment (two words, no English anchor). The only signal is 'kam' — the subject must come entirely from context. WP-5: `acc` widened to PLN-052, the same-template operation route, for the reason given on G1404.",
   "session": "prev",
   "prior_id": "G1027"
  },
@@ -1194,6 +1196,106 @@
     }
    }
   }
+ },
+ {
+  "n": 1046,
+  "q": "Which GPs planned the most activities under the Water Sufficient Village theme in 2024-25?",
+  "gold": "PLN-031",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP5-gold/categorical",
+  "id": "G1046",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "theme": "Theme 4 - Water Sufficient Village"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "theme by NAME without its number"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "D31.6 categorical widening. Pairs with G1023, which names the same slot through the trailing-space theme; this one carries a clean stored value, so a failure here is the extractor rather than the byte-level binding."
+ },
+ {
+  "n": 1047,
+  "q": "Which Gram Panchayats have not planned any activities under Theme 8 in 2024-25?",
+  "gold": "PLN-032",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP5-gold/categorical",
+  "id": "G1047",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "theme": "Theme 8 - Village with Good Governance"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "theme by NUMBER alone ('Theme 8')"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "D31.6 categorical widening. The number-only surface: the registry resolves 'Theme 8' by alias, so this measures whether the extractor hands over the two words it was given rather than deciding they are not a theme."
+ },
+ {
+  "n": 1048,
+  "q": "Child Friendly Village theme ke under 2024-25 me kaunse GP ne koi activity plan nahi ki?",
+  "gold": "PLN-032",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP5-gold/categorical",
+  "id": "G1048",
+  "bracket": "Planning",
+  "lang": "code_mixed",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "theme": "Theme 3 - Child Friendly Village"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "theme name in a code-mixed sentence"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "D31.6 categorical widening. Code-mixed retrieves at 100% (WP-4c 3.1), so a miss here is the categorical slot and not the register."
+ },
+ {
+  "n": 1049,
+  "q": "2024-25 me Poverty Free and Enhanced Livelihoods Village theme ke under sabse zyada activities kis GP ne plan ki?",
+  "gold": "PLN-031",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP5-gold/categorical",
+  "id": "G1049",
+  "bracket": "Planning",
+  "lang": "code_mixed",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "theme": "Theme 1 - Poverty Free and Enhanced Livelihoods Village"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "the longest theme name in the registry, code-mixed"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "D31.6 categorical widening. A seven-word categorical value is the shape most likely to come back truncated or paraphrased rather than quoted."
  },
  {
   "n": 1201,
@@ -2128,7 +2230,9 @@
   "n": 1404,
   "q": "and the lowest?",
   "gold": "BUD-023",
-  "acc": [],
+  "acc": [
+   "BUD-022"
+  ],
   "partial": false,
   "excluded": false,
   "src": "WP4a-gold/budgeting_funding",
@@ -2144,7 +2248,7 @@
   "entity_surface": [],
   "answerability": "Yes",
   "sme_review": false,
-  "notes": "Direction-flip fragment: same subject and year, opposite ranking template.",
+  "notes": "Direction-flip fragment: same subject and year, opposite ranking template. WP-5: `acc` widened to BUD-022 — the SAME-TEMPLATE operation route. WP-4c §5.2 corrected its own first reading of this row: the verdict is `tier=operation`, not a template re-serve, and the catalogue carries no relation expressing the hop. Under the D31.2 guard the fragment now re-queries BUD-022 without its `$top_n = 1` and returns the true lowest focus area with an echo saying so — the right answer, by the route the system actually has. Serving BUD-023 would be equally right; both are acceptable readings, which is what `acc` is for. Grading only BUD-023 would score the fix as a failure.",
   "session": "prev",
   "prior_id": "G1403"
  },
@@ -2585,6 +2689,137 @@
   "answerability": "Partial",
   "sme_review": true,
   "notes": ""
+ },
+ {
+  "n": 1423,
+  "q": "Which activities of Andhrua are funded under Own Funds in 2024-25?",
+  "gold": "SCH-002",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP5-gold/categorical",
+  "id": "G1423",
+  "bracket": "Budgeting & Funding",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "gp_name": "Andhrua",
+   "scheme": "Own Funds"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "scheme whose name is two ordinary words"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "D31.6 categorical widening. 'Own Funds' is the scheme most easily read as prose rather than as a value — which is the failure this row exists to catch."
+ },
+ {
+  "n": 1424,
+  "q": "What is the total estimated cost of activities under the 14th Finance Commission in Bhubaneswar for 2023-24?",
+  "gold": "SCH-003",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP5-gold/categorical",
+  "id": "G1424",
+  "bracket": "Budgeting & Funding",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2023-2024",
+   "block_name": "Bhubaneswar",
+   "scheme": "Fourteen Finance Commission"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "scheme alias '14th' for a stored value spelled 'Fourteen'"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "D31.6 categorical widening. The alias and the stored value share no characters, so binding it proves the registry resolution ran rather than a string match."
+ },
+ {
+  "n": 1425,
+  "q": "Which GPs in Bhubaneswar have no activities under the 4th State Finance Scheme in 2024-25?",
+  "gold": "SCH-006",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP5-gold/categorical",
+  "id": "G1425",
+  "bracket": "Budgeting & Funding",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "block_name": "Bhubaneswar",
+   "scheme": "4TH STATE FINANCE SCHEME"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "scheme stored in UPPER CASE, asked in title case"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "D31.6 categorical widening. A zero-rows-is-the-answer question, so a wrongly bound scheme returns an empty table that reads exactly like a correct one."
+ },
+ {
+  "n": 1426,
+  "q": "Khordha me XV Finance Commission ke under activities ka status breakdown kya hai 2024-25 me?",
+  "gold": "SCH-009",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP5-gold/categorical",
+  "id": "G1426",
+  "bracket": "Budgeting & Funding",
+  "lang": "code_mixed",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "district_name": "Khordha",
+   "scheme": "XV Finance Commission"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "Roman-numeral scheme name in a code-mixed sentence"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "D31.6 categorical widening."
+ },
+ {
+  "n": 1427,
+  "q": "What is the district-wise activity count under the 5th State Finance Commission for 2024-25?",
+  "gold": "SCH-011",
+  "acc": [
+   "SCH-001"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "WP5-gold/categorical",
+  "id": "G1427",
+  "bracket": "Budgeting & Funding",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "scheme": "5TH STATE FINANCE COMMISSION"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "scheme with no geography beside it"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "D31.6 categorical widening. `acc` admits SCH-001, which counts activities under a scheme within a named district — an equally legitimate reading of a question that names no district, and one G1409 already treats as the answer."
  },
  {
   "n": 1501,
@@ -3201,9 +3436,10 @@
   "expected_behavior": "clarify",
   "expected_entities": {},
   "answerability": "Partial",
-  "notes": "T2(e)(iii) — fragment x tier collision, NO slot constraint. Laxmipur is both a block and a GP in the 20-GP sample and EXP-001 can filter on either, so both readings are executable and serving one is a coin flip presented as an answer. D18.P3: clarify, and the prompt must be the TIER question ('Laxmipur (block)' / 'Laxmipur (GP)'), not the generic 'narrowed, or a new question?'. Pairs with G1523; graded as clarify-with-gold-chip.",
+  "notes": "T2(e)(iii) — fragment x tier collision, NO slot constraint. Laxmipur is both a block and a GP in the 20-GP sample and EXP-001 can filter on either, so both readings are executable and serving one is a coin flip presented as an answer. D18.P3: clarify, and the prompt must be the TIER question ('Laxmipur (block)' / 'Laxmipur (GP)'), not the generic 'narrowed, or a new question?'. Pairs with G1523; graded as clarify-with-gold-chip. D31.3 (WP-5): expected_clarification='tier_collision' — the D18.P3 ratified outcome grades as a PASS. WP-4c made the router ask the tier question in 2 of 3 replays (0 of 3 in WP-4) and the grader scored every one of them a failure, so the ratified behaviour was costing an accuracy point. `partial` stays true: the gold chip is still the right thing to offer where one is offered.",
   "session": "prev",
-  "prior_id": "G1523"
+  "prior_id": "G1523",
+  "expected_clarification": "tier_collision"
  },
  {
   "n": 1601,
@@ -3790,6 +4026,60 @@
   "answerability": "Partial",
   "sme_review": true,
   "notes": ""
+ },
+ {
+  "n": 1625,
+  "q": "How many activities in Bhubaneswar are under approval for 2024-25?",
+  "gold": "STS-003",
+  "acc": [
+   "STS-010"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "WP5-gold/categorical",
+  "id": "G1625",
+  "bracket": "Implementation & Progress",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "block_name": "Bhubaneswar",
+   "status": "UNDER APPROVAL"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "status phrase that is also ordinary English"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "D31.6 categorical widening. Completes the status registry: G1603/G1604/G1605/G1623 cover ongoing, completed and abandoned, leaving the two approval states unmeasured. **AUTHORING ERROR FOUND BY THE RUN (WP-5):** STS-010 is a purpose-built template for exactly this question ('How many activities in {block_name} are stuck in Under Approval status for {date_range}?'), so routing there is at least as good a reading as STS-003 with $status bound — and the run took it. `acc` admits both. The consequence for what this row MEASURES is stated rather than hidden: on the STS-010 route there is no `$status` slot, so the categorical expectation is vacuous and G1626 ('Activity Approved') is the row that measures the status slot."
+ },
+ {
+  "n": 1626,
+  "q": "2023-24 me Bhubaneswar me kitni activities approved status me hain?",
+  "gold": "STS-003",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP5-gold/categorical",
+  "id": "G1626",
+  "bracket": "Implementation & Progress",
+  "lang": "code_mixed",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2023-2024",
+   "block_name": "Bhubaneswar",
+   "status": "Activity Approved"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "status alias 'approved' for the stored 'Activity Approved', beside the near-identical 'UNDER APPROVAL'"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "D31.6 categorical widening. The two approval states differ by one word and mean different things, so this row and G1625 are a pair: binding either to the other is a silent wrong answer."
  },
  {
   "n": 1701,
@@ -4631,6 +4921,32 @@
   "sme_review": false,
   "notes": "All four asset_loc_* columns are 100% NULL. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
   "unanswerable_ref": "AST-004"
+ },
+ {
+  "n": 1861,
+  "q": "How many assets were created under the Self-sufficient Infrastructure in Village theme in Bhubaneswar for 2024-25?",
+  "gold": "AST-008",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP5-gold/categorical",
+  "id": "G1861",
+  "bracket": "Assets",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "block_name": "Bhubaneswar",
+   "theme": "Theme 6 - Self-sufficient Infrastructure in Village"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "theme alongside a block, so the two categorical readings compete"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "D31.6 categorical widening. The only theme row outside Planning, and the only one where a geography is named in the same breath."
  },
  {
   "n": 1901,

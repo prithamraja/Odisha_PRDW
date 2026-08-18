@@ -25,7 +25,12 @@ from pathlib import Path
 if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
-PASSING = {"hit", "partial", "clarify_gold_offered", "excluded"}
+# `clarify_as_ratified` is here for the reason D31.3 gives: a clarification the
+# gold row itself declares as the ratified outcome (G1524's tier question, under
+# D18.P3) is the system behaving as designed, and counting it as a failure made
+# the project pay an accuracy point for shipping what it had ruled.
+PASSING = {"hit", "partial", "clarify_as_ratified", "clarify_gold_offered",
+           "excluded"}
 
 
 def main(paths: list[Path]) -> None:

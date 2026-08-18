@@ -82,7 +82,12 @@ from query_router.fragment_reroute  import (
 )
 from query_router.followup_classifier import FrameEdit
 from query_router.suggestions       import suggest_followups
-from query_router.echo              import append_caveat, echo_answer
+from query_router.echo              import (
+    append_caveat,
+    echo_answer,
+    operation_answer,
+    operation_description,
+)
 from query_router.unanswerable_catalog import UNANSWERABLE_CATALOG
 from query_router.date_phrase       import extract_date_window
 from query_router.preprocessor      import normalize
@@ -311,6 +316,37 @@ def _catalog_caveat(query_id: Optional[str]) -> Optional[str]:
 class OperationCallRequest(OperationRequest):
     session_id:    str
     result_set_id: str  # guard: must match the current frame's table
+
+
+# Tiers that put an ANSWER on the officer's screen, as opposed to a question or
+# a refusal. `RouteTier`'s values are "tier1"/"tier2"; the operation path sets
+# the literal "operation".
+_SERVED_TIERS = frozenset({"tier1", "tier2", "operation"})
+
+
+def _echoed(tier, query_description: str | None, query_id: str | None) -> str | None:
+    """Every served answer restates the question it answered. Enforced (D31.2).
+
+    WHY THIS IS AN ASSERTION AND NOT A DEFAULT. `query_description` is the
+    disclosure D3 rests on, and the one path that quietly left it None — the
+    operations path — is where the truncated-table defect lived undetected for a
+    whole work package. WP-4c measured 1 / 4 / 3 served answers per replay with
+    no echo at all. Substituting a placeholder here would restore the silence in
+    a form that reads like an answer; raising makes a missing echo a failure of
+    the run, visible to the eval harness and to the suite, on the first replay
+    rather than the fiftieth.
+
+    Non-answer tiers pass through untouched: a clarification's prompt IS its
+    text, and a refusal states the workbook's reason.
+    """
+    value = getattr(tier, "value", tier)
+    if value in _SERVED_TIERS and not (query_description or "").strip():
+        raise AssertionError(
+            f"served answer for query_id={query_id!r} (tier={value}) carries no "
+            f"query_description — D3 requires every served answer to restate the "
+            f"question it answered"
+        )
+    return query_description
 
 
 def _requery_for_frame(frame: ContextFrame, start_date: str, end_date: str):
@@ -885,13 +921,23 @@ def query_endpoint(req: QueryRequest):
             executed = _execute_operation(decision.operation, session_id, op_start, op_end)
             if executed is not None:
                 frame, op_result = executed
+                # THE ECHO AND THE CAVEAT, both of which this path used to skip
+                # (D31.2). The caveat qualifies the rows, so it qualifies any
+                # number taken from them; the echo says which operation ran and
+                # over what, which is how a reader catches a minimum computed
+                # over a table the question truncated.
+                op_caveat = _catalog_caveat(frame.template_id)
                 return QueryResponse(
                     session_id=session_id,
                     context_frame=frame,
                     tier="operation",
-                    answer=op_result.answer,
+                    answer=operation_answer(frame, op_result, op_caveat),
                     result=op_result.result,
                     query_id=frame.template_id,
+                    query_description=_echoed(
+                        "operation", operation_description(frame, op_result),
+                        frame.template_id),
+                    caveat=op_caveat,
                     date_range={
                         "start_date": op_start,
                         "end_date":   op_end,
@@ -1124,7 +1170,8 @@ def query_endpoint(req: QueryRequest):
         answer=answer,
         result=result.result,
         query_id=result.query_id,
-        query_description=result.query_description,
+        query_description=_echoed(
+            result.tier, result.query_description, result.query_id),
         intent=result.intent,
         caveat=result.caveat,
         entities=[
@@ -1238,10 +1285,15 @@ def operation_endpoint(req: OperationCallRequest):
         # An operation RECOMPUTES on the same question's rows — a top-N, a share,
         # a re-sort. The caveat qualifies the rows, so it qualifies the
         # recomputation too: a percentage taken over a 17%-covered population is
-        # exactly as misleading as the count it came from.
-        answer=append_caveat(op_result.answer, caveat),
+        # exactly as misleading as the count it came from. The echo above it
+        # names the operation and its SCOPE, which is the disclosure a tapped
+        # control needs just as much as a typed follow-up does.
+        answer=operation_answer(frame, op_result, caveat),
         result=op_result.result,
         query_id=frame.template_id,
+        query_description=_echoed(
+            "operation", operation_description(frame, op_result),
+            frame.template_id),
         caveat=caveat,
         latency_ms=(time.monotonic() - started) * 1000,
         operation=op_result.operation,
