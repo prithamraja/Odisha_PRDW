@@ -37,7 +37,8 @@ from query_router.router            import (
 from query_router.vector_retriever  import VectorRetriever
 from query_router.dashboard_catalog import DASHBOARD_CATALOG
 from query_router.template_catalog  import TEMPLATE_CATALOG
-from query_router.config            import MAX_SUGGESTION_CHIPS, USE_VECTOR_RETRIEVAL
+from query_router.config            import (MAX_SUGGESTION_CHIPS, USE_VECTOR_RETRIEVAL,
+                                            LLM_TIMEOUT_SECONDS)
 from query_router.models            import (
     Chip,
     Clarification,
@@ -179,7 +180,19 @@ def startup():
         print("[startup] WARNING: OPENAI_API_KEY not set — /query endpoint disabled")
         return
 
-    _openai_client = OpenAI(api_key=oai_key)
+    # A client-level timeout, because two call paths do not set one per request:
+    # the startup index build and the query-time embedding in VectorRetriever.
+    # The four chat sites pass timeout=LLM_TIMEOUT_SECONDS themselves and are
+    # unaffected by this default.
+    #
+    # Without it a stalled embedding blocks startup FOREVER. The index build
+    # below is wrapped in try/except so a failure degrades to intent
+    # classification and the app still serves -- but a hang is not an exception,
+    # so that fallback never runs, uvicorn never binds, and the health check
+    # never passes. Observed in ECS: tasks sat idle at 0.7 CPU units past the
+    # grace period and were killed, repeatedly, while a task started earlier
+    # kept serving. The service could not be replaced.
+    _openai_client = OpenAI(api_key=oai_key, timeout=LLM_TIMEOUT_SECONDS)
     _validator     = EntityValidator(adapter)
 
     # The extraction prompt's enum lists are GENERATED from the registry, never
