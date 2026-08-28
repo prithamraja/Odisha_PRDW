@@ -35,7 +35,6 @@
     "admin_issuing_authority": "dimension",
     "admin_authority_as_recorded": "dimension",
     "technical_authority": "dimension",
-
     "geography": "dimension",
     "district": "dimension",
     "districts": "additive_count",
@@ -99,7 +98,6 @@
     "hectares": "additive_count",
     "completed": "additive_count",
     "pending": "additive_count",
-
     "_comment_entity_grain": "Columns introduced when the entity-listing templates were collapsed to one row per farmer (fidelity item 2). The STRING_AGG'd label lists are dimensions; the per-entity counters are counts. Several need an exact entry because a pattern would otherwise claim them for the wrong family — 'registrations' contains the substring 'ratio', 'unpaid_deliveries' contains 'paid', and the '*_transactions' pair contains 'subsidy'.",
     "crops": "dimension",
     "varieties": "dimension",
@@ -112,10 +110,22 @@
     "registrations": "additive_count",
     "subsidy_transactions": "additive_count",
     "input_subsidy_transactions": "additive_count",
-
     "_comment_new_templates": "Columns introduced by the templates added in the same pass (Q147-Q153, F13, G46). 'declared_over_recorded' is the P11 over-declaration ratio; 'state_schemes' is a scheme count that the dimension pattern would otherwise claim on the word 'state'.",
     "declared_over_recorded": "ratio",
-    "state_schemes": "additive_count"
+    "state_schemes": "additive_count",
+    "_comment_money_vs_status": "Money columns the status-prefix rule claims first. '(^|_)(started|ongoing|completed|approved|abandoned|awaiting)_' sits above the money rule on purpose -- 'gps_approved' is a count of gram panchayats, not an amount -- so these are pinned here rather than by reordering the patterns, which would break that. The '_year1'/'_year2' pair is claimed by a different clause in the same rule; 'expenditure_year1' is SUM(v.total_expenditure) FILTER (...), so it is an amount too.",
+    "approved_cost": "additive_value",
+    "admin_approved_cost": "additive_value",
+    "approved_cost_action_plan": "additive_value",
+    "technical_approved_cost": "additive_value",
+    "expenditure_year1": "additive_value",
+    "expenditure_year2": "additive_value",
+    "approved_cost_year1": "additive_value",
+    "approved_cost_year2": "additive_value",
+    "_comment_per_unit_means": "Per-unit MEANS, not totals: SUM(cost)/COUNT(*), expenditure/gps, and AVG(...) OVER (). They were classified additive_count, which offers them for summation -- and summing a per-activity average down a displayed table is exactly the confident, meaningless number this file exists to prevent. They are ratios, like avg_planned_cost.",
+    "cost_per_activity": "ratio",
+    "expenditure_per_gp": "ratio",
+    "state_avg_expenditure_per_gp": "ratio"
   },
   "patterns": [
     {
