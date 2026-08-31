@@ -8,13 +8,51 @@ root directory and its own `railway.json`:
 | `ask-api` | `Ask`                          | Nixpacks (Python 3.11, `requirements.txt`) | `uvicorn main:app --host 0.0.0.0 --port $PORT` |
 | `ask-web` | `frontend/ab-dashboard-main`   | Nixpacks (Node ≥20, `npm run build`)       | `npx vite preview --host :: --port $PORT`      |
 
-## Before anything else
+## Live deployment (as of 2026-08-18)
 
-Railway builds **what is on GitHub**, not what is on your disk. Today the
-pushed tree still has `Chatbot/`; the local rename to `Ask/` is uncommitted, and
-`.gitignore` still names `Chatbot/...` paths (so a commit would sweep in the
-eval artefacts and `__pycache__` now sitting under `Ask/`). Fix the ignore
-rules, commit the rename, push — then `preflight` will pass.
+| | |
+|---|---|
+| Project | `OdishaPRDW` — `693ae217-d644-417f-903a-35c2385ff2e2` |
+| Environment | `production` — `e140f86c-181e-4600-b16f-f9f9cce50539` |
+| Backend | service `Odisha_PRDW` — https://odishaprdw-production.up.railway.app |
+| Frontend | service `ask-web` — https://ask-web-production.up.railway.app |
+
+Railway builds **what is on GitHub**, not what is on your disk. The `Ask/`
+restructure is pushed as of `6565737`, so both roots resolve.
+
+## Root Directory IS scriptable — correction
+
+An earlier version of this file said Root Directory could only be set in the
+dashboard, because the CLI has no flag for it. The CLI doesn't, but the GraphQL
+API does, and a **project token is enough** for it:
+
+```
+POST https://backboard.railway.com/graphql/v2
+Header: Project-Access-Token: <RAILWAY_TOKEN from Insights/.env>
+Header: User-Agent: curl/8.4.0      # python-urllib's default UA is blocked by
+                                    # Cloudflare with error 1010 before it ever
+                                    # reaches the API
+
+mutation($serviceId: String!, $environmentId: String!, $input: ServiceInstanceUpdateInput!) {
+  serviceInstanceUpdate(serviceId: $serviceId, environmentId: $environmentId, input: $input)
+}
+variables: { "input": { "rootDirectory": "Ask" } }
+```
+
+`serviceCreate`, `serviceDomainCreate` and `serviceInstanceDeployV2` all accept
+the project token too — the CLI refuses these ("Unauthorized") because of its
+own account-level preflight, not because the API rejects them.
+
+## What a project token CANNOT do
+
+`deploymentTriggerCreate` returns **Bad Access**: wiring a GitHub auto-deploy
+trigger needs the GitHub app's user-level authorization. Consequence today:
+
+- **backend** auto-deploys on push to `master` (trigger created when the service
+  was first connected in the dashboard),
+- **ask-web** does **not** — it was created via the API, so a push does not
+  rebuild it. Either connect the repo once in the dashboard (Settings → Source),
+  or redeploy it explicitly with `serviceInstanceDeployV2`.
 
 ## Order matters
 

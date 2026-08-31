@@ -35,3 +35,8 @@ Chatbot/eval_full_graded*.json
 Chatbot/consistency_results.jsonl
 Chatbot/consistency_table.csv
 consistency_run.log
+
+# Railway credentials — deploy/railway-deploy.sh reads the token from this file
+# so it never has to be typed into a shell command, a chat window, or a commit.
+deploy/.railway-token
+*.railway-token

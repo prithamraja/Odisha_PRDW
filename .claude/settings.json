@@ -12,7 +12,10 @@
       "Bash(python Insights/src/build_views.py --pack Insights/domain_pack_prdw --data-dir Data --views-dir Insights/views_prdw --reports-dir Insights/reports_prdw --strict)",
       "Bash(cp Insights/views_prdw/view2_geo_month_cube.parquet ../v2_buildB.parquet)",
       "Bash(bash /c/Users/prith/AppData/Local/Temp/claude/i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW/b3a49dd2-1d20-4999-9b87-d5264656907e/scratchpad/sync.sh)",
-      "Bash(python Insights/src/phase4b_engine.py --views view1)"
+      "Bash(python Insights/src/phase4b_engine.py --views view1)",
+      "Bash(git --no-pager diff --stat deploy/RAILWAY.md handoffs/PROJECT_PLAN.md)",
+      "Bash(git --no-pager diff deploy/RAILWAY.md)",
+      "Bash(git --no-pager diff handoffs/PROJECT_PLAN.md)"
     ],
     "additionalDirectories": [
       "i:\\My Drive\\ASC Lab\\LMIC AI Code repo\\Odisha_PRDW\\Insights",
