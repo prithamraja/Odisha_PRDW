@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""WP-D4 (v2) -- one logged, capped call path. Every call in the trial goes through
+"""WP-D4 -- one logged, capped call path. Every call in the trial goes through
 here so the spend guard and the usage record cannot be bypassed."""
 import os, sys, json, time, hashlib
 
@@ -8,11 +8,6 @@ BASE = os.path.dirname(os.path.dirname(HERE))
 LOG = os.path.join(HERE, "logs", "calls.jsonl")
 
 # Spend guard, from the brief. Hard limits, enforced here in code.
-#
-# The counter reads logs/calls.jsonl, which is round 2's log. Round 1 -- run
-# against the SUPERSEDED v1 brief, with a different context and a different
-# verifier wording -- is archived intact at round1/logs/calls.jsonl and its 50
-# calls are reported separately. The 60-call cap in this brief is this run's cap.
 MAX_CALLS = 60
 MAX_INPUT_TOKENS = 16000
 WRITER_MAX_COMPLETION = 8000

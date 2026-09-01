@@ -1,24 +1,13 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""WP-D4 (v2) T3 -- mechanical nothing-invented checks.
+"""WP-D4 T3 -- mechanical nothing-invented checks.
 
-Four checks per finding, over lead and detail together:
-
-  (a) every numeral appears verbatim in that finding's packet or in the
-      instantiated context
-  (b) every place / person / category name appears in that finding's packet
-  (c) no raw database token -- column identifiers, "(varies)", "PERIOD_...",
-      engine pattern-type enums
-  (d) lead <= 2 sentences, detail <= ~200 words
-
-NO STYLE CHECKS -- the brief forbids them outright. Whether the prose reads well,
-whether it took the angle you would have taken, whether it ordered its points
-sensibly: all of that is the operator's call at the gate, not code's.
+Four checks per finding, over lead and detail. NO STYLE CHECKS -- the brief
+forbids them; whether the prose reads well is the operator's call at the gate.
 
 The normalizations are deliberately TIGHT (brief trap: "51.96" must not match
 "5,196"). Numerals are compared as whole TOKENS against the token set of the
-finding's own packet plus the instantiated context -- not as raw substrings, so
-"893" cannot match inside "6,893" either.
+finding's own packet plus Appendix A -- not as raw substrings, so "893" cannot
+match inside "6,893" either.
 """
 import os, re, sys, json
 import pandas as pd
@@ -28,8 +17,7 @@ BASE = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, os.path.join(BASE, "Insights", "src"))
 sys.path.insert(0, HERE)
 
-from prompts import render_packet
-from context import CONTEXT
+from prompts import APPENDIX_A, render_packet
 
 # Columns that carry human-readable NAMES. Codes (LGD, block_code) and time
 # labels are excluded: they are not the "place/person/category" of check (b).
@@ -60,15 +48,13 @@ _VARIES = "(varies)"
 # Kept whole so grouping and decimals are part of the identity of the token.
 _NUM = re.compile(r"\d{4}-\d{2,4}|\d+(?:[.,]\d+)*")
 
-ROSTER_PATH = os.path.join(HERE, "entity_roster.json")
 
-
-def numerals(text):
+def numerals(text: str) -> list:
     return _NUM.findall(text)
 
 
-def _num_variants(tok):
-    """Exact value, plus the one formatting-only variant allowed: a trailing
+def _num_variants(tok: str) -> set:
+    """Exact value, plus the one formatting-only variant we allow: a trailing
     '.0' dropped (100.0 -> 100). Rounding is NOT allowed -- 48.3 -> 48 changes
     the claim -- and commas are never stripped (that is the stated trap)."""
     out = {tok}
@@ -77,9 +63,7 @@ def _num_variants(tok):
     return out
 
 
-def build_name_roster(cache=True):
-    if cache and os.path.exists(ROSTER_PATH):
-        return set(json.load(open(ROSTER_PATH, encoding="utf-8")))
+def build_name_roster() -> set:
     import phase5b_report as p5b
     roster = set()
     for cfg in p5b.VIEW_CONFIGS.values():
@@ -90,21 +74,19 @@ def build_name_roster(cache=True):
                     s = str(v).strip()
                     if s and not s.isdigit():
                         roster.add(s)
-    json.dump(sorted(roster), open(ROSTER_PATH, "w", encoding="utf-8"),
-              indent=1, ensure_ascii=False)
     return roster
 
 
-def _sentences(text):
+def _sentences(text: str) -> list:
     """Sentence split that does not break on the '.' inside 'Rs 1.24 crore'."""
     protected = re.sub(r"(?<=\d)\.(?=\d)", "\x00", text)
     parts = [p.strip() for p in re.split(r"(?<=[.!?])\s+", protected) if p.strip()]
     return [p.replace("\x00", ".") for p in parts]
 
 
-def check_finding(packet, lead, detail, roster):
+def check_finding(packet: dict, lead: str, detail: str, roster: set) -> dict:
     packet_text = render_packet(packet)
-    allowed_text = packet_text + "\n" + CONTEXT
+    allowed_text = packet_text + "\n" + APPENDIX_A
     allowed_nums = set()
     for t in numerals(allowed_text):
         allowed_nums |= _num_variants(t)
@@ -112,7 +94,7 @@ def check_finding(packet, lead, detail, roster):
     body = (lead + "\n" + detail).strip()
     results = {}
 
-    # (a) every numeral traces to the packet or the instantiated context
+    # (a) every numeral traces to the packet or Appendix A
     bad_nums = []
     for t in numerals(body):
         if not (_num_variants(t) & allowed_nums):
@@ -142,8 +124,7 @@ def check_finding(packet, lead, detail, roster):
             hits.append(e)
     results["c_db_tokens"] = {"pass": not hits, "tokens": sorted(set(hits))}
 
-    # (d) shape: lead <= 2 sentences, detail <= ~200 words (10% tolerance on the
-    #     brief's "up to ~200 words")
+    # (d) shape: lead <= 2 sentences, detail <= ~200 words (10% tolerance)
     n_sent = len(_sentences(lead))
     n_words = len(detail.split())
     results["d_shape"] = {
@@ -156,13 +137,13 @@ def check_finding(packet, lead, detail, roster):
     return results
 
 
-def failure_reason(res):
+def failure_reason(res: dict) -> str:
     """Plain-English reason, fed back on the single regeneration (T5)."""
     bits = []
     if not res["a_numerals"]["pass"]:
         bits.append("It used numbers that were not in the reference figures or the "
-                    "context: " + ", ".join(res["a_numerals"]["unsupported"])
-                    + ". Use only figures that were given to you, exactly as written.")
+                    "background: " + ", ".join(res["a_numerals"]["unsupported"])
+                    + ". Use only figures that were given to you.")
     if not res["b_names"]["pass"]:
         bits.append("It named places or categories that do not belong to this finding: "
                     + ", ".join(res["b_names"]["not_in_packet"])
@@ -172,7 +153,7 @@ def failure_reason(res):
                     + ", ".join(res["c_db_tokens"]["tokens"])
                     + ". Write it the way an official would say it.")
     if not res["d_shape"]["pass"]:
-        bits.append("Length: the lead ran to %d sentences (at most 2) and the detail "
-                    "to %d words (at most about 200)."
-                    % (res["d_shape"]["lead_sentences"], res["d_shape"]["detail_words"]))
+        bits.append(f"Length: the lead ran to {res['d_shape']['lead_sentences']} sentences "
+                    f"(at most 2) and the detail to {res['d_shape']['detail_words']} words "
+                    f"(at most about 200).")
     return " ".join(bits)

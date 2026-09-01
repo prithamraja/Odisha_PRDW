@@ -1,194 +1,280 @@
 #!/usr/bin/env python
-"""WP-D4 T6 -- the review document. Reads without opening any other file."""
+# -*- coding: utf-8 -*-
+"""WP-D4 (v2) T6 -- the review document.
+
+REVIEW.md must read without opening any other file, so everything it needs --
+totals, quotes, per-finding text, check results, verdicts -- is written into it.
+"""
 import os, sys, json, collections
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from verify import VERIFIER_MODEL
 
+import llm
+from context import CONTEXT
+
+D = json.load(open(os.path.join(HERE, "results.json"), encoding="utf-8"))
 PACKETS = {p["rank"]: p for p in json.load(open(os.path.join(HERE, "packets.json"), encoding="utf-8"))}
-RESULTS = json.load(open(os.path.join(HERE, "results.json"), encoding="utf-8"))
-V2 = json.load(open(os.path.join(HERE, "results_v2.json"), encoding="utf-8"))
-CALLS = [json.loads(l) for l in open(os.path.join(HERE, "logs", "calls.jsonl"), encoding="utf-8")]
+REMEASURE = {}
+_rm = os.path.join(HERE, "remeasure.json")
+if os.path.exists(_rm):
+    REMEASURE = json.load(open(_rm, encoding="utf-8"))
 
-CANDIDATE_SET_ID = "a7f991c1df3771f9"
-WRITER_MODEL = "gpt-5.6-sol"
+FINDINGS = D["findings"]
+OUT = os.path.join(HERE, "REVIEW.md")
+
+CANDIDATE_SET = "a7f991c1df3771f9"
+
+VIEW_TITLE = {"view1": "Activity Lifecycle", "view2": "Geo-Month Cash Cube",
+              "view3": "GP Performance"}
 
 
-def check_line(chk):
-    a, b, c, d = chk["a_numerals"], chk["b_names"], chk["c_db_tokens"], chk["d_shape"]
-    bits = [
-        "(a) numerals {} ({} checked{})".format(
-            "PASS" if a["pass"] else "FAIL", a["checked"],
-            "" if a["pass"] else ": " + ", ".join(a["unsupported"])),
-        "(b) names {}{}".format("PASS" if b["pass"] else "FAIL",
-                                "" if b["pass"] else ": " + ", ".join(b["not_in_packet"])),
-        "(c) db tokens {}{}".format("PASS" if c["pass"] else "FAIL",
-                                    "" if c["pass"] else ": " + ", ".join(c["tokens"])),
-        "(d) shape {} (lead {} sent., detail {} w)".format(
-            "PASS" if d["pass"] else "FAIL", d["lead_sentences"], d["detail_words"]),
-    ]
+def usage_rollup():
+    by = collections.OrderedDict()
+    total = {"n": 0, "prompt": 0, "completion": 0, "reasoning": 0}
+    for line in open(llm.LOG, encoding="utf-8"):
+        r = json.loads(line)
+        u = r["usage"]
+        b = by.setdefault(r["purpose"], {"n": 0, "prompt": 0, "completion": 0,
+                                         "reasoning": 0, "model": r["model"]})
+        b["n"] += 1
+        b["prompt"] += u["prompt_tokens"]
+        b["completion"] += u["completion_tokens"]
+        b["reasoning"] += u["reasoning_tokens"] or 0
+        total["n"] += 1
+        total["prompt"] += u["prompt_tokens"]
+        total["completion"] += u["completion_tokens"]
+        total["reasoning"] += u["reasoning_tokens"] or 0
+    return by, total
+
+
+def check_cell(chk):
+    bits = []
+    for key, label in (("a_numerals", "numerals"), ("b_names", "names"),
+                       ("c_db_tokens", "no database wording"), ("d_shape", "shape")):
+        bits.append(("PASS " if chk[key]["pass"] else "**FAIL** ") + label)
     return "; ".join(bits)
 
 
-def main():
+def check_detail(chk):
+    return ("%d numerals checked, all traced; no name outside the packet; no database "
+            "wording; lead %d sentence(s), detail %d words"
+            % (chk["a_numerals"]["checked"], chk["d_shape"]["lead_sentences"],
+               chk["d_shape"]["detail_words"])) if chk["all_pass"] else json.dumps(chk)
+
+
+def verdict_cell(ver):
+    v = ver["verdict"]
+    if v == "pass":
+        return "**pass** — %d factual claims mapped to source lines" % len(ver.get("claim_map", []))
+    if v == "fail":
+        return "**fail** — %d drifted claim(s)" % len(ver.get("problems", []))
+    return "**fail-to-verify**"
+
+
+def problems_block(ver, indent="  "):
     L = []
-    W = L.append
+    for p in ver.get("problems", []):
+        L.append('%s- Flagged: "%s"' % (indent, p.get("drifted_claim")))
+        L.append("%s  Source says: %s" % (indent, p.get("missing_or_contradicted_fact")))
+    return "\n".join(L)
 
-    usage = collections.Counter()
-    for c in CALLS:
-        usage["prompt"] += c["usage"]["prompt_tokens"]
-        usage["completion"] += c["usage"]["completion_tokens"]
-        usage["reasoning"] += c["usage"]["reasoning_tokens"] or 0
-    by_purpose = collections.Counter(c["purpose"] for c in CALLS)
 
-    n_first = sum(1 for r in RESULTS if r["status"] == "first-pass")
-    n_regen = sum(1 for r in RESULTS if r["status"] == "regenerated")
-    n_fell = sum(1 for r in RESULTS if r["status"] == "fell back")
-    v2_pass = sum(1 for k, v in V2.items() if v["verdict"] == "pass")
-    n_v2 = len(V2)
+def main():
+    by, total = usage_rollup()
+    statuses = collections.Counter(r["status"] for r in FINDINGS)
+    n_rend = sum(len(r["attempts"]) for r in FINDINGS)
+    n_nums = sum(a["checks"]["a_numerals"]["checked"] for r in FINDINGS for a in r["attempts"])
+    code_fails = sum(1 for r in FINDINGS for a in r["attempts"] if not a["checks"]["all_pass"])
+    ver_fail = [(r, a) for r in FINDINGS for a in r["attempts"]
+                if a["verifier"]["verdict"] == "fail"]
+    ver_unverified = [(r, a) for r in FINDINGS for a in r["attempts"]
+                      if a["verifier"]["verdict"] == "fail_to_verify"]
 
-    W("# WP-D4 prose trial - review document")
-    W("")
-    W("**What this is.** A trial, not a shipped change. Fifteen findings were rewritten by")
-    W("a context-driven writer that received no writing rules at all - only the context")
-    W("brief (Appendix A of the WP-D4 brief) and a packet of deterministically computed")
-    W("reference figures per finding. All safety sits *after* the writer: mechanical")
-    W("nothing-invented checks, then a different-model verifier. Nothing here is wired to")
-    W("the feed, the reports or the frontend; `global_feed.json` is untouched.")
-    W("")
-    W("**Your job at the gate.** Label each of the fifteen **adopt** / **adopt-with-edits**")
-    W("/ **reject**, judging the new text against the current feed text shown beside it.")
-    W("")
-    W("- **Candidate set:** `{}` (six pinned files verified against WPD3b section 4 before the run)".format(CANDIDATE_SET_ID))
-    W("- **Writer:** `{}` - one batch call, all 15 findings, no rules in the prompt".format(WRITER_MODEL))
-    W("- **Verifier:** `{}` - a different model generation; same vendor (disclosed limitation)".format(VERIFIER_MODEL))
-    W("")
-    W("## Totals")
-    W("")
-    W("| | count |")
-    W("|---|---:|")
-    W("| Findings | 15 |")
-    W("| Clean on the first pass (checks + verifier v1) | **{}** |".format(n_first))
-    W("| Passed after one regeneration | **{}** |".format(n_regen))
-    W("| Fell back to the current feed sentence | **{}** |".format(n_fell))
-    W("| Code checks that fired (of 28 renderings checked) | 2 |")
-    W("| Verifier v1 failures later shown to be false positives | {} of {} |".format(v2_pass, n_v2))
-    W("| API calls | {} of 60 allowed |".format(len(CALLS)))
-    W("")
-    W("**What the code checks caught.** Two of twenty-eight renderings, both the same")
-    W("thing: a fiscal year written `2020-21` / `2024-25` where the packet says")
-    W("`2020-2021` / `2024-2025`. The number was *right*; it was not *verbatim*. Nothing")
-    W("else ever tripped them - across 181 numerals checked, the writer invented no")
-    W("figure, named no place outside its own finding, and emitted no database token.")
-    W("")
-    W("**What the verifier caught that the code could not.** Three real drifts, none of")
-    W("which changes a digit and none of which any mechanical check could see:")
-    W("")
-    W("1. **Finding 3** - the writer narrowed a stated limitation, turning the background's")
-    W("   \"sanction records exist for only about one **work** in six\" into \"one **activity**")
-    W("   in six\". Different denominator, same digits.")
-    W("2. **Finding 8** - the writer attached a sample-wide total (`Rs 41.61 crore`) to the")
-    W("   eighteen Gram Panchayats the *pattern* holds in, and dropped the finding's")
-    W("   `Costed`-only scope. Every numeral was legitimate; the attribution was not.")
-    W("3. **Finding 9** - the writer asserted \"this analysis did not assess geographic")
-    W("   differences\", a claim about the analysis that no source makes.")
-    W("")
-    W("**The verifier's own defect, measured.** Under the brief's literal T4 wording the")
-    W("verifier failed 8 of 15 - but {} of those 8 were one repeated false positive: it".format(v2_pass))
-    W("flagged the *\"what to check at the next review\"* sentence as an unsupported claim,")
-    W("the very sentence Appendix A asks the writer to produce. The verifier sees only the")
-    W("background bullets, which never *state* a recommendation, so every suggestion looked")
-    W("invented. Re-running those eight with one sentence added, separating a suggested")
-    W("action from a factual claim, {} of {} passed. **The fallbacks below are an artefact of".format(v2_pass, n_v2))
-    W("that verifier wording, not of the writing** - which is why each one shows the")
-    W("rendering it produced as well as the fallback.")
-    W("")
-    W("---")
-    W("")
+    W = []
+    w = W.append
 
-    for r in RESULTS:
+    w("# WP-D4 prose trial — review document")
+    w("")
+    w("**What this is.** A trial, not a shipped change. The fifteen findings at the top")
+    w("of the Discover feed were rewritten by a writer that received **no writing rules")
+    w("at all** — only the context brief and, per finding, a packet of deterministically")
+    w("computed reference figures and variable definitions. All safety sits *after* the")
+    w("writer: mechanical nothing-invented checks, then a different-model verifier.")
+    w("Nothing here is wired to the feed, the reports or the frontend; `global_feed.json`")
+    w("is untouched and the feed sentences below are its current text.")
+    w("")
+    w("**Your job at the gate.** Label each of the fifteen **adopt** / **adopt-with-edits**")
+    w("/ **reject**, judging the new text against the current feed text shown beside it.")
+    w("That labelling — not anything in this document — decides whether the design goes to")
+    w("production and what the context brief needs changed.")
+    w("")
+    w("- **Candidate set:** `%s` (six pinned files in `Insights/metainsights/` verified against WP-D3b §4 before the run; feed `global_feed.json` sha256 `3da40edae324f917…`)" % CANDIDATE_SET)
+    w("- **Writer:** `%s` — pinned by D17 through `discover_config`. One batch call, all 15 findings, no rules in the prompt." % D["writer_model"])
+    w("- **Verifier:** `%s` — a different model generation; same vendor (disclosed limitation: one completion key on file)." % D["verifier_model"])
+    w("- **Context:** the instantiated Appendix A, reproduced in full at the end of this document. It carries **no list of domain facts** and no caution layer; the writer worked from the packets alone.")
+    w("")
+
+    w("## Totals")
+    w("")
+    w("| | count |")
+    w("|---|---:|")
+    w("| Findings | 15 |")
+    w("| Clean on the first pass (checks **and** verifier) | **%d** |" % statuses["first-pass"])
+    w("| Passed after one regeneration | **%d** |" % statuses["regenerated"])
+    w("| Fell back to the current feed sentence | **%d** |" % statuses["fell back"])
+    w("| Renderings put through the safety net | %d |" % n_rend)
+    w("| Numerals machine-checked across them | %d |" % n_nums)
+    w("| Renderings the code checks failed | **%d** |" % code_fails)
+    w("| Renderings the verifier failed | **%d** |" % len(ver_fail))
+    w("| Verifier calls that returned nothing to parse | %d |" % len(ver_unverified))
+    w("| API calls | %d of %d allowed |" % (total["n"], llm.MAX_CALLS))
+    w("")
+
+    w("**What the code checks caught: nothing.** Across %d renderings and %d numerals," % (n_rend, n_nums))
+    w("every figure traced to its own packet or to the context, no rendering named a place")
+    w("or category outside its own finding, no rendering emitted a database token, and every")
+    w("lead and detail was inside the length bounds. The layer is not idle — it is the layer")
+    w("that makes \"the writer invented no figure\" a measured statement rather than an")
+    w("impression — but on this run it found nothing to reject. Round 1's only two catches")
+    w("were fiscal years written `2020-21` against a packet that said `2020-2021`; this")
+    w("round's packets carry both forms of every year, and that class is gone.")
+    w("")
+
+    w("**What the verifier caught that the code could not.** %d drifts, none of which changes" % len(ver_fail))
+    w("a digit and none of which any mechanical check could see:")
+    w("")
+    n = 0
+    for r, a in ver_fail:
+        n += 1
+        for p in a["verifier"].get("problems", []):
+            w('%d. **Finding %d, attempt %d** — "%s"' % (n, r["rank"], a["attempt"], p.get("drifted_claim")))
+            w("   *The source says:* %s" % p.get("missing_or_contradicted_fact"))
+            break
+    w("")
+    w("All four are the same species: the numbers were right and the *attribution*,")
+    w("*inference* or *implied fact* was not. A pattern read as a practice; a seasonal")
+    w("shape read as a control risk; a partial coverage figure read as evidence of missing")
+    w("records; a single quoted percentage read as a rank across nine districts. This is the")
+    w("class of error the trial exists to test for, and code checks cannot reach it.")
+    w("")
+
+    if ver_unverified:
+        w("**The verifier's own failure, measured.** One verifier call — finding 1, first")
+        w("attempt — returned an empty string: the model spent all 4,000 of its completion")
+        w("budget on internal reasoning and stopped for length. Under the brief an")
+        w("unparseable verdict is a fail-to-verify, never a pass, so that finding was")
+        w("regenerated and its recorded status is *regenerated*. Re-running that same call")
+        rm = REMEASURE.get("1/1")
+        if rm:
+            w("afterwards at the same ceiling returned **%s** on %d reasoning tokens, so the"
+              % (rm["remeasured_verdict"], rm["remeasured_usage"]["reasoning_tokens"]))
+            w("starvation was a one-off, not a property of that prompt. **Finding 1's first")
+            w("rendering was sound; it was regenerated because the judge fell over, not")
+            w("because the writing did.** Both versions are shown below.")
+        w("")
+
+    w("**Cost.** %d calls: %s. Token usage in full:" % (
+        total["n"], ", ".join("%d %s" % (v["n"], k.replace("_", " ")) for k, v in by.items())))
+    w("")
+    w("| call type | model | calls | prompt tokens | completion tokens | of which reasoning |")
+    w("|---|---|---:|---:|---:|---:|")
+    for k, v in by.items():
+        w("| %s | `%s` | %d | %s | %s | %s |"
+          % (k.replace("_", " "), v["model"], v["n"], f"{v['prompt']:,}",
+             f"{v['completion']:,}", f"{v['reasoning']:,}"))
+    w("| **total** | | **%d** | **%s** | **%s** | **%s** |"
+      % (total["n"], f"{total['prompt']:,}", f"{total['completion']:,}",
+         f"{total['reasoning']:,}"))
+    w("")
+    w("The repository holds no per-token price list for these model ids, so the cost is")
+    w("stated in tokens rather than in an invented currency figure. Worst case allowed by")
+    w("the brief was about 1.44M tokens; this run used %s." % f"{total['prompt'] + total['completion']:,}")
+    w("")
+    w("---")
+    w("")
+
+    for r in FINDINGS:
         rank = r["rank"]
-        p = PACKETS[rank]
+        pk = PACKETS[rank]
         last = r["attempts"][-1]
-        v2 = V2.get(str(rank)) or V2.get(rank)
-
-        title = "## Finding {} - {}".format(rank, p["view_title"])
-        if p["thin"]:
-            title += "  ·  *thin packet: no reference figures could be computed*"
-        W(title)
-        W("")
-        W("**Status: {}**".format(r["status"].upper()))
-        W("")
-        W("**Current feed text (what the officer sees today):**")
-        W("")
-        W("> " + r["feed_sentence"])
-        W("")
+        w("## Finding %d — %s" % (rank, VIEW_TITLE.get(r["view"], r["view"])))
+        w("")
+        w("**Status: %s.**" % r["status"].upper())
+        w("")
+        w("**Current feed text (what production says today)**")
+        w("")
+        w("> %s" % pk["feed_sentence"].replace("\n", " "))
+        w("")
+        w("**Final rendering**")
+        w("")
         if r["status"] == "fell back":
-            W("**Final rendering - per the failure path, this is the current feed sentence above.**")
-            W("")
-            W("**The rendering that was produced** (shown because the fallback was driven by the")
-            W("verifier wording described above, not by anything wrong in this text):")
+            w("*The safety net rejected both attempts, so the final rendering is the current")
+            w("feed sentence above, marked* `FELL BACK`. *The text the writer actually")
+            w("produced is shown under \"attempts\" below, because you cannot judge the design")
+            w("from a fallback.*")
         else:
-            W("**Final rendering:**")
-        W("")
-        W("> **Lead.** " + last["lead"].replace("\n", " "))
-        W(">")
-        W("> **Detail.** " + last["detail"].replace("\n", " "))
-        W("")
-        W("**Checks (final rendering):** " + check_line(last["checks"]))
-        W("")
-        if len(r["attempts"]) > 1:
-            W("**First attempt checks:** " + check_line(r["attempts"][0]["checks"]))
-            W("")
-            W("**Why it was regenerated:** " + r.get("regeneration_reason", "")[:600])
-            W("")
-        v1 = last["verifier"]
-        W("**Verifier v1 ({}): {}**".format(VERIFIER_MODEL, v1["verdict"].upper()))
-        W("")
-        if v1["verdict"] == "pass":
-            for c in v1.get("claim_map", [])[:6]:
-                W("- claim: *{}* -> supported by: {}".format(c.get("claim"), c.get("supported_by")))
-        else:
-            for pr in v1.get("problems", [])[:4]:
-                W("- flagged: *\"{}\"*".format(pr.get("drifted_claim")))
-                W("  - source says: {}".format(pr.get("missing_or_contradicted_fact")))
-        W("")
-        if v2:
-            W("**Verifier v2 (action separated from claim): {}**".format(v2["verdict"].upper()))
-            W("")
-            if v2["verdict"] == "pass":
-                for c in v2.get("claim_map", [])[:4]:
-                    W("- claim: *{}* -> supported by: {}".format(c.get("claim"), c.get("supported_by")))
-            else:
-                for pr in v2.get("problems", [])[:3]:
-                    W("- flagged: *\"{}\"*".format(pr.get("drifted_claim")))
-                    W("  - source says: {}".format(pr.get("missing_or_contradicted_fact")))
-            W("")
-        W("**Operator label:**  [ ] adopt   [ ] adopt-with-edits   [ ] reject")
-        W("")
-        W("---")
-        W("")
+            w("> **%s**" % r["final_lead"].replace("\n", " "))
+            w(">")
+            w("> %s" % r["final_detail"].replace("\n", " "))
+        w("")
+        w("**Checks (final attempt):** %s" % check_cell(last["checks"]))
+        w("")
+        w("**Verifier verdict (final attempt):** %s" % verdict_cell(last["verifier"]))
+        if last["verifier"].get("problems"):
+            w("")
+            w(problems_block(last["verifier"], indent=""))
+        w("")
+        w("**Operator label:**  [ ] adopt   [ ] adopt-with-edits   [ ] reject")
+        w("")
 
-    W("## Calls and usage")
-    W("")
-    W("| purpose | calls | model |")
-    W("|---|---:|---|")
-    for k, v in by_purpose.items():
-        model = next(c["model"] for c in CALLS if c["purpose"] == k)
-        W("| {} | {} | `{}` |".format(k, v, model))
-    W("| **total** | **{}** | cap 60 |".format(len(CALLS)))
-    W("")
-    W("Prompt tokens {:,} - completion tokens {:,} (of which reasoning {:,}) - total {:,}.".format(
-        usage["prompt"], usage["completion"], usage["reasoning"],
-        usage["prompt"] + usage["completion"]))
-    W("Every call returned `finish_reason: stop`; nothing was truncated and the batch was")
-    W("never split. The repo records no token price, so usage is reported in tokens only.")
-    W("")
+        if len(r["attempts"]) > 1 or r["status"] == "fell back":
+            w("<details><summary>Attempts</summary>")
+            w("")
+            for a in r["attempts"]:
+                w("**Attempt %d** — checks %s, verifier %s"
+                  % (a["attempt"], "PASS" if a["checks"]["all_pass"] else "FAIL",
+                     a["verifier"]["verdict"]))
+                w("")
+                w("> **%s**" % a["lead"].replace("\n", " "))
+                w(">")
+                w("> %s" % a["detail"].replace("\n", " "))
+                w("")
+                if a["verifier"].get("problems"):
+                    w(problems_block(a["verifier"], indent=""))
+                    w("")
+            if r.get("regeneration_reason"):
+                w("*Reason fed back to the writer for the regeneration:* %s"
+                  % r["regeneration_reason"])
+                w("")
+            rm = REMEASURE.get("%d/1" % rank)
+            if rm:
+                w("*Re-measurement of attempt 1's verdict, run after the trial and not counted")
+                w("in it:* the same verifier, same ceiling, same rendering returned **%s**"
+                  % rm["remeasured_verdict"])
+                w("(finish `%s`, %d reasoning tokens, %d factual claims mapped to source lines)."
+                  % (rm["remeasured_finish_reason"],
+                     rm["remeasured_usage"]["reasoning_tokens"],
+                     len(rm.get("claim_map") or [])))
+                w("")
+            w("</details>")
+            w("")
+        w("---")
+        w("")
 
-    out = os.path.join(HERE, "REVIEW.md")
-    open(out, "w", encoding="utf-8").write("\n".join(L) + "\n")
-    print("wrote", out, len("\n".join(L)), "chars")
+    w("## Appendix — the context every rendering was written from")
+    w("")
+    w("Reproduced verbatim, so this document reads without opening another file. It is the")
+    w("instantiated Appendix A of the WP-D4 brief: the operator's template with the four")
+    w("PR&DW slot values filled in. Note what is *not* in it — no list of domain facts, no")
+    w("caution library, no writing rules, no phrasing suggestions.")
+    w("")
+    for line in CONTEXT.split("\n"):
+        w("> " + line if line.strip() else ">")
+    w("")
+
+    open(OUT, "w", encoding="utf-8").write("\n".join(W) + "\n")
+    print("wrote %s (%d lines)" % (OUT, len(W)))
 
 
 if __name__ == "__main__":

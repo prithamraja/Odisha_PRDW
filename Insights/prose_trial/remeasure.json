@@ -1,0 +1,57 @@
+{
+ "1/1": {
+  "lead": "Costed activities show a combined spending shortfall of Rs 51.96 crore against plans, and the gap is spread across blocks rather than being confined to one location.",
+  "detail": "The broad spread appears in 27 of 28 asset categories; Banking Facilities shows no clear pattern. Rangeilunda has the largest recorded gap at Rs 9.11 crore, with Rs 2.73 crore spent against Rs 11.84 crore planned, while Kalimela spent Rs 1.76 crore of Rs 7.65 crore. Blocks should review ageing activities and reconcile whether these gaps reflect works yet to start, incomplete expenditure records or plans that are no longer active; the sample does not by itself establish the cause.",
+  "original_verdict": "fail_to_verify",
+  "original_finish_reason": "length",
+  "original_usage": {
+   "prompt_tokens": 2500,
+   "completion_tokens": 4000,
+   "total_tokens": 6500,
+   "reasoning_tokens": 4000
+  },
+  "remeasured_verdict": "pass",
+  "remeasured_finish_reason": "stop",
+  "remeasured_usage": {
+   "prompt_tokens": 2500,
+   "completion_tokens": 2020,
+   "total_tokens": 4520,
+   "reasoning_tokens": 1537
+  },
+  "claim_map": [
+   {
+    "claim": "Costed activities show a combined spending shortfall of Rs 51.96 crore against plans",
+    "supported_by": "Records covered: is_costless = Costed; overspend_vs_plan (the measure): rupees, totalled, SIGNED (money spent minus money planned). A positive figure is spending above the plan; a negative figure is planned money not spent.; total: Rs -51.96 crore"
+   },
+   {
+    "claim": "the gap is spread across blocks rather than being confined to one location",
+    "supported_by": "Engine sentence: Across nearly all asset_category_label values (27/28), overspend_vs_plan is spread evenly across block_name values -- it belongs to all of them and no single block_name accounts for it."
+   },
+   {
+    "claim": "The broad spread appears in 27 of 28 asset categories",
+    "supported_by": "Engine sentence: Across nearly all asset_category_label values (27/28), overspend_vs_plan is spread evenly across block_name values -- it belongs to all of them and no single block_name accounts for it."
+   },
+   {
+    "claim": "Banking Facilities shows no clear pattern",
+    "supported_by": "Exceptions: - Banking Facilities: no clear pattern -- the engine found no clear pattern here"
+   },
+   {
+    "claim": "Rangeilunda has the largest recorded gap at Rs 9.11 crore",
+    "supported_by": "bottom_values / Rangeilunda / value: Rs -9.11 crore"
+   },
+   {
+    "claim": "Rs 2.73 crore spent against Rs 11.84 crore planned",
+    "supported_by": "utilization_companion / absolutes / Rangeilunda: Rs 2.73 crore spent of Rs 11.84 crore planned cost"
+   },
+   {
+    "claim": "Kalimela spent Rs 1.76 crore of Rs 7.65 crore",
+    "supported_by": "utilization_companion / absolutes / Kalimela: Rs 1.76 crore spent of Rs 7.65 crore planned cost"
+   },
+   {
+    "claim": "the sample does not by itself establish the cause",
+    "supported_by": "SOURCE MATERIAL 2: The current data is a 20-Gram-Panchayat sample; percentages describe the sample, not the state.; SOURCE MATERIAL 2: Be direct about what the data can and cannot establish — an insight that overstates certainty could send an official after the wrong problem."
+   }
+  ],
+  "problems": []
+ }
+}

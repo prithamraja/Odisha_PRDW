@@ -3,14 +3,13 @@
   "rank": 1,
   "view": "view1",
   "view_title": "Activity Lifecycle",
-  "view_row": "one row per planned activity -- 12,704 activities planned by the 20 Gram Panchayats between 2020-2021 and 2025-2026.",
   "pattern_type": "EVENNESS",
   "measure": "overspend_vs_plan",
   "breakdown": "block_name",
   "compared_across": "asset_category_label",
   "scope": "is_costless = Costed",
   "feed_sentence": "Across nearly all asset_category_label values (27/28), overspend_vs_plan is spread evenly across block_name values -- it belongs to all of them and no single block_name accounts for it. Uneven only in: Banking Facilities (not evenly spread) -- this is about how the total is spread, not about how much any one of them spends",
-  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
   "members_following_the_pattern": [
    "Uncategorised",
    "Buildings",
@@ -47,36 +46,9 @@
     "name": "Banking Facilities",
     "kind": "no clear pattern",
     "in_words": "the engine found no clear pattern here",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    }
   ],
-  "definitions": [
-   {
-    "variable": "overspend_vs_plan",
-    "role": "the measure",
-    "definition": "rupees, totalled, SIGNED (money spent minus money planned). A positive figure is spending above the plan; a negative figure is planned money not spent.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "block_name",
-    "role": "the breakdown",
-    "definition": "the Block, from the LGD-coded government roster. 16 of them in this sample.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "asset_category_label",
-    "role": "compared across",
-    "definition": "the asset the work creates. 27 named categories reach this view; 'Uncategorised' means no asset category was recorded against the work, and is not itself a kind of asset.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "is_costless",
-    "role": "filter",
-    "definition": "whether the activity was planned with a cost ('Costed') or without one ('Costless' -- training, campaigns and services).",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   }
-  ],
-  "definitions_missing": [],
   "reference_figures": [
    {
     "label": "top_values / Lahunipara / value",
@@ -314,26 +286,20 @@
     "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
    }
   ],
-  "grain_figures": [],
   "thin": false,
-  "thin_reason": null,
-  "year_forms": {
-   "2020-2021": "2020-21",
-   "2025-2026": "2025-26"
-  }
+  "thin_reason": null
  },
  {
   "rank": 2,
   "view": "view2",
   "view_title": "Geo-Month Cash Cube",
-  "view_row": "one row per Gram Panchayat per calendar month -- 1,440 rows covering April 2020 to March 2026, months with no transactions included as zeros.",
   "pattern_type": "TREND",
   "measure": "activity_linked_expenditure",
   "breakdown": "(varies)",
   "compared_across": "temporal_grain",
   "scope": "all records in this view",
   "feed_sentence": "Across all temporal_grain values, activity_linked_expenditure is increasing over (varies)",
-  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
   "members_following_the_pattern": [
    "month",
    "quarter",
@@ -342,143 +308,21 @@
   "members_count": 3,
   "members_out_of": 3,
   "exceptions": [],
-  "definitions": [
-   {
-    "variable": "activity_linked_expenditure",
-    "role": "the measure",
-    "definition": "rupees, totalled, SPENT basis -- the part of the month's cashbook payments that is linked to a planned activity.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "(varies)",
-    "role": "the breakdown",
-    "definition": "this finding compares several breakdowns at once rather than one fixed breakdown.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "temporal_grain",
-    "role": "compared across",
-    "definition": "which time unit the pattern was measured over: month, quarter or fiscal year. Its three values are the three time units, not places or categories.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   }
-  ],
-  "definitions_missing": [],
   "reference_figures": [],
-  "grain_figures": [
-   {
-    "label": "top_values / 2025-2026 / value",
-    "display": "Rs 5.92 crore",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "top_values / 2025-2026 / share_of_total",
-    "display": "24.7%",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "top_values / 2024-2025 / value",
-    "display": "Rs 5.06 crore",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "top_values / 2024-2025 / share_of_total",
-    "display": "21.1%",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "top_values / 2022-2023 / value",
-    "display": "Rs 4.78 crore",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "top_values / 2022-2023 / share_of_total",
-    "display": "19.9%",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "top_values / 2021-2022 / value",
-    "display": "Rs 4.16 crore",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "top_values / 2021-2022 / share_of_total",
-    "display": "17.3%",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "top_values / 2023-2024 / value",
-    "display": "Rs 3.66 crore",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "top_values / 2023-2024 / share_of_total",
-    "display": "15.2%",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "bottom_values / 2023-2024 / value",
-    "display": "Rs 3.66 crore",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "bottom_values / 2023-2024 / share_of_total",
-    "display": "15.2%",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "bottom_values / 2020-2021 / value",
-    "display": "Rs 42.43 lakh",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "bottom_values / 2020-2021 / share_of_total",
-    "display": "1.8%",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "count_breakdown_values",
-    "display": "6",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "measure_unit",
-    "display": "rupees",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "how_aggregated",
-    "display": "totalled across rows - an absolute figure",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "total",
-    "display": "Rs 24.00 crore",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   }
-  ],
-  "thin": false,
-  "thin_reason": null,
-  "year_forms": {
-   "2020-2021": "2020-21",
-   "2021-2022": "2021-22",
-   "2022-2023": "2022-23",
-   "2023-2024": "2023-24",
-   "2024-2025": "2024-25",
-   "2025-2026": "2025-26"
-  }
+  "thin": true,
+  "thin_reason": "Varies across members -- see individual patterns"
  },
  {
   "rank": 3,
   "view": "view3",
   "view_title": "GP Performance",
-  "view_row": "one row per Gram Panchayat per fiscal year -- 120 rows, all 20 Gram Panchayats across all 6 years, including years with nothing recorded.",
   "pattern_type": "TREND",
   "measure": "sanctioned_total",
   "breakdown": "fiscal_year",
   "compared_across": "district_name",
   "scope": "all records in this view",
   "feed_sentence": "Across most district_name values (5/9), sanctioned_total is decreasing over fiscal_year. Exceptions: Kandhamal (sanctioned_total is increasing over fiscal_year); Khordha (no clear pattern); Ganjam (no clear pattern) and 1 others",
-  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
   "members_following_the_pattern": [
    "Bargarh",
    "Koraput",
@@ -493,48 +337,27 @@
     "name": "Kandhamal",
     "kind": "opposite direction",
     "in_words": "moves in the opposite direction: increasing, where most are decreasing",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    },
    {
     "name": "Khordha",
     "kind": "no clear pattern",
     "in_words": "the engine found no clear pattern here",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    },
    {
     "name": "Ganjam",
     "kind": "no clear pattern",
     "in_words": "the engine found no clear pattern here",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    },
    {
     "name": "Rayagada",
     "kind": "no clear pattern",
     "in_words": "the engine found no clear pattern here",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    }
   ],
-  "definitions": [
-   {
-    "variable": "sanctioned_total",
-    "role": "the measure",
-    "definition": "rupees, totalled, SANCTIONED basis -- the approval amounts recorded for a Gram Panchayat in a fiscal year.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "fiscal_year",
-    "role": "the breakdown",
-    "definition": "the April-to-March year, written in full, for example 2024-2025. Six years run from 2020-2021 to 2025-2026.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "district_name",
-    "role": "compared across",
-    "definition": "the District, from the LGD-coded government roster. 9 of them in this sample.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   }
-  ],
-  "definitions_missing": [],
   "reference_figures": [
    {
     "label": "top_values / 2020-2021 / value",
@@ -627,30 +450,20 @@
     "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
    }
   ],
-  "grain_figures": [],
   "thin": false,
-  "thin_reason": null,
-  "year_forms": {
-   "2020-2021": "2020-21",
-   "2021-2022": "2021-22",
-   "2022-2023": "2022-23",
-   "2023-2024": "2023-24",
-   "2024-2025": "2024-25",
-   "2025-2026": "2025-26"
-  }
+  "thin_reason": null
  },
  {
   "rank": 4,
   "view": "view1",
   "view_title": "Activity Lifecycle",
-  "view_row": "one row per planned activity -- 12,704 activities planned by the 20 Gram Panchayats between 2020-2021 and 2025-2026.",
   "pattern_type": "EVENNESS",
   "measure": "overspend_vs_sanction",
   "breakdown": "district_name",
   "compared_across": "asset_category_label",
   "scope": "all records in this view",
   "feed_sentence": "Across nearly all asset_category_label values (27/28), overspend_vs_sanction is spread evenly across district_name values -- it belongs to all of them and no single district_name accounts for it. Uneven only in: Banking Facilities (not evenly spread) -- this is about how the total is spread, not about how much any one of them spends",
-  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
   "members_following_the_pattern": [
    "Uncategorised",
    "Buildings",
@@ -687,30 +500,9 @@
     "name": "Banking Facilities",
     "kind": "no clear pattern",
     "in_words": "the engine found no clear pattern here",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    }
   ],
-  "definitions": [
-   {
-    "variable": "overspend_vs_sanction",
-    "role": "the measure",
-    "definition": "rupees, totalled, SIGNED (money spent minus money sanctioned). Positive is spending above the sanctioned amount; negative is sanctioned money not spent. It exists only where a sanction record exists.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "district_name",
-    "role": "the breakdown",
-    "definition": "the District, from the LGD-coded government roster. 9 of them in this sample.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "asset_category_label",
-    "role": "compared across",
-    "definition": "the asset the work creates. 27 named categories reach this view; 'Uncategorised' means no asset category was recorded against the work, and is not itself a kind of asset.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   }
-  ],
-  "definitions_missing": [],
   "reference_figures": [
    {
     "label": "top_values / Rayagada / value",
@@ -913,26 +705,20 @@
     "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
    }
   ],
-  "grain_figures": [],
   "thin": false,
-  "thin_reason": null,
-  "year_forms": {
-   "2020-2021": "2020-21",
-   "2025-2026": "2025-26"
-  }
+  "thin_reason": null
  },
  {
   "rank": 5,
   "view": "view1",
   "view_title": "Activity Lifecycle",
-  "view_row": "one row per planned activity -- 12,704 activities planned by the 20 Gram Panchayats between 2020-2021 and 2025-2026.",
   "pattern_type": "TOP_TWO",
   "measure": "fund_untied_total",
   "breakdown": "output_type_label",
   "compared_across": "gp_name",
   "scope": "activity_type_label = Public Works",
   "feed_sentence": "Across nearly all gp_name values (19/20), Code 101 and Code 105 lead in fund_untied_total among output_type_label values. Exception: Haldikudar (different pattern)",
-  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
   "members_following_the_pattern": [
    "Andhrua",
    "Bandhpali",
@@ -961,36 +747,9 @@
     "name": "Haldikudar",
     "kind": "different pattern",
     "in_words": "the engine found a different kind of pattern here",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    }
   ],
-  "definitions": [
-   {
-    "variable": "fund_untied_total",
-    "role": "the measure",
-    "definition": "rupees, totalled, PLANNED basis -- the untied part of the planned funding. Untied is the discretionary grant (components 4211 and 4250), as against the tied grant, which is earmarked (component 4249).",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "output_type_label",
-    "role": "the breakdown",
-    "definition": "the activity's output-type code. No output-type code has a description on file, so every value reads 'Code 101' through 'Code 110' -- eight codes with nothing recorded about what they contain.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "gp_name",
-    "role": "compared across",
-    "definition": "the Gram Panchayat, from the LGD-coded government roster. 20 of them in this sample.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "activity_type_label",
-    "role": "filter",
-    "definition": "the decoded kind of activity, 2 values.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   }
-  ],
-  "definitions_missing": [],
   "reference_figures": [
    {
     "label": "top_values / Code 101 / value",
@@ -1158,26 +917,20 @@
     "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
    }
   ],
-  "grain_figures": [],
   "thin": false,
-  "thin_reason": null,
-  "year_forms": {
-   "2020-2021": "2020-21",
-   "2025-2026": "2025-26"
-  }
+  "thin_reason": null
  },
  {
   "rank": 6,
   "view": "view2",
   "view_title": "Geo-Month Cash Cube",
-  "view_row": "one row per Gram Panchayat per calendar month -- 1,440 rows covering April 2020 to March 2026, months with no transactions included as zeros.",
   "pattern_type": "OUTSTANDING_1",
   "measure": "payment_count",
   "breakdown": "block_name",
   "compared_across": "fiscal_year",
   "scope": "all records in this view",
   "feed_sentence": "Across most fiscal_year values (5/6), Bhubaneswar has the highest payment_count among block_name values. Exception: 2024-2025 (no clear pattern)",
-  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
   "members_following_the_pattern": [
    "2020-2021",
    "2021-2022",
@@ -1192,30 +945,9 @@
     "name": "2024-2025",
     "kind": "no clear pattern",
     "in_words": "the engine found no clear pattern here",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    }
   ],
-  "definitions": [
-   {
-    "variable": "payment_count",
-    "role": "the measure",
-    "definition": "vouchers, counted, CASHBOOK basis -- every payment voucher the Gram Panchayat recorded in the month, whether or not it is tied to a planned activity.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "block_name",
-    "role": "the breakdown",
-    "definition": "the Block, from the LGD-coded government roster. 16 of them in this sample.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "fiscal_year",
-    "role": "compared across",
-    "definition": "the April-to-March year, written in full, for example 2024-2025. Six years run from 2020-2021 to 2025-2026.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   }
-  ],
-  "definitions_missing": [],
   "reference_figures": [
    {
     "label": "top_values / Bhubaneswar / value",
@@ -1318,30 +1050,20 @@
     "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
    }
   ],
-  "grain_figures": [],
   "thin": false,
-  "thin_reason": null,
-  "year_forms": {
-   "2020-2021": "2020-21",
-   "2021-2022": "2021-22",
-   "2022-2023": "2022-23",
-   "2023-2024": "2023-24",
-   "2024-2025": "2024-25",
-   "2025-2026": "2025-26"
-  }
+  "thin_reason": null
  },
  {
   "rank": 7,
   "view": "view1",
   "view_title": "Activity Lifecycle",
-  "view_row": "one row per planned activity -- 12,704 activities planned by the 20 Gram Panchayats between 2020-2021 and 2025-2026.",
   "pattern_type": "OUTSTANDING_1",
   "measure": "n_activities",
   "breakdown": "asset_category_label",
   "compared_across": "gp_name",
   "scope": "activity_type_label = Public Works",
   "feed_sentence": "Across nearly all gp_name values (19/20), Uncategorised has the highest n_activities among asset_category_label values. Exception: Govindapur (different pattern)",
-  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
   "members_following_the_pattern": [
    "Andhrua",
    "Bandhpali",
@@ -1370,36 +1092,9 @@
     "name": "Govindapur",
     "kind": "different pattern",
     "in_words": "the engine found a different kind of pattern here",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    }
   ],
-  "definitions": [
-   {
-    "variable": "n_activities",
-    "role": "the measure",
-    "definition": "activities, counted -- one per planned activity.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "asset_category_label",
-    "role": "the breakdown",
-    "definition": "the asset the work creates. 27 named categories reach this view; 'Uncategorised' means no asset category was recorded against the work, and is not itself a kind of asset.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "gp_name",
-    "role": "compared across",
-    "definition": "the Gram Panchayat, from the LGD-coded government roster. 20 of them in this sample.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "activity_type_label",
-    "role": "filter",
-    "definition": "the decoded kind of activity, 2 values.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   }
-  ],
-  "definitions_missing": [],
   "reference_figures": [
    {
     "label": "top_values / Uncategorised / value",
@@ -1502,26 +1197,20 @@
     "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
    }
   ],
-  "grain_figures": [],
   "thin": false,
-  "thin_reason": null,
-  "year_forms": {
-   "2020-2021": "2020-21",
-   "2025-2026": "2025-26"
-  }
+  "thin_reason": null
  },
  {
   "rank": 8,
   "view": "view1",
   "view_title": "Activity Lifecycle",
-  "view_row": "one row per planned activity -- 12,704 activities planned by the 20 Gram Panchayats between 2020-2021 and 2025-2026.",
   "pattern_type": "OUTSTANDING_LAST",
   "measure": "overspend_vs_plan",
   "breakdown": "status_label",
   "compared_across": "gp_name",
   "scope": "is_costless = Costed",
   "feed_sentence": "Across nearly all gp_name values (18/20), Activity Approved has the lowest overspend_vs_plan among status_label values. Exception: Boipariguda (no clear pattern); Laxmipur (no clear pattern)",
-  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
   "members_following_the_pattern": [
    "Andhrua",
    "Bandhpali",
@@ -1549,42 +1238,15 @@
     "name": "Boipariguda",
     "kind": "no clear pattern",
     "in_words": "the engine found no clear pattern here",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    },
    {
     "name": "Laxmipur",
     "kind": "no clear pattern",
     "in_words": "the engine found no clear pattern here",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    }
   ],
-  "definitions": [
-   {
-    "variable": "overspend_vs_plan",
-    "role": "the measure",
-    "definition": "rupees, totalled, SIGNED (money spent minus money planned). A positive figure is spending above the plan; a negative figure is planned money not spent.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "status_label",
-    "role": "the breakdown",
-    "definition": "the activity's current recorded status. The values are Activity Approved, WORK ONGOING, WORK ABANDONED, UNDER APPROVAL and WORK COMPLETED; 'Buildings' is a known mis-coding on 13 rows.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "gp_name",
-    "role": "compared across",
-    "definition": "the Gram Panchayat, from the LGD-coded government roster. 20 of them in this sample.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "is_costless",
-    "role": "filter",
-    "definition": "whether the activity was planned with a cost ('Costed') or without one ('Costless' -- training, campaigns and services).",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   }
-  ],
-  "definitions_missing": [],
   "reference_figures": [
    {
     "label": "top_values / WORK COMPLETED / value",
@@ -1767,26 +1429,20 @@
     "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
    }
   ],
-  "grain_figures": [],
   "thin": false,
-  "thin_reason": null,
-  "year_forms": {
-   "2020-2021": "2020-21",
-   "2025-2026": "2025-26"
-  }
+  "thin_reason": null
  },
  {
   "rank": 9,
   "view": "view2",
   "view_title": "Geo-Month Cash Cube",
-  "view_row": "one row per Gram Panchayat per calendar month -- 1,440 rows covering April 2020 to March 2026, months with no transactions included as zeros.",
   "pattern_type": "SEASONALITY",
   "measure": "payment_count",
   "breakdown": "(varies)",
   "compared_across": "temporal_grain",
   "scope": "all records in this view",
   "feed_sentence": "Across most temporal_grain values (2/3), payment_count shows seasonal pattern (PERIOD_12) over (varies). Exception: fiscal_year (no clear pattern)",
-  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
   "members_following_the_pattern": [
    "month",
    "quarter"
@@ -1798,146 +1454,24 @@
     "name": "fiscal_year",
     "kind": "no clear pattern",
     "in_words": "the engine found no clear pattern here",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    }
   ],
-  "definitions": [
-   {
-    "variable": "payment_count",
-    "role": "the measure",
-    "definition": "vouchers, counted, CASHBOOK basis -- every payment voucher the Gram Panchayat recorded in the month, whether or not it is tied to a planned activity.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "(varies)",
-    "role": "the breakdown",
-    "definition": "this finding compares several breakdowns at once rather than one fixed breakdown.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "temporal_grain",
-    "role": "compared across",
-    "definition": "which time unit the pattern was measured over: month, quarter or fiscal year. Its three values are the three time units, not places or categories.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   }
-  ],
-  "definitions_missing": [],
   "reference_figures": [],
-  "grain_figures": [
-   {
-    "label": "top_values / 2025-2026 / value",
-    "display": "1,985 vouchers",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "top_values / 2025-2026 / share_of_total",
-    "display": "23.3%",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "top_values / 2024-2025 / value",
-    "display": "1,443 vouchers",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "top_values / 2024-2025 / share_of_total",
-    "display": "16.9%",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "top_values / 2020-2021 / value",
-    "display": "1,418 vouchers",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "top_values / 2020-2021 / share_of_total",
-    "display": "16.6%",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "top_values / 2022-2023 / value",
-    "display": "1,362 vouchers",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "top_values / 2022-2023 / share_of_total",
-    "display": "16.0%",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "top_values / 2021-2022 / value",
-    "display": "1,318 vouchers",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "top_values / 2021-2022 / share_of_total",
-    "display": "15.5%",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "bottom_values / 2021-2022 / value",
-    "display": "1,318 vouchers",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "bottom_values / 2021-2022 / share_of_total",
-    "display": "15.5%",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "bottom_values / 2023-2024 / value",
-    "display": "1,003 vouchers",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "bottom_values / 2023-2024 / share_of_total",
-    "display": "11.8%",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "count_breakdown_values",
-    "display": "6",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "measure_unit",
-    "display": "vouchers",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "how_aggregated",
-    "display": "totalled across rows - an absolute figure",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   },
-   {
-    "label": "total",
-    "display": "8,529 vouchers",
-    "provenance": "computed by phase5b_report.enrich_candidates_with_stats on the same view, measure and filter, with the breakdown set to the fiscal-year grain this finding covers"
-   }
-  ],
-  "thin": false,
-  "thin_reason": null,
-  "year_forms": {
-   "2020-2021": "2020-21",
-   "2021-2022": "2021-22",
-   "2022-2023": "2022-23",
-   "2023-2024": "2023-24",
-   "2024-2025": "2024-25",
-   "2025-2026": "2025-26"
-  }
+  "thin": true,
+  "thin_reason": "Varies across members -- see individual patterns"
  },
  {
   "rank": 10,
   "view": "view1",
   "view_title": "Activity Lifecycle",
-  "view_row": "one row per planned activity -- 12,704 activities planned by the 20 Gram Panchayats between 2020-2021 and 2025-2026.",
   "pattern_type": "ATTRIBUTION",
   "measure": "gen_amount",
   "breakdown": "status_label",
   "compared_across": "gp_name",
   "scope": "is_costless = Costed",
   "feed_sentence": "Across nearly all gp_name values (18/20), WORK ONGOING accounts for the majority of gen_amount among status_label values. Exception: Boipariguda (no clear pattern); Laxmipur (no clear pattern)",
-  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
   "members_following_the_pattern": [
    "Andhrua",
    "Bandhpali",
@@ -1965,42 +1499,15 @@
     "name": "Boipariguda",
     "kind": "no clear pattern",
     "in_words": "the engine found no clear pattern here",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    },
    {
     "name": "Laxmipur",
     "kind": "no clear pattern",
     "in_words": "the engine found no clear pattern here",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    }
   ],
-  "definitions": [
-   {
-    "variable": "gen_amount",
-    "role": "the measure",
-    "definition": "rupees, totalled, SPENT basis -- voucher-linked spending recorded against the General social-category component (the other two components are SC and ST).",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "status_label",
-    "role": "the breakdown",
-    "definition": "the activity's current recorded status. The values are Activity Approved, WORK ONGOING, WORK ABANDONED, UNDER APPROVAL and WORK COMPLETED; 'Buildings' is a known mis-coding on 13 rows.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "gp_name",
-    "role": "compared across",
-    "definition": "the Gram Panchayat, from the LGD-coded government roster. 20 of them in this sample.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "is_costless",
-    "role": "filter",
-    "definition": "whether the activity was planned with a cost ('Costed') or without one ('Costless' -- training, campaigns and services).",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   }
-  ],
-  "definitions_missing": [],
   "reference_figures": [
    {
     "label": "top_values / WORK ONGOING / value",
@@ -2148,26 +1655,20 @@
     "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
    }
   ],
-  "grain_figures": [],
   "thin": false,
-  "thin_reason": null,
-  "year_forms": {
-   "2020-2021": "2020-21",
-   "2025-2026": "2025-26"
-  }
+  "thin_reason": null
  },
  {
   "rank": 11,
   "view": "view2",
   "view_title": "Geo-Month Cash Cube",
-  "view_row": "one row per Gram Panchayat per calendar month -- 1,440 rows covering April 2020 to March 2026, months with no transactions included as zeros.",
   "pattern_type": "TREND",
   "measure": "activity_linked_expenditure",
   "breakdown": "quarter",
   "compared_across": "district_name",
   "scope": "all records in this view",
   "feed_sentence": "Across most district_name values (6/9), activity_linked_expenditure is increasing over quarter. Exception: Bargarh (different pattern); Koraput (different pattern); Cuttack (different pattern)",
-  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
   "members_following_the_pattern": [
    "Khordha",
    "Ganjam",
@@ -2183,42 +1684,21 @@
     "name": "Bargarh",
     "kind": "different pattern",
     "in_words": "the engine found a different kind of pattern here",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    },
    {
     "name": "Koraput",
     "kind": "different pattern",
     "in_words": "the engine found a different kind of pattern here",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    },
    {
     "name": "Cuttack",
     "kind": "different pattern",
     "in_words": "the engine found a different kind of pattern here",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    }
   ],
-  "definitions": [
-   {
-    "variable": "activity_linked_expenditure",
-    "role": "the measure",
-    "definition": "rupees, totalled, SPENT basis -- the part of the month's cashbook payments that is linked to a planned activity.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "quarter",
-    "role": "the breakdown",
-    "definition": "the calendar quarter, for example 2024-Q1.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "district_name",
-    "role": "compared across",
-    "definition": "the District, from the LGD-coded government roster. 9 of them in this sample.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   }
-  ],
-  "definitions_missing": [],
   "reference_figures": [
    {
     "label": "top_values / 2026-Q1 / value",
@@ -2311,23 +1791,20 @@
     "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
    }
   ],
-  "grain_figures": [],
   "thin": false,
-  "thin_reason": null,
-  "year_forms": {}
+  "thin_reason": null
  },
  {
   "rank": 12,
   "view": "view1",
   "view_title": "Activity Lifecycle",
-  "view_row": "one row per planned activity -- 12,704 activities planned by the 20 Gram Panchayats between 2020-2021 and 2025-2026.",
   "pattern_type": "OUTSTANDING_1",
   "measure": "beneficiaries_expected",
   "breakdown": "status_label",
   "compared_across": "gp_name",
   "scope": "all records in this view",
   "feed_sentence": "Across nearly all gp_name values (18/20), Activity Approved has the highest beneficiaries_expected among status_label values. Exception: Boipariguda (no clear pattern); Laxmipur (no clear pattern)",
-  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
   "members_following_the_pattern": [
    "Andhrua",
    "Bandhpali",
@@ -2355,36 +1832,15 @@
     "name": "Boipariguda",
     "kind": "no clear pattern",
     "in_words": "the engine found no clear pattern here",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    },
    {
     "name": "Laxmipur",
     "kind": "no clear pattern",
     "in_words": "the engine found no clear pattern here",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    }
   ],
-  "definitions": [
-   {
-    "variable": "beneficiaries_expected",
-    "role": "the measure",
-    "definition": "people, totalled -- the beneficiaries an activity records as expected. Recorded by the activities that carry community-service detail, 763 of them in this sample.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "status_label",
-    "role": "the breakdown",
-    "definition": "the activity's current recorded status. The values are Activity Approved, WORK ONGOING, WORK ABANDONED, UNDER APPROVAL and WORK COMPLETED; 'Buildings' is a known mis-coding on 13 rows.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "gp_name",
-    "role": "compared across",
-    "definition": "the Gram Panchayat, from the LGD-coded government roster. 20 of them in this sample.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   }
-  ],
-  "definitions_missing": [],
   "reference_figures": [
    {
     "label": "top_values / Activity Approved / value",
@@ -2532,26 +1988,20 @@
     "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
    }
   ],
-  "grain_figures": [],
   "thin": false,
-  "thin_reason": null,
-  "year_forms": {
-   "2020-2021": "2020-21",
-   "2025-2026": "2025-26"
-  }
+  "thin_reason": null
  },
  {
   "rank": 13,
   "view": "view1",
   "view_title": "Activity Lifecycle",
-  "view_row": "one row per planned activity -- 12,704 activities planned by the 20 Gram Panchayats between 2020-2021 and 2025-2026.",
   "pattern_type": "OUTSTANDING_1",
   "measure": "fund_untied_total",
   "breakdown": "theme",
   "compared_across": "gp_name",
   "scope": "is_costless = Costed",
   "feed_sentence": "Across nearly all gp_name values (18/20), Theme 6 - Self-sufficient Infrastructure in Village has the highest fund_untied_total among theme values. Exception: Boipariguda (Unmapped theme has the highest fund_untied_total among theme values); Kalimela (Theme 4 - Water Sufficient Village has the highest fund_untied_total among theme values)",
-  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
   "members_following_the_pattern": [
    "Andhrua",
    "Bandhpali",
@@ -2579,42 +2029,15 @@
     "name": "Boipariguda",
     "kind": "different pattern",
     "in_words": "a different one leads here: Unmapped theme",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    },
    {
     "name": "Kalimela",
     "kind": "different pattern",
     "in_words": "a different one leads here: Theme 4 - Water Sufficient Village",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    }
   ],
-  "definitions": [
-   {
-    "variable": "fund_untied_total",
-    "role": "the measure",
-    "definition": "rupees, totalled, PLANNED basis -- the untied part of the planned funding. Untied is the discretionary grant (components 4211 and 4250), as against the tied grant, which is earmarked (component 4249).",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "theme",
-    "role": "the breakdown",
-    "definition": "the LSDG theme the activity's focus area maps to. 6 themes; 'Unmapped theme' means the focus area has no theme mapping on file.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "gp_name",
-    "role": "compared across",
-    "definition": "the Gram Panchayat, from the LGD-coded government roster. 20 of them in this sample.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "is_costless",
-    "role": "filter",
-    "definition": "whether the activity was planned with a cost ('Costed') or without one ('Costless' -- training, campaigns and services).",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   }
-  ],
-  "definitions_missing": [],
   "reference_figures": [
    {
     "label": "top_values / Theme 6 - Self-sufficient Infrastructure in Village / value",
@@ -2767,26 +2190,20 @@
     "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
    }
   ],
-  "grain_figures": [],
   "thin": false,
-  "thin_reason": null,
-  "year_forms": {
-   "2020-2021": "2020-21",
-   "2025-2026": "2025-26"
-  }
+  "thin_reason": null
  },
  {
   "rank": 14,
   "view": "view1",
   "view_title": "Activity Lifecycle",
-  "view_row": "one row per planned activity -- 12,704 activities planned by the 20 Gram Panchayats between 2020-2021 and 2025-2026.",
   "pattern_type": "OUTSTANDING_LAST",
   "measure": "overspend_vs_sanction",
   "breakdown": "output_type_label",
   "compared_across": "gp_name",
   "scope": "work_type_label = New/Fresh",
   "feed_sentence": "Across nearly all gp_name values (19/20), Code 101 has the lowest overspend_vs_sanction among output_type_label values. Exception: Chikilli (no clear pattern)",
-  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
   "members_following_the_pattern": [
    "Andhrua",
    "Bandhpali",
@@ -2815,36 +2232,9 @@
     "name": "Chikilli",
     "kind": "no clear pattern",
     "in_words": "the engine found no clear pattern here",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    }
   ],
-  "definitions": [
-   {
-    "variable": "overspend_vs_sanction",
-    "role": "the measure",
-    "definition": "rupees, totalled, SIGNED (money spent minus money sanctioned). Positive is spending above the sanctioned amount; negative is sanctioned money not spent. It exists only where a sanction record exists.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "output_type_label",
-    "role": "the breakdown",
-    "definition": "the activity's output-type code. No output-type code has a description on file, so every value reads 'Code 101' through 'Code 110' -- eight codes with nothing recorded about what they contain.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "gp_name",
-    "role": "compared across",
-    "definition": "the Gram Panchayat, from the LGD-coded government roster. 20 of them in this sample.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "work_type_label",
-    "role": "filter",
-    "definition": "the decoded kind of work, 4 values; 'Unknown' means the code has no decode on file.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   }
-  ],
-  "definitions_missing": [],
   "reference_figures": [
    {
     "label": "top_values / Code 109 / value",
@@ -3002,26 +2392,20 @@
     "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
    }
   ],
-  "grain_figures": [],
   "thin": false,
-  "thin_reason": null,
-  "year_forms": {
-   "2020-2021": "2020-21",
-   "2025-2026": "2025-26"
-  }
+  "thin_reason": null
  },
  {
   "rank": 15,
   "view": "view1",
   "view_title": "Activity Lifecycle",
-  "view_row": "one row per planned activity -- 12,704 activities planned by the 20 Gram Panchayats between 2020-2021 and 2025-2026.",
   "pattern_type": "ATTRIBUTION",
   "measure": "evidence_uploads",
   "breakdown": "output_type_label",
   "compared_across": "gp_name",
   "scope": "work_type_label = New/Fresh",
   "feed_sentence": "Across nearly all gp_name values (19/20), Code 101 accounts for the majority of evidence_uploads among output_type_label values. Exception: Chikilli (no clear pattern)",
-  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
   "members_following_the_pattern": [
    "Andhrua",
    "Bandhpali",
@@ -3050,36 +2434,9 @@
     "name": "Chikilli",
     "kind": "no clear pattern",
     "in_words": "the engine found no clear pattern here",
-    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b section 4 hashes)"
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
    }
   ],
-  "definitions": [
-   {
-    "variable": "evidence_uploads",
-    "role": "the measure",
-    "definition": "geotagged photo uploads, counted -- 8,267 uploads across 1,675 activities in this sample.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "output_type_label",
-    "role": "the breakdown",
-    "definition": "the activity's output-type code. No output-type code has a description on file, so every value reads 'Code 101' through 'Code 110' -- eight codes with nothing recorded about what they contain.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "gp_name",
-    "role": "compared across",
-    "definition": "the Gram Panchayat, from the LGD-coded government roster. 20 of them in this sample.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   },
-   {
-    "variable": "work_type_label",
-    "role": "filter",
-    "definition": "the decoded kind of work, 4 values; 'Unknown' means the code has no decode on file.",
-    "provenance": "signed glossary: handoffs/WPD2_mining_calibration.md Appendix A (= phase5b_report.VIEW_DESCRIPTIONS column_glossary); units cross-checked against phase5b_report._UNITS"
-   }
-  ],
-  "definitions_missing": [],
   "reference_figures": [
    {
     "label": "top_values / Code 101 / value",
@@ -3222,12 +2579,7 @@
     "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
    }
   ],
-  "grain_figures": [],
   "thin": false,
-  "thin_reason": null,
-  "year_forms": {
-   "2020-2021": "2020-21",
-   "2025-2026": "2025-26"
-  }
+  "thin_reason": null
  }
 ]
