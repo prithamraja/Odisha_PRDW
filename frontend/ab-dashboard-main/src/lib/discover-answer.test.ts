@@ -130,3 +130,33 @@ describe("a recorded live turn", () => {
     );
   });
 });
+
+// Recorded after WP-D6 landed (question decomposition + the render-time
+// glossary). The sentences now carry officer phrases rather than column names,
+// and a decomposition record's coverage line reads differently from a mined
+// finding's — the STRUCTURE the parser keys on is unchanged, and this fixture
+// is what proves that rather than assumes it.
+const LIVE_TURN_D6 = "- Within the whole of Gram Panchayat Report Card by Year, spending totals Rs 25.35 crore across 16 blocks. It is spread across them without one standing out: the largest is Bhubaneswar at 13.1% (Rs 3.33 crore), then Rangeilunda at 10.8% (Rs 2.73 crore). The remaining 14 together account for Rs 19.29 crore. For size: Bhubaneswar holds 10.4% of the 12,704 activities behind these totals, against 13.1% of spending -- a group's total grows with how much of the work it holds.\n   (a breakdown of the recorded totals, not a mined pattern \u2014 the parts add up to the whole)\n\n- Within focus area Rural housing, spending measured against plan totals Rs -2.23 crore across 16 blocks. This measure is signed: a positive figure is spending above plan and a negative figure is spending below plan. It is concentrated: Boipariguda accounts for 95.7% of it (Rs -2.13 crore). The remaining 15 together account for Rs -9.50 lakh. For size: Boipariguda holds 2.0% of the 305 activities behind these totals, against 95.7% of spending measured against plan -- a group's total grows with how much of the work it holds. As a ratio rather than an amount, Boipariguda is 0.0%.\n   (a breakdown of the recorded totals, not a mined pattern \u2014 the parts add up to the whole)\n\n(as of 2026-08-17)";
+
+describe("a recorded live turn after WP-D6", () => {
+  it("still splits into findings, coverage and stamp", () => {
+    const { blocks, stamp } = parseAnswer(LIVE_TURN_D6);
+
+    expect(blocks.every((b) => b.kind === "finding")).toBe(true);
+    expect(blocks).toHaveLength(2);
+    expect(stamp).toBe("as of 2026-08-17");
+  });
+
+  it("keeps a decomposition's coverage line intact", () => {
+    const first = parseAnswer(LIVE_TURN_D6).blocks[0];
+
+    expect(first.kind).toBe("finding");
+    if (first.kind !== "finding") return;
+    expect(first.coverage).toBe(
+      "a breakdown of the recorded totals, not a mined pattern — the parts " +
+        "add up to the whole"
+    );
+    // Rupee figures and percentages belong to the sentence, not the coverage.
+    expect(first.text).toContain("Rs 25.35 crore");
+  });
+});

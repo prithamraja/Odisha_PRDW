@@ -14,8 +14,6 @@ import { InsightReport, type ReportState } from "./InsightReport";
 import { InsightSearchBar } from "./InsightSearchBar";
 import { RichText } from "./RichText";
 
-const ALL = "__all__";
-
 // --- Formatted headline: the report's bold, plus every bare number ---
 function FormattedHeadline({ text }: { text: string }) {
   return (
@@ -179,7 +177,6 @@ interface AnomaliesViewProps {
 }
 
 export function AnomaliesView({ onRouteToAsk }: AnomaliesViewProps = {}) {
-  const [section, setSection] = useState<string>(ALL);
   const [expanded, setExpanded] = useState<number | null>(null);
   const [report, setReport] = useState<ReportState | null>(null);
   const [sessionId] = useState(getOrCreateDiscoverSessionId);
@@ -223,41 +220,23 @@ export function AnomaliesView({ onRouteToAsk }: AnomaliesViewProps = {}) {
     []
   );
 
-  // Chips are the report's own sections, in the order they appear in it. The
-  // counts are insight counts: a reading note is not a finding, so it does not
-  // add to the number on a chip.
+  // The report's own sections, in the order they appear in it — still what the
+  // feed is interleaved by, so no one section's findings monopolise the top.
   const sectionNames = useMemo(
     () => parsed.sections.map((s) => s.name),
     [parsed]
   );
 
-  const insights = useMemo(() => {
-    if (section !== ALL) {
-      return parsed.insights.filter((ins) => ins.section === section);
-    }
-    return interleaveBySection(parsed.insights, sectionNames);
-  }, [parsed, sectionNames, section]);
-
-  // In the All view the findings are interleaved across sections, so a note
-  // pinned beside any one of them would read as qualifying its neighbours.
-  // Every note is shown there instead, each named for the section it governs.
-  const notes: ReportSection[] = useMemo(
-    () =>
-      parsed.sections.filter(
-        (s) => s.readingNote !== null && (section === ALL || s.name === section)
-      ),
-    [parsed, section]
+  const insights = useMemo(
+    () => interleaveBySection(parsed.insights, sectionNames),
+    [parsed, sectionNames]
   );
 
-  const chips = useMemo(
-    () => [
-      { key: ALL, label: "All", count: parsed.insights.length },
-      ...parsed.sections.map((s) => ({
-        key: s.name,
-        label: s.name,
-        count: s.insights.length,
-      })),
-    ],
+  // The findings are interleaved across sections, so a note pinned beside any
+  // one of them would read as qualifying its neighbours. Every note is shown
+  // instead, each named for the section it governs.
+  const notes: ReportSection[] = useMemo(
+    () => parsed.sections.filter((s) => s.readingNote !== null),
     [parsed]
   );
 
@@ -288,56 +267,17 @@ export function AnomaliesView({ onRouteToAsk }: AnomaliesViewProps = {}) {
           <EmptyState />
         ) : (
           <>
-            {/* Section chips — derived from the report, not hardcoded. The
-                section names are long sentences, so listing them all at once
-                cost five stacked rows before the first finding. They now sit in
-                a two-row grid that flows into columns and scrolls sideways,
-                which keeps the feed itself above the fold. */}
-            {sectionNames.length > 1 && (
-              <div className="mb-8">
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-design">
-                    Insight Categories
-                  </span>
-                  <div className="flex-1 h-px bg-line" />
-                </div>
-                <div
-                  className="grid grid-rows-2 grid-flow-col auto-cols-max gap-1.5 overflow-x-auto scrollbar-thin pb-2"
-                  role="group"
-                  aria-label="Filter insights by category"
-                >
-                  {chips.map((chip) => {
-                    const active = section === chip.key;
-                    return (
-                      <button
-                        key={chip.key}
-                        onClick={() => {
-                          setSection(chip.key);
-                          setExpanded(null);
-                        }}
-                        aria-pressed={active}
-                        className={`px-3 py-1.5 rounded-full text-[13px] transition-colors whitespace-nowrap flex items-center gap-1.5 ${
-                          active
-                            ? "bg-ink text-ivory"
-                            : "bg-white border border-line text-ink hover:border-ink/30"
-                        }`}
-                      >
-                        {chip.label}
-                        <span className={active ? "text-ivory/60" : "text-muted-design"}>
-                          {chip.count}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+            {/* The category chips were removed once the question box landed:
+                filtering by section was a way of narrowing 32 findings by hand,
+                and asking for what you want does that better. The sections
+                themselves are not gone — they still interleave the feed, and
+                each finding still names its own. */}
 
             {/* Insights list */}
             <div className="divide-y divide-line border-y border-line">
               {insights.map((insight, i) => (
                 <InsightRow
-                  key={`${section}-${i}`}
+                  key={i}
                   insight={insight}
                   isOpen={expanded === i}
                   onToggle={() => setExpanded(expanded === i ? null : i)}

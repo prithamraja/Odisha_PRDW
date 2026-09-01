@@ -280,16 +280,5 @@ describe("the rendered Discover feed", () => {
     unmount();
   });
 
-  it("excludes the notes from the chip counts", () => {
-    const { container, unmount } = render(createElement(AnomaliesView));
-    const { insights } = parseReport(feedReport);
-
-    const allChip = [...container.querySelectorAll('[role="group"] button')].find(
-      (b) => b.textContent?.startsWith("All")
-    )!;
-    expect(allChip.textContent).toBe(`All${insights.length}`);
-    unmount();
-  });
-
   afterEach(() => cleanup());
 });

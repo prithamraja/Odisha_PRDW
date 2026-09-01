@@ -29,6 +29,7 @@ interface InsightReportProps {
 const MOVE_CAPTIONS: Record<string, string> = {
   retrieve: "From the findings already mined",
   navigate: "Following on from what is on screen",
+  decompose: "A breakdown of the recorded totals",
   lookup: "This one is for Ask",
   why: "Scope note",
 };

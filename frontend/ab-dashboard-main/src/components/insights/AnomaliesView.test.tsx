@@ -41,17 +41,25 @@ beforeEach(() => {
   sessionStorage.clear();
 });
 
-describe("AnomaliesView question box", () => {
-  it("sits above the category chips", () => {
+// Each case mounts the whole 32-row feed as well as the report card, which
+// runs close to vitest's 5s default in jsdom. The feed size is the point, so
+// the budget is raised rather than the render trimmed.
+describe("AnomaliesView question box", { timeout: 20000 }, () => {
+  it("replaces the category chips, which are gone", () => {
     render(<AnomaliesView />);
-    const box = screen.getByPlaceholderText(PLACEHOLDER);
-    const chips = screen.queryByText("Insight Categories");
-    // Only meaningful when the dropped-in report has sections to filter by.
-    if (chips) {
-      expect(box.compareDocumentPosition(chips)).toBe(
-        Node.DOCUMENT_POSITION_FOLLOWING
-      );
-    }
+
+    expect(screen.getByPlaceholderText(PLACEHOLDER)).toBeInTheDocument();
+    expect(screen.queryByText("Insight Categories")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("group", { name: "Filter insights by category" })
+    ).not.toBeInTheDocument();
+  });
+
+  // The chips went, the sections did not: the feed is still interleaved by
+  // them so no one section monopolises the top of the list.
+  it("still shows the whole feed under the question box", () => {
+    render(<AnomaliesView />);
+    expect(screen.getAllByRole("button", { expanded: false }).length).toBeGreaterThan(1);
   });
 
   it("renders the finding and its coverage, with the run stamp", async () => {
