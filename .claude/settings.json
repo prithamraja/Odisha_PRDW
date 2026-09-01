@@ -15,7 +15,8 @@
       "Bash(python Insights/src/phase4b_engine.py --views view1)",
       "Bash(git --no-pager diff --stat deploy/RAILWAY.md handoffs/PROJECT_PLAN.md)",
       "Bash(git --no-pager diff deploy/RAILWAY.md)",
-      "Bash(git --no-pager diff handoffs/PROJECT_PLAN.md)"
+      "Bash(git --no-pager diff handoffs/PROJECT_PLAN.md)",
+      "PowerShell($j = Get-Content 'Insights\\\\metainsights\\\\global_feed.json' -Raw | ConvertFrom-Json; ConvertTo-Json -InputObject @\\($j.feed[0..14]\\) -Depth 10 | Out-File -Encoding utf8 'handoffs\\\\WPD4_stage1_findings.json'; \\(Get-Item 'handoffs\\\\WPD4_stage1_findings.json'\\).Length)"
     ],
     "additionalDirectories": [
       "i:\\My Drive\\ASC Lab\\LMIC AI Code repo\\Odisha_PRDW\\Insights",

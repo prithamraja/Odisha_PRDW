@@ -1,0 +1,286 @@
+{
+ "1": {
+  "verdict": "pass",
+  "claim_map": [
+   {
+    "claim": "The recorded gap between planned cost and expenditure is spread across blocks in 27 of 28 asset categories, rather than being driven by any single block.",
+    "supported_by": "Engine sentence: Across nearly all asset_category_label values (27/28), overspend_vs_plan is spread evenly across block_name values -- it belongs to all of them and no single block_name accounts for it."
+   },
+   {
+    "claim": "Across 5,630 costed activities, recorded expenditure is Rs 51.96 crore below planned cost",
+    "supported_by": "Records covered: is_costless = Costed; total: Rs -51.96 crore; size_share / volume_in_scope: 5,630 activities"
+   },
+   {
+    "claim": "incomplete expenditure links mean this is not confirmed underspending.",
+    "supported_by": "Total cashbook spending has not grown across these years, while the share of spending linked to a planned activity rose from 2.7% to 53.2% -- a rise in \"linked spending\" is mostly better record-keeping."
+   },
+   {
+    "claim": "Banking Facilities is the only category with no clear cross-block pattern.",
+    "supported_by": "Exceptions: - Banking Facilities: no clear pattern -- the engine found no clear pattern here"
+   },
+   {
+    "claim": "The largest block-level gaps are in Rangeilunda, where Rs 2.73 crore is recorded as spent against Rs 11.84 crore planned, and Kalimela, with Rs 1.76 crore against Rs 7.65 crore planned",
+    "supported_by": "bottom_values / Kalimela / value: Rs -5.90 crore; bottom_values / Rangeilunda / value: Rs -9.11 crore; utilization_companion / absolutes / Kalimela: Rs 1.76 crore spent of Rs 7.65 crore planned cost; utilization_companion / absolutes / Rangeilunda: Rs 2.73 crore spent of Rs 11.84 crore planned cost"
+   },
+   {
+    "claim": "treating this as a record-quality check rather than evidence of poor delivery.",
+    "supported_by": "Total cashbook spending has not grown across these years, while the share of spending linked to a planned activity rose from 2.7% to 53.2% -- a rise in \"linked spending\" is mostly better record-keeping.; Only 17 works in the whole sample are marked completed, so completion figures measure recording practice, not delivery."
+   }
+  ],
+  "problems": [],
+  "lead": "The recorded gap between planned cost and expenditure is spread across blocks in 27 of 28 asset categories, rather than being driven by any single block. Across 5,630 costed activities, recorded expenditure is Rs 51.96 crore below planned cost, although incomplete expenditure links mean this is not confirmed underspending.",
+  "detail": "Banking Facilities is the only category with no clear cross-block pattern. The largest block-level gaps are in Rangeilunda, where Rs 2.73 crore is recorded as spent against Rs 11.84 crore planned, and Kalimela, with Rs 1.76 crore against Rs 7.65 crore planned; officials should start by reconciling expenditure links in these blocks, while treating this as a record-quality check rather than evidence of poor delivery."
+ },
+ "3": {
+  "verdict": "pass",
+  "claim_map": [
+   {
+    "claim": "Sanctioned values declined over time in five of the nine districts",
+    "supported_by": "Engine sentence: Across most district_name values (5/9), sanctioned_total is decreasing over fiscal_year."
+   },
+   {
+    "claim": "represented in the 20-Gram-Panchayat sample",
+    "supported_by": "This is a 20-Gram-Panchayat sample; percentages describe the sample, not the state."
+   },
+   {
+    "claim": "Kandhamal moved in the opposite direction",
+    "supported_by": "- Kandhamal: opposite direction -- moves in the opposite direction: increasing, where most are decreasing"
+   },
+   {
+    "claim": "Khordha, Ganjam and Rayagada showed no clear pattern",
+    "supported_by": "Exceptions:\n  - Khordha: no clear pattern -- the engine found no clear pattern here\n  - Ganjam: no clear pattern -- the engine found no clear pattern here\n  - Rayagada: no clear pattern -- the engine found no clear pattern here"
+   },
+   {
+    "claim": "The declining pattern appears in Bargarh, Koraput, Cuttack, Sundargarh and Malkangiri",
+    "supported_by": "Follows the pattern (5 of 9): Bargarh, Koraput, Cuttack, Sundargarh, Malkangiri"
+   },
+   {
+    "claim": "the recorded sanctioned value across all years was Rs 28.84 crore",
+    "supported_by": "total: Rs 28.84 crore"
+   },
+   {
+    "claim": "sanction records cover only about one work in six",
+    "supported_by": "Sanction records exist for only about one work in six, so figures on a\n  sanctioned basis describe that subset, and a falling sanctioned value can\n  mean fewer sanctions or fewer sanctions being entered."
+   },
+   {
+    "claim": "before interpreting these trends as changes in actual sanctioning",
+    "supported_by": "Sanction records exist for only about one work in six, so figures on a\n  sanctioned basis describe that subset, and a falling sanctioned value can\n  mean fewer sanctions or fewer sanctions being entered."
+   }
+  ],
+  "problems": [],
+  "lead": "Sanctioned values declined over time in five of the nine districts represented in the 20-Gram-Panchayat sample. Kandhamal moved in the opposite direction, while Khordha, Ganjam and Rayagada showed no clear pattern.",
+  "detail": "The declining pattern appears in Bargarh, Koraput, Cuttack, Sundargarh and Malkangiri; the recorded sanctioned value across all years was Rs 28.84 crore. Because sanction records cover only about one work in six, review the completeness and timeliness of sanction entry before interpreting these trends as changes in actual sanctioning."
+ },
+ "6": {
+  "verdict": "pass",
+  "claim_map": [
+   {
+    "claim": "Bhubaneswar recorded the highest payment workload in five of the six years reviewed",
+    "supported_by": "Engine sentence: Across most fiscal_year values (5/6), Bhubaneswar has the highest payment_count among block_name values."
+   },
+   {
+    "claim": "accounting for 2,135 vouchers—25.0% of the sample total",
+    "supported_by": "top_values / Bhubaneswar / value: 2,135 vouchers; top_values / Bhubaneswar / share_of_total: 25.0%; total: 8,529 vouchers; This is a 20-Gram-Panchayat sample; percentages describe the sample, not the state."
+   },
+   {
+    "claim": "This indicates transaction volume, not performance.",
+    "supported_by": "Voucher and payment counts are workload, not a performance rating."
+   },
+   {
+    "claim": "Across the 16 blocks represented, 8,529 vouchers were recorded.",
+    "supported_by": "count_breakdown_values: 16; measure_unit: vouchers; total: 8,529 vouchers"
+   },
+   {
+    "claim": "Bhubaneswar’s volume was well above Rangeilunda (945), Bheden (885), Sheragada (609) and Kalimela (568)",
+    "supported_by": "top_values / Bhubaneswar / value: 2,135 vouchers; top_values / Rangeilunda / value: 945 vouchers; top_values / Bheden / value: 885 vouchers; top_values / Sheragada / value: 609 vouchers; top_values / Kalimela / value: 568 vouchers"
+   },
+   {
+    "claim": "in the remaining year, there was no clear leader",
+    "supported_by": "Exceptions: - 2024-2025: no clear pattern -- the engine found no clear pattern here"
+   },
+   {
+    "claim": "Bhubaneswar’s consistently higher count",
+    "supported_by": "Follows the pattern (5 of 6): 2020-2021, 2021-2022, 2022-2023, 2023-2024, 2025-2026"
+   }
+  ],
+  "problems": [],
+  "lead": "Bhubaneswar recorded the highest payment workload in five of the six years reviewed, accounting for 2,135 vouchers—25.0% of the sample total. This indicates transaction volume, not performance.",
+  "detail": "Across the 16 blocks represented, 8,529 vouchers were recorded. Bhubaneswar’s volume was well above Rangeilunda (945), Bheden (885), Sheragada (609) and Kalimela (568); in the remaining year, there was no clear leader. At the next review, ask whether Bhubaneswar’s consistently higher count reflects genuinely more transactions or differences in how vouchers are entered and counted."
+ },
+ "8": {
+  "verdict": "pass",
+  "claim_map": [
+   {
+    "claim": "In 18 of the 20 sampled Gram Panchayats, costed activities marked “Activity Approved” had the largest gap between planned cost and recorded spending among status groups.",
+    "supported_by": "Engine sentence: Across nearly all gp_name values (18/20), Activity Approved has the lowest overspend_vs_plan among status_label values. Records covered: is_costless = Costed"
+   },
+   {
+    "claim": "Across the full sample, this group recorded Rs 14.00 lakh spent against Rs 41.75 crore planned—a gap of Rs 41.61 crore.",
+    "supported_by": "utilization_companion / absolutes / Activity Approved: Rs 14.00 lakh spent of Rs 41.75 crore planned cost; highlight_values / Activity Approved / value: Rs -41.61 crore"
+   },
+   {
+    "claim": "“Activity Approved” accounts for 53.9% of the 5,630 costed activities reviewed.",
+    "supported_by": "size_share / scope: Costed only; size_share / volume_in_scope: 5,630 activities; size_share / share_of_volume / Activity Approved: 53.9%"
+   },
+   {
+    "claim": "The pattern was not clear in Boipariguda or Laxmipur.",
+    "supported_by": "Exceptions: - Boipariguda: no clear pattern -- the engine found no clear pattern here; - Laxmipur: no clear pattern -- the engine found no clear pattern here"
+   },
+   {
+    "claim": "clarify what the “Buildings” status represents",
+    "supported_by": "Engine sentence: Activity Approved has the lowest overspend_vs_plan among status_label values; Reference figures: top_values / Buildings / value: Rs -10.88 lakh"
+   },
+   {
+    "claim": "the data show low recorded spending against plan",
+    "supported_by": "utilization_companion / utilization_pct / Activity Approved: 0.3%; utilization_companion / absolutes / Activity Approved: Rs 14.00 lakh spent of Rs 41.75 crore planned cost"
+   },
+   {
+    "claim": "cannot establish whether activities have started or whether records are incomplete",
+    "supported_by": "background facts about how these records are known to be incomplete: Total cashbook spending has not grown across these years, while the share of spending linked to a planned activity rose from 2.7% to 53.2% -- a rise in \"linked spending\" is mostly better record-keeping."
+   }
+  ],
+  "problems": [],
+  "lead": "In 18 of the 20 sampled Gram Panchayats, costed activities marked “Activity Approved” had the largest gap between planned cost and recorded spending among status groups. Across the full sample, this group recorded Rs 14.00 lakh spent against Rs 41.75 crore planned—a gap of Rs 41.61 crore.",
+  "detail": "“Activity Approved” accounts for 53.9% of the 5,630 costed activities reviewed. The pattern was not clear in Boipariguda or Laxmipur. At the next review, reconcile planned costs, recorded expenditure and status classifications for this group, and clarify what the “Buildings” status represents; the data show low recorded spending against plan, but cannot establish whether activities have started or whether records are incomplete."
+ },
+ "9": {
+  "verdict": "fail",
+  "claim_map": [],
+  "problems": [
+   {
+    "drifted_claim": "this analysis did not assess geographic differences.",
+    "missing_or_contradicted_fact": "The source finding is about payment_count by temporal_grain and says records covered are all records in the view, but it does not state whether geographic differences were or were not assessed."
+   }
+  ],
+  "lead": "Payment counts show a recurring seasonal pattern when viewed by month or quarter, including the normal concentration of payments in March. No clear recurring pattern appears in fiscal-year totals.",
+  "detail": "This pattern covers all records in the view and reflects timing and workload, not performance. Reviews should compare like periods and avoid treating the usual year-end payment concentration as an exception; this analysis did not assess geographic differences."
+ },
+ "10": {
+  "verdict": "pass",
+  "claim_map": [
+   {
+    "claim": "\"Ongoing works account for 93.9% of the recorded value of costed activities\"",
+    "supported_by": "Records covered: is_costless = Costed; Reference figures: - top_values / WORK ONGOING / share_of_total: 93.9%"
+   },
+   {
+    "claim": "\"Rs 28.59 crore out of Rs 30.43 crore\"",
+    "supported_by": "Reference figures: - top_values / WORK ONGOING / value: Rs 28.59 crore; - total: Rs 30.43 crore"
+   },
+   {
+    "claim": "\"This pattern appears in 18 of the 20 sampled Gram Panchayats.\"",
+    "supported_by": "Engine sentence: Across nearly all gp_name values (18/20), WORK ONGOING accounts for the majority of gen_amount among status_label values.; This is a 20-Gram-Panchayat sample; percentages describe the sample, not the state."
+   },
+   {
+    "claim": "\"Boipariguda and Laxmipur are the only exceptions\"",
+    "supported_by": "Exceptions: - Boipariguda: no clear pattern -- the engine found no clear pattern here; - Laxmipur: no clear pattern -- the engine found no clear pattern here"
+   },
+   {
+    "claim": "\"with no clear dominant status by value\"",
+    "supported_by": "Exceptions: - Boipariguda: no clear pattern -- the engine found no clear pattern here; - Laxmipur: no clear pattern -- the engine found no clear pattern here"
+   },
+   {
+    "claim": "\"Completed works account for just Rs 23.98 lakh, or 0.8%\"",
+    "supported_by": "Reference figures: - top_values / WORK COMPLETED / value: Rs 23.98 lakh; - top_values / WORK COMPLETED / share_of_total: 0.8%"
+   },
+   {
+    "claim": "\"only 17 works in the full sample are recorded as completed\"",
+    "supported_by": "Only 17 works in the whole sample are marked completed, so completion figures measure recording practice, not delivery."
+   },
+   {
+    "claim": "\"this reflects status recording rather than actual delivery\"",
+    "supported_by": "Only 17 works in the whole sample are marked completed, so completion figures measure recording practice, not delivery."
+   },
+   {
+    "claim": "\"the 18 Gram Panchayats\"",
+    "supported_by": "Follows the pattern (18 of 20): Andhrua, Bandhpali, Barimunda, Bhatigaon, Bheden, Biswamathpur, Chikilli, Dadhapatna, Dutimendi, Govindapur, Haldikudar, Hirlipali, Itipur, Kalimela, Kalyansinghpur, Karuabahal, Mendarajpur, Sharagada"
+   },
+   {
+    "claim": "\"the large value recorded as ongoing\"",
+    "supported_by": "Reference figures: - top_values / WORK ONGOING / value: Rs 28.59 crore; - top_values / WORK ONGOING / share_of_total: 93.9%"
+   }
+  ],
+  "problems": [],
+  "lead": "Ongoing works account for 93.9% of the recorded value of costed activities—Rs 28.59 crore out of Rs 30.43 crore. This pattern appears in 18 of the 20 sampled Gram Panchayats.",
+  "detail": "Boipariguda and Laxmipur are the only exceptions, with no clear dominant status by value. Completed works account for just Rs 23.98 lakh, or 0.8%, but only 17 works in the full sample are recorded as completed, so this reflects status recording rather than actual delivery; at the next review, ask the 18 Gram Panchayats to explain the large value recorded as ongoing and reconcile work-status records with available work and payment evidence."
+ },
+ "13": {
+  "verdict": "pass",
+  "claim_map": [
+   {
+    "claim": "Theme 6—Self-sufficient Infrastructure in Village—accounts for ₹30.07 crore, or 50.4% of untied funds across costed activities",
+    "supported_by": "Reference figures: - top_values / Theme 6 - Self-sufficient Infrastructure in Village / value: Rs 30.07 crore; - top_values / Theme 6 - Self-sufficient Infrastructure in Village / share_of_total: 50.4%; Records covered: is_costless = Costed"
+   },
+   {
+    "claim": "[Theme 6] is the largest theme in 18 of the 20 sampled Gram Panchayats",
+    "supported_by": "Engine sentence: Across nearly all gp_name values (18/20), Theme 6 - Self-sufficient Infrastructure in Village has the highest fund_untied_total among theme values."
+   },
+   {
+    "claim": "Boipariguda and Kalimela are the exceptions",
+    "supported_by": "Exceptions: - Boipariguda: different pattern -- a different one leads here: Unmapped theme; - Kalimela: different pattern -- a different one leads here: Theme 4 - Water Sufficient Village"
+   },
+   {
+    "claim": "The analysis covers 5,630 costed activities",
+    "supported_by": "size_share / scope: Costed only; size_share / volume_in_scope: 5,630 activities"
+   },
+   {
+    "claim": "[The analysis covers activities] worth ₹59.64 crore",
+    "supported_by": "total: Rs 59.64 crore"
+   },
+   {
+    "claim": "Unmapped theme records carry the highest total in Boipariguda",
+    "supported_by": "Exceptions: - Boipariguda: different pattern -- a different one leads here: Unmapped theme"
+   },
+   {
+    "claim": "Theme 4—Water Sufficient Village—leads in Kalimela",
+    "supported_by": "Exceptions: - Kalimela: different pattern -- a different one leads here: Theme 4 - Water Sufficient Village"
+   },
+   {
+    "claim": "the data shows which category leads but not why",
+    "supported_by": "Engine sentence: Across nearly all gp_name values (18/20), Theme 6 - Self-sufficient Infrastructure in Village has the highest fund_untied_total among theme values. Exception: Boipariguda (Unmapped theme has the highest fund_untied_total among theme values); Kalimela (Theme 4 - Water Sufficient Village has the highest fund_untied_total among theme values)"
+   }
+  ],
+  "problems": [],
+  "lead": "Theme 6—Self-sufficient Infrastructure in Village—accounts for ₹30.07 crore, or 50.4% of untied funds across costed activities, and is the largest theme in 18 of the 20 sampled Gram Panchayats. Boipariguda and Kalimela are the exceptions.",
+  "detail": "The analysis covers 5,630 costed activities worth ₹59.64 crore. Unmapped theme records carry the highest total in Boipariguda, while Theme 4—Water Sufficient Village—leads in Kalimela; officials should examine the underlying activity and theme records for these two GPs before interpreting their allocation patterns, as the data shows which category leads but not why."
+ },
+ "15": {
+  "verdict": "pass",
+  "claim_map": [
+   {
+    "claim": "All 6,893 recorded photo uploads for New/Fresh works are under Code 101",
+    "supported_by": "Records covered: work_type_label = New/Fresh; top_values / Code 101 / value: 6,893 photo uploads; top_values / Code 101 / share_of_total: 100.0%; total: 6,893 photo uploads"
+   },
+   {
+    "claim": "with this pattern seen in 19 of the 20 sampled Gram Panchayats",
+    "supported_by": "Across nearly all gp_name values (19/20), Code 101 accounts for the majority of evidence_uploads among output_type_label values; This is a 20-Gram-Panchayat sample"
+   },
+   {
+    "claim": "Chikilli is the only exception, where no clear pattern was found",
+    "supported_by": "Exceptions: - Chikilli: no clear pattern -- the engine found no clear pattern here"
+   },
+   {
+    "claim": "The records cover 11,047 New/Fresh activities",
+    "supported_by": "size_share / scope: New/Fresh only; size_share / volume_in_scope: 11,047 activities"
+   },
+   {
+    "claim": "spread across five output codes",
+    "supported_by": "count_breakdown_values: 5"
+   },
+   {
+    "claim": "Codes 102, 103, 109 and 110 have no recorded photo uploads",
+    "supported_by": "top_values / Code 102 / value: 0 photo uploads; top_values / Code 103 / value: 0 photo uploads; top_values / Code 109 / value: 0 photo uploads; top_values / Code 110 / value: 0 photo uploads"
+   },
+   {
+    "claim": "Codes 101 to 110 have no descriptions on file",
+    "supported_by": "Output categories \"Code 101\" to \"Code 110\" have no descriptions on file; nothing can be concluded about what they contain until the department supplies the decode"
+   },
+   {
+    "claim": "the upload distribution cannot yet be interpreted",
+    "supported_by": "Output categories \"Code 101\" to \"Code 110\" have no descriptions on file; nothing can be concluded about what they contain until the department supplies the decode"
+   }
+  ],
+  "problems": [],
+  "lead": "All 6,893 recorded photo uploads for New/Fresh works are under Code 101, with this pattern seen in 19 of the 20 sampled Gram Panchayats. Chikilli is the only exception, where no clear pattern was found.",
+  "detail": "The records cover 11,047 New/Fresh activities spread across five output codes, but Codes 102, 103, 109 and 110 have no recorded photo uploads. As Codes 101 to 110 have no descriptions on file, the upload distribution cannot yet be interpreted; the department should obtain the code descriptions and examine Chikilli separately at the next review."
+ }
+}

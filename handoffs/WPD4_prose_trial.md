@@ -44,7 +44,7 @@ report, do not fix.
 
 | File | Why |
 |---|---|
-| Appendix A below | The writer's entire prompt context — embed verbatim, never paraphrase |
+| Appendix A below | The context template — instantiate the slots, embed verbatim, never paraphrase |
 | `Insights/metainsights/global_feed.json` | The 15 inputs = feed ranks 1–15 (`feed` array, in order); each row's `summary` is the finding's current sentence |
 | `Insights/src/phase5b_report.py` | How figure enrichment and reading notes are computed today — reuse for reference figures, don't reinvent |
 | `Insights/src/discover_config.py` | The shared prose-model constant (D17) and its budget-check discipline |
@@ -72,10 +72,8 @@ investigation of the frontend one-liners (separate, PM-owned).
   first use or you get silently empty prose.
 - The feed's `summary` field is frozen by D16 — your output goes only in the
   review document.
-- Every figure the model may use must be in its packet or in Appendix A's
-  background; the model computes nothing (the checks enforce this).
-- Appendix A's background facts each trace to a published reading note — add
-  none, remove none; if one looks wrong, STOP and report rather than edit it.
+- Every figure the model may use must be in its packet or a context slot
+  value; the model computes nothing (the checks enforce this).
 - `Insights/.env` loads from `BASE_DIR/.env`, not the repo root (WPD3 §4.4).
 
 ## Tasks
@@ -88,7 +86,20 @@ existing enrichment paths — display-formatted exactly as they may appear in
 prose ("Rs 42.61 lakh", "5 out of 9"), covering the finding's own numbers
 (totals, shares, leader values, per-year figures where the pattern is a trend)
 and the exception detail the engine recorded (which places, and whether each is
-opposite-direction, different-pattern, or no-clear-pattern, in words).
+opposite-direction, different-pattern, or no-clear-pattern, in words). Add a
+one-line **definition** for each variable the finding uses (its measure, its
+breakdown, and any filter dimensions), pulled from the signed glossary
+(`handoffs/WPD2_mining_calibration.md` Appendix A / the pack crosswalk): unit,
+money basis (planned / sanctioned / spent), sign convention for signed
+measures, and what the values are — including that output-type codes have no
+descriptions on file and "Uncategorised" means no asset category recorded.
+Definitions say what a variable IS, never how much to trust it. Include the
+companion statistics the enrichment layer already computes for the finding's
+measure (e.g. utilization companions), and give year figures in both display
+forms ("2020-2021" and "2020-21") so the verbatim check does not fail on
+formatting. No caution or scope-note layer of any kind (operator ruling,
+2026-08-31): the packet is structure, figures and definitions — nothing
+interpretive.
 **Done when:** 15 packets exist; every figure traces to the pinned candidate
 set, the views, or a published reading note (provenance recorded per figure).
 **Trap:** raw floats — the packet carries display strings, because the checks
@@ -99,10 +110,14 @@ calculations.
 
 ### T2 — The writer call (one batch)
 
-**Do:** One request to the pinned prose model: Appendix A verbatim, then the 15
-packets. No rules, no style instructions, no phrasing suggestions beyond what
-Appendix A itself says. Ask for clearly delimited output per finding: lead
-line, then detail block. Run the D17 budget check first.
+**Do:** Request(s) to the pinned prose model: the instantiated Appendix A
+template verbatim, then the packets. Input is packets only — never the feed
+JSON, which carries no figures. Default is ONE batch of all 15; split only if
+the input cap would be exceeded, and split by view so same-view findings stay
+together (a size rule, not content curation). No rules, no style instructions,
+no phrasing suggestions beyond what Appendix A itself says. Ask for clearly
+delimited output per finding: lead line, then detail block. Run the D17 budget
+check first.
 **Done when:** 15 two-part renderings exist; request/response and `usage`
 logged.
 **Trap:** truncation mid-batch — if the response cuts off, split into smaller
@@ -111,7 +126,7 @@ batches rather than raising the output cap past its ceiling.
 ### T3 — Nothing-invented checks (code, per finding, both parts)
 
 **Do:** Assert: (a) every numeral appears verbatim in that finding's packet or
-in Appendix A's background figures; (b) every place/person/category name
+in the instantiated context's slot values; (b) every place/person/category name
 appears in the packet; (c) no raw database token — column identifiers,
 "(varies)", "PERIOD_…", engine pattern-type enums; (d) lead ≤ 2 sentences,
 detail ≤ ~200 words.
@@ -124,12 +139,15 @@ wouldn't have chosen, that is the operator's call at the gate, not a failure.
 
 **Do:** A *different* model than the writer (choose from what the existing keys
 serve; verify the ID against the live model list per D17; record the choice —
-same-vendor-only is acceptable if disclosed). Input: the packet + Appendix A's
-background + the rendering. Question: does the rendering claim anything the
-packet and background do not support, or lose/weaken a limitation they state?
-Output JSON: `pass` (each core claim mapped to a packet/background entry) or
-`fail` (quoting the drifted claim, naming the missing or contradicted fact).
-Vague verdict = fail-to-verify, not pass.
+same-vendor-only is acceptable if disclosed). Input: the packet + the
+instantiated context + the rendering. Question — in two parts, learned from round 1: FACTUAL CLAIMS must each be
+supported by the packet or the instantiated context (mapped on pass; the drifted claim
+quoted on fail). SUGGESTED ACTIONS and review questions ("check X", "ask Y")
+are judged only for consistency — they must not assert new facts or contradict
+the sources, but they need no source that recommends them, since Appendix A
+itself asks the writer to propose them. (Round 1 ran the stricter reading and
+7 of its 8 failures were exactly this false positive; the split wording passed
+them on re-run.) Vague verdict = fail-to-verify, not pass.
 **Done when:** 15 verdicts logged machine-readably.
 **Trap:** rubber-stamping — the claim mapping on pass is not optional.
 
@@ -172,8 +190,7 @@ trial.
 ## Escalation protocol
 
 STOP (report, don't proceed): precondition failures; pinned-set hash mismatch;
-empty completions after two budget-check attempts; an Appendix A background
-fact that appears wrong. Decide-and-document (report journal): batch splitting,
+empty completions after two budget-check attempts. Decide-and-document (report journal): batch splitting,
 check normalizations, verifier model choice, packet field details.
 
 ## Gate
@@ -198,57 +215,55 @@ self-audit (files written = allowlist; git read-only).
 
 ---
 
-## Appendix A — the context brief (the writer's verbatim prompt context)
+## Appendix A — the context (a reusable template + this deployment's values)
 
-> You are writing for a decision-aid system used by government officials in
-> Odisha's Department of Panchayati Raj & Drinking Water. The system
-> automatically analyses village-level planning and spending records —
-> development plans, sanctions, payments, works and photo evidence from
-> Gram Panchayats, blocks, and districts — and surfaces patterns worth an official's attention.
+The context is deliberately a **template**: everything domain-specific enters
+through named slots filled from the domain pack, so the same template serves
+the next deployment unchanged. The writer receives the **instantiated** text
+verbatim — never the slot names. The template contains **no list of domain
+facts**: the writer works from each finding's packet — the engine structure
+and the measured reference figures — and nothing else.
+
+**Template (operator-authored wording, 2026-08-31):**
+
+> You are writing for a decision-aid system used by {AUDIENCE}. The system
+> automatically analyses {DATA_DESCRIPTION} and surfaces patterns worth an
+> official's attention.
 >
-> Your readers are busy block-, district- and state-level officials, not data
-> analysts. They read these insights to decide where to direct attention:
-> which districts to question, which records to reconcile, which local
-> practices to check at the next review.
+> Your readers are {READERS}, not data analysts. They read these insights to
+> decide where to direct attention: {ATTENTION_EXAMPLES}.
 >
-> Below are 15 findings from the analysis engine, each written in the engine's
+> Below are findings from the analysis engine, each written in the engine's
 > internal style — accurate but full of database language — along with
 > reference figures for each. Rewrite each finding as an insight a senior
 > officer would find clear and actionable:
-> - a one-to-two-sentence lead the officer sees first;
+>
+> - a one-to-two-sentence lead the officer sees first. This should be
+>   interesting enough to catch a reader's attention and easy enough to
+>   understand that the officer doesn't need to read the subsequent paragraph
+>   simply to understand it. Lead with what the officer would act on — usually
+>   the size and direction of the issue — rather than with the statistical
+>   pattern.
 > - a short detail paragraph explaining what was found, which places are
 >   exceptions and in what way, and what is worth checking or asking at the
 >   next review.
 >
 > Write naturally, in plain English. Use the reference figures where they
 > strengthen the point; use no number that is not provided. Be direct about
-> what the data can and cannot establish — these records are incomplete in
-> known ways described below, and an insight that overstates certainty could
-> send an official after the wrong problem.
->
-> Background to reflect where relevant:
-> - Sanction records exist for only about one work in six, so figures on a
->   sanctioned basis describe that subset, and a falling sanctioned value can
->   mean fewer sanctions or fewer sanctions being entered.
-> - Cost-free activities (training, campaigns, services) began being recorded
->   only in 2023-24, so activity counts jump at that boundary for a reporting
->   reason, not a real one.
-> - Total cashbook spending has not grown across these years, while the share
->   of spending linked to a planned activity rose from 2.7% to 53.2% — a rise
->   in "linked spending" is mostly better record-keeping.
-> - March concentrates payments every year; it is the fiscal year-end and this
->   is normal government cash flow.
-> - Output categories "Code 101" to "Code 110" have no descriptions on file;
->   nothing can be concluded about what they contain until the department
->   supplies the decode.
-> - "Uncategorised" assets are works with no asset category recorded — about
->   two-thirds of all works; it is not itself a kind of asset.
-> - Only 17 works in the whole sample are marked completed, so completion
->   figures measure recording practice, not delivery.
-> - Voucher and payment counts are workload, not a performance rating.
-> - This is a 20-Gram-Panchayat sample; percentages describe the sample, not
->   the state.
+> what the data can and cannot establish — an insight that overstates
+> certainty could send an official after the wrong problem.
 
-*(Implementation note, not part of the prompt: every bullet above traces to
-the published reading notes in the executive report and the signed glossary —
-the agent embeds this text verbatim and adds nothing.)*
+**This deployment's slot values (from the PR&DW pack):**
+
+| slot | value |
+|---|---|
+| AUDIENCE | government officials in Odisha's Department of Panchayati Raj & Drinking Water |
+| DATA_DESCRIPTION | village-level planning and spending records — development plans, sanctions, payments, works and photo evidence from Gram Panchayats, blocks, and districts. The current data is a 20-Gram-Panchayat sample; percentages describe the sample, not the state |
+| READERS | busy block-, district- and state-level officials |
+| ATTENTION_EXAMPLES | which districts to question, which records to reconcile, which local practices to check at the next review |
+
+*(An Appendix B — a rule-attached caution/scope-note library — was considered
+and **dropped by operator ruling, 2026-08-31**: no caution layer of any kind.
+Packets carry the engine structure and measured reference figures; what the
+data can and cannot establish is for the writer and the reviewing officials
+to judge.)*

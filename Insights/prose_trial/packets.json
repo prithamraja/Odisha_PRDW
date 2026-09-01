@@ -1,0 +1,2585 @@
+[
+ {
+  "rank": 1,
+  "view": "view1",
+  "view_title": "Activity Lifecycle",
+  "pattern_type": "EVENNESS",
+  "measure": "overspend_vs_plan",
+  "breakdown": "block_name",
+  "compared_across": "asset_category_label",
+  "scope": "is_costless = Costed",
+  "feed_sentence": "Across nearly all asset_category_label values (27/28), overspend_vs_plan is spread evenly across block_name values -- it belongs to all of them and no single block_name accounts for it. Uneven only in: Banking Facilities (not evenly spread) -- this is about how the total is spread, not about how much any one of them spends",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
+  "members_following_the_pattern": [
+   "Uncategorised",
+   "Buildings",
+   "Recreational Facilities",
+   "Drinking water supply structure",
+   "Water Sources & Structures",
+   "Roads, Bridges & Culverts",
+   "Community Sanitation",
+   "Plastic Waste Management",
+   "Solid Waste Management",
+   "Sanitation & Sewerage Facilities",
+   "Liquid Waste Management",
+   "Household Sanitation",
+   "Movable Sanitation Asset",
+   "Faecal Sludge Management",
+   "Education Facilities",
+   "Office Equipment",
+   "Medical & Health Facilities",
+   "Land",
+   "Irrigation Sources",
+   "Computers and peripherals",
+   "Electrification",
+   "Drinking water supply equipment",
+   "Pond & Reservoir",
+   "Other Public/Social",
+   "Electrical Installation and Equipment",
+   "Medical Supplies",
+   "Grey water management"
+  ],
+  "members_count": 27,
+  "members_out_of": 28,
+  "exceptions": [
+   {
+    "name": "Banking Facilities",
+    "kind": "no clear pattern",
+    "in_words": "the engine found no clear pattern here",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   }
+  ],
+  "reference_figures": [
+   {
+    "label": "top_values / Lahunipara / value",
+    "display": "Rs -90.62 lakh",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Baranga / value",
+    "display": "Rs -1.10 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Kalyansingpur / value",
+    "display": "Rs -1.24 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Attabira / value",
+    "display": "Rs -1.27 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Balisankara / value",
+    "display": "Rs -1.28 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Kalimela / value",
+    "display": "Rs -5.90 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Rangeilunda / value",
+    "display": "Rs -9.11 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "count_breakdown_values",
+    "display": "16",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "measure_unit",
+    "display": "rupees",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "how_aggregated",
+    "display": "totalled across rows - an absolute figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "total",
+    "display": "Rs -51.96 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / what_this_is",
+    "display": "each place's share of the 5,630 activities behind the totals above - the volume base, not a performance figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / scope",
+    "display": "Costed only",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / volume_in_scope",
+    "display": "5,630 activities",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Bhubaneswar",
+    "display": "13.7%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Kalimela",
+    "display": "8.2%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Rangeilunda",
+    "display": "7.9%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Boipariguda",
+    "display": "7.1%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Barpali",
+    "display": "6.7%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Bheden",
+    "display": "6.6%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Laxmipur",
+    "display": "6.4%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Baranga",
+    "display": "5.9%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Khajuripada",
+    "display": "5.9%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Khallikote",
+    "display": "5.5%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Tangi Choudwar",
+    "display": "5.5%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Balisankara",
+    "display": "5.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Kalyansingpur",
+    "display": "4.3%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Lahunipara",
+    "display": "4.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Attabira",
+    "display": "3.8%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Sheragada",
+    "display": "3.5%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / basis",
+    "display": "planned cost",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / what_this_is",
+    "display": "the same money as overspend_vs_plan, read as a share instead of a difference: how much of each group's planned cost was actually spent",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / how_computed",
+    "display": "ratio of sums - the group's total total_expenditure divided by its total total_cost. It is NOT an average of per-row ratios and the percentages do not add up to anything",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / Attabira",
+    "display": "48.3%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / Balisankara",
+    "display": "42.2%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / Baranga",
+    "display": "52.9%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / Kalimela",
+    "display": "23.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / Kalyansingpur",
+    "display": "49.6%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / Lahunipara",
+    "display": "45.3%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / Rangeilunda",
+    "display": "23.1%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / Attabira",
+    "display": "Rs 1.19 crore spent of Rs 2.46 crore planned cost",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / Balisankara",
+    "display": "Rs 93.75 lakh spent of Rs 2.22 crore planned cost",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / Baranga",
+    "display": "Rs 1.24 crore spent of Rs 2.34 crore planned cost",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / Kalimela",
+    "display": "Rs 1.76 crore spent of Rs 7.65 crore planned cost",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / Kalyansingpur",
+    "display": "Rs 1.22 crore spent of Rs 2.46 crore planned cost",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / Lahunipara",
+    "display": "Rs 75.12 lakh spent of Rs 1.66 crore planned cost",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / Rangeilunda",
+    "display": "Rs 2.73 crore spent of Rs 11.84 crore planned cost",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   }
+  ],
+  "thin": false,
+  "thin_reason": null
+ },
+ {
+  "rank": 2,
+  "view": "view2",
+  "view_title": "Geo-Month Cash Cube",
+  "pattern_type": "TREND",
+  "measure": "activity_linked_expenditure",
+  "breakdown": "(varies)",
+  "compared_across": "temporal_grain",
+  "scope": "all records in this view",
+  "feed_sentence": "Across all temporal_grain values, activity_linked_expenditure is increasing over (varies)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
+  "members_following_the_pattern": [
+   "month",
+   "quarter",
+   "fiscal_year"
+  ],
+  "members_count": 3,
+  "members_out_of": 3,
+  "exceptions": [],
+  "reference_figures": [],
+  "thin": true,
+  "thin_reason": "Varies across members -- see individual patterns"
+ },
+ {
+  "rank": 3,
+  "view": "view3",
+  "view_title": "GP Performance",
+  "pattern_type": "TREND",
+  "measure": "sanctioned_total",
+  "breakdown": "fiscal_year",
+  "compared_across": "district_name",
+  "scope": "all records in this view",
+  "feed_sentence": "Across most district_name values (5/9), sanctioned_total is decreasing over fiscal_year. Exceptions: Kandhamal (sanctioned_total is increasing over fiscal_year); Khordha (no clear pattern); Ganjam (no clear pattern) and 1 others",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
+  "members_following_the_pattern": [
+   "Bargarh",
+   "Koraput",
+   "Cuttack",
+   "Sundargarh",
+   "Malkangiri"
+  ],
+  "members_count": 5,
+  "members_out_of": 9,
+  "exceptions": [
+   {
+    "name": "Kandhamal",
+    "kind": "opposite direction",
+    "in_words": "moves in the opposite direction: increasing, where most are decreasing",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   },
+   {
+    "name": "Khordha",
+    "kind": "no clear pattern",
+    "in_words": "the engine found no clear pattern here",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   },
+   {
+    "name": "Ganjam",
+    "kind": "no clear pattern",
+    "in_words": "the engine found no clear pattern here",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   },
+   {
+    "name": "Rayagada",
+    "kind": "no clear pattern",
+    "in_words": "the engine found no clear pattern here",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   }
+  ],
+  "reference_figures": [
+   {
+    "label": "top_values / 2020-2021 / value",
+    "display": "Rs 6.13 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / 2020-2021 / share_of_total",
+    "display": "21.2%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / 2021-2022 / value",
+    "display": "Rs 5.51 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / 2021-2022 / share_of_total",
+    "display": "19.1%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / 2024-2025 / value",
+    "display": "Rs 4.63 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / 2024-2025 / share_of_total",
+    "display": "16.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / 2023-2024 / value",
+    "display": "Rs 4.56 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / 2023-2024 / share_of_total",
+    "display": "15.8%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / 2022-2023 / value",
+    "display": "Rs 4.45 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / 2022-2023 / share_of_total",
+    "display": "15.4%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / 2022-2023 / value",
+    "display": "Rs 4.45 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / 2022-2023 / share_of_total",
+    "display": "15.4%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / 2025-2026 / value",
+    "display": "Rs 3.57 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / 2025-2026 / share_of_total",
+    "display": "12.4%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "count_breakdown_values",
+    "display": "6",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "measure_unit",
+    "display": "rupees",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "how_aggregated",
+    "display": "totalled across rows - an absolute figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "total",
+    "display": "Rs 28.84 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   }
+  ],
+  "thin": false,
+  "thin_reason": null
+ },
+ {
+  "rank": 4,
+  "view": "view1",
+  "view_title": "Activity Lifecycle",
+  "pattern_type": "EVENNESS",
+  "measure": "overspend_vs_sanction",
+  "breakdown": "district_name",
+  "compared_across": "asset_category_label",
+  "scope": "all records in this view",
+  "feed_sentence": "Across nearly all asset_category_label values (27/28), overspend_vs_sanction is spread evenly across district_name values -- it belongs to all of them and no single district_name accounts for it. Uneven only in: Banking Facilities (not evenly spread) -- this is about how the total is spread, not about how much any one of them spends",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
+  "members_following_the_pattern": [
+   "Uncategorised",
+   "Buildings",
+   "Recreational Facilities",
+   "Drinking water supply structure",
+   "Water Sources & Structures",
+   "Roads, Bridges & Culverts",
+   "Community Sanitation",
+   "Plastic Waste Management",
+   "Solid Waste Management",
+   "Sanitation & Sewerage Facilities",
+   "Liquid Waste Management",
+   "Household Sanitation",
+   "Movable Sanitation Asset",
+   "Faecal Sludge Management",
+   "Education Facilities",
+   "Office Equipment",
+   "Medical & Health Facilities",
+   "Land",
+   "Irrigation Sources",
+   "Computers and peripherals",
+   "Electrification",
+   "Drinking water supply equipment",
+   "Pond & Reservoir",
+   "Other Public/Social",
+   "Electrical Installation and Equipment",
+   "Medical Supplies",
+   "Grey water management"
+  ],
+  "members_count": 27,
+  "members_out_of": 28,
+  "exceptions": [
+   {
+    "name": "Banking Facilities",
+    "kind": "no clear pattern",
+    "in_words": "the engine found no clear pattern here",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   }
+  ],
+  "reference_figures": [
+   {
+    "label": "top_values / Rayagada / value",
+    "display": "Rs -17.43 lakh",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Cuttack / value",
+    "display": "Rs -18.73 lakh",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Malkangiri / value",
+    "display": "Rs -32.05 lakh",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Koraput / value",
+    "display": "Rs -37.43 lakh",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Sundargarh / value",
+    "display": "Rs -37.66 lakh",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Khordha / value",
+    "display": "Rs -73.70 lakh",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Ganjam / value",
+    "display": "Rs -1.68 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "count_breakdown_values",
+    "display": "9",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "measure_unit",
+    "display": "rupees",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "how_aggregated",
+    "display": "totalled across rows - an absolute figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "total",
+    "display": "Rs -5.02 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / what_this_is",
+    "display": "each place's share of the 12,704 activities behind the totals above - the volume base, not a performance figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / scope",
+    "display": "the whole view",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / volume_in_scope",
+    "display": "12,704 activities",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Bargarh",
+    "display": "24.1%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Ganjam",
+    "display": "21.4%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Koraput",
+    "display": "11.5%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Khordha",
+    "display": "10.4%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Sundargarh",
+    "display": "8.9%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Cuttack",
+    "display": "8.7%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Malkangiri",
+    "display": "6.7%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Kandhamal",
+    "display": "4.5%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Rayagada",
+    "display": "3.9%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / basis",
+    "display": "sanctioned amount",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / what_this_is",
+    "display": "the same money as overspend_vs_sanction, read as a share instead of a difference: how much of each group's sanctioned amount was actually spent This is the sanctioned basis, so it describes only the activities that have a sanction record on file (about one in six); it is not a programme-wide utilisation rate.",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / how_computed",
+    "display": "ratio of sums - the group's total total_expenditure divided by its total fund_sanctioned_total. It is NOT an average of per-row ratios and the percentages do not add up to anything",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / Cuttack",
+    "display": "92.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / Ganjam",
+    "display": "73.3%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / Khordha",
+    "display": "81.9%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / Koraput",
+    "display": "89.3%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / Malkangiri",
+    "display": "84.6%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / Rayagada",
+    "display": "87.5%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / Sundargarh",
+    "display": "81.8%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / Cuttack",
+    "display": "Rs 2.14 crore spent of Rs 2.33 crore sanctioned amount",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / Ganjam",
+    "display": "Rs 4.61 crore spent of Rs 6.30 crore sanctioned amount",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / Khordha",
+    "display": "Rs 3.33 crore spent of Rs 4.06 crore sanctioned amount",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / Koraput",
+    "display": "Rs 3.13 crore spent of Rs 3.50 crore sanctioned amount",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / Malkangiri",
+    "display": "Rs 1.76 crore spent of Rs 2.08 crore sanctioned amount",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / Rayagada",
+    "display": "Rs 1.22 crore spent of Rs 1.40 crore sanctioned amount",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / Sundargarh",
+    "display": "Rs 1.69 crore spent of Rs 2.07 crore sanctioned amount",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   }
+  ],
+  "thin": false,
+  "thin_reason": null
+ },
+ {
+  "rank": 5,
+  "view": "view1",
+  "view_title": "Activity Lifecycle",
+  "pattern_type": "TOP_TWO",
+  "measure": "fund_untied_total",
+  "breakdown": "output_type_label",
+  "compared_across": "gp_name",
+  "scope": "activity_type_label = Public Works",
+  "feed_sentence": "Across nearly all gp_name values (19/20), Code 101 and Code 105 lead in fund_untied_total among output_type_label values. Exception: Haldikudar (different pattern)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
+  "members_following_the_pattern": [
+   "Andhrua",
+   "Bandhpali",
+   "Barimunda",
+   "Bhatigaon",
+   "Bheden",
+   "Biswamathpur",
+   "Boipariguda",
+   "Chikilli",
+   "Dadhapatna",
+   "Dutimendi",
+   "Govindapur",
+   "Hirlipali",
+   "Itipur",
+   "Kalimela",
+   "Kalyansinghpur",
+   "Karuabahal",
+   "Laxmipur",
+   "Mendarajpur",
+   "Sharagada"
+  ],
+  "members_count": 19,
+  "members_out_of": 20,
+  "exceptions": [
+   {
+    "name": "Haldikudar",
+    "kind": "different pattern",
+    "in_words": "the engine found a different kind of pattern here",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   }
+  ],
+  "reference_figures": [
+   {
+    "label": "top_values / Code 101 / value",
+    "display": "Rs 34.88 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 101 / share_of_total",
+    "display": "62.1%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 105 / value",
+    "display": "Rs 16.90 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 105 / share_of_total",
+    "display": "30.1%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 104 / value",
+    "display": "Rs 2.35 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 104 / share_of_total",
+    "display": "4.2%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 106 / value",
+    "display": "Rs 1.26 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 106 / share_of_total",
+    "display": "2.3%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 103 / value",
+    "display": "Rs 48.84 lakh",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 103 / share_of_total",
+    "display": "0.9%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Code 110 / value",
+    "display": "Rs 2.30 lakh",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Code 110 / share_of_total",
+    "display": "0.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Code 109 / value",
+    "display": "Rs 0",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Code 109 / share_of_total",
+    "display": "0.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "count_breakdown_values",
+    "display": "8",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "measure_unit",
+    "display": "rupees",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "how_aggregated",
+    "display": "totalled across rows - an absolute figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "total",
+    "display": "Rs 56.20 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / what_this_is",
+    "display": "each place's share of the 9,418 activities behind the totals above - the volume base, not a performance figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / scope",
+    "display": "Public Works only",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / volume_in_scope",
+    "display": "9,418 activities",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Code 101",
+    "display": "38.1%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Code 110",
+    "display": "24.9%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Code 105",
+    "display": "12.8%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Code 102",
+    "display": "8.5%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Code 103",
+    "display": "6.5%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Code 109",
+    "display": "4.8%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Code 104",
+    "display": "3.2%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Code 106",
+    "display": "1.1%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "highlight_values / Code 101 / value",
+    "display": "Rs 34.88 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "highlight_values / Code 101 / share_of_total",
+    "display": "62.1%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "highlight_values / Code 105 / value",
+    "display": "Rs 16.90 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "highlight_values / Code 105 / share_of_total",
+    "display": "30.1%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   }
+  ],
+  "thin": false,
+  "thin_reason": null
+ },
+ {
+  "rank": 6,
+  "view": "view2",
+  "view_title": "Geo-Month Cash Cube",
+  "pattern_type": "OUTSTANDING_1",
+  "measure": "payment_count",
+  "breakdown": "block_name",
+  "compared_across": "fiscal_year",
+  "scope": "all records in this view",
+  "feed_sentence": "Across most fiscal_year values (5/6), Bhubaneswar has the highest payment_count among block_name values. Exception: 2024-2025 (no clear pattern)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
+  "members_following_the_pattern": [
+   "2020-2021",
+   "2021-2022",
+   "2022-2023",
+   "2023-2024",
+   "2025-2026"
+  ],
+  "members_count": 5,
+  "members_out_of": 6,
+  "exceptions": [
+   {
+    "name": "2024-2025",
+    "kind": "no clear pattern",
+    "in_words": "the engine found no clear pattern here",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   }
+  ],
+  "reference_figures": [
+   {
+    "label": "top_values / Bhubaneswar / value",
+    "display": "2,135 vouchers",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Bhubaneswar / share_of_total",
+    "display": "25.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Rangeilunda / value",
+    "display": "945 vouchers",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Rangeilunda / share_of_total",
+    "display": "11.1%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Bheden / value",
+    "display": "885 vouchers",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Bheden / share_of_total",
+    "display": "10.4%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Sheragada / value",
+    "display": "609 vouchers",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Sheragada / share_of_total",
+    "display": "7.1%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Kalimela / value",
+    "display": "568 vouchers",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Kalimela / share_of_total",
+    "display": "6.7%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Lahunipara / value",
+    "display": "181 vouchers",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Lahunipara / share_of_total",
+    "display": "2.1%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Balisankara / value",
+    "display": "178 vouchers",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Balisankara / share_of_total",
+    "display": "2.1%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "count_breakdown_values",
+    "display": "16",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "measure_unit",
+    "display": "vouchers",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "how_aggregated",
+    "display": "totalled across rows - an absolute figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "total",
+    "display": "8,529 vouchers",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "highlight_values / Bhubaneswar / value",
+    "display": "2,135 vouchers",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "highlight_values / Bhubaneswar / share_of_total",
+    "display": "25.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   }
+  ],
+  "thin": false,
+  "thin_reason": null
+ },
+ {
+  "rank": 7,
+  "view": "view1",
+  "view_title": "Activity Lifecycle",
+  "pattern_type": "OUTSTANDING_1",
+  "measure": "n_activities",
+  "breakdown": "asset_category_label",
+  "compared_across": "gp_name",
+  "scope": "activity_type_label = Public Works",
+  "feed_sentence": "Across nearly all gp_name values (19/20), Uncategorised has the highest n_activities among asset_category_label values. Exception: Govindapur (different pattern)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
+  "members_following_the_pattern": [
+   "Andhrua",
+   "Bandhpali",
+   "Barimunda",
+   "Bhatigaon",
+   "Bheden",
+   "Biswamathpur",
+   "Boipariguda",
+   "Chikilli",
+   "Dadhapatna",
+   "Dutimendi",
+   "Haldikudar",
+   "Hirlipali",
+   "Itipur",
+   "Kalimela",
+   "Kalyansinghpur",
+   "Karuabahal",
+   "Laxmipur",
+   "Mendarajpur",
+   "Sharagada"
+  ],
+  "members_count": 19,
+  "members_out_of": 20,
+  "exceptions": [
+   {
+    "name": "Govindapur",
+    "kind": "different pattern",
+    "in_words": "the engine found a different kind of pattern here",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   }
+  ],
+  "reference_figures": [
+   {
+    "label": "top_values / Uncategorised / value",
+    "display": "5,181 activities",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Uncategorised / share_of_total",
+    "display": "55.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Buildings / value",
+    "display": "688 activities",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Buildings / share_of_total",
+    "display": "7.3%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Household Sanitation / value",
+    "display": "524 activities",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Household Sanitation / share_of_total",
+    "display": "5.6%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Water Sources & Structures / value",
+    "display": "449 activities",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Water Sources & Structures / share_of_total",
+    "display": "4.8%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Roads, Bridges & Culverts / value",
+    "display": "332 activities",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Roads, Bridges & Culverts / share_of_total",
+    "display": "3.5%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Medical Supplies / value",
+    "display": "10 activities",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Medical Supplies / share_of_total",
+    "display": "0.1%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Banking Facilities / value",
+    "display": "2 activities",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Banking Facilities / share_of_total",
+    "display": "0.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "count_breakdown_values",
+    "display": "28",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "measure_unit",
+    "display": "activities",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "how_aggregated",
+    "display": "totalled across rows - an absolute figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "total",
+    "display": "9,418 activities",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "highlight_values / Uncategorised / value",
+    "display": "5,181 activities",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "highlight_values / Uncategorised / share_of_total",
+    "display": "55.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   }
+  ],
+  "thin": false,
+  "thin_reason": null
+ },
+ {
+  "rank": 8,
+  "view": "view1",
+  "view_title": "Activity Lifecycle",
+  "pattern_type": "OUTSTANDING_LAST",
+  "measure": "overspend_vs_plan",
+  "breakdown": "status_label",
+  "compared_across": "gp_name",
+  "scope": "is_costless = Costed",
+  "feed_sentence": "Across nearly all gp_name values (18/20), Activity Approved has the lowest overspend_vs_plan among status_label values. Exception: Boipariguda (no clear pattern); Laxmipur (no clear pattern)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
+  "members_following_the_pattern": [
+   "Andhrua",
+   "Bandhpali",
+   "Barimunda",
+   "Bhatigaon",
+   "Bheden",
+   "Biswamathpur",
+   "Chikilli",
+   "Dadhapatna",
+   "Dutimendi",
+   "Govindapur",
+   "Haldikudar",
+   "Hirlipali",
+   "Itipur",
+   "Kalimela",
+   "Kalyansinghpur",
+   "Karuabahal",
+   "Mendarajpur",
+   "Sharagada"
+  ],
+  "members_count": 18,
+  "members_out_of": 20,
+  "exceptions": [
+   {
+    "name": "Boipariguda",
+    "kind": "no clear pattern",
+    "in_words": "the engine found no clear pattern here",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   },
+   {
+    "name": "Laxmipur",
+    "kind": "no clear pattern",
+    "in_words": "the engine found no clear pattern here",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   }
+  ],
+  "reference_figures": [
+   {
+    "label": "top_values / WORK COMPLETED / value",
+    "display": "Rs 18,797",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Buildings / value",
+    "display": "Rs -10.88 lakh",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / UNDER APPROVAL / value",
+    "display": "Rs -37.60 lakh",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / WORK ONGOING / value",
+    "display": "Rs -4.24 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / WORK ABANDONED / value",
+    "display": "Rs -5.64 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / WORK ABANDONED / value",
+    "display": "Rs -5.64 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Activity Approved / value",
+    "display": "Rs -41.61 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "count_breakdown_values",
+    "display": "6",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "measure_unit",
+    "display": "rupees",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "how_aggregated",
+    "display": "totalled across rows - an absolute figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "total",
+    "display": "Rs -51.96 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / what_this_is",
+    "display": "each place's share of the 5,630 activities behind the totals above - the volume base, not a performance figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / scope",
+    "display": "Costed only",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / volume_in_scope",
+    "display": "5,630 activities",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Activity Approved",
+    "display": "53.9%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / WORK ONGOING",
+    "display": "37.5%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / WORK ABANDONED",
+    "display": "7.5%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / UNDER APPROVAL",
+    "display": "0.6%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / WORK COMPLETED",
+    "display": "0.3%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Buildings",
+    "display": "0.2%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "highlight_values / Activity Approved / value",
+    "display": "Rs -41.61 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / basis",
+    "display": "planned cost",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / what_this_is",
+    "display": "the same money as overspend_vs_plan, read as a share instead of a difference: how much of each group's planned cost was actually spent",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / how_computed",
+    "display": "ratio of sums - the group's total total_expenditure divided by its total total_cost. It is NOT an average of per-row ratios and the percentages do not add up to anything",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / Activity Approved",
+    "display": "0.3%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / Buildings",
+    "display": "0.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / UNDER APPROVAL",
+    "display": "0.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / WORK ABANDONED",
+    "display": "3.6%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / WORK COMPLETED",
+    "display": "100.8%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / WORK ONGOING",
+    "display": "85.4%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / Activity Approved",
+    "display": "Rs 14.00 lakh spent of Rs 41.75 crore planned cost",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / Buildings",
+    "display": "Rs 0 spent of Rs 10.88 lakh planned cost",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / UNDER APPROVAL",
+    "display": "Rs 0 spent of Rs 37.60 lakh planned cost",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / WORK ABANDONED",
+    "display": "Rs 21.03 lakh spent of Rs 5.85 crore planned cost",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / WORK COMPLETED",
+    "display": "Rs 24.17 lakh spent of Rs 23.98 lakh planned cost",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / WORK ONGOING",
+    "display": "Rs 24.76 crore spent of Rs 28.99 crore planned cost",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   }
+  ],
+  "thin": false,
+  "thin_reason": null
+ },
+ {
+  "rank": 9,
+  "view": "view2",
+  "view_title": "Geo-Month Cash Cube",
+  "pattern_type": "SEASONALITY",
+  "measure": "payment_count",
+  "breakdown": "(varies)",
+  "compared_across": "temporal_grain",
+  "scope": "all records in this view",
+  "feed_sentence": "Across most temporal_grain values (2/3), payment_count shows seasonal pattern (PERIOD_12) over (varies). Exception: fiscal_year (no clear pattern)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
+  "members_following_the_pattern": [
+   "month",
+   "quarter"
+  ],
+  "members_count": 2,
+  "members_out_of": 3,
+  "exceptions": [
+   {
+    "name": "fiscal_year",
+    "kind": "no clear pattern",
+    "in_words": "the engine found no clear pattern here",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   }
+  ],
+  "reference_figures": [],
+  "thin": true,
+  "thin_reason": "Varies across members -- see individual patterns"
+ },
+ {
+  "rank": 10,
+  "view": "view1",
+  "view_title": "Activity Lifecycle",
+  "pattern_type": "ATTRIBUTION",
+  "measure": "gen_amount",
+  "breakdown": "status_label",
+  "compared_across": "gp_name",
+  "scope": "is_costless = Costed",
+  "feed_sentence": "Across nearly all gp_name values (18/20), WORK ONGOING accounts for the majority of gen_amount among status_label values. Exception: Boipariguda (no clear pattern); Laxmipur (no clear pattern)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
+  "members_following_the_pattern": [
+   "Andhrua",
+   "Bandhpali",
+   "Barimunda",
+   "Bhatigaon",
+   "Bheden",
+   "Biswamathpur",
+   "Chikilli",
+   "Dadhapatna",
+   "Dutimendi",
+   "Govindapur",
+   "Haldikudar",
+   "Hirlipali",
+   "Itipur",
+   "Kalimela",
+   "Kalyansinghpur",
+   "Karuabahal",
+   "Mendarajpur",
+   "Sharagada"
+  ],
+  "members_count": 18,
+  "members_out_of": 20,
+  "exceptions": [
+   {
+    "name": "Boipariguda",
+    "kind": "no clear pattern",
+    "in_words": "the engine found no clear pattern here",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   },
+   {
+    "name": "Laxmipur",
+    "kind": "no clear pattern",
+    "in_words": "the engine found no clear pattern here",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   }
+  ],
+  "reference_figures": [
+   {
+    "label": "top_values / WORK ONGOING / value",
+    "display": "Rs 28.59 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / WORK ONGOING / share_of_total",
+    "display": "93.9%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / WORK ABANDONED / value",
+    "display": "Rs 1.15 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / WORK ABANDONED / share_of_total",
+    "display": "3.8%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Activity Approved / value",
+    "display": "Rs 32.74 lakh",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Activity Approved / share_of_total",
+    "display": "1.1%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / WORK COMPLETED / value",
+    "display": "Rs 23.98 lakh",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / WORK COMPLETED / share_of_total",
+    "display": "0.8%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / UNDER APPROVAL / value",
+    "display": "Rs 13.04 lakh",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / UNDER APPROVAL / share_of_total",
+    "display": "0.4%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / UNDER APPROVAL / value",
+    "display": "Rs 13.04 lakh",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / UNDER APPROVAL / share_of_total",
+    "display": "0.4%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Buildings / value",
+    "display": "Rs 0",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Buildings / share_of_total",
+    "display": "0.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "count_breakdown_values",
+    "display": "6",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "measure_unit",
+    "display": "rupees",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "how_aggregated",
+    "display": "totalled across rows - an absolute figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "total",
+    "display": "Rs 30.43 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / what_this_is",
+    "display": "each place's share of the 5,630 activities behind the totals above - the volume base, not a performance figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / scope",
+    "display": "Costed only",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / volume_in_scope",
+    "display": "5,630 activities",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Activity Approved",
+    "display": "53.9%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / WORK ONGOING",
+    "display": "37.5%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / WORK ABANDONED",
+    "display": "7.5%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / UNDER APPROVAL",
+    "display": "0.6%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / WORK COMPLETED",
+    "display": "0.3%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Buildings",
+    "display": "0.2%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "highlight_values / WORK ONGOING / value",
+    "display": "Rs 28.59 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "highlight_values / WORK ONGOING / share_of_total",
+    "display": "93.9%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   }
+  ],
+  "thin": false,
+  "thin_reason": null
+ },
+ {
+  "rank": 11,
+  "view": "view2",
+  "view_title": "Geo-Month Cash Cube",
+  "pattern_type": "TREND",
+  "measure": "activity_linked_expenditure",
+  "breakdown": "quarter",
+  "compared_across": "district_name",
+  "scope": "all records in this view",
+  "feed_sentence": "Across most district_name values (6/9), activity_linked_expenditure is increasing over quarter. Exception: Bargarh (different pattern); Koraput (different pattern); Cuttack (different pattern)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
+  "members_following_the_pattern": [
+   "Khordha",
+   "Ganjam",
+   "Kandhamal",
+   "Sundargarh",
+   "Malkangiri",
+   "Rayagada"
+  ],
+  "members_count": 6,
+  "members_out_of": 9,
+  "exceptions": [
+   {
+    "name": "Bargarh",
+    "kind": "different pattern",
+    "in_words": "the engine found a different kind of pattern here",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   },
+   {
+    "name": "Koraput",
+    "kind": "different pattern",
+    "in_words": "the engine found a different kind of pattern here",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   },
+   {
+    "name": "Cuttack",
+    "kind": "different pattern",
+    "in_words": "the engine found a different kind of pattern here",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   }
+  ],
+  "reference_figures": [
+   {
+    "label": "top_values / 2026-Q1 / value",
+    "display": "Rs 1.99 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / 2026-Q1 / share_of_total",
+    "display": "8.3%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / 2025-Q1 / value",
+    "display": "Rs 1.92 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / 2025-Q1 / share_of_total",
+    "display": "8.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / 2023-Q1 / value",
+    "display": "Rs 1.79 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / 2023-Q1 / share_of_total",
+    "display": "7.4%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / 2022-Q1 / value",
+    "display": "Rs 1.76 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / 2022-Q1 / share_of_total",
+    "display": "7.3%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / 2025-Q2 / value",
+    "display": "Rs 1.39 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / 2025-Q2 / share_of_total",
+    "display": "5.8%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / 2020-Q3 / value",
+    "display": "Rs 0",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / 2020-Q3 / share_of_total",
+    "display": "0.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / 2020-Q2 / value",
+    "display": "Rs 0",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / 2020-Q2 / share_of_total",
+    "display": "0.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "count_breakdown_values",
+    "display": "24",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "measure_unit",
+    "display": "rupees",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "how_aggregated",
+    "display": "totalled across rows - an absolute figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "total",
+    "display": "Rs 24.00 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   }
+  ],
+  "thin": false,
+  "thin_reason": null
+ },
+ {
+  "rank": 12,
+  "view": "view1",
+  "view_title": "Activity Lifecycle",
+  "pattern_type": "OUTSTANDING_1",
+  "measure": "beneficiaries_expected",
+  "breakdown": "status_label",
+  "compared_across": "gp_name",
+  "scope": "all records in this view",
+  "feed_sentence": "Across nearly all gp_name values (18/20), Activity Approved has the highest beneficiaries_expected among status_label values. Exception: Boipariguda (no clear pattern); Laxmipur (no clear pattern)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
+  "members_following_the_pattern": [
+   "Andhrua",
+   "Bandhpali",
+   "Barimunda",
+   "Bhatigaon",
+   "Bheden",
+   "Biswamathpur",
+   "Chikilli",
+   "Dadhapatna",
+   "Dutimendi",
+   "Govindapur",
+   "Haldikudar",
+   "Hirlipali",
+   "Itipur",
+   "Kalimela",
+   "Kalyansinghpur",
+   "Karuabahal",
+   "Mendarajpur",
+   "Sharagada"
+  ],
+  "members_count": 18,
+  "members_out_of": 20,
+  "exceptions": [
+   {
+    "name": "Boipariguda",
+    "kind": "no clear pattern",
+    "in_words": "the engine found no clear pattern here",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   },
+   {
+    "name": "Laxmipur",
+    "kind": "no clear pattern",
+    "in_words": "the engine found no clear pattern here",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   }
+  ],
+  "reference_figures": [
+   {
+    "label": "top_values / Activity Approved / value",
+    "display": "2,03,534 people",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Activity Approved / share_of_total",
+    "display": "98.4%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / WORK ONGOING / value",
+    "display": "2,759 people",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / WORK ONGOING / share_of_total",
+    "display": "1.3%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / WORK ABANDONED / value",
+    "display": "606 people",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / WORK ABANDONED / share_of_total",
+    "display": "0.3%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / UNDER APPROVAL / value",
+    "display": "30 people",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / UNDER APPROVAL / share_of_total",
+    "display": "0.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Buildings / value",
+    "display": "0 people",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Buildings / share_of_total",
+    "display": "0.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Buildings / value",
+    "display": "0 people",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Buildings / share_of_total",
+    "display": "0.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / WORK COMPLETED / value",
+    "display": "0 people",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / WORK COMPLETED / share_of_total",
+    "display": "0.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "count_breakdown_values",
+    "display": "6",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "measure_unit",
+    "display": "people",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "how_aggregated",
+    "display": "totalled across rows - an absolute figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "total",
+    "display": "2,06,929 people",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / what_this_is",
+    "display": "each place's share of the 12,704 activities behind the totals above - the volume base, not a performance figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / scope",
+    "display": "the whole view",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / volume_in_scope",
+    "display": "12,704 activities",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Activity Approved",
+    "display": "79.6%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / WORK ONGOING",
+    "display": "16.6%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / WORK ABANDONED",
+    "display": "3.3%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / UNDER APPROVAL",
+    "display": "0.3%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / WORK COMPLETED",
+    "display": "0.1%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Buildings",
+    "display": "0.1%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "highlight_values / Activity Approved / value",
+    "display": "2,03,534 people",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "highlight_values / Activity Approved / share_of_total",
+    "display": "98.4%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   }
+  ],
+  "thin": false,
+  "thin_reason": null
+ },
+ {
+  "rank": 13,
+  "view": "view1",
+  "view_title": "Activity Lifecycle",
+  "pattern_type": "OUTSTANDING_1",
+  "measure": "fund_untied_total",
+  "breakdown": "theme",
+  "compared_across": "gp_name",
+  "scope": "is_costless = Costed",
+  "feed_sentence": "Across nearly all gp_name values (18/20), Theme 6 - Self-sufficient Infrastructure in Village has the highest fund_untied_total among theme values. Exception: Boipariguda (Unmapped theme has the highest fund_untied_total among theme values); Kalimela (Theme 4 - Water Sufficient Village has the highest fund_untied_total among theme values)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
+  "members_following_the_pattern": [
+   "Andhrua",
+   "Bandhpali",
+   "Barimunda",
+   "Bhatigaon",
+   "Bheden",
+   "Biswamathpur",
+   "Chikilli",
+   "Dadhapatna",
+   "Dutimendi",
+   "Govindapur",
+   "Haldikudar",
+   "Hirlipali",
+   "Itipur",
+   "Kalyansinghpur",
+   "Karuabahal",
+   "Laxmipur",
+   "Mendarajpur",
+   "Sharagada"
+  ],
+  "members_count": 18,
+  "members_out_of": 20,
+  "exceptions": [
+   {
+    "name": "Boipariguda",
+    "kind": "different pattern",
+    "in_words": "a different one leads here: Unmapped theme",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   },
+   {
+    "name": "Kalimela",
+    "kind": "different pattern",
+    "in_words": "a different one leads here: Theme 4 - Water Sufficient Village",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   }
+  ],
+  "reference_figures": [
+   {
+    "label": "top_values / Theme 6 - Self-sufficient Infrastructure in Village / value",
+    "display": "Rs 30.07 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Theme 6 - Self-sufficient Infrastructure in Village / share_of_total",
+    "display": "50.4%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Theme 4 - Water Sufficient Village / value",
+    "display": "Rs 11.63 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Theme 4 - Water Sufficient Village / share_of_total",
+    "display": "19.5%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Unmapped theme / value",
+    "display": "Rs 5.70 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Unmapped theme / share_of_total",
+    "display": "9.6%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Theme 5 - Clean and Green Village  / value",
+    "display": "Rs 4.63 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Theme 5 - Clean and Green Village  / share_of_total",
+    "display": "7.8%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Theme 8 - Village with Good Governance / value",
+    "display": "Rs 3.57 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Theme 8 - Village with Good Governance / share_of_total",
+    "display": "6.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Theme 3 - Child Friendly Village / value",
+    "display": "Rs 3.27 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Theme 3 - Child Friendly Village / share_of_total",
+    "display": "5.5%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Theme 1 - Poverty Free and Enhanced Livelihoods Village / value",
+    "display": "Rs 77.06 lakh",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Theme 1 - Poverty Free and Enhanced Livelihoods Village / share_of_total",
+    "display": "1.3%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "count_breakdown_values",
+    "display": "7",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "measure_unit",
+    "display": "rupees",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "how_aggregated",
+    "display": "totalled across rows - an absolute figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "total",
+    "display": "Rs 59.64 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / what_this_is",
+    "display": "each place's share of the 5,630 activities behind the totals above - the volume base, not a performance figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / scope",
+    "display": "Costed only",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / volume_in_scope",
+    "display": "5,630 activities",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Theme 5 - Clean and Green Village ",
+    "display": "32.9%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Theme 6 - Self-sufficient Infrastructure in Village",
+    "display": "32.6%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Theme 4 - Water Sufficient Village",
+    "display": "19.9%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Unmapped theme",
+    "display": "5.6%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Theme 8 - Village with Good Governance",
+    "display": "4.2%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Theme 3 - Child Friendly Village",
+    "display": "3.7%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Theme 1 - Poverty Free and Enhanced Livelihoods Village",
+    "display": "1.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "highlight_values / Theme 6 - Self-sufficient Infrastructure in Village / value",
+    "display": "Rs 30.07 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "highlight_values / Theme 6 - Self-sufficient Infrastructure in Village / share_of_total",
+    "display": "50.4%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   }
+  ],
+  "thin": false,
+  "thin_reason": null
+ },
+ {
+  "rank": 14,
+  "view": "view1",
+  "view_title": "Activity Lifecycle",
+  "pattern_type": "OUTSTANDING_LAST",
+  "measure": "overspend_vs_sanction",
+  "breakdown": "output_type_label",
+  "compared_across": "gp_name",
+  "scope": "work_type_label = New/Fresh",
+  "feed_sentence": "Across nearly all gp_name values (19/20), Code 101 has the lowest overspend_vs_sanction among output_type_label values. Exception: Chikilli (no clear pattern)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
+  "members_following_the_pattern": [
+   "Andhrua",
+   "Bandhpali",
+   "Barimunda",
+   "Bhatigaon",
+   "Bheden",
+   "Biswamathpur",
+   "Boipariguda",
+   "Dadhapatna",
+   "Dutimendi",
+   "Govindapur",
+   "Haldikudar",
+   "Hirlipali",
+   "Itipur",
+   "Kalimela",
+   "Kalyansinghpur",
+   "Karuabahal",
+   "Laxmipur",
+   "Mendarajpur",
+   "Sharagada"
+  ],
+  "members_count": 19,
+  "members_out_of": 20,
+  "exceptions": [
+   {
+    "name": "Chikilli",
+    "kind": "no clear pattern",
+    "in_words": "the engine found no clear pattern here",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   }
+  ],
+  "reference_figures": [
+   {
+    "label": "top_values / Code 109 / value",
+    "display": "Rs 0",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 102 / value",
+    "display": "Rs -21,568",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 110 / value",
+    "display": "Rs -1.78 lakh",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 103 / value",
+    "display": "Rs -2.70 lakh",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 101 / value",
+    "display": "Rs -2.49 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Code 103 / value",
+    "display": "Rs -2.70 lakh",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Code 101 / value",
+    "display": "Rs -2.49 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "count_breakdown_values",
+    "display": "5",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "measure_unit",
+    "display": "rupees",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "how_aggregated",
+    "display": "totalled across rows - an absolute figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "total",
+    "display": "Rs -2.54 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / what_this_is",
+    "display": "each place's share of the 11,047 activities behind the totals above - the volume base, not a performance figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / scope",
+    "display": "New/Fresh only",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / volume_in_scope",
+    "display": "11,047 activities",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Code 110",
+    "display": "33.8%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Code 101",
+    "display": "32.8%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Code 109",
+    "display": "17.2%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Code 102",
+    "display": "9.4%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Code 103",
+    "display": "6.9%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "highlight_values / Code 101 / value",
+    "display": "Rs -2.49 crore",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / basis",
+    "display": "sanctioned amount",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / what_this_is",
+    "display": "the same money as overspend_vs_sanction, read as a share instead of a difference: how much of each group's sanctioned amount was actually spent This is the sanctioned basis, so it describes only the activities that have a sanction record on file (about one in six); it is not a programme-wide utilisation rate.",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / how_computed",
+    "display": "ratio of sums - the group's total total_expenditure divided by its total fund_sanctioned_total. It is NOT an average of per-row ratios and the percentages do not add up to anything",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / Code 101",
+    "display": "85.7%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / Code 102",
+    "display": "82.9%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / Code 103",
+    "display": "70.1%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / utilization_pct / Code 110",
+    "display": "0.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / Code 101",
+    "display": "Rs 14.94 crore spent of Rs 17.43 crore sanctioned amount",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / Code 102",
+    "display": "Rs 1.04 lakh spent of Rs 1.26 lakh sanctioned amount",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / Code 103",
+    "display": "Rs 6.33 lakh spent of Rs 9.03 lakh sanctioned amount",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "utilization_companion / absolutes / Code 110",
+    "display": "Rs 0 spent of Rs 1.78 lakh sanctioned amount",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   }
+  ],
+  "thin": false,
+  "thin_reason": null
+ },
+ {
+  "rank": 15,
+  "view": "view1",
+  "view_title": "Activity Lifecycle",
+  "pattern_type": "ATTRIBUTION",
+  "measure": "evidence_uploads",
+  "breakdown": "output_type_label",
+  "compared_across": "gp_name",
+  "scope": "work_type_label = New/Fresh",
+  "feed_sentence": "Across nearly all gp_name values (19/20), Code 101 accounts for the majority of evidence_uploads among output_type_label values. Exception: Chikilli (no clear pattern)",
+  "feed_sentence_provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)",
+  "members_following_the_pattern": [
+   "Andhrua",
+   "Bandhpali",
+   "Barimunda",
+   "Bhatigaon",
+   "Bheden",
+   "Biswamathpur",
+   "Boipariguda",
+   "Dadhapatna",
+   "Dutimendi",
+   "Govindapur",
+   "Haldikudar",
+   "Hirlipali",
+   "Itipur",
+   "Kalimela",
+   "Kalyansinghpur",
+   "Karuabahal",
+   "Laxmipur",
+   "Mendarajpur",
+   "Sharagada"
+  ],
+  "members_count": 19,
+  "members_out_of": 20,
+  "exceptions": [
+   {
+    "name": "Chikilli",
+    "kind": "no clear pattern",
+    "in_words": "the engine found no clear pattern here",
+    "provenance": "global_feed.json feed[rank] (pinned candidate set, WPD3b §4 hashes)"
+   }
+  ],
+  "reference_figures": [
+   {
+    "label": "top_values / Code 101 / value",
+    "display": "6,893 photo uploads",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 101 / share_of_total",
+    "display": "100.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 102 / value",
+    "display": "0 photo uploads",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 102 / share_of_total",
+    "display": "0.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 103 / value",
+    "display": "0 photo uploads",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 103 / share_of_total",
+    "display": "0.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 109 / value",
+    "display": "0 photo uploads",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 109 / share_of_total",
+    "display": "0.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 110 / value",
+    "display": "0 photo uploads",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "top_values / Code 110 / share_of_total",
+    "display": "0.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Code 109 / value",
+    "display": "0 photo uploads",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Code 109 / share_of_total",
+    "display": "0.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Code 110 / value",
+    "display": "0 photo uploads",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "bottom_values / Code 110 / share_of_total",
+    "display": "0.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "count_breakdown_values",
+    "display": "5",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "measure_unit",
+    "display": "uploads",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "how_aggregated",
+    "display": "totalled across rows - an absolute figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "total",
+    "display": "6,893 photo uploads",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / what_this_is",
+    "display": "each place's share of the 11,047 activities behind the totals above - the volume base, not a performance figure",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / scope",
+    "display": "New/Fresh only",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / volume_in_scope",
+    "display": "11,047 activities",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Code 110",
+    "display": "33.8%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Code 101",
+    "display": "32.8%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Code 109",
+    "display": "17.2%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Code 102",
+    "display": "9.4%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "size_share / share_of_volume / Code 103",
+    "display": "6.9%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "highlight_values / Code 101 / value",
+    "display": "6,893 photo uploads",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   },
+   {
+    "label": "highlight_values / Code 101 / share_of_total",
+    "display": "100.0%",
+    "provenance": "computed by phase5b_report.enrich_candidates_with_stats over Insights/views_prdw/*.parquet, rebuilt from Data/ via domain_pack_prdw (calibration README step 1)"
+   }
+  ],
+  "thin": false,
+  "thin_reason": null
+ }
+]
