@@ -1,0 +1,45 @@
+feed: 32 findings, candidate set a7f991c1df3771f9
+packets: 32; thin [16, 27]; roster 217 names; definitions missing none
+batch plan: view1_part1(8 ranks, ~8983 tok), view1_part2(7 ranks, ~7302 tok), view2(15 ranks, ~11158 tok), view3(2 ranks, ~2626 tok)
+spend guard: 0 calls already logged in C:\dev\odisha-prose-trial\Insights\reports_prdw\wpd4b_run; WP cap 120, per-run cap 120
+budget check: model=gpt-5.6-sol finish=stop reasoning=365 visible_chars=922 completion=593 of 8000, headroom=7407
+batch view1_part1  ranks [1, 4, 5, 7, 8, 10, 12, 13] -> got [1, 4, 5, 7, 8, 10, 12, 13], finish=stop, in=8989 out=1655 reasoning=418
+batch view1_part2  ranks [14, 15, 17, 18, 19, 21, 22] -> got [14, 15, 17, 18, 19, 21, 22], finish=stop, in=7308 out=1976 reasoning=1024
+batch view2        ranks [2, 6, 9, 11, 16, 20, 23, 24, 26, 27, 28, 29, 30, 31, 32] -> got [2, 6, 9, 11, 16, 20, 23, 24, 26, 27, 28, 29, 30, 31, 32], finish=stop, in=11164 out=2205 reasoning=301
+batch view3        ranks [3, 25] -> got [3, 25], finish=stop, in=2632 out=909 reasoning=512
+rank  1: regenerated checks=PASS verifier=pass           attempts=2
+rank  2: first-pass  checks=PASS verifier=pass           attempts=1
+rank  3: first-pass  checks=PASS verifier=pass           attempts=1
+rank  4: first-pass  checks=PASS verifier=pass           attempts=1
+rank  5: regenerated checks=PASS verifier=pass           attempts=2
+rank  6: regenerated checks=PASS verifier=pass           attempts=2
+rank  7: first-pass  checks=PASS verifier=pass           attempts=1
+rank  8: regenerated checks=PASS verifier=pass           attempts=2
+rank  9: first-pass  checks=PASS verifier=pass           attempts=1
+rank 10: regenerated checks=PASS verifier=pass           attempts=2
+rank 11: first-pass  checks=PASS verifier=pass           attempts=1
+rank 12: regenerated checks=PASS verifier=pass           attempts=2
+rank 13: first-pass  checks=PASS verifier=pass           attempts=1
+rank 14: first-pass  checks=PASS verifier=pass           attempts=1
+rank 15: first-pass  checks=PASS verifier=pass           attempts=1
+rank 16: first-pass  checks=PASS verifier=pass           attempts=1
+rank 17: first-pass  checks=PASS verifier=pass           attempts=1
+rank 18: first-pass  checks=PASS verifier=pass           attempts=1
+rank 19: first-pass  checks=PASS verifier=pass           attempts=1
+rank 20: first-pass  checks=PASS verifier=pass           attempts=1
+rank 21: first-pass  checks=PASS verifier=pass           attempts=1
+rank 22: first-pass  checks=PASS verifier=pass           attempts=1
+rank 23: first-pass  checks=PASS verifier=pass           attempts=1
+rank 24: regenerated checks=PASS verifier=pass           attempts=2
+rank 25: first-pass  checks=PASS verifier=pass           attempts=1
+rank 26: first-pass  checks=PASS verifier=pass           attempts=1
+rank 27: first-pass  checks=PASS verifier=pass           attempts=1
+rank 28: regenerated checks=PASS verifier=pass           attempts=2
+rank 29: first-pass  checks=PASS verifier=pass           attempts=1
+rank 30: first-pass  checks=PASS verifier=pass           attempts=1
+rank 31: first-pass  checks=PASS verifier=pass           attempts=1
+rank 32: first-pass  checks=PASS verifier=pass           attempts=1
+
+wrote C:\dev\odisha-prose-trial\Insights\metainsights\insight_prose.json
+status: first-pass 24, regenerated 8
+calls this run 53 (WP total 53 of 120); tokens 198198

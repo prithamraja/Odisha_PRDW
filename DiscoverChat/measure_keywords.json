@@ -1,0 +1,74 @@
+{
+  "what_this_is": "WP-D5 D5.1: the structural boost's MEASURE half. Officer words -> the measure columns the engine mined. Data, not code, on the SBM-dictionary precedent, so the operator can grow it from query logs without touching the retrieval module.",
+  "how_it_works": "Each entry lists surface phrases and the measure column(s) they name. Matching is whole-word, case-insensitive, on the EXPANDED query (query_expansion.json runs first). A question that names a measure boosts findings mined on that measure; a question that names none gets no measure boost and rides on cosine alone.",
+  "why_not_the_glossary": "The glossary defines a column for a reader who already knows which column they want. This file goes the other way — from what an officer says to which column it is — and the two do not have the same shape. 'Money not spent' is not in any definition; it is what an officer calls a negative overspend_vs_plan.",
+  "sign_note": "overspend_vs_plan and overspend_vs_sanction are SIGNED (spent minus planned/sanctioned). Underspend and overspend are the SAME column read in two directions, so both sets of words map to it. The direction lives in the finding's own figures, never in this map — nothing here decides which way a number points.",
+  "keywords": [
+    {"phrases": ["overspend", "over spend", "over-spend", "overspending", "spending above plan", "spent more than planned", "exceeded the plan", "cost overrun"],
+     "measures": ["overspend_vs_plan", "overspend_vs_sanction"]},
+
+    {"phrases": ["underspend", "under spend", "under-spend", "underspending", "unspent", "money not spent", "not spent", "planned but not spent", "sanctioned but not spent", "yet to be spent", "lying unspent", "remain unspent", "not spending", "spending shortfall", "shortfall", "spending gap", "on track", "behind on spending", "utilisation", "utilization", "absorption"],
+     "measures": ["overspend_vs_plan", "overspend_vs_sanction"]},
+
+    {"phrases": ["expenditure", "spending", "spent", "outgo", "money spent", "actual spending"],
+     "measures": ["total_expenditure", "expenditure_total", "activity_linked_expenditure", "payment_amount"]},
+
+    {"phrases": ["payment", "payments", "outflow", "outflows", "paid out", "disbursement", "disbursed"],
+     "measures": ["payment_amount", "payment_amount_mean", "payment_count"]},
+
+    {"phrases": ["receipt", "receipts", "inflow", "inflows", "money received", "funds received", "credited"],
+     "measures": ["receipt_amount", "receipt_amount_mean", "receipt_count"]},
+
+    {"phrases": ["voucher", "vouchers", "transactions", "number of payments"],
+     "measures": ["payment_count", "receipt_count"]},
+
+    {"phrases": ["cashbook", "cash book", "cash flow", "cash flows"],
+     "measures": ["payment_amount", "receipt_amount", "payment_amount_mean", "receipt_amount_mean"]},
+
+    {"phrases": ["plan cost", "planned cost", "action plan cost", "estimated cost", "plan value", "planned amount", "planned money"],
+     "measures": ["total_cost", "planned_cost"]},
+
+    {"phrases": ["sanction", "sanctions", "sanctioned", "sanctioned amount", "approval amount", "approved amount"],
+     "measures": ["fund_sanctioned_total", "sanctioned_amount", "sanctioned_total", "sanctions_count", "work_proposed_cost"]},
+
+    {"phrases": ["administrative approval", "admin approval", "administrative sanction"],
+     "measures": ["is_admin_approved", "n_admin_approvals"]},
+
+    {"phrases": ["technical approval", "technical sanction", "technical clearance"],
+     "measures": ["has_technical_approval", "n_tech_approvals"]},
+
+    {"phrases": ["tied", "tied grant", "earmarked", "earmarked grant"],
+     "measures": ["fund_tied_total"]},
+
+    {"phrases": ["untied", "untied grant", "discretionary", "discretionary grant"],
+     "measures": ["fund_untied_total"]},
+
+    {"phrases": ["general component", "general share"], "measures": ["gen_amount"]},
+    {"phrases": ["scheduled caste component", "sc component"], "measures": ["sc_amount"]},
+    {"phrases": ["scheduled tribe component", "st component"], "measures": ["st_amount"]},
+
+    {"phrases": ["activities", "works", "number of works", "how many works", "how many activities", "workload", "activity count"],
+     "measures": ["n_activities", "n_costed", "n_costless"]},
+
+    {"phrases": ["plans", "gpdp", "gram panchayat development plan", "number of plans"],
+     "measures": ["n_plans"]},
+
+    {"phrases": ["completed", "completion", "finished works", "works completed"],
+     "measures": ["is_completed", "n_completed"]},
+
+    {"phrases": ["ongoing", "in progress", "under execution", "works ongoing"],
+     "measures": ["is_ongoing", "n_ongoing"]},
+
+    {"phrases": ["abandoned", "dropped works", "stopped works", "works abandoned"],
+     "measures": ["is_abandoned", "n_abandoned", "fund_abandoned_total"]},
+
+    {"phrases": ["started", "commenced", "work started"], "measures": ["is_started"]},
+    {"phrases": ["under approval", "pending approval", "awaiting approval"], "measures": ["is_under_approval"]},
+
+    {"phrases": ["photo", "photos", "photograph", "geotag", "geotagged", "evidence", "photo evidence", "uploads", "progress evidence", "documentation"],
+     "measures": ["evidence_uploads", "has_progress_evidence", "n_with_evidence"]},
+
+    {"phrases": ["trainee", "trainees", "training", "people trained"], "measures": ["trainees_total"]},
+    {"phrases": ["beneficiary", "beneficiaries", "people served", "expected beneficiaries"], "measures": ["beneficiaries_expected"]}
+  ]
+}

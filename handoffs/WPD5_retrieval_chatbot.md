@@ -4,7 +4,16 @@
 is a separate chatbot that gives conversational access to pre-mined
 MetaInsight findings. It computes nothing, mines nothing, and never writes a
 number of its own. **Authored:** PM, 2026-09-01, from the InsightPilot design
-session. Not yet registered in `PROJECT_PLAN.md`; not yet dispatched.
+session. Registered in `PROJECT_PLAN.md` 2026-09-01 (D41/D42).
+
+**Runs CONCURRENTLY with WP-D4b** (`handoffs/WPD4b_prose_production.md`). The
+writable sets are disjoint — verified by the PM: WP-D4b owns
+`Insights/src/phase5e_insight_prose.py`, `Insights/src/insight_prose_config.py`,
+`Insights/metainsights/insight_prose.json`,
+`Insights/reports_prdw/check_insight_prose.py`,
+`Insights/reports_prdw/wpd4b_run/**`, `handoffs/WPD4b_REPORT.md`. Expect those
+files to appear in `git status` while you run: touch none of them, list them
+in your self-audit as not-yours.
 
 **Design rulings this brief encodes (operator/user, 2026-09-01 session):**
 
@@ -13,8 +22,9 @@ session. Not yet registered in `PROJECT_PLAN.md`; not yet dispatched.
    routing between the two products.
 2. **Correlations only — no causal analysis anywhere.** Outcome variables are
    not reliable enough to support causal claims. "Why" questions get a
-   scope-honest reframe, never an answer. (Needs a D-number in the decision
-   log; the Discover block is D40+ — check for collisions before assigning.)
+   scope-honest reframe, never an answer. (Assigned **D41** in the decision
+   log, 2026-09-01, collision-checked; D42 records this WP's design rulings,
+   D43 the WP-D4b production decisions.)
 3. **Retrieval corpus goes wide from the onset:** every candidate that passes
    twin-merge and prefilter is indexed — not just the ranked/feed cut.
 4. **Hybrid retrieval, tested not assumed:** embedding cosine plus a
@@ -98,11 +108,17 @@ code: log in the report, do not fix. No git operation beyond read-only
 
 ## Preconditions — verify, then STOP on failure
 
-1. **Committed tree** (`git status` clean at start; dirty → STOP and report).
+1. **Committed tree, with the concurrency exception:** `git status` clean
+   EXCEPT paths inside WP-D4b's writable set (listed in the concurrency note
+   above), which a concurrent agent may be writing — exclude those from the
+   check and list them in your report. Any OTHER dirty path → STOP.
 2. **Local-mirror execution only** (D6): never run Python against the Drive
    path. Mirror per the bootstrap §6 recipe.
-3. **Pinned candidate set intact:** SHA-256 of the files in
-   `Insights/metainsights/` matches the WPD3b report. Mismatch → STOP.
+3. **Pinned candidate set intact:** SHA-256 of the six pinned files in
+   `Insights/metainsights/` matches the WPD3b report §4 (ignore
+   `insight_prose.*` — WP-D4b's concurrent output — and your own
+   `retrieval_corpus.*`; new files, not pinned). Mismatch on a pinned
+   file → STOP.
 4. `Insights/.env` provides the API keys (prose model + embedding model).
    Missing → STOP.
 

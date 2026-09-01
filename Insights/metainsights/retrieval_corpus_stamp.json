@@ -1,0 +1,90 @@
+{
+  "what_this_is": "Provenance for retrieval_corpus.json/.npy. The `generated_at` line is the ONLY field expected to differ between two consecutive builds (D5.0 gate); everything else, vectors included, is reproduced from the cache.",
+  "artefacts": [
+    "metainsights/retrieval_corpus.json",
+    "metainsights/retrieval_corpus.npy"
+  ],
+  "candidate_set_id": "a7f991c1df3771f9",
+  "generated_at": "2026-09-01T07:06:33Z",
+  "build_seconds": 1.0,
+  "embedding_pin": {
+    "model": "qwen/qwen3-embedding-8b",
+    "dims": 1024,
+    "base_url": "https://api.novita.ai/openai",
+    "query_instruction": "Instruct: Given a question from a government official about village-level planning and spending, retrieve analysis findings that answer it\nQuery: ",
+    "document_instruction": null,
+    "normalisation": "L2, client-side",
+    "storage_dtype": "float32"
+  },
+  "embedding_pin_fingerprint": "7a6509707ac3aa5c",
+  "embedding_calls": 0,
+  "texts_embedded": 0,
+  "records": 4239,
+  "counts": {
+    "view1": {
+      "raw": 5000,
+      "twin_merged": 884,
+      "corpus": 4116,
+      "ranked": 15
+    },
+    "view2": {
+      "raw": 122,
+      "twin_merged": 1,
+      "corpus": 121,
+      "ranked": 15
+    },
+    "view3": {
+      "raw": 2,
+      "twin_merged": 0,
+      "corpus": 2,
+      "ranked": 2
+    }
+  },
+  "ranking_prefilter_cap": 5000,
+  "source_files": {
+    "global_feed.json": {
+      "sha256": "3da40edae324f917ce8fd5118df54b8c24fad92716e27550b18ff238c46a1cce",
+      "bytes": 53709
+    },
+    "global_feed_source_set.json": {
+      "sha256": "6c7b62e62f728849530b2078dd30b72c53fc019bacacf3b65e42a27e272e11a4",
+      "bytes": 1474
+    },
+    "view1_candidates.json": {
+      "sha256": "890767085988a6c7b61b1694a51e544d977932b1f567c89cae0e017b3643359b",
+      "bytes": 5868996
+    },
+    "view1_data_quality.json": {
+      "sha256": "08d69cde4f870759273983a9c7c570d4d0851c63cf5592f7bb83cb51a3bc71f9",
+      "bytes": 63
+    },
+    "view1_ranked.json": {
+      "sha256": "182ff833849488cad3a15c0cec614f903a9ee68bff3175ffe824f8e3262476e1",
+      "bytes": 18430
+    },
+    "view2_candidates.json": {
+      "sha256": "5796d3c8029c5f06efe71fa59ce84c3e9c847335b52b89c0078eb82f0ad2358c",
+      "bytes": 143100
+    },
+    "view2_data_quality.json": {
+      "sha256": "08d69cde4f870759273983a9c7c570d4d0851c63cf5592f7bb83cb51a3bc71f9",
+      "bytes": 63
+    },
+    "view2_ranked.json": {
+      "sha256": "44c9638c450d29af03e2981855757c1a603db98272763c695133047d7cf3cd62",
+      "bytes": 16544
+    },
+    "view3_candidates.json": {
+      "sha256": "a5fa0a1f5f2fa659f52d89bff2f7d11dc12beb52aa97afccb92b882effd17ecb",
+      "bytes": 3613
+    },
+    "view3_data_quality.json": {
+      "sha256": "782b1660e4edcc21d7f4eb81df9d001774d8998850ea1a49095260cda3e72cf2",
+      "bytes": 1072
+    },
+    "view3_ranked.json": {
+      "sha256": "a5fa0a1f5f2fa659f52d89bff2f7d11dc12beb52aa97afccb92b882effd17ecb",
+      "bytes": 3613
+    }
+  }
+}

@@ -1,0 +1,13 @@
+# DiscoverChat (WP-D5). Mirrors Ask's requirements where the two overlap, so a
+# deploy of either lands on the same versions of the shared pieces.
+fastapi
+uvicorn[standard]
+pydantic
+numpy
+openai
+python-dotenv
+duckdb
+rapidfuzz
+pandas
+pyarrow
+tiktoken

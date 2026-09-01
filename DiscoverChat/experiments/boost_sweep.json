@@ -1,0 +1,947 @@
+[
+ {
+  "geo_boost": 0.0,
+  "threshold": 0.56,
+  "geo_hit_rate": 0.4118,
+  "geo_place_named_precision": 0.8702,
+  "measure_precision": 0.9483,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5596
+ },
+ {
+  "geo_boost": 0.0,
+  "threshold": 0.57,
+  "geo_hit_rate": 0.3529,
+  "geo_place_named_precision": 0.8571,
+  "measure_precision": 0.9483,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5596
+ },
+ {
+  "geo_boost": 0.0,
+  "threshold": 0.58,
+  "geo_hit_rate": 0.3235,
+  "geo_place_named_precision": 0.907,
+  "measure_precision": 0.9478,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5596
+ },
+ {
+  "geo_boost": 0.0,
+  "threshold": 0.59,
+  "geo_hit_rate": 0.2941,
+  "geo_place_named_precision": 0.9524,
+  "measure_precision": 0.9478,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5596
+ },
+ {
+  "geo_boost": 0.0,
+  "threshold": 0.6,
+  "geo_hit_rate": 0.2353,
+  "geo_place_named_precision": 0.9811,
+  "measure_precision": 0.9469,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5596
+ },
+ {
+  "geo_boost": 0.0,
+  "threshold": 0.61,
+  "geo_hit_rate": 0.1765,
+  "geo_place_named_precision": 0.9762,
+  "measure_precision": 0.9444,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5596
+ },
+ {
+  "geo_boost": 0.0,
+  "threshold": 0.62,
+  "geo_hit_rate": 0.1765,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.9412,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5596
+ },
+ {
+  "geo_boost": 0.0,
+  "threshold": 0.63,
+  "geo_hit_rate": 0.1471,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.9355,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5596
+ },
+ {
+  "geo_boost": 0.0,
+  "threshold": 0.64,
+  "geo_hit_rate": 0.0882,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.9286,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5596
+ },
+ {
+  "geo_boost": 0.0,
+  "threshold": 0.65,
+  "geo_hit_rate": 0.0588,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.9143,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5596
+ },
+ {
+  "geo_boost": 0.0,
+  "threshold": 0.66,
+  "geo_hit_rate": 0.0588,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.8947,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5596
+ },
+ {
+  "geo_boost": 0.0,
+  "threshold": 0.67,
+  "geo_hit_rate": 0.0294,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.8846,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5596
+ },
+ {
+  "geo_boost": 0.0,
+  "threshold": 0.68,
+  "geo_hit_rate": 0.0,
+  "geo_place_named_precision": 0.0,
+  "measure_precision": 0.878,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5596
+ },
+ {
+  "geo_boost": 0.0,
+  "threshold": 0.69,
+  "geo_hit_rate": 0.0,
+  "geo_place_named_precision": 0.0,
+  "measure_precision": 0.8929,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5596
+ },
+ {
+  "geo_boost": 0.0,
+  "threshold": 0.7,
+  "geo_hit_rate": 0.0,
+  "geo_place_named_precision": 0.0,
+  "measure_precision": 0.9524,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5596
+ },
+ {
+  "geo_boost": 0.03,
+  "threshold": 0.56,
+  "geo_hit_rate": 0.7059,
+  "geo_place_named_precision": 0.9852,
+  "measure_precision": 0.9483,
+  "none_false_answer_rate": 0.2,
+  "highest_out_of_scope_score": 0.5896
+ },
+ {
+  "geo_boost": 0.03,
+  "threshold": 0.57,
+  "geo_hit_rate": 0.6471,
+  "geo_place_named_precision": 0.9883,
+  "measure_precision": 0.9483,
+  "none_false_answer_rate": 0.2,
+  "highest_out_of_scope_score": 0.5896
+ },
+ {
+  "geo_boost": 0.03,
+  "threshold": 0.58,
+  "geo_hit_rate": 0.5294,
+  "geo_place_named_precision": 0.987,
+  "measure_precision": 0.9478,
+  "none_false_answer_rate": 0.2,
+  "highest_out_of_scope_score": 0.5896
+ },
+ {
+  "geo_boost": 0.03,
+  "threshold": 0.59,
+  "geo_hit_rate": 0.4706,
+  "geo_place_named_precision": 0.9846,
+  "measure_precision": 0.9478,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5896
+ },
+ {
+  "geo_boost": 0.03,
+  "threshold": 0.6,
+  "geo_hit_rate": 0.3529,
+  "geo_place_named_precision": 0.9903,
+  "measure_precision": 0.9469,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5896
+ },
+ {
+  "geo_boost": 0.03,
+  "threshold": 0.61,
+  "geo_hit_rate": 0.3235,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.9444,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5896
+ },
+ {
+  "geo_boost": 0.03,
+  "threshold": 0.62,
+  "geo_hit_rate": 0.2941,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.9412,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5896
+ },
+ {
+  "geo_boost": 0.03,
+  "threshold": 0.63,
+  "geo_hit_rate": 0.2647,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.9355,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5896
+ },
+ {
+  "geo_boost": 0.03,
+  "threshold": 0.64,
+  "geo_hit_rate": 0.1765,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.9286,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5896
+ },
+ {
+  "geo_boost": 0.03,
+  "threshold": 0.65,
+  "geo_hit_rate": 0.1765,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.9143,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5896
+ },
+ {
+  "geo_boost": 0.03,
+  "threshold": 0.66,
+  "geo_hit_rate": 0.1471,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.8947,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5896
+ },
+ {
+  "geo_boost": 0.03,
+  "threshold": 0.67,
+  "geo_hit_rate": 0.0882,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.8846,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5896
+ },
+ {
+  "geo_boost": 0.03,
+  "threshold": 0.68,
+  "geo_hit_rate": 0.0882,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.878,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5896
+ },
+ {
+  "geo_boost": 0.03,
+  "threshold": 0.69,
+  "geo_hit_rate": 0.0588,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.8929,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5896
+ },
+ {
+  "geo_boost": 0.03,
+  "threshold": 0.7,
+  "geo_hit_rate": 0.0294,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.9524,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.5896
+ },
+ {
+  "geo_boost": 0.06,
+  "threshold": 0.56,
+  "geo_hit_rate": 0.9118,
+  "geo_place_named_precision": 0.9909,
+  "measure_precision": 0.9483,
+  "none_false_answer_rate": 0.4,
+  "highest_out_of_scope_score": 0.6196
+ },
+ {
+  "geo_boost": 0.06,
+  "threshold": 0.57,
+  "geo_hit_rate": 0.8824,
+  "geo_place_named_precision": 0.993,
+  "measure_precision": 0.9483,
+  "none_false_answer_rate": 0.4,
+  "highest_out_of_scope_score": 0.6196
+ },
+ {
+  "geo_boost": 0.06,
+  "threshold": 0.58,
+  "geo_hit_rate": 0.7647,
+  "geo_place_named_precision": 0.9918,
+  "measure_precision": 0.9478,
+  "none_false_answer_rate": 0.4,
+  "highest_out_of_scope_score": 0.6196
+ },
+ {
+  "geo_boost": 0.06,
+  "threshold": 0.59,
+  "geo_hit_rate": 0.7059,
+  "geo_place_named_precision": 0.9902,
+  "measure_precision": 0.9478,
+  "none_false_answer_rate": 0.4,
+  "highest_out_of_scope_score": 0.6196
+ },
+ {
+  "geo_boost": 0.06,
+  "threshold": 0.6,
+  "geo_hit_rate": 0.6471,
+  "geo_place_named_precision": 0.9884,
+  "measure_precision": 0.9469,
+  "none_false_answer_rate": 0.2,
+  "highest_out_of_scope_score": 0.6196
+ },
+ {
+  "geo_boost": 0.06,
+  "threshold": 0.61,
+  "geo_hit_rate": 0.5294,
+  "geo_place_named_precision": 0.987,
+  "measure_precision": 0.9444,
+  "none_false_answer_rate": 0.2,
+  "highest_out_of_scope_score": 0.6196
+ },
+ {
+  "geo_boost": 0.06,
+  "threshold": 0.62,
+  "geo_hit_rate": 0.5294,
+  "geo_place_named_precision": 0.9851,
+  "measure_precision": 0.9412,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.6196
+ },
+ {
+  "geo_boost": 0.06,
+  "threshold": 0.63,
+  "geo_hit_rate": 0.4118,
+  "geo_place_named_precision": 0.9811,
+  "measure_precision": 0.9355,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.6196
+ },
+ {
+  "geo_boost": 0.06,
+  "threshold": 0.64,
+  "geo_hit_rate": 0.3235,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.9286,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.6196
+ },
+ {
+  "geo_boost": 0.06,
+  "threshold": 0.65,
+  "geo_hit_rate": 0.2941,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.9143,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.6196
+ },
+ {
+  "geo_boost": 0.06,
+  "threshold": 0.66,
+  "geo_hit_rate": 0.2647,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.8947,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.6196
+ },
+ {
+  "geo_boost": 0.06,
+  "threshold": 0.67,
+  "geo_hit_rate": 0.2059,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.8846,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.6196
+ },
+ {
+  "geo_boost": 0.06,
+  "threshold": 0.68,
+  "geo_hit_rate": 0.1765,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.878,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.6196
+ },
+ {
+  "geo_boost": 0.06,
+  "threshold": 0.69,
+  "geo_hit_rate": 0.1471,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.8929,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.6196
+ },
+ {
+  "geo_boost": 0.06,
+  "threshold": 0.7,
+  "geo_hit_rate": 0.0882,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.9524,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.6196
+ },
+ {
+  "geo_boost": 0.09,
+  "threshold": 0.56,
+  "geo_hit_rate": 0.9706,
+  "geo_place_named_precision": 0.9948,
+  "measure_precision": 0.9483,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.6496
+ },
+ {
+  "geo_boost": 0.09,
+  "threshold": 0.57,
+  "geo_hit_rate": 0.9706,
+  "geo_place_named_precision": 0.9947,
+  "measure_precision": 0.9483,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.6496
+ },
+ {
+  "geo_boost": 0.09,
+  "threshold": 0.58,
+  "geo_hit_rate": 0.9412,
+  "geo_place_named_precision": 0.9944,
+  "measure_precision": 0.9478,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.6496
+ },
+ {
+  "geo_boost": 0.09,
+  "threshold": 0.59,
+  "geo_hit_rate": 0.9118,
+  "geo_place_named_precision": 0.9939,
+  "measure_precision": 0.9478,
+  "none_false_answer_rate": 0.4,
+  "highest_out_of_scope_score": 0.6496
+ },
+ {
+  "geo_boost": 0.09,
+  "threshold": 0.6,
+  "geo_hit_rate": 0.9118,
+  "geo_place_named_precision": 0.993,
+  "measure_precision": 0.9469,
+  "none_false_answer_rate": 0.4,
+  "highest_out_of_scope_score": 0.6496
+ },
+ {
+  "geo_boost": 0.09,
+  "threshold": 0.61,
+  "geo_hit_rate": 0.7941,
+  "geo_place_named_precision": 0.9919,
+  "measure_precision": 0.9444,
+  "none_false_answer_rate": 0.4,
+  "highest_out_of_scope_score": 0.6496
+ },
+ {
+  "geo_boost": 0.09,
+  "threshold": 0.62,
+  "geo_hit_rate": 0.7647,
+  "geo_place_named_precision": 0.9903,
+  "measure_precision": 0.9412,
+  "none_false_answer_rate": 0.4,
+  "highest_out_of_scope_score": 0.6496
+ },
+ {
+  "geo_boost": 0.09,
+  "threshold": 0.63,
+  "geo_hit_rate": 0.6765,
+  "geo_place_named_precision": 0.9885,
+  "measure_precision": 0.9355,
+  "none_false_answer_rate": 0.4,
+  "highest_out_of_scope_score": 0.6496
+ },
+ {
+  "geo_boost": 0.09,
+  "threshold": 0.64,
+  "geo_hit_rate": 0.5294,
+  "geo_place_named_precision": 0.9871,
+  "measure_precision": 0.9286,
+  "none_false_answer_rate": 0.2,
+  "highest_out_of_scope_score": 0.6496
+ },
+ {
+  "geo_boost": 0.09,
+  "threshold": 0.65,
+  "geo_hit_rate": 0.5294,
+  "geo_place_named_precision": 0.9852,
+  "measure_precision": 0.9143,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.6496
+ },
+ {
+  "geo_boost": 0.09,
+  "threshold": 0.66,
+  "geo_hit_rate": 0.4706,
+  "geo_place_named_precision": 0.9818,
+  "measure_precision": 0.8947,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.6496
+ },
+ {
+  "geo_boost": 0.09,
+  "threshold": 0.67,
+  "geo_hit_rate": 0.3824,
+  "geo_place_named_precision": 0.9885,
+  "measure_precision": 0.8846,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.6496
+ },
+ {
+  "geo_boost": 0.09,
+  "threshold": 0.68,
+  "geo_hit_rate": 0.2941,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.878,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.6496
+ },
+ {
+  "geo_boost": 0.09,
+  "threshold": 0.69,
+  "geo_hit_rate": 0.2647,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.8929,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.6496
+ },
+ {
+  "geo_boost": 0.09,
+  "threshold": 0.7,
+  "geo_hit_rate": 0.2059,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.9524,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.6496
+ },
+ {
+  "geo_boost": 0.12,
+  "threshold": 0.56,
+  "geo_hit_rate": 0.9706,
+  "geo_place_named_precision": 0.9951,
+  "measure_precision": 0.9483,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.6796
+ },
+ {
+  "geo_boost": 0.12,
+  "threshold": 0.57,
+  "geo_hit_rate": 0.9706,
+  "geo_place_named_precision": 0.995,
+  "measure_precision": 0.9483,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.6796
+ },
+ {
+  "geo_boost": 0.12,
+  "threshold": 0.58,
+  "geo_hit_rate": 0.9706,
+  "geo_place_named_precision": 0.9949,
+  "measure_precision": 0.9478,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.6796
+ },
+ {
+  "geo_boost": 0.12,
+  "threshold": 0.59,
+  "geo_hit_rate": 0.9706,
+  "geo_place_named_precision": 0.9948,
+  "measure_precision": 0.9478,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.6796
+ },
+ {
+  "geo_boost": 0.12,
+  "threshold": 0.6,
+  "geo_hit_rate": 0.9706,
+  "geo_place_named_precision": 0.9947,
+  "measure_precision": 0.9469,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.6796
+ },
+ {
+  "geo_boost": 0.12,
+  "threshold": 0.61,
+  "geo_hit_rate": 0.9412,
+  "geo_place_named_precision": 0.9945,
+  "measure_precision": 0.9444,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.6796
+ },
+ {
+  "geo_boost": 0.12,
+  "threshold": 0.62,
+  "geo_hit_rate": 0.9118,
+  "geo_place_named_precision": 0.9939,
+  "measure_precision": 0.9412,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.6796
+ },
+ {
+  "geo_boost": 0.12,
+  "threshold": 0.63,
+  "geo_hit_rate": 0.9118,
+  "geo_place_named_precision": 0.993,
+  "measure_precision": 0.9355,
+  "none_false_answer_rate": 0.4,
+  "highest_out_of_scope_score": 0.6796
+ },
+ {
+  "geo_boost": 0.12,
+  "threshold": 0.64,
+  "geo_hit_rate": 0.8235,
+  "geo_place_named_precision": 0.992,
+  "measure_precision": 0.9286,
+  "none_false_answer_rate": 0.4,
+  "highest_out_of_scope_score": 0.6796
+ },
+ {
+  "geo_boost": 0.12,
+  "threshold": 0.65,
+  "geo_hit_rate": 0.7941,
+  "geo_place_named_precision": 0.9905,
+  "measure_precision": 0.9143,
+  "none_false_answer_rate": 0.4,
+  "highest_out_of_scope_score": 0.6796
+ },
+ {
+  "geo_boost": 0.12,
+  "threshold": 0.66,
+  "geo_hit_rate": 0.7353,
+  "geo_place_named_precision": 0.9887,
+  "measure_precision": 0.8947,
+  "none_false_answer_rate": 0.4,
+  "highest_out_of_scope_score": 0.6796
+ },
+ {
+  "geo_boost": 0.12,
+  "threshold": 0.67,
+  "geo_hit_rate": 0.5588,
+  "geo_place_named_precision": 0.9873,
+  "measure_precision": 0.8846,
+  "none_false_answer_rate": 0.4,
+  "highest_out_of_scope_score": 0.6796
+ },
+ {
+  "geo_boost": 0.12,
+  "threshold": 0.68,
+  "geo_hit_rate": 0.5294,
+  "geo_place_named_precision": 0.9854,
+  "measure_precision": 0.878,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.6796
+ },
+ {
+  "geo_boost": 0.12,
+  "threshold": 0.69,
+  "geo_hit_rate": 0.5,
+  "geo_place_named_precision": 0.982,
+  "measure_precision": 0.8929,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.6796
+ },
+ {
+  "geo_boost": 0.12,
+  "threshold": 0.7,
+  "geo_hit_rate": 0.4706,
+  "geo_place_named_precision": 0.989,
+  "measure_precision": 0.9524,
+  "none_false_answer_rate": 0.0,
+  "highest_out_of_scope_score": 0.6796
+ },
+ {
+  "geo_boost": 0.16,
+  "threshold": 0.56,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.9951,
+  "measure_precision": 0.9483,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7265
+ },
+ {
+  "geo_boost": 0.16,
+  "threshold": 0.57,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.9951,
+  "measure_precision": 0.9483,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7265
+ },
+ {
+  "geo_boost": 0.16,
+  "threshold": 0.58,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.9951,
+  "measure_precision": 0.9478,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7265
+ },
+ {
+  "geo_boost": 0.16,
+  "threshold": 0.59,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.9951,
+  "measure_precision": 0.9478,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7265
+ },
+ {
+  "geo_boost": 0.16,
+  "threshold": 0.6,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.9951,
+  "measure_precision": 0.9469,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7265
+ },
+ {
+  "geo_boost": 0.16,
+  "threshold": 0.61,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.995,
+  "measure_precision": 0.9444,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7265
+ },
+ {
+  "geo_boost": 0.16,
+  "threshold": 0.62,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.9949,
+  "measure_precision": 0.9412,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7265
+ },
+ {
+  "geo_boost": 0.16,
+  "threshold": 0.63,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.9948,
+  "measure_precision": 0.9355,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7265
+ },
+ {
+  "geo_boost": 0.16,
+  "threshold": 0.64,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.9947,
+  "measure_precision": 0.9286,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7265
+ },
+ {
+  "geo_boost": 0.16,
+  "threshold": 0.65,
+  "geo_hit_rate": 0.9706,
+  "geo_place_named_precision": 0.9945,
+  "measure_precision": 0.9143,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7265
+ },
+ {
+  "geo_boost": 0.16,
+  "threshold": 0.66,
+  "geo_hit_rate": 0.9412,
+  "geo_place_named_precision": 0.994,
+  "measure_precision": 0.8947,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7265
+ },
+ {
+  "geo_boost": 0.16,
+  "threshold": 0.67,
+  "geo_hit_rate": 0.9412,
+  "geo_place_named_precision": 0.9931,
+  "measure_precision": 0.8846,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7265
+ },
+ {
+  "geo_boost": 0.16,
+  "threshold": 0.68,
+  "geo_hit_rate": 0.8529,
+  "geo_place_named_precision": 0.992,
+  "measure_precision": 0.878,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7265
+ },
+ {
+  "geo_boost": 0.16,
+  "threshold": 0.69,
+  "geo_hit_rate": 0.8529,
+  "geo_place_named_precision": 0.9907,
+  "measure_precision": 0.8929,
+  "none_false_answer_rate": 0.4,
+  "highest_out_of_scope_score": 0.7265
+ },
+ {
+  "geo_boost": 0.16,
+  "threshold": 0.7,
+  "geo_hit_rate": 0.7941,
+  "geo_place_named_precision": 0.989,
+  "measure_precision": 0.9524,
+  "none_false_answer_rate": 0.4,
+  "highest_out_of_scope_score": 0.7265
+ },
+ {
+  "geo_boost": 0.2,
+  "threshold": 0.56,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.9951,
+  "measure_precision": 0.9483,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7798
+ },
+ {
+  "geo_boost": 0.2,
+  "threshold": 0.57,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.9951,
+  "measure_precision": 0.9483,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7798
+ },
+ {
+  "geo_boost": 0.2,
+  "threshold": 0.58,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.9951,
+  "measure_precision": 0.9478,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7798
+ },
+ {
+  "geo_boost": 0.2,
+  "threshold": 0.59,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.9951,
+  "measure_precision": 0.9478,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7798
+ },
+ {
+  "geo_boost": 0.2,
+  "threshold": 0.6,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.9951,
+  "measure_precision": 0.9469,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7798
+ },
+ {
+  "geo_boost": 0.2,
+  "threshold": 0.61,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.9951,
+  "measure_precision": 0.9444,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7798
+ },
+ {
+  "geo_boost": 0.2,
+  "threshold": 0.62,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.9951,
+  "measure_precision": 0.9412,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7798
+ },
+ {
+  "geo_boost": 0.2,
+  "threshold": 0.63,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.9951,
+  "measure_precision": 0.9355,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7798
+ },
+ {
+  "geo_boost": 0.2,
+  "threshold": 0.64,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.9951,
+  "measure_precision": 0.9286,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7798
+ },
+ {
+  "geo_boost": 0.2,
+  "threshold": 0.65,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.995,
+  "measure_precision": 0.9143,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7798
+ },
+ {
+  "geo_boost": 0.2,
+  "threshold": 0.66,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.9949,
+  "measure_precision": 0.8947,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7798
+ },
+ {
+  "geo_boost": 0.2,
+  "threshold": 0.67,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.9948,
+  "measure_precision": 0.8846,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7798
+ },
+ {
+  "geo_boost": 0.2,
+  "threshold": 0.68,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 0.9947,
+  "measure_precision": 0.878,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7798
+ },
+ {
+  "geo_boost": 0.2,
+  "threshold": 0.69,
+  "geo_hit_rate": 0.9706,
+  "geo_place_named_precision": 0.9945,
+  "measure_precision": 0.8929,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7798
+ },
+ {
+  "geo_boost": 0.2,
+  "threshold": 0.7,
+  "geo_hit_rate": 0.9412,
+  "geo_place_named_precision": 0.994,
+  "measure_precision": 0.9524,
+  "none_false_answer_rate": 0.6,
+  "highest_out_of_scope_score": 0.7798
+ }
+]

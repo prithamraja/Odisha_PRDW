@@ -1,0 +1,28 @@
+self-test: 32 feed sentences, no API call
+
+T1 -- the cleaned renderer, over all 32 feed sentences
+  PASS  every finding renders a non-empty sentence           32 rendered
+  PASS  no raw database token survives the cleaning          
+  PASS  no "(varies)" survives the cleaning                  
+  PASS  no ungrammatical "and N others" survives             
+  PASS  the renderer is deterministic                        
+
+T2 -- the three ratified fixes, each against its measured case
+  PASS  numeral variant accepts a dropped trailing .00       14.00 -> ['14', '14.00']
+  PASS  ...but still rejects rounding (48.3 is not 48)       
+  PASS  ...and never strips a comma (5,196 is not 5196)      
+  PASS  name check accepts a name the packet carries in another case flagged: []
+  PASS  ...but still rejects a name the packet does not carry at all 
+  PASS  bottom_values dropped when the breakdown has < 8 groups 
+  PASS  ...and kept when the breakdown is large enough to have a real bottom 
+  PASS  ...and the engine's `note` never reaches a packet as a figure 
+  PASS  the verifier path has a budget probe (D17 discipline on the judge) 
+
+Samples -- one per finding class
+  rank 25 (varies) measure       For 10 of 18 measures (district: Bargarh), values are spread evenly across the Gram Panchayats. Not evenly spread in: the number of plans; the total sanctioned amount on record; the number of completed works; and five others. This is about how totals are spread, not about how much any one of them spends.
+  rank 2  (varies) breakdown     Spending linked to planned activities is rising in all three time views — by month, by quarter and by year.
+  rank 3  "and 1 others" fixed   In 5 of the 9 districts, the total sanctioned amount on record is falling over the years. The exceptions are: Kandhamal (rising over the years); Khordha (no clear pattern); Ganjam (no clear pattern); Rayagada (no clear pattern).
+  rank 14 code-named             In 19 of the 20 Gram Panchayats (kind of work: New/Fresh), Code 101 has the lowest spending against the sanctioned amount of any output-type code. The exception is: Chikilli (no clear pattern).
+  rank 11 plain                  In 6 of the 9 districts, spending linked to planned activities is rising over the quarters. The exceptions are: Bargarh (a different pattern); Koraput (a different pattern); Cuttack (a different pattern).
+
+self-test: 14 checks, 0 failed

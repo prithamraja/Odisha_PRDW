@@ -1,0 +1,35 @@
+sidecar: I:\My Drive\ASC Lab\LMIC AI Code repo\Odisha_PRDW\Insights\metainsights\insight_prose.json
+run stamp 2026-09-01T07:21:04Z, candidate set a7f991c1df3771f9, writer gpt-5.6-sol, verifier gpt-5.5
+
+Structure
+  PASS  one run stamp across all records                     stamps=['2026-09-01T07:21:04Z']
+  PASS  run candidate_set_id matches the feed's source set   a7f991c1df3771f9 vs a7f991c1df3771f9
+  PASS  every record carries that candidate_set_id           
+  PASS  all 32 feed ranks present exactly once               32 records
+  PASS  records are in feed order                            
+  PASS  the feed on disk is the feed the run read            
+  PASS  shipped context is the instantiated Appendix A in the code 
+  PASS  shipped context matches its own sha256               
+
+Nothing-invented checks, replayed from the shipped packets
+  ..... roster NOT rebuilt (no --rebuild-roster)             needs a mirror with views_prdw/*.parquet
+  PASS  every shipped rendering is check-green on replay     31 replayed, 233 numerals, roster as shipped (217 names)
+
+Failure path
+  PASS  every fell-back record carries its template sentence verbatim 1 fell back
+  PASS  every regenerated / fell-back record carries the causing verdict 11 records
+  PASS  no vague verdicts: passes map claims, fails quote them 
+
+Guards
+  PASS  no writer batch exceeded the input ceiling           largest 11164 of 16000
+  PASS  call count within the spend cap                      59 of 120
+  PASS  usage recorded on every verifier call                
+
+Profile (reported, not asserted)
+  all 32      : first-pass 21 / regenerated 10 / fell-back 1
+  ranks 1-15  : first-pass 11 / regenerated 4 / fell-back 0
+  ranks 16-32 : first-pass 10 / regenerated 6 / fell-back 1
+  thin packets: [16, 27]
+  verifier retry-on-empty fired on ranks: none
+
+check_insight_prose: 15 checks, 0 failed

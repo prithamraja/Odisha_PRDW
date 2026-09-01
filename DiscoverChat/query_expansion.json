@@ -1,0 +1,60 @@
+{
+  "what_this_is": "WP-D5 D42 ruling 7: the deterministic abbreviation/synonym expansion every QUERY passes through before it is embedded. Data, not code, on the SBM-dictionary precedent (Ask decision: keyword dictionaries are data the operator can grow from query logs without a code change). Documents never pass through this file.",
+  "how_it_works": "Each entry matches case-insensitively on whole words. The match is REWRITTEN as 'long form (surface form)' so the embedded query carries both — an officer who types 'XV FC' and a finding that says 'XV Finance Commission' then share vocabulary, and an officer who types the long form loses nothing. Order matters only where one pattern contains another; longer patterns are applied first, automatically.",
+  "scope_note": "Some terms below (Jal Jeevan Mission, MGNREGS) name programmes the current 20-GP extract does not carry a column for. Expanding them is still correct: the relevance floor then declines honestly with 'the current analysis has nothing on this', which is a better answer than a near-miss on an unexpanded abbreviation.",
+  "provenance": "Scheme forms follow Ask's entity_validator._SCHEME_ALIASES, which is the ratified vocabulary (WP-2). Where a term appears there, the long form here is the string that registry resolves to, so the two products cannot drift into naming the same scheme differently.",
+  "expansions": [
+    {"match": "gpdp", "long_form": "Gram Panchayat Development Plan"},
+    {"match": "gp", "long_form": "Gram Panchayat"},
+    {"match": "gps", "long_form": "Gram Panchayats"},
+    {"match": "ps", "long_form": "Panchayat Samiti block"},
+    {"match": "zp", "long_form": "Zilla Parishad district"},
+    {"match": "pri", "long_form": "Panchayati Raj Institution"},
+    {"match": "bdo", "long_form": "Block Development Officer"},
+    {"match": "peo", "long_form": "Panchayat Executive Officer"},
+
+    {"match": "xv fc", "long_form": "XV Finance Commission"},
+    {"match": "15th fc", "long_form": "XV Finance Commission"},
+    {"match": "15th finance commission", "long_form": "XV Finance Commission"},
+    {"match": "cfc", "long_form": "XV Finance Commission central finance commission"},
+    {"match": "xiv fc", "long_form": "Fourteen Finance Commission"},
+    {"match": "14th fc", "long_form": "Fourteen Finance Commission"},
+    {"match": "sfc", "long_form": "5th State Finance Commission"},
+    {"match": "osr", "long_form": "own source revenue own funds"},
+
+    {"match": "lsdg", "long_form": "Localised Sustainable Development Goals theme"},
+    {"match": "sdg", "long_form": "Sustainable Development Goals theme"},
+    {"match": "odf", "long_form": "Open Defecation Free sanitation"},
+    {"match": "sbm", "long_form": "Swachh Bharat Mission sanitation"},
+    {"match": "sbm-g", "long_form": "Swachh Bharat Mission Gramin rural sanitation"},
+    {"match": "slwm", "long_form": "solid and liquid waste management"},
+    {"match": "swm", "long_form": "solid waste management"},
+    {"match": "lwm", "long_form": "liquid waste management"},
+    {"match": "fsm", "long_form": "faecal sludge management"},
+    {"match": "pws", "long_form": "piped water supply drinking water"},
+    {"match": "jjm", "long_form": "Jal Jeevan Mission drinking water supply"},
+    {"match": "mgnregs", "long_form": "Mahatma Gandhi National Rural Employment Guarantee Scheme"},
+    {"match": "nrega", "long_form": "Mahatma Gandhi National Rural Employment Guarantee Scheme"},
+    {"match": "pmay", "long_form": "Pradhan Mantri Awas Yojana housing"},
+
+    {"match": "ts", "long_form": "technical sanction technical approval"},
+    {"match": "aa", "long_form": "administrative approval"},
+    {"match": "uc", "long_form": "utilisation certificate"},
+    {"match": "o&m", "long_form": "operation and maintenance"},
+    {"match": "dpr", "long_form": "detailed project report"},
+
+    {"match": "fy", "long_form": "fiscal year"},
+    {"match": "q1", "long_form": "first quarter"},
+    {"match": "q4", "long_form": "fourth quarter year end"},
+    {"match": "yoy", "long_form": "year on year"},
+
+    {"match": "sc", "long_form": "Scheduled Caste component"},
+    {"match": "st", "long_form": "Scheduled Tribe component"},
+    {"match": "obc", "long_form": "Other Backward Classes"},
+
+    {"match": "expr", "long_form": "expenditure spending"},
+    {"match": "cr", "long_form": "crore"},
+    {"match": "rs", "long_form": "rupees"},
+    {"match": "inr", "long_form": "rupees"}
+  ]
+}

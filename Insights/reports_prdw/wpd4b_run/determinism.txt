@@ -1,0 +1,27 @@
+determinism: Insights/reports_prdw/wpd4b_run/sidecar_run1.json  vs  Insights/reports_prdw/wpd4b_run/sidecar_run2.json
+
+Run-level deterministic fields
+  PASS  run.candidate_set_id byte-identical                  
+  PASS  run.feed_sha256 byte-identical                       
+  PASS  run.source_set_sha256 byte-identical                 
+  PASS  run.context byte-identical                           
+  PASS  run.context_sha256 byte-identical                    
+  PASS  run.context_slot_values byte-identical               
+  PASS  run.ceilings byte-identical                          
+  PASS  run.writer_model byte-identical                      
+  PASS  run.verifier_model byte-identical                    
+  PASS  run.batch_plan byte-identical                        
+  PASS  run.name_roster byte-identical                       
+  PASS  run.packets byte-identical                           
+
+Record-level deterministic fields
+  PASS  same ranks in both runs                              
+  PASS  every deterministic record field byte-identical      10 fields x 32 records
+
+Expected differences (reported, not asserted)
+  run stamp   : 2026-09-01T07:03:11Z  vs  2026-09-01T07:21:04Z
+  identical prose on 0 of 32 records (LLM wording is free to differ)
+  A statuses  : {'first-pass': 24, 'regenerated': 8}
+  B statuses  : {'fell-back': 1, 'first-pass': 21, 'regenerated': 10}
+
+determinism: 14 checks, 0 failed

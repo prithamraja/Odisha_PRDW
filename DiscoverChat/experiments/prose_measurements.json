@@ -1,0 +1,200 @@
+{
+ "summary": {
+  "generated_at": "2026-09-01T07:53:41Z",
+  "writer_model": "gpt-5.6-sol",
+  "verifier_model": "gpt-5.5",
+  "turns": 8,
+  "reached_writer": 5,
+  "fell_back": 1,
+  "writer_attempts": 9,
+  "attempts_with_causal_wording": 3,
+  "numerals_checked": 11,
+  "numerals_invented": 0
+ },
+ "turns": [
+  {
+   "question": "Is spending on track?",
+   "findings": 12,
+   "reached_writer": true,
+   "fell_back": true,
+   "attempts": 2,
+   "attempt_detail": [
+    {
+     "attempt": 1,
+     "checks_failed": [],
+     "causal_words": [],
+     "sentences": 8,
+     "words": 155,
+     "numerals_checked": 1,
+     "numerals_unsupported": []
+    },
+    {
+     "attempt": 2,
+     "checks_failed": [
+      "e_causal"
+     ],
+     "causal_words": [
+      "therefore"
+     ],
+     "sentences": 9,
+     "words": 175,
+     "numerals_checked": 1,
+     "numerals_unsupported": []
+    }
+   ],
+   "verdicts": [
+    "fail"
+   ],
+   "final_reason": "It used causal wording: 'therefore'. This analysis finds patterns and associations and cannot establish what causes what, so say how things go together rather than what produced what. Wording that works: is associated with; occurs alongside; moves together with; is concentrated in; coincides with; the same places also show; where X is high, Y tends to be high; the analysis does not establish which",
+   "prose": ""
+  },
+  {
+   "question": "Which places are behaving differently from the rest?",
+   "findings": 6,
+   "reached_writer": true,
+   "fell_back": false,
+   "attempts": 2,
+   "attempt_detail": [
+    {
+     "attempt": 1,
+     "checks_failed": [
+      "e_causal"
+     ],
+     "causal_words": [
+      "because",
+      "drive"
+     ],
+     "sentences": 5,
+     "words": 90,
+     "numerals_checked": 0,
+     "numerals_unsupported": []
+    },
+    {
+     "attempt": 2,
+     "checks_failed": [],
+     "causal_words": [],
+     "sentences": 6,
+     "words": 127,
+     "numerals_checked": 1,
+     "numerals_unsupported": []
+    }
+   ],
+   "verdicts": [
+    "pass"
+   ],
+   "final_reason": "",
+   "prose": "The analysis finds few clear place-level departures from the general pattern. Overspending is usually spread across Gram Panchayats, fund components and focus areas rather than concentrated in one place. Chikilli is the clearest named exception, while several focus areas also show uneven distribution across Gram Panchayats; the available findings do not identify which Gram Panchayats account for those focus-area differences.\n\nTaken together, these findings make Chikilli the main place for follow-up, particularly the distribution of overspend against plan across fund components and overspend against sanction across focus areas for output type Code 101. The focus-area exceptions may also merit reconciliation to identify the associated Gram Panchayats. These are wider, non-shortlisted patterns about how overspending is distributed; they do not establish unusually high total spending, wrongdoing or causation."
+  },
+  {
+   "question": "Where is money planned but not spent?",
+   "findings": 12,
+   "reached_writer": true,
+   "fell_back": false,
+   "attempts": 1,
+   "attempt_detail": [
+    {
+     "attempt": 1,
+     "checks_failed": [],
+     "causal_words": [],
+     "sentences": 6,
+     "words": 129,
+     "numerals_checked": 0,
+     "numerals_unsupported": []
+    }
+   ],
+   "verdicts": [
+    "pass"
+   ],
+   "final_reason": "",
+   "prose": "The available findings do not directly identify where planned money remains unspent. They mainly describe how spending above plans or sanctions is distributed across Gram Panchayats, focus areas, asset categories and fund components. The Bargarh finding also flags uneven planning, sanction and completion measures, but does not quantify an unspent balance.\n\nOverall, the overspending patterns are generally widespread rather than concentrated in one Gram Panchayat or category, with Chikilli and several focus areas or asset categories appearing as distributional exceptions. These exceptions do not establish that they have the largest amounts or explain why the pattern occurred. To answer the question, planned and sanctioned amounts should be reconciled directly with payments for each work and Gram Panchayat; the findings shown here cannot establish where the largest planned-but-unspent balances are."
+  },
+  {
+   "question": "What should I raise at the next review meeting?",
+   "findings": 0,
+   "reached_writer": false,
+   "note": "rendered directly; too few findings to need connective prose"
+  },
+  {
+   "question": "Is money moving steadily or in year-end bursts?",
+   "findings": 12,
+   "reached_writer": true,
+   "fell_back": false,
+   "attempts": 2,
+   "attempt_detail": [
+    {
+     "attempt": 1,
+     "checks_failed": [
+      "e_causal"
+     ],
+     "causal_words": [
+      "Because",
+      "therefore"
+     ],
+     "sentences": 7,
+     "words": 117,
+     "numerals_checked": 0,
+     "numerals_unsupported": []
+    },
+    {
+     "attempt": 2,
+     "checks_failed": [],
+     "causal_words": [],
+     "sentences": 8,
+     "words": 139,
+     "numerals_checked": 0,
+     "numerals_unsupported": []
+    }
+   ],
+   "verdicts": [
+    "pass"
+   ],
+   "final_reason": "",
+   "prose": "The analysis holds a mixed set of time-pattern findings on sanctions, payments, receipts and activity-linked expenditure. Recurring seasonal patterns appear across several district and Gram Panchayat records, alongside increasing payment or expenditure at some time grains. These tests identify recurrence and trends, but not when peaks occur or whether they fall at fiscal year-end. They cannot by themselves establish year-end bursting.\n\nTaken together, the sample does not support a simple choice between steady movement and year-end bursts. Cyclical movement is visible, but some payment measures show no clear pattern or follow a different cycle, and some trends disappear at the fiscal-year view. Most of these findings were not promoted to the ranked shortlist. Month-by-month payment amounts and counts near fiscal year-end should be checked in the named districts and Gram Panchayats before concluding that spending is bunched at year-end."
+  },
+  {
+   "question": "Anything worth my attention this quarter?",
+   "findings": 0,
+   "reached_writer": false,
+   "note": "rendered directly; too few findings to need connective prose"
+  },
+  {
+   "question": "How is GPDP implementation going under XV FC?",
+   "findings": 0,
+   "reached_writer": false,
+   "note": "rendered directly; too few findings to need connective prose"
+  },
+  {
+   "question": "What does the analysis say about photo evidence?",
+   "findings": 8,
+   "reached_writer": true,
+   "fell_back": false,
+   "attempts": 2,
+   "attempt_detail": [
+    {
+     "attempt": 1,
+     "checks_failed": [],
+     "causal_words": [],
+     "sentences": 6,
+     "words": 131,
+     "numerals_checked": 3,
+     "numerals_unsupported": []
+    },
+    {
+     "attempt": 2,
+     "checks_failed": [],
+     "causal_words": [],
+     "sentences": 6,
+     "words": 139,
+     "numerals_checked": 5,
+     "numerals_unsupported": []
+    }
+   ],
+   "verdicts": [
+    "fail",
+    "pass"
+   ],
+   "final_reason": "",
+   "prose": "The analysis examined photo evidence through evidence-upload counts in the Activity Lifecycle data. It found two recurring patterns across separately defined scopes, including costed activities, activities for the general public, Public Works and New/Fresh works: uploads tend to be concentrated under output Code 101, often alongside Code 105, and they tend to be associated with Sarpanch-sanctioned activities. These scopes may overlap, but the analysis does not establish that they contain the same records.\n\nTaken together, the findings suggest checking what Codes 101 and 105 represent and reviewing the named GP exceptions, especially Chikilli, where no clear pattern repeatedly appears. They do not show whether photos are adequate, genuine or linked to the correct stage of work; nor do they establish why uploads are concentrated under particular codes or sanction authorities. The percentages and counts describe only the 20-GP sample."
+  }
+ ]
+}
