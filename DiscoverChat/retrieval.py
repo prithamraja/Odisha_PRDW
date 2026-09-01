@@ -76,6 +76,7 @@ class Retriever:
         self.corpus = corpus_mod.load()
         self.extractor = extractor if extractor is not None else SlotExtractor()
         self._embedder = embedder
+        self._query_cache: dict = {}
         self._geo_index = self._build_geo_index()
         self._measure_index = self._build_measure_index()
 
@@ -86,6 +87,28 @@ class Retriever:
         if self._embedder is None:
             self._embedder = config.Embedder()
         return self._embedder
+
+    def query_vector(self, text: str):
+        """The query embedding, computed once per process per exact string.
+
+        Memoisation, and it buys two things. The cheap one is time: the offline
+        gate puts the same twenty questions through six checks, each a network
+        call the endpoint answers in 30-100 seconds, and the suite went from
+        unrunnable to a couple of minutes.
+
+        The one that matters is DETERMINISM. The embedding endpoint is not
+        bit-deterministic -- phase5d measured 1.2e-3 of drift per component
+        between two calls on one string -- so the same question asked twice in
+        one gate run could previously land either side of the floor and flip a
+        check that nobody had touched. One vector per string per process removes
+        that source of flapping entirely. Nothing is cached across processes, so
+        a rebuilt corpus or a changed pin is never served a stale vector.
+        """
+        cached = self._query_cache.get(text)
+        if cached is None:
+            cached = self.embedder.query(text)
+            self._query_cache[text] = cached
+        return cached
 
     # ── structural indexes (built once, from the corpus's own fields) ────────
     def _build_geo_index(self) -> dict:
@@ -159,29 +182,63 @@ class Retriever:
         query_vector: np.ndarray | None = None,
         vectors: np.ndarray | None = None,
         collapse: bool = True,
+        include_decompositions: bool = False,
     ) -> Result:
-        """Rank the corpus against one question. The shipped path.
+        """Rank the corpus against one question. The THRESHOLD path.
 
         `vectors` and `query_vector` exist for the D5.1 experiment, which runs
         THIS function against a different document matrix (the bare-sentence
         arm) rather than a second copy of the scoring logic.
+
+        DECOMPOSITIONS ARE EXCLUDED HERE BY DEFAULT, and this is a real design
+        decision rather than a convenience -- see WPD6_REPORT §D6.1.
+
+        `RELEVANCE_THRESHOLD` is 0.62 because the D5.1 experiment measured it,
+        over the findings corpus, and the property it was chosen to give is that
+        an out-of-scope question clears nothing. Adding 36,218 decompositions
+        breaks that property, measurably and by construction: a depth-1
+        decomposition opens by naming its slice ("Within district Cuttack,
+        planned cost totals ..."), so "What is the price of onions in Cuttack
+        market?" reaches cosine 0.6256 against one -- above the floor on cosine
+        alone -- where over findings it reached 0.488.
+
+        A threshold carries evidence only for the corpus it was fitted on.
+        Rather than move the number to fit new data, which is the manoeuvre D42
+        ruling 5 exists to forbid, this path keeps the corpus the number was
+        fitted on. `pool()` -- the judged path, which is production -- searches
+        everything, because there the last word belongs to the judge and not to
+        a comparison.
+
+        The visible cost is stated rather than hidden: when the judge is
+        unreachable and a turn falls back here, a decompose question is answered
+        from findings alone. Degrading to a thinner answer is the right failure;
+        degrading to a confident wrong one is not.
         """
         threshold = config.RELEVANCE_THRESHOLD if threshold is None else threshold
         floor = config.QUALITY_FLOOR if quality_floor is None else quality_floor
         matrix = self.corpus.vectors if vectors is None else vectors
+        # The two corpora are concatenated findings-first, so the cut is a row
+        # index rather than a per-record test inside the scoring loop.
+        limit = (len(matrix) if (include_decompositions or vectors is not None)
+                 else self.corpus.meta.get("findings", len(matrix)))
 
         slots = self.extractor.extract(question)
         if query_vector is None:
-            query_vector = self.embedder.query(slots.expanded)
+            query_vector = self.query_vector(slots.expanded)
 
+        matrix = matrix[:limit]
         cosines = matrix @ np.asarray(query_vector, dtype=np.float32)
 
         if use_boost:
             boost, why = self.structural_boost(slots)
+            boost = boost[:limit]
         else:
             boost, why = np.zeros(len(cosines), dtype=np.float32), {}
 
         total = cosines + boost
+        # `best_cosine` is reported over the SAME rows that were scored, so the
+        # gate's "best cosine is below the threshold" evidence describes the
+        # comparison that actually happened.
         best_cosine = float(cosines.max()) if len(cosines) else 0.0
 
         order = np.argsort(-total)
@@ -226,13 +283,35 @@ class Retriever:
 
         `ANSWER_CAP` is deliberately NOT applied. It caps how much is written
         out; this is what the judge reads.
+
+        THE POOL IS SHARED BETWEEN THE TWO CORPORA, and it has to be, because
+        truncation is not a neutral operation when one corpus is eight times the
+        size of the other. Measured on the first build: for "How is Chikilli
+        doing?", "Is spending on track?", "How is Barpali block doing?" and
+        "Where is money planned but not spent?", the top 100 by score was
+        **100% decompositions and zero findings** -- the judge never saw a mined
+        pattern for any of them, so it could not have kept one. That is not the
+        decomposition being ranked higher on the merits; it is 36,218 records
+        crowding out 4,239 at the cut.
+
+        So each corpus contributes up to half the slots, and whichever has fewer
+        gives its unused slots back to the other. This is the SAME argument the
+        diversity rule above already makes -- collapse before truncating,
+        because truncation must not spend all its slots on one class of record
+        -- applied to corpus membership instead of to duplicate sentences.
+
+        It does not privilege either kind, and the distinction matters for D6.1.
+        Ranking is untouched: the merged list is re-sorted by the one score, the
+        judge rules on relevance alone, and it routinely keeps zero of one kind.
+        What the reservation changes is only which candidates get to be
+        considered.
         """
         floor = config.CANDIDATE_FLOOR if floor is None else floor
         size = config.CANDIDATE_POOL if size is None else size
 
         slots = self.extractor.extract(question)
         if query_vector is None:
-            query_vector = self.embedder.query(slots.expanded)
+            query_vector = self.query_vector(slots.expanded)
 
         cosines = self.corpus.vectors @ np.asarray(query_vector, dtype=np.float32)
         boost, why = self.structural_boost(slots)
@@ -251,9 +330,37 @@ class Retriever:
 
         hits, collapsed = collapse_near_duplicates(hits)
         capped = len(hits) > size
-        return Result(slots=slots, hits=hits[:size], considered=len(cosines),
+        kept = share_pool_between_corpora(hits, size)
+        return Result(slots=slots, hits=kept, considered=len(cosines),
                       best_cosine=float(cosines.max()) if len(cosines) else 0.0,
                       threshold=floor, collapsed_count=collapsed, capped=capped)
+
+
+def share_pool_between_corpora(hits: list, size: int) -> list:
+    """Truncate `hits` to `size` without letting one corpus crowd out the other.
+
+    Each kind may take up to half the slots; whichever has fewer than its half
+    hands the remainder back, so a question that only findings can answer still
+    gets a pool of `size` findings and vice versa. The survivors are returned in
+    SCORE ORDER, not grouped by kind — the judge reads one ranked list and is
+    never told which file a candidate came from.
+
+    See `Retriever.pool` for the measurement that made this necessary.
+    """
+    if len(hits) <= size:
+        return hits
+    findings = [h for h in hits if not h.finding.is_decomposition]
+    decompositions = [h for h in hits if h.finding.is_decomposition]
+
+    half = size // 2
+    n_find = min(len(findings), max(half, size - len(decompositions)))
+    n_dec = min(len(decompositions), size - n_find)
+    # A short second corpus gives its slots back to the first.
+    n_find = min(len(findings), size - n_dec)
+
+    kept = findings[:n_find] + decompositions[:n_dec]
+    kept.sort(key=lambda h: -h.score)
+    return kept
 
 
 def collapse_near_duplicates(hits: list) -> tuple:

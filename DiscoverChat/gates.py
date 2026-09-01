@@ -41,6 +41,7 @@ logging.basicConfig(level=logging.ERROR)
 
 from DiscoverChat import (                                     # noqa: E402
     assemble, causal_gate, checks, classifier, config, corpus as corpus_mod,
+    glossary,
 )
 from DiscoverChat.retrieval import Retriever                    # noqa: E402
 
@@ -55,27 +56,107 @@ def check(name: str, proves: str):
 
 
 # ── 1. The corpus is the one that was built ──────────────────────────────────
-@check("corpus-pin", "the corpus is served under the pin it was embedded with")
+@check("corpus-pin", "both corpora are served under the pin they were embedded with")
 def _corpus_pin(ctx):
     stamp = config.assert_pin_matches_corpus()
+    d_stamp = config.decompose_stamp()
     corpus = ctx["corpus"]
-    assert len(corpus) == stamp["records"], (
-        f"{len(corpus)} records loaded, stamp says {stamp['records']}")
+    expected = stamp["records"] + (d_stamp["records"] if d_stamp else 0)
+    assert len(corpus) == expected, (
+        f"{len(corpus)} records loaded, stamps say {expected}")
     assert corpus.vectors.shape == (len(corpus), config.EMBED_DIMS)
-    return f"{len(corpus):,} findings, pin {stamp['embedding_pin_fingerprint']}"
+    assert corpus.meta["findings"] == stamp["records"]
+    if d_stamp:
+        assert corpus.meta["decompositions"] == d_stamp["records"]
+        assert (d_stamp["embedding_pin_fingerprint"]
+                == stamp["embedding_pin_fingerprint"]), (
+            "the two corpora are embedded under different pins, so their "
+            "vectors are not comparable and one ranking over both is nonsense")
+    return (f"{corpus.meta['findings']:,} findings + "
+            f"{corpus.meta['decompositions']:,} decompositions, one pin "
+            f"{stamp['embedding_pin_fingerprint']}")
 
 
 @check("corpus-deterministic-text",
-       "every displayed sentence comes from the engine, not from a model")
+       "every displayed sentence is built, not generated")
 def _sentences_are_engine(ctx):
-    """The engine's sentences have a fixed opening. A model-written sentence
-    would not, so this is a cheap standing check that nothing has started
-    generating finding text."""
+    """Each builder has a fixed opening. A model-written sentence would not, so
+    this is a cheap standing check that nothing has started generating record
+    text: `generate_nl_summary` opens "Across ", `phase5f_decompose` opens
+    "Within ", and neither can be reached by a model."""
     corpus = ctx["corpus"]
-    bad = [f.id for f in corpus.all()
-           if not (f.sentence.startswith("Across ") or f.sentence == "(no commonness)")]
-    assert not bad, f"{len(bad)} findings do not read like engine output: {bad[:5]}"
-    return f"{len(corpus):,} sentences all in the engine's template form"
+    bad_f = [f.id for f in corpus.all() if not f.is_decomposition
+             and not (f.sentence.startswith("Across ")
+                      or f.sentence == "(no commonness)")]
+    bad_d = [f.id for f in corpus.all() if f.is_decomposition
+             and not f.sentence.startswith("Within ")]
+    assert not bad_f, f"{len(bad_f)} findings do not read like engine output: {bad_f[:5]}"
+    assert not bad_d, (f"{len(bad_d)} decompositions do not read like builder "
+                       f"output: {bad_d[:5]}")
+    return (f"{corpus.meta['findings']:,} engine sentences + "
+            f"{corpus.meta['decompositions']:,} decomposition sentences, "
+            f"all in template form")
+
+
+# ── 1b. The decomposition sidecar: arithmetic, and named honestly ────────────
+@check("decompose-reconciles",
+       "every stored decomposition's members sum to its total (D6.0 gate a)")
+def _decompose_reconciles(ctx):
+    """The whole premise of D6.0, re-checked at SERVE time and not only at build
+    time. The build proves it over the records it just computed; this proves it
+    over the file actually being served, which is the one an officer sees."""
+    corpus = ctx["corpus"]
+    records = [f for f in corpus.all() if f.is_decomposition]
+    if not records:
+        return "no sidecar loaded — nothing to check"
+    failures = [f.id for f in records if not f.data.get("reconciles")]
+    assert not failures, (
+        f"{len(failures)} of {len(records)} decompositions do not reconcile: "
+        f"{failures[:5]}")
+    return f"{len(records):,} decompositions, all members-sum-to-total"
+
+
+@check("decompose-evenness-honest",
+       "a flat split says so; it does not manufacture a leader (D6 ruling 4)")
+def _decompose_evenness(ctx):
+    """Ruling 4's first-class result. An evenly-spread decomposition must SAY it
+    is evenly spread, and it must not also claim a concentration — the two
+    readings cannot both be true of one distribution, and the failure this
+    guards is a template that appends "the largest is X" to every record
+    regardless of shape."""
+    corpus = ctx["corpus"]
+    even = [f for f in corpus.all()
+            if f.is_decomposition and f.data.get("shape") == "even"]
+    if not even:
+        return "no sidecar loaded — nothing to check"
+    missing = [f.id for f in even if "spread evenly" not in f.sentence]
+    assert not missing, (
+        f"{len(missing)} evenly-spread decompositions do not say so: "
+        f"{missing[:5]}")
+    claims = [f.id for f in even if "accounts for the majority" in f.sentence]
+    assert not claims, (
+        f"{len(claims)} evenly-spread decompositions also claim a leader: "
+        f"{claims[:5]}")
+    no_single = [f for f in even if "no single" in f.sentence]
+    return (f"{len(even):,} evenly-spread decompositions, all saying so; "
+            f"{len(no_single):,} state 'no single ... accounts for it'")
+
+
+@check("decompose-signed-not-a-magnitude",
+       "a mixed-sign gap reports both directions, never a share of a net")
+def _decompose_signed(ctx):
+    """A share of a near-zero net is arithmetic that produces 400% and means
+    nothing. The builder gives these their own shape; this checks the shape
+    reaches the sentence."""
+    corpus = ctx["corpus"]
+    off = [f for f in corpus.all()
+           if f.is_decomposition and f.data.get("shape") == "offsetting"]
+    if not off:
+        return "no offsetting decompositions in the sidecar"
+    bad = [f.id for f in off if "both directions" not in f.sentence]
+    assert not bad, f"{len(bad)} offsetting decompositions hide the cancelling: {bad[:5]}"
+    return (f"{len(off):,} offsetting decompositions, each stating both "
+            f"directions and the net")
 
 
 # ── 2. Number-lookup declines and routes to Ask ──────────────────────────────
@@ -172,6 +253,109 @@ def _floor(ctx):
             f"{result.threshold}, zero shown")
 
 
+# ── 4b. The decompose intent routes, and does not steal the reframe ──────────
+DECOMPOSE_QUESTIONS = [
+    "Where does the gap sit?",
+    "Which blocks account for the shortfall?",
+    "Break down spending by block",
+    "Who is driving the shortfall?",
+    "What makes up the underspend?",
+    "Break it down by fiscal year",
+    "Where is the money going?",
+    "How is the total split across districts?",
+]
+
+
+@check("decompose-routes", "a 'where does it sit' question routes to decompose")
+def _decompose_routes(ctx):
+    for question in DECOMPOSE_QUESTIONS:
+        routing = classifier.rule_route(question)
+        assert routing is not None and routing.move == classifier.DECOMPOSE, (
+            f"not routed to decompose by rule: {question!r} -> {routing}")
+    return f"{len(DECOMPOSE_QUESTIONS)} decompose questions, all routed by rule"
+
+
+@check("decompose-does-not-eat-why",
+       "adding the decompose rule did not take any question off the D41 reframe")
+def _decompose_vs_why(ctx):
+    """The decompose rule runs BEFORE the why rule, so it is the one change in
+    this WP that could silently remove a refusal. Every why-question in the
+    suite is re-asserted here, and so is the distinction the trigger file rests
+    on: a spike is a shape and keeps the reframe, a shortfall is a sum and does
+    not."""
+    for question in WHY_QUESTIONS:
+        routing = classifier.rule_route(question)
+        assert routing is not None and routing.move == classifier.WHY, (
+            f"the decompose rule stole a why-question: {question!r} -> {routing}")
+    shapes = ["What is causing the year-end payment spike?",
+              "What is driving the change in status?"]
+    for question in shapes:
+        routing = classifier.rule_route(question)
+        assert routing is not None and routing.move == classifier.WHY, (
+            f"a question about a SHAPE was routed to decompose: {question!r}")
+    for question in LOOKUP_QUESTIONS:
+        routing = classifier.rule_route(question)
+        assert routing is not None and routing.move == classifier.LOOKUP, (
+            f"the decompose rule stole a lookup question: {question!r}")
+    return (f"{len(WHY_QUESTIONS)} why + {len(shapes)} shape questions still "
+            f"reframed, {len(LOOKUP_QUESTIONS)} lookups still declined")
+
+
+@check("decompose-causal-note",
+       "a causally-worded decompose answer states what it does not establish")
+def _decompose_note(ctx):
+    answer = ctx["assembler"].answer("Who is driving the shortfall?")
+    assert answer.move == classifier.DECOMPOSE
+    if not any(f.is_decomposition for f in answer.findings):
+        return ("no decomposition cleared the offline threshold for this "
+                "question — the note is checked on the judged path (--live)")
+    assert "does not establish what produced it" in answer.text, (
+        "a 'who is driving' answer returned a split with no scope note")
+    return "the scope note is present ahead of the numbers"
+
+
+# ── 4c. No engine vocabulary reaches an officer ──────────────────────────────
+@check("no-raw-column-names",
+       "no rendered sentence shows an engine column name that has a phrase")
+def _no_raw_columns(ctx):
+    """D6.1's display-glossary condition, scanned over EVERY record in both
+    corpora rather than over the handful the suite happens to retrieve.
+
+    Scoped, as the brief scopes it, to columns that HAVE a glossary entry. A
+    column with none renders raw on purpose and is counted here and listed in
+    the report — inventing a phrase for it is the PM's call, not this code's."""
+    corpus = ctx["corpus"]
+    offenders, gapped = [], {}
+    for finding in corpus.all():
+        rendered = finding.display_sentence()
+        left = glossary.raw_columns(rendered, finding.view)
+        if left:
+            offenders.append((finding.id, left))
+        for token in glossary.untranslated(rendered, finding.view):
+            gapped[token] = gapped.get(token, 0) + 1
+    assert not offenders, (
+        f"{len(offenders)} rendered sentences still show a translatable column "
+        f"name: {offenders[:3]}")
+    known = ", ".join(f"{k} ({v})" for k, v in sorted(gapped.items()))
+    return (f"{len(corpus):,} rendered sentences clean; known gaps carried "
+            f"through unchanged: {known or 'none'}")
+
+
+@check("glossary-gaps-declared",
+       "every column with no officer phrase is one the report lists")
+def _glossary_gaps(ctx):
+    """A gate that lets gaps through silently would let the list rot. This
+    fails if a NEW untranslated column appears, so the report's list and the
+    code cannot drift apart."""
+    gaps = {(g["view"], g["column"]) for g in glossary.gaps()}
+    declared = {("view2", "payment_amount_mean"), ("view2", "receipt_amount_mean")}
+    assert gaps == declared, (
+        f"the glossary gap list has changed.\n  now:      {sorted(gaps)}\n"
+        f"  declared: {sorted(declared)}\n"
+        f"Author the phrases or update WPD6_REPORT's list.")
+    return f"{len(gaps)} declared gaps, both view2 per-GP-month averages"
+
+
 # ── 5. Every numeral traceable ───────────────────────────────────────────────
 @check("numerals-traceable",
        "every numeral in every answer traces to a corpus sentence")
@@ -179,6 +363,7 @@ def _numerals(ctx):
     assembler = ctx["assembler"]
     corpus = ctx["corpus"]
     questions = (LOOKUP_QUESTIONS + WHY_QUESTIONS + NO_MATCH_QUESTIONS
+                 + DECOMPOSE_QUESTIONS
                  + ["How is Chikilli doing?", "Is spending on track?",
                     "Where is money planned but not spent?",
                     "How is Barpali block doing?"])
@@ -204,6 +389,7 @@ def _numerals(ctx):
 def _causal(ctx):
     assembler = ctx["assembler"]
     questions = (LOOKUP_QUESTIONS + WHY_QUESTIONS + NO_MATCH_QUESTIONS
+                 + DECOMPOSE_QUESTIONS
                  + ["How is Chikilli doing?", "Is spending on track?",
                     "Which places are behaving differently from the rest?"])
     for question in questions:
@@ -242,6 +428,26 @@ def _causal_catches(ctx):
             f"{len(must_pass)} honest sentences passed")
 
 
+# ── 6b. The judge is the one that was measured (D6.2 item 2) ─────────────────
+@check("judge-model-evidenced",
+       "the configured judge is the id the out-of-scope evidence was measured on")
+def _judge_evidenced(ctx):
+    """The out-of-scope guarantee is a property of a model id, not of the code.
+
+    This fails RED on a swapped `DISCOVERCHAT_JUDGE_MODEL` and names the
+    requalification step, because the alternative -- a quiet swap -- keeps every
+    other check green while discarding the only evidence that the system refuses
+    questions it has no answer to.
+    """
+    evidenced, reference = config.evidenced_judge_model()
+    assert config.JUDGE_MODEL == evidenced, (
+        f"the configured judge is {config.JUDGE_MODEL!r}, but the out-of-scope "
+        f"evidence was measured on {evidenced!r}.\n"
+        f"        evidence: {reference}\n"
+        f"        {config.REQUALIFY_JUDGE}")
+    return f"{evidenced} — {reference}"
+
+
 # ── 7. The run stamp ─────────────────────────────────────────────────────────
 @check("run-stamp", "every answer carries the run stamp")
 def _stamp(ctx):
@@ -257,17 +463,42 @@ def _stamp(ctx):
 
 
 # ── 8. Findings are shown verbatim ───────────────────────────────────────────
-@check("findings-verbatim", "a shown finding's sentence is the corpus's, byte for byte")
+@check("findings-verbatim",
+       "a shown sentence is the corpus's, with only its column names translated")
 def _verbatim(ctx):
-    assembler = ctx["assembler"]
+    """Two assertions, and the second is what keeps this a real check after D6.1.
+
+    The rendered sentence is no longer byte-identical to the stored one -- the
+    display glossary swaps `fund_untied_total` for "untied grant planned" -- so
+    the first assertion moved to the rendered form. On its own that would be
+    weaker, because it no longer pins the text to the corpus at all.
+
+    The second assertion restores the strength and aims it at the thing worth
+    protecting: the NUMERALS of the rendered sentence must equal the numerals of
+    the stored one, in order, exactly. A translation that altered a figure, or
+    reordered two clauses so their figures swapped, fails here. Nothing a
+    dictionary substitution can legitimately do touches a digit.
+    """
+    corpus = ctx["corpus"]
+    checked = 0
     for question in ("How is Chikilli doing?", "Is spending on track?",
-                     "Where is money planned but not spent?"):
-        answer = assembler.answer(question)
+                     "Where is money planned but not spent?",
+                     "Which blocks account for the shortfall?"):
+        answer = ctx["assembler"].answer(question)
         for finding in answer.findings:
-            assert finding.sentence in answer.text, (
-                f"finding {finding.id} was not shown verbatim")
-            assert (ctx["corpus"].get(finding.id).sentence == finding.sentence)
-    return "every shown sentence identical to the corpus record"
+            shown = finding.display_sentence()
+            assert shown in answer.text, (
+                f"record {finding.id} was not shown verbatim")
+            stored = corpus.get(finding.id)
+            assert stored.sentence == finding.sentence, (
+                f"record {finding.id} does not match the corpus")
+            assert checks.numerals(shown) == checks.numerals(stored.sentence), (
+                f"the display glossary altered a figure in {finding.id}:\n"
+                f"  stored:   {checks.numerals(stored.sentence)}\n"
+                f"  rendered: {checks.numerals(shown)}")
+            checked += 1
+    return (f"{checked} shown sentences identical to their corpus record, "
+            f"every numeral unchanged by the translation")
 
 
 # ── 9. Coverage is stated for unranked findings ──────────────────────────────

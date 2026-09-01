@@ -78,19 +78,42 @@ def _sentences(text: str) -> list:
 def supplied_text(findings: list) -> str:
     """Everything the writer was legitimately given, as one blob.
 
-    A finding's whole record is in scope, not just its sentence: the writer is
+    A record's whole entry is in scope, not just its sentence: the writer is
     handed the sentence, the coverage line and the named members, so a name or a
     count drawn from any of those is supported. Nothing outside the supplied
-    findings is.
+    records is.
+
+    BOTH SENTENCES are included -- the stored one and the rendered one (D6.1).
+    They carry the same digits but different words, and the officer sees the
+    rendered one, so a phrase like "untied grant planned" has to be allowed
+    where `fund_untied_total` was.
+
+    A DECOMPOSITION additionally supplies its member figures (D6.1: "the
+    nothing-invented check learns the decompose records as an allowed numeral
+    source"). Every one is a build-time artefact of `phase5f_decompose`, exactly
+    as a finding's figures are artefacts of the engine -- and a member value
+    that appears in the record but not in the truncated sentence is still a
+    number this system computed, not one a model invented.
     """
     parts = []
     for finding in findings:
         parts.append(finding.sentence)
+        parts.append(finding.display_sentence())
         parts.append(finding.view_title)
         parts.append(finding.coverage_line())
         parts.append(finding.data.get("subspace_phrase", ""))
         parts.extend(str(n) for n in finding.data.get("named_members", []))
         parts.extend(str(m) for m in finding.data.get("measures", []))
+        if finding.is_decomposition:
+            data = finding.data
+            parts.append(str(data.get("total_display", "")))
+            parts.append(str(data.get("measure_phrase", "")))
+            parts.append(str(data.get("dimension_phrase", "")))
+            parts.append(str(data.get("n_members", "")))
+            for member in data.get("members", []):
+                parts.append(str(member.get("member", "")))
+                parts.append(str(member.get("value", "")))
+                parts.append(str(member.get("share", "")))
     return "\n".join(parts)
 
 

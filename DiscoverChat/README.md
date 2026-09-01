@@ -19,6 +19,7 @@ two products cannot disagree about what a place is called.
 |---|---|
 | **retrieve** | pool everything above the candidate floor (0.50), hand the top 100 to a **relevance judge**, and show what it keeps. A few findings render directly; a larger set gets connective prose around them. |
 | **navigate** | a follow-up walks finding structure — an exception member, a shared measure, a sibling finding. No free exploration. |
+| **decompose** | *"where does the gap sit"*, *"which blocks account for the shortfall"*, *"break it down by fiscal year"*. Retrieved exactly as a retrieve turn is, over the same corpus; what the move records is the intent. |
 | **decline** | a number-lookup routes to Ask; a *why* question gets a scope-honest reframe (D41: correlations only, no causal analysis). |
 
 If the judge keeps nothing, the answer is *"the current analysis has nothing on
@@ -39,7 +40,13 @@ Drive path (D6).
 #    timestamp, because vectors are reused from the previous build by text hash.
 python Insights/src/phase5d_retrieval_corpus.py
 
-# 2. the gate (D5.2) — one command, deterministic, no model calls
+# 1b. build the decomposition sidecar (D6.0). Needs the Parquet views first.
+python Insights/src/build_views.py --pack Insights/domain_pack_prdw \
+       --data-dir Data --views-dir Insights/views_prdw \
+       --reports-dir Insights/reports_prdw --strict
+python Insights/src/phase5f_decompose.py
+
+# 2. the gate (D5.2 + D6.1) — one command, deterministic, no model calls
 python DiscoverChat/gates.py
 python DiscoverChat/gates.py --live      # plus real turns through writer+verifier
 
@@ -110,12 +117,70 @@ arms so the labelling is arm-blind.
 | `classifier.py` | the turn decision, rules first, logged per turn |
 | `writer.py` | free writer + the WP-D4 safety net |
 | `checks.py` | mechanical nothing-invented checks |
-| `causal_gate.py` | the causal-verb ban (D41) |
+| `causal_gate.py` | a thin adapter over `Insights/src/prose_gate.py`, which holds the one copy of the causal-verb ban (D41) |
+| `glossary.py` | render-time column translation — `fund_untied_total` becomes "untied grant planned". A dictionary, no model |
 | `verifier.py` | different-model verifier, retry-on-empty |
 | `assemble.py` | the three moves; renders findings from the corpus |
 | `navigate.py` | the three structural walks |
 | `gates.py` | the D5.2 behaviour suite |
-| `query_expansion.json`, `measure_keywords.json` | authored **data**, on the SBM-dictionary precedent — the operator grows these from query logs without a code change |
+| `query_expansion.json`, `measure_keywords.json`, `decompose_triggers.json` | authored **data**, on the SBM-dictionary precedent — the operator grows these from query logs without a code change |
+
+## Decompositions (WP-D6)
+
+Alongside the 4,239 mined findings the service serves 36,218 **decompositions** —
+precomputed answers to *"where does this amount sit"*. Each one splits a
+measure's total across one dimension inside one slice, and its members add up to
+that total. They are built by `Insights/src/phase5f_decompose.py`, embedded
+under the same pin, and retrieved through the same machinery; the chatbot
+computes nothing at question time.
+
+Two things about how they are served:
+
+**Both kinds reach the judge.** The candidate pool reserves up to half its 100
+slots for each corpus. Without that reservation the pool was measured at **100%
+decompositions and zero findings** on four of five test questions — 36,218
+records simply crowding out 4,239 at the cut, not out-ranking them. Ranking
+itself is untouched: one score, one list, and the judge is never told which file
+a candidate came from.
+
+**The threshold path does not serve them.** `RELEVANCE_THRESHOLD` is 0.62
+because D5.1 measured it over the findings corpus, and the property it buys is
+that an out-of-scope question clears nothing. That does not survive the sidecar:
+*"What is the price of onions in Cuttack market?"* reaches cosine 0.6256 against
+a decomposition that opens *"Within district Cuttack, …"*, where over findings
+alone it reached 0.488. So `score()` keeps the corpus its number was fitted on
+and `pool()` — the judged path, which is production — searches everything. When
+the judge is unreachable a decompose question degrades to findings only. The
+judged path was re-measured with the sidecar loaded: **0.0% false-answer rate
+over 20 runs** (`experiments/run_decompose_oos.py`).
+
+Set `DISCOVERCHAT_USE_DECOMPOSE=0` to serve findings alone.
+
+## Requalifying the judge
+
+The out-of-scope guarantee is a property of **one model id**, not of the code.
+At `CANDIDATE_FLOOR=0.50` four of the five out-of-scope questions reach the judge
+with a non-empty pool, so it is the only thing standing between them and a
+confidently-wrong answer, and its 0.0% false-answer rate was measured on
+`gpt-5.6-sol` and on nothing else.
+
+`gates.py` therefore fails red when `DISCOVERCHAT_JUDGE_MODEL` is not the id the
+evidence was measured on. The evidenced id is read out of
+`experiments/judge_arm_results.json` rather than restated as a constant, because
+a constant can be edited in the same commit that swaps the model — which is
+exactly the drift the check exists to catch.
+
+To qualify a different judge, re-run the battery on it and let the run files
+record the new id:
+
+```bash
+DISCOVERCHAT_JUDGE_MODEL=<new-id> python DiscoverChat/experiments/run_judge_arm.py
+DISCOVERCHAT_JUDGE_MODEL=<new-id> python DiscoverChat/experiments/run_decompose_oos.py --repeats 4
+```
+
+The first rewrites `judge_arm_results.json`, which is what the gate reads; the
+second repeats the out-of-scope battery with the decomposition sidecar loaded.
+**Both must come back at a 0.0% false-answer rate before the id is trusted.**
 
 ## Two things to know before changing anything
 

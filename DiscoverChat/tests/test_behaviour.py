@@ -65,10 +65,23 @@ class FloorTests(_Base):
 
 class RenderingTests(_Base):
     def test_finding_sentences_are_verbatim(self):
+        """The shown sentence is the corpus's, with only its column names
+        translated (WP-D6 D6.1).
+
+        The numeral assertion is what keeps this strong. The rendered string is
+        no longer byte-identical to the stored one -- the glossary swaps
+        `fund_sanctioned_total` for "sanctioned amount" -- so containment alone
+        would no longer pin the text to the corpus. Requiring the numerals to
+        match exactly, in order, means no substitution can alter a figure or
+        reorder two clauses so their figures swap.
+        """
+        from DiscoverChat import checks
         answer = self.assembler.answer("How is Chikilli doing?")
         self.assertTrue(answer.findings)
         for finding in answer.findings:
-            self.assertIn(finding.sentence, answer.text)
+            self.assertIn(finding.display_sentence(), answer.text)
+            self.assertEqual(checks.numerals(finding.display_sentence()),
+                             checks.numerals(finding.sentence))
 
     def test_every_answer_carries_the_run_stamp(self):
         for question in ("How is Chikilli doing?", "How much was spent?",

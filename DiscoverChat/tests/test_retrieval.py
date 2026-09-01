@@ -73,8 +73,21 @@ class CorpusTests(unittest.TestCase):
         cls.corpus = corpus_mod.load()
 
     def test_pin_matches(self):
+        """Both corpora, and both under ONE pin (WP-D6).
+
+        The single pin is the load-bearing half. The two files are concatenated
+        into one matrix and scored against one query vector, so vectors from
+        different pins would not be comparable and the ranking over them would
+        be arithmetic on unrelated numbers.
+        """
         stamp = config.assert_pin_matches_corpus()
-        self.assertEqual(len(self.corpus), stamp["records"])
+        d_stamp = config.decompose_stamp()
+        expected = stamp["records"] + (d_stamp["records"] if d_stamp else 0)
+        self.assertEqual(len(self.corpus), expected)
+        self.assertEqual(self.corpus.meta["findings"], stamp["records"])
+        if d_stamp:
+            self.assertEqual(d_stamp["embedding_pin_fingerprint"],
+                             stamp["embedding_pin_fingerprint"])
 
     def test_vectors_are_row_aligned_and_unit_length(self):
         import numpy as np
@@ -84,11 +97,29 @@ class CorpusTests(unittest.TestCase):
 
     def test_enrichment_separates_what_the_sentence_does_not(self):
         """The reason the enriched text exists, asserted as a fact about the
-        corpus: bare sentences collide, enriched texts do not."""
-        bare = {r["bare_text_sha256"] for r in self.corpus.records}
-        rich = {r["embed_text_sha256"] for r in self.corpus.records}
-        self.assertLess(len(bare), len(self.corpus))
-        self.assertEqual(len(rich), len(self.corpus))
+        corpus: bare sentences collide, enriched texts do not.
+
+        Scoped to the findings, which is where the collision was measured --
+        `generate_nl_summary` never names the base subspace, so 2,464 of 4,239
+        records share a sentence with some other record. The decomposition
+        builder names its slice in every sentence and carries no `bare_text`
+        to compare, so the property is not defined for it. Its own uniqueness
+        is checked below.
+        """
+        findings = [r for r in self.corpus.records
+                    if r.get("record_type") != "decomposition"]
+        bare = {r["bare_text_sha256"] for r in findings}
+        rich = {r["embed_text_sha256"] for r in findings}
+        self.assertLess(len(bare), len(findings))
+        self.assertEqual(len(rich), len(findings))
+
+    def test_every_embedded_text_is_distinct(self):
+        """Across BOTH corpora. Two records sharing an embedded text share a
+        vector, and retrieval then cannot tell them apart at all — which is the
+        failure the enrichment recipe exists to prevent, and adding a second
+        corpus is exactly the event that could reintroduce it."""
+        texts = {r["embed_text_sha256"] for r in self.corpus.records}
+        self.assertEqual(len(texts), len(self.corpus))
 
     def test_geography_holds_no_engine_tokens(self):
         """'EVEN' is a pattern shape, not a Gram Panchayat."""
@@ -98,8 +129,19 @@ class CorpusTests(unittest.TestCase):
                 self.assertFalse(name.startswith("PERIOD_"))
 
     def test_every_finding_carries_the_run_stamp(self):
-        ids = {r["candidate_set_id"] for r in self.corpus.records}
+        """ONE candidate set behind everything an answer can show.
+
+        The findings carry it per record; the decomposition sidecar carries it
+        once, on the payload, and `corpus.load` refuses to concatenate two
+        corpora whose ids differ. Both are asserted, because an answer prints
+        one run stamp and a mixed pair would date half of it wrongly.
+        """
+        ids = {r["candidate_set_id"] for r in self.corpus.records
+               if r.get("record_type") != "decomposition"}
         self.assertEqual(len(ids), 1)
+        d_stamp = config.decompose_stamp()
+        if d_stamp:
+            self.assertEqual(d_stamp["candidate_set_id"], ids.pop())
 
 
 class DiversityTests(unittest.TestCase):

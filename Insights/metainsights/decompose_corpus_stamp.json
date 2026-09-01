@@ -1,0 +1,76 @@
+{
+  "what_this_is": "Provenance for decompose_corpus.json/.npy. The `generated_at` line is the ONLY field expected to differ between two consecutive builds (D6.0 gate); everything else, vectors included, is reproduced from the cache.",
+  "artefacts": [
+    "metainsights/decompose_corpus.json",
+    "metainsights/decompose_corpus.npy"
+  ],
+  "candidate_set_id": "a7f991c1df3771f9",
+  "generated_at": "2026-09-01T12:40:29Z",
+  "build_seconds": 151.2,
+  "embedding_pin": {
+    "model": "qwen/qwen3-embedding-8b",
+    "dims": 1024,
+    "base_url": "https://api.novita.ai/openai",
+    "query_instruction": "Instruct: Given a question from a government official about village-level planning and spending, retrieve analysis findings that answer it\nQuery: ",
+    "document_instruction": null,
+    "normalisation": "L2, client-side",
+    "storage_dtype": "float32"
+  },
+  "embedding_pin_fingerprint": "7a6509707ac3aa5c",
+  "embedding_calls": 0,
+  "texts_embedded": 0,
+  "records": 36218,
+  "reconciled": 36218,
+  "counts": {
+    "view1": {
+      "rows": 12704,
+      "measures": 24,
+      "dimensions": 17,
+      "subspaces": 127,
+      "records": 33868,
+      "skipped": {
+        "definitional": 3946,
+        "zero_total": 6345,
+        "single_member": 4633
+      }
+    },
+    "view2": {
+      "rows": 1440,
+      "measures": 7,
+      "dimensions": 6,
+      "subspaces": 52,
+      "records": 1283,
+      "skipped": {
+        "definitional": 0,
+        "zero_total": 12,
+        "single_member": 532
+      }
+    },
+    "view3": {
+      "rows": 120,
+      "measures": 18,
+      "dimensions": 4,
+      "subspaces": 46,
+      "records": 1067,
+      "skipped": {
+        "definitional": 0,
+        "zero_total": 67,
+        "single_member": 1368
+      }
+    }
+  },
+  "view_parquets": {
+    "view1_activity_lifecycle.parquet": {
+      "sha256": "a177bc32885116fc3b3285eed2edb113baa47a618a924c3cec2e9627560b42a3",
+      "bytes": 328031
+    },
+    "view2_geo_month_cube.parquet": {
+      "sha256": "770c3154d1654f40e1cf587d4be7c0f8bff0e9c4b8c1b0d5ff400dbef3766aed",
+      "bytes": 36867
+    },
+    "view3_gp_performance.parquet": {
+      "sha256": "7c2382f0c8740e8ad4d0657aebf68717ed4b2decb94706c23559e9d2fffde57f",
+      "bytes": 14279
+    }
+  }
+}

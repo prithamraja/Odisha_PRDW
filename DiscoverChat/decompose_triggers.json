@@ -1,0 +1,34 @@
+{
+  "what_this_is": "WP-D6 D6.1. The turn-classifier vocabulary that marks a question as asking WHERE AN AMOUNT SITS rather than what the analysis found. Data, not code, on the same principle as query_expansion.json and measure_keywords.json: this list is edited at a pilot by whoever hears the questions, without a code change.",
+
+  "why_it_is_tested_first": "Two of the four constructions the brief names are already captured by an EXISTING rule, and captured wrongly. 'Who is driving the shortfall' matches the WHY rule 'what is causing|driving|behind' and would be answered with the D41 causal reframe -- a refusal -- when the question has an arithmetic answer that is sitting precomputed in the sidecar. 'Which blocks account for the gap' is close to the LOOKUP family. So the decompose rules run BEFORE both, and the behaviour suite pins that ordering.",
+
+  "share_of_total": [
+    ["\\bbreak(?:ing)?\\s+(?:it|this|that|the\\s+\\w+)?\\s*down\\s+by\\b", "asks for a breakdown by a dimension"],
+    ["\\bbreak\\s+down\\b", "asks for a breakdown"],
+    ["\\bbroken\\s+down\\s+by\\b", "asks for a breakdown by a dimension"],
+    ["\\bbreakdown\\s+(?:of|by)\\b", "asks for a breakdown"],
+    ["\\bwhere\\s+(?:does|do|is|are)\\b[^?]*\\b(?:sit|sits|sitting|go|goes|going|went|come\\s+from|coming\\s+from|came\\s+from|concentrated)\\b", "asks where an amount sits"],
+    ["\\bwhich\\s+\\w+(?:\\s+\\w+)?\\s+account(?:s)?\\s+for\\b", "asks which members account for a total"],
+    ["\\bwho\\s+account(?:s)?\\s+for\\b", "asks who accounts for a total"],
+    ["\\bwhat\\s+(?:makes|make)\\s+up\\b", "asks what a total is made up of"],
+    ["\\bmade\\s+up\\s+of\\b", "asks what a total is made up of"],
+    ["\\bhow\\s+(?:is|are)\\b[^?]*\\b(?:split|divided|distributed|spread)\\b", "asks how a total is split"],
+    ["\\bshare\\s+of\\s+the\\b[^?]*\\b(?:gap|total|shortfall|underspend|overspend|spending|amount)\\b", "asks for a share of a total"],
+    ["\\bwhich\\s+\\w+(?:\\s+\\w+)?\\s+(?:carry|carries|hold|holds)\\s+(?:the|most)\\b", "asks which members carry a total"]
+  ],
+
+  "causal_phrasing": [
+    ["\\b(?:who|what|which)\\s+(?:is|are)\\s+(?:driving|behind)\\b", "asks what is behind an amount"],
+    ["\\bwhat\\s+(?:is|'s)\\s+causing\\b", "asks what is causing an amount"]
+  ],
+
+  "accounting_nouns": [
+    "gap", "gaps", "shortfall", "shortfalls", "underspend", "underspending",
+    "overspend", "overspending", "overrun", "overruns", "total", "totals",
+    "difference", "balance", "amount", "amounts", "spend", "spending",
+    "expenditure", "payments", "receipts", "sanctions", "cost", "money"
+  ],
+
+  "why_the_nouns_gate_the_causal_half": "A causal phrasing alone is NOT enough to take a turn off the D41 reframe, and this is the line that keeps the two apart. 'Who is driving the shortfall' names an ADDITIVE QUANTITY, and the honest answer is arithmetic: these members contribute these amounts and they sum to it. 'What is causing the year-end payment spike' names a SHAPE -- a spike is a pattern, not a sum -- and there is no decomposition of it; that turn keeps the reframe, as D41 requires. So a causal phrasing routes here only when an accounting noun follows it, and the answer carries a deterministic note saying the breakdown shows where the amount sits and does not establish what produced it."
+}

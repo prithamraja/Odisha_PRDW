@@ -1,0 +1,257 @@
+{
+ "generated_at": "2026-09-01T12:28:41Z",
+ "judge_model": "gpt-5.6-sol",
+ "candidate_floor": 0.5,
+ "candidate_pool": 100,
+ "corpus": {
+  "findings": 4239,
+  "decompositions": 36218
+ },
+ "repeats": 4,
+ "out_of_scope_runs": 20,
+ "out_of_scope_answered": 0,
+ "false_answer_rate": 0.0,
+ "elapsed_seconds": 107.9,
+ "rows": [
+  {
+   "run": 0,
+   "kind": "out_of_scope",
+   "q": "What is the price of onions in Cuttack market?",
+   "move": "lookup",
+   "shown": 0,
+   "decompositions_shown": 0,
+   "pool": null,
+   "judge_source": null
+  },
+  {
+   "run": 0,
+   "kind": "out_of_scope",
+   "q": "What is the rainfall forecast for Koraput next week?",
+   "move": "lookup",
+   "shown": 0,
+   "decompositions_shown": 0,
+   "pool": null,
+   "judge_source": null
+  },
+  {
+   "run": 0,
+   "kind": "out_of_scope",
+   "q": "How many teachers are posted in the block primary schools?",
+   "move": "lookup",
+   "shown": 0,
+   "decompositions_shown": 0,
+   "pool": null,
+   "judge_source": null
+  },
+  {
+   "run": 0,
+   "kind": "out_of_scope",
+   "q": "Give me the list of pending court cases against the panchayat.",
+   "move": "lookup",
+   "shown": 0,
+   "decompositions_shown": 0,
+   "pool": null,
+   "judge_source": null
+  },
+  {
+   "run": 0,
+   "kind": "out_of_scope",
+   "q": "Who is the current Sarpanch of Chikilli?",
+   "move": "lookup",
+   "shown": 0,
+   "decompositions_shown": 0,
+   "pool": null,
+   "judge_source": null
+  },
+  {
+   "run": 1,
+   "kind": "out_of_scope",
+   "q": "What is the price of onions in Cuttack market?",
+   "move": "lookup",
+   "shown": 0,
+   "decompositions_shown": 0,
+   "pool": null,
+   "judge_source": null
+  },
+  {
+   "run": 1,
+   "kind": "out_of_scope",
+   "q": "What is the rainfall forecast for Koraput next week?",
+   "move": "lookup",
+   "shown": 0,
+   "decompositions_shown": 0,
+   "pool": null,
+   "judge_source": null
+  },
+  {
+   "run": 1,
+   "kind": "out_of_scope",
+   "q": "How many teachers are posted in the block primary schools?",
+   "move": "lookup",
+   "shown": 0,
+   "decompositions_shown": 0,
+   "pool": null,
+   "judge_source": null
+  },
+  {
+   "run": 1,
+   "kind": "out_of_scope",
+   "q": "Give me the list of pending court cases against the panchayat.",
+   "move": "lookup",
+   "shown": 0,
+   "decompositions_shown": 0,
+   "pool": null,
+   "judge_source": null
+  },
+  {
+   "run": 1,
+   "kind": "out_of_scope",
+   "q": "Who is the current Sarpanch of Chikilli?",
+   "move": "lookup",
+   "shown": 0,
+   "decompositions_shown": 0,
+   "pool": null,
+   "judge_source": null
+  },
+  {
+   "run": 2,
+   "kind": "out_of_scope",
+   "q": "What is the price of onions in Cuttack market?",
+   "move": "lookup",
+   "shown": 0,
+   "decompositions_shown": 0,
+   "pool": null,
+   "judge_source": null
+  },
+  {
+   "run": 2,
+   "kind": "out_of_scope",
+   "q": "What is the rainfall forecast for Koraput next week?",
+   "move": "lookup",
+   "shown": 0,
+   "decompositions_shown": 0,
+   "pool": null,
+   "judge_source": null
+  },
+  {
+   "run": 2,
+   "kind": "out_of_scope",
+   "q": "How many teachers are posted in the block primary schools?",
+   "move": "lookup",
+   "shown": 0,
+   "decompositions_shown": 0,
+   "pool": null,
+   "judge_source": null
+  },
+  {
+   "run": 2,
+   "kind": "out_of_scope",
+   "q": "Give me the list of pending court cases against the panchayat.",
+   "move": "lookup",
+   "shown": 0,
+   "decompositions_shown": 0,
+   "pool": null,
+   "judge_source": null
+  },
+  {
+   "run": 2,
+   "kind": "out_of_scope",
+   "q": "Who is the current Sarpanch of Chikilli?",
+   "move": "lookup",
+   "shown": 0,
+   "decompositions_shown": 0,
+   "pool": null,
+   "judge_source": null
+  },
+  {
+   "run": 3,
+   "kind": "out_of_scope",
+   "q": "What is the price of onions in Cuttack market?",
+   "move": "lookup",
+   "shown": 0,
+   "decompositions_shown": 0,
+   "pool": null,
+   "judge_source": null
+  },
+  {
+   "run": 3,
+   "kind": "out_of_scope",
+   "q": "What is the rainfall forecast for Koraput next week?",
+   "move": "lookup",
+   "shown": 0,
+   "decompositions_shown": 0,
+   "pool": null,
+   "judge_source": null
+  },
+  {
+   "run": 3,
+   "kind": "out_of_scope",
+   "q": "How many teachers are posted in the block primary schools?",
+   "move": "lookup",
+   "shown": 0,
+   "decompositions_shown": 0,
+   "pool": null,
+   "judge_source": null
+  },
+  {
+   "run": 3,
+   "kind": "out_of_scope",
+   "q": "Give me the list of pending court cases against the panchayat.",
+   "move": "lookup",
+   "shown": 0,
+   "decompositions_shown": 0,
+   "pool": null,
+   "judge_source": null
+  },
+  {
+   "run": 3,
+   "kind": "out_of_scope",
+   "q": "Who is the current Sarpanch of Chikilli?",
+   "move": "lookup",
+   "shown": 0,
+   "decompositions_shown": 0,
+   "pool": null,
+   "judge_source": null
+  },
+  {
+   "run": 0,
+   "kind": "in_scope",
+   "q": "Where does the gap sit?",
+   "move": "decompose",
+   "shown": 4,
+   "decompositions_shown": 4,
+   "pool": 100,
+   "judge_source": "judge"
+  },
+  {
+   "run": 0,
+   "kind": "in_scope",
+   "q": "Which blocks account for the shortfall?",
+   "move": "decompose",
+   "shown": 1,
+   "decompositions_shown": 1,
+   "pool": 100,
+   "judge_source": "judge"
+  },
+  {
+   "run": 0,
+   "kind": "in_scope",
+   "q": "Break down spending by block",
+   "move": "decompose",
+   "shown": 1,
+   "decompositions_shown": 1,
+   "pool": 100,
+   "judge_source": "judge"
+  },
+  {
+   "run": 0,
+   "kind": "in_scope",
+   "q": "How is Chikilli doing?",
+   "move": "retrieve",
+   "shown": 7,
+   "decompositions_shown": 5,
+   "pool": 100,
+   "judge_source": "judge"
+  }
+ ]
+}

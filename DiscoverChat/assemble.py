@@ -25,6 +25,17 @@ from . import classifier, config, judge as judge_mod, navigate, writer as writer
 from .retrieval import Result
 
 
+# A decomposition answers "where does this sit", and an officer who asked "who
+# is DRIVING the shortfall" will read a split as the answer to the question they
+# asked unless the difference is stated. Deterministic text, on the same footing
+# as the why-reframe: it states a limit, it does not characterise the findings.
+DECOMPOSE_SCOPE_NOTE = (
+    "One thing to be clear about: the breakdown below shows where the amount "
+    "sits — which parts add up to it, and in what proportion. It does not "
+    "establish what produced it. This analysis finds patterns and does not "
+    "measure what causes what."
+)
+
 ASK_ROUTE_MESSAGE = (
     "That is a question about the records themselves — a figure, a count or a "
     "list — and this system does not hold them. Ask, the question-answering "
@@ -53,16 +64,21 @@ class Answer:
 # ── deterministic rendering ──────────────────────────────────────────────────
 
 def render_finding(finding, *, bullet: bool = False) -> str:
-    """One finding, from the corpus, verbatim. No model touches this.
+    """One record, from the corpus, verbatim. No model touches this.
 
     Bulleted rather than numbered, and that is not a style choice: a numbered
     list puts digits into the answer that belong to no finding, and the gate's
     "every numeral traces to a corpus sentence" check would then have to carve
     out an exception for presentation. A check with an exception in it is a
     weaker check, and list markers are the cheaper thing to give up.
+
+    `display_sentence()` rather than `sentence` (D6.1): the same string with its
+    engine column names swapped for officer phrases by a dictionary. It is still
+    the corpus's sentence -- no clause moves and no digit changes -- which is
+    why `findings-verbatim` in the gate is still a real check after the swap.
     """
     head = "- " if bullet else ""
-    return f"{head}{finding.sentence}\n   ({finding.coverage_line()})"
+    return f"{head}{finding.display_sentence()}\n   ({finding.coverage_line()})"
 
 
 def render_findings(findings: list) -> str:
@@ -275,6 +291,14 @@ class Assembler:
             prose_meta = prose.as_dict()
             prose_meta["used"] = not prose.fell_back
             text = f"{prose.text}\n\n{body}" if prose.text else body
+
+        # A causally-worded decompose turn gets the limit stated before the
+        # numbers, not after them: an officer who reads the split first has
+        # already taken it for the answer to "who is driving this".
+        if (routing.move == classifier.DECOMPOSE
+                and classifier.asked_causally(message)
+                and any(f.is_decomposition for f in findings)):
+            text = f"{DECOMPOSE_SCOPE_NOTE}\n\n{text}"
 
         if result.capped:
             text += (f"\n\nMore than {config.ANSWER_CAP} findings clear the "

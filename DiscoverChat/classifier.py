@@ -30,6 +30,12 @@ from dataclasses import dataclass
 from . import config, context_brief, llm
 
 RETRIEVE, NAVIGATE, LOOKUP, WHY = "retrieve", "navigate", "lookup", "why"
+# WP-D6 D6.1. Not a fifth kind of answer: a DECOMPOSE turn retrieves exactly as
+# a RETRIEVE turn does, over one corpus that holds findings and decompositions
+# together. What the move records is the officer's INTENT, which is worth
+# logging, and -- the reason it has to exist at all -- it is what keeps
+# "who is driving the shortfall" off the causal reframe.
+DECOMPOSE = "decompose"
 
 
 @dataclass
@@ -76,8 +82,62 @@ _LOOKUP_PATTERNS = [
 ]
 
 
+# ── DECOMPOSE. The vocabulary is data (`decompose_triggers.json`) ────────────
+with open(config.DATA_DECOMPOSE_TRIGGERS, encoding="utf-8") as _fh:
+    _TRIGGERS = json.load(_fh)
+
+_DECOMPOSE_PATTERNS = [(re.compile(p, re.IGNORECASE), why)
+                       for p, why in _TRIGGERS["share_of_total"]]
+_DECOMPOSE_CAUSAL = [(re.compile(p, re.IGNORECASE), why)
+                     for p, why in _TRIGGERS["causal_phrasing"]]
+_ACCOUNTING_NOUN = re.compile(
+    r"\b(?:" + "|".join(re.escape(n) for n in _TRIGGERS["accounting_nouns"])
+    + r")\b", re.IGNORECASE)
+
+
+def decompose_route(message: str) -> Routing | None:
+    """A question about where an amount sits, or None.
+
+    The causal half is gated on an accounting noun; the data file's
+    `why_the_nouns_gate_the_causal_half` gives the reasoning at length. In
+    short: "who is driving the shortfall" names an additive quantity and has an
+    arithmetic answer, "what is causing the year-end spike" names a shape and
+    keeps the D41 reframe.
+    """
+    for pattern, reason in _DECOMPOSE_PATTERNS:
+        if pattern.search(message):
+            return Routing(DECOMPOSE, "rule", reason)
+    for pattern, reason in _DECOMPOSE_CAUSAL:
+        if pattern.search(message) and _ACCOUNTING_NOUN.search(message):
+            return Routing(DECOMPOSE, "rule",
+                           f"{reason}, and the thing named is an amount that "
+                           f"adds up, so it has an arithmetic answer")
+    return None
+
+
+def asked_causally(message: str) -> bool:
+    """Did a DECOMPOSE turn arrive in causal wording?
+
+    The answer then carries a deterministic note saying the breakdown shows
+    where the amount sits and not what produced it — because the officer asked
+    "who is driving this", and handing back a split without that line lets the
+    split be read as the causal answer D41 forbids.
+    """
+    return any(p.search(message) for p, _ in _DECOMPOSE_CAUSAL)
+
+
 def rule_route(message: str) -> Routing | None:
-    # WHY is tested first. "Why is spending so much higher in X" contains "how
+    # DECOMPOSE is tested FIRST, and the ordering is load-bearing rather than
+    # arbitrary: two of the constructions the D6.1 brief names are already
+    # caught by the rules below, and caught wrongly. "Who is driving the
+    # shortfall" matches the WHY rule and would be refused with the causal
+    # reframe although the sidecar holds its arithmetic answer; "which blocks
+    # account for the gap" sits next to the LOOKUP family. Tested last, this
+    # rule would never fire on either.
+    routed = decompose_route(message)
+    if routed is not None:
+        return routed
+    # WHY before LOOKUP. "Why is spending so much higher in X" contains "how
     # much"-adjacent wording and would otherwise be read as a quantity request,
     # and a why-question misrouted to LOOKUP loses the D41 reframe entirely.
     for pattern, reason in _WHY_PATTERNS:
@@ -94,7 +154,7 @@ _PROMPT = """{context}
 
 Reply with JSON only, no other text:
 
-{{"move": "RETRIEVE" | "NAVIGATE" | "LOOKUP" | "WHY", "reason": "<one short sentence>"}}
+{{"move": "RETRIEVE" | "NAVIGATE" | "LOOKUP" | "WHY" | "DECOMPOSE", "reason": "<one short sentence>"}}
 
 {history}The officer's message:
 {message}
@@ -154,6 +214,6 @@ def _parse(text: str):
     except json.JSONDecodeError:
         return None
     move = str(obj.get("move", "")).strip().lower()
-    if move not in (RETRIEVE, NAVIGATE, LOOKUP, WHY):
+    if move not in (RETRIEVE, NAVIGATE, LOOKUP, WHY, DECOMPOSE):
         return None
     return move, str(obj.get("reason", "")).strip()
