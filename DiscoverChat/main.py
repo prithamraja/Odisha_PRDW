@@ -26,6 +26,7 @@ import uuid
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from . import assemble, config, corpus as corpus_mod
@@ -55,6 +56,21 @@ app = FastAPI(title="DiscoverChat",
               description="Conversational access to pre-mined MetaInsight "
                           "findings. Computes nothing; retrieves and frames.",
               lifespan=lifespan)
+
+# The Discover tab calls this from the browser, on a different port from Ask's
+# backend, so every request is cross-origin. Open like Ask's, and for the same
+# reason: the service is read-only over already-published findings and holds no
+# per-user data. `allow_credentials` stays FALSE — no cookie or auth header is
+# ever sent, and a wildcard origin WITH credentials is the one combination
+# browsers reject outright, so turning it on would break the tab rather than
+# secure it.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class AskRequest(BaseModel):

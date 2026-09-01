@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { ChevronDown, ChevronRight, FileSearch, Info } from "lucide-react";
 
 import {
@@ -9,27 +9,12 @@ import {
   type Insight,
   type ReportSection,
 } from "@/lib/insights-report";
+import { askDiscover } from "@/services/discover-api";
+import { InsightReport, type ReportState } from "./InsightReport";
+import { InsightSearchBar } from "./InsightSearchBar";
+import { RichText } from "./RichText";
 
 const ALL = "__all__";
-
-// --- Body text: the report's own **bold**, rendered as emphasis ---
-// The generator marks the figures it wants the eye to land on. Every body in
-// the feed goes through here, so a marker is never shown as an asterisk.
-function RichText({ text }: { text: string }) {
-  return (
-    <>
-      {splitBold(text).map((run, i) =>
-        run.bold ? (
-          <strong key={i} className="font-semibold text-ink">
-            {run.text}
-          </strong>
-        ) : (
-          <span key={i}>{run.text}</span>
-        )
-      )}
-    </>
-  );
-}
 
 // --- Formatted headline: the report's bold, plus every bare number ---
 function FormattedHeadline({ text }: { text: string }) {
@@ -178,9 +163,60 @@ function ReadingNoteCallout({
   );
 }
 
-export function AnomaliesView() {
+const DISCOVER_SESSION_KEY = "discoverchat-session-id";
+
+function getOrCreateDiscoverSessionId() {
+  const existing = sessionStorage.getItem(DISCOVER_SESSION_KEY);
+  if (existing) return existing;
+  const sessionId = crypto.randomUUID();
+  sessionStorage.setItem(DISCOVER_SESSION_KEY, sessionId);
+  return sessionId;
+}
+
+interface AnomaliesViewProps {
+  /** Hand the question to Ask. Offered when DiscoverChat declines a lookup. */
+  onRouteToAsk?: (question: string) => void;
+}
+
+export function AnomaliesView({ onRouteToAsk }: AnomaliesViewProps = {}) {
   const [section, setSection] = useState<string>(ALL);
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [report, setReport] = useState<ReportState | null>(null);
+  const [sessionId] = useState(getOrCreateDiscoverSessionId);
+  // Which request the card is currently showing. A turn can take a judge round
+  // trip, and dismissing the card during one must not let the answer reopen it.
+  const inFlight = useRef(0);
+
+  // The card appears the moment the question is asked rather than when the
+  // answer lands — a slow turn must still be visibly in flight, or the officer
+  // asks it again.
+  const handleSearch = useCallback(
+    async (question: string) => {
+      const request = ++inFlight.current;
+      setReport({ question, status: "loading" });
+      try {
+        const response = await askDiscover(question, { session_id: sessionId });
+        if (inFlight.current !== request) return;
+        setReport({ question, status: "done", response });
+      } catch (err) {
+        if (inFlight.current !== request) return;
+        setReport({
+          question,
+          status: "error",
+          error:
+            err instanceof Error
+              ? err.message
+              : "Something went wrong. Please try again.",
+        });
+      }
+    },
+    [sessionId]
+  );
+
+  const handleDismiss = useCallback(() => {
+    inFlight.current++;
+    setReport(null);
+  }, []);
 
   const parsed = useMemo(
     () => (rawReport ? parseReport(rawReport) : { insights: [], sections: [] }),
@@ -229,6 +265,24 @@ export function AnomaliesView() {
     <div className="flex-1 overflow-y-auto scrollbar-thin bg-ivory">
       <div className="max-w-[860px] mx-auto px-10 py-10">
         <PageHead />
+
+        {/* The question box. It runs DiscoverChat over the same mined findings
+            the feed below is drawn from, so it sits above the feed's own
+            filters rather than in a tab of its own — and it is offered even
+            when no report has been dropped in, because the two are separate
+            sources and an empty feed does not mean an empty corpus. */}
+        <InsightSearchBar
+          onSearch={handleSearch}
+          isLoading={report?.status === "loading"}
+        />
+
+        {report && (
+          <InsightReport
+            state={report}
+            onDismiss={handleDismiss}
+            onRouteToAsk={onRouteToAsk}
+          />
+        )}
 
         {parsed.insights.length === 0 ? (
           <EmptyState />

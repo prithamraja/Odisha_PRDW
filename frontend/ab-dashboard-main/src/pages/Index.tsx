@@ -129,6 +129,18 @@ const Index = () => {
     [sessionId]
   );
 
+  // DiscoverChat declines a records question rather than proxying it (D42
+  // ruling 1). The two products are separate backends, so the handover is the
+  // frontend's to make: switch to Ask and send the question the officer typed,
+  // unchanged, so they do not have to type it twice.
+  const handleRouteToAsk = useCallback(
+    (question: string) => {
+      setActiveView("ask");
+      void handleSend(question);
+    },
+    [handleSend]
+  );
+
   const handleContextReset = useCallback(async () => {
     try {
       await resetContext(sessionId);
@@ -196,7 +208,7 @@ const Index = () => {
               onContextReset={handleContextReset}
             />
           ) : (
-            <AnomaliesView />
+            <AnomaliesView onRouteToAsk={handleRouteToAsk} />
           )}
         </div>
       </main>

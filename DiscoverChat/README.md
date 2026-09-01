@@ -52,6 +52,35 @@ python -m uvicorn DiscoverChat.main:app --host 127.0.0.1 --port 8100
 
 `GET /health`, `POST /chat`, `GET /finding/{id}`, `GET /ask-route`.
 
+## The front end
+
+The Discover tab's question box — *"Ask a question to generate an insight
+report"* — posts to `/chat` here, not to Ask. It is its own base URL
+(`VITE_DISCOVER_API_BASE_URL`, default `http://localhost:8100`) because the two
+products are two services; one shared variable would silently send Discover
+questions to Ask's `/query` the first time either moved.
+
+| front-end file | what it does |
+|---|---|
+| `src/services/discover-api.ts` | the `/chat` client and the response types |
+| `src/lib/discover-answer.ts` | splits one answer into findings, prose and the run stamp — presentational only, nothing rewritten or dropped |
+| `src/components/insights/InsightSearchBar.tsx` | the question box above the category chips |
+| `src/components/insights/InsightReport.tsx` | the report card, including the handover on a decline |
+
+Two behaviours the front end owns rather than the service:
+
+**The handover.** A `lookup` move is the D42 decline — the service will not
+proxy a records question. The card then offers *"Put this question to Ask"*,
+which switches tabs and re-sends the officer's own words, unchanged.
+
+**The run stamp is always shown.** Every answer ends in one; the card pins it
+under the report, because a pattern read without the date it was mined on reads
+as today's.
+
+CORS is open (`allow_origins=["*"]`, credentials off) so the browser can reach
+this from the dev server's port. Nothing here is per-user and everything it
+serves is already-published findings.
+
 ## The D5.1 experiment
 
 The retrieval design was decided by measurement, not argument (D42 ruling 4).

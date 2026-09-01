@@ -85,12 +85,27 @@ unchanged; (d) record counts per view reported.
 - The nothing-invented check learns the decompose records as an allowed
   numeral source (their numbers are build-time artifacts, exactly like
   finding figures).
+- **Display glossary (scope addition, PM 2026-09-01, operator-approved):**
+  finding sentences currently render in engine vocabulary
+  (`fund_untied_total`, `gp_name`, `is_completed`) — acceptable in a
+  labelling sheet, not in an officer-facing answer. Add a deterministic
+  render-time translation in DiscoverChat that maps column names to officer
+  phrases, reusing the same `column_glossary` dicts the corpus builder's
+  enriched text already uses (read from `Insights/src/phase5b_report.py`;
+  do not fork the dicts — import or load them from the one source). No LLM
+  anywhere in this path; translation applies to every rendered sentence,
+  findings and decompositions alike. Gaps in the glossary (a column with no
+  entry) render the raw name and are LISTED in the report rather than
+  papered over — the missing entries are PM/operator content to author, not
+  the implementer's to invent.
 
 **Gate D6.1:** extend the one-command offline gate and the behavior suite:
 decompose questions route correctly; every numeral in a decompose answer
 traces to a stored record; evenness-shaped decompositions render the
-"spread evenly" sentence, not a fake concentration; existing 13/13 checks
-and 43/43 tests stay green.
+"spread evenly" sentence, not a fake concentration; a raw-column-name scan
+over every rendered sentence in the suite comes back empty for every column
+that HAS a glossary entry (known gaps excepted and listed); existing 13/13
+checks and 43/43 tests stay green.
 
 ## D6.2 — the two inherited fixes
 
