@@ -1,0 +1,17 @@
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/dev/ab-dashboard-odisha[39m
+
+ [32m✓[39m src/test/example.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/services/api.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32m✓[39m src/lib/insights-report.test.ts [2m([22m[2m24 tests[22m[2m)[22m[33m 885[2mms[22m[39m
+   [33m[2m✓[22m[39m the rendered Discover feed[2m > [22mshows no raw markdown markers anywhere on the page [33m 741[2mms[22m[39m
+ [32m✓[39m src/components/chat/MessageBubble.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[32m 278[2mms[22m[39m
+ [32m✓[39m src/pages/Index.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[33m 1381[2mms[22m[39m
+   [33m[2m✓[22m[39m the escape from a follow-up reading[2m > [22mre-sends the user's own words with the context reset [33m 615[2mms[22m[39m
+   [33m[2m✓[22m[39m the escape from a follow-up reading[2m > [22mappends the correction and leaves the exchange it corrects on screen [33m 473[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m5 passed[39m[22m[90m (5)[39m
+[2m      Tests [22m [1m[32m40 passed[39m[22m[90m (40)[39m
+[2m   Start at [22m 15:26:23
+[2m   Duration [22m 8.88s[2m (transform 811ms, setup 1.52s, collect 8.59s, tests 2.58s, environment 9.35s, prepare 4.37s)[22m
+

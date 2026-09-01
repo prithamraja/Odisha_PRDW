@@ -22,6 +22,14 @@
 # There is also a --determinism mode, for the T2 gate: given two sidecars it
 # asserts that every deterministic field is byte-identical and reports the run
 # stamp and the LLM wording as the only differences.
+#
+# WP-D4d adds the Discover rendering to the default run: metainsights/
+# insight_feed.md must regenerate byte-identical from the shipped sidecar, and
+# must parse back through a transcription of the frontend parser into one
+# insight per record with every lead and every detail verbatim. Both replay on
+# the Drive copy while the shipped rendering carries no reading notes; with
+# notes ON the regeneration half needs the parquet views and says so instead of
+# asserting.
 # =============================================================================
 """WP-D4b -- replay the insight-prose checks over the shipped sidecar."""
 import os
@@ -91,7 +99,8 @@ class Report(object):
 # The replay
 # =============================================================================
 
-def check_sidecar(sidecar_path, feed_path, source_set_path, rebuild_roster_base=None):
+def check_sidecar(sidecar_path, feed_path, source_set_path, rebuild_roster_base=None,
+                  feed_md_path=None, base=None):
     doc = json.load(open(sidecar_path, encoding="utf-8"))
     run = doc["run"]
     records = doc["records"]
@@ -281,7 +290,285 @@ def check_sidecar(sidecar_path, feed_path, source_set_path, rebuild_roster_base=
     print("  verifier retry-on-empty fired on ranks: %s" % (retried or "none"))
     assert counts  # keep the profile block honest about having read something
 
+    # WP-D4d. The rendering the Discover page actually serves.
+    if feed_md_path:
+        check_feed_md(R, sidecar_path, feed_md_path, feed_path, base)
+
     return R.done("check_insight_prose")
+
+
+# =============================================================================
+# WP-D4d T3 -- the feed markdown: regeneration, and a parse-level round trip
+# =============================================================================
+# Two claims are worth asserting about metainsights/insight_feed.md, because
+# between them they are the whole reason it exists.
+#
+#   (a) It is a RENDERING. Regenerated from the shipped sidecar it comes back
+#       byte-identical, so the published Discover page cannot have drifted from
+#       the checked prose -- not by a hand-edit, not by a stale copy.
+#   (b) It ROUND-TRIPS. Run back through the frontend's recognition it yields
+#       one insight per record, each leadline exactly the record's lead and each
+#       detail present verbatim, with reading notes (when on) attached to their
+#       section and to no finding row.
+#
+# `parse_report_min` below is a deliberately literal transcription of
+# `frontend/ab-dashboard-main/src/lib/insights-report.ts` -- both insight shapes
+# and the reading-note blockquote, in the same order, with the same `tidy` and
+# `stripOuterBold`. A transcription can only ever prove the emitter agrees with
+# THIS reading of the parser, which is why it is not the only round-trip
+# evidence: the frontend's own vitest suite parses the same file with the real
+# parser in the mirror (WP-D4d report sec.3). This one replays anywhere,
+# including on the Drive copy with no node and no parquet.
+
+_MD_TIDY = " -- "
+_MD_TIDY_TO = " — "
+
+
+def _md_tidy(text):
+    return text.replace(_MD_TIDY, _MD_TIDY_TO)
+
+
+def _md_strip_outer_bold(line):
+    trimmed = line.strip()
+    inner = trimmed[2:-2].strip()
+    return trimmed if "**" in inner else inner
+
+
+def parse_report_min(md):
+    """insights-report.ts's `parseReport`, transcribed. Returns the same shape:
+    {"insights": [...], "sections": [{"name", "insights", "readingNote"}]}.
+    """
+    marker = "> **Reading note:**"
+    insights = []
+    sections = []
+    by_name = {}
+
+    def section_for(name):
+        if name not in by_name:
+            by_name[name] = {"name": name, "insights": [], "readingNote": None}
+            sections.append(by_name[name])
+        return by_name[name]
+
+    current = "General"
+    lines = md.split("\n")
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+
+        if line.startswith("## ") and not line.startswith("### "):
+            current = line[3:].strip() or "General"
+            section_for(current)
+            i += 1
+            continue
+
+        if line.startswith(marker):
+            parts = [line[len(marker):].strip()]
+            i += 1
+            while i < len(lines) and lines[i].startswith(">"):
+                parts.append(re.sub(r"^>\s?", "", lines[i]).strip())
+                i += 1
+            note = _md_tidy(" ".join(parts).strip())
+            if note:
+                section_for(current)["readingNote"] = note
+            continue
+
+        if line.startswith("**") and line.rstrip().endswith("**"):
+            leadline = _md_strip_outer_bold(line)
+            bullets = []
+            i += 1
+            while i < len(lines):
+                b = lines[i].strip()
+                if re.match(r"^\d+\.\s", b):
+                    bullets.append(_md_tidy(re.sub(r"^\d+\.\s*", "", b)))
+                    i += 1
+                elif b == "":
+                    i += 1
+                    if i < len(lines) and re.match(r"^\d+\.\s", lines[i].strip()):
+                        continue
+                    break
+                else:
+                    break
+            if leadline:
+                ins = {"leadline": _md_tidy(leadline), "bullets": bullets,
+                       "section": current}
+                insights.append(ins)
+                section_for(current)["insights"].append(ins)
+            continue
+
+        if line.startswith("### "):
+            heading = line[4:].strip()
+            i += 1
+            nxt = next((l for l in lines[i:] if l.strip() != ""), None)
+            if nxt is not None and nxt.startswith("**"):
+                continue
+            bullets = []
+            paragraph = ""
+            while i < len(lines):
+                b = lines[i].strip()
+                if b.startswith("## ") or b.startswith("### ") or b.startswith("---"):
+                    break
+                if b.startswith("- "):
+                    bullets.append(_md_tidy(b[2:]))
+                    i += 1
+                elif re.match(r"^\d+\.\s", b):
+                    bullets.append(_md_tidy(re.sub(r"^\d+\.\s*", "", b)))
+                    i += 1
+                elif b != "" and not paragraph:
+                    paragraph = _md_tidy(b)
+                    i += 1
+                else:
+                    i += 1
+            all_bullets = ([paragraph] if paragraph else []) + bullets
+            if heading:
+                ins = {"leadline": _md_tidy(heading), "bullets": all_bullets,
+                       "section": current}
+                insights.append(ins)
+                section_for(current)["insights"].append(ins)
+            continue
+
+        i += 1
+
+    populated = [s for s in sections
+                 if s["insights"] or s["readingNote"] is not None]
+    return {"insights": insights, "sections": populated}
+
+
+def check_feed_md(R, sidecar_path, feed_md_path, feed_path, base):
+    """(a) the rendering regenerates byte-identical; (b) it round-trips."""
+    print("\nThe Discover rendering -- %s" % os.path.basename(feed_md_path))
+    if not os.path.exists(feed_md_path):
+        R.add(False, "insight_feed.md exists", feed_md_path)
+        return
+
+    with open(feed_md_path, "rb") as fh:
+        on_disk = fh.read()
+    md = on_disk.decode("utf-8")
+
+    # The header states the mode it was emitted in, so the regeneration cannot
+    # silently use the other one and call the difference a drift.
+    modes = [m for m, line in p5e.FEED_MD_NOTES_LINE.items() if line in md]
+    if not R.add(len(modes) == 1,
+                 "header names exactly one reading-notes mode",
+                 "matched %d of the 2 mode lines" % len(modes)):
+        return
+    reading_notes = modes[0]
+
+    R.add("do not hand-edit" in md and "phase5e_insight_prose.py" in md,
+          "provenance header present (generated, do not hand-edit)")
+    sidecar = json.load(open(sidecar_path, encoding="utf-8"))
+    stamp = sidecar["run"]["stamp"]
+    R.add(stamp in md and sidecar["run"]["candidate_set_id"] in md,
+          "header carries the run stamp and candidate set id",
+          "%s / %s" % (stamp, sidecar["run"]["candidate_set_id"]))
+
+    # ---- (a) regeneration ---------------------------------------------------
+    notes_by_view = None
+    can_regen = True
+    if reading_notes:
+        views = os.path.join(base, "views_prdw")
+        can_regen = os.path.isdir(views)
+        if can_regen:
+            sys.path.insert(0, os.path.join(base, "src"))
+            import phase5b_report as p5b
+            feed = json.load(open(feed_path, encoding="utf-8"))["feed"]
+            notes_by_view = p5e.build_reading_notes(p5b, feed)
+        else:
+            print("  ..... %-52s %s"
+                  % ("regeneration NOT replayed (notes are ON)",
+                     "needs a mirror with views_prdw/*.parquet"))
+    if can_regen:
+        regenerated = p5e.render_feed_markdown(sidecar, notes_by_view).encode("utf-8")
+        R.add(regenerated == on_disk,
+              "regenerates byte-identical from the shipped sidecar",
+              "%d bytes, sha256 %s" % (len(on_disk),
+                                       p5e._sha256_text(md)[:16]))
+
+    # ---- (b) the parse-level round trip ------------------------------------
+    parsed = parse_report_min(md)
+    records = sidecar["records"]
+
+    # The parser returns insights in DOCUMENT order, and the document groups the
+    # feed by view. So the records are grouped the same way before they are
+    # paired off -- comparing feed order against document order would fail every
+    # record after the first for no reason but the grouping. (Feed order itself
+    # is asserted inside each section by the pairing, and the page interleaves
+    # the sections again at render time.)
+    order, by_view = [], {}
+    for r in records:
+        if r["view"] not in by_view:
+            by_view[r["view"]] = []
+            order.append(r["view"])
+        by_view[r["view"]].append(r)
+    want = [r for v in order for r in by_view[v]]
+    got = parsed["insights"]
+
+    R.add(len(got) == len(want),
+          "one insight parses back per sidecar record",
+          "%d parsed, %d records" % (len(got), len(want)))
+    if len(got) != len(want):
+        return
+
+    bad_lead = [r["rank"] for r, g in zip(want, got) if g["leadline"] != r["lead"]]
+    R.add(not bad_lead, "every leadline is its record's lead, verbatim",
+          "%d compared%s" % (len(want),
+                             "" if not bad_lead else " -- differs: %s" % bad_lead))
+
+    bad_detail = []
+    for r, g in zip(want, got):
+        expected = [r["detail"]] if r["detail"].strip() else []
+        if g["bullets"] != expected:
+            bad_detail.append(r["rank"])
+    R.add(not bad_detail,
+          "every detail comes back whole, and nothing else does",
+          "%d with detail, %d fallbacks%s"
+          % (sum(1 for r in want if r["detail"].strip()),
+             sum(1 for r in want if not r["detail"].strip()),
+             "" if not bad_detail else " -- differs: %s" % bad_detail))
+
+    # Order and section membership: the page interleaves by section, so a
+    # finding in the wrong one is filed under the wrong chip.
+    bad_section = [r["rank"] for r, g in zip(want, got)
+                   if g["section"] != r["view_title"]]
+    R.add(not bad_section, "every finding lands in its own view's section",
+          "" if not bad_section else "misfiled: %s" % bad_section)
+
+    titles = []
+    for r in records:
+        if r["view_title"] not in titles:
+            titles.append(r["view_title"])
+    R.add([s["name"] for s in parsed["sections"]] == titles,
+          "sections are the feed's view titles, in feed order",
+          " / ".join(titles))
+    R.add(not [i for i in got if i["section"] == "General"],
+          "no finding is stranded outside a section")
+
+    counted = sum(len(s["insights"]) for s in parsed["sections"])
+    R.add(counted == len(got),
+          "the chip counts sum to the row count", "%d" % counted)
+
+    # ---- reading notes: in the right place, and never a finding -------------
+    noted = [s for s in parsed["sections"] if s["readingNote"] is not None]
+    if reading_notes:
+        expected_views = [r["view"] for r in records]
+        seen = []
+        for v in expected_views:
+            if v not in seen:
+                seen.append(v)
+        if notes_by_view is not None:
+            want_sections = [records[[r["view"] for r in records].index(v)]["view_title"]
+                             for v in seen if notes_by_view.get(v)]
+            R.add([s["name"] for s in noted] == want_sections,
+                  "each note is attached to the section that earned it",
+                  " / ".join(want_sections))
+        R.add(len(noted) == md.count("\n> **Reading note:**"),
+              "one parsed note per marker in the file", "%d" % len(noted))
+    else:
+        R.add(not noted and "> **Reading note:**" not in md,
+              "no reading notes, as emitted (--no-reading-notes)",
+              "the operator's dispatch decision, 2026-09-01")
+
+    R.add(not [i for i in got if "Reading note" in i["leadline"]],
+          "no reading note is parsed as a finding")
 
 
 # =============================================================================
@@ -441,6 +728,9 @@ def main(argv=None):
     ap.add_argument("--rebuild-roster", action="store_true",
                     help="rebuild the name roster from views_prdw/*.parquet and "
                          "assert it matches the shipped one (needs a mirror)")
+    ap.add_argument("--feed-md", default=None,
+                    help="the emitted Discover rendering to check (default: "
+                         "<base>/metainsights/insight_feed.md)")
     ap.add_argument("--determinism", nargs=2, metavar=("A", "B"),
                     help="compare two sidecars: assert every deterministic field "
                          "is byte-identical (the T2 gate)")
@@ -464,7 +754,8 @@ def main(argv=None):
         print("FAIL: no sidecar at %s" % sidecar)
         return 1
     return check_sidecar(sidecar, P["feed"], P["source_set"],
-                         rebuild_roster_base=base if args.rebuild_roster else None)
+                         rebuild_roster_base=base if args.rebuild_roster else None,
+                         feed_md_path=args.feed_md or P["feed_md"], base=base)
 
 
 if __name__ == "__main__":

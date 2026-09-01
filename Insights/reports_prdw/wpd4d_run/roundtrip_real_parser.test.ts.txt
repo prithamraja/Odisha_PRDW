@@ -1,0 +1,88 @@
+// WP-D4d T3 evidence — THROWAWAY, not committed to the repo.
+// The real frontend parser, run over the emitted insight_feed.md, compared
+// record by record against Insights/metainsights/insight_prose.json.
+import { readFileSync } from "node:fs";
+import { describe, it, expect } from "vitest";
+
+import { parseReport, interleaveBySection } from "@/lib/insights-report";
+import feedReport from "@/data/insights/insight_feed.md?raw";
+
+const SIDECAR =
+  "I:/My Drive/ASC Lab/LMIC AI Code repo/Odisha_PRDW/Insights/metainsights/insight_prose.json";
+
+type Rec = {
+  rank: number;
+  view: string;
+  view_title: string;
+  lead: string;
+  detail: string;
+  status: string;
+};
+
+const records: Rec[] = JSON.parse(readFileSync(SIDECAR, "utf-8")).records;
+
+// The document groups the feed by view; the parser returns document order.
+const order: string[] = [];
+const byView = new Map<string, Rec[]>();
+for (const r of records) {
+  if (!byView.has(r.view)) {
+    byView.set(r.view, []);
+    order.push(r.view);
+  }
+  byView.get(r.view)!.push(r);
+}
+const inDocOrder = order.flatMap((v) => byView.get(v)!);
+
+describe("WP-D4d: the REAL parser over the emitted feed", () => {
+  const { insights, sections } = parseReport(feedReport);
+
+  it("yields exactly one insight per sidecar record", () => {
+    expect(insights).toHaveLength(records.length);
+    expect(records).toHaveLength(32);
+  });
+
+  it("gives every leadline back as its record's lead, byte for byte", () => {
+    const bad = inDocOrder
+      .map((r, i) => (insights[i].leadline === r.lead ? null : r.rank))
+      .filter((x) => x !== null);
+    expect(bad).toEqual([]);
+  });
+
+  it("gives every detail back whole, and adds nothing", () => {
+    const bad = inDocOrder
+      .map((r, i) => {
+        const want = r.detail.trim() ? [r.detail] : [];
+        return JSON.stringify(insights[i].bullets) === JSON.stringify(want)
+          ? null
+          : r.rank;
+      })
+      .filter((x) => x !== null);
+    expect(bad).toEqual([]);
+  });
+
+  it("files every finding under its own view's section", () => {
+    const bad = inDocOrder
+      .map((r, i) => (insights[i].section === r.view_title ? null : r.rank))
+      .filter((x) => x !== null);
+    expect(bad).toEqual([]);
+    expect(sections.map((s) => s.name)).toEqual(
+      order.map((v) => byView.get(v)![0].view_title)
+    );
+  });
+
+  it("carries no reading note, and none is a finding", () => {
+    expect(sections.filter((s) => s.readingNote !== null)).toEqual([]);
+    expect(insights.filter((i) => i.leadline.includes("Reading note"))).toEqual([]);
+  });
+
+  it("still interleaves the sections for the unfiltered list", () => {
+    const woven = interleaveBySection(
+      insights,
+      sections.map((s) => s.name)
+    );
+    expect(woven).toHaveLength(insights.length);
+    expect(woven[0].section).toBe("Activity Lifecycle");
+    expect(woven[1].section).toBe("Geo-Month Cash Cube");
+    expect(woven[2].section).toBe("GP Performance");
+  });
+});

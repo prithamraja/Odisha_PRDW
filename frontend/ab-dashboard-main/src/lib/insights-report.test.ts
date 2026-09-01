@@ -8,7 +8,7 @@ import {
   splitBold,
 } from "@/lib/insights-report";
 import { AnomaliesView } from "@/components/insights/AnomaliesView";
-import gamma05 from "@/data/insights/gamma_0.5_report.md?raw";
+import feedReport from "@/data/insights/insight_feed.md?raw";
 
 describe("parseReport", () => {
   it("assigns insights to the '## ' section currently in scope", () => {
@@ -185,32 +185,46 @@ describe("splitBold", () => {
   });
 });
 
-describe("the bundled Odisha PR&DW gamma 0.5 report", () => {
-  const { insights, sections } = parseReport(gamma05);
+describe("the bundled Odisha PR&DW insight feed", () => {
+  const { insights, sections } = parseReport(feedReport);
 
   // Discover renders whatever single .md sits in src/data/insights/. The feed
   // reads as this department's own findings either way, so a report from an
   // earlier deployment left in the folder is silently wrong rather than broken.
-  // These assertions pin the bundled report to THIS programme.
+  // These assertions pin the bundled report to THIS programme and THIS run.
+  //
+  // WP-D4d replaced the gamma 0.5 executive edition with a deterministic
+  // rendering of the checked insight-prose sidecar, emitted by
+  // Insights/src/phase5e_insight_prose.py --emit-feed-md. The stamp line below
+  // is that rendering's identity: it changes only when the sidecar is rebuilt,
+  // and a copy that has drifted from the sidecar will not carry it.
   it("is the Odisha report, not a retired AP or UP one", () => {
-    expect(gamma05).toContain("Odisha PR&DW Decision Aid");
-    expect(gamma05).not.toContain("AP RTGS");
-    expect(gamma05).not.toContain("PM-JAY");
+    expect(feedReport).toContain("Odisha PR&DW Decision Aid");
+    expect(feedReport).not.toContain("AP RTGS");
+    expect(feedReport).not.toContain("PM-JAY");
+  });
+
+  it("is the emitted rendering of the checked prose, at its own run stamp", () => {
+    expect(feedReport).toContain(
+      "*Prose run 2026-09-01T08:17:35Z from candidate set `a7f991c1df3771f9`.*"
+    );
+    expect(feedReport).toContain("do not hand-edit");
   });
 
   it("parses every bold leadline in the file, and nothing else", () => {
-    const leadlineCount = (gamma05.match(/^\*\*.*\*\*$/gm) ?? []).length;
+    const leadlineCount = (feedReport.match(/^\*\*.*\*\*$/gm) ?? []).length;
     expect(insights).toHaveLength(leadlineCount);
+    // One per finding in the global feed, which is frozen at 32 by D16.
+    expect(insights).toHaveLength(32);
   });
 
   it("discovers the report's three sections", () => {
     expect(sections).toHaveLength(3);
-    expect(sections[0].name).toBe(
-      "Activity Lifecycle - Every Planned Work and Its Money"
-    );
-    expect(sections.map((s) => s.name)).toContain(
-      "Gram Panchayat Report Card by Year"
-    );
+    expect(sections.map((s) => s.name)).toEqual([
+      "Activity Lifecycle",
+      "Geo-Month Cash Cube",
+      "GP Performance",
+    ]);
   });
 
   it("leaves no insight stranded outside a section", () => {
@@ -221,21 +235,14 @@ describe("the bundled Odisha PR&DW gamma 0.5 report", () => {
     expect(insights.filter((i) => i.bullets.length === 0)).toHaveLength(0);
   });
 
-  it("carries the generator's deterministic reading notes, and no insight is one", () => {
-    const noted = sections.filter((s) => s.readingNote !== null);
-    const markers = (gamma05.match(/^> \*\*Reading note:\*\*/gm) ?? []).length;
-
-    expect(markers).toBeGreaterThan(0);
-    expect(noted).toHaveLength(markers);
-    // Every section's note has to be the one the generator wrote for THAT
-    // view, not a note that happened to land in scope. The sanction-record
-    // caveat is the one both the lifecycle and report-card views carry.
-    expect(noted.map((s) => s.readingNote).join(" ")).toContain(
-      "2,101 of the 12,704 activities"
-    );
-    // The old report had the caveat written by the model as a "### " heading,
-    // which the feed then rendered as a numbered finding.
-    expect(insights.map((i) => i.leadline)).not.toContain("Reading note for this view");
+  it("carries no reading note, and no insight is one", () => {
+    // The operator's dispatch decision on 2026-09-01 was to emit this edition
+    // with --no-reading-notes, so the page shows no methodology callout. What
+    // must still hold is that nothing in the file is READ as a note-shaped
+    // finding: the caveats are absent, not demoted into the list.
+    expect(feedReport).not.toContain("> **Reading note:**");
+    expect(sections.filter((s) => s.readingNote !== null)).toHaveLength(0);
+    expect(insights.filter((i) => i.leadline.includes("Reading note"))).toHaveLength(0);
   });
 
   it("counts only insights, so the chip totals sum to the row count", () => {
@@ -258,25 +265,24 @@ describe("the rendered Discover feed", () => {
     unmount();
   });
 
-  it("renders each reading note as a callout, not as a row", () => {
+  it("gives every finding a row and nothing else one", () => {
     const { container, unmount } = render(createElement(AnomaliesView));
-    const { insights, sections } = parseReport(gamma05);
-    const noted = sections.filter((s) => s.readingNote !== null);
+    const { insights } = parseReport(feedReport);
 
-    // One toggle per insight and not one more: the notes are outside the list.
+    // One toggle per insight and not one more. This edition carries no reading
+    // note, so the assertion the gamma edition made here -- that a note renders
+    // as a callout outside the list -- has no note to make it on; parseReport's
+    // own reading-note suite above still covers the contract.
     expect(container.querySelectorAll("[aria-expanded]")).toHaveLength(
       insights.length
     );
-    expect(container.textContent).toContain(
-      "one row for each of the 12,704 activities"
-    );
-    expect(noted.length).toBeGreaterThan(0);
+    expect(container.textContent).not.toContain("Reading note");
     unmount();
   });
 
   it("excludes the notes from the chip counts", () => {
     const { container, unmount } = render(createElement(AnomaliesView));
-    const { insights } = parseReport(gamma05);
+    const { insights } = parseReport(feedReport);
 
     const allChip = [...container.querySelectorAll('[role="group"] button')].find(
       (b) => b.textContent?.startsWith("All")

@@ -20,14 +20,20 @@
 #
 # Output:
 #   metainsights/insight_prose.json          the sidecar (deleted before write)
+#   metainsights/insight_feed.md             the sidecar rendered for Discover
 #   reports_prdw/wpd4b_run/calls_<stamp>.jsonl   every call, with `usage`
 #
-# NOT wired to anything. The feed JSON is frozen by D16; where this prose is
-# displayed is the queued contract-v2 conversation, not this step's business.
+# The feed JSON stays frozen by D16 and the sidecar is still a sidecar -- but as
+# of WP-D4d this prose IS the published Discover surface: --emit-feed-md renders
+# the shipped sidecar into the markdown the frontend parses, and that rendering
+# is what sits in frontend/ab-dashboard-main/src/data/insights/. Emitted, never
+# hand-written, so the page cannot drift from the checked artifact.
 #
 # Run (one command, from anywhere):
 #   python Insights/src/phase5e_insight_prose.py
 #   python Insights/src/phase5e_insight_prose.py --dry-run   # no API calls
+#   python Insights/src/phase5e_insight_prose.py --emit-feed-md --no-reading-notes
+#                                                            # no API calls
 #
 # This file EDITS NO EXISTING PIPELINE FILE. It imports from phase5b_report and
 # discover_config and writes only its own sidecar and its own run log.
@@ -1498,6 +1504,232 @@ def build_records(caller, writer_model, packets, renderings, roster,
     return records
 
 
+# =============================================================================
+# STEP 6 (WP-D4d T1): the feed markdown emitter
+# =============================================================================
+# The Discover tab renders one markdown file dropped into
+# frontend/ab-dashboard-main/src/data/insights/, parsed at build time by
+# src/lib/insights-report.ts. Until WP-D4d that file was a committed copy of the
+# gamma 0.5 executive report. This renders THE SIDECAR into that same contract
+# instead, so what an officer reads is the checked prose and cannot drift from
+# it: the file is emitted, never hand-written, and the checker regenerates it
+# byte-for-byte from insight_prose.json.
+#
+# The parser recognises two insight shapes. This uses ONE of them and invents
+# none:
+#
+#     **<the record's lead>**
+#
+#     1. <the record's detail>
+#
+# which the parser reads back as leadline == lead and bullets == [detail]. The
+# detail is NOT split into sentences: the shape does not need it, and one
+# verbatim string is a stronger guarantee than n verbatim fragments. A record
+# whose detail is empty -- a fallback -- renders as the leadline alone, which
+# the parser reads back as an insight with no bullets.
+#
+# The other shape ("### " heading + paragraph) is deliberately not used. Its
+# collector runs to the next "## ", "### " or "---" and silently swallows
+# everything else on the way, INCLUDING a reading-note blockquote; the
+# bold-leadline collector stops at the first non-numbered line, so a note that
+# follows a finding is still parsed as a note. With reading notes on, only this
+# shape is safe.
+#
+# Nothing here calls a model, and with reading notes off nothing here reads a
+# parquet view either, so the default mode runs on the Drive copy.
+
+# The one header line the checker reads back: it records the mode the file was
+# emitted in, so a regeneration cannot silently use the other one.
+FEED_MD_NOTES_LINE = {
+    True: "*Reading notes: included, verbatim from "
+          "`phase5b_report.reading_note_block`.*",
+    False: "*Reading notes: omitted (`--no-reading-notes`).*",
+}
+
+
+def _feed_md_reject(rank, field, why):
+    raise StopRun(
+        "cannot emit rank %d: its %s %s. The frontend parser is the contract "
+        "and this WP may not adjust it, so the emitter stops rather than write "
+        "markdown that does not round-trip." % (rank, field, why))
+
+
+def _check_renderable(rec):
+    """Refuse to emit prose the parser would hand back changed.
+
+    Every rule here is a property of `insights-report.ts`, not a style
+    preference:
+
+      * a leadline is ONE line -- the parser is line-based;
+      * `stripOuterBold` returns the line UNCHANGED when the text inside the
+        outer pair carries its own "**", so a lead containing a bold span would
+        come back still wrapped in the markers it went in with;
+      * `tidy` rewrites " -- " to " -- "(em dash) in leadlines and bullets, so
+        text carrying the spaced double hyphen cannot survive verbatim;
+      * a lead opening with "#", ">", "- " or "1. " is a different construct to
+        the parser before it is ever a lead.
+
+    None of these fires on the shipped sidecar. They exist so that "leadline ==
+    the record's lead" is a structural guarantee rather than an observation
+    about one file.
+    """
+    rank = rec["rank"]
+    lead, detail = rec["lead"], rec["detail"]
+
+    if not lead.strip():
+        _feed_md_reject(rank, "lead", "is empty")
+    for field, text in (("lead", lead), ("detail", detail)):
+        if text != text.strip():
+            _feed_md_reject(rank, field, "carries leading or trailing whitespace")
+        if "\n" in text or "\r" in text:
+            _feed_md_reject(rank, field, "spans more than one line")
+        if " -- " in text:
+            _feed_md_reject(rank, field,
+                            "carries a spaced double hyphen, which the parser "
+                            "rewrites to an em dash")
+    if "**" in lead:
+        _feed_md_reject(rank, "lead", "carries a bold span, which stops "
+                                      "`stripOuterBold` unwrapping the line")
+    if re.match(r"^(#|>|- |\d+\.\s)", lead):
+        _feed_md_reject(rank, "lead", "opens with a markdown construct the "
+                                      "parser reads before it reads a leadline")
+
+
+def render_feed_markdown(sidecar, notes_by_view=None):
+    """The sidecar as the markdown the Discover feed parses. Deterministic.
+
+    `notes_by_view` is `{view: note_text}`, or None for no reading notes.
+    Building a note needs the parquet views, so the caller builds it and hands
+    it in -- this function reads nothing off disk and has no clock, which is
+    what makes two runs byte-identical.
+    """
+    records = sidecar["records"]
+    run = sidecar["run"]
+    reading_notes = notes_by_view is not None
+
+    # Section order is first-appearance in feed order, and findings keep feed
+    # order inside their section. Both come free from walking the records once.
+    order = []
+    by_view = {}
+    titles = {}
+    for rec in records:
+        view = rec["view"]
+        if view not in by_view:
+            by_view[view] = []
+            order.append(view)
+            titles[view] = rec["view_title"]
+        elif titles[view] != rec["view_title"]:
+            raise StopRun("view %s carries two titles in the sidecar: %r and %r"
+                          % (view, titles[view], rec["view_title"]))
+        by_view[view].append(rec)
+
+    stamps = sorted({rec["run_stamp"] for rec in records})
+    if len(stamps) != 1:
+        raise StopRun("the sidecar carries %d run stamps: %s"
+                      % (len(stamps), stamps))
+
+    out = []
+    out.append("# Odisha PR&DW Decision Aid -- the insight feed")
+    out.append("")
+    out.append("*Department of Panchayati Raj & Drinking Water, "
+               "Government of Odisha*")
+    out.append("")
+    out.append("*Every finding in `metainsights/global_feed.json`, written as "
+               "checked prose by the insight-prose step: one section per view, "
+               "findings in feed order, %d in all.*" % len(records))
+    out.append("")
+    out.append("*Prose run %s from candidate set `%s`.*"
+               % (stamps[0], run["candidate_set_id"]))
+    out.append("")
+    out.append(FEED_MD_NOTES_LINE[reading_notes])
+    out.append("")
+    out.append("*Generated from `metainsights/insight_prose.json` -- do not "
+               "hand-edit; regenerate via `python "
+               "Insights/src/phase5e_insight_prose.py --emit-feed-md%s`.*"
+               % ("" if reading_notes else " --no-reading-notes"))
+    out.append("")
+    out.append("---")
+
+    for view in order:
+        out.append("")
+        out.append("## %s" % titles[view])
+        for rec in by_view[view]:
+            _check_renderable(rec)
+            out.append("")
+            out.append("**%s**" % rec["lead"])
+            if rec["detail"].strip():
+                out.append("")
+                out.append("1. %s" % rec["detail"])
+        if reading_notes:
+            note = notes_by_view.get(view, "")
+            if note:
+                out.append("")
+                out.append(note)
+
+    out.append("")
+    return "\n".join(out)
+
+
+def build_reading_notes(p5b, feed):
+    """`{view: the "> **Reading note:** ..." line}` for every view that has one.
+
+    Verbatim from phase5b's machinery, never re-worded here. The block is built
+    from the ENRICHED feed rows, exactly as the executive report builds it, so
+    the sentences `reading_note_block` appends off the findings -- the count
+    caveat, the linkage sentence, the earmark figures, the dated-event citations
+    -- are the ones this feed's own findings earn. That enrichment reads
+    views_prdw/*.parquet, which is why reading notes need a mirror.
+    """
+    by_view = {}
+    for row in feed:
+        by_view.setdefault(row["view"], []).append(row)
+
+    notes = {}
+    for view, rows in sorted(by_view.items()):
+        enriched = p5b.enrich_candidates_with_stats(view, rows,
+                                                    p5b.VIEW_CONFIGS[view])
+        block = p5b.reading_note_block(view, enriched)
+        if block.strip():
+            notes[view] = block.strip()
+    return notes
+
+
+def emit_feed_markdown(P, reading_notes):
+    """--emit-feed-md. Sidecar (+ the views, if notes are on) -> insight_feed.md."""
+    if not os.path.exists(P["sidecar"]):
+        raise StopRun("no sidecar at %s -- there is nothing to render"
+                      % P["sidecar"])
+    sidecar = json.load(open(P["sidecar"], encoding="utf-8"))
+
+    notes_by_view = None
+    if reading_notes:
+        if P["src"] not in sys.path:
+            sys.path.insert(0, P["src"])
+        import phase5b_report as p5b
+        feed = json.load(open(P["feed"], encoding="utf-8"))["feed"]
+        notes_by_view = build_reading_notes(p5b, feed)
+
+    text = render_feed_markdown(sidecar, notes_by_view)
+
+    # The sidecar's stale-suite rule, applied here too: the old rendering goes
+    # before the new one is written, so a failed run cannot leave behind a file
+    # that reads as current.
+    if os.path.exists(P["feed_md"]):
+        os.remove(P["feed_md"])
+    with open(P["feed_md"], "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(text)
+
+    print("wrote %s" % P["feed_md"])
+    print("  %d findings, %d sections, reading notes %s"
+          % (len(sidecar["records"]),
+             len({r["view"] for r in sidecar["records"]}),
+             ("on (%d emitted)" % len(notes_by_view or {})) if reading_notes
+             else "off"))
+    print("  sidecar   sha256 %s" % _sha256_file(P["sidecar"]))
+    print("  rendering sha256 %s" % _sha256_text(text))
+    return 0
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--base", default=None,
@@ -1510,11 +1742,31 @@ def main(argv=None):
                          "place, never copied, printed or written")
     ap.add_argument("--dry-run", action="store_true",
                     help="build packets, roster and batch plan; make no API call")
+    # WP-D4d. Rendering the shipped sidecar is not part of building one, so it
+    # exits before the key is loaded and before a Caller exists -- there is no
+    # code path from this flag to an API call.
+    ap.add_argument("--emit-feed-md", action="store_true",
+                    help="render the SHIPPED sidecar to metainsights/insight_feed.md "
+                         "-- the markdown the Discover feed parses -- and exit. "
+                         "Deterministic; no API call, no rebuild of the sidecar")
+    ap.add_argument("--no-reading-notes", action="store_true",
+                    help="--emit-feed-md only: omit each view's deterministic "
+                         "reading note. With notes ON (the default) the emitter "
+                         "enriches the feed rows to build them, so it needs a "
+                         "mirror carrying views_prdw/*.parquet; with them off it "
+                         "reads only the sidecar and runs anywhere")
     args = ap.parse_args(argv)
 
     P = CFG.paths(os.path.abspath(args.base) if args.base else None)
     if args.env:
         P["env"] = os.path.abspath(args.env)
+
+    # Before the phase5b import: with reading notes off the emitter needs
+    # nothing but the sidecar, and pulling in the enrichment stack to render a
+    # markdown file would make the Drive copy unable to run it.
+    if args.emit_feed_md:
+        return emit_feed_markdown(P, reading_notes=not args.no_reading_notes)
+
     if P["src"] not in sys.path:
         sys.path.insert(0, P["src"])
     import phase5b_report as p5b

@@ -44,6 +44,10 @@ def paths(base_dir=None):
         "feed": os.path.join(meta, "global_feed.json"),
         "source_set": os.path.join(meta, "global_feed_source_set.json"),
         "sidecar": os.path.join(meta, "insight_prose.json"),
+        # WP-D4d. The deterministic markdown rendering of the sidecar, emitted
+        # by phase5e --emit-feed-md and copied into the frontend's drop-in
+        # folder. It is a RENDERING, never a source: nothing reads it back.
+        "feed_md": os.path.join(meta, "insight_feed.md"),
         "run_log_dir": os.path.join(b, "reports_prdw", "wpd4c_run"),
         # The API key lives in Insights/.env and is loaded FROM THERE, in place
         # -- never copied into the mirror, never printed, never written. WPD3
