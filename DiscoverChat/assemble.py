@@ -21,7 +21,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from . import classifier, config, judge as judge_mod, navigate, writer as writer_mod
+from . import (classifier, config, judge as judge_mod, navigate,
+               render, writer as writer_mod)
 from .retrieval import Result
 
 
@@ -53,12 +54,22 @@ class Answer:
     prose: dict = field(default_factory=dict)
     retrieval: dict = field(default_factory=dict)
     stamp: str = ""
+    # WP-D7 D7.3. `text` is what a plain client shows -- the narrative with its
+    # [id] tags stripped, because the tags are plumbing and never appear on
+    # screen. `tagged_text` is the same prose WITH them, which is what a hover
+    # UI needs, and `citations` is the per-id record map that resolves each one.
+    # Both are empty on every path that did not produce a consolidated
+    # narrative, so a caller can tell the two apart without parsing the prose.
+    tagged_text: str = ""
+    citations: dict = field(default_factory=dict)
 
     def as_dict(self) -> dict:
         return {"move": self.move, "text": self.text,
                 "findings": [f.id for f in self.findings],
                 "routing": self.routing, "prose": self.prose,
-                "retrieval": self.retrieval, "stamp": self.stamp}
+                "retrieval": self.retrieval, "stamp": self.stamp,
+                "tagged_text": self.tagged_text,
+                "citations": sorted(self.citations)}
 
 
 # ── deterministic rendering ──────────────────────────────────────────────────
@@ -277,20 +288,57 @@ class Assembler:
         findings = [h.finding for h in result.hits]
         body = render_findings(findings)
 
-        # A small answer is rendered from its sentences and needs no prose at
-        # all. Calling a model to introduce two findings would be spending a
-        # verifier round on a sentence that adds nothing.
-        if len(findings) <= config.FULL_RENDER_MAX or not self.allow_model:
-            text = body
-            prose_meta = {"used": False,
-                          "why": "few enough findings to render directly"}
+        # WP-D7 D7.3. The writer CONSOLIDATES, and the finding sentences are no
+        # longer printed beneath it: the narrative is the answer, and the stored
+        # sentence is reached by hovering the figure that cites it (ruling 4).
+        #
+        # It runs on essentially every answer that has findings, not only the
+        # wide sweeps FULL_RENDER_MAX was written for -- the judge selects a
+        # median of 3, so gating prose at 5 would have left most answers
+        # unconsolidated.
+        #
+        # THE FALLBACK, when the citation check refuses a narrative twice, is
+        # the bare glossary-translated sentences. The officer loses the
+        # narrative and loses nothing else: those sentences were always the
+        # deterministic text, and they are what the pre-D7 service showed.
+        tagged_text, citations = "", {}
+        consolidating = (config.CONSOLIDATE and self.allow_model
+                         and len(findings) >= config.CONSOLIDATE_MIN_FINDINGS)
+        if not consolidating:
+            # The PRE-D7 PATH, kept reachable and not merely kept in the file.
+            # `DISCOVERCHAT_CONSOLIDATE=0` has to restore the service that ran
+            # before this WP, or it is not a reversion switch -- it is a switch
+            # that turns the answer into bare sentences and calls that "the old
+            # behaviour". The old behaviour was: bare sentences up to
+            # FULL_RENDER_MAX, connective prose above it, and the inline
+            # verifier deciding whether that prose was shown. That is what the
+            # D7.3 before/after arm measures, and what an operator rolling the
+            # change back would get.
+            if (self.allow_model and config.CONSOLIDATE is False
+                    and len(findings) > config.FULL_RENDER_MAX):
+                prose = writer_mod.write(message, findings,
+                                         corpus_roster=self._roster,
+                                         turn_id=turn_id, fallback="")
+                prose_meta = prose.as_dict()
+                prose_meta["used"] = not prose.fell_back
+                text = f"{prose.text}\n\n{body}" if prose.text else body
+            else:
+                text = body
+                prose_meta = {"used": False,
+                              "why": ("model disabled" if not self.allow_model
+                                      else "few enough findings to render "
+                                           "directly")}
         else:
-            prose = writer_mod.write(message, findings,
-                                     corpus_roster=self._roster,
-                                     turn_id=turn_id, fallback="")
-            prose_meta = prose.as_dict()
-            prose_meta["used"] = not prose.fell_back
-            text = f"{prose.text}\n\n{body}" if prose.text else body
+            consolidated = writer_mod.consolidate(
+                message, findings, run_date=stamp, turn_id=turn_id)
+            prose_meta = consolidated.as_dict()
+            prose_meta["used"] = not consolidated.fell_back
+            if consolidated.fell_back:
+                text = body
+            else:
+                text = consolidated.text
+                tagged_text = consolidated.tagged
+                citations = render.citation_map(findings, run_date=stamp)
 
         # A causally-worded decompose turn gets the limit stated before the
         # numbers, not after them: an officer who reads the split first has
@@ -307,7 +355,8 @@ class Assembler:
 
         return Answer(move=routing.move, text=_stamped(text, stamp),
                       findings=findings, routing=routing.as_dict(),
-                      prose=prose_meta, retrieval=retrieval_meta, stamp=stamp)
+                      prose=prose_meta, retrieval=retrieval_meta, stamp=stamp,
+                      tagged_text=tagged_text, citations=citations)
 
 
 def _stamped(text: str, stamp: str) -> str:

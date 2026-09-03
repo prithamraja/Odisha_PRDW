@@ -28,6 +28,7 @@ It is the mode to run before a deploy; it is not what keeps the suite green.
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import os
 import sys
@@ -40,8 +41,8 @@ if str(REPO) not in sys.path:
 logging.basicConfig(level=logging.ERROR)
 
 from DiscoverChat import (                                     # noqa: E402
-    assemble, causal_gate, checks, classifier, config, corpus as corpus_mod,
-    glossary,
+    assemble, causal_gate, checks, classifier, config, context_brief,
+    corpus as corpus_mod, glossary, render, verifier, writer,
 )
 from DiscoverChat.retrieval import Retriever                    # noqa: E402
 
@@ -514,7 +515,373 @@ def _coverage(ctx):
             f"outside the ranked shortlist, each labelled")
 
 
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+# WP-D7 — the new checks (D7.0 config, D7.1 checks-still-fire, D7.2, D7.3)
+# ═════════════════════════════════════════════════════════════════════════════
+# Every one of these is OFFLINE and deterministic, for the reason the module
+# docstring already gives: a gate whose green depends on a model call goes red
+# for reasons nobody changed. The live halves — the nano's own behaviour, the
+# audit's drift rate, and citation-checked prose on real turns — are in
+# `live_checks` and in the two experiment scripts, which is where a number that
+# moves belongs.
+
+# Three synthetic records, built here rather than pulled from the corpus. The
+# seeded-violation checks need a KNOWN set of figures to violate, and a corpus
+# record's numerals change when the corpus is rebuilt, which would make these
+# checks fail for a reason that has nothing to do with what they test.
+_SEED = [
+    {"finding_id": "1-00235", "record_type": "finding",
+     "sentence": "Across most measure values (19/22), Code 101 accounts for "
+                 "51.96 percent of total_cost.",
+     "view": "view1", "view_title": "Activity Lifecycle", "score": 0.4,
+     "in_feed": False, "view_rank": None, "feed_rank": None, "measures": [],
+     "geography": {}, "named_members": [], "subspace_phrase": "the whole view"},
+    {"finding_id": "1-00987", "record_type": "finding",
+     "sentence": "Across 12 blocks, fund_untied_total reaches Rs 1.24 crore "
+                 "in Boipariguda.",
+     "view": "view1", "view_title": "Activity Lifecycle", "score": 0.3,
+     "in_feed": False, "view_rank": None, "feed_rank": None, "measures": [],
+     "geography": {}, "named_members": ["Boipariguda"],
+     "subspace_phrase": "the whole view"},
+    {"finding_id": "d1-00042", "record_type": "decomposition",
+     "sentence": "Within the whole view, activities planned totals 12,704 "
+                 "activities across 20 Gram Panchayats.",
+     "view": "view1", "view_title": "Activity Lifecycle", "score": 0.0,
+     "in_feed": False, "view_rank": None, "feed_rank": None, "measures": [],
+     "geography": {}, "named_members": [], "subspace_phrase": "the whole view"},
+]
+SEED_FINDINGS = [corpus_mod.Finding(i, r) for i, r in enumerate(_SEED)]
+SEED_RUN_DATE = "as of 2026-08-17"
+
+CLEAN_PROSE = (
+    "Code 101 accounts for 51.96 percent of total cost across 19 of 22 "
+    "measures [1-00235]. Untied grant planned reaches Rs 1.24 crore in "
+    "Boipariguda across 12 blocks [1-00987]. Activities planned total 12,704 "
+    "across 20 Gram Panchayats [d1-00042].")
+
+
+# ── D7.0. The classifier constant, and the evidence behind it ────────────────
+@check("classifier-model-evidenced",
+       "the configured classifier is the id the D7.0 gate was run on")
+def _classifier_evidenced(ctx):
+    """The judge has this check already (D6.2 item 2) and the classifier now
+    needs it for the same reason: after D7.0 the routing that reaches an officer
+    for every question the rules miss is a property of one model id, and Ask's
+    F1 is the standing proof that a small model can fail SILENTLY. A swap that
+    nobody re-gated would keep every other check green.
+
+    Absent evidence is a WARNING here rather than a failure, unlike the judge's:
+    the judge's 0.0% false-answer rate is the only thing standing between an
+    out-of-scope question and a confidently-wrong answer, and the classifier's
+    worst case is a turn routed to RETRIEVE that should have been reframed --
+    bad, and not that.
+    """
+    if not config.CLASSIFIER_EVIDENCE_PATH.exists():
+        return (f"no D7.0 evidence file yet; run "
+                f"`python DiscoverChat/experiments/run_classifier_nano.py "
+                f"--repeats 4` on {config.CLASSIFIER_MODEL}")
+    with open(config.CLASSIFIER_EVIDENCE_PATH, encoding="utf-8") as fh:
+        evidence = json.load(fh)
+    assert evidence["classifier_model"] == config.CLASSIFIER_MODEL, (
+        f"the configured classifier is {config.CLASSIFIER_MODEL!r}, but the "
+        f"D7.0 evidence was measured on {evidence['classifier_model']!r}.\n"
+        f"        Re-run: DISCOVERCHAT_CLASSIFIER_MODEL="
+        f"{config.CLASSIFIER_MODEL} python "
+        f"DiscoverChat/experiments/run_classifier_nano.py --repeats 4")
+    assert evidence["gate"]["passed"], (
+        f"the D7.0 evidence for {config.CLASSIFIER_MODEL} is RED: "
+        f"routing green every run={evidence['gate']['routing_green_every_run']}, "
+        f"zero nulls={evidence['gate']['zero_null_classifications']}")
+    return (f"{evidence['classifier_model']} — {evidence['repeats']} runs, "
+            f"{evidence['calls_to_the_model']} calls, "
+            f"{evidence['empty_replies']} empty, "
+            f"{evidence['unparseable_replies']} unparseable "
+            f"({evidence['generated_at']})")
+
+
+@check("classifier-null-is-not-silent",
+       "an empty or unparseable classification is named, not swallowed")
+def _classifier_null_named(ctx):
+    """The F1 check, at the code level. `classify` still falls through to
+    RETRIEVE on a bad reply -- that is the right runtime behaviour -- but the
+    Routing it returns must SAY so, or the gate above has nothing to count."""
+    empty = classifier.Routing(classifier.RETRIEVE, "default", "x",
+                               model_empty=True)
+    bad = classifier.Routing(classifier.RETRIEVE, "default", "x",
+                             model_unparseable=True)
+    rule = classifier.rule_route("Why is spending low in Chikilli?")
+    assert empty.model_null and bad.model_null
+    assert not rule.model_null, "a rule-routed turn claims a model null"
+    assert empty.as_dict()["model_empty"] is True, (
+        "the null flag does not reach the logged routing dict, so a turn that "
+        "fell through silently would look identical to one that was decided")
+    return "the flag exists, reaches as_dict(), and is False on the rule path"
+
+
+# ── D7.1. The verifier is out of the turn, and the checks still fire ─────────
+@check("inline-verifier-off",
+       "turn prose is not verified inline; the module is still there for the audit")
+def _inline_verifier_off(ctx):
+    assert config.INLINE_VERIFY is False, (
+        "DISCOVERCHAT_INLINE_VERIFY is on; D7.1 turns it off for turn prose")
+    assert hasattr(verifier, "verify") and hasattr(verifier, "build_audit_prompt"), (
+        "the verifier module was deleted rather than switched off — the audit "
+        "needs it")
+    assert "consolidat" in verifier.CONSOLIDATED_DESCRIPTION.lower(), (
+        "the audit has no prompt describing what a consolidated answer is, so "
+        "it would judge restatement as intrusion (the T4 false positive)")
+    return ("inline verification off; verifier.py intact with both prompt "
+            "shapes (connective, consolidated)")
+
+
+@check("citation-checks-fire",
+       "each seeded violation is caught — the checks are not vacuous")
+def _citation_checks_fire(ctx):
+    """A check that never fires proves nothing (the `causal-gate-catches`
+    principle, applied to D7.3). One seeded violation per step, plus the clean
+    text that must PASS -- because a check that fails everything is as useless
+    as one that fails nothing."""
+    clean = checks.check_citations(CLEAN_PROSE, SEED_FINDINGS,
+                                   run_date=SEED_RUN_DATE)
+    assert clean["all_pass"], (
+        f"the clean prose was rejected: {checks.citation_failure_reason(clean)}")
+
+    seeded = {
+        "unknown id": CLEAN_PROSE.replace("[1-00235]", "[1-99999]"),
+        "derived figure": CLEAN_PROSE + " Together these cover 63.2 percent "
+                                        "of the total [1-00235].",
+        "misattributed figure": "Untied grant reaches Rs 51.96 crore "
+                                "[1-00987]. " + CLEAN_PROSE,
+        "uncited numeral": CLEAN_PROSE + " There were 7 exceptions.",
+        "dropped finding": ("Code 101 accounts for 51.96 percent across 19 of "
+                            "22 [1-00235]. Untied grant reaches Rs 1.24 crore "
+                            "in 12 blocks [1-00987]."),
+        "causal claim": CLEAN_PROSE + " The shortfall was caused by late "
+                                      "sanctions [1-00235].",
+    }
+    for name, prose in seeded.items():
+        result = checks.check_citations(prose, SEED_FINDINGS,
+                                        run_date=SEED_RUN_DATE)
+        assert not result["all_pass"], f"the check missed a seeded {name}"
+        assert checks.citation_failure_reason(result).strip(), (
+            f"a seeded {name} was caught with no reason to feed back")
+    return (f"clean prose passes; {len(seeded)} seeded violations all caught "
+            f"({', '.join(seeded)})")
+
+
+@check("audit-reads-both-writer-shapes",
+       "the offline audit can read the logged prompts it will be given")
+def _audit_reads_logs(ctx):
+    """The audit's only input is the log, and the log spans a writer change.
+    A parser that silently failed on one shape would audit half the corpus of
+    prose and report a rate over the other half without saying so."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "run_prose_audit", REPO / "DiscoverChat" / "experiments"
+        / "run_prose_audit.py")
+    audit = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(audit)
+
+    connective = {"prompt": "background\n\nThe analysis holds 5 finding(s) "
+                            "that bear on it:\n\nFINDING 1\n  Across x.\n\n"
+                            "Write the connective prose. Give it in two parts",
+                  "response_text": "OPENING: hello\nCLOSING: NONE"}
+    consolidated = {"prompt": "background\n\nFINDINGS\n[1-00235] Across x.",
+                    "response_text": "Across x [1-00235]."}
+    block, is_c = audit._sources(connective)
+    assert not is_c and "FINDING 1" in block and "Write the connective" not in block
+    block, is_c = audit._sources(consolidated)
+    assert is_c and "[1-00235]" in block
+    assert audit._prose(connective, False) == "hello"
+    assert audit._prose(consolidated, True) == "Across x [1-00235]."
+
+    records = audit._load(audit.DEFAULT_LOGS)
+    picked, how = audit.sample(records, None)
+    return (f"both prompt shapes parsed; {len(records)} logged writer calls "
+            f"available, would audit {how}")
+
+
+# ── D7.2. Provenance: the record endpoint ────────────────────────────────────
+def _record_ctx(ctx):
+    """`main`'s handlers read module STATE; give them this gate's corpus."""
+    from DiscoverChat import main as main_mod
+    main_mod.STATE["retriever"] = ctx["retriever"]
+    main_mod.STATE["stamp"] = ctx["corpus"].stamp
+    return main_mod
+
+
+@check("record-endpoint-resolves",
+       "every id an answer could cite resolves, and an unknown id 404s")
+def _record_endpoint(ctx):
+    """The brief's D7.2 gate, over the suite's answers rather than over a
+    handful of ids: an id that appears in an answer and does not resolve is a
+    hover an officer cannot follow, which is the one thing this endpoint is
+    for."""
+    from fastapi import HTTPException
+    main_mod = _record_ctx(ctx)
+    assembler = ctx["assembler"]
+
+    questions = (DECOMPOSE_QUESTIONS
+                 + ["How is Chikilli doing?", "Is spending on track?",
+                    "Where is money planned but not spent?",
+                    "How is Barpali block doing?",
+                    "Which places are behaving differently from the rest?"])
+    ids, corpora = set(), set()
+    for question in questions:
+        for finding in assembler.answer(question).findings:
+            ids.add(finding.id)
+    # Both corpora, explicitly, because they are two files behind one id space
+    # and a lookup that only ever saw findings would not prove decompositions
+    # resolve.
+    ids.add(next(f.id for f in ctx["corpus"].all() if not f.is_decomposition))
+    ids.add(next(f.id for f in ctx["corpus"].all() if f.is_decomposition))
+
+    for finding_id in sorted(ids):
+        payload = main_mod.record(finding_id)
+        assert payload["found"] and payload["id"] == finding_id
+        record = ctx["corpus"].get(finding_id)
+        assert payload["sentence"] == record.sentence, (
+            f"{finding_id} served a sentence that is not the corpus's")
+        assert payload["display_sentence"] == record.display_sentence()
+        assert payload["run_stamp"] == config.run_stamp_line(), (
+            f"{finding_id} served without the run stamp")
+        assert payload["url"].endswith(finding_id)
+        corpora.add("decomposition" if record.is_decomposition else "finding")
+
+    try:
+        main_mod.record("1-99999999")
+        raise AssertionError("an unknown id did not 404")
+    except HTTPException as exc:
+        assert exc.status_code == 404, f"unknown id returned {exc.status_code}"
+    return (f"{len(ids)} ids resolve with sentence, stamp and url "
+            f"({', '.join(sorted(corpora))}); unknown id 404s")
+
+
+@check("record-view-is-readable",
+       "the HTML record view carries the sentence, its scope and the run stamp")
+def _record_view(ctx):
+    main_mod = _record_ctx(ctx)
+    finding_id = next(f.id for f in ctx["corpus"].all() if f.is_decomposition)
+    record = ctx["corpus"].get(finding_id)
+    page = main_mod._record_html(main_mod._record_payload(record))
+    for needle, what in ((finding_id, "the id"),
+                         (config.run_stamp_line(), "the run stamp"),
+                         ("Stored sentence", "the stored sentence"),
+                         ("Standing in the analysis", "its standing")):
+        assert needle in page, f"the record view omits {what}"
+    assert "<table" in page and "</html>" in page
+    return f"{len(page):,}-byte readable view for {finding_id}, stamp included"
+
+
+# ── D7.3. The tags never reach the screen, and every numeral is bound ────────
+@check("tags-never-rendered",
+       "the [id] tags are plumbing: stripped from the text an officer reads")
+def _tags_stripped(ctx):
+    stripped = checks.strip_tags(CLEAN_PROSE)
+    assert "[" not in stripped and "]" not in stripped, (
+        f"a citation tag survived into the display text: {stripped}")
+    for finding in SEED_FINDINGS:
+        assert finding.id not in stripped, f"{finding.id} is visible in the prose"
+    assert "51.96 percent" in stripped and "12,704" in stripped, (
+        "stripping the tags also removed content")
+    html_out = render.to_html(CLEAN_PROSE, SEED_FINDINGS,
+                              run_date=SEED_RUN_DATE)
+    assert "[1-00235]" not in html_out, "a tag survived into the rendered HTML"
+    return "tags removed from both the plain text and the rendered HTML"
+
+
+@check("hover-binds-every-numeral",
+       "every checked numeral is a hover element carrying its stored sentence")
+def _hover_binds(ctx):
+    """Ruling 4's condition, mechanically: the number itself is the hover
+    target. Checked against `bind_numerals` rather than by counting `<span>`s,
+    so the renderer and the check cannot drift apart -- if they ever did, this
+    is where it would show."""
+    bindings = checks.bind_numerals(CLEAN_PROSE, SEED_FINDINGS,
+                                    run_date=SEED_RUN_DATE)
+    bound = [b for b in bindings if b["matched"]]
+    assert bound, "no numeral bound at all — the fixture is broken"
+    html_out = render.to_html(CLEAN_PROSE, SEED_FINDINGS,
+                              run_date=SEED_RUN_DATE)
+    for binding in bound:
+        finding = next(f for f in SEED_FINDINGS if f.id == binding["matched"])
+        assert f'data-finding-id="{finding.id}"' in html_out, (
+            f"{binding['token']} bound to {finding.id} but no hover element "
+            f"carries that id")
+    for finding in SEED_FINDINGS:
+        assert config.record_url(finding.id) in html_out, (
+            f"no record link for {finding.id}")
+        assert finding.display_sentence()[:40] in html_out, (
+            f"the hover for {finding.id} does not carry its stored sentence")
+    assert html_out.count('class="dc-cite"') >= len(bound), (
+        "fewer hover elements than bound numerals")
+    return (f"{len(bound)} of {len(bindings)} numerals bound and wrapped; "
+            f"{len(SEED_FINDINGS)} record links present")
+
+
+@check("consolidation-prompt-is-the-operators",
+       "the writer prompt is Appendix A and carries no writing rules of our own")
+def _prompt_is_appendix_a(ctx):
+    """D40 records the operator rejecting rules-in-the-prompt three times, and
+    the brief says "nothing else in the prompt". This is the standing check that
+    nobody helpfully adds a style line later."""
+    prompt = context_brief.CONSOLIDATING_WRITER_PROMPT
+    for line in ("Turn the analytical findings below into clear, concise prose",
+                 "consolidate them into a small number of underlying patterns",
+                 "Do not make causal claims ever",
+                 'Ignore ranking metadata such as "not in the ranked shortlist."',
+                 "tag the finding it comes from with its id in square brackets",
+                 "Do not compute new numbers",
+                 "Return only the finished prose."):
+        assert line in prompt, f"the operator's prompt lost: {line!r}"
+    assert "PM addition" not in prompt, (
+        "the bracket scaffolding was pasted into the prompt")
+    assert context_brief.WRITER_TASK not in context_brief.for_consolidating_writer(), (
+        "the D5 connective-prose task is still stacked in front of the "
+        "operator's prompt, and it tells the writer not to restate findings")
+    built = writer.build_consolidation_prompt(
+        "Is spending on track?", SEED_FINDINGS, run_date=SEED_RUN_DATE)
+    for banned in ("ranked ", "score", "Standing in the analysis"):
+        assert banned not in built.replace(
+            'Ignore ranking metadata such as "not in the ranked shortlist."', ""), (
+            f"ranking metadata reached the writer: {banned!r}")
+    assert "[1-00235] " in built and "[d1-00042] " in built
+    assert "the parts add up to the whole" in built, (
+        "a decomposition reached the writer without its scope note")
+    return (f"{len(prompt.split())} words, Appendix A verbatim plus the two "
+            f"ratified additions; no scores or coverage lines in the payload")
+
+
 # ── live-only ────────────────────────────────────────────────────────────────
+def _log_size() -> int:
+    """Bytes in the call log now — the marker the trace check reads from."""
+    from DiscoverChat import llm
+    return llm.LOG_PATH.stat().st_size if llm.LOG_PATH.exists() else 0
+
+
+def _calls_since(offset: int, turn_id: str) -> list:
+    """Every logged model call for one turn, from `offset` onward."""
+    from DiscoverChat import llm
+    if not llm.LOG_PATH.exists():
+        return []
+    with open(llm.LOG_PATH, encoding="utf-8") as fh:
+        fh.seek(offset)
+        out = []
+        for line in fh:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if record.get("turn_id") == turn_id:
+                out.append(record)
+    return out
+
+
 def live_checks(ctx) -> list:
     """Real turns on the JUDGED path — writer and verifier included.
 
@@ -562,6 +929,66 @@ def live_checks(ctx) -> list:
                     f"{result['e_causal']['pass']} | invented ids="
                     f"{len(judged.get('hallucinated_ids', []))}",
                     ok))
+
+    # ── WP-D7 D7.1: no verifier call in a turn's trace ───────────────────────
+    # Read from the CALL LOG rather than from the writer's return value, because
+    # the claim being made is about what the service did, not about what a
+    # dataclass says it did. `llm.call` is the only path to a model and it logs
+    # every call, so a verify call that happened cannot hide from this.
+    from DiscoverChat import llm
+    before = _log_size()
+    trace_turn = "d71-trace"
+    traced = assembler.answer("Is spending on track?", turn_id=trace_turn)
+    calls = _calls_since(before, trace_turn)
+    purposes = sorted({c.get("purpose") for c in calls})
+    out.append(("live:no-verifier-in-turn",
+                f"turn {trace_turn} made {len(calls)} model calls "
+                f"({', '.join(purposes) or 'none'}); prose used="
+                f"{traced.prose.get('used')}",
+                "verify" not in purposes))
+
+    # ── WP-D7 D7.3: citation-checked prose on real turns ─────────────────────
+    # ZERO citation-check failures may reach the user. That is not the same as
+    # zero fallbacks: a fallback is the check WORKING -- the officer gets the
+    # bare sentences, which is ratified behaviour -- so fallbacks are counted
+    # and reported, and what must be zero is a narrative that reached the text
+    # while failing its own check.
+    questions = ["Is spending on track?",
+                 "Which places are behaving differently from the rest?",
+                 "How is Chikilli doing?",
+                 "Where is money planned but not spent?",
+                 "Which blocks account for the shortfall?",
+                 "How is Barpali block doing?"]
+    reached_user, fell_back, narratives = 0, 0, 0
+    numerals_checked, uncited = 0, []
+    for question in questions:
+        answer = assembler.answer(question)
+        if not answer.findings:
+            continue
+        if not answer.tagged_text:
+            fell_back += 1
+            continue
+        narratives += 1
+        result = checks.check_citations(answer.tagged_text, answer.findings,
+                                        run_date=answer.stamp)
+        if not result["all_pass"]:
+            reached_user += 1
+        bindings = checks.bind_numerals(answer.tagged_text, answer.findings,
+                                        run_date=answer.stamp)
+        numerals_checked += len(bindings)
+        uncited += [b["token"] for b in bindings
+                    if b["matched"] is None and not b["exempt"]]
+        # The tags are plumbing: they must not be in what the officer reads.
+        if "[" in answer.text and "]" in answer.text:
+            reached_user += 1
+
+    out.append(("live:citation-check",
+                f"{narratives} narratives, {fell_back} fell back to bare "
+                f"sentences, {reached_user} failing narratives reached the "
+                f"user, {numerals_checked} numerals bound, "
+                f"{len(uncited)} uncited",
+                reached_user == 0 and not uncited))
+
     return out
 
 

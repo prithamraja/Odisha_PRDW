@@ -1,14 +1,15 @@
 # Deploying Odisha PR&DW on Railway
 
-Two services off one GitHub repo (`prithamraja/Odisha_PRDW`), each with its own
+Three services off one GitHub repo (`prithamraja/Odisha_PRDW`), each with its own
 root directory and its own `railway.json`:
 
 | Service   | Root Directory                 | Build   | Start                                       |
 |-----------|--------------------------------|---------|---------------------------------------------|
 | `ask-api` | `Ask`                          | Nixpacks (Python 3.11, `requirements.txt`) | `uvicorn main:app --host 0.0.0.0 --port $PORT` |
 | `ask-web` | `frontend/ab-dashboard-main`   | Nixpacks (Node ≥20, `npm run build`)       | `npx vite preview --host :: --port $PORT`      |
+| `discover-api` | **repo root** (`/`)       | Nixpacks (Python 3.11, root `requirements.txt`) | `uvicorn DiscoverChat.main:app --host 0.0.0.0 --port $PORT` |
 
-## Live deployment (as of 2026-08-18)
+## Live deployment (as of 2026-09-03)
 
 | | |
 |---|---|
@@ -16,6 +17,7 @@ root directory and its own `railway.json`:
 | Environment | `production` — `e140f86c-181e-4600-b16f-f9f9cce50539` |
 | Backend | service `Odisha_PRDW` — https://odishaprdw-production.up.railway.app |
 | Frontend | service `ask-web` — https://ask-web-production.up.railway.app |
+| Discover | service `discover-api` — https://discover-api-production-1154.up.railway.app |
 
 Railway builds **what is on GitHub**, not what is on your disk. The `Ask/`
 restructure is pushed as of `6565737`, so both roots resolve.
@@ -98,3 +100,44 @@ service): Settings → Source → Root Directory, Variables → paste from
 - **No auth on `/query`.** Anyone with the backend URL spends your OpenAI
   credit. Worth a shared secret or Railway private networking if the API does
   not need to be public.
+
+## DiscoverChat (`discover-api`), added 2026-09-03
+
+Deployed after the Discover tab's question box shipped in `023b49f` with no
+service behind it. Three things about it differ from `ask-api`, and each one
+broke a deploy attempt before it was fixed:
+
+- **Root Directory is the repo root, not `DiscoverChat/`.** `config.py` puts
+  `Insights/src` and `Ask/` on `sys.path` and reads the corpus out of
+  `Insights/metainsights/`. A service rooted at `DiscoverChat/` cannot see any
+  of it. Nixpacks only detects Python if a requirements file sits at the root it
+  is given, which is what the root `requirements.txt` is for — it does nothing
+  but re-export `DiscoverChat/requirements.txt`.
+- **It needs `NOVITA_API_KEY` as well as `OPENAI_API_KEY`.** The retrieval pin
+  embeds the user's question through Qwen on Novita
+  (`phase5d_retrieval_corpus.EMBED_API_KEY_VAR`), not through OpenAI. With only
+  `OPENAI_API_KEY` set it boots fine and then fails on the first question, which
+  is the worst possible way for this to be wrong.
+- **`scipy` was missing from `DiscoverChat/requirements.txt`.** `glossary.py`
+  imports `phase4a_engine`, which does `from scipy import stats` at module
+  scope, so `import DiscoverChat.main` fails outright without it. It went
+  unnoticed because every dev venv already had scipy from Insights work. Before
+  changing these requirements again, test in a venv built from them alone.
+
+**Question decomposition is OFF in production.** The WP-D6 sidecar
+(`decompose_corpus.json` / `.npy`, ~310 MB) is a build output and is not in git,
+so the deployed service runs without it. `config.py` tolerates that by design.
+If decomposition is meant to be live, the sidecar needs a Railway volume or some
+other way in — it will never fit in the repo.
+
+## Correction: a variable change DOES rebuild a service
+
+The note above says `ask-web` has no GitHub trigger and a push will not rebuild
+it. That is still true, and is why the frontend sat on an 18 August build until
+3 September while the backend kept auto-deploying.
+
+What was not known then: writing a variable with `variableUpsert` triggers a
+redeploy on its own. Setting `VITE_DISCOVER_API_BASE_URL` on `ask-web` rebuilt
+it from current `master` without any explicit deploy call. Useful as a way to
+force a frontend rebuild, but do not rely on it as the fix — connect the repo in
+the dashboard (Settings → Source) so ordinary code pushes reach `ask-web` too.

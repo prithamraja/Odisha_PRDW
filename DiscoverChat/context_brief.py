@@ -67,6 +67,47 @@ Write the connective prose that turns those findings into an answer: an opening 
 
 Write naturally, in plain English. Use no number that is not in the findings you were given. Be direct about what the analysis can and cannot establish — an answer that overstates certainty could send an official after the wrong problem. The analysis finds patterns and associations; it is not able to establish what causes what."""
 
+# ── WP-D7 D7.3: the consolidating writer's prompt ────────────────────────────
+# THE OPERATOR'S TEXT, VERBATIM (WPD7 Appendix A), plus the two additions the
+# brief marks as PM additions for approval. Both are kept, and neither is a
+# style rule smuggled in: ruling 3 of the brief ratifies them in its own body as
+# guards (a) and (c) of the three that make a verifier-less writer safe, so the
+# square brackets in Appendix A are belt-and-braces over a decision already
+# taken. What IS dropped is Appendix A's bracket scaffolding itself -- the words
+# "[PM addition 1 -- citations:" are an instruction to a human reader, not to a
+# writer, and pasting them into the prompt would be the only thing in it that
+# was not addressed to the model.
+#
+# NOTHING ELSE IS IN THIS PROMPT. The brief is explicit -- "no writing rules
+# beyond those lines" -- so WRITER_TASK, which is D5's connective-prose job
+# description, is NOT used on this path. `for_consolidating_writer()` returns
+# the BACKGROUND alone, which is what ruling 8's "context brief" names.
+CONSOLIDATING_WRITER_PROMPT = """Turn the analytical findings below into clear, concise prose for a senior government official.
+
+Do not rewrite each finding separately. Identify overlapping or repeated findings, consolidate them into a small number of underlying patterns, and explain those patterns as a coherent narrative. Do not make causal claims ever. Do not fabricate or overstate data.
+
+Preserve important numbers and exceptions where useful. Ignore ranking metadata such as "not in the ranked shortlist." Avoid database-style language and do not infer causes that are not supported by the findings.
+
+After every figure and every claim, tag the finding it comes from with its id in square brackets, exactly as given, e.g. [1-00235]. A sentence drawing on two findings carries both tags.
+
+Use figures exactly as they appear in the findings. Do not compute new numbers — no percentages, sums, or differences that are not stated in a finding.
+
+Return only the finished prose."""
+
+
+def for_consolidating_writer() -> str:
+    """The context brief that precedes the D7.3 prompt, verbatim.
+
+    BACKGROUND ONLY. Ruling 8's "context brief" is the domain background -- who
+    is reading, what the data is, that the sample is 20 Gram Panchayats. The
+    task paragraph on this path is the operator's own prompt above, and stacking
+    WRITER_TASK in front of it would put two different job descriptions in one
+    prompt, the older of which tells the writer it may not restate a finding --
+    the exact instruction ruling 3 reverses.
+    """
+    return BACKGROUND
+
+
 CLASSIFIER_TASK = """An officer has sent a message to this system. Decide which of four things the system should do with it.
 
 RETRIEVE — the officer is asking what the analysis has found about something: a place, a kind of spending, a pattern, or a general "what should I look at". This is the ordinary case.

@@ -96,8 +96,46 @@ VERIFIER_MODEL = os.getenv("DISCOVERCHAT_VERIFIER_MODEL", "gpt-5.6-luna")
 VERIFIER_MAX_COMPLETION = int(os.getenv("DISCOVERCHAT_VERIFIER_TOKENS", "9000"))
 
 # The classifier is a small, cheap routing decision, logged per turn (D5.2).
-CLASSIFIER_MODEL = os.getenv("DISCOVERCHAT_CLASSIFIER_MODEL", "gpt-5.5")
+#
+# WP-D7 D7.0: `gpt-5.5` -> a nano, on the operator's ruling, for cost and for
+# the ~3 s it takes off every turn. ONE CONSTANT, and the budget is checked
+# alongside it (D17), because the two are not independent: a smaller model that
+# reasons more can starve at a ceiling the larger one never touched.
+#
+# THE ID IS NOT THE ONE THE BRIEF NAMED, and that was an operator decision taken
+# during execution, not a substitution made here. WPD7's ruling 1 and its
+# precondition 4 both name `gpt-5.5-nano`; that id returns 404 `model_not_found`
+# and appears nowhere in this account's 124-model list. Precondition 4 says STOP
+# rather than substitute, so execution stopped and the operator ruled
+# (2026-09-03): use `gpt-5.4-nano`, the nearest available nano, and gate it hard.
+#
+# `gpt-5.4-nano` is a SIBLING OF THE F1 OFFENDER. Ask's WP-4 found
+# `gpt-5.4-mini` returning all-null structured output on ~25% of calls, and this
+# is the same generation. That is a reason to watch it, not a reason to refuse
+# it -- the four-run gate and the non-empty assertion below are precisely the
+# instrument for that failure, and running them on the model most likely to show
+# it is the point rather than the problem.
+#
+# THE F1 LESSON IS THE REASON THIS IS GATED RATHER THAN JUST CHANGED. Ask's
+# WP-4 found `gpt-5.4-mini` returning all-null structured output on ~25% of
+# calls -- no error, no refusal, just nulls, spending 40-52 reasoning tokens
+# where a success spent 80-201. It accounted for 55 of 73 confirmed failures
+# and it was invisible for a whole work package, because the caller treated a
+# null as "no verdict" and fell back. This module's caller does the same thing
+# (`classifier.classify` -> RETRIEVE on an unparseable reply), which is the
+# right RUNTIME behaviour and the wrong thing to measure a model by. So the
+# gate counts empty and unparseable replies explicitly and fails on one.
+#
+# REVERSION IS THE ENVIRONMENT VARIABLE, no code change and no redeploy:
+#     DISCOVERCHAT_CLASSIFIER_MODEL=gpt-5.5
+# Set it in the service environment (Railway: Variables) and restart. The gate
+# evidence for nano lives in `DiscoverChat/experiments/classifier_nano_results.json`;
+# a different id is unevidenced until that file is rebuilt on it:
+#     DISCOVERCHAT_CLASSIFIER_MODEL=<id> python DiscoverChat/experiments/run_classifier_nano.py --repeats 4
+CLASSIFIER_MODEL = os.getenv("DISCOVERCHAT_CLASSIFIER_MODEL", "gpt-5.4-nano")
 CLASSIFIER_MAX_COMPLETION = int(os.getenv("DISCOVERCHAT_CLASSIFIER_TOKENS", "2000"))
+
+CLASSIFIER_EVIDENCE_PATH = HERE / "experiments" / "classifier_nano_results.json"
 
 # The relevance judge (operator proposal, 2026-09-01). Ruling on up to 100
 # findings at once is a large reasoning job, and this WP has already lost two
@@ -194,6 +232,59 @@ FULL_RENDER_MAX = int(os.getenv("DISCOVERCHAT_FULL_RENDER_MAX", "4"))
 # how much of a very broad sweep is written out at once, and the answer says so.
 ANSWER_CAP = int(os.getenv("DISCOVERCHAT_ANSWER_CAP", "12"))
 
+# ── WP-D7: the verifier leaves the turn (D7.1) ───────────────────────────────
+# The inline verifier cost a median 28.7 s of a ~60 s turn (measured over the
+# seven logged verify calls in `experiments/logs/calls.jsonl`) and is the single
+# largest item in time-to-first-paint. D7.1 turns it OFF for turn prose and
+# moves it offline as a sampled audit that reports a drift rate.
+#
+# THIS IS A CONFIG DEFAULT, NOT A DELETION, and the distinction is the whole
+# design: `verifier.py` stays, unchanged, because the audit runs the same
+# verifier over the same prose with the same context. Turning this back on
+# restores the pre-D7 behaviour exactly:
+#     DISCOVERCHAT_INLINE_VERIFY=1
+#
+# WHAT IS GIVEN UP, STATED PLAINLY. WP-D4 measured what the verifier caught that
+# no mechanical check could see: 3 qualitative drifts in 15 packets -- a
+# limitation narrowed, a sample-wide total pinned to a subset, a claim about the
+# analysis itself. The D7.3 citation check covers NUMBERS, not MEANING, and with
+# D7.3's consolidating writer the model now restates findings rather than only
+# introducing them, so the class of error the verifier caught is if anything
+# more reachable. The offline audit is the only measurement of it. Read its
+# drift rate as the price of the latency, and see README "The audit is the only
+# check on qualitative drift".
+INLINE_VERIFY = os.getenv("DISCOVERCHAT_INLINE_VERIFY", "0") not in (
+    "0", "", "false", "False")
+
+# ── WP-D7: the consolidating writer (D7.3) ───────────────────────────────────
+# REVISES D42 ruling 6 ("the LLM writes only connective prose"). The writer now
+# turns the judge's selected findings into ONE narrative, consolidating
+# overlapping findings into a small number of patterns, and the finding
+# sentences are no longer printed beneath it -- the hover-to-source citation is
+# how an officer reaches the stored sentence (D7.2, ruling 4).
+#
+# The judge selects a median of 3 findings and at most 6 in the measured set;
+# ANSWER_CAP 12 is a ceiling, not a typical size. So the writer runs on
+# essentially every answer that has findings, which is why the minimum is 1 and
+# not FULL_RENDER_MAX. FULL_RENDER_MAX is superseded for the judged path and
+# kept only for the threshold/no-model path the offline gate runs on.
+CONSOLIDATE = os.getenv("DISCOVERCHAT_CONSOLIDATE", "1") not in (
+    "0", "", "false", "False")
+CONSOLIDATE_MIN_FINDINGS = int(os.getenv("DISCOVERCHAT_CONSOLIDATE_MIN", "1"))
+
+# ── WP-D7: provenance (D7.2) ─────────────────────────────────────────────────
+# Every citation in an answer carries the id and a URL that resolves to the
+# stored record. The base is configurable because the service and the front end
+# are not on the same origin in production (the Discover tab calls a Railway
+# service cross-origin), and a relative URL would resolve against the front
+# end's host and 404.
+#     DISCOVERCHAT_RECORD_URL_BASE=https://discover-api-production-1154.up.railway.app/record
+RECORD_URL_BASE = os.getenv("DISCOVERCHAT_RECORD_URL_BASE", "/record").rstrip("/")
+
+
+def record_url(finding_id: str) -> str:
+    return f"{RECORD_URL_BASE}/{finding_id}"
+
 
 def load_stamp() -> dict:
     with open(STAMP_PATH, encoding="utf-8") as fh:
@@ -275,4 +366,8 @@ def knobs() -> dict:
         "use_judge": USE_JUDGE,
         "candidate_floor": CANDIDATE_FLOOR,
         "candidate_pool": CANDIDATE_POOL,
+        "inline_verify": INLINE_VERIFY,
+        "consolidate": CONSOLIDATE,
+        "consolidate_min_findings": CONSOLIDATE_MIN_FINDINGS,
+        "classifier_model": CLASSIFIER_MODEL,
     }

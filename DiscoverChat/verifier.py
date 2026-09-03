@@ -37,7 +37,7 @@ SOURCE MATERIAL 1 — the findings the writing was given, exactly as the analysi
 SOURCE MATERIAL 2 — the context the writer was given:
 {context}
 
-THE WRITING TO CHECK — this is the connective prose only. The finding sentences above are shown to the officer verbatim and are not this writer's work:
+THE WRITING TO CHECK — {prose_description}:
 {prose}
 
 Sort what the writing says into two kinds, and judge each kind by its own standard.
@@ -81,11 +81,54 @@ def render_findings(findings: list) -> str:
     return "\n".join(lines)
 
 
+# WP-D7 D7.1. The one sentence in TEMPLATE that describes WHAT THE WRITING IS
+# has to be true of the writing, and after D7.3 there are two kinds.
+#
+# The connective-prose description is false of a consolidated narrative in the
+# way that matters most: it tells the verifier the finding sentences are shown
+# verbatim beside the prose and are not the writer's work. A consolidated
+# answer restates them and they are NOT shown. A verifier told otherwise would
+# judge restatement as intrusion — the same shape of false positive as WP-D4's
+# T4, where the verifier flagged the sentence its own context had asked for.
+CONNECTIVE_DESCRIPTION = (
+    "this is the connective prose only. The finding sentences above are shown "
+    "to the officer verbatim and are not this writer's work")
+
+CONSOLIDATED_DESCRIPTION = (
+    "this is the whole answer. The writer was asked to consolidate the findings "
+    "above into one narrative for an official, so it restates and merges them "
+    "on purpose; the finding sentences are NOT shown to the officer separately. "
+    "Restating a finding is the job and is not a fault. Square-bracketed ids "
+    "such as [1-00235] are citations to the findings above and are removed "
+    "before the officer sees the text; judge the sentences, not the tags")
+
+
 def build_prompt(prose: str, findings: list) -> str:
     return TEMPLATE.format(task=context_brief.VERIFIER_TASK,
                            findings=render_findings(findings),
                            context=context_brief.for_verifier(),
+                           prose_description=CONNECTIVE_DESCRIPTION,
                            prose=prose)
+
+
+def build_audit_prompt(prose: str, source_material: str, writer_context: str,
+                       *, consolidated: bool) -> str:
+    """The offline audit's prompt (D7.1).
+
+    Built from strings rather than from `Finding` objects because the audit
+    reads LOGGED calls: the findings a past turn was written from are recorded
+    in that turn's prompt and nowhere else, and re-retrieving them today would
+    audit a different answer. `writer_context` is the writer's own logged
+    prompt, in full — the T4 lesson, applied to the strongest available form of
+    it, which is not a reconstruction but the exact bytes the writer read.
+    """
+    return TEMPLATE.format(
+        task=context_brief.VERIFIER_TASK,
+        findings=source_material,
+        context=writer_context,
+        prose_description=(CONSOLIDATED_DESCRIPTION if consolidated
+                           else CONNECTIVE_DESCRIPTION),
+        prose=prose)
 
 
 def verify(prose: str, findings: list, *, turn_id=None) -> dict:

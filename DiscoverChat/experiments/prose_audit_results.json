@@ -1,0 +1,179 @@
+{
+  "generated_at": "2026-09-03T18:48:45",
+  "verifier_model": "gpt-5.6-luna",
+  "audited": 12,
+  "passed": 7,
+  "drifted": 5,
+  "fail_to_verify": 0,
+  "drift_rate": 0.4166666666666667,
+  "drift_rate_of_verified": 0.4166666666666667,
+  "median_seconds": 17.15,
+  "results": [
+    {
+      "n": 1,
+      "source_turn_id": "measure-1",
+      "source_ts": "2026-09-01T13:17:29",
+      "writer_model": "gpt-5.6-sol",
+      "shape": "connective",
+      "verdict": "fail",
+      "prose": "The available analysis cannot establish whether spending is on track overall. It examines how overspending against plans and sanctions is distributed, not whether expenditure is keeping pace with time or the size of any spending gap. In this 20-Gram-Panchayat sample, overspending is generally spread across Gram Panchayats, focus areas, fund components, output types, fiscal years, themes and activity categories, with some exceptions. None of these patterns was promoted to the ranked shortlist.\n\nTaken together, the findings do not point to a single Gram Panchayat or category as the main source of overspending. The uneven patterns in Chikilli and in the named focus areas, blocks and output types may merit reconciliation, but they show distribution rather than the amount spent. Likewise, themes or output codes with the lowest overspending are not necessarily underspending or on track. A firm assessment would require actual spending against plan and sanction, considered alongside the relevant stage of the fiscal year.",
+      "problems": [
+        {
+          "drifted_claim": "In this 20-Gram-Panchayat sample, overspending is generally spread across Gram Panchayats, focus areas, fund components, output types, fiscal years, themes and activity categories, with some exceptions.",
+          "missing_or_contradicted_fact": "The findings support distribution across focus areas, fund components, output types and fiscal years, and across Gram Panchayats within several dimensions. They do not establish that overspending is spread across themes or activity categories: Finding 7 only identifies which themes are lowest within blocks, Finding 10 describes distribution across Gram Panchayats within themes, and Finding 12 describes distribution across Gram Panchayats within activity_for_label values."
+        }
+      ],
+      "seconds": 28.1
+    },
+    {
+      "n": 2,
+      "source_turn_id": "measure-1",
+      "source_ts": "2026-09-01T13:18:05",
+      "writer_model": "gpt-5.6-sol",
+      "shape": "connective",
+      "verdict": "fail",
+      "prose": "The available analysis looks at overspending against plans and sanctions, not at the full pace of expenditure or completion of works. It therefore cannot establish whether spending overall is on track. In this 20-Gram-Panchayat sample, overspending against plan is generally spread across Gram Panchayats, focus areas, fund components, output types, fiscal years, themes and activity categories rather than concentrated in one place. The findings also separately identify themes and output codes with comparatively low overspending. These are broader patterns that were not promoted to the ranked shortlist, and they do not establish causes.\n\nTaken together, these findings do not support a firm on-track or off-track conclusion. Where the findings explicitly describe uneven distribution, Chikilli and the named focus-area exceptions may merit record reconciliation; that unevenness concerns how overspending is distributed, not the amount spent. The block-level theme results and Gram-Panchayat-level output-code results should be read differently: they identify relative low-overspend comparators, not uneven distribution. Planned, sanctioned and paid amounts, along with their timing, would need to be checked before judging whether spending is progressing appropriately.",
+      "problems": [
+        {
+          "drifted_claim": "The available analysis looks at overspending against plans and sanctions, not at the full pace of expenditure or completion of works.",
+          "missing_or_contradicted_fact": "The sources provide findings about overspend_vs_plan and overspend_vs_sanction, but do not state that the analysis does not measure expenditure pace or completion of works."
+        },
+        {
+          "drifted_claim": "In this 20-Gram-Panchayat sample, overspending against plan is generally spread across Gram Panchayats, focus areas, fund components, output types, fiscal years, themes and activity categories rather than concentrated in one place.",
+          "missing_or_contradicted_fact": "The findings support even spread across Gram Panchayats for several dimensions and identify low-overspend themes and output codes, but they do not say overspending is spread across themes or activity categories. Finding 10 says overspending is spread across Gram Panchayats within all theme values, and Finding 12 says the same within all activity_for_label values."
+        }
+      ],
+      "seconds": 17.9
+    },
+    {
+      "n": 3,
+      "source_turn_id": "measure-2",
+      "source_ts": "2026-09-01T13:18:29",
+      "writer_model": "gpt-5.6-sol",
+      "shape": "connective",
+      "verdict": "fail",
+      "prose": "The analysis mostly finds similar patterns across Gram Panchayats, with limited exceptions. Chikilli repeatedly stands out because its overspending is distributed differently across fund components or focus areas. Some focus areas—especially Fuel and fodder and Khadi—also show uneven distributions across Gram Panchayats under several record subsets.\n\nThese findings concern how overspending is distributed, not which place spends the most or why the pattern occurs. They suggest checking Chikilli and identifying which Gram Panchayats drive the uneven focus-area patterns, but they do not establish a cause or identify a district-level exception.",
+      "problems": [
+        {
+          "drifted_claim": "They suggest checking Chikilli and identifying which Gram Panchayats drive the uneven focus-area patterns",
+          "missing_or_contradicted_fact": "The findings say the unevenness is about how the total is distributed, not how much any one place spends, and that it belongs to all Gram Panchayats with no single Gram Panchayat accounting for it. The context also says the analysis cannot establish what causes what, so identifying Gram Panchayats that “drive” the patterns is unsupported."
+        }
+      ],
+      "seconds": 15.6
+    },
+    {
+      "n": 4,
+      "source_turn_id": "measure-2",
+      "source_ts": "2026-09-01T13:18:38",
+      "writer_model": "gpt-5.6-sol",
+      "shape": "connective",
+      "verdict": "pass",
+      "prose": "The analysis finds few clear place-level departures from the general pattern. Overspending is usually spread across Gram Panchayats, fund components and focus areas rather than concentrated in one place. Chikilli is the clearest named exception, while several focus areas also show uneven distribution across Gram Panchayats; the available findings do not identify which Gram Panchayats account for those focus-area differences.\n\nTaken together, these findings make Chikilli the main place for follow-up, particularly the distribution of overspend against plan across fund components and overspend against sanction across focus areas for output type Code 101. The focus-area exceptions may also merit reconciliation to identify the associated Gram Panchayats. These are wider, non-shortlisted patterns about how overspending is distributed; they do not establish unusually high total spending, wrongdoing or causation.",
+      "problems": [],
+      "seconds": 22.8
+    },
+    {
+      "n": 5,
+      "source_turn_id": "measure-3",
+      "source_ts": "2026-09-01T13:19:17",
+      "writer_model": "gpt-5.6-sol",
+      "shape": "connective",
+      "verdict": "pass",
+      "prose": "The available findings do not directly identify where planned money remains unspent. They mainly describe how spending above plans or sanctions is distributed across Gram Panchayats, focus areas, asset categories and fund components. The Bargarh finding also flags uneven planning, sanction and completion measures, but does not quantify an unspent balance.\n\nOverall, the overspending patterns are generally widespread rather than concentrated in one Gram Panchayat or category, with Chikilli and several focus areas or asset categories appearing as distributional exceptions. These exceptions do not establish that they have the largest amounts or explain why the pattern occurred. To answer the question, planned and sanctioned amounts should be reconciled directly with payments for each work and Gram Panchayat; the findings shown here cannot establish where the largest planned-but-unspent balances are.",
+      "problems": [],
+      "seconds": 13.0
+    },
+    {
+      "n": 6,
+      "source_turn_id": "measure-5",
+      "source_ts": "2026-09-01T13:20:13",
+      "writer_model": "gpt-5.6-sol",
+      "shape": "connective",
+      "verdict": "pass",
+      "prose": "The analysis examined whether sanctions, payments and activity-linked expenditure move progressively over time or follow recurring seasonal cycles. The picture is mixed: some places and periods show increases, while others show seasonal or unclear patterns. The findings do not directly identify year-end concentration.\n\nTaken together, these patterns suggest uneven timing rather than a single, consistent flow across the sample. Because the seasonal findings do not show when peaks occurred, they cannot establish that money moved in year-end bursts. The named districts, Gram Panchayats and fiscal years are therefore places to check monthly and quarterly transaction records, particularly where payment patterns differ from sanctions or expenditure. These are associations in the records and do not explain their causes.",
+      "problems": [],
+      "seconds": 10.1
+    },
+    {
+      "n": 7,
+      "source_turn_id": "measure-5",
+      "source_ts": "2026-09-01T13:20:33",
+      "writer_model": "gpt-5.6-sol",
+      "shape": "connective",
+      "verdict": "pass",
+      "prose": "The analysis holds a mixed set of time-pattern findings on sanctions, payments, receipts and activity-linked expenditure. Recurring seasonal patterns appear across several district and Gram Panchayat records, alongside increasing payment or expenditure at some time grains. These tests identify recurrence and trends, but not when peaks occur or whether they fall at fiscal year-end. They cannot by themselves establish year-end bursting.\n\nTaken together, the sample does not support a simple choice between steady movement and year-end bursts. Cyclical movement is visible, but some payment measures show no clear pattern or follow a different cycle, and some trends disappear at the fiscal-year view. Most of these findings were not promoted to the ranked shortlist. Month-by-month payment amounts and counts near fiscal year-end should be checked in the named districts and Gram Panchayats before concluding that spending is bunched at year-end.",
+      "problems": [],
+      "seconds": 13.0
+    },
+    {
+      "n": 8,
+      "source_turn_id": "measure-8",
+      "source_ts": "2026-09-01T13:22:23",
+      "writer_model": "gpt-5.6-sol",
+      "shape": "connective",
+      "verdict": "fail",
+      "prose": "The analysis looked at how photo-evidence uploads are distributed across output types, Gram Panchayats, sanctioning authorities and types of activity in the sample. The findings point to a recurring concentration around output Codes 101 and 105, while Sarpanch-sanctioned activities account for most uploads across several groupings. These are different views of the same activity-lifecycle records, so they should be read together rather than treated as separate issues.\n\nThe patterns can help officials identify records where output coding or upload practices merit checking, especially in the listed exceptions. They do not show whether the photos are adequate, authentic or compliant, nor why uploads are concentrated in particular codes or under a particular sanctioning authority. They also describe only the 20-Gram-Panchayat sample and do not establish a statewide pattern or a causal relationship.",
+      "problems": [
+        {
+          "drifted_claim": "They do not show whether the photos are adequate, authentic or compliant",
+          "missing_or_contradicted_fact": "The supplied findings and context do not state that photo adequacy, authenticity or compliance were assessed or that the analysis cannot establish them."
+        }
+      ],
+      "seconds": 6.3
+    },
+    {
+      "n": 9,
+      "source_turn_id": "measure-8",
+      "source_ts": "2026-09-01T13:22:59",
+      "writer_model": "gpt-5.6-sol",
+      "shape": "connective",
+      "verdict": "pass",
+      "prose": "The analysis examined photo evidence through evidence-upload counts in the Activity Lifecycle data. It found two recurring patterns across separately defined scopes, including costed activities, activities for the general public, Public Works and New/Fresh works: uploads tend to be concentrated under output Code 101, often alongside Code 105, and they tend to be associated with Sarpanch-sanctioned activities. These scopes may overlap, but the analysis does not establish that they contain the same records.\n\nTaken together, the findings suggest checking what Codes 101 and 105 represent and reviewing the named GP exceptions, especially Chikilli, where no clear pattern repeatedly appears. They do not show whether photos are adequate, genuine or linked to the correct stage of work; nor do they establish why uploads are concentrated under particular codes or sanction authorities. The percentages and counts describe only the 20-GP sample.",
+      "problems": [],
+      "seconds": 22.0
+    },
+    {
+      "n": 10,
+      "source_turn_id": null,
+      "source_ts": "2026-09-01T14:42:15",
+      "writer_model": "gpt-5.6-sol",
+      "shape": "connective",
+      "verdict": "pass",
+      "prose": "The analysis identifies a small set of places that differ from the prevailing pattern in this 20-Gram-Panchayat sample. Chikilli, Boipariguda, Laxmipur and Khallikote stand out in how overspending against sanctions is distributed; Koraput, Cuttack and Kandhamal differ in how overspending against plans is distributed across sanctioning authorities. Haldikudar also differs in which output types lead untied-fund totals for Public Works. These are distributional differences, not evidence that the places overspent more or that any focus area, status or authority caused the pattern.\n\nHaldikudar’s pattern is the strongest-ranked exception here. The other findings were not promoted to the ranked shortlist, but they can still guide targeted reconciliation of the relevant records. Any follow-up should first confirm the underlying classifications and amounts; this sample cannot establish causes or support conclusions about Odisha as a whole.",
+      "problems": [],
+      "seconds": 16.4
+    },
+    {
+      "n": 11,
+      "source_turn_id": null,
+      "source_ts": "2026-09-01T14:42:20",
+      "writer_model": "gpt-5.6-sol",
+      "shape": "connective",
+      "verdict": "fail",
+      "prose": "The analysis identifies several places whose spending patterns differ from the rest of the 20-Gram-Panchayat sample. Chikilli stands out across both focus areas and status labels, while Boipariguda, Laxmipur, Khallikote, Koraput, Cuttack and Kandhamal differ on one of these distribution measures. These findings concern how overspending is spread across categories, not the amount spent. Haldikudar shows a separate difference in which output types lead in untied funds.\n\nHaldikudar is the strongest of these signals in the current feed, ranked 5 of 32; the other patterns were not promoted to the ranked shortlist. These are sample-level associations that point to records or local practices worth checking. They do not establish why the places differ or indicate that any category caused the spending pattern.",
+      "problems": [
+        {
+          "drifted_claim": "Haldikudar is the strongest of these signals in the current feed, ranked 5 of 32;",
+          "missing_or_contradicted_fact": "The source says Haldikudar's pattern is ranked 5 of 32 in the current feed, while the other four findings were not promoted to the ranked shortlist. It does not state that Haldikudar is the strongest of these signals."
+        }
+      ],
+      "seconds": 22.6
+    },
+    {
+      "n": 12,
+      "source_turn_id": null,
+      "source_ts": "2026-09-01T14:42:36",
+      "writer_model": "gpt-5.6-sol",
+      "shape": "connective",
+      "verdict": "pass",
+      "prose": "In this 20-Gram-Panchayat sample, Chikilli consistently appears at the low end for proposed work cost and sanctioned funds, and in most years for technical and administrative approvals. A separate pattern concerns New/Fresh works: Chikilli is the only GP where overspending against sanction is not evenly spread across fiscal years. These patterns do not establish whether the reason is lower activity, pending approvals, incomplete records or another local factor.\n\nTaken together, the findings suggest checking Chikilli’s proposed works, sanctions and approval records for completeness and consistency, and identifying which fiscal years account for its uneven overspending pattern. That pattern concerns when overspending appears, not how much Chikilli overspends. These findings were part of the wider analysis rather than the ranked shortlist, so they support targeted verification rather than a conclusion that performance is poor.",
+      "problems": [],
+      "seconds": 18.0
+    }
+  ],
+  "sampling": "all 12 logged writer calls",
+  "log_paths": [
+    "C:\\dev\\odisha-d7\\DiscoverChat\\experiments\\logs\\calls.jsonl",
+    "C:\\dev\\odisha-d7\\DiscoverChat\\logs\\calls.jsonl"
+  ]
+}

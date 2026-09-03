@@ -1,0 +1,1658 @@
+{
+  "generated_at": "2026-09-03T18:44:38",
+  "classifier_model": "gpt-5.4-nano",
+  "classifier_max_completion": 2000,
+  "repeats": 4,
+  "suite_size": 22,
+  "fallthrough_size": 10,
+  "gate": {
+    "routing_green_every_run": true,
+    "zero_null_classifications": true,
+    "passed": true
+  },
+  "calls_to_the_model": 128,
+  "empty_replies": 0,
+  "unparseable_replies": 0,
+  "median_seconds": 0.9,
+  "p90_seconds": 1.3,
+  "pass_a_routing": [
+    {
+      "run": 1,
+      "by_family": {
+        "decompose": "8/8",
+        "why": "8/8",
+        "lookup": "6/6"
+      },
+      "green": true,
+      "failures": []
+    },
+    {
+      "run": 2,
+      "by_family": {
+        "decompose": "8/8",
+        "why": "8/8",
+        "lookup": "6/6"
+      },
+      "green": true,
+      "failures": []
+    },
+    {
+      "run": 3,
+      "by_family": {
+        "decompose": "8/8",
+        "why": "8/8",
+        "lookup": "6/6"
+      },
+      "green": true,
+      "failures": []
+    },
+    {
+      "run": 4,
+      "by_family": {
+        "decompose": "8/8",
+        "why": "8/8",
+        "lookup": "6/6"
+      },
+      "green": true,
+      "failures": []
+    }
+  ],
+  "pass_b_model_forced": [
+    [
+      {
+        "question": "Where does the gap sit?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking where the identified gap is located in the analysis, which requires retrieving the relevant findings about its position.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking where the identified gap is located in the analysis, which requires retrieving the relevant findings about it",
+        "seconds": 3.2,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Which blocks account for the shortfall?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer asks for specific blocks responsible for the shortfall, which requires exact breakdown numbers/records from the database.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer asks for specific blocks responsible for the shortfall, which requires exact breakdown numbers/records from the database.",
+        "seconds": 1.8,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Break down spending by block",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is requesting a specific breakdown of spending by block, which requires exact amounts/lists from the database rather than new pattern analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is requesting a specific breakdown of spending by block, which requires exact amounts/lists from the database rather than",
+        "seconds": 1.3,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Who is driving the shortfall?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for the underlying driver of a shortfall, which requires an explanatory reframe rather than a specific database figure.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for the underlying driver of a shortfall, which requires an explanatory reframe rather than a specific database fi",
+        "seconds": 0.8,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "What makes up the underspend?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking what components constitute the observed underspending pattern in the analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking what components constitute the observed underspending pattern in the analysis.\"}",
+        "seconds": 2.1,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Break it down by fiscal year",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer requests a specific breakdown by fiscal year, which requires exact figures from the database.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer requests a specific breakdown by fiscal year, which requires exact figures from the database.\"}",
+        "seconds": 0.9,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Where is the money going?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer asks for an overall finding on how funds are allocated across the sampled gram panchayats, which the system can summarize from its analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer asks for an overall finding on how funds are allocated across the sampled gram panchayats, which the system can summari",
+        "seconds": 0.9,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "How is the total split across districts?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is asking for specific cross-district totals/splits, which requires precise numbers from records rather than new pattern analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is asking for specific cross-district totals/splits, which requires precise numbers from records rather than new pattern ",
+        "seconds": 1.1,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Why is spending low in Chikilli?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for an explanation of why spending is low in Chikilli, which requires identifying likely drivers rather than retrieving exact figures.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for an explanation of why spending is low in Chikilli, which requires identifying likely drivers rather than retri",
+        "seconds": 1.4,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "What is causing the year-end payment spike?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer asks for the cause behind a pattern (the year-end payment spike), which requires an explanatory reframing rather than retrieval of exact records.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer asks for the cause behind a pattern (the year-end payment spike), which requires an explanatory reframing rather than retrie",
+        "seconds": 0.8,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "Why do so many activities have no asset category?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for an explanation of why many activities are missing asset category labels, which this system can only address as likely drivers/patterns rather than proven causes.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for an explanation of why many activities are missing asset category labels, which this system can only address as",
+        "seconds": 1.0,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "What is the reason for the drop in sanctions?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for an explanation for the observed drop in sanctions, which requires identifying likely drivers rather than retrieving specific records.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for an explanation for the observed drop in sanctions, which requires identifying likely drivers rather than retri",
+        "seconds": 0.8,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "Explain why Boipariguda is different.",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for an explanation of why Boipariguda differs from other places, which this system can only address as likely drivers behind observed patterns rather than a definitive cause.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for an explanation of why Boipariguda differs from other places, which this system can only address as likely driv",
+        "seconds": 1.0,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "How come Ganjam is an exception?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for the reason behind why Ganjam is flagged as an exception in the analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for the reason behind why Ganjam is flagged as an exception in the analysis.\"}",
+        "seconds": 1.2,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "How much was spent in Khordha last year?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is requesting a specific spending number for Khordha, which requires a direct database retrieval.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is requesting a specific spending number for Khordha, which requires a direct database retrieval.\"}",
+        "seconds": 1.4,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "How many activities are ongoing in Barpali block?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer asks for a specific count of ongoing activities in Barpali block, which requires a database record retrieval.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer asks for a specific count of ongoing activities in Barpali block, which requires a database record retrieval.\"}",
+        "seconds": 0.9,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "What is the total sanctioned amount for 2024-2025?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer requests a specific total figure from the records, which requires retrieving an exact number from the database.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer requests a specific total figure from the records, which requires retrieving an exact number from the database.\"}",
+        "seconds": 1.0,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "Give me the list of abandoned works.",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer requests a specific list of abandoned works, which requires retrieving exact records rather than summarizing patterns.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer requests a specific list of abandoned works, which requires retrieving exact records rather than summarizing patterns.\"}",
+        "seconds": 0.9,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "Who is the current Sarpanch of Chikilli?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is asking for a specific current office-holder name, which requires a direct database lookup rather than analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is asking for a specific current office-holder name, which requires a direct database lookup rather than analysis.\"}",
+        "seconds": 0.9,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "Show me the top 10 GPs by expenditure.",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is asking for a specific ranked list of GPs by expenditure, which requires retrieving exact numbers/records from the database.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is asking for a specific ranked list of GPs by expenditure, which requires retrieving exact numbers/records from the data",
+        "seconds": 0.9,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "What is causing the year-end payment spike?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for an explanation of the observed year-end payment spike, which requires cause-oriented interpretation rather than retrieving specific records or totals.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for an explanation of the observed year-end payment spike, which requires cause-oriented interpretation rather tha",
+        "seconds": 0.9,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "What is driving the change in status?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for the underlying drivers behind a change in status, which requires an explanatory, association-based reframe rather than retrieving or looking up records.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for the underlying drivers behind a change in status, which requires an explanatory, association-based reframe rat",
+        "seconds": 0.8,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      }
+    ],
+    [
+      {
+        "question": "Where does the gap sit?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for where a particular gap is located in the analysis, which requires fetching relevant findings.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for where a particular gap is located in the analysis, which requires fetching relevant findings.\"}",
+        "seconds": 1.0,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Which blocks account for the shortfall?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is requesting specific blocks and their shortfall amounts, which requires exact figures from the underlying database.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is requesting specific blocks and their shortfall amounts, which requires exact figures from the underlying database.\"}",
+        "seconds": 0.8,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Break down spending by block",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer requests a specific breakdown of spending by block, which requires database-level figures not available in this analysis system.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer requests a specific breakdown of spending by block, which requires database-level figures not available in this analysis ",
+        "seconds": 1.0,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Who is driving the shortfall?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for an explanation of what is causing the shortfall (who is driving it), so the system should provide likely drivers/pattern associations rather than definitive causality.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for an explanation of what is causing the shortfall (who is driving it), so the system should provide likely drive",
+        "seconds": 1.2,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "What makes up the underspend?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking what components contribute to the observed underspend, which the analysis can break down into spending/work elements.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking what components contribute to the observed underspend, which the analysis can break down into spending/work e",
+        "seconds": 0.9,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Break it down by fiscal year",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is requesting a fiscal-year-wise breakdown of amounts/records, which requires specific numbers or lists from the database.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is requesting a fiscal-year-wise breakdown of amounts/records, which requires specific numbers or lists from the database",
+        "seconds": 0.9,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Where is the money going?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for an overview of where spending is directed, which fits a general pattern-finding query.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for an overview of where spending is directed, which fits a general pattern-finding query.\"}",
+        "seconds": 1.1,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "How is the total split across districts?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is asking for a specific cross-district breakdown of the total, which requires exact numbers from the database.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is asking for a specific cross-district breakdown of the total, which requires exact numbers from the database.\"}",
+        "seconds": 1.3,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Why is spending low in Chikilli?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for an explanation behind low spending in Chikilli, which requires pattern-based re-framing rather than a direct database lookup.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for an explanation behind low spending in Chikilli, which requires pattern-based re-framing rather than a direct d",
+        "seconds": 1.0,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "What is causing the year-end payment spike?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for the underlying reason behind an observed year-end payment spike, which requires explanation rather than retrieving or listing data.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for the underlying reason behind an observed year-end payment spike, which requires explanation rather than retrie",
+        "seconds": 0.8,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "Why do so many activities have no asset category?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for an explanation behind the pattern of many activities lacking an asset category.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for an explanation behind the pattern of many activities lacking an asset category.\"}",
+        "seconds": 0.9,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "What is the reason for the drop in sanctions?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for the cause behind a change (drop) in sanctions, which requires explanation rather than retrieval of records or numbers.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for the cause behind a change (drop) in sanctions, which requires explanation rather than retrieval of records or ",
+        "seconds": 0.8,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "Explain why Boipariguda is different.",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for an explanation of what drives why Boipariguda differs from others in the sample.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for an explanation of what drives why Boipariguda differs from others in the sample.\"}",
+        "seconds": 1.4,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "How come Ganjam is an exception?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer asks for the reason why Ganjam is flagged as an exception in the analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer asks for the reason why Ganjam is flagged as an exception in the analysis.\"}",
+        "seconds": 0.8,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "How much was spent in Khordha last year?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer asks for a specific spending amount for Khordha last year, which requires retrieving an exact figure from the database.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer asks for a specific spending amount for Khordha last year, which requires retrieving an exact figure from the database.\"}",
+        "seconds": 0.9,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "How many activities are ongoing in Barpali block?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is asking for a specific count of ongoing activities in Barpali block, which requires retrieving exact database figures.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is asking for a specific count of ongoing activities in Barpali block, which requires retrieving exact database figures.\"",
+        "seconds": 0.9,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "What is the total sanctioned amount for 2024-2025?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer asks for a specific aggregate figure (total sanctioned amount for 2024-2025), which requires pulling exact numbers from the database rather than retrieving an analysis pattern.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer asks for a specific aggregate figure (total sanctioned amount for 2024-2025), which requires pulling exact numbers from t",
+        "seconds": 0.9,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "Give me the list of abandoned works.",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer requests a specific list of abandoned works, which requires exact records from the database rather than pattern analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer requests a specific list of abandoned works, which requires exact records from the database rather than pattern analysis.",
+        "seconds": 1.0,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "Who is the current Sarpanch of Chikilli?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is asking for a specific current office-holder, which requires retrieving an exact record from the database.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is asking for a specific current office-holder, which requires retrieving an exact record from the database.\"}",
+        "seconds": 0.8,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "Show me the top 10 GPs by expenditure.",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer asks for a specific ranked list (top 10 GPs by expenditure), which requires exact figures from the database.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer asks for a specific ranked list (top 10 GPs by expenditure), which requires exact figures from the database.\"}",
+        "seconds": 1.0,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "What is causing the year-end payment spike?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for the underlying cause of a specific observed pattern (the year-end payment spike), which requires a causal/explanatory reframing.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for the underlying cause of a specific observed pattern (the year-end payment spike), which requires a causal/expl",
+        "seconds": 0.9,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "What is driving the change in status?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for the underlying reason driving a change in status, which requires a causal-style explanation.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for the underlying reason driving a change in status, which requires a causal-style explanation.\"}",
+        "seconds": 0.7,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      }
+    ],
+    [
+      {
+        "question": "Where does the gap sit?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking where the shortfall/gap originates, which requires identifying contributing factors or explaining the underlying pattern rather than retrieving a specific record or number.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking where the shortfall/gap originates, which requires identifying contributing factors or explaining the underlying p",
+        "seconds": 1.0,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Which blocks account for the shortfall?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is asking for a specific allocation of the shortfall by blocks, which requires exact figures from records rather than analysis narrative.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is asking for a specific allocation of the shortfall by blocks, which requires exact figures from records rather than ana",
+        "seconds": 1.0,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Break down spending by block",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is requesting specific breakdown figures by block, which requires retrieving exact spending numbers from the database.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is requesting specific breakdown figures by block, which requires retrieving exact spending numbers from the database.\"}",
+        "seconds": 1.0,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Who is driving the shortfall?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for an explanation of what is driving the observed shortfall.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for an explanation of what is driving the observed shortfall.\"}",
+        "seconds": 0.7,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "What makes up the underspend?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking what components or categories explain the underspending pattern.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking what components or categories explain the underspending pattern.\"}",
+        "seconds": 0.8,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Break it down by fiscal year",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is asking for specific breakdown figures by fiscal year, which requires retrieving exact records/numbers from the database.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is asking for specific breakdown figures by fiscal year, which requires retrieving exact records/numbers from the databas",
+        "seconds": 1.0,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Where is the money going?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for a general overview of where spending is directed across the sample.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for a general overview of where spending is directed across the sample.\"}",
+        "seconds": 0.7,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "How is the total split across districts?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is asking for a specific quantitative breakdown of spending split across districts, which requires exact numbers from the database.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is asking for a specific quantitative breakdown of spending split across districts, which requires exact numbers from the",
+        "seconds": 0.8,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Why is spending low in Chikilli?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for an explanation of the low-spending pattern in Chikilli.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for an explanation of the low-spending pattern in Chikilli.\"}",
+        "seconds": 1.1,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "What is causing the year-end payment spike?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for the drivers behind a year-end payment spike, which requires explaining associations rather than retrieving specific records or totals.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for the drivers behind a year-end payment spike, which requires explaining associations rather than retrieving spe",
+        "seconds": 0.9,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "Why do so many activities have no asset category?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for the underlying reason behind missing asset-category classification in many activities, which the system can only address via patterns/associations rather than definitive causation.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for the underlying reason behind missing asset-category classification in many activities, which the system can on",
+        "seconds": 5.0,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "What is the reason for the drop in sanctions?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for an explanation behind a decline in sanctions, which requires causal interpretation rather than retrieving specific records or numbers.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for an explanation behind a decline in sanctions, which requires causal interpretation rather than retrieving spec",
+        "seconds": 1.0,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "Explain why Boipariguda is different.",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer asks for an explanation of why Boipariguda differs from other Gram Panchayats, which requires identifying likely drivers rather than retrieving exact records.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer asks for an explanation of why Boipariguda differs from other Gram Panchayats, which requires identifying likely drivers rat",
+        "seconds": 1.7,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "How come Ganjam is an exception?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for the underlying reason Ganjam is flagged as an exception in the analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for the underlying reason Ganjam is flagged as an exception in the analysis.\"}",
+        "seconds": 0.9,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "How much was spent in Khordha last year?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is requesting a specific amount spent in Khordha last year, which requires a database number rather than analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is requesting a specific amount spent in Khordha last year, which requires a database number rather than analysis.\"}",
+        "seconds": 0.8,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "How many activities are ongoing in Barpali block?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer asks for a specific number (ongoing activities in Barpali block), which requires retrieving exact records from the database.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer asks for a specific number (ongoing activities in Barpali block), which requires retrieving exact records from the databa",
+        "seconds": 0.8,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "What is the total sanctioned amount for 2024-2025?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is requesting a specific total sanctioned amount for 2024-2025, which requires an exact database figure.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is requesting a specific total sanctioned amount for 2024-2025, which requires an exact database figure.\"}",
+        "seconds": 1.0,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "Give me the list of abandoned works.",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer requests a specific list of records (abandoned works), which requires database retrieval of exact items rather than new analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer requests a specific list of records (abandoned works), which requires database retrieval of exact items rather than new a",
+        "seconds": 0.9,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "Who is the current Sarpanch of Chikilli?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer asks for a specific factual detail (the current Sarpanch of Chikilli), which requires querying the database records rather than analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer asks for a specific factual detail (the current Sarpanch of Chikilli), which requires querying the database records rathe",
+        "seconds": 0.9,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "Show me the top 10 GPs by expenditure.",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer requests a specific ranked list of GP expenditures, which requires retrieving exact records from the database rather than analyzing patterns.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer requests a specific ranked list of GP expenditures, which requires retrieving exact records from the database rather than",
+        "seconds": 0.8,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "What is causing the year-end payment spike?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for the drivers behind an observed year-end payment spike, which requires an explanatory reframing rather than retrieving exact records.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for the drivers behind an observed year-end payment spike, which requires an explanatory reframing rather than ret",
+        "seconds": 0.9,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "What is driving the change in status?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for the reason behind a change in status, which requires an explanation of underlying drivers rather than a specific record or number.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for the reason behind a change in status, which requires an explanation of underlying drivers rather than a specif",
+        "seconds": 1.1,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      }
+    ],
+    [
+      {
+        "question": "Where does the gap sit?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for the location of a gap identified in the analysis, requiring the system to surface where it occurs.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for the location of a gap identified in the analysis, requiring the system to surface where it occurs.\"}",
+        "seconds": 0.8,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Which blocks account for the shortfall?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer needs specific blocks and their shortfall figures, which requires pulling exact numbers/records from the database rather than retrieving patterns.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer needs specific blocks and their shortfall figures, which requires pulling exact numbers/records from the database rather ",
+        "seconds": 1.0,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Break down spending by block",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is requesting a specific breakdown of spending by block, which requires pulling exact figures/lists from the database rather than generating an explanation or general retrieval.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is requesting a specific breakdown of spending by block, which requires pulling exact figures/lists from the database rat",
+        "seconds": 1.0,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Who is driving the shortfall?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for the underlying drivers behind a shortfall, which requires explanation rather than retrieving specific records or numbers.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for the underlying drivers behind a shortfall, which requires explanation rather than retrieving specific records ",
+        "seconds": 0.8,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "What makes up the underspend?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for the components that explain the underspend, which requires summarizing what the analysis found.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for the components that explain the underspend, which requires summarizing what the analysis found.\"}",
+        "seconds": 0.9,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Break it down by fiscal year",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is asking for a fiscal-yearwise breakdown, which requires specific numbers or records from the database that this system cannot retrieve on its own.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is asking for a fiscal-yearwise breakdown, which requires specific numbers or records from the database that this system ",
+        "seconds": 1.0,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Where is the money going?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer asks for an overview of where funds are being spent, which matches the system’s pattern-based analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer asks for an overview of where funds are being spent, which matches the system’s pattern-based analysis.\"}",
+        "seconds": 0.9,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "How is the total split across districts?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is asking for a specific quantitative split across districts, which requires exact figures from the database.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is asking for a specific quantitative split across districts, which requires exact figures from the database.\"}",
+        "seconds": 0.8,
+        "rule_label": "decompose",
+        "agrees_with_rule": false
+      },
+      {
+        "question": "Why is spending low in Chikilli?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer asks for an explanation of why spending is low in Chikilli, which requires cause-focused reframe beyond pattern analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer asks for an explanation of why spending is low in Chikilli, which requires cause-focused reframe beyond pattern analysis.\"}",
+        "seconds": 0.9,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "What is causing the year-end payment spike?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer asks for the underlying cause of a spike in year-end payments, which requires explanation rather than retrieving a specific record or number.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer asks for the underlying cause of a spike in year-end payments, which requires explanation rather than retrieving a specific ",
+        "seconds": 1.8,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "Why do so many activities have no asset category?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for the underlying reason behind a data-quality/pattern issue (activities lacking asset category), which requires an explanation rather than a direct lookup.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for the underlying reason behind a data-quality/pattern issue (activities lacking asset category), which requires ",
+        "seconds": 1.0,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "What is the reason for the drop in sanctions?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for an explanation of why sanctions dropped, which requires a causal/driver-oriented analysis rather than a direct retrieval of numbers.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for an explanation of why sanctions dropped, which requires a causal/driver-oriented analysis rather than a direct",
+        "seconds": 0.9,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "Explain why Boipariguda is different.",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for an explanation of why Boipariguda shows different patterns in the village-level planning and spending records.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for an explanation of why Boipariguda shows different patterns in the village-level planning and spending records.",
+        "seconds": 1.1,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "How come Ganjam is an exception?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for the reason behind why Ganjam is flagged as an exception.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for the reason behind why Ganjam is flagged as an exception.\"}",
+        "seconds": 1.1,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "How much was spent in Khordha last year?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer requests a specific expenditure amount for Khordha, which requires querying exact records rather than pattern analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer requests a specific expenditure amount for Khordha, which requires querying exact records rather than pattern analysis.\"}",
+        "seconds": 0.8,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "How many activities are ongoing in Barpali block?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is asking for a specific count of activities in Barpali block, which requires exact figures from records rather than analysis patterns.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is asking for a specific count of activities in Barpali block, which requires exact figures from records rather than anal",
+        "seconds": 0.8,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "What is the total sanctioned amount for 2024-2025?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is asking for a specific total sanctioned amount for a specific year, which requires retrieving an exact number from the database.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is asking for a specific total sanctioned amount for a specific year, which requires retrieving an exact number from the ",
+        "seconds": 0.8,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "Give me the list of abandoned works.",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is requesting a specific list of records (abandoned works), which requires fetching exact items from the database rather than generating an analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is requesting a specific list of records (abandoned works), which requires fetching exact items from the database rather ",
+        "seconds": 0.8,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "Who is the current Sarpanch of Chikilli?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is requesting a specific person holding a post for a specific village/GP, which requires a direct database lookup.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is requesting a specific person holding a post for a specific village/GP, which requires a direct database lookup.\"}",
+        "seconds": 0.9,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "Show me the top 10 GPs by expenditure.",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is requesting a specific ranked list (top 10 GPs by expenditure), which requires exact database retrieval.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is requesting a specific ranked list (top 10 GPs by expenditure), which requires exact database retrieval.\"}",
+        "seconds": 1.6,
+        "rule_label": "lookup",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "What is causing the year-end payment spike?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for the driver behind a pattern (the year-end payment spike), which requires an explanatory reframe rather than a direct lookup or retrieval.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for the driver behind a pattern (the year-end payment spike), which requires an explanatory reframe rather than a ",
+        "seconds": 1.1,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      },
+      {
+        "question": "What is driving the change in status?",
+        "move": "why",
+        "source": "model",
+        "reason": "The officer is asking for the underlying driver behind a change in status, which requires explanation of patterns rather than retrieving exact records or numbers.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"WHY\",\"reason\":\"The officer is asking for the underlying driver behind a change in status, which requires explanation of patterns rather than retrieving",
+        "seconds": 2.6,
+        "rule_label": "why",
+        "agrees_with_rule": true
+      }
+    ]
+  ],
+  "pass_c_rule_miss": [
+    [
+      {
+        "question": "What is the price of onions in Cuttack market?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer asks for a specific current price, which requires a direct database or external market record rather than pattern-based analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer asks for a specific current price, which requires a direct database or external market record rather than pattern-based a",
+        "seconds": 2.3
+      },
+      {
+        "question": "What is the rainfall forecast for Koraput next week?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer requests a specific external forecast value that this system cannot provide from its village-level records.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer requests a specific external forecast value that this system cannot provide from its village-level records.\"}",
+        "seconds": 0.8
+      },
+      {
+        "question": "How is Chikilli doing?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for the latest analysis of how the village/Gram Panchayat Chikilli is performing.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for the latest analysis of how the village/Gram Panchayat Chikilli is performing.\"}",
+        "seconds": 0.7
+      },
+      {
+        "question": "Is spending on track?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking whether the analysis shows spending is on schedule/track.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking whether the analysis shows spending is on schedule/track.\"}",
+        "seconds": 0.8
+      },
+      {
+        "question": "Where is money planned but not spent?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer wants to know which locations show planned amounts that were not fully spent, which is a direct pattern to surface from the analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer wants to know which locations show planned amounts that were not fully spent, which is a direct pattern to surface from",
+        "seconds": 0.9
+      },
+      {
+        "question": "How is Barpali block doing?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for a general status/assessment of Barpali block based on the analysis findings.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for a general status/assessment of Barpali block based on the analysis findings.\"}",
+        "seconds": 0.8
+      },
+      {
+        "question": "Which places are behaving differently from the rest?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer wants an overview of which villages/GPs/districts show outlier behavior versus the sample, which matches a general pattern-finding request.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer wants an overview of which villages/GPs/districts show outlier behavior versus the sample, which matches a general patt",
+        "seconds": 1.3
+      },
+      {
+        "question": "Anything I should be looking at in Ganjam?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer asks for items worth attention in Ganjam, which fits the system’s normal pattern-based retrieval of what to check.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer asks for items worth attention in Ganjam, which fits the system’s normal pattern-based retrieval of what to check.\"}",
+        "seconds": 2.2
+      },
+      {
+        "question": "Tell me about untied grants.",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for an overview of a spending category (untied grants), which the system can summarize from the sample analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for an overview of a spending category (untied grants), which the system can summarize from the sample analys",
+        "seconds": 1.0
+      },
+      {
+        "question": "What about the other blocks?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for information on what the analysis found in other blocks.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for information on what the analysis found in other blocks.\"}",
+        "seconds": 0.9
+      }
+    ],
+    [
+      {
+        "question": "What is the price of onions in Cuttack market?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer asks for a specific current market price, which requires retrieving an exact number from a database rather than analyzing spending patterns.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer asks for a specific current market price, which requires retrieving an exact number from a database rather than analyzing",
+        "seconds": 0.9
+      },
+      {
+        "question": "What is the rainfall forecast for Koraput next week?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer asks for a specific external forecast value (rainfall for Koraput next week), which this database-backed planning system cannot provide without a dedicated forecasting data source.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer asks for a specific external forecast value (rainfall for Koraput next week), which this database-backed planning system ",
+        "seconds": 1.3
+      },
+      {
+        "question": "How is Chikilli doing?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for an assessment of how a specific Gram Panchayat (Chikilli) is doing, which requires pulling the relevant analysis findings.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for an assessment of how a specific Gram Panchayat (Chikilli) is doing, which requires pulling the relevant a",
+        "seconds": 1.0
+      },
+      {
+        "question": "Is spending on track?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer asks whether village-level spending is on schedule, which requires checking the analysis of spending progress patterns.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer asks whether village-level spending is on schedule, which requires checking the analysis of spending progress patterns.",
+        "seconds": 1.2
+      },
+      {
+        "question": "Where is money planned but not spent?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for the analysis result identifying places where planned funds were not actually spent.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for the analysis result identifying places where planned funds were not actually spent.\"}",
+        "seconds": 0.9
+      },
+      {
+        "question": "How is Barpali block doing?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for the current analysis/status of Barpali block, which the system should summarize from the existing dataset.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for the current analysis/status of Barpali block, which the system should summarize from the existing dataset",
+        "seconds": 1.1
+      },
+      {
+        "question": "Which places are behaving differently from the rest?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking which locations show unusual patterns compared with the rest, which is a request for the analysis’s findings.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking which locations show unusual patterns compared with the rest, which is a request for the analysis’s findings.",
+        "seconds": 1.3
+      },
+      {
+        "question": "Anything I should be looking at in Ganjam?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for relevant issues or patterns to watch for in Ganjam based on the current village-level analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for relevant issues or patterns to watch for in Ganjam based on the current village-level analysis.\"}",
+        "seconds": 0.9
+      },
+      {
+        "question": "Tell me about untied grants.",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for analysis about a spending category ('untied grants'), which the system can surface patterns about generally.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for analysis about a spending category ('untied grants'), which the system can surface patterns about general",
+        "seconds": 0.8
+      },
+      {
+        "question": "What about the other blocks?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for what the analysis shows about other blocks beyond the current sample.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for what the analysis shows about other blocks beyond the current sample.\"}",
+        "seconds": 1.0
+      }
+    ],
+    [
+      {
+        "question": "What is the price of onions in Cuttack market?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is asking for a specific market price, which requires retrieving a specific number from an external database rather than pattern analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is asking for a specific market price, which requires retrieving a specific number from an external database rather than ",
+        "seconds": 1.2
+      },
+      {
+        "question": "What is the rainfall forecast for Koraput next week?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is asking for a specific external forecast value, which this system cannot compute from the planning/spending database.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is asking for a specific external forecast value, which this system cannot compute from the planning/spending database.\"}",
+        "seconds": 0.9
+      },
+      {
+        "question": "How is Chikilli doing?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for an assessment of a specific village-level place (Chikilli), which requires retrieving what the analysis found.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for an assessment of a specific village-level place (Chikilli), which requires retrieving what the analysis f",
+        "seconds": 0.8
+      },
+      {
+        "question": "Is spending on track?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking a general status check on whether village-level spending is on track.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking a general status check on whether village-level spending is on track.\"}",
+        "seconds": 0.7
+      },
+      {
+        "question": "Where is money planned but not spent?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for places where planned funds were not actually spent, which requires retrieving findings on a spending gap pattern.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for places where planned funds were not actually spent, which requires retrieving findings on a spending gap ",
+        "seconds": 0.9
+      },
+      {
+        "question": "How is Barpali block doing?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for an overview of performance/indicators for Barpali block based on the current village-level records.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for an overview of performance/indicators for Barpali block based on the current village-level records.\"}",
+        "seconds": 0.8
+      },
+      {
+        "question": "Which places are behaving differently from the rest?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for which places show outlier or different behavior compared with other villages in the sample.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for which places show outlier or different behavior compared with other villages in the sample.\"}",
+        "seconds": 1.1
+      },
+      {
+        "question": "Anything I should be looking at in Ganjam?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for guidance on what patterns or issues the analysis has found to check in the Ganjam district.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for guidance on what patterns or issues the analysis has found to check in the Ganjam district.\"}",
+        "seconds": 0.9
+      },
+      {
+        "question": "Tell me about untied grants.",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for what the analysis has found regarding untied grants.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for what the analysis has found regarding untied grants.\"}",
+        "seconds": 0.8
+      },
+      {
+        "question": "What about the other blocks?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for the analysis results about other blocks, which requires fetching what the system found beyond the current set.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for the analysis results about other blocks, which requires fetching what the system found beyond the current",
+        "seconds": 0.9
+      }
+    ],
+    [
+      {
+        "question": "What is the price of onions in Cuttack market?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer is requesting a specific current market price, which requires pulling an exact number from a data source not available to this analysis system.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer is requesting a specific current market price, which requires pulling an exact number from a data source not available to",
+        "seconds": 0.9
+      },
+      {
+        "question": "What is the rainfall forecast for Koraput next week?",
+        "move": "lookup",
+        "source": "model",
+        "reason": "The officer asks for a specific external forecast number, which this planning-and-spending records system cannot determine without a direct weather forecast source.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"LOOKUP\",\"reason\":\"The officer asks for a specific external forecast number, which this planning-and-spending records system cannot determine without a ",
+        "seconds": 0.8
+      },
+      {
+        "question": "How is Chikilli doing?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for the latest analysis status of a specific Gram Panchayat (Chikilli).",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for the latest analysis status of a specific Gram Panchayat (Chikilli).\"}",
+        "seconds": 0.9
+      },
+      {
+        "question": "Is spending on track?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for an assessment of whether spending is on track, which requires the system to surface relevant analysis from the records.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for an assessment of whether spending is on track, which requires the system to surface relevant analysis fro",
+        "seconds": 1.0
+      },
+      {
+        "question": "Where is money planned but not spent?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for a pattern-location answer about planned funds that were not actually spent.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for a pattern-location answer about planned funds that were not actually spent.\"}",
+        "seconds": 0.9
+      },
+      {
+        "question": "How is Barpali block doing?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for an assessment of performance at Barpali block, which requires retrieving the system’s existing analysis.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for an assessment of performance at Barpali block, which requires retrieving the system’s existing analysis.\"",
+        "seconds": 0.8
+      },
+      {
+        "question": "Which places are behaving differently from the rest?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for an overview of which villages/places show unusual or different behavior compared with the sample norms.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for an overview of which villages/places show unusual or different behavior compared with the sample norms.\"}",
+        "seconds": 1.3
+      },
+      {
+        "question": "Anything I should be looking at in Ganjam?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for key areas to review in Ganjam based on the system’s findings.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for key areas to review in Ganjam based on the system’s findings.\"}",
+        "seconds": 0.9
+      },
+      {
+        "question": "Tell me about untied grants.",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for what the analysis found about untied grants in the sample.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for what the analysis found about untied grants in the sample.\"}",
+        "seconds": 1.1
+      },
+      {
+        "question": "What about the other blocks?",
+        "move": "retrieve",
+        "source": "model",
+        "reason": "The officer is asking for analysis of other blocks, which requires retrieving what the system found beyond the current 20-Gram-Panchayat sample.",
+        "model_empty": false,
+        "model_unparseable": false,
+        "raw": "{\"move\":\"RETRIEVE\",\"reason\":\"The officer is asking for analysis of other blocks, which requires retrieving what the system found beyond the current 20-Gram-Panc",
+        "seconds": 0.9
+      }
+    ]
+  ],
+  "pass_c_stability": {
+    "What is the price of onions in Cuttack market?": {
+      "routes": [
+        "lookup"
+      ],
+      "stable": true,
+      "seen": [
+        "lookup",
+        "lookup",
+        "lookup",
+        "lookup"
+      ]
+    },
+    "What is the rainfall forecast for Koraput next week?": {
+      "routes": [
+        "lookup"
+      ],
+      "stable": true,
+      "seen": [
+        "lookup",
+        "lookup",
+        "lookup",
+        "lookup"
+      ]
+    },
+    "How is Chikilli doing?": {
+      "routes": [
+        "retrieve"
+      ],
+      "stable": true,
+      "seen": [
+        "retrieve",
+        "retrieve",
+        "retrieve",
+        "retrieve"
+      ]
+    },
+    "Is spending on track?": {
+      "routes": [
+        "retrieve"
+      ],
+      "stable": true,
+      "seen": [
+        "retrieve",
+        "retrieve",
+        "retrieve",
+        "retrieve"
+      ]
+    },
+    "Where is money planned but not spent?": {
+      "routes": [
+        "retrieve"
+      ],
+      "stable": true,
+      "seen": [
+        "retrieve",
+        "retrieve",
+        "retrieve",
+        "retrieve"
+      ]
+    },
+    "How is Barpali block doing?": {
+      "routes": [
+        "retrieve"
+      ],
+      "stable": true,
+      "seen": [
+        "retrieve",
+        "retrieve",
+        "retrieve",
+        "retrieve"
+      ]
+    },
+    "Which places are behaving differently from the rest?": {
+      "routes": [
+        "retrieve"
+      ],
+      "stable": true,
+      "seen": [
+        "retrieve",
+        "retrieve",
+        "retrieve",
+        "retrieve"
+      ]
+    },
+    "Anything I should be looking at in Ganjam?": {
+      "routes": [
+        "retrieve"
+      ],
+      "stable": true,
+      "seen": [
+        "retrieve",
+        "retrieve",
+        "retrieve",
+        "retrieve"
+      ]
+    },
+    "Tell me about untied grants.": {
+      "routes": [
+        "retrieve"
+      ],
+      "stable": true,
+      "seen": [
+        "retrieve",
+        "retrieve",
+        "retrieve",
+        "retrieve"
+      ]
+    },
+    "What about the other blocks?": {
+      "routes": [
+        "retrieve"
+      ],
+      "stable": true,
+      "seen": [
+        "retrieve",
+        "retrieve",
+        "retrieve",
+        "retrieve"
+      ]
+    }
+  }
+}

@@ -17,10 +17,15 @@ two products cannot disagree about what a place is called.
 
 | move | what happens |
 |---|---|
-| **retrieve** | pool everything above the candidate floor (0.50), hand the top 100 to a **relevance judge**, and show what it keeps. A few findings render directly; a larger set gets connective prose around them. |
+| **retrieve** | pool everything above the candidate floor (0.50), hand the top 100 to a **relevance judge**, and show what it keeps. The judge's selection is turned into **one consolidated narrative** by the writer (WP-D7), every figure citing the finding it came from. |
 | **navigate** | a follow-up walks finding structure — an exception member, a shared measure, a sibling finding. No free exploration. |
 | **decompose** | *"where does the gap sit"*, *"which blocks account for the shortfall"*, *"break it down by fiscal year"*. Retrieved exactly as a retrieve turn is, over the same corpus; what the move records is the intent. |
 | **decline** | a number-lookup routes to Ask; a *why* question gets a scope-honest reframe (D41: correlations only, no causal analysis). |
+
+The turn classifier runs on `gpt-5.4-nano` (WP-D7 D7.0; `gpt-5.5-nano` in the
+brief was unavailable on the account, and the operator chose the nearest nano).
+Rules decide every unambiguous route first; the model is asked only about what
+is left. Revert with `DISCOVERCHAT_CLASSIFIER_MODEL=gpt-5.5`.
 
 If the judge keeps nothing, the answer is *"the current analysis has nothing on
 this."* The judge may only **reject** — it selects by id from the pool, cannot
@@ -57,7 +62,70 @@ python -m unittest DiscoverChat.tests.test_retrieval DiscoverChat.tests.test_beh
 python -m uvicorn DiscoverChat.main:app --host 127.0.0.1 --port 8100
 ```
 
-`GET /health`, `POST /chat`, `GET /finding/{id}`, `GET /ask-route`.
+`GET /health`, `POST /chat`, `GET /finding/{id}`, `GET /record/{id}`,
+`GET /ask-route`.
+
+## Fast answers: the consolidating writer, provenance, and the audit (WP-D7)
+
+Three changes, all reachable through config so any one can be reverted without a
+redeploy.
+
+**The writer consolidates (D7.3).** Before WP-D7 the model wrote only connective
+prose and the finding sentences were shown verbatim beneath it. Now the judge's
+selected findings go to the writer as one narrative: overlapping findings merged
+into a small number of patterns, told for a senior official. The finding
+sentences are no longer printed — the narrative is the answer. Three guards make
+that safe without an inline verifier, and they are the reason the citations have
+to be checkable rather than decorative:
+
+1. **Citations.** Every figure and claim tags the finding id it came from,
+   `[1-00235]`. The tags are plumbing and are stripped before an officer sees
+   the text.
+2. **The citation check (`checks.check_citations`), blocking, four steps:**
+   every cited id is in the answer set; every numeral appears in the *stored
+   sentence of a finding cited in the same sentence* (an uncited numeral, or one
+   cited to a finding that does not contain it, fails); the causal scan; every
+   selected finding is cited at least once. On failure the writer regenerates
+   once, then falls back to the bare glossary-translated sentences — the pre-D7
+   text, ratified as designed behaviour, not a defect. The fallback rate is
+   reported.
+3. **No derived figures.** The writer may not compute a percentage, sum or
+   difference; a computed number is in no finding's stored sentence, so step 2
+   catches it.
+
+**Hover-to-source (D7.2/D7.3).** The number itself is the hover target.
+`GET /record/{id}` returns the stored record — the sentence as stored and as
+glossary-translated, its coordinates, values, engine score and run stamp — as
+JSON, or `?format=html` for a readable view. An unknown id 404s. `POST /chat`
+returns the prose with its tags (`answer_tagged`), a per-id record map
+(`citations`), and a reference HTML render (`answer_html`) that binds each
+numeral to its record with the same function the citation check uses. The hover
+UI in the Discover tab is the front end's to build; the service ships the
+reference render so the behaviour suite can exercise it end to end.
+
+**The verifier moved offline (D7.1).** Inline verification is off for turn prose
+(`DISCOVERCHAT_INLINE_VERIFY=1` restores it) — it cost a median ~28 s of a ~60 s
+turn. `verifier.py` is unchanged; `experiments/run_prose_audit.py` runs it over
+logged writer output and reports a **drift rate** for the operator to judge —
+not a pass/fail.
+
+> **The audit is the only check on qualitative drift.** The citation check
+> covers numbers, not meaning. A limitation quietly narrowed, a subset total
+> generalised to the whole, a hedge dropped — every one of those passes the
+> citation check with every digit correct, and with D7.3's consolidating writer
+> the model now restates findings rather than only introducing them, so that
+> class of error is if anything more reachable than before. WP-D4 measured it at
+> 3 in 15 packets and the inline verifier was what caught it. Nothing catches it
+> inline any more. Read the audit's drift rate as the price of the latency.
+
+```bash
+# D7.0 — qualify the nano classifier (4 runs, gates on zero null classifications)
+python DiscoverChat/experiments/run_classifier_nano.py --repeats 4
+# D7.1 — the offline drift audit over logged writer calls
+python DiscoverChat/experiments/run_prose_audit.py
+# D7.3 — before/after over 15 answers, with latency (writes answer_compare.md)
+python DiscoverChat/experiments/run_answer_compare.py
+```
 
 ## The front end
 
