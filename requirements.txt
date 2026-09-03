@@ -1,0 +1,9 @@
+# Root-level requirements, for the `discover-api` Railway service ONLY.
+#
+# Unlike Ask and the frontend, DiscoverChat's Root Directory on Railway is the
+# REPO ROOT, not its own folder: DiscoverChat/config.py puts Insights/src and
+# Ask/ on sys.path and reads the corpus from Insights/metainsights/, so a
+# service rooted at DiscoverChat/ cannot see the code or the data it needs.
+# Nixpacks only detects Python if it finds a requirements file at the root it
+# was given, hence this file.
+-r DiscoverChat/requirements.txt

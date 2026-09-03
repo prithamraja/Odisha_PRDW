@@ -11,3 +11,11 @@ rapidfuzz
 pandas
 pyarrow
 tiktoken
+
+# scipy is NOT optional and NOT directly imported here. DiscoverChat/glossary.py
+# imports phase4a_engine from Insights/src, which does `from scipy import stats`
+# at module scope, so the service cannot even be imported without it. It was
+# missing until the first real deploy attempt: every local run had scipy already
+# in the venv from Insights work, so nothing failed until a clean environment
+# tried it.
+scipy
