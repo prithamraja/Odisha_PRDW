@@ -1,5 +1,13 @@
-import { describe, expect, it } from "vitest";
-import { parseAnswer } from "./discover-answer";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  parseAnswer,
+  parseCitedAnswer,
+  resetCitationWarnings,
+  usedFallbackSelection,
+  type CitedBlock,
+} from "./discover-answer";
+import type { DiscoverCitation } from "@/services/discover-api";
+import FIXTURES from "./discover-answers.fixtures.json";
 
 // The fixtures below are the shapes DiscoverChat/assemble.py actually emits:
 // `render_finding` (bulleted and bare), `_stamped`, and the why-reframe.
@@ -158,5 +166,226 @@ describe("a recorded live turn after WP-D6", () => {
     );
     // Rupee figures and percentages belong to the sentence, not the coverage.
     expect(first.text).toContain("Rs 25.35 crore");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Hover-to-source (WP-D8)
+// ---------------------------------------------------------------------------
+
+/**
+ * Recorded from the running WP-D7 DiscoverChat on 2026-09-04 (candidate set
+ * a7f991c1df3771f9) over the 15 questions of
+ * `DiscoverChat/experiments/answer_compare.json`, plus the brief's two manual
+ * cases. Real turns, not hand-written: a hand-written fixture would agree with
+ * whatever the parser does, and the point of these is to disagree when the
+ * parser and the service's own render disagree.
+ */
+interface Fixture {
+  question: string;
+  answer: string;
+  answer_tagged: string;
+  citations: Record<string, DiscoverCitation>;
+  answer_html: string;
+  judge_source: string | null;
+}
+
+const fixtures = FIXTURES as unknown as Fixture[];
+const cited = fixtures.filter((f) => f.answer_html.trim() !== "");
+
+/** The bound spans the SERVICE produced: id and text, in document order. */
+function oracleSpans(answerHtml: string): { id: string; text: string }[] {
+  const body = /<p>([\s\S]*?)<\/p>/.exec(answerHtml);
+  if (!body) return [];
+  const out: { id: string; text: string }[] = [];
+  const span =
+    /<span class="dc-cite"[^>]*\sdata-finding-id="([^"]*)"[^>]*>([\s\S]*?)<\/span>/g;
+  let m: RegExpExecArray | null;
+  while ((m = span.exec(body[1])) !== null) {
+    out.push({
+      id: m[1],
+      text: m[2]
+        .replace(/<a class="dc-cite-link"[\s\S]*?<\/a>/g, "")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&quot;/g, '"')
+        .replace(/&#x27;/g, "'")
+        .replace(/&#39;/g, "'")
+        .replace(/&amp;/g, "&"),
+    });
+  }
+  return out;
+}
+
+/** The bound spans OUR render produced, in the same shape and order. */
+function renderedSpans(blocks: CitedBlock[]): { id: string; text: string }[] {
+  return blocks.flatMap((b) =>
+    b.segments
+      .filter((s) => s.citation)
+      .map((s) => ({ id: s.citation!.id, text: s.text }))
+  );
+}
+
+describe("parseCitedAnswer, against the service's own render", () => {
+  beforeEach(() => resetCitationWarnings());
+
+  it("has the recorded turns to check against", () => {
+    expect(fixtures.length).toBeGreaterThanOrEqual(15);
+    expect(cited.length).toBeGreaterThan(0);
+  });
+
+  // (a) The hard invariant. Our segments are slices of `answer` itself, so
+  // this is exact — no whitespace drift, every numeral in place and in order.
+  it.each(cited.map((f) => [f.question, f] as const))(
+    "reassembles the answer byte for byte: %s",
+    (_q, fixture) => {
+      const { blocks } = parseCitedAnswer(
+        fixture.answer,
+        fixture.answer_html,
+        fixture.citations
+      );
+      const plain = parseAnswer(fixture.answer);
+
+      expect(blocks).toHaveLength(plain.blocks.length);
+      blocks.forEach((block, i) => {
+        // Segments concatenate back to exactly the block's own text...
+        expect(block.segments.map((s) => s.text).join("")).toBe(block.text);
+        // ...and that text is byte for byte what the untagged parse gives.
+        expect(block.text).toBe(plain.blocks[i].text);
+        expect(block.kind).toBe(plain.blocks[i].kind);
+      });
+    }
+  );
+
+  // (b) The oracle. Every span the service bound is a bound span here, with
+  // the same text, in the same order — and there are no extra ones.
+  it.each(cited.map((f) => [f.question, f] as const))(
+    "binds exactly the spans answer_html binds: %s",
+    (_q, fixture) => {
+      const { blocks } = parseCitedAnswer(
+        fixture.answer,
+        fixture.answer_html,
+        fixture.citations
+      );
+
+      const expected = oracleSpans(fixture.answer_html);
+      expect(expected.length).toBeGreaterThan(0);
+      expect(renderedSpans(blocks)).toEqual(expected);
+      // The ids as a set too, so a reordering cannot pass by coincidence.
+      expect(new Set(renderedSpans(blocks).map((s) => s.id))).toEqual(
+        new Set(expected.map((s) => s.id))
+      );
+    }
+  );
+
+  it("never emits an empty segment", () => {
+    for (const fixture of cited) {
+      const { blocks } = parseCitedAnswer(
+        fixture.answer,
+        fixture.answer_html,
+        fixture.citations
+      );
+      for (const block of blocks) {
+        for (const segment of block.segments) {
+          expect(segment.text.length).toBeGreaterThan(0);
+        }
+      }
+    }
+  });
+
+  it("reports that it found citations", () => {
+    const fixture = cited[0];
+    const parsed = parseCitedAnswer(
+      fixture.answer,
+      fixture.answer_html,
+      fixture.citations
+    );
+    expect(parsed.hasCitations).toBe(true);
+  });
+});
+
+describe("parseCitedAnswer when the payload cannot carry a binding", () => {
+  beforeEach(() => resetCitationWarnings());
+
+  // (d) An older service, or a turn that fell back to bare sentences.
+  it("renders exactly as the untagged parse when there is no answer_html", () => {
+    for (const fixture of fixtures) {
+      const parsed = parseCitedAnswer(fixture.answer);
+      const plain = parseAnswer(fixture.answer);
+
+      expect(parsed.stamp).toBe(plain.stamp);
+      expect(parsed.hasCitations).toBe(false);
+      expect(parsed.blocks.map((b) => b.text)).toEqual(
+        plain.blocks.map((b) => b.text)
+      );
+      // One plain segment per block: nothing is hoverable.
+      for (const block of parsed.blocks) {
+        expect(block.segments.every((s) => s.citation === null)).toBe(true);
+      }
+    }
+  });
+
+  it("falls back rather than mangling when the markup is not this answer's", () => {
+    const fixture = cited[0];
+    const parsed = parseCitedAnswer(
+      "A completely unrelated answer.\n\n(as of 2026-08-17)",
+      fixture.answer_html,
+      fixture.citations
+    );
+
+    expect(parsed.hasCitations).toBe(false);
+    expect(parsed.blocks[0].text).toBe("A completely unrelated answer.");
+  });
+
+  // (c) An id in the markup with no entry in the citations map.
+  it("renders an unknown id as plain text and warns once per id", () => {
+    const fixture = cited[0];
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    // Every id in the markup is now unknown.
+    const parsed = parseCitedAnswer(fixture.answer, fixture.answer_html, {});
+
+    // The words are still there, in full, and none of them is hoverable.
+    const plain = parseAnswer(fixture.answer);
+    expect(parsed.blocks.map((b) => b.text)).toEqual(
+      plain.blocks.map((b) => b.text)
+    );
+    expect(parsed.hasCitations).toBe(false);
+    for (const block of parsed.blocks) {
+      expect(block.segments.every((s) => s.citation === null)).toBe(true);
+    }
+
+    // Once per id, not once per occurrence.
+    const ids = new Set(oracleSpans(fixture.answer_html).map((s) => s.id));
+    expect(warn).toHaveBeenCalledTimes(ids.size);
+
+    warn.mockRestore();
+  });
+
+  it("survives an empty answer with markup attached", () => {
+    expect(parseCitedAnswer("", '<div class="dc-answer"><p>x</p></div>', {})).toEqual(
+      { blocks: [], stamp: null, hasCitations: false }
+    );
+  });
+});
+
+// (e) The fallback notice, at the level the notice is decided.
+describe("usedFallbackSelection", () => {
+  it("is true only when the judge fell back to the threshold", () => {
+    expect(
+      usedFallbackSelection({ judge: { source: "fallback-threshold" } })
+    ).toBe(true);
+    expect(usedFallbackSelection({ judge: { source: "judge" } })).toBe(false);
+    expect(usedFallbackSelection({ judge: {} })).toBe(false);
+    expect(usedFallbackSelection({})).toBe(false);
+    expect(usedFallbackSelection(undefined)).toBe(false);
+  });
+
+  it("agrees with the recorded turns", () => {
+    for (const fixture of fixtures) {
+      expect(
+        usedFallbackSelection({ judge: { source: fixture.judge_source } })
+      ).toBe(fixture.judge_source === "fallback-threshold");
+    }
   });
 });

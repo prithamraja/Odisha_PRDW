@@ -1,0 +1,18 @@
+[
+ {
+  "question": "What should I know about Kalimela?",
+  "spans": 49,
+  "hovered": "852",
+  "href": "http://localhost:8100/record/d1-23759?format=html",
+  "openOnFocus": 1,
+  "openAfterEscape": 0
+ },
+ {
+  "question": "How is Chikilli doing?",
+  "spans": 28,
+  "hovered": "5",
+  "href": "http://localhost:8100/record/1-02288?format=html",
+  "openOnFocus": 1,
+  "openAfterEscape": 0
+ }
+]
