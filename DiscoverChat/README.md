@@ -250,6 +250,35 @@ The first rewrites `judge_arm_results.json`, which is what the gate reads; the
 second repeats the out-of-scope battery with the decomposition sidecar loaded.
 **Both must come back at a 0.0% false-answer rate before the id is trusted.**
 
+### The prompt is qualified too, not just the id (WP-D9)
+
+The guarantee belongs to the model **and the words it was given**, together.
+Until WP-D9 the gate pinned only the id, so the judge's instruction could be
+rewritten — loosened, tightened, or helpfully tidied — while every check stayed
+green and the evidence quietly stopped describing the running system.
+
+`judge-prompt-evidenced` closes that. The evidence files record
+`judge_prompt_sha256`, the SHA-256 of the prompt **template** (not a rendered
+prompt: a rendered one carries the question and 100 candidates, so its hash
+changes every call). The check fails red on any change to the template and
+names the requalification, exactly as a model swap does.
+
+**So a prompt edit is requalified the same way a model swap is** — re-run both
+scripts above without the `DISCOVERCHAT_JUDGE_MODEL` override; they stamp the
+new hash into the run files as they go.
+
+Two instructions ship, and both stay reachable so the wording can be reverted
+by configuration rather than by a revert commit:
+
+| `DISCOVERCHAT_JUDGE_PROMPT` | the instruction |
+|---|---|
+| `complete` | keep every finding that adds distinct information; drop near-repeats |
+| `minimal` | the pre-D9 "keep the smallest set that fully answers the question" |
+
+Switching the variant moves the hash, so it goes red until the battery is
+re-run on it. That is the intended workflow, not a nuisance: an unmeasured
+judge instruction is exactly what the check is for.
+
 ## Two things to know before changing anything
 
 **The knobs are provisional.** `RELEVANCE_THRESHOLD`, `QUALITY_FLOOR` and the

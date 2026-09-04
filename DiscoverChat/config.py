@@ -144,6 +144,12 @@ CLASSIFIER_EVIDENCE_PATH = HERE / "experiments" / "classifier_nano_results.json"
 JUDGE_MODEL = os.getenv("DISCOVERCHAT_JUDGE_MODEL", "gpt-5.6-sol")
 JUDGE_MAX_COMPLETION = int(os.getenv("DISCOVERCHAT_JUDGE_TOKENS", "12000"))
 
+# WP-D9: which judge instruction is in force. "complete" keeps every finding
+# that adds distinct information; "minimal" is the pre-D9 "smallest sufficient
+# set" and is kept reachable as the reversion (D9.1's decision rule reverts by
+# configuration, not by a revert commit). The text of each lives in judge.py.
+JUDGE_PROMPT_VARIANT = os.getenv("DISCOVERCHAT_JUDGE_PROMPT", "complete")
+
 # ── The judge is bound to the model it was measured on (WP-D6 D6.2 item 2) ───
 # WP-D5 moved the out-of-scope guarantee from arithmetic to a model. A floor
 # cannot be talked round; a judge can, and at CANDIDATE_FLOOR=0.50 four of the
@@ -170,6 +176,40 @@ def evidenced_judge_model() -> tuple:
                  f"{sum(1 for q in evidence['questions'] if q['kind'] == 'none')}"
                  f" out-of-scope questions)")
     return evidence["judge_model"], reference
+
+
+def evidenced_judge_prompt() -> tuple:
+    """(prompt sha256, reference) the out-of-scope evidence was measured on.
+
+    WP-D9. The same argument as `evidenced_judge_model`, one level down. The
+    0.0% false-answer rate is a property of the model AND the words it was
+    given; before D9.0 the gate checked only half of that pair, so the
+    instruction could be rewritten -- which is exactly what D9.1 does -- with
+    every check staying green and the evidence silently no longer describing
+    the running system.
+
+    Read from the evidence, never restated as a constant here, for the reason
+    given above: a constant can be edited in the same commit that changes the
+    prompt.
+    """
+    with open(JUDGE_EVIDENCE_PATH, encoding="utf-8") as fh:
+        evidence = json.load(fh)
+    sha = evidence.get("judge_prompt_sha256")
+    variant = evidence.get("judge_prompt_variant", "unrecorded")
+    reference = (f"DiscoverChat/experiments/judge_arm_results.json "
+                 f"({evidence['generated_at']}, prompt {variant!r})")
+    return sha, reference
+
+
+REQUALIFY_JUDGE_PROMPT = (
+    "The judge prompt is qualified by the same battery as the judge model. "
+    "After editing it, re-run both and let the run files record the new "
+    "hash:\n"
+    "    python DiscoverChat/experiments/run_judge_arm.py\n"
+    "    python DiscoverChat/experiments/run_decompose_oos.py --repeats 4\n"
+    "Both must come back with a 0.0% false-answer rate before the wording is "
+    "trusted. To revert instead, set DISCOVERCHAT_JUDGE_PROMPT=minimal."
+)
 
 
 REQUALIFY_JUDGE = (
@@ -230,7 +270,7 @@ FULL_RENDER_MAX = int(os.getenv("DISCOVERCHAT_FULL_RENDER_MAX", "4"))
 # The hard ceiling on how many findings reach one answer. Not a top-N in the
 # sense ruling 5 forbids — the floor still decides membership; this only caps
 # how much of a very broad sweep is written out at once, and the answer says so.
-ANSWER_CAP = int(os.getenv("DISCOVERCHAT_ANSWER_CAP", "12"))
+ANSWER_CAP = int(os.getenv("DISCOVERCHAT_ANSWER_CAP", "20"))
 
 # ── WP-D7: the verifier leaves the turn (D7.1) ───────────────────────────────
 # The inline verifier cost a median 28.7 s of a ~60 s turn (measured over the
@@ -264,7 +304,7 @@ INLINE_VERIFY = os.getenv("DISCOVERCHAT_INLINE_VERIFY", "0") not in (
 # how an officer reaches the stored sentence (D7.2, ruling 4).
 #
 # The judge selects a median of 3 findings and at most 6 in the measured set;
-# ANSWER_CAP 12 is a ceiling, not a typical size. So the writer runs on
+# ANSWER_CAP is a ceiling, not a typical size (WP-D9 raised it 12 -> 20). So the writer runs on
 # essentially every answer that has findings, which is why the minimum is 1 and
 # not FULL_RENDER_MAX. FULL_RENDER_MAX is superseded for the judged path and
 # kept only for the threshold/no-model path the offline gate runs on.

@@ -1,6 +1,8 @@
 {
- "generated_at": "2026-09-01T09:06:09Z",
+ "generated_at": "2026-09-04T06:07:51Z",
  "judge_model": "gpt-5.6-sol",
+ "judge_prompt_variant": "complete",
+ "judge_prompt_sha256": "b5284df7ac3d95aea17bfdbc0c1b32763e570947801f0b0eaea7ec441c7e5619",
  "candidate_floor": 0.5,
  "candidate_pool": 100,
  "questions": [
@@ -8,20 +10,36 @@
    "id": "GEO-01",
    "kind": "geo",
    "text": "How is Andhrua doing?",
-   "pool": 96,
-   "pool_min_score": 0.5002,
+   "pool": 100,
+   "pool_min_score": 0.5276,
    "kept": [
-    "2-00078"
+    "d1-20049",
+    "d1-20050",
+    "d1-20055",
+    "d1-20062",
+    "d1-20061",
+    "d1-20067",
+    "d1-20078",
+    "d2-00880",
+    "d3-00569"
    ],
    "kept_rows": [
-    4194
+    24288,
+    24289,
+    24294,
+    24301,
+    24300,
+    24306,
+    24317,
+    38987,
+    39959
    ],
    "judge": {
-    "kept": 1,
-    "considered": 96,
+    "kept": 9,
+    "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the direct Andhrua-wide summary, which shows it leads the sample on most measures while identifying areas without a clear pattern.",
+    "reason": "Kept a concise overview of Andhrua\u2019s plans, spending and sanction position, implementation progress, evidence coverage, recording completeness, and comparison within Khordha.",
     "hallucinated_ids": []
    }
   },
@@ -29,24 +47,32 @@
    "id": "GEO-02",
    "kind": "geo",
    "text": "Anything I should know about Bandhpali GP?",
-   "pool": 67,
-   "pool_min_score": 0.5003,
+   "pool": 100,
+   "pool_min_score": 0.5076,
    "kept": [
-    "1-02932",
-    "2-00120",
-    "1-02875"
+    "d3-00757",
+    "d3-00763",
+    "d1-20573",
+    "d2-00894",
+    "d1-20489",
+    "d1-20528",
+    "d1-20556"
    ],
    "kept_rows": [
-    2932,
-    4236,
-    2875
+    40147,
+    40153,
+    24812,
+    39001,
+    24728,
+    24767,
+    24795
    ],
    "judge": {
-    "kept": 3,
-    "considered": 67,
+    "kept": 7,
+    "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept three distinct Bandhpali exceptions concerning untied-fund theme concentration, quarterly expenditure movement, and overspend patterns by output type.",
+    "reason": "Kept the main attention points on plan\u2013spend gaps, ongoing works, limited sanction coverage, improving linkage, missing metadata and concentrated building expenditure.",
     "hallucinated_ids": []
    }
   },
@@ -55,23 +81,39 @@
    "kind": "geo",
    "text": "What has the analysis found about Barimunda?",
    "pool": 100,
-   "pool_min_score": 0.5,
+   "pool_min_score": 0.5261,
    "kept": [
-    "1-02937",
-    "1-02895",
-    "1-02953"
+    "d3-00771",
+    "d1-20594",
+    "d3-00773",
+    "d3-00774",
+    "d1-20588",
+    "d1-20591",
+    "d1-20610",
+    "d1-20592",
+    "d1-20600",
+    "d1-20764",
+    "d1-20783"
    ],
    "kept_rows": [
-    2937,
-    2895,
-    2953
+    40161,
+    24833,
+    40163,
+    40164,
+    24827,
+    24830,
+    24849,
+    24831,
+    24839,
+    25003,
+    25022
    ],
    "judge": {
-    "kept": 3,
+    "kept": 11,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest findings showing Barimunda diverges from common patterns in untied funds by work type and output code, and in expenditure by work type.",
+    "reason": "Kept Barimunda\u2019s core planning, sanction, spending and activity patterns, including the plan gap, abandoned and ongoing works, thematic funding, limited sanction coverage and major metadata gaps.",
     "hallucinated_ids": []
    }
   },
@@ -80,23 +122,41 @@
    "kind": "geo",
    "text": "Show me findings for Bhatigaon.",
    "pool": 100,
-   "pool_min_score": 0.5161,
+   "pool_min_score": 0.5338,
    "kept": [
-    "1-02954",
-    "1-02749",
-    "2-00120"
+    "d3-00791",
+    "d2-00936",
+    "d1-20972",
+    "d1-20963",
+    "d1-21015",
+    "d1-21035",
+    "d1-21058",
+    "d1-20868",
+    "d1-21060",
+    "d1-21061",
+    "d1-20906",
+    "d1-20888"
    ],
    "kept_rows": [
-    2954,
-    2749,
-    4236
+    40181,
+    39043,
+    25211,
+    25202,
+    25254,
+    25274,
+    25297,
+    25107,
+    25299,
+    25300,
+    25145,
+    25127
    ],
    "judge": {
-    "kept": 3,
+    "kept": 12,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept three distinct Bhatigaon-specific findings on overspend, untied-fund themes and quarterly expenditure trends.",
+    "reason": "Kept Bhatigaon\u2019s main plan-spending gap, implementation and recording issues, and notable spending concentrations.",
     "hallucinated_ids": []
    }
   },
@@ -105,23 +165,33 @@
    "kind": "geo",
    "text": "Is there anything unusual in Bheden?",
    "pool": 100,
-   "pool_min_score": 0.5198,
+   "pool_min_score": 0.5373,
    "kept": [
-    "2-00074",
-    "2-00114",
-    "1-03032"
+    "d3-00398",
+    "d3-00400",
+    "d2-00144",
+    "d1-21272",
+    "d1-21313",
+    "d1-31302",
+    "d1-00010",
+    "d1-29999"
    ],
    "kept_rows": [
-    4190,
-    4230,
-    3032
+    39788,
+    39790,
+    38251,
+    25511,
+    25552,
+    35541,
+    4249,
+    34238
    ],
    "judge": {
-    "kept": 3,
+    "kept": 8,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest Bheden-specific exceptions: high values across most measures, a different quarterly expenditure trend, and an unusual tied-fund theme mix.",
+    "reason": "Kept distinct exceptions concerning the large plan\u2013spending gap, cashbook reconciliation and missing fields, low Good Governance spending, concentrated ST-labelled spending, and abandoned works.",
     "hallucinated_ids": []
    }
   },
@@ -130,15 +200,33 @@
    "kind": "geo",
    "text": "How is Biswamathpur performing on spending?",
    "pool": 100,
-   "pool_min_score": 0.5527,
-   "kept": [],
-   "kept_rows": [],
+   "pool_min_score": 0.5924,
+   "kept": [
+    "d3-00824",
+    "d1-21618",
+    "d1-21619",
+    "d2-00978",
+    "d3-00827",
+    "d3-00329",
+    "d3-00500",
+    "d1-21496"
+   ],
+   "kept_rows": [
+    40214,
+    25857,
+    25858,
+    39085,
+    40217,
+    39719,
+    39890,
+    25735
+   ],
    "judge": {
-    "kept": 0,
+    "kept": 8,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "None of the findings directly assesses Biswamathpur\u2019s overall spending performance.",
+    "reason": "Kept overall and comparative spending, gaps against plan and sanction, recording completeness, cashbook reconciliation, and the concentration of spending in ongoing works.",
     "hallucinated_ids": []
    }
   },
@@ -147,25 +235,33 @@
    "kind": "geo",
    "text": "What stands out in Boipariguda?",
    "pool": 100,
-   "pool_min_score": 0.5067,
+   "pool_min_score": 0.5282,
    "kept": [
-    "1-02933",
-    "1-02894",
-    "1-03022",
-    "1-02734"
+    "d1-21846",
+    "d1-21656",
+    "d2-00999",
+    "d1-21635",
+    "d1-21673",
+    "d1-21707",
+    "d1-21821",
+    "1-02933"
    ],
    "kept_rows": [
-    2933,
-    2894,
-    3022,
-    2734
+    26085,
+    25895,
+    39106,
+    25874,
+    25912,
+    25946,
+    26060,
+    2933
    ],
    "judge": {
-    "kept": 4,
+    "kept": 8,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest Boipariguda exceptions: unmapped-theme untied funds, an unusual Code 103 concentration, and no dominant ongoing-work share of expenditure.",
+    "reason": "Kept the main planning\u2013spending gaps, record-completeness concerns, unusual spending mix and Boipariguda\u2019s clearest exception to the sample pattern.",
     "hallucinated_ids": []
    }
   },
@@ -174,29 +270,33 @@
    "kind": "geo",
    "text": "Is Chikilli an outlier on anything?",
    "pool": 100,
-   "pool_min_score": 0.5525,
+   "pool_min_score": 0.5825,
    "kept": [
     "1-02286",
-    "1-02296",
     "1-02289",
+    "1-02296",
     "1-02292",
+    "1-02813",
     "1-02792",
-    "1-02813"
+    "1-02658",
+    "1-02956"
    ],
    "kept_rows": [
     2286,
-    2296,
     2289,
+    2296,
     2292,
+    2813,
     2792,
-    2813
+    2658,
+    2956
    ],
    "judge": {
-    "kept": 6,
+    "kept": 8,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept Chikilli\u2019s clearest outliers: lowest sanctions and proposed costs, persistently lowest approval counts, and unusually concentrated overspending patterns.",
+    "reason": "Kept distinct sample-level exceptions showing unusually low sanctions, proposed costs and approvals, plus atypical spending distributions and category patterns.",
     "hallucinated_ids": []
    }
   },
@@ -205,27 +305,35 @@
    "kind": "geo",
    "text": "Dadhapatna performance",
    "pool": 100,
-   "pool_min_score": 0.5757,
+   "pool_min_score": 0.5999,
    "kept": [
-    "1-02994",
-    "1-02835",
-    "1-02842",
-    "1-02892",
-    "1-02729"
+    "d3-00866",
+    "d3-00867",
+    "d3-00868",
+    "d1-21977",
+    "d3-00870",
+    "d2-01035",
+    "d1-21996",
+    "d1-22097",
+    "d1-22140"
    ],
    "kept_rows": [
-    2994,
-    2835,
-    2842,
-    2892,
-    2729
+    40256,
+    40257,
+    40258,
+    26216,
+    40260,
+    39142,
+    26235,
+    26336,
+    26379
    ],
    "judge": {
-    "kept": 5,
+    "kept": 9,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the main Dadhapatna-specific signals on tied-fund composition, status-wise overspending, progress evidence and expenditure status.",
+    "reason": "Kept the main plan, sanction and spending position, key sector and status concentrations, expenditure-linkage trend, and major record-completeness issues for Dadhapatna.",
     "hallucinated_ids": []
    }
   },
@@ -233,24 +341,44 @@
    "id": "GEO-10",
    "kind": "geo",
    "text": "Tell me about Dutimendi.",
-   "pool": 32,
-   "pool_min_score": 0.5001,
+   "pool": 100,
+   "pool_min_score": 0.5014,
    "kept": [
-    "1-02994",
-    "1-03026",
+    "d3-00879",
+    "d1-22231",
+    "d1-22232",
+    "d1-22317",
+    "d1-22375",
+    "d1-22237",
+    "d3-00885",
+    "d1-22247",
+    "d1-22244",
+    "d1-22265",
+    "d1-22445",
+    "d2-01063",
     "1-03059"
    ],
    "kept_rows": [
-    2994,
-    3026,
+    40269,
+    26470,
+    26471,
+    26556,
+    26614,
+    26476,
+    40275,
+    26486,
+    26483,
+    26504,
+    26684,
+    39170,
     3059
    ],
    "judge": {
-    "kept": 3,
-    "considered": 32,
+    "kept": 13,
+    "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept Dutimendi\u2019s clearest departures from the sample pattern: Codes 101 and 106 lead tied funds and expenditure, while New/Fresh and Upgradation lead expenditure by work type.",
+    "reason": "Kept a broad Dutimendi overview covering plans, priorities, costs, sanctions, spending, work status, missing records and a sample-level exception.",
     "hallucinated_ids": []
    }
   },
@@ -259,21 +387,29 @@
    "kind": "geo",
    "text": "Any issues flagged in Govindapur?",
    "pool": 100,
-   "pool_min_score": 0.5218,
+   "pool_min_score": 0.5516,
    "kept": [
-    "1-02976",
-    "1-02892"
+    "d3-00904",
+    "d1-22637",
+    "d1-22691",
+    "d3-00905",
+    "d1-22674",
+    "d2-01084"
    ],
    "kept_rows": [
-    2976,
-    2892
+    40294,
+    26876,
+    26930,
+    40295,
+    26913,
+    39191
    ],
    "judge": {
-    "kept": 2,
+    "kept": 6,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the two findings that explicitly flag Govindapur as differing from the usual pattern in the 20-GP sample.",
+    "reason": "Kept distinct Govindapur flags on the plan shortfall, approved works with no spending, sparse sanction and scheme records, abandoned allocations, and incomplete payment-to-plan linkage.",
     "hallucinated_ids": []
    }
   },
@@ -281,26 +417,50 @@
    "id": "GEO-12",
    "kind": "geo",
    "text": "What does the analysis say about Haldikudar?",
-   "pool": 70,
-   "pool_min_score": 0.501,
+   "pool": 100,
+   "pool_min_score": 0.5128,
    "kept": [
-    "1-02996",
-    "1-03022",
-    "1-02879",
-    "1-02956"
+    "d3-00915",
+    "d3-00918",
+    "d3-00919",
+    "d3-00920",
+    "d3-00921",
+    "d1-22801",
+    "d1-22792",
+    "d1-22793",
+    "d1-22773",
+    "d1-22798",
+    "d1-22908",
+    "d1-22791",
+    "d1-22974",
+    "d1-22954",
+    "d2-01105",
+    "1-02996"
    ],
    "kept_rows": [
-    2996,
-    3022,
-    2879,
-    2956
+    40305,
+    40308,
+    40309,
+    40310,
+    40311,
+    27040,
+    27031,
+    27032,
+    27012,
+    27037,
+    27147,
+    27030,
+    27213,
+    27193,
+    39212,
+    2996
    ],
    "judge": {
-    "kept": 4,
-    "considered": 70,
+    "kept": 16,
+    "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest Haldikudar-specific exceptions covering untied funds, total cost and overspend patterns without repeating overlapping findings.",
+    "reason": "Kept the main scale, allocation, spending-gap, record-completeness and sample-exception findings for Haldikudar while excluding repetitive breakdowns.",
     "hallucinated_ids": []
    }
   },
@@ -309,23 +469,31 @@
    "kind": "geo",
    "text": "Hirlipali - anything to raise at the review?",
    "pool": 100,
-   "pool_min_score": 0.5094,
+   "pool_min_score": 0.5398,
    "kept": [
-    "1-02937",
-    "1-02922",
-    "1-02898"
+    "d3-00938",
+    "d1-23062",
+    "d1-23216",
+    "d1-23157",
+    "d3-00939",
+    "d2-01119",
+    "d1-23254"
    ],
    "kept_rows": [
-    2937,
-    2922,
-    2898
+    40328,
+    27301,
+    27455,
+    27396,
+    40329,
+    39226,
+    27493
    ],
    "judge": {
-    "kept": 3,
+    "kept": 7,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept three Hirlipali-specific exceptions concerning untied funds, total expenditure and generated amounts, all showing atypical allocation patterns worth reconciling.",
+    "reason": "Kept distinct review points on the plan\u2013spend gap, affected sectors and abandoned works, plus major gaps in scheme, sanction, activity-linkage and asset-category records.",
     "hallucinated_ids": []
    }
   },
@@ -334,27 +502,23 @@
    "kind": "geo",
    "text": "How does Itipur compare with the others?",
    "pool": 100,
-   "pool_min_score": 0.5491,
+   "pool_min_score": 0.5689,
    "kept": [
     "1-02958",
     "1-02974",
-    "1-02895",
-    "1-02725",
-    "1-02653"
+    "1-02895"
    ],
    "kept_rows": [
     2958,
     2974,
-    2895,
-    2725,
-    2653
+    2895
    ],
    "judge": {
-    "kept": 5,
+    "kept": 3,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest ways Itipur differs from most of the 20-GP sample across overspending, untied funds, activity status and asset categorisation.",
+    "reason": "Kept three clear comparisons where Itipur differs from the sample majority in output-type and work-type patterns.",
     "hallucinated_ids": []
    }
   },
@@ -363,25 +527,31 @@
    "kind": "geo",
    "text": "Findings for Kalimela please.",
    "pool": 100,
-   "pool_min_score": 0.5075,
+   "pool_min_score": 0.5276,
    "kept": [
-    "1-02132",
-    "1-00771",
-    "1-00838",
-    "1-00896"
+    "1-02147",
+    "1-02930",
+    "1-03048",
+    "1-03026",
+    "d1-23760",
+    "d2-01161",
+    "d1-23581"
    ],
    "kept_rows": [
-    2132,
-    771,
-    838,
-    896
+    2147,
+    2930,
+    3048,
+    3026,
+    27999,
+    39268,
+    27820
    ],
    "judge": {
-    "kept": 4,
+    "kept": 7,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept four distinct Kalimela block findings covering completion, untied-fund theme, sanctioned-output mix, and work-type mix.",
+    "reason": "Kept distinct Kalimela findings on completion, unusual spending priorities, record completeness, and the plan-to-spending gap.",
     "hallucinated_ids": []
    }
   },
@@ -390,23 +560,33 @@
    "kind": "geo",
    "text": "What is going on in Kalyansinghpur?",
    "pool": 100,
-   "pool_min_score": 0.5135,
+   "pool_min_score": 0.5451,
    "kept": [
-    "1-03315",
-    "1-03322",
-    "1-00726"
+    "d3-00984",
+    "d3-00987",
+    "d3-00989",
+    "d3-00996",
+    "d1-23987",
+    "d1-23878",
+    "d1-24044",
+    "d2-01182"
    ],
    "kept_rows": [
-    3315,
-    3322,
-    726
+    40374,
+    40377,
+    40379,
+    40386,
+    28226,
+    28117,
+    28283,
+    39289
    ],
    "judge": {
-    "kept": 3,
+    "kept": 8,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the place-specific concentration of SC amounts and Kalyansinghpur\u2019s distinct output-code overspend pattern.",
+    "reason": "Kept the main planning, spending, work-status and sanction picture, along with significant scheme and expenditure-linkage recording gaps.",
     "hallucinated_ids": []
    }
   },
@@ -415,27 +595,31 @@
    "kind": "geo",
    "text": "Karuabahal GP - what has been found?",
    "pool": 100,
-   "pool_min_score": 0.5282,
+   "pool_min_score": 0.5566,
    "kept": [
-    "1-03022",
-    "1-02876",
-    "1-02729",
-    "1-02724",
-    "1-02979"
+    "d3-00688",
+    "d1-24156",
+    "d1-24321",
+    "d1-24153",
+    "d1-24246",
+    "d1-24250",
+    "d2-01203"
    ],
    "kept_rows": [
-    3022,
-    2876,
-    2729,
-    2724,
-    2979
+    40078,
+    28395,
+    28560,
+    28392,
+    28485,
+    28489,
+    39310
    ],
    "judge": {
-    "kept": 5,
+    "kept": 7,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest Karuabahal-specific findings on cost and overspend composition, activity and expenditure status, and its atypical tied-fund focus.",
+    "reason": "Kept the main planning-spending gap, affected sectors, incomplete records, sanction coverage, work-status pattern and improving expenditure linkage for Karuabahal.",
     "hallucinated_ids": []
    }
   },
@@ -444,15 +628,25 @@
    "kind": "geo",
    "text": "Is Laxmipur behind on anything?",
    "pool": 100,
-   "pool_min_score": 0.5085,
-   "kept": [],
-   "kept_rows": [],
+   "pool_min_score": 0.5318,
+   "kept": [
+    "d3-01024",
+    "d1-24403",
+    "d1-24404",
+    "d1-24526"
+   ],
+   "kept_rows": [
+    40414,
+    28642,
+    28643,
+    28765
+   ],
    "judge": {
-    "kept": 0,
+    "kept": 4,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "None of these findings establishes that Laxmipur is behind on approvals, spending, completion or evidence.",
+    "reason": "Kept Laxmipur GP\u2019s overall shortfall against plan, the main focus-area gaps, underspending against recorded sanctions, and the major sanction-authority data gap.",
     "hallucinated_ids": []
    }
   },
@@ -461,23 +655,39 @@
    "kind": "geo",
    "text": "Mendarajpur - show me what the analysis found.",
    "pool": 100,
-   "pool_min_score": 0.5142,
+   "pool_min_score": 0.5433,
    "kept": [
-    "1-02984",
-    "1-02732",
-    "1-02964"
+    "d3-01033",
+    "d3-01034",
+    "d3-01037",
+    "d3-01039",
+    "d3-01040",
+    "d3-01041",
+    "d2-01245",
+    "d1-24807",
+    "d1-24632",
+    "d1-24633",
+    "d1-24617"
    ],
    "kept_rows": [
-    2984,
-    2732,
-    2964
+    40423,
+    40424,
+    40427,
+    40429,
+    40430,
+    40431,
+    39352,
+    29046,
+    28871,
+    28872,
+    28856
    ],
    "judge": {
-    "kept": 3,
+    "kept": 11,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "No Mendarajpur-specific exception appears; these are the clearest sample-wide patterns that include it.",
+    "reason": "Kept Mendarajpur\u2019s planning and spending overview, key funding gaps, sector patterns, pending approvals and major recording-completeness issues.",
     "hallucinated_ids": []
    }
   },
@@ -485,20 +695,36 @@
    "id": "GEO-20",
    "kind": "geo",
    "text": "Anything notable about Sharagada?",
-   "pool": 9,
-   "pool_min_score": 0.5062,
+   "pool": 100,
+   "pool_min_score": 0.5066,
    "kept": [
-    "1-02937"
+    "1-02937",
+    "d1-24911",
+    "d1-24948",
+    "d1-24956",
+    "d1-25004",
+    "d1-25050",
+    "d2-01266",
+    "d1-24875",
+    "d1-24876"
    ],
    "kept_rows": [
-    2937
+    2937,
+    29150,
+    29187,
+    29195,
+    29243,
+    29289,
+    39373,
+    29114,
+    29115
    ],
    "judge": {
-    "kept": 1,
-    "considered": 9,
+    "kept": 9,
+    "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the only finding specific to Sharagada: maintenance, rather than new/fresh works, has the highest untied-fund total.",
+    "reason": "Kept Sharagada\u2019s unusual maintenance focus, plan-to-spending mix, major metadata gaps, improving but incomplete expenditure linkage, and plan/sanction reconciliation gaps.",
     "hallucinated_ids": []
    }
   },
@@ -507,23 +733,47 @@
    "kind": "geo",
    "text": "How is Barpali block doing?",
    "pool": 100,
-   "pool_min_score": 0.5766,
+   "pool_min_score": 0.5998,
    "kept": [
-    "2-00074",
-    "2-00114",
-    "1-00792"
+    "d3-00414",
+    "d3-00127",
+    "d3-00130",
+    "d1-06856",
+    "d3-00131",
+    "d3-00126",
+    "d3-00136",
+    "d3-00137",
+    "d1-06854",
+    "d2-00109",
+    "d3-00132",
+    "d3-00133",
+    "d1-06880",
+    "d1-06870",
+    "d1-07074"
    ],
    "kept_rows": [
-    4190,
-    4230,
-    792
+    39804,
+    39517,
+    39520,
+    11095,
+    39521,
+    39516,
+    39526,
+    39527,
+    11093,
+    38216,
+    39522,
+    39523,
+    11119,
+    11109,
+    11313
    ],
    "judge": {
-    "kept": 3,
+    "kept": 15,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept Barpali-specific findings on its comparatively high expenditure and sanctions, atypical quarterly expenditure trend, and asset-category overspend pattern.",
+    "reason": "Kept the block overview, comparative position, delivery and funding gaps, work status, priority shortfall, GP concentrations, and key recording-quality issues.",
     "hallucinated_ids": []
    }
   },
@@ -532,25 +782,41 @@
    "kind": "geo",
    "text": "What has been found in Attabira block?",
    "pool": 100,
-   "pool_min_score": 0.5548,
+   "pool_min_score": 0.5707,
    "kept": [
-    "1-00741",
-    "1-00783",
-    "1-00786",
-    "1-00754"
+    "d3-00073",
+    "d3-00078",
+    "d3-00079",
+    "d3-00085",
+    "d3-00086",
+    "d2-00046",
+    "d1-06114",
+    "d1-06117",
+    "d1-06262",
+    "d1-16805",
+    "d1-14906",
+    "d1-30666"
    ],
    "kept_rows": [
-    741,
-    783,
-    786,
-    754
+    39463,
+    39468,
+    39469,
+    39475,
+    39476,
+    38153,
+    10353,
+    10356,
+    10501,
+    21044,
+    19145,
+    34905
    ],
    "judge": {
-    "kept": 4,
+    "kept": 12,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest Attabira-specific exceptions: Code 105 leads tied funds and ongoing works, while maintenance leads both started and ongoing works.",
+    "reason": "Kept the main activity, spending and status picture, along with notable recording gaps and Attabira-specific concentrations that merit review.",
     "hallucinated_ids": []
    }
   },
@@ -559,27 +825,33 @@
    "kind": "geo",
    "text": "Khallikote block - anything unusual?",
    "pool": 100,
-   "pool_min_score": 0.5707,
+   "pool_min_score": 0.6079,
    "kept": [
+    "d1-17580",
+    "d1-16810",
+    "d1-15491",
     "1-00666",
-    "1-00639",
-    "1-00508",
+    "1-00795",
     "1-00546",
-    "1-00852"
+    "1-00508",
+    "d3-00289"
    ],
    "kept_rows": [
+    21819,
+    21049,
+    19730,
     666,
-    639,
-    508,
+    795,
     546,
-    852
+    508,
+    39679
    ],
    "judge": {
-    "kept": 5,
+    "kept": 8,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept distinct Khallikote exceptions covering concentrated overspending, atypical sanction and work-status mixes, and no clear output-type pattern in progress evidence.",
+    "reason": "Kept Khallikote-specific exceptions involving sector shortfalls, unusual sanction and asset/output mixes, and abandoned works concentrated in 2021-22.",
     "hallucinated_ids": []
    }
   },
@@ -588,27 +860,33 @@
    "kind": "geo",
    "text": "Is Lahunipara block an exception to anything?",
    "pool": 100,
-   "pool_min_score": 0.5977,
+   "pool_min_score": 0.629,
    "kept": [
     "1-00722",
-    "1-00869",
-    "1-00865",
-    "1-00911",
+    "1-00843",
+    "1-00892",
+    "1-00838",
+    "1-00873",
+    "1-00731",
+    "1-00914",
     "1-00795"
    ],
    "kept_rows": [
     722,
-    869,
-    865,
-    911,
+    843,
+    892,
+    838,
+    873,
+    731,
+    914,
     795
    ],
    "judge": {
-    "kept": 5,
+    "kept": 8,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept distinct Lahunipara exceptions covering output types, activity mix, work types and asset-category overspend, while omitting overlapping variants.",
+    "reason": "Kept distinct sample-wide patterns where Lahunipara is explicitly an exception in output type, work type or asset-category rankings.",
     "hallucinated_ids": []
    }
   },
@@ -616,22 +894,40 @@
    "id": "GEO-25",
    "kind": "geo",
    "text": "Findings for Tangi Choudwar.",
-   "pool": 35,
-   "pool_min_score": 0.5001,
+   "pool": 100,
+   "pool_min_score": 0.5016,
    "kept": [
-    "1-00779",
-    "1-00816"
+    "d3-00375",
+    "d1-10078",
+    "d3-00378",
+    "d3-00380",
+    "d3-00466",
+    "d1-09970",
+    "d2-00376",
+    "d1-10104",
+    "d1-09952",
+    "d1-09957",
+    "d1-09944"
    ],
    "kept_rows": [
-    779,
-    816
+    39765,
+    14317,
+    39768,
+    39770,
+    39856,
+    14209,
+    38483,
+    14343,
+    14191,
+    14196,
+    14183
    ],
    "judge": {
-    "kept": 2,
-    "considered": 35,
+    "kept": 11,
+    "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the two distinct Tangi Choudwar exceptions: its untied-fund mix and overspend pattern by work type differ from the prevailing block pattern.",
+    "reason": "Kept the main planning, spending, progress, evidence and record-completeness findings that highlight where Tangi Choudwar may need review.",
     "hallucinated_ids": []
    }
   },
@@ -640,21 +936,41 @@
    "kind": "geo",
    "text": "How do the GPs in Sheragada block look?",
    "pool": 100,
-   "pool_min_score": 0.5155,
+   "pool_min_score": 0.5261,
    "kept": [
-    "1-00612",
-    "1-00783"
+    "d3-00357",
+    "d3-00358",
+    "d3-00513",
+    "d1-09677",
+    "d1-09678",
+    "d1-09679",
+    "d1-09685",
+    "d1-09689",
+    "d1-09841",
+    "d1-09683",
+    "d3-00364",
+    "1-00596"
    ],
    "kept_rows": [
-    612,
-    783
+    39747,
+    39748,
+    39903,
+    13916,
+    13917,
+    13918,
+    13924,
+    13928,
+    14080,
+    13922,
+    39754,
+    596
    ],
    "judge": {
-    "kept": 2,
+    "kept": 12,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Sheragada stands out as maintenance-oriented: maintenance accounts for most total work cost and leads among ongoing works.",
+    "reason": "Kept the main Sheragada findings on planning, sector and grant mix, ongoing work, plan\u2013spend gaps, missing records, costless activities and its unusual maintenance emphasis.",
     "hallucinated_ids": []
    }
   },
@@ -663,23 +979,43 @@
    "kind": "geo",
    "text": "Bhubaneswar block performance",
    "pool": 100,
-   "pool_min_score": 0.6186,
+   "pool_min_score": 0.6484,
    "kept": [
+    "d3-00024",
+    "d3-00178",
+    "d3-00180",
+    "d3-00181",
+    "d3-00199",
+    "d1-07421",
+    "d2-00158",
+    "d1-07654",
+    "d1-07464",
+    "d1-07528",
     "2-00118",
     "2-00117",
     "2-00119"
    ],
    "kept_rows": [
+    39414,
+    39568,
+    39570,
+    39571,
+    39589,
+    11660,
+    38265,
+    11893,
+    11703,
+    11767,
     4234,
     4233,
     4235
    ],
    "judge": {
-    "kept": 3,
+    "kept": 13,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest Bhubaneswar-specific comparisons on payment volume, payment value and receipts across fiscal years.",
+    "reason": "Kept the block\u2019s overall scale, plan and sanction gaps, GP and year patterns, spending mix, recording completeness, and comparative payment and receipt findings.",
     "hallucinated_ids": []
    }
   },
@@ -688,25 +1024,33 @@
    "kind": "geo",
    "text": "Anything on Balisankara block?",
    "pool": 100,
-   "pool_min_score": 0.5883,
+   "pool_min_score": 0.6169,
    "kept": [
-    "1-00682",
-    "1-00722",
-    "1-00855",
-    "1-00861"
+    "d3-00090",
+    "d3-00096",
+    "d2-00067",
+    "d1-06512",
+    "d1-06496",
+    "d1-17851",
+    "d1-06360",
+    "d1-06343"
    ],
    "kept_rows": [
-    682,
-    722,
-    855,
-    861
+    39480,
+    39486,
+    38174,
+    10751,
+    10735,
+    22090,
+    10599,
+    10582
    ],
    "judge": {
-    "kept": 4,
+    "kept": 8,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept four distinct Balisankara exceptions covering overspend distribution, output codes, technical approvals and ongoing works.",
+    "reason": "Kept the main planning and spending gaps, record-linkage issues, missing scheme data, abandoned-work exposure, allocation concentrations and beneficiary outlier.",
     "hallucinated_ids": []
    }
   },
@@ -715,25 +1059,39 @@
    "kind": "geo",
    "text": "How is Khordha district doing overall?",
    "pool": 100,
-   "pool_min_score": 0.5428,
+   "pool_min_score": 0.5579,
    "kept": [
-    "3-00001",
-    "1-01556",
-    "1-01532",
-    "1-01260"
+    "d3-00569",
+    "d2-00523",
+    "d3-00576",
+    "d3-00575",
+    "d1-11567",
+    "d1-11420",
+    "d1-11612",
+    "d1-11653",
+    "d1-11455",
+    "d1-11461",
+    "1-01532"
    ],
    "kept_rows": [
-    4238,
-    1556,
-    1532,
-    1260
+    39959,
+    38630,
+    39966,
+    39965,
+    15806,
+    15659,
+    15851,
+    15892,
+    15694,
+    15700,
+    1532
    ],
    "judge": {
-    "kept": 4,
+    "kept": 11,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest Khordha-specific signals on sanction trends, expenditure priorities, progress evidence and overspending against sanctions.",
+    "reason": "Kept distinct Khordha findings on plan-versus-spend, work status, sector mix, expenditure linkage, progress evidence and major record-completeness concerns.",
     "hallucinated_ids": []
    }
   },
@@ -742,29 +1100,35 @@
    "kind": "geo",
    "text": "What has the analysis found in Koraput?",
    "pool": 100,
-   "pool_min_score": 0.5819,
+   "pool_min_score": 0.5965,
    "kept": [
-    "1-03733",
-    "1-01209",
-    "1-01053",
-    "1-01603",
-    "1-02392",
-    "1-02383"
+    "d3-00605",
+    "d3-00637",
+    "d1-11770",
+    "d1-17855",
+    "d1-11893",
+    "d1-11735",
+    "d2-00551",
+    "d1-11752",
+    "d1-11725"
    ],
    "kept_rows": [
-    3733,
-    1209,
-    1053,
-    1603,
-    2392,
-    2383
+    39995,
+    40027,
+    16009,
+    22094,
+    16132,
+    15974,
+    38658,
+    15991,
+    15964
    ],
    "judge": {
-    "kept": 6,
+    "kept": 9,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept six distinct Koraput signals covering unmapped costs, overspend concentration, work status, output mix and recent year-specific funding patterns.",
+    "reason": "Kept distinct Koraput findings on plan and sanction gaps, their concentration by place, year and category, recording completeness, and beneficiary concentration.",
     "hallucinated_ids": []
    }
   },
@@ -773,29 +1137,51 @@
    "kind": "geo",
    "text": "Is Ganjam an exception on anything?",
    "pool": 100,
-   "pool_min_score": 0.5976,
+   "pool_min_score": 0.6143,
    "kept": [
+    "d3-00043",
+    "1-03690",
+    "1-04053",
+    "1-02280",
     "1-03694",
+    "1-02385",
+    "1-02387",
+    "1-02396",
+    "1-02380",
+    "1-02382",
+    "1-03732",
     "3-00001",
+    "1-01131",
     "1-01640",
-    "1-01452",
-    "1-01133",
-    "1-02133"
+    "1-01446",
+    "1-01261",
+    "1-01267"
    ],
    "kept_rows": [
+    39433,
+    3690,
+    4053,
+    2280,
     3694,
+    2385,
+    2387,
+    2396,
+    2380,
+    2382,
+    3732,
     4238,
+    1131,
     1640,
-    1452,
-    1133,
-    2133
+    1446,
+    1261,
+    1267
    ],
    "judge": {
-    "kept": 6,
+    "kept": 17,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept distinct Ganjam exceptions covering overspend, sanction trends, expenditure mix, activity concentration and abandoned funds.",
+    "reason": "Kept distinct sample-wide exceptions showing Ganjam\u2019s unusually large plan shortfall, recurring low spending against plans or sanctions, leadership on several funding measures, and differences in trends and spending composition.",
     "hallucinated_ids": []
    }
   },
@@ -804,25 +1190,33 @@
    "kind": "geo",
    "text": "Sundergarh district - what should I look at?",
    "pool": 100,
-   "pool_min_score": 0.5356,
+   "pool_min_score": 0.554,
    "kept": [
-    "1-01383",
-    "1-01556",
-    "1-01242",
-    "1-03612"
+    "d1-12560",
+    "d1-12561",
+    "d1-12624",
+    "d1-12617",
+    "d1-12777",
+    "d1-12757",
+    "d1-12798",
+    "d2-00642"
    ],
    "kept_rows": [
-    1383,
-    1556,
-    1242,
-    3612
+    16799,
+    16800,
+    16863,
+    16856,
+    17016,
+    16996,
+    17037,
+    38749
    ],
    "judge": {
-    "kept": 4,
+    "kept": 8,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept four distinct sample-based signals on Sundargarh\u2019s activity mix, expenditure priorities, uneven tied/untied overspend, and high expected beneficiaries under an unmapped theme.",
+    "reason": "Kept the main review points: plan and sanction gaps, sanitation and roads requiring attention, major missing classification fields, and changing activity-linkage completeness.",
     "hallucinated_ids": []
    }
   },
@@ -831,25 +1225,29 @@
    "kind": "geo",
    "text": "Anything flagged for Kandhamal?",
    "pool": 100,
-   "pool_min_score": 0.5667,
+   "pool_min_score": 0.5871,
    "kept": [
+    "d1-11165",
+    "d1-11160",
+    "d1-11327",
+    "d2-00502",
     "3-00001",
-    "1-01209",
-    "1-01680",
-    "1-00933"
+    "1-01680"
    ],
    "kept_rows": [
+    15404,
+    15399,
+    15566,
+    38609,
     4238,
-    1209,
-    1680,
-    933
+    1680
    ],
    "judge": {
-    "kept": 4,
+    "kept": 6,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept four distinct Kandhamal exceptions covering sanction trends, concentration of overspend, expenditure by work type, and sanctioned funds by output code.",
+    "reason": "Kept distinct Kandhamal flags on plan shortfalls, abandoned works, missing scheme records, expenditure linkage, rising sanctions and an unusual work-type spending mix.",
     "hallucinated_ids": []
    }
   },
@@ -858,29 +1256,35 @@
    "kind": "geo",
    "text": "Findings for Cuttack ZP.",
    "pool": 100,
-   "pool_min_score": 0.5749,
+   "pool_min_score": 0.5945,
    "kept": [
-    "1-02133",
+    "d3-00449",
+    "d2-00432",
+    "d1-10738",
+    "d1-10534",
+    "d1-10596",
+    "d1-10569",
+    "d1-10528",
     "1-01556",
-    "1-01260",
-    "1-01206",
-    "1-01441",
-    "1-01533"
+    "1-01441"
    ],
    "kept_rows": [
-    2133,
+    39839,
+    38539,
+    14977,
+    14773,
+    14835,
+    14808,
+    14767,
     1556,
-    1260,
-    1206,
-    1441,
-    1533
+    1441
    ],
    "judge": {
-    "kept": 6,
+    "kept": 9,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest Cuttack-specific findings on abandoned funds, spending priorities, overspend patterns, sanction-authority concentration and progress evidence.",
+    "reason": "Kept distinct Cuttack findings on plan and sanction gaps, recording completeness, missing authority data, abandoned works, funding concentration, and notable sector and asset patterns.",
     "hallucinated_ids": []
    }
   },
@@ -889,19 +1293,45 @@
    "kind": "measure",
    "text": "Where is money planned but not spent?",
    "pool": 100,
-   "pool_min_score": 0.6297,
+   "pool_min_score": 0.6442,
    "kept": [
-    "1-03595"
+    "d1-21599",
+    "d1-21335",
+    "d1-21656",
+    "d1-22474",
+    "d1-33072",
+    "d1-30990",
+    "d1-30280",
+    "d1-30631",
+    "d1-29169",
+    "d1-17298",
+    "d1-17843",
+    "d1-04410",
+    "d1-05492",
+    "d1-30044"
    ],
    "kept_rows": [
-    3595
+    25838,
+    25574,
+    25895,
+    26713,
+    37311,
+    35229,
+    34519,
+    34870,
+    33408,
+    21537,
+    22082,
+    8649,
+    9731,
+    34283
    ],
    "judge": {
-    "kept": 1,
+    "kept": 14,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest geographic pattern: Bargarh and Ganjam generally have the lowest spending relative to plan across themes.",
+    "reason": "Kept the clearest geographic concentrations and largest plan-to-spending gaps across GPs, blocks, districts, work types, themes and asset categories.",
     "hallucinated_ids": []
    }
   },
@@ -910,25 +1340,35 @@
    "kind": "measure",
    "text": "What does the analysis say about photo evidence?",
    "pool": 100,
-   "pool_min_score": 0.5303,
+   "pool_min_score": 0.5578,
    "kept": [
+    "d1-00020",
     "1-02655",
     "1-02687",
-    "1-02750",
-    "1-01793"
+    "1-03039",
+    "1-01793",
+    "1-01725",
+    "1-02399",
+    "1-02891",
+    "d1-19782"
    ],
    "kept_rows": [
+    4259,
     2655,
     2687,
-    2750,
-    1793
+    3039,
+    1793,
+    1725,
+    2399,
+    2891,
+    24021
    ],
    "judge": {
-    "kept": 4,
+    "kept": 9,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest non-duplicative patterns on photo uploads by output type, work status, work type and scheme over time.",
+    "reason": "Kept the overall coverage and distinct patterns by output type, status, work type, scheme, authority, focus area and fund component, including the marked Itipur concentration.",
     "hallucinated_ids": []
    }
   },
@@ -937,25 +1377,37 @@
    "kind": "measure",
    "text": "Anything about technical sanction?",
    "pool": 100,
-   "pool_min_score": 0.5521,
+   "pool_min_score": 0.5715,
    "kept": [
-    "1-01753",
+    "1-01752",
     "1-02289",
+    "1-01796",
     "1-01320",
-    "1-01537"
+    "1-01537",
+    "1-02713",
+    "1-01284",
+    "1-02663",
+    "1-03644",
+    "1-00102"
    ],
    "kept_rows": [
-    1753,
+    1752,
     2289,
+    1796,
     1320,
-    1537
+    1537,
+    2713,
+    1284,
+    2663,
+    3644,
+    102
    ],
    "judge": {
-    "kept": 4,
+    "kept": 10,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest technical-approval patterns on sanction authority, Chikilli\u2019s recurring low position, grant component and focus area.",
+    "reason": "Kept distinct technical-approval patterns covering sanctioning authority, low-approval GPs, schemes, fund components, focus areas, work types, status, output types, themes and beneficiary groups.",
     "hallucinated_ids": []
    }
   },
@@ -964,7 +1416,7 @@
    "kind": "measure",
    "text": "Which works have been abandoned?",
    "pool": 100,
-   "pool_min_score": 0.5851,
+   "pool_min_score": 0.6196,
    "kept": [],
    "kept_rows": [],
    "judge": {
@@ -972,7 +1424,7 @@
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "This is a lookup for a specific list of abandoned works, but the findings only provide aggregate patterns, not work-level records.",
+    "reason": "This is a request for a specific list of records; the findings only provide aggregate patterns and do not identify individual abandoned works.",
     "hallucinated_ids": []
    }
   },
@@ -981,27 +1433,29 @@
    "kind": "measure",
    "text": "How is the tied grant behaving?",
    "pool": 100,
-   "pool_min_score": 0.6168,
+   "pool_min_score": 0.6455,
    "kept": [
-    "1-02982",
-    "1-01077",
-    "1-02383",
-    "1-01455",
-    "1-02187"
+    "d1-19764",
+    "1-02659",
+    "1-03035",
+    "1-02187",
+    "1-03043",
+    "1-02382"
    ],
    "kept_rows": [
-    2982,
-    1077,
-    2383,
-    1455,
-    2187
+    24003,
+    2659,
+    3035,
+    2187,
+    3043,
+    2382
    ],
    "judge": {
-    "kept": 5,
+    "kept": 6,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest findings on tied-grant focus areas, work mix, district concentration, overspending and sanction authority.",
+    "reason": "Kept the overall spread and the clearest recurring patterns by output, theme, sanctioning authority, work type and district.",
     "hallucinated_ids": []
    }
   },
@@ -1010,29 +1464,27 @@
    "kind": "measure",
    "text": "Findings on untied grant",
    "pool": 100,
-   "pool_min_score": 0.6139,
+   "pool_min_score": 0.648,
    "kept": [
     "1-02996",
     "1-02931",
     "1-02937",
     "1-02193",
-    "1-02385",
-    "1-01310"
+    "1-03292"
    ],
    "kept_rows": [
     2996,
     2931,
     2937,
     2193,
-    2385,
-    1310
+    3292
    ],
    "judge": {
-    "kept": 6,
+    "kept": 5,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest non-duplicative untied-grant patterns on outputs, themes, work types, sanction authority, district concentration and uncategorised assets.",
+    "reason": "Kept distinct sample-wide patterns on leading output codes, themes, work types, sanctioning authority and intended beneficiaries for untied grants.",
     "hallucinated_ids": []
    }
   },
@@ -1041,25 +1493,29 @@
    "kind": "measure",
    "text": "What is happening with receipts?",
    "pool": 100,
-   "pool_min_score": 0.5524,
+   "pool_min_score": 0.5886,
    "kept": [
-    "2-00039",
-    "2-00007",
+    "d2-00001",
+    "d2-00003",
+    "2-00041",
     "2-00010",
-    "2-00119"
+    "2-00007",
+    "d2-00788"
    ],
    "kept_rows": [
-    4155,
-    4123,
+    38108,
+    38110,
+    4157,
     4126,
-    4235
+    4123,
+    38895
    ],
    "judge": {
-    "kept": 4,
+    "kept": 6,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest receipt-specific findings on amount trends, seasonality in amounts and counts, and the leading block over time.",
+    "reason": "Kept the overall receipt amount and voucher count, the broad decline in counts, seasonality in counts and amounts, and the clearest example of March-end concentration.",
     "hallucinated_ids": []
    }
   },
@@ -1068,25 +1524,33 @@
    "kind": "measure",
    "text": "Any pattern in payments?",
    "pool": 100,
-   "pool_min_score": 0.5809,
+   "pool_min_score": 0.6144,
    "kept": [
     "2-00002",
+    "2-00035",
     "2-00032",
+    "2-00031",
+    "2-00068",
+    "2-00059",
     "2-00117",
     "2-00118"
    ],
    "kept_rows": [
     4118,
+    4151,
     4148,
+    4147,
+    4184,
+    4175,
     4233,
     4234
    ],
    "judge": {
-    "kept": 4,
+    "kept": 8,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest payment patterns covering seasonality, amount trends, and Bhubaneswar\u2019s lead in payment amounts and counts across the sample.",
+    "reason": "Kept distinct payment patterns covering seasonality, trends, quarterly spikes and shifts, and the block leading in payment value and volume.",
     "hallucinated_ids": []
    }
   },
@@ -1095,25 +1559,33 @@
    "kind": "measure",
    "text": "Anything on administrative approval?",
    "pool": 100,
-   "pool_min_score": 0.5273,
+   "pool_min_score": 0.5509,
    "kept": [
+    "d1-00018",
     "1-02292",
-    "1-01757",
+    "1-01758",
+    "1-02665",
     "1-02426",
-    "1-01844"
+    "1-01844",
+    "1-02348",
+    "1-01799"
    ],
    "kept_rows": [
+    4257,
     2292,
-    1757,
+    1758,
+    2665,
     2426,
-    1844
+    1844,
+    2348,
+    1799
    ],
    "judge": {
-    "kept": 4,
+    "kept": 8,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest non-duplicative patterns on administrative approvals: Chikilli\u2019s consistently low count and the leading sanction authority, focus areas and work status.",
+    "reason": "Kept the overall sample picture and distinct recurring patterns by GP, authority, output type, focus area, status, grant type and scheme.",
     "hallucinated_ids": []
    }
   },
@@ -1121,24 +1593,34 @@
    "id": "MEA-10",
    "kind": "measure",
    "text": "What has been found about training?",
-   "pool": 24,
-   "pool_min_score": 0.5021,
+   "pool": 100,
+   "pool_min_score": 0.5022,
    "kept": [
-    "1-01641",
-    "1-00919",
-    "1-01054"
+    "d1-05502",
+    "d1-25499",
+    "d1-25151",
+    "d1-25514",
+    "d1-25223",
+    "1-02739",
+    "d1-30291",
+    "d1-18480"
    ],
    "kept_rows": [
-    1641,
-    919,
-    1054
+    9741,
+    29738,
+    29390,
+    29753,
+    29462,
+    2739,
+    34530,
+    22719
    ],
    "judge": {
-    "kept": 3,
-    "considered": 24,
+    "kept": 8,
+    "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest district-level findings on training themes, intended trainee groups and approval status.",
+    "reason": "Kept the broad trainee distribution, cost and theme patterns, status exceptions, a sharp water-theme concentration, and the training-focused spending gap.",
     "hallucinated_ids": []
    }
   },
@@ -1147,15 +1629,27 @@
    "kind": "vague",
    "text": "Is spending on track?",
    "pool": 100,
-   "pool_min_score": 0.6567,
-   "kept": [],
-   "kept_rows": [],
+   "pool_min_score": 0.6705,
+   "kept": [
+    "d1-25140",
+    "1-02966",
+    "1-02976",
+    "1-00729",
+    "1-03593"
+   ],
+   "kept_rows": [
+    29379,
+    2966,
+    2976,
+    729,
+    3593
+   ],
    "judge": {
-    "kept": 0,
+    "kept": 5,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "None of these findings shows actual spending progress against plans or sanctions, so they cannot establish whether spending is on track.",
+    "reason": "Kept the sample-wide shortfall against plan and the clearest status, work-type, theme and district patterns showing where spending is lagging.",
     "hallucinated_ids": []
    }
   },
@@ -1164,21 +1658,33 @@
    "kind": "vague",
    "text": "What should I raise at the next review meeting?",
    "pool": 100,
-   "pool_min_score": 0.5027,
+   "pool_min_score": 0.5217,
    "kept": [
-    "1-02931",
-    "1-02808"
+    "1-00730",
+    "d1-30990",
+    "d1-30280",
+    "d1-30654",
+    "d1-17843",
+    "d1-31193",
+    "d1-31215",
+    "d1-30005"
    ],
    "kept_rows": [
-    2931,
-    2808
+    730,
+    35229,
+    34519,
+    34893,
+    22082,
+    35432,
+    35454,
+    34244
    ],
    "judge": {
-    "kept": 2,
+    "kept": 8,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Raise the concentration of untied funds in Theme 6\u2014especially Boipariguda\u2019s unmapped-theme exception\u2014and reconcile Chikilli\u2019s unusual concentration of spending above sanction across focus areas.",
+    "reason": "Kept the largest recurring plan gaps, their main geographic concentrations, the Boipariguda rural-housing exception, and major sanction and scheme record gaps.",
     "hallucinated_ids": []
    }
   },
@@ -1187,19 +1693,27 @@
    "kind": "vague",
    "text": "Where is the biggest problem?",
    "pool": 100,
-   "pool_min_score": 0.5125,
+   "pool_min_score": 0.5329,
    "kept": [
-    "1-03316"
+    "1-03593",
+    "d1-30990",
+    "d1-17843",
+    "d1-33072",
+    "d1-05492"
    ],
    "kept_rows": [
-    3316
+    3593,
+    35229,
+    22082,
+    37311,
+    9731
    ],
    "judge": {
-    "kept": 1,
+    "kept": 5,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest location-specific concern: Bargarh accounts for most abandoned funds in four of seven themes in the sample.",
+    "reason": "Kept the broad district pattern and the largest or most concentrated plan-spending gaps identifying Sheragada, Boipariguda, Biswamathpur and uncategorised works as priority hotspots.",
     "hallucinated_ids": []
    }
   },
@@ -1208,19 +1722,23 @@
    "kind": "vague",
    "text": "Is money moving steadily or in year-end bursts?",
    "pool": 100,
-   "pool_min_score": 0.5708,
+   "pool_min_score": 0.6262,
    "kept": [
+    "d2-00032",
+    "d2-00824",
     "2-00066"
    ],
    "kept_rows": [
+    38139,
+    38931,
     4182
    ],
    "judge": {
-    "kept": 1,
+    "kept": 3,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Most money-flow measures show outliers in March 2025 and March 2026, indicating year-end bursts rather than steady movement.",
+    "reason": "Kept the overall monthly spread, the recent March year-end concentration, and the cross-measure March outlier pattern.",
     "hallucinated_ids": []
    }
   },
@@ -1229,25 +1747,33 @@
    "kind": "vague",
    "text": "Which places are behaving differently from the rest?",
    "pool": 100,
-   "pool_min_score": 0.5729,
+   "pool_min_score": 0.5911,
    "kept": [
-    "1-02996",
-    "1-02964",
-    "1-00654",
-    "1-01205"
+    "d1-17843",
+    "d1-31625",
+    "d1-30024",
+    "1-02815",
+    "1-02792",
+    "1-02839",
+    "1-02879",
+    "1-02976"
    ],
    "kept_rows": [
-    2996,
-    2964,
-    654,
-    1205
+    22082,
+    35864,
+    34263,
+    2815,
+    2792,
+    2839,
+    2879,
+    2976
    ],
    "judge": {
-    "kept": 4,
+    "kept": 8,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest GP-, block- and district-level exceptions in untied-fund mix and overspending patterns.",
+    "reason": "Kept the clearest distinct outliers in spending concentration and in fund, year, status, output-type and work-type patterns.",
     "hallucinated_ids": []
    }
   },
@@ -1256,23 +1782,31 @@
    "kind": "vague",
    "text": "Anything worth my attention this quarter?",
    "pool": 100,
-   "pool_min_score": 0.5544,
+   "pool_min_score": 0.5717,
    "kept": [
     "2-00071",
     "2-00116",
-    "1-02734"
+    "1-03595",
+    "d1-30990",
+    "d1-30280",
+    "d1-17843",
+    "d1-31519"
    ],
    "kept_rows": [
     4187,
     4232,
-    2734
+    3595,
+    35229,
+    34519,
+    22082,
+    35758
    ],
    "judge": {
-    "kept": 3,
+    "kept": 7,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the current-quarter multi-measure outlier, district exceptions in expenditure trends, and the widespread concentration of expenditure in ongoing works as the clearest review priorities in this 20-GP sample.",
+    "reason": "Kept the clearest quarter-level anomaly and distinct review priorities covering district exceptions, large plan gaps, Boipariguda\u2019s rural-housing concentration, and missing sanctioning-authority records.",
     "hallucinated_ids": []
    }
   },
@@ -1280,16 +1814,16 @@
    "id": "NON-01",
    "kind": "none",
    "text": "What is the price of onions in Cuttack market?",
-   "pool": 65,
-   "pool_min_score": 0.5,
+   "pool": 100,
+   "pool_min_score": 0.5061,
    "kept": [],
    "kept_rows": [],
    "judge": {
     "kept": 0,
-    "considered": 65,
+    "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "None of the findings concerns onion prices or Cuttack market prices.",
+    "reason": "None of the findings reports onion market prices in Cuttack.",
     "hallucinated_ids": []
    }
   },
@@ -1297,16 +1831,16 @@
    "id": "NON-02",
    "kind": "none",
    "text": "How many teachers are posted in the block primary schools?",
-   "pool": 8,
+   "pool": 100,
    "pool_min_score": 0.5001,
    "kept": [],
    "kept_rows": [],
    "judge": {
     "kept": 0,
-    "considered": 8,
+    "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "This is a roster lookup for a specific teacher count; none of the findings contains staffing data.",
+    "reason": "None of the findings reports the number of teachers posted in block primary schools; this requires a staff-record lookup.",
     "hallucinated_ids": []
    }
   },
@@ -1314,16 +1848,16 @@
    "id": "NON-03",
    "kind": "none",
    "text": "What is the rainfall forecast for Koraput next week?",
-   "pool": 38,
-   "pool_min_score": 0.5007,
+   "pool": 100,
+   "pool_min_score": 0.5008,
    "kept": [],
    "kept_rows": [],
    "judge": {
     "kept": 0,
-    "considered": 38,
+    "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "None of the findings provides a rainfall forecast for Koraput; they concern planning and spending patterns.",
+    "reason": "None of the findings provides a rainfall forecast for Koraput; they concern planning and spending records.",
     "hallucinated_ids": []
    }
   },
@@ -1331,16 +1865,16 @@
    "id": "NON-04",
    "kind": "none",
    "text": "Who is the current Sarpanch of Chikilli?",
-   "pool": 17,
-   "pool_min_score": 0.5033,
+   "pool": 100,
+   "pool_min_score": 0.5008,
    "kept": [],
    "kept_rows": [],
    "judge": {
     "kept": 0,
-    "considered": 17,
+    "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "This is a lookup for a current office-holder, and none of the findings identifies Chikilli's Sarpanch.",
+    "reason": "None of the findings identifies the current Sarpanch of Chikilli; this requires a current office-holder lookup.",
     "hallucinated_ids": []
    }
   },
@@ -1348,16 +1882,16 @@
    "id": "NON-05",
    "kind": "none",
    "text": "Give me the list of pending court cases against the panchayat.",
-   "pool": 0,
-   "pool_min_score": 0.0,
+   "pool": 100,
+   "pool_min_score": 0.5168,
    "kept": [],
    "kept_rows": [],
    "judge": {
     "kept": 0,
-    "considered": 0,
-    "attempts": 0,
+    "considered": 100,
+    "attempts": 1,
     "source": "judge",
-    "reason": "no candidate cleared the candidate floor",
+    "reason": "None of the findings contains a list or records of pending court cases against the panchayat.",
     "hallucinated_ids": []
    }
   },
@@ -1366,25 +1900,29 @@
    "kind": "open",
    "text": "How is GPDP implementation going under XV FC?",
    "pool": 100,
-   "pool_min_score": 0.5191,
+   "pool_min_score": 0.5491,
    "kept": [
-    "1-02212",
-    "1-02314",
-    "1-03350",
-    "1-02891"
+    "d1-28720",
+    "d1-28726",
+    "d1-28728",
+    "d1-28731",
+    "d1-28735",
+    "d1-28737"
    ],
    "kept_rows": [
-    2212,
-    2314,
-    3350,
-    2891
+    32959,
+    32965,
+    32967,
+    32970,
+    32974,
+    32976
    ],
    "judge": {
-    "kept": 4,
+    "kept": 6,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest XV FC findings on spending prominence, adherence to sanctions, abandoned funds and progress evidence in tied grants.",
+    "reason": "Kept the XV FC-wide activity pipeline and financial progress findings, including the sanction-record coverage caveat and spending shortfall against plans.",
     "hallucinated_ids": []
    }
   },
@@ -1393,21 +1931,35 @@
    "kind": "open",
    "text": "Are the ODF and SBM works progressing?",
    "pool": 100,
-   "pool_min_score": 0.5347,
+   "pool_min_score": 0.5513,
    "kept": [
-    "1-01547",
-    "1-01532"
+    "d1-03498",
+    "d1-03510",
+    "d1-02255",
+    "d1-02269",
+    "d1-04961",
+    "d1-04975",
+    "d1-04974",
+    "d1-17891",
+    "d1-17897"
    ],
    "kept_rows": [
-    1547,
-    1532
+    7737,
+    7749,
+    6494,
+    6508,
+    9200,
+    9214,
+    9213,
+    22130,
+    22136
    ],
    "judge": {
-    "kept": 2,
+    "kept": 9,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the district-level findings showing sanitation works leading both ongoing activity and recorded progress evidence across the sample.",
+    "reason": "Kept the sanitation planning, ongoing-work and completion indicators, plus overall abandonment and spending gaps that show whether progress is translating into delivery.",
     "hallucinated_ids": []
    }
   },
@@ -1416,21 +1968,23 @@
    "kind": "open",
    "text": "Is drinking water getting its share of the money?",
    "pool": 100,
-   "pool_min_score": 0.5444,
+   "pool_min_score": 0.5801,
    "kept": [
     "1-01524",
-    "1-01556"
+    "1-01556",
+    "d1-30352"
    ],
    "kept_rows": [
     1524,
-    1556
+    1556,
+    34591
    ],
    "judge": {
-    "kept": 2,
+    "kept": 3,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest district-level findings on drinking water\u2019s share of tied funds and actual expenditure in the sample.",
+    "reason": "Kept evidence that drinking water is a leading recipient of tied funds and expenditure, alongside the substantial gap between planned and actual spending.",
     "hallucinated_ids": []
    }
   },
@@ -1439,25 +1993,27 @@
    "kind": "why",
    "text": "Why is spending low in Chikilli?",
    "pool": 100,
-   "pool_min_score": 0.5371,
+   "pool_min_score": 0.5694,
    "kept": [
-    "1-02286",
     "1-02296",
+    "1-02286",
     "1-02289",
-    "1-02292"
+    "1-02292",
+    "d1-21936"
    ],
    "kept_rows": [
-    2286,
     2296,
+    2286,
     2289,
-    2292
+    2292,
+    26175
    ],
    "judge": {
-    "kept": 4,
+    "kept": 5,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "Kept the clearest upstream correlates\u2014low proposed costs, sanctions and approvals\u2014which may help investigate low spending but do not establish its cause.",
+    "reason": "These findings do not establish cause, but flag unusually low proposed costs, sanctions and approvals, plus a large spending shortfall among approved activities, for reconciliation.",
     "hallucinated_ids": []
    }
   },
@@ -1466,21 +2022,15 @@
    "kind": "why",
    "text": "What is causing the year-end payment spike?",
    "pool": 100,
-   "pool_min_score": 0.5546,
-   "kept": [
-    "2-00064",
-    "2-00002"
-   ],
-   "kept_rows": [
-    4180,
-    4118
-   ],
+   "pool_min_score": 0.587,
+   "kept": [],
+   "kept_rows": [],
    "judge": {
-    "kept": 2,
+    "kept": 0,
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "These show recurring payment seasonality and March outliers alongside earlier sanction and expenditure outliers, which are leads to reconcile but do not establish the cause.",
+    "reason": "The findings confirm a recurring March payment spike but do not establish what is causing it.",
     "hallucinated_ids": []
    }
   },
@@ -1489,7 +2039,7 @@
    "kind": "why",
    "text": "Why do so many activities have no asset category?",
    "pool": 100,
-   "pool_min_score": 0.6936,
+   "pool_min_score": 0.7322,
    "kept": [],
    "kept_rows": [],
    "judge": {
@@ -1497,18 +2047,30 @@
     "considered": 100,
     "attempts": 1,
     "source": "judge",
-    "reason": "The findings confirm that uncategorised activities are widespread but do not identify why asset categories are missing.",
+    "reason": "The findings show how widespread uncategorised activities are, but none explains why asset categories are missing.",
     "hallucinated_ids": []
    }
   }
  ],
  "metrics": {
-  "geo_hit_rate": 0.9118,
-  "geo_place_named_precision": 0.9832,
-  "measure_precision": 0.9714,
+  "geo_hit_rate": 1.0,
+  "geo_place_named_precision": 1.0,
+  "measure_precision": 0.9865,
   "none_false_answer_rate": 0.0,
-  "shown_per_geo_question": 3.5,
+  "shown_per_geo_question": 9.35,
   "judge_fallbacks": 0,
-  "hallucinated_ids": 0
+  "hallucinated_ids": 0,
+  "answer_cap": 20,
+  "kept_median": 8,
+  "kept_median_all": 8,
+  "answers_with_findings": 53,
+  "kept_max": 17,
+  "kept_mean": 7.39,
+  "cap_binding_rate": 0.0,
+  "restatement_share": 0.1086,
+  "restatement_counts": {
+   "shared": 49,
+   "of_kept": 451
+  }
  }
 }

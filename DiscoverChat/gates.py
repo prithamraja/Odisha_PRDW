@@ -449,6 +449,39 @@ def _judge_evidenced(ctx):
     return f"{evidenced} — {reference}"
 
 
+# ── 6c. The judge prompt is the one that was measured (WP-D9 D9.0) ───────────
+@check("judge-prompt-evidenced",
+       "the configured judge prompt is the wording the out-of-scope evidence "
+       "was measured on")
+def _judge_prompt_evidenced(ctx):
+    """The other half of the pair `judge-model-evidenced` binds.
+
+    The out-of-scope guarantee belongs to (model, prompt) together. Until D9.0
+    the gate pinned the id and left the words free, so any edit to the judge's
+    instruction -- the loosening D9.1 makes, or a later helpful tidy -- kept
+    every check green while discarding the evidence that the system stays
+    silent on questions it cannot answer. This goes red on any change to the
+    prompt template and names the requalification, exactly as a model swap does.
+    """
+    from DiscoverChat import judge
+    evidenced, reference = config.evidenced_judge_prompt()
+    configured = judge.prompt_sha256()
+    assert evidenced, (
+        "the judge evidence records no prompt hash, so the running prompt "
+        "cannot be checked against it.\n"
+        f"        evidence: {reference}\n"
+        f"        {config.REQUALIFY_JUDGE_PROMPT}")
+    assert configured == evidenced, (
+        f"the configured judge prompt "
+        f"({config.JUDGE_PROMPT_VARIANT!r}, sha256 {configured[:12]}) is not "
+        f"the wording the out-of-scope evidence was measured on "
+        f"(sha256 {evidenced[:12]}).\n"
+        f"        evidence: {reference}\n"
+        f"        {config.REQUALIFY_JUDGE_PROMPT}")
+    return (f"{config.JUDGE_PROMPT_VARIANT} — sha256 {configured[:12]} — "
+            f"{reference}")
+
+
 # ── 7. The run stamp ─────────────────────────────────────────────────────────
 @check("run-stamp", "every answer carries the run stamp")
 def _stamp(ctx):

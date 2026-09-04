@@ -1,8 +1,8 @@
 {
- "generated_at": "2026-09-04T05:45:36Z",
+ "generated_at": "2026-09-01T12:28:41Z",
  "judge_model": "gpt-5.6-sol",
- "judge_prompt_variant": "complete",
- "judge_prompt_sha256": "b5284df7ac3d95aea17bfdbc0c1b32763e570947801f0b0eaea7ec441c7e5619",
+ "judge_prompt_variant": "minimal",
+ "judge_prompt_sha256": "ad73ea44a482194aa40abbd1cd65b32dc5f1f3430b58bb3dfa1cbf8ec3f0a55d",
  "candidate_floor": 0.5,
  "candidate_pool": 100,
  "corpus": {
@@ -13,7 +13,7 @@
  "out_of_scope_runs": 20,
  "out_of_scope_answered": 0,
  "false_answer_rate": 0.0,
- "elapsed_seconds": 145.0,
+ "elapsed_seconds": 107.9,
  "rows": [
   {
    "run": 0,
@@ -220,8 +220,8 @@
    "kind": "in_scope",
    "q": "Where does the gap sit?",
    "move": "decompose",
-   "shown": 5,
-   "decompositions_shown": 5,
+   "shown": 4,
+   "decompositions_shown": 4,
    "pool": 100,
    "judge_source": "judge"
   },
@@ -250,8 +250,8 @@
    "kind": "in_scope",
    "q": "How is Chikilli doing?",
    "move": "retrieve",
-   "shown": 12,
-   "decompositions_shown": 7,
+   "shown": 7,
+   "decompositions_shown": 5,
    "pool": 100,
    "judge_source": "judge"
   }

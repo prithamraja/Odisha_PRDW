@@ -39,7 +39,7 @@ REPO = HERE.parent.parent
 sys.path.insert(0, str(REPO))
 logging.basicConfig(level=logging.ERROR)
 
-from DiscoverChat import assemble, classifier, config   # noqa: E402
+from DiscoverChat import assemble, classifier, config, judge   # noqa: E402
 from DiscoverChat.retrieval import Retriever            # noqa: E402
 
 OUT = HERE / "decompose_oos_results.json"
@@ -111,6 +111,9 @@ def main(argv=None) -> int:
     payload = {
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "judge_model": config.JUDGE_MODEL,
+        # WP-D9: the wording is evidence too, not just the id.
+        "judge_prompt_variant": config.JUDGE_PROMPT_VARIANT,
+        "judge_prompt_sha256": judge.prompt_sha256(),
         "candidate_floor": config.CANDIDATE_FLOOR,
         "candidate_pool": config.CANDIDATE_POOL,
         "corpus": {"findings": corpus.meta["findings"],

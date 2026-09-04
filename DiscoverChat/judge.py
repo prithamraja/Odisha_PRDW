@@ -43,6 +43,7 @@ errors. Retry-on-empty (D43) applies here too.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from dataclasses import dataclass, field
@@ -66,7 +67,7 @@ class Selection:
                 "hallucinated_ids": self.hallucinated_ids}
 
 
-PROMPT = """{context}
+_PROMPT_MINIMAL = """{context}
 
 An officer asked:
 {question}
@@ -90,6 +91,59 @@ Reply with JSON only, no other text:
 
 Use the finding ids exactly as they appear above. An empty list is a valid reply.
 """
+_PROMPT_COMPLETE = """{context}
+
+An officer asked:
+{question}
+
+Below are {n} findings from the analysis, the closest matches to that question out of {corpus_size}. They are ordered by how close the match is, but closeness is not the same as usefulness — many of them will have nothing to do with what was asked.
+
+Choose the ones an officer asking this question would count as part of the answer. Most of these will not be; choosing well means leaving most of them out.
+
+{candidates}
+
+How to choose:
+- Keep a finding only if it genuinely bears on what was asked. A finding about a different place, a different measure or a different question is not an answer merely because it was among the closest matches.
+- **Keep every finding that adds distinct information to the answer.** How many that is depends on the question — a narrow one may have a single answer, a broad one many. Completeness matters: a finding the officer would want and does not get is a worse failure than one extra.
+- **Where several findings make the same point over different slices of the data, keep the clearest one, not all of them.** The engine mines the same pattern over many overlapping slices; near-repetition is not extra evidence. Two findings are distinct when they tell the officer different things, not when they are worded differently.
+- **Keep nothing for a question the findings do not answer.** On-topic is not the same as answering; if none of the candidates answers the question, return none.
+- If the officer named a place, a finding that is about that place in its own right is more of an answer than one that lists it among twenty others following a general pattern.
+- **Returning nothing is a correct answer and is often the right one.** These findings come from one analysis run that looked for particular shapes of pattern. If the question is about something the analysis simply did not look at — a person, a forecast, a record, a price, a roster — then none of these is an answer, and saying so is right. Do not keep a finding because something ought to be said.
+
+Reply with JSON only, no other text:
+
+{{"keep": ["<finding id>", "<finding id>", ...], "note": "<one short sentence on what you kept and why, or why you kept nothing>"}}
+
+Use the finding ids exactly as they appear above. An empty list is a valid reply.
+"""
+
+
+# ── WP-D9: the prompt is a qualified artefact, like the model id ─────────────
+# The out-of-scope silence guarantee is a property of (model, prompt) TOGETHER.
+# `judge-model-evidenced` binds the id; `judge-prompt-evidenced` binds this
+# text. Both variants stay reachable so the D9.1 instruction can be reverted by
+# configuration rather than by a revert commit:
+#     DISCOVERCHAT_JUDGE_PROMPT=minimal
+PROMPT_VARIANTS = {"minimal": _PROMPT_MINIMAL, "complete": _PROMPT_COMPLETE}
+
+if config.JUDGE_PROMPT_VARIANT not in PROMPT_VARIANTS:
+    raise ValueError(
+        f"DISCOVERCHAT_JUDGE_PROMPT={config.JUDGE_PROMPT_VARIANT!r} is not a "
+        f"known judge prompt; expected one of {sorted(PROMPT_VARIANTS)}")
+
+PROMPT = PROMPT_VARIANTS[config.JUDGE_PROMPT_VARIANT]
+
+
+def prompt_sha256(text: str = None) -> str:
+    """SHA-256 of the judge prompt TEMPLATE, hashed as `llm.call` hashes prompts.
+
+    The template, not a rendered instance: a rendered prompt carries the
+    question and 100 candidates, so its hash changes every call and could never
+    be pinned. This is what the evidence files record and the gate compares.
+    """
+    return hashlib.sha256(
+        (PROMPT if text is None else text).encode("utf-8")).hexdigest()
+
 
 
 def render_candidates(findings: list) -> str:

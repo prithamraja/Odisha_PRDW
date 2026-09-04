@@ -84,7 +84,7 @@ Write naturally, in plain English. Use no number that is not in the findings you
 # the BACKGROUND alone, which is what ruling 8's "context brief" names.
 CONSOLIDATING_WRITER_PROMPT = """Turn the analytical findings below into clear, concise prose for a senior government official.
 
-Do not rewrite each finding separately. Identify overlapping or repeated findings, consolidate them into a small number of underlying patterns, and explain those patterns as a coherent narrative. Do not make causal claims ever. Do not fabricate or overstate data.
+Do not rewrite each finding separately. Identify overlapping or repeated findings, consolidate them into a small number of underlying patterns, and explain those patterns as a coherent narrative. Do not make causal claims ever and do not use "therefore", "because", or "driven by". Do not fabricate or overstate data.
 
 Preserve important numbers and exceptions where useful. Ignore ranking metadata such as "not in the ranked shortlist." Avoid database-style language and do not infer causes that are not supported by the findings.
 

@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import json
 import logging
+import statistics
 import sys
 import time
 from pathlib import Path
@@ -88,6 +89,9 @@ def main() -> int:
     payload = {
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "judge_model": config.JUDGE_MODEL,
+        # WP-D9: the wording is evidence too, not just the id.
+        "judge_prompt_variant": config.JUDGE_PROMPT_VARIANT,
+        "judge_prompt_sha256": judge.prompt_sha256(),
         "candidate_floor": config.CANDIDATE_FLOOR,
         "candidate_pool": config.CANDIDATE_POOL,
         "questions": rows,
@@ -112,6 +116,39 @@ def main() -> int:
     print(f"  ids invented by the judge ... {m['hallucinated_ids']}")
     print(f"\n  wrote {OUT}")
     return 0
+
+
+
+# ── WP-D9 (d): are the kept findings distinct, or the same point re-sliced? ──
+# The brief's key: (measure, breakdown, pattern type). A decomposition has no
+# pattern_type and calls its breakdown `dimension`, so it is normalised onto the
+# same three-part key rather than excluded -- an answer that keeps six
+# decompositions of one measure over one dimension is restating exactly as much
+# as one that keeps six findings.
+def restatement_key(record) -> tuple:
+    d = record.data
+    if record.is_decomposition:
+        return (d.get("measure"), d.get("dimension"), "DECOMPOSITION")
+    return (d.get("measure"), d.get("breakdown"), d.get("pattern_type"))
+
+
+def restatement_share(corpus, rows) -> tuple:
+    """Fraction of kept findings that share a key with another KEPT finding in
+    the SAME answer. Counted over answers with 2+ kept findings: a single-finding
+    answer cannot restate itself, and including it would dilute the measure
+    toward zero exactly when the judge is being most selective."""
+    shared = total = 0
+    for row in rows:
+        # `get` takes a finding id; these are row indices, so `finding` it is.
+        kept = [corpus.finding(r) for r in row["kept_rows"]]
+        if len(kept) < 2:
+            continue
+        keys = [restatement_key(k) for k in kept]
+        for key in keys:
+            total += 1
+            if keys.count(key) > 1:
+                shared += 1
+    return _ratio(shared, total), shared, total
 
 
 def metrics(corpus, questions, rows) -> dict:
@@ -143,6 +180,12 @@ def metrics(corpus, questions, rows) -> dict:
             if shown:
                 none_answered += 1
 
+    # WP-D9: what the completeness instruction is expected to move.
+    kept_counts = [len(row["kept_rows"]) for row in rows]
+    answered = [n for n in kept_counts if n]
+    cap_bound = sum(1 for n in kept_counts if n >= config.ANSWER_CAP)
+    share, share_shared, share_total = restatement_share(corpus, rows)
+
     return {
         "geo_hit_rate": _ratio(geo_hits, geo_n),
         "geo_place_named_precision": _ratio(geo_named, geo_shown),
@@ -151,6 +194,20 @@ def metrics(corpus, questions, rows) -> dict:
         "shown_per_geo_question": round(geo_shown / geo_n, 2) if geo_n else 0.0,
         "judge_fallbacks": fallbacks,
         "hallucinated_ids": hallucinated,
+        # WP-D9 D9.1
+        "answer_cap": config.ANSWER_CAP,
+        # Two medians on purpose: over ANSWERED questions, and over all
+        # of them. WP-D5 quoted 3 (all 61, empties included); the same
+        # set reads 4 over the 51 that kept anything. Reporting one
+        # without saying which is how a baseline gets misread.
+        "kept_median": (statistics.median(answered) if answered else 0),
+        "kept_median_all": (statistics.median(kept_counts) if kept_counts else 0),
+        "answers_with_findings": len(answered),
+        "kept_max": (max(kept_counts) if kept_counts else 0),
+        "kept_mean": round(sum(kept_counts) / len(kept_counts), 2) if rows else 0,
+        "cap_binding_rate": _ratio(cap_bound, len(rows)),
+        "restatement_share": share,
+        "restatement_counts": {"shared": share_shared, "of_kept": share_total},
     }
 
 

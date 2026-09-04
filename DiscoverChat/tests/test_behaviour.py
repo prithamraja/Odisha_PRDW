@@ -264,5 +264,49 @@ class JudgeTests(_Base):
         self.assertFalse(meta["used"])
 
 
+class JudgePromptBindingTests(unittest.TestCase):
+    """WP-D9 D9.0 — the prompt is evidence, and the binding says which one."""
+
+    def test_both_instructions_stay_reachable(self):
+        """D9.1 reverts by configuration, so "minimal" must not be deleted."""
+        from DiscoverChat import judge
+        self.assertEqual(sorted(judge.PROMPT_VARIANTS), ["complete", "minimal"])
+
+    def test_the_variants_differ_only_in_the_instruction(self):
+        """Everything outside the changed bullets is held identical, so a
+        measured difference is attributable to the instruction and not to
+        some other drift in the prompt."""
+        from DiscoverChat import judge
+        minimal = judge.PROMPT_VARIANTS["minimal"]
+        complete = judge.PROMPT_VARIANTS["complete"]
+        self.assertNotEqual(minimal, complete)
+        for shared in ("An officer asked:",
+                       "Choose the ones an officer asking this question would "
+                       "count as part of the answer.",
+                       "Returning nothing is a correct answer",
+                       "Reply with JSON only, no other text:"):
+            self.assertIn(shared, minimal)
+            self.assertIn(shared, complete)
+        self.assertIn("Keep the smallest set that fully answers", minimal)
+        self.assertNotIn("Keep the smallest set that fully answers", complete)
+        self.assertIn("adds distinct information", complete)
+
+    def test_the_hash_is_of_the_template_not_a_rendered_prompt(self):
+        """A rendered prompt carries 100 candidates and could never be pinned."""
+        from DiscoverChat import judge
+        self.assertEqual(judge.prompt_sha256(),
+                         judge.prompt_sha256(judge.PROMPT))
+        self.assertNotEqual(judge.prompt_sha256(judge.PROMPT_VARIANTS["minimal"]),
+                            judge.prompt_sha256(judge.PROMPT_VARIANTS["complete"]))
+
+    def test_the_evidence_records_a_prompt_hash(self):
+        """Without it `judge-prompt-evidenced` has nothing to compare against."""
+        from DiscoverChat import config
+        sha, reference = config.evidenced_judge_prompt()
+        self.assertTrue(sha)
+        self.assertEqual(len(sha), 64)
+        self.assertIn("judge_arm_results.json", reference)
+
+
 if __name__ == "__main__":
     unittest.main()
