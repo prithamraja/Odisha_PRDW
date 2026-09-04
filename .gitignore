@@ -40,3 +40,12 @@ consistency_run.log
 # so it never has to be typed into a shell command, a chat window, or a commit.
 deploy/.railway-token
 *.railway-token
+
+# WP-D6 decomposition sidecar — a ~310 MB build output of
+# Insights/src/phase5f_decompose.py. Both halves exceed GitHub's 100 MB hard
+# limit, so an accidental `git add -A` would produce a push GitHub rejects.
+# The STAMP beside them stays committed: it is what config.py pin-checks.
+Insights/metainsights/decompose_corpus.json
+Insights/metainsights/decompose_corpus.npy
+decompose_corpus.json
+decompose_corpus.npy
