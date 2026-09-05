@@ -54,6 +54,7 @@
 
 import argparse
 import ast
+import gzip
 import hashlib
 import json
 import os
@@ -78,9 +79,134 @@ from phase5c_global_feed import VIEW_TITLES                    # noqa: E402
 MI_DIR = os.path.join(BASE_DIR, "metainsights")
 VIEWS = ("view1", "view2", "view3")
 
-CORPUS_PATH  = os.path.join(MI_DIR, "retrieval_corpus.json")
+CORPUS_PATH  = os.path.join(MI_DIR, "retrieval_corpus.json.gz")
 VECTORS_PATH = os.path.join(MI_DIR, "retrieval_corpus.npy")
 STAMP_PATH   = os.path.join(MI_DIR, "retrieval_corpus_stamp.json")
+
+# The pre-WP-D10 spelling. Read for the vector cache, never written (D10.0):
+# the first rebuild under the new format must reuse the old build's vectors by
+# hash rather than re-embed them, and the old build is a plain .json.
+LEGACY_CORPUS_PATH = os.path.join(MI_DIR, "retrieval_corpus.json")
+
+
+# =============================================================================
+# THE STORAGE FORMAT  (WP-D10)
+# =============================================================================
+# One format, one loader, both corpora (D10 ruling 5). What changed and why,
+# each of them MEASURED on the real corpus before it was adopted:
+#
+#   GZIP, LEVEL 6, mtime=0.   The record JSON compresses 10.9x (76 -> 7.0 MB)
+#       and decompresses in 0.15 s. Level 9 is slower and no smaller. `mtime=0`
+#       and an empty `filename` because gzip's header otherwise carries a
+#       timestamp and the source file's name, and the build gate compares BYTES
+#       between two consecutive builds -- a header clock would fail it every
+#       time for no reason to do with the data.
+#
+#   COMPACT JSON.  No indentation. The file is a build output read by one
+#       loader, not a document anyone diffs by eye; `python -m json.tool` and
+#       `--embed-text` below are what make it readable when it must be.
+#
+#   NO `embed_text`, ITS HASH KEPT.  The exact text that was embedded is no
+#       longer STORED, it is REPRODUCIBLE and hash-pinned -- D10 ruling 3
+#       amending WP-D5 ruling 7. `--embed-text <id>` rebuilds it from the
+#       record's own fields and checks it against `embed_text_sha256`, so the
+#       audit trail is a command rather than 60 MB of duplicated strings. The
+#       hash stays because it is also the vector cache's key.
+#
+#   FLOAT16 VECTORS, FLOAT32 ARITHMETIC.  Measured against the fp32 file on the
+#       real corpus: 100% top-100 pool overlap, top-1 unchanged, cosine drift
+#       < 1e-4 -- an order of magnitude below the endpoint's own call-to-call
+#       jitter of 1.2e-3. Every loader upcasts at load, so RAM and every
+#       comparison downstream are fp32 exactly as before; only the disk changes
+#       (148 -> 74 MB). Vectors are NOT gzipped: floats compress 1.09x, which
+#       buys nothing and costs a decompress.
+#
+# DIMENSIONS ARE UNTOUCHED. Matryoshka truncation was measured (512 gives 92.8%
+# pool overlap, 256 gives 87.4%) and declined by the operator. Nothing in this
+# section changes the pin's model, dims or instructions -- only how the numbers
+# are laid down on disk.
+GZIP_LEVEL = 6
+STORAGE_DTYPE = "float16"
+VECTOR_DTYPE = np.float16
+
+
+def write_corpus_json(path: str, payload: dict) -> None:
+    """The record file: compact JSON, gzip 6, and a header with no clock in it."""
+    raw = json.dumps(payload, ensure_ascii=False, sort_keys=False,
+                     separators=(",", ":")).encode("utf-8")
+    tmp = path + ".tmp"
+    with open(tmp, "wb") as fh:
+        with gzip.GzipFile(filename="", mode="wb", compresslevel=GZIP_LEVEL,
+                           fileobj=fh, mtime=0) as gz:
+            gz.write(raw)
+    os.replace(tmp, path)
+
+
+def read_corpus_json(path: str) -> dict:
+    """A record file in EITHER format -- gzipped or the pre-D10 plain .json.
+
+    Both spellings are read and only the new one is written. This is what makes
+    the first rebuild under D10 cost zero embedding calls: the cache reader
+    below opens the previous build, which is a plain .json, and the endpoint is
+    never touched.
+    """
+    if path.endswith(".gz"):
+        with gzip.open(path, "rb") as fh:
+            return json.loads(fh.read().decode("utf-8"))
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def save_vectors(path: str, vectors: np.ndarray) -> None:
+    """Store fp16. Rounding fp32 -> fp16 is deterministic, and re-storing an
+    already-fp16 vector is the identity, so a rebuild from the cache reproduces
+    the file byte for byte."""
+    np.save(path, np.asarray(vectors, dtype=VECTOR_DTYPE))
+
+
+def load_vectors(path: str) -> np.ndarray:
+    """Read fp16 OR fp32 from disk and hand back fp32. Every consumer of a
+    vector in this system works in fp32; the storage dtype stops at this line."""
+    return np.asarray(np.load(path), dtype=np.float32)
+
+
+# ── The decomposition member list, columnar (D10 ruling 3) ───────────────────
+# 36,218 records carry 1.1M members between them, and stored one dict per member
+# the key names alone were the single largest thing in the file. Columnar stores
+# each key once. `is_null` becomes `null_index` -- the positions that are null,
+# which for this corpus is a handful of entries rather than 1.1M `false`s.
+#
+# The order of the lists IS the order of the members, and the builder sorts them
+# (descending by magnitude, then by label) before they get here, so "the largest
+# member" stays position 0 through the round trip.
+MEMBER_COLUMNS = ("member", "value", "rows", "share")
+
+
+def members_columnar(members: list) -> dict:
+    """[{member, is_null, value, rows, share}, ...] -> columns."""
+    columnar = {col: [m[col] for m in members] for col in MEMBER_COLUMNS}
+    columnar["null_index"] = [i for i, m in enumerate(members) if m["is_null"]]
+    return columnar
+
+
+def members_expand(members) -> list:
+    """Columns -> [{member, is_null, value, rows, share}, ...].
+
+    Accepts a pre-D10 list unchanged, so one reader serves a corpus in either
+    format and no caller has to ask which it is holding.
+    """
+    if isinstance(members, list):
+        return members
+    if not members:
+        return []
+    nulls = set(members.get("null_index") or ())
+    names = members["member"]
+    return [{"member": names[i],
+             "is_null": i in nulls,
+             "value": members["value"][i],
+             "rows": members["rows"][i],
+             "share": members["share"][i]}
+            for i in range(len(names))]
 
 
 # =============================================================================
@@ -123,8 +249,16 @@ QUERY_INSTRUCTION = (
 )
 
 
-def embedding_pin() -> dict:
-    """Everything that decides what a vector means. Copied into the stamp."""
+def semantic_pin() -> dict:
+    """Everything that decides what a vector MEANS -- the model, the dimension
+    count, the endpoint, the instructions, the normalisation.
+
+    Deliberately excludes `storage_dtype`, which decides only how the number is
+    laid down on disk. The distinction is what lets the WP-D10 rebuild reuse the
+    fp32 build's vectors instead of re-embedding 40,457 texts against a
+    non-deterministic endpoint: the vectors mean the same thing, they are simply
+    about to be written narrower.
+    """
     return {
         "model": EMBED_MODEL,
         "dims": EMBED_DIMS,
@@ -132,8 +266,18 @@ def embedding_pin() -> dict:
         "query_instruction": QUERY_INSTRUCTION,
         "document_instruction": None,          # documents are embedded plain
         "normalisation": "L2, client-side",
-        "storage_dtype": "float32",
     }
+
+
+def embedding_pin() -> dict:
+    """The full pin, meaning plus storage. Copied into the stamp.
+
+    `storage_dtype` is in here, and therefore in the fingerprint, on purpose
+    (D10.1): an fp32 file and an fp16 file are read by different code paths, so
+    a loader must never be able to open the wrong one quietly. The cache reader
+    is the one place that compares `semantic_pin()` instead, and it says why.
+    """
+    return dict(semantic_pin(), storage_dtype=STORAGE_DTYPE)
 
 
 def pin_fingerprint() -> str:
@@ -141,6 +285,19 @@ def pin_fingerprint() -> str:
     return hashlib.sha256(
         json.dumps(embedding_pin(), sort_keys=True).encode("utf-8")
     ).hexdigest()[:16]
+
+
+def cache_is_reusable(old_payload: dict) -> bool:
+    """May the vectors in a previous build be reused as they stand?
+
+    Yes when the previous build MEANS the same thing by a vector, whatever
+    dtype it wrote. An old file that predates the pin carrying `storage_dtype`
+    at all compares equal here too, because the field is stripped from both
+    sides rather than defaulted on one.
+    """
+    old_pin = dict(old_payload.get("embedding_pin") or {})
+    old_pin.pop("storage_dtype", None)
+    return old_pin == semantic_pin()
 
 
 # =============================================================================
@@ -684,17 +841,34 @@ def build_records(validator) -> tuple:
                 "feed_rank":          feed_row["rank"] if feed_row else None,
                 "named_members":      named_members(c),
                 "geography":          geo,
-                "embed_text":         build_embed_text(c, view),
-                "bare_text":          build_bare_text(c),
                 "candidate_set_id":   stamp["candidate_set_id"],
+                # `bare_text` STAYS. D10 ruling 3 drops the enriched embedded
+                # text and nothing else, and this one has a reader:
+                # `experiments/run_arms.py` embeds it as arm A of D5.1.
+                "bare_text":          build_bare_text(c),
+                # NOT stored (D10 ruling 3). The text that was embedded is
+                # carried only as far as the embedder and the hash below;
+                # `--embed-text <id>` regenerates it from the fields above and
+                # checks it against that hash.
+                "_embed_text":        build_embed_text(c, view),
             })
 
     for r in records:
         r["embed_text_sha256"] = hashlib.sha256(
-            r["embed_text"].encode("utf-8")).hexdigest()
+            r["_embed_text"].encode("utf-8")).hexdigest()
         r["bare_text_sha256"] = hashlib.sha256(
             r["bare_text"].encode("utf-8")).hexdigest()
     return records, counts, stamp
+
+
+def strip_transient(records: list) -> list:
+    """Drop the underscore-prefixed build scratch before the records are written.
+
+    The texts themselves are 60 MB of the old file and every byte of them is
+    reproducible from what stays; the hashes are what the cache and the audit
+    command need, and those are kept.
+    """
+    return [{k: v for k, v in r.items() if not k.startswith("_")} for r in records]
 
 
 def load_vector_cache() -> dict:
@@ -705,18 +879,23 @@ def load_vector_cache() -> dict:
     byte-identical. Reuse is keyed on the exact text, so any change to the
     enrichment recipe invalidates exactly the records it changed and no others.
     """
-    if not (os.path.exists(CORPUS_PATH) and os.path.exists(VECTORS_PATH)):
+    corpus_path = next((c for c in (CORPUS_PATH, LEGACY_CORPUS_PATH)
+                        if os.path.exists(c)), None)
+    if corpus_path is None or not os.path.exists(VECTORS_PATH):
         return {}
     try:
-        with open(CORPUS_PATH, encoding="utf-8") as fh:
-            old = json.load(fh)
-        vectors = np.load(VECTORS_PATH)
+        old = read_corpus_json(corpus_path)
+        vectors = load_vectors(VECTORS_PATH)
     except Exception:
         return {}
     old_records = old.get("records", [])
     if len(old_records) != len(vectors):
         return {}
-    if old.get("embedding_pin_fingerprint") != pin_fingerprint():
+    # The SEMANTIC pin, not the fingerprint: a build that wrote fp32 and a build
+    # that writes fp16 produce the same vector for the same text, and refusing
+    # the old file here would re-embed the whole corpus against an endpoint that
+    # is not bit-deterministic -- which is a cost AND a broken determinism gate.
+    if not cache_is_reusable(old):
         return {}          # a different pin means different vectors, always
     return {r["embed_text_sha256"]: vectors[i] for i, r in enumerate(old_records)}
 
@@ -729,25 +908,36 @@ def write_outputs(records, counts, stamp, vectors, embedder, elapsed):
             "and the 32-finding feed are marked, not selected for. Every "
             "sentence is phase5_ranking.generate_nl_summary -- nothing here "
             "computes, re-reads or rewrites a figure. Vectors live beside this "
-            "file in retrieval_corpus.npy, row-aligned with `records`."
+            "file in retrieval_corpus.npy, float16 on disk and read as float32, "
+            "row-aligned with `records`. The embedded text is not stored: "
+            "`embed_text_sha256` pins it, and `python "
+            "Insights/src/phase5d_retrieval_corpus.py --embed-text <id>` "
+            "regenerates it from the record and verifies it (WP-D10)."
         ),
         "candidate_set_id": stamp["candidate_set_id"],
         "source_generated_at": stamp["generated_at"],
         "embedding_pin": embedding_pin(),
         "embedding_pin_fingerprint": pin_fingerprint(),
         "counts": counts,
-        "records": records,
+        "records": strip_transient(records),
     }
-    with open(CORPUS_PATH, "w", encoding="utf-8") as fh:
-        json.dump(payload, fh, indent=1, ensure_ascii=False, sort_keys=False)
-        fh.write("\n")
+    write_corpus_json(CORPUS_PATH, payload)
 
     if vectors is not None:
-        np.save(VECTORS_PATH, vectors)
+        save_vectors(VECTORS_PATH, vectors)
 
+    # The INPUTS this build read, hashed. Both sidecars are excluded BY NAME:
+    # `decompose_corpus.*` is a sibling OUTPUT of phase5f, not a source of this
+    # build, and the pre-D10 filter (ends in ".json", does not start with
+    # "retrieval_corpus") admitted it only because it happened to end in .json --
+    # so a retrieval rebuild run after the sidecar existed would have quietly
+    # hashed 161 MB of someone else's output into this provenance. The rename
+    # forced the question; naming both corpora answers it once.
     source_files = {}
     for name in sorted(os.listdir(MI_DIR)):
-        if not name.endswith(".json") or name.startswith("retrieval_corpus"):
+        if not (name.endswith(".json") or name.endswith(".json.gz")):
+            continue
+        if name.startswith("retrieval_corpus") or name.startswith("decompose_corpus"):
             continue
         path = os.path.join(MI_DIR, name)
         source_files[name] = {"sha256": sha256_of(path),
@@ -761,7 +951,7 @@ def write_outputs(records, counts, stamp, vectors, embedder, elapsed):
                 "consecutive builds (D5.0 gate); everything else, vectors "
                 "included, is reproduced from the cache."
             ),
-            "artefacts": ["metainsights/retrieval_corpus.json",
+            "artefacts": ["metainsights/retrieval_corpus.json.gz",
                           "metainsights/retrieval_corpus.npy"],
             "candidate_set_id": stamp["candidate_set_id"],
             "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -778,13 +968,97 @@ def write_outputs(records, counts, stamp, vectors, embedder, elapsed):
         fh.write("\n")
 
 
+# =============================================================================
+# THE AUDIT COMMAND  (WP-D10, D10.2)
+# =============================================================================
+# WP-D5 ruling 7 said "the exact embedded text is stored". D10 ruling 3 amends
+# it to "the exact embedded text is REPRODUCIBLE and hash-pinned", and this is
+# the reproduction. It rebuilds the text from the stored record alone -- the
+# same `build_embed_text` the build called, over the same fields -- and compares
+# its SHA-256 to the one on the record.
+#
+# MATCH means the stored hash and the regenerated text agree, which is the whole
+# claim: nothing was lost by not storing 60 MB of strings. MISMATCH means the
+# record and its vector no longer describe each other, and the corpus needs
+# rebuilding -- so the command exits non-zero and the text is printed either way,
+# because an auditor asking what was embedded should get an answer even when the
+# answer is "not this".
+
+def candidate_from_record(record: dict) -> MetaInsightCandidate:
+    """The candidate a findings record was built from, back out of the record.
+
+    Only the fields `build_embed_text` actually reads are reconstructed, and
+    they are read the same way `feed_index` reads a feed row -- one way to turn
+    a serialised candidate back into a candidate, not two.
+    """
+    return MetaInsightCandidate(
+        extending_strategy=record["extending_strategy"],
+        extending_dimension=record["extending_dimension"],
+        pattern_type=record["pattern_type"],
+        breakdown=record["breakdown"],
+        measure=record["measure"],
+        base_subspace=Subspace(frozenset(tuple(f) for f in record["base_subspace"])),
+        commonness_sets=record["commonness_sets"],
+        exceptions=record["exceptions"],
+        hdp_size=record["hdp_size"],
+    )
+
+
+def regenerate_embed_text(record: dict) -> str:
+    return build_embed_text(candidate_from_record(record), record["view"])
+
+
+def audit_embed_text(finding_ids: list) -> int:
+    """Print each id's regenerated embed text with MATCH / MISMATCH. 0 if all match."""
+    corpus_path = next((c for c in (CORPUS_PATH, LEGACY_CORPUS_PATH)
+                        if os.path.exists(c)), None)
+    if corpus_path is None:
+        raise SystemExit(f"STOP: no corpus at {CORPUS_PATH}. Build it first.")
+    payload = read_corpus_json(corpus_path)
+    by_id = {r["finding_id"]: r for r in payload["records"]}
+
+    failures = 0
+    for finding_id in finding_ids:
+        record = by_id.get(finding_id)
+        if record is None:
+            print(f"{finding_id}  UNKNOWN ID")
+            failures += 1
+            continue
+        text = regenerate_embed_text(record)
+        actual = hashlib.sha256(text.encode("utf-8")).hexdigest()
+        stored = record["embed_text_sha256"]
+        ok = actual == stored
+        failures += 0 if ok else 1
+        print(f"=== {finding_id}  {'MATCH' if ok else 'MISMATCH'}")
+        print(text)
+        print(f"--- stored     {stored}")
+        print(f"--- regenerated {actual}")
+    return 1 if failures else 0
+
+
+def all_finding_ids() -> list:
+    corpus_path = next((c for c in (CORPUS_PATH, LEGACY_CORPUS_PATH)
+                        if os.path.exists(c)), None)
+    payload = read_corpus_json(corpus_path)
+    return [r["finding_id"] for r in payload["records"]]
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="WP-D5 D5.0 retrieval corpus build")
     ap.add_argument("--no-embed", action="store_true",
                     help="build the records and skip the vectors (structure check)")
     ap.add_argument("--force-embed", action="store_true",
                     help="ignore the vector cache and re-embed everything")
+    ap.add_argument("--embed-text", nargs="+", metavar="ID",
+                    help="regenerate these records' embedded text from their "
+                         "stored fields and check it against embed_text_sha256 "
+                         "(D10.2). 'ALL' checks every record.")
     args = ap.parse_args(argv)
+
+    if args.embed_text:
+        ids = (all_finding_ids() if args.embed_text == ["ALL"]
+               else args.embed_text)
+        return audit_embed_text(ids)
 
     t0 = time.time()
     validator, why = open_ask_validator()
@@ -831,7 +1105,7 @@ def main(argv=None) -> int:
               f"{len(need):,} to embed")
         if need:
             embedder = Embedder()
-            fresh = embedder.documents([r["embed_text"] for r in need])
+            fresh = embedder.documents([r["_embed_text"] for r in need])
             for r, v in zip(need, fresh):
                 cache[r["embed_text_sha256"]] = v
         # NOT re-normalised here. `Embedder.documents` normalises once, at the
@@ -839,7 +1113,8 @@ def main(argv=None) -> int:
         # a second pass over already-unit vectors moves the last bit of some
         # components and the first attempt at this gate failed on exactly that
         # -- 0 texts re-embedded and a different .npy anyway.
-        vectors = np.stack([cache[r["embed_text_sha256"]] for r in records])
+        vectors = np.stack([np.asarray(cache[r["embed_text_sha256"]],
+                                       dtype=np.float32) for r in records])
 
     write_outputs(records, counts, stamp, vectors, embedder, time.time() - t0)
     print(f"  wrote {CORPUS_PATH}")

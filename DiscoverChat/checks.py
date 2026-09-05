@@ -24,6 +24,9 @@ from __future__ import annotations
 
 import re
 
+# `corpus` first: it imports `config`, which is what puts Insights/src on the
+# path for `causal_gate`'s own import of `prose_gate`.
+from . import corpus as corpus_mod
 from . import causal_gate
 from .context_brief import for_consolidating_writer, for_writer
 
@@ -110,7 +113,7 @@ def supplied_text(findings: list) -> str:
             parts.append(str(data.get("measure_phrase", "")))
             parts.append(str(data.get("dimension_phrase", "")))
             parts.append(str(data.get("n_members", "")))
-            for member in data.get("members", []):
+            for member in corpus_mod.members_of(data):
                 parts.append(str(member.get("member", "")))
                 parts.append(str(member.get("value", "")))
                 parts.append(str(member.get("share", "")))

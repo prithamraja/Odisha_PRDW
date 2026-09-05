@@ -286,8 +286,46 @@ boost weights carry the values the D5.1 experiment measured. They become
 ratified numbers at the D5.3 operator gate, not before. Every one is an
 environment override, so moving one for a pilot needs no code change.
 
-**The embedding pin travels with the corpus.** Model id, dimension count and the
-query instruction are pinned together and copied into
+**The embedding pin travels with the corpus.** Model id, dimension count, the
+query instruction and the storage dtype are pinned together and copied into
 `retrieval_corpus_stamp.json`. Startup compares them and refuses to serve a
 corpus embedded under a different pin — a mismatch there produces plausible
 nonsense rather than an error, which is the worst failure mode available.
+
+## How the corpus is stored, and how to read what was embedded (WP-D10)
+
+The two sidecars are **90 MB on disk, down from 345 MB**, and nothing about what
+they retrieve changed. Three things make the difference, each measured before it
+was adopted:
+
+| | |
+|---|---|
+| **gzip, level 6** | the record files are `retrieval_corpus.json.gz` and `decompose_corpus.json.gz`, compact (unindented) JSON. 10.9x smaller, 0.15 s to decompress. Written with `mtime=0` so two builds are byte-identical. |
+| **float16 vectors** | the `.npy` files are half the size. Every loader upcasts to float32 at load, so the matrix, the cosines and the floor are float32 exactly as before — the storage width stops at `corpus._read`. |
+| **no stored `embed_text`** | the enriched text that was embedded is no longer kept in the file. Its SHA-256 is. |
+
+The vectors are deliberately **not** gzipped: floats compress 1.09x, which buys
+nothing and costs a decompress on every start.
+
+**WP-D5 ruling 7 is amended by D10 ruling 3.** It used to read "the exact
+embedded text is stored"; it now reads "the exact embedded text is
+**reproducible and hash-pinned**". The reproduction is a command:
+
+```bash
+# regenerate one record's embedded text from its stored fields and check it
+# against embed_text_sha256 — prints the text, then MATCH or MISMATCH
+python Insights/src/phase5d_retrieval_corpus.py --embed-text 1-00042
+python Insights/src/phase5f_decompose.py --embed-text d1-00042
+
+# the whole corpus at once; exits non-zero if any record fails
+python Insights/src/phase5f_decompose.py --embed-text ALL
+```
+
+MISMATCH means the record and its vector have stopped describing each other and
+the corpus needs rebuilding. All 40,457 records report MATCH as of WP-D10.
+
+One shape to know: a decomposition's `members` are stored **columnar** —
+`{"member": [...], "value": [...], "rows": [...], "share": [...],
+"null_index": [...]}` — because one dict per member was the largest single thing
+in the sidecar. Never read that layout directly; `corpus.members_of(record)`
+hands back the list of dicts and accepts a pre-D10 file unchanged.

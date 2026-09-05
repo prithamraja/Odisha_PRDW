@@ -223,7 +223,7 @@ def _record_payload(record) -> dict:
             "commonness_sets": data.get("commonness_sets", []),
             "total": data.get("total"),
             "total_display": data.get("total_display"),
-            "members": data.get("members", []),
+            "members": corpus_mod.members_of(data),
             "shape": data.get("shape"),
             "reconciles": data.get("reconciles"),
         },

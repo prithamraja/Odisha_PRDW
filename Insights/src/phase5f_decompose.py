@@ -100,6 +100,10 @@ from phase5d_retrieval_corpus import (                         # noqa: E402
     Embedder, embedding_pin, pin_fingerprint, sha256_of,
     open_ask_validator, resolve_geography, GEO_DIMS,
     MAX_NAMED_IN_TEXT,
+    # The WP-D10 storage format, imported rather than restated: one format and
+    # one loader for both corpora (D10 ruling 5), decided in phase5d.
+    read_corpus_json, write_corpus_json, save_vectors, load_vectors,
+    cache_is_reusable, members_columnar, members_expand,
 )
 
 MI_DIR = os.path.join(BASE_DIR, "metainsights")
@@ -107,9 +111,13 @@ VIEWS_DIR = os.path.join(BASE_DIR, "views_prdw")
 VIEWS = ("view1", "view2", "view3")
 CONFIGS = {"view1": VIEW1_CONFIG, "view2": VIEW2_CONFIG, "view3": VIEW3_CONFIG}
 
-CORPUS_PATH = os.path.join(MI_DIR, "decompose_corpus.json")
+CORPUS_PATH = os.path.join(MI_DIR, "decompose_corpus.json.gz")
 VECTORS_PATH = os.path.join(MI_DIR, "decompose_corpus.npy")
 STAMP_PATH = os.path.join(MI_DIR, "decompose_corpus_stamp.json")
+
+# The pre-WP-D10 spelling, read for the vector cache and never written -- so the
+# first rebuild under the new format re-embeds nothing (D10.0 gate a).
+LEGACY_CORPUS_PATH = os.path.join(MI_DIR, "decompose_corpus.json")
 
 # The label a null dimension value carries. It is a MEMBER, never a silent drop
 # (D6.0: "an explicit row for null/unknown members"). `tied_untied` is null on
@@ -814,11 +822,13 @@ def build_records(views: tuple, validator=None) -> tuple:
                         "evenness": shape["evenness"],
                         "n_members": len(members),
                         "has_null_member": any(m["is_null"] for m in members),
-                        "members": members,
+                        "members": members_columnar(members),
                         "residual": residual,
                         "reconciles": _reconciles(total, members, gross),
                         "sentence": sentence,
-                        "embed_text": embed_text,
+                        # Not stored (D10 ruling 3); `--embed-text <id>`
+                        # regenerates it and checks it against the hash below.
+                        "_embed_text": embed_text,
                     })
                     made += 1
 
@@ -833,8 +843,13 @@ def build_records(views: tuple, validator=None) -> tuple:
 
     for record in records:
         record["embed_text_sha256"] = hashlib.sha256(
-            record["embed_text"].encode("utf-8")).hexdigest()
+            record["_embed_text"].encode("utf-8")).hexdigest()
     return records, counts
+
+
+def strip_transient(records: list) -> list:
+    """Drop the underscore-prefixed build scratch before the records are written."""
+    return [{k: v for k, v in r.items() if not k.startswith("_")} for r in records]
 
 
 def _reconciles(total: float, members: list, gross: float) -> bool:
@@ -935,7 +950,7 @@ def embed_missing(records: list, cache: dict) -> tuple:
     unsaved = 0
     for i in range(0, len(need), EMBED_CHUNK):
         chunk = need[i:i + EMBED_CHUNK]
-        vectors = embedder.documents([r["embed_text"] for r in chunk])
+        vectors = embedder.documents([r["_embed_text"] for r in chunk])
         for record, vector in zip(chunk, vectors):
             cache[record["embed_text_sha256"]] = vector
         unsaved += len(chunk)
@@ -961,18 +976,23 @@ def load_vector_cache() -> dict:
     Reuse is keyed on the exact text, so a change to the sentence or to the
     enrichment recipe invalidates exactly the records it changed.
     """
-    if not (os.path.exists(CORPUS_PATH) and os.path.exists(VECTORS_PATH)):
+    corpus_path = next((c for c in (CORPUS_PATH, LEGACY_CORPUS_PATH)
+                        if os.path.exists(c)), None)
+    if corpus_path is None or not os.path.exists(VECTORS_PATH):
         return {}
     try:
-        with open(CORPUS_PATH, encoding="utf-8") as fh:
-            old = json.load(fh)
-        vectors = np.load(VECTORS_PATH)
+        old = read_corpus_json(corpus_path)
+        vectors = load_vectors(VECTORS_PATH)
     except Exception:
         return {}
     old_records = old.get("records", [])
     if len(old_records) != len(vectors):
         return {}
-    if old.get("embedding_pin_fingerprint") != pin_fingerprint():
+    # The SEMANTIC pin, for the reason phase5d gives at the same line: fp32 and
+    # fp16 are the same vector written two widths, and re-embedding 36,218 texts
+    # to change a storage width would cost money AND break the byte-identity
+    # gate, because the endpoint is not deterministic.
+    if not cache_is_reusable(old):
         return {}
     return {r["embed_text_sha256"]: vectors[i] for i, r in enumerate(old_records)}
 
@@ -1007,7 +1027,12 @@ def write_outputs(records, counts, stamp, vectors, embedder, elapsed, views):
             "identity -- its members sum to its total -- and the D6.0 gate "
             "checks all of them. Nothing here correlates, infers or explains "
             "(D41); it is bookkeeping. Vectors live beside this file in "
-            "decompose_corpus.npy, row-aligned with `records`."
+            "decompose_corpus.npy, float16 on disk and read as float32, "
+            "row-aligned with `records`. `members` is COLUMNAR -- parallel "
+            "lists plus `null_index` -- and the embedded text is not stored: "
+            "`embed_text_sha256` pins it, and `python "
+            "Insights/src/phase5f_decompose.py --embed-text <id>` regenerates "
+            "it from the record and verifies it (WP-D10)."
         ),
         "candidate_set_id": stamp["candidate_set_id"],
         "source_generated_at": stamp["generated_at"],
@@ -1022,14 +1047,12 @@ def write_outputs(records, counts, stamp, vectors, embedder, elapsed, views):
         },
         "counts": counts,
         "view_parquets": parquet_provenance(views),
-        "records": records,
+        "records": strip_transient(records),
     }
-    with open(CORPUS_PATH, "w", encoding="utf-8") as fh:
-        json.dump(payload, fh, indent=1, ensure_ascii=False, sort_keys=False)
-        fh.write("\n")
+    write_corpus_json(CORPUS_PATH, payload)
 
     if vectors is not None:
-        np.save(VECTORS_PATH, vectors)
+        save_vectors(VECTORS_PATH, vectors)
 
     with open(STAMP_PATH, "w", encoding="utf-8") as fh:
         json.dump({
@@ -1039,7 +1062,7 @@ def write_outputs(records, counts, stamp, vectors, embedder, elapsed, views):
                 "consecutive builds (D6.0 gate); everything else, vectors "
                 "included, is reproduced from the cache."
             ),
-            "artefacts": ["metainsights/decompose_corpus.json",
+            "artefacts": ["metainsights/decompose_corpus.json.gz",
                           "metainsights/decompose_corpus.npy"],
             "candidate_set_id": stamp["candidate_set_id"],
             "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -1056,6 +1079,56 @@ def write_outputs(records, counts, stamp, vectors, embedder, elapsed, views):
         fh.write("\n")
 
 
+# =============================================================================
+# THE AUDIT COMMAND  (WP-D10, D10.2)
+# =============================================================================
+# The twin of phase5d's, over this corpus's own `build_embed_text`. Everything
+# that function reads -- view, measure, dimension, subspace, members, sentence
+# -- is on the record, so the text it produced is regenerable from the record
+# alone, which is what D10 ruling 3 replaces "the exact text is stored" with.
+
+def regenerate_embed_text(record: dict) -> str:
+    return build_embed_text(
+        record["view"], record["measure"], record["dimension"],
+        [tuple(p) for p in record["subspace"]],
+        members_expand(record["members"]), record["sentence"])
+
+
+def audit_embed_text(decompose_ids: list) -> int:
+    """Print each id's regenerated embed text with MATCH / MISMATCH. 0 if all match."""
+    corpus_path = next((c for c in (CORPUS_PATH, LEGACY_CORPUS_PATH)
+                        if os.path.exists(c)), None)
+    if corpus_path is None:
+        raise SystemExit(f"STOP: no corpus at {CORPUS_PATH}. Build it first.")
+    payload = read_corpus_json(corpus_path)
+    by_id = {r["finding_id"]: r for r in payload["records"]}
+
+    failures = 0
+    for record_id in decompose_ids:
+        record = by_id.get(record_id)
+        if record is None:
+            print(f"{record_id}  UNKNOWN ID")
+            failures += 1
+            continue
+        text = regenerate_embed_text(record)
+        actual = hashlib.sha256(text.encode("utf-8")).hexdigest()
+        stored = record["embed_text_sha256"]
+        ok = actual == stored
+        failures += 0 if ok else 1
+        print(f"=== {record_id}  {'MATCH' if ok else 'MISMATCH'}")
+        print(text)
+        print(f"--- stored     {stored}")
+        print(f"--- regenerated {actual}")
+    return 1 if failures else 0
+
+
+def all_record_ids() -> list:
+    corpus_path = next((c for c in (CORPUS_PATH, LEGACY_CORPUS_PATH)
+                        if os.path.exists(c)), None)
+    payload = read_corpus_json(corpus_path)
+    return [r["finding_id"] for r in payload["records"]]
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="WP-D6 D6.0 decomposition corpus build")
     ap.add_argument("--no-embed", action="store_true",
@@ -1064,7 +1137,16 @@ def main(argv=None) -> int:
                     help="ignore the vector cache and re-embed everything")
     ap.add_argument("--views", default=",".join(VIEWS),
                     help="comma-separated subset, for a faster structure check")
+    ap.add_argument("--embed-text", nargs="+", metavar="ID",
+                    help="regenerate these records' embedded text from their "
+                         "stored fields and check it against embed_text_sha256 "
+                         "(D10.2). 'ALL' checks every record.")
     args = ap.parse_args(argv)
+
+    if args.embed_text:
+        ids = (all_record_ids() if args.embed_text == ["ALL"]
+               else args.embed_text)
+        return audit_embed_text(ids)
 
     views = tuple(v.strip() for v in args.views.split(",") if v.strip())
     for view in views:
@@ -1150,7 +1232,8 @@ def main(argv=None) -> int:
         # moment of embedding, and float32 L2-normalisation is not idempotent
         # (WP-D5 defect 1: a second pass moves the last bit of some components
         # and the byte-identity gate fails with nothing re-embedded).
-        vectors = np.stack([cache[r["embed_text_sha256"]] for r in records])
+        vectors = np.stack([np.asarray(cache[r["embed_text_sha256"]],
+                                       dtype=np.float32) for r in records])
 
     write_outputs(records, counts, stamp, vectors, embedder,
                   time.time() - t0, views)

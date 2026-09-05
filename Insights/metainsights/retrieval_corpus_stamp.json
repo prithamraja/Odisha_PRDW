@@ -1,12 +1,12 @@
 {
   "what_this_is": "Provenance for retrieval_corpus.json/.npy. The `generated_at` line is the ONLY field expected to differ between two consecutive builds (D5.0 gate); everything else, vectors included, is reproduced from the cache.",
   "artefacts": [
-    "metainsights/retrieval_corpus.json",
+    "metainsights/retrieval_corpus.json.gz",
     "metainsights/retrieval_corpus.npy"
   ],
   "candidate_set_id": "a7f991c1df3771f9",
-  "generated_at": "2026-09-01T07:06:33Z",
-  "build_seconds": 1.0,
+  "generated_at": "2026-09-04T12:50:18Z",
+  "build_seconds": 1.1,
   "embedding_pin": {
     "model": "qwen/qwen3-embedding-8b",
     "dims": 1024,
@@ -14,9 +14,9 @@
     "query_instruction": "Instruct: Given a question from a government official about village-level planning and spending, retrieve analysis findings that answer it\nQuery: ",
     "document_instruction": null,
     "normalisation": "L2, client-side",
-    "storage_dtype": "float32"
+    "storage_dtype": "float16"
   },
-  "embedding_pin_fingerprint": "7a6509707ac3aa5c",
+  "embedding_pin_fingerprint": "808928d2275aa54b",
   "embedding_calls": 0,
   "texts_embedded": 0,
   "records": 4239,
@@ -49,6 +49,10 @@
     "global_feed_source_set.json": {
       "sha256": "6c7b62e62f728849530b2078dd30b72c53fc019bacacf3b65e42a27e272e11a4",
       "bytes": 1474
+    },
+    "insight_prose.json": {
+      "sha256": "333b24e5214fec8ce4056d5bdd38506ad8059061ddd7d9022417496182354f10",
+      "bytes": 939932
     },
     "view1_candidates.json": {
       "sha256": "890767085988a6c7b61b1694a51e544d977932b1f567c89cae0e017b3643359b",

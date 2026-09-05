@@ -101,14 +101,33 @@ class Corpus:
         return (Finding(i, r) for i, r in enumerate(self.records))
 
 
+def members_of(data: dict) -> list:
+    """A decomposition record's members as a list of dicts.
+
+    The corpus stores them COLUMNAR (WP-D10) because one dict per member, key
+    names included, was the largest single thing in the sidecar. Every reader
+    goes through here rather than learning the layout: `checks.supplied_text`,
+    the `/record/{id}` JSON and its HTML view. A pre-D10 file whose members are
+    already a list comes back unchanged, so the same reader serves both.
+    """
+    return config.members_expand(data.get("members", []))
+
+
 _CACHE: Corpus | None = None
 
 
 def _read(corpus_path, vectors_path, what: str) -> tuple:
-    """One corpus file and its vectors, checked for the mismatches that matter."""
-    with open(corpus_path, encoding="utf-8") as fh:
-        payload = json.load(fh)
-    vectors = np.load(vectors_path)
+    """One corpus file and its vectors, checked for the mismatches that matter.
+
+    Both are read through the builder's own format functions (WP-D10): the
+    records out of a gzipped, compact JSON, the vectors out of an fp16 .npy and
+    UPCAST TO FP32 here. Everything past this line -- the matrix, the cosines,
+    the boosts, the floor -- is fp32 exactly as it was before the file got
+    narrower, so the storage width is a fact about the disk and about nothing
+    else.
+    """
+    payload = config.read_corpus_json(str(corpus_path))
+    vectors = config.load_vectors(str(vectors_path))
     records = payload["records"]
     if len(records) != len(vectors):
         raise SystemExit(
@@ -120,7 +139,7 @@ def _read(corpus_path, vectors_path, what: str) -> tuple:
             f"STOP: {what} vectors are {vectors.shape[1]}-dimensional, the pin "
             f"says {config.EMBED_DIMS}."
         )
-    return payload, records, np.asarray(vectors, dtype=np.float32)
+    return payload, records, vectors
 
 
 def load(force: bool = False) -> Corpus:
