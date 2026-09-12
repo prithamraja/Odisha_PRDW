@@ -2209,6 +2209,21 @@
   "rows": 6,
   "status": "PASS"
  },
+ "PHY-006": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null
+  },
+  "rows": 11,
+  "status": "PASS (WP-6 T5, executed against panchayat_1.duckdb)"
+ },
  "PLN-001": {
   "answerable": "Yes",
   "params": {

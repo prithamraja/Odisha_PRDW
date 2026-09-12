@@ -671,6 +671,11 @@ FAMILY_DESCRIPTIONS: dict[str, dict] = {
         "members": ['PHY-004'],
     },
 
+    'phy_006__progress_evidence': {
+        "desc": 'LISTS: Which Gram Panchayats have expenditure recorded but no physical progress in a given year. Returns activities_without_evidence, expenditure. One row per gp_name × block_name × district_name. Counted FROM THE GP ROSTER by LEFT JOIN, so panchayats with zero activity are still in the denominator and still appear — which is the finding a review meeting is looking for. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Physical progress here is photo/GPS evidence uploaded against an activity, not a stage model: only 1,675 of the 12,704 activities carry any upload at all, so "no physical progress" means no evidence was uploaded rather than no work done.',
+        "members": ['PHY-006'],
+    },
+
     'pln_001__planning': {
         "desc": 'COUNTS: How many Gram Panchayats in a given district/a given block have uploaded the GPDP in a given year. Returns gps_with_gpdp. A single summary row by default; breakdowns on request. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. UPLOADED a GPDP, which is any plan row — not the approved subset; the approval question is the neighbouring one. Caveat: A row in plan = an uploaded GPDP.',
         "members": ['PLN-001'],

@@ -108,7 +108,9 @@ phrase in BOTH slots and let the caller split it.
 colloquial names: toilets, SBM, ODF → "Sanitation"; piped water, Jal Jeevan → "Drinking \
 water"; anganwadi, ICDS → "Women and child development"; street light → "Rural \
 electrification".
-- For theme: one of the LSDG themes, exactly: {theme_enum}. "clean and green" → \
+- For theme: one of the LSDG themes, exactly: {theme_enum}. "Sankalp themes" is \
+what officers call these themes collectively — it names no single theme, so return \
+null for it unless one theme is actually named. "clean and green" → \
 "Theme 5 - Clean and Green Village". Return null if no theme is named.
 - For scheme / scheme_2: return exactly one of: {scheme_enum}. Map the colloquial names: \
 CFC, central finance commission, 15th FC → "XV Finance Commission"; SFC, state finance \

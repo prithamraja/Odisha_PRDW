@@ -1591,7 +1591,7 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
 WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
-  AND v.theme = $theme
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
   AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
   AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
@@ -1605,7 +1605,7 @@ LIMIT $top_n
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
-            {'name': 'theme', 'entity_type': 'theme'},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
@@ -1654,7 +1654,8 @@ WHERE NOT EXISTS (
         SELECT 1 FROM v_activity v
         WHERE v.gp_lgd_code = g.gp_lgd_code
           AND v.fiscal_year IN (SELECT UNNEST($date_range))
-          AND v.theme = $theme
+          AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+          AND ($theme IS NOT NULL OR v.theme <> 'Unmapped theme')
           AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
           AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
           AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
@@ -1665,7 +1666,7 @@ ORDER BY g.zp_name, g.block_name, g.gp_name
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
-            {'name': 'theme', 'entity_type': 'theme'},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
@@ -13527,6 +13528,70 @@ ORDER BY activities DESC
             'How many activities in a given block have physical-progress evidence recorded in a given year, funded from tied grants?',
             # ── end derived ──
         ],
+    },
+
+    'PHY-006': {
+        "abstract_question": 'Which Gram Panchayats have expenditure recorded but no physical progress in {date_range}?',
+        "date_filter": None,
+        "date_kind": None,
+        "sql_template": """
+SELECT g.gp_name, g.block_name, g.zp_name AS district_name,
+       COUNT(v.activity_code) AS activities_without_evidence,
+       COALESCE(SUM(v.total_expenditure), 0) AS expenditure
+FROM gram_panchayat g
+LEFT JOIN v_activity v
+       ON v.gp_lgd_code = g.gp_lgd_code
+      AND v.fiscal_year IN (SELECT UNNEST($date_range))
+      AND COALESCE(v.total_expenditure, 0) > 0
+      AND v.has_progress_evidence = 0
+      AND ($plan_type  IS NULL OR v.plan_type       IN (SELECT UNNEST($plan_type)))
+      AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+      AND ($theme      IS NULL OR v.theme           IN (SELECT UNNEST($theme)))
+      AND ($scheme     IS NULL OR v.scheme_name     IN (SELECT UNNEST($scheme)))
+WHERE ($district_name IS NULL OR g.zp_name    IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR g.block_name IN (SELECT UNNEST($block_name)))
+  AND ($gp_name       IS NULL OR g.gp_lgd_code = $gp_name)
+GROUP BY 1,2,3
+HAVING COUNT(v.activity_code) > 0
+ORDER BY expenditure DESC
+""",
+        "param_slots": [
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
+        ],
+        "grouped_geo": [
+    'district_name',
+    'block_name',
+    'gp_name',
+],
+        "result_ttl_seconds": 600,
+        "caveat": 'Physical progress here is photo/GPS evidence uploaded against an activity, not a stage model: only 1,675 of the 12,704 activities carry any upload at all, so "no physical progress" means no evidence was uploaded rather than no work done.',
+        "bracket": 'Implementation & Progress',
+        "module": 'Physical Progress',
+        "submodule": 'Progress Evidence',
+        "question_type": 'Listing',
+        "answerable": 'Partial',
+        "paraphrases": [
+            'Which GPs have spent money but recorded no physical progress in a given year?',
+            'List the Gram Panchayats where expenditure is recorded but no progress evidence exists.',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
+            'Which Gram Panchayats have expenditure recorded but no physical progress in a given year?',
+            'Which Gram Panchayats have expenditure recorded but no physical progress in a given year, for a given district?',
+            'Which Gram Panchayats have expenditure recorded but no physical progress in a given year, for a given block?',
+            'Which Gram Panchayats have expenditure recorded but no physical progress in a given year, for a given gram panchayat (GP)?',
+            'Which Gram Panchayats have expenditure recorded but no physical progress in a given year, in the main GPDP?',
+            'Which Gram Panchayats have expenditure recorded but no physical progress in a given year, under a given focus area?',
+            'Which Gram Panchayats have expenditure recorded but no physical progress in a given year, under a given LSDG theme?',
+            'Which Gram Panchayats have expenditure recorded but no physical progress in a given year, under a given scheme?',
+            # ── end derived ──
+        ],
+        "notes": 'WP-6 T5, added for Eval_1 gap A ("which GPs have expenditure recorded but zero physical progress"). Roster-shaped: the LEFT JOIN from gram_panchayat makes the GP roster the grain, so the answer is about panchayats rather than about activity rows, and the HAVING keeps only the panchayats that actually have such activities.',
     },
 
     'AST-001': {

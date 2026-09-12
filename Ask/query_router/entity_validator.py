@@ -229,8 +229,9 @@ _STATUS_ALIASES = {
 _FOCUS_AREA_ALIASES = {
     "toilet":            "Sanitation",
     "toilets":           "Sanitation",
-    "swachh bharat":     "Sanitation",
-    "sbm":               "Sanitation",
+    "swachh bharat":     "Sanitation",      # LOSSY — see LOSSY_ALIASES
+    "swachh bharat mission": "Sanitation",  # LOSSY
+    "sbm":               "Sanitation",      # LOSSY
     "odf":               "Sanitation",
     "water":             "Drinking water",
     "drinking water supply": "Drinking water",
@@ -351,6 +352,44 @@ _ASSET_CATEGORY_ALIASES = {
     "pond":             "Pond & Reservoir",
     "computer":         "Computers and peripherals",
 }
+
+
+# ── Aliases that LOSE something (WP-6 T5) ─────────────────────────────────────
+# An alias that merely spells a value differently ("khurda" -> "Khordha") costs
+# the reader nothing. These do not: they answer a question the database cannot
+# quite express, and the answer is only honest if it says so. The sentence is
+# appended VERBATIM to the answer, the way a Partial template's caveat is (D3) —
+# never paraphrased through a model.
+#
+# Operator rulings, 2026-09-12: Swachh Bharat is accepted as the Sanitation
+# focus area WITH this caveat; "sector" is NOT aliased at all (the bot asks);
+# Sankalp themes answer from the six LSDG themes present with NO caveat.
+LOSSY_ALIASES: dict[tuple[str, str], str] = {
+    ("focus_area", "swachh bharat"):
+        "Swachh Bharat is read here as the Sanitation focus area: activities do "
+        "not record SBM as a scheme, so this counts every sanitation activity, "
+        "including any funded from elsewhere.",
+    ("focus_area", "sbm"):
+        "SBM is read here as the Sanitation focus area: activities do not record "
+        "SBM as a scheme, so this counts every sanitation activity, including any "
+        "funded from elsewhere.",
+    ("focus_area", "swachh bharat mission"):
+        "Swachh Bharat is read here as the Sanitation focus area: activities do "
+        "not record SBM as a scheme, so this counts every sanitation activity, "
+        "including any funded from elsewhere.",
+}
+
+
+def lossy_caveat(entity) -> str | None:
+    """The sentence an answer owes the reader for the alias it resolved through.
+
+    Keyed on what the OFFICER typed, not on what it resolved to: "Sanitation"
+    asked for plainly loses nothing and gets no sentence.
+    """
+    if getattr(entity, "confidence", None) != "alias":
+        return None
+    base, _ = _resolve_config(entity.entity_type)
+    return LOSSY_ALIASES.get((base, _collapse_ws(entity.raw_value)))
 
 
 # ── Registry config ───────────────────────────────────────────────────────────

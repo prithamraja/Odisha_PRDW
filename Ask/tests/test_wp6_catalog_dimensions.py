@@ -597,5 +597,117 @@ class T4ListFilterTests(unittest.TestCase):
         self.assertIn("Drinking water and Sanitation", result.query_description)
 
 
+@unittest.skipIf(_adapter() is None, f"no sample database at {_DB_PATH}")
+class T5NewTemplateAndRelaxedSlotsTests(unittest.TestCase):
+    """The one genuinely new question, and the two slots the operator relaxed."""
+
+    def _bind_rows(self, qid, values):
+        from query_router.template_catalog import bind
+        sql, params = bind(qid, values)
+        return _adapter().execute(sql, params).fetchall()
+
+    def test_phy006_answers_the_eval1_question(self):
+        """Gap A: "which GPs have expenditure recorded but zero physical
+        progress". Roster-shaped, so the grain is panchayats, not activity rows.
+        """
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        entry = T["PHY-006"]
+        self.assertIn("FROM gram_panchayat g", entry["sql_template"])
+        self.assertIn("LEFT JOIN v_activity", entry["sql_template"])
+        self.assertEqual(entry["answerable"], "Partial")
+        self.assertIn("photo/GPS evidence", entry["caveat"])
+
+        rows = self._bind_rows("PHY-006", {"date_range": "2024-2025"})
+        want = _adapter().execute(
+            "SELECT COUNT(DISTINCT gp_lgd_code) FROM v_activity "
+            "WHERE fiscal_year = '2024-2025' AND COALESCE(total_expenditure,0) > 0 "
+            "AND has_progress_evidence = 0").fetchone()[0]
+        self.assertEqual(len(rows), want)
+        self.assertGreater(len(rows), 0)
+
+    def test_pln031_answers_across_all_themes(self):
+        """Operator ruling 2026-09-12: the theme becomes optional, so "which GP
+        planned the most activities?" no longer asks which theme."""
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        theme = next(s for s in T["PLN-031"]["param_slots"] if s["name"] == "theme")
+        self.assertTrue(theme.get("optional"))
+        rows = self._bind_rows("PLN-031", {"date_range": "2024-2025", "top_n": "1"})
+        want = _adapter().execute(
+            "SELECT COUNT(*) FROM v_activity WHERE fiscal_year = '2024-2025' "
+            "GROUP BY gp_lgd_code ORDER BY COUNT(*) DESC LIMIT 1").fetchone()[0]
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0][3], want, "the top GP's own activity count")
+
+    def test_pln032_with_no_theme_means_no_theme_at_all(self):
+        """With the theme absent it lists the GPs with nothing under ANY LSDG
+        theme — activities whose focus area maps to no theme do not count as
+        theme planning, which is what 'Unmapped theme' means."""
+        rows = self._bind_rows("PLN-032", {"date_range": "2024-2025"})
+        want = _adapter().execute(
+            "SELECT COUNT(*) FROM gram_panchayat g WHERE NOT EXISTS ("
+            "SELECT 1 FROM v_activity v WHERE v.gp_lgd_code = g.gp_lgd_code "
+            "AND v.fiscal_year = '2024-2025' AND v.theme <> 'Unmapped theme')"
+        ).fetchone()[0]
+        self.assertEqual(len(rows), want)
+
+    def test_a_named_theme_still_narrows_pln032(self):
+        both = len(self._bind_rows("PLN-032", {"date_range": "2024-2025"}))
+        one = len(self._bind_rows(
+            "PLN-032", {"date_range": "2024-2025",
+                        "theme": "Theme 4 - Water Sufficient Village"}))
+        self.assertGreaterEqual(one, both)
+
+
+@unittest.skipIf(_adapter() is None, f"no sample database at {_DB_PATH}")
+class T5LossyAliasTests(unittest.TestCase):
+    """A reading the database cannot quite express says so in the answer."""
+
+    @classmethod
+    def setUpClass(cls):
+        from query_router.entity_validator import EntityValidator
+        cls.validator = EntityValidator(_adapter())
+
+    def _serve(self, qid, **values):
+        import time
+        from query_router import router
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        types = router._template_slot_types(T[qid])
+        entities = []
+        for slot, value in values.items():
+            entity = self.validator.validate(value, types[slot])
+            entity.slot_name = slot
+            entities.append(entity)
+        return router._serve_query_id(
+            qid, entities, None, user_query="q", normalized="q",
+            start=time.monotonic(), cache_conn=_adapter(), dashboard_results={},
+            template_map=T, dashboard_questions={}, start_date=None, end_date=None)
+
+    def test_swachh_bharat_answers_with_its_caveat(self):
+        result = self._serve("STS-003", date_range="2024-2025",
+                             focus_area="Swachh Bharat", status="WORK COMPLETED")
+        self.assertIn("Sanitation focus area", result.caveat)
+        self.assertIn("do not record SBM as a scheme", result.caveat)
+
+    def test_the_templates_own_caveat_survives_beside_it(self):
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        own = (T["STS-003"].get("caveat") or "").strip()
+        result = self._serve("STS-003", date_range="2024-2025",
+                             focus_area="Swachh Bharat")
+        self.assertTrue(own and own in result.caveat)
+
+    def test_the_plain_value_owes_nothing(self):
+        result = self._serve("STS-003", date_range="2024-2025",
+                             focus_area="Sanitation")
+        self.assertNotIn("read here as", result.caveat or "")
+
+    def test_sankalp_themes_answer_without_a_caveat(self):
+        """Operator ruling 2026-09-12: answer from the six themes present, no
+        warning. Nothing may quietly turn the collective name into one theme."""
+        from query_router.entity_validator import LOSSY_ALIASES, REGISTRY_CONFIG
+        aliases = REGISTRY_CONFIG["theme"]["aliases"]
+        self.assertNotIn("sankalp themes", aliases)
+        self.assertFalse([k for k in LOSSY_ALIASES if k[0] == "theme"])
+
+
 if __name__ == "__main__":
     unittest.main()

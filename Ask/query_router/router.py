@@ -39,7 +39,7 @@ from .date_phrase       import resolve_fiscal_years
 from .intent_catalog    import INTENT_LOOKUP, INTENT_SLOTS
 from .intent_classifier import classify_intent
 from .entity_extractor  import extract_entities
-from .entity_validator  import EntityValidator, mask_aadhaar
+from .entity_validator  import EntityValidator, lossy_caveat, mask_aadhaar
 from .reranker          import rerank
 from .fallback          import generate_fallback_message
 from .zones             import (
@@ -1806,6 +1806,21 @@ def _serve_unanswerable(
     return result
 
 
+def _caveat_for(template: dict, entities: list) -> str | None:
+    """The template's caveat, plus a sentence for every LOSSY alias the question
+    resolved through (WP-6 T5). Appended verbatim, like the caveat itself: a
+    reading the database cannot quite express has to be visible in the answer,
+    not in a log.
+    """
+    parts = [(template.get("caveat") or "").strip()]
+    for entity in entities:
+        sentence = lossy_caveat(entity)
+        if sentence and sentence not in parts:
+            parts.append(sentence)
+    joined = " ".join(p for p in parts if p)
+    return joined or None
+
+
 def _readable_values(entity) -> str:
     """How a bound value reads in the echo. Several values are NAMED, never
     summed away into one figure the officer cannot take apart (WP-6 T4)."""
@@ -1973,7 +1988,7 @@ def _serve_query_id(
         query_id=query_id,
         intent=intent,
         query_description=query_description,
-        caveat=template.get("caveat"),
+        caveat=_caveat_for(template, validated_entities),
         start_date=start_date,
         end_date=end_date,
         date_filter_applied=date_filter_applied,

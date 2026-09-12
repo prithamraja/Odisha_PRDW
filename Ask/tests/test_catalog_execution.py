@@ -43,7 +43,7 @@ _ORACLE = json.loads(_ORACLE_PATH.read_text(encoding="utf-8"))
 _RETIRED_PATH = Path(__file__).parent / "data" / "retired_templates.json"
 _RETIRED = (json.loads(_RETIRED_PATH.read_text(encoding="utf-8"))
             if _RETIRED_PATH.exists() else {})
-_ADDED_IN_WP6: set[str] = set()
+_ADDED_IN_WP6 = {"PHY-006"}
 
 _STATE: dict = {}
 
