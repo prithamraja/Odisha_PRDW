@@ -398,6 +398,14 @@ REGISTRY_CONFIG: dict[str, dict] = {
     # other.
     "tied_untied": {"kind": "categorical", "fuzzy_threshold": 95,
                     "aliases": _TIED_UNTIED_ALIASES},
+    # WP-6 T3. The breakdown slot: a FIXED whitelist, the values M2 wrote into
+    # every CASE. Never extracted by the model — query_router/breakdown.py reads
+    # it from a phrase table — and never loaded from the database, because a
+    # breakdown is structure, not data.
+    "group_by": {"kind": "enum",
+                 "values": ("district", "block", "gp", "theme", "focus_area",
+                            "status", "scheme", "plan_type", "fiscal_year",
+                            "total")},
     # Asset coverage is sparse (4,286 of 12,704 activity rows carry a category)
     # and 8 of 36 category codes / 56 of 198 subcategory codes have no decode.
     # Both are WP-3 answer caveats; the registry's job is only to accept the
@@ -469,6 +477,7 @@ PARAM_ENTITY_TYPES: dict[str, str] = {
     "status":             "status",
     "plan_type":          "plan_type",          # WP-6 T1; not a workbook bind name
     "tied_untied":        "tied_untied",        # WP-6 T2; not a workbook bind name
+    "group_by":           "group_by",           # WP-6 T3; not a workbook bind name
     "asset_category":     "asset_category",
     "asset_sub_category": "asset_subcategory",
     "activity_code":      "activity_code",
@@ -894,6 +903,8 @@ class EntityValidator:
             return self._validate_numeric(raw_value, entity_type, cfg)
         if kind == "date":
             return self._validate_date(raw_value, entity_type)
+        if kind == "enum":
+            return self._validate_enum(raw_value, entity_type, cfg)
 
         raw_text = str(raw_value)
         if base_type in _GEO_TYPES and _collapse_ws(raw_text) in _STATE_LEVEL_TERMS:
@@ -972,6 +983,17 @@ class EntityValidator:
             return self._entity(entity_type, raw_value, parse_deadline(raw_value), "exact")
         except ValueError:
             raise EntityNotFound(entity_type, str(raw_value), [])
+
+    def _validate_enum(self, raw_value, entity_type: str, cfg: dict) -> ExtractedEntity:
+        """A value from a FIXED list (WP-6 T3's breakdown): exact or refused.
+
+        No fuzzy step: 'block' and 'plan_type' are not near-misses of each other,
+        and a breakdown guessed wrong regroups a correct answer silently.
+        """
+        norm = re.sub(r"[\s-]+", "_", _collapse_ws(str(raw_value)))
+        if norm in cfg["values"]:
+            return self._entity(entity_type, raw_value, norm, "exact")
+        raise EntityNotFound(entity_type, str(raw_value), list(cfg["values"]))
 
     # ── Fiscal year ───────────────────────────────────────────────────────────
 

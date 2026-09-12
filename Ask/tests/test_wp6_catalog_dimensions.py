@@ -220,5 +220,243 @@ class T2UniversalSlotExecutionTests(unittest.TestCase):
                                  stored)
 
 
+class T3BreakdownReaderTests(unittest.TestCase):
+    """The `$group_by` phrase table, on Eval_1's own wordings."""
+
+    CASES = (
+        ("Give a district-wise summary of asset creation for 2024 to 2025.", "district"),
+        ("What is the district-level summary of assets created in 2024 to 2025?", "district"),
+        ("Show asset creation totals across all districts for 2024 to 2025.", "district"),
+        ("What is the total estimated cost of all planned activities state-wide "
+         "for 2024 to 2026?", "total"),
+        ("What is the total unspent balance across all GPs in the state for 2020 "
+         "to 2021?", "total"),
+        ("Which GPs have planned zero-cost activities for 2024 to 2025?", "gp"),
+        ("What is the total allocation for the 9 Sankalp themes state-wide for "
+         "2024 to 2025?", "theme"),
+        ("What is the thematic distribution of planned activities for 2024 to 2025?",
+         "theme"),
+        ("Categorize the planned activities by their respective themes for 2024 to "
+         "2025.", "theme"),
+        ("What is the total actual expenditure incurred by each GP in 2024-25?", "gp"),
+        ("Year-wise expenditure of Andhrua", "fiscal_year"),
+        ("How many activities are in the main vs supplementary plans in 2024-25?",
+         "plan_type"),
+        ("How many activities are in progress during 2024 to 2025?", None),
+        ("How many activities are planned under the sanitation sector for 2024 to "
+         "2025?", None),
+    )
+
+    def test_eval1_wordings(self):
+        from query_router.breakdown import group_by_from_text
+        for question, want in self.CASES:
+            with self.subTest(question=question):
+                self.assertEqual(group_by_from_text(question), want)
+
+    def test_one_whitelist_in_three_places(self):
+        from query_router.breakdown import GROUP_BY_VALUES as runtime
+        from query_router.entity_validator import REGISTRY_CONFIG
+        from tools.derive_catalog import GROUP_BY_VALUES as derive
+        self.assertEqual(runtime, derive)
+        self.assertEqual(runtime, REGISTRY_CONFIG["group_by"]["values"])
+
+    def test_no_statement_lists_a_value_outside_the_whitelist(self):
+        """T7.3(b): a `$group_by` value outside the whitelist in any statement."""
+        import re
+        from query_router.breakdown import GROUP_BY_VALUES
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        carriers = 0
+        for qid, entry in T.items():
+            case = re.search(r"CASE\s+\$group_by\b(.*?)\bEND\s+AS\s+group_label",
+                             entry["sql_template"], re.S)
+            if case:
+                carriers += 1
+                with self.subTest(qid=qid):
+                    self.assertLessEqual(set(re.findall(r"WHEN\s+'(\w+)'", case.group(1))),
+                                         set(GROUP_BY_VALUES))
+        self.assertGreater(carriers, 100)
+
+    def test_reshape_names_the_column_it_holds(self):
+        from query_router.breakdown import reshape
+        template = {"sql_template": (
+            "SELECT CASE $group_by\n  WHEN 'district' THEN v.district_name\n"
+            "  WHEN 'total' THEN 'All'\n  ELSE v.theme  -- absent: theme\n"
+            "END AS group_label,\n CASE WHEN $group_by IS NULL THEN v.block_name "
+            "END AS block_name, COUNT(*) AS n FROM v_activity v GROUP BY 1, 2")}
+        rows = [{"group_label": "Theme 1", "block_name": "B", "n": 3}]
+        self.assertEqual(reshape(template, None, rows),
+                         [{"theme": "Theme 1", "block_name": "B", "n": 3}])
+        self.assertEqual(reshape(template, "district", rows),
+                         [{"district_name": "Theme 1", "n": 3}])
+        self.assertEqual(reshape(template, "total", rows), [{"n": 3}])
+
+
+class T3SectorTests(unittest.TestCase):
+    """Operator ruling 2026-09-12: 'sector' as the breakdown is asked about."""
+
+    NAMES = ["Drinking water", "Sanitation", "water", "sanitation", "road"]
+
+    def test_sector_as_the_breakdown_asks(self):
+        from query_router.breakdown import sector_clarification
+        asked = sector_clarification(
+            "Which sector has the best activity completion rate for 2024 to 2026?",
+            self.NAMES)
+        self.assertIsNotNone(asked)
+        prompt, chips = asked
+        self.assertIn("focus area", prompt)
+        self.assertEqual([label for label, _ in chips], ["By focus area", "By LSDG theme"])
+        self.assertIn("Which focus area has", chips[0][1])
+        self.assertIn("Which LSDG theme has", chips[1][1])
+
+    def test_a_named_value_answers(self):
+        from query_router.breakdown import sector_clarification
+        for question in (
+                "Show the breakdown of tied fund expenditure by sector (water vs "
+                "sanitation) for 2025 to 2026.",
+                "How many activities are planned under the sanitation sector for 2024 "
+                "to 2025?"):
+            with self.subTest(question=question):
+                self.assertIsNone(sector_clarification(question, self.NAMES))
+
+
+@unittest.skipIf(_adapter() is None, f"no sample database at {_DB_PATH}")
+class T3BreakdownExecutionTests(unittest.TestCase):
+
+    def _binds(self, qid, sample):
+        from query_router.entity_validator import EntityValidator
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        validator = EntityValidator(_adapter())
+        values = {}
+        for slot in T[qid]["param_slots"]:
+            value = sample.get(slot["name"])
+            if value is not None and slot.get("bind") == "code":
+                value = validator.validate(str(value), slot["entity_type"]).resolved_code
+            values[slot["name"]] = value
+        return values
+
+    def _count(self, qid, values, wrap="COUNT(*)"):
+        from query_router.template_catalog import bind
+        sql, params = bind(qid, values)
+        return _adapter().execute(f"SELECT {wrap} FROM ({sql}) AS answer", params).fetchone()
+
+    def test_every_retired_id_is_reproduced_by_its_survivor(self):
+        import json
+        retired = json.loads((_BACKEND / "tests" / "data" / "retired_templates.json")
+                             .read_text(encoding="utf-8"))
+        self.assertEqual(sorted(retired), ["BUD-018", "EXP-025", "PLN-050", "PLN-051"])
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        for qid, record in retired.items():
+            with self.subTest(retired=qid, survivor=record["survivor"]):
+                self.assertNotIn(qid, T)
+                values = self._binds(record["survivor"], record["params"])
+                values["group_by"] = record["group_by"]
+                self.assertEqual(self._count(record["survivor"], values)[0], record["rows"])
+
+    def test_ast001_by_district_sums_to_the_ungrouped_total(self):
+        """The brief's own proof for T3."""
+        base = {"date_range": "2024-2025"}
+        per_gp = self._count("AST-001", base, "COUNT(*), SUM(asset_rows)")
+        per_district = self._count("AST-001", {**base, "group_by": "district"},
+                                   "COUNT(*), SUM(asset_rows)")
+        districts = _adapter().execute(
+            "SELECT COUNT(DISTINCT district_name) FROM v_asset "
+            "WHERE fiscal_year = '2024-2025'").fetchone()[0]
+        self.assertEqual(per_district[0], districts)
+        self.assertEqual(per_district[1], per_gp[1])
+        self.assertGreater(per_gp[0], per_district[0])
+
+    def test_total_is_one_row(self):
+        rows = self._count("BUD-006", {"date_range": "2024-2025", "group_by": "total"},
+                           "COUNT(*), SUM(planned_cost)")
+        themes = self._count("BUD-006", {"date_range": "2024-2025"},
+                             "COUNT(*), SUM(planned_cost)")
+        self.assertEqual(rows[0], 1)
+        self.assertEqual(rows[1], themes[1])
+        self.assertGreater(themes[0], 1)
+
+
+@unittest.skipIf(_adapter() is None, f"no sample database at {_DB_PATH}")
+class T3RouterTests(unittest.TestCase):
+    """The breakdown through the real router functions, with no LLM call."""
+
+    @classmethod
+    def setUpClass(cls):
+        from query_router.entity_validator import EntityValidator
+        cls.validator = EntityValidator(_adapter())
+
+    def test_the_extractor_is_never_asked_for_a_breakdown(self):
+        from query_router import router
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        asked: list[str] = []
+
+        def stub(query, slots, client, intent=None):
+            asked.extend(slots)
+            return {s: None for s in slots}
+
+        real, router.extract_entities = router.extract_entities, stub
+        try:
+            raw = router._extract_slot_values(
+                "Give a district-wise summary of asset creation for 2024-25",
+                router._template_slot_types(T["AST-001"]), object(),
+                validator=self.validator)
+        finally:
+            router.extract_entities = real
+        self.assertEqual(raw.get("group_by"), "district")
+        self.assertNotIn("group_by", asked)
+
+    def _serve(self, qid, **values):
+        import time
+        from query_router import router
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        types = router._template_slot_types(T[qid])
+        entities = []
+        for slot, value in values.items():
+            entity = self.validator.validate(value, types[slot])
+            entity.slot_name = slot
+            entities.append(entity)
+        return router._serve_query_id(
+            qid, entities, None, user_query="q", normalized="q",
+            start=time.monotonic(), cache_conn=_adapter(), dashboard_results={},
+            template_map=T, dashboard_questions={}, start_date=None, end_date=None)
+
+    def test_a_district_breakdown_reads_as_districts(self):
+        result = self._serve("AST-001", date_range="2024-2025", group_by="district")
+        self.assertTrue(result.result)
+        row = result.result[0]
+        self.assertIn("district_name", row)
+        self.assertNotIn("group_label", row)
+        self.assertNotIn("block_name", row, "the blanked finer column is dropped")
+        self.assertIn("broken down by district", result.query_description)
+
+    def test_no_breakdown_reads_exactly_as_before(self):
+        row = self._serve("AST-001", date_range="2024-2025").result[0]
+        self.assertLessEqual({"gp_name", "block_name"}, set(row))
+        self.assertNotIn("group_label", row)
+
+    def test_a_breakdown_the_statement_cannot_honour_is_dropped(self):
+        """v_asset carries no scheme: 'scheme-wise assets' must not answer with
+        the default breakdown while claiming a scheme one."""
+        result = self._serve("AST-001", date_range="2024-2025", group_by="scheme")
+        self.assertIn("gp_name", result.result[0])
+        self.assertNotIn("broken down", result.query_description or "")
+
+    def test_which_sector_is_asked_before_retrieval(self):
+        import time
+        from query_router import router
+
+        class NoRetrieval:
+            def retrieve_scored(self, query, k):
+                raise AssertionError("retrieval must not run before the question")
+
+        result = router._route_vector(
+            "Which sector has the best activity completion rate for 2024 to 2026?",
+            "n", time.monotonic(), validator=self.validator, openai_client=object(),
+            retriever=NoRetrieval(), cache_conn=None, dashboard_results={},
+            template_map={}, dashboard_questions={}, start_date=None, end_date=None)
+        self.assertEqual(result.clarification.reason, "ambiguous_term")
+        self.assertEqual([c.label for c in result.clarification.options],
+                         ["By focus area", "By LSDG theme"])
+
+
 if __name__ == "__main__":
     unittest.main()

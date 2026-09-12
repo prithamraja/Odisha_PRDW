@@ -114,13 +114,23 @@ TEMPLATE_CATALOG: dict[str, dict] = {
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COUNT(DISTINCT v.gp_lgd_code) AS gps_with_gpdp
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       COUNT(DISTINCT v.gp_lgd_code) AS gps_with_gpdp
 FROM v_plan v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
   AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -128,6 +138,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'A row in plan = an uploaded GPDP. Pass NULL to any geography parameter to drop that filter.',
@@ -154,13 +165,23 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COUNT(DISTINCT v.gp_lgd_code) AS gps_approved
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       COUNT(DISTINCT v.gp_lgd_code) AS gps_approved
 FROM v_plan v
 WHERE v.fiscal_year = $date_range AND v.is_approved = 1
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
   AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -168,6 +189,7 @@ WHERE v.fiscal_year = $date_range AND v.is_approved = 1
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'plan_code_status is 100% NULL, so approval is proxied by approval_date IS NOT NULL. Every plan row has one, so this currently equals PLN-001.',
@@ -386,7 +408,15 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COUNT(DISTINCT v.gp_lgd_code) AS gps_late
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       COUNT(DISTINCT v.gp_lgd_code) AS gps_late
 FROM v_plan v
 WHERE v.fiscal_year = $date_range
   AND v.approval_date > CAST($deadline AS DATE)
@@ -394,6 +424,8 @@ WHERE v.fiscal_year = $date_range
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
   AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -402,6 +434,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'No upload-date column exists; approval_date is used as the timestamp and the deadline is supplied by the user as $deadline.',
@@ -427,7 +460,15 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COUNT(DISTINCT v.gp_lgd_code) AS gps_late
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       COUNT(DISTINCT v.gp_lgd_code) AS gps_late
 FROM v_plan v
 WHERE v.fiscal_year = $date_range
   AND v.approval_date > CAST($deadline AS DATE)
@@ -435,6 +476,8 @@ WHERE v.fiscal_year = $date_range
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
   AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -443,6 +486,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'No upload-date column exists; approval_date is used as the timestamp and the deadline is supplied by the user as $deadline.',
@@ -513,7 +557,15 @@ ORDER BY days_late DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COUNT(DISTINCT CASE WHEN v.approval_date <= CAST($deadline AS DATE)
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       COUNT(DISTINCT CASE WHEN v.approval_date <= CAST($deadline AS DATE)
                            THEN v.gp_lgd_code END) AS on_time_gps,
        COUNT(DISTINCT CASE WHEN v.approval_date >  CAST($deadline AS DATE)
                            THEN v.gp_lgd_code END) AS late_gps,
@@ -524,6 +576,8 @@ WHERE v.fiscal_year = $date_range
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
   AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -532,6 +586,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'approval_date used as the upload timestamp.',
@@ -601,13 +656,23 @@ ORDER BY v.plan_type
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COUNT(DISTINCT v.gp_lgd_code) AS gps_approved
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       COUNT(DISTINCT v.gp_lgd_code) AS gps_approved
 FROM v_plan v
 WHERE v.fiscal_year = $date_range AND v.is_approved = 1
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
   AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -615,6 +680,7 @@ WHERE v.fiscal_year = $date_range AND v.is_approved = 1
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Duplicate of PLN-002 in the source list; same approval proxy applies.',
@@ -641,13 +707,23 @@ WHERE v.fiscal_year = $date_range AND v.is_approved = 1
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COUNT(DISTINCT v.gp_lgd_code) AS gps_awaiting_approval
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       COUNT(DISTINCT v.gp_lgd_code) AS gps_awaiting_approval
 FROM v_plan v
 WHERE v.fiscal_year = $date_range AND v.is_approved = 0
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
   AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -655,6 +731,7 @@ WHERE v.fiscal_year = $date_range AND v.is_approved = 0
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Returns 0 because every plan row carries an approval_date. Genuinely-pending plans are not represented in the data.',
@@ -681,7 +758,15 @@ WHERE v.fiscal_year = $date_range AND v.is_approved = 0
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.block_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.block_name  -- absent: block_name
+              END AS group_label,
        COUNT(DISTINCT v.gp_lgd_code) AS gps_with_plan,
        COUNT(DISTINCT CASE WHEN v.is_approved = 1 THEN v.gp_lgd_code END) AS gps_approved,
        ROUND(100.0 * COUNT(DISTINCT CASE WHEN v.is_approved = 1 THEN v.gp_lgd_code END)
@@ -697,6 +782,7 @@ ORDER BY approval_rate_pct DESC
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Approval proxied by approval_date, so the rate is 100% everywhere.',
@@ -720,7 +806,15 @@ ORDER BY approval_rate_pct DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.district_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.district_name  -- absent: district_name
+              END AS group_label,
        COUNT(DISTINCT v.gp_lgd_code) AS gps_with_plan,
        COUNT(DISTINCT CASE WHEN v.is_approved = 1 THEN v.gp_lgd_code END) AS gps_approved,
        ROUND(100.0 * COUNT(DISTINCT CASE WHEN v.is_approved = 1 THEN v.gp_lgd_code END)
@@ -736,6 +830,7 @@ ORDER BY approval_rate_pct DESC
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -869,7 +964,15 @@ ORDER BY v.district_name, v.block_name, v.gp_name
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.block_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.block_name  -- absent: block_name
+              END AS group_label,
        COUNT(DISTINCT CASE WHEN v.is_approved = 0 THEN v.gp_lgd_code END) AS pending_approvals,
        COUNT(DISTINCT v.gp_lgd_code) AS gps_with_plan
 FROM v_plan v
@@ -885,6 +988,7 @@ LIMIT $top_n
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
             {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'pending_approvals is 0 everywhere because approval_date is always populated.',
@@ -908,7 +1012,15 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.district_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.district_name  -- absent: district_name
+              END AS group_label,
        COUNT(DISTINCT CASE WHEN v.is_approved = 0 THEN v.gp_lgd_code END) AS pending_approvals,
        COUNT(DISTINCT v.gp_lgd_code) AS gps_with_plan
 FROM v_plan v
@@ -924,6 +1036,7 @@ LIMIT $top_n
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
             {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -951,7 +1064,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme, COUNT(*) AS planned_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
@@ -978,6 +1103,7 @@ ORDER BY planned_activities DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Themes come from dim_lsdg_theme, which maps only 17 of 30 focus areas; the rest fall into 'Unmapped theme'.",
@@ -989,6 +1115,14 @@ ORDER BY planned_activities DESC
         "paraphrases": [
             'How many activities are planned under each GPDP theme in Andhrua in 2024-2025?',
             'How many activities are planned under each of the nine GPDP themes in a Gram Panchayat in a given year?',
+            # folded from PLN-050 (WP-6 T3): the same measure, answered with $group_by
+            'How many activities are planned under each focus area in a given gram panchayat in a given year?',
+            'How many activities are planned under each focus area in Andhrua in 2024-2025?',
+            'How many activities are planned under each focus area in a Gram Panchayat in a given year?',
+            # folded from PLN-051 (WP-6 T3): the same measure, answered with $group_by
+            'How many activities are planned under each focus area in a given block in a given year?',
+            'How many activities are planned under each focus area in Bhubaneswar in 2024-2025?',
+            'How many total activities are planned under each focus area in a block in a given year?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities are planned under each GPDP theme in a given gram panchayat in a given year?',
             'How many activities are planned under each GPDP theme in a given district in a given year?',
@@ -1008,7 +1142,19 @@ ORDER BY planned_activities DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme, COUNT(*) AS planned_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
@@ -1037,6 +1183,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas. Set $top_n = 1 for a single answer.',
@@ -1067,7 +1214,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme, COUNT(*) AS planned_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
@@ -1096,6 +1255,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas. Set $top_n = 1 for a single answer.',
@@ -1126,7 +1286,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme, COUNT(*) AS planned_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
@@ -1155,6 +1327,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas. Set $top_n = 1 for a single answer.',
@@ -1185,7 +1358,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme, COUNT(*) AS planned_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
@@ -1214,6 +1399,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas. Set $top_n = 1 for a single answer.',
@@ -1244,7 +1430,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme, COUNT(*) AS planned_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
@@ -1273,6 +1471,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas. Set $top_n = 1 for a single answer.',
@@ -1303,7 +1502,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme, COUNT(*) AS planned_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
@@ -1332,6 +1543,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas. Set $top_n = 1 for a single answer.',
@@ -1362,7 +1574,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.gp_name, v.block_name, v.district_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.gp_name  -- absent: gp_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.block_name END AS block_name, CASE WHEN $group_by IS NULL THEN v.district_name END AS district_name,
        COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
@@ -1390,6 +1614,7 @@ LIMIT $top_n
             {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -1803,7 +2028,19 @@ ORDER BY v.theme, v.fiscal_year
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label,
        COUNT(*) FILTER (WHERE v.fiscal_year = $date_range_2) AS activities_year1,
        COUNT(*) FILTER (WHERE v.fiscal_year = $date_range)   AS activities_year2,
        COUNT(*) FILTER (WHERE v.fiscal_year = $date_range)
@@ -1836,6 +2073,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "The source question said 'in {Date_Range}'; a change needs two years, so a second year parameter was added.",
@@ -1867,7 +2105,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label,
        COUNT(*) FILTER (WHERE v.fiscal_year = $date_range_2) AS activities_year1,
        COUNT(*) FILTER (WHERE v.fiscal_year = $date_range)   AS activities_year2,
        COUNT(*) FILTER (WHERE v.fiscal_year = $date_range)
@@ -1900,6 +2150,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "The source question said 'in {Date_Range}'; a change needs two years, so a second year parameter was added.",
@@ -2047,7 +2298,19 @@ ORDER BY pct_share DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme, COUNT(*) AS planned_activities
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label, COUNT(*) AS planned_activities
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
@@ -2075,6 +2338,7 @@ ORDER BY planned_activities ASC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -2225,7 +2489,19 @@ ORDER BY planned_activities ASC, pct_completed ASC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name, COUNT(*) AS planned_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
@@ -2251,6 +2527,7 @@ GROUP BY 1
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -2274,124 +2551,24 @@ GROUP BY 1
         ],
     },
 
-    'PLN-050': {
-        "abstract_question": 'How many activities are planned under each focus area in {gp_name} in {date_range}?',
-        "date_filter": None,
-        "date_kind": None,
-        "sql_template": """
-SELECT v.focus_area_name, COUNT(*) AS planned_activities,
-       SUM(COALESCE(v.total_cost,0)) AS planned_cost
-FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
-  AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
-  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
-GROUP BY 1
-ORDER BY planned_activities DESC
-""",
-        "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
-            {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
-            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
-        ],
-        "result_ttl_seconds": 600,
-        "bracket": 'Planning',
-        "module": 'GPDP',
-        "submodule": 'Planning',
-        "question_type": 'Count',
-        "answerable": 'Yes',
-        "paraphrases": [
-            'How many activities are planned under each focus area in Andhrua in 2024-2025?',
-            'How many activities are planned under each focus area in a Gram Panchayat in a given year?',
-            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
-            'How many activities are planned under each focus area in a given gram panchayat in a given year?',
-            'How many activities are planned under each focus area in a given district in a given year?',
-            'How many activities are planned under each focus area in a given block in a given year?',
-            'How many activities are planned under each focus area in a given gram panchayat in a given year, in the main GPDP?',
-            'How many activities are planned under each focus area in a given gram panchayat in a given year, for ongoing activities?',
-            'How many activities are planned under each focus area in a given gram panchayat in a given year, under a given focus area?',
-            'How many activities are planned under each focus area in a given gram panchayat in a given year, under a given LSDG theme?',
-            'How many activities are planned under each focus area in a given gram panchayat in a given year, under a given scheme?',
-            'How many activities are planned under each focus area in a given gram panchayat in a given year, funded from tied grants?',
-            # ── end derived ──
-        ],
-    },
-
-    'PLN-051': {
-        "abstract_question": 'How many activities are planned under each focus area in {block_name} in {date_range}?',
-        "date_filter": None,
-        "date_kind": None,
-        "sql_template": """
-SELECT v.focus_area_name, COUNT(*) AS planned_activities,
-       SUM(COALESCE(v.total_cost,0)) AS planned_cost
-FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
-  AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
-  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
-GROUP BY 1
-ORDER BY planned_activities DESC
-""",
-        "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
-            {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
-            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
-        ],
-        "result_ttl_seconds": 600,
-        "bracket": 'Planning',
-        "module": 'GPDP',
-        "submodule": 'Planning',
-        "question_type": 'Count',
-        "answerable": 'Yes',
-        "paraphrases": [
-            'How many activities are planned under each focus area in Bhubaneswar in 2024-2025?',
-            'How many total activities are planned under each focus area in a block in a given year?',
-            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
-            'How many activities are planned under each focus area in a given block in a given year?',
-            'How many activities are planned under each focus area in a given district in a given year?',
-            'How many activities are planned under each focus area in a given gram panchayat in a given year?',
-            'How many activities are planned under each focus area in a given block in a given year, in the main GPDP?',
-            'How many activities are planned under each focus area in a given block in a given year, for ongoing activities?',
-            'How many activities are planned under each focus area in a given block in a given year, under a given focus area?',
-            'How many activities are planned under each focus area in a given block in a given year, under a given LSDG theme?',
-            'How many activities are planned under each focus area in a given block in a given year, under a given scheme?',
-            'How many activities are planned under each focus area in a given block in a given year, funded from tied grants?',
-            # ── end derived ──
-        ],
-    },
-
     'PLN-052': {
         "abstract_question": 'Which focus area has the highest number of planned activities in {date_range}?',
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name, COUNT(*) AS planned_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
@@ -2420,6 +2597,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Set $top_n = 1 for a single answer.',
@@ -2451,7 +2629,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name, COUNT(*) AS planned_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
@@ -2480,6 +2670,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Set $top_n = 1 for a single answer.',
@@ -2511,7 +2702,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name, COUNT(*) AS planned_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
@@ -2540,6 +2743,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Set $top_n = 1 for a single answer.',
@@ -2570,7 +2774,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name, COUNT(*) AS planned_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
@@ -2599,6 +2815,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Set $top_n = 1 for a single answer.',
@@ -2629,7 +2846,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name, COUNT(*) AS planned_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
@@ -2658,6 +2887,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Set $top_n = 1 for a single answer.',
@@ -2688,7 +2918,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name, COUNT(*) AS planned_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
@@ -2717,6 +2959,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Set $top_n = 1 for a single answer.',
@@ -3313,7 +3556,19 @@ ORDER BY 1
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name, COUNT(*) AS planned_activities
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label, COUNT(*) AS planned_activities
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
@@ -3341,6 +3596,7 @@ ORDER BY planned_activities ASC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -3371,7 +3627,19 @@ ORDER BY planned_activities ASC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label,
        COUNT(DISTINCT v.fiscal_year) AS years_present,
        COUNT(*) AS total_activities,
        ROUND(AVG(COALESCE(v.total_cost,0)),2) AS avg_planned_cost
@@ -3399,6 +3667,7 @@ ORDER BY years_present DESC, total_activities DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -3545,7 +3814,19 @@ ORDER BY pct_share DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label,
        COUNT(*) FILTER (WHERE COALESCE(v.total_cost,0) > 0
                           AND COALESCE(v.total_cost,0) < $threshold) AS low_cost_activities,
        COUNT(*) AS total_activities,
@@ -3578,6 +3859,7 @@ ORDER BY low_cost_activities DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Pass $threshold = 1000 to reproduce the 'below Rs. 1000' band in the source question.",
@@ -3670,7 +3952,19 @@ ORDER BY activities DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COUNT(*) FILTER (WHERE v.is_costless_activity = 1
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       COUNT(*) FILTER (WHERE v.is_costless_activity = 1
                            OR COALESCE(v.total_cost,0) = 0) AS no_cost_activities,
        COUNT(*) AS total_activities,
        ROUND(100.0 * COUNT(*) FILTER (WHERE v.is_costless_activity = 1
@@ -3687,6 +3981,8 @@ WHERE v.fiscal_year = $date_range
   AND ($theme IS NULL OR v.theme = $theme)
   AND ($scheme IS NULL OR v.scheme_name = $scheme)
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -3699,6 +3995,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Flagship' activities are not identifiable - no flagship flag exists. Only the no-cost half of the question is answered.",
@@ -3729,7 +4026,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.gp_name, v.block_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.gp_name  -- absent: gp_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.block_name END AS block_name,
        COUNT(*) AS total_activities,
        COUNT(*) FILTER (WHERE COALESCE(v.total_cost,0) > 0
                           AND COALESCE(v.total_cost,0) < $threshold) AS low_cost_activities,
@@ -3762,6 +4071,7 @@ ORDER BY pct_low_cost DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -3839,7 +4149,15 @@ ORDER BY v.plan_type
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.gp_name, v.block_name, v.district_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.gp_name  -- absent: gp_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.block_name END AS block_name, CASE WHEN $group_by IS NULL THEN v.district_name END AS district_name,
        COUNT(*) FILTER (WHERE v.plan_type = 'Main')          AS main_plans,
        COUNT(*) FILTER (WHERE v.plan_type = 'Supplementary') AS supplementary_plans,
        CASE WHEN COUNT(*) FILTER (WHERE v.plan_type = 'Supplementary') > 0
@@ -3857,6 +4175,7 @@ ORDER BY 1
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -3885,7 +4204,15 @@ ORDER BY 1
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COUNT(DISTINCT v.gp_lgd_code) AS gps_with_supplementary,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       COUNT(DISTINCT v.gp_lgd_code) AS gps_with_supplementary,
        COUNT(*) AS supplementary_plans
 FROM v_plan v
 WHERE v.fiscal_year = $date_range
@@ -3893,12 +4220,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -4041,7 +4371,19 @@ ORDER BY actual_expenditure DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT SUM(v.total_expenditure) AS total_expenditure,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       SUM(v.total_expenditure) AS total_expenditure,
        SUM(v.total_expenditure) FILTER (WHERE v.work_type_label = 'Maintenance') AS maintenance_expenditure,
        ROUND(100.0 * SUM(v.total_expenditure) FILTER (WHERE v.work_type_label = 'Maintenance')
              / NULLIF(SUM(v.total_expenditure),0), 2) AS pct_maintenance
@@ -4056,6 +4398,8 @@ WHERE v.fiscal_year = $date_range
   AND ($theme IS NULL OR v.theme = $theme)
   AND ($scheme IS NULL OR v.scheme_name = $scheme)
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -4068,6 +4412,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -4152,7 +4497,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.gp_name, v.block_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.gp_name  -- absent: gp_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.block_name END AS block_name,
        SUM(v.total_expenditure) FILTER (WHERE v.work_type_label = 'Maintenance') AS maintenance_exp,
        SUM(v.total_expenditure) FILTER (WHERE v.work_type_label = 'New/Fresh')   AS fresh_exp,
        SUM(v.total_expenditure) AS total_exp
@@ -4183,6 +4540,7 @@ ORDER BY maintenance_exp DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -4216,7 +4574,19 @@ ORDER BY maintenance_exp DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.fiscal_year,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.fiscal_year  -- absent: fiscal_year
+              END AS group_label,
        COUNT(*) FILTER (WHERE v.work_type_label = 'Maintenance') AS maintenance_activities,
        SUM(v.total_expenditure) FILTER (WHERE v.work_type_label = 'Maintenance') AS maintenance_expenditure,
        SUM(v.total_expenditure) AS total_expenditure,
@@ -4246,6 +4616,7 @@ ORDER BY 1
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -4385,7 +4756,19 @@ ORDER BY years_with_maintenance DESC, total_maintenance_expenditure DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COUNT(*) AS sanctioned_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       COUNT(*) AS sanctioned_activities,
        SUM(COALESCE(v.fund_sanctioned_general,0)) AS general_sanctioned,
        SUM(COALESCE(v.fund_sanctioned_sc,0))      AS sc_sanctioned,
        SUM(COALESCE(v.fund_sanctioned_st,0))      AS st_sanctioned,
@@ -4406,6 +4789,8 @@ WHERE v.fiscal_year = $date_range
   AND ($theme IS NULL OR v.theme = $theme)
   AND ($scheme IS NULL OR v.scheme_name = $scheme)
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -4418,6 +4803,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Now uses the real earmark columns from admin_approval_scheme rather than the spent split. Coverage is thin in the source: fund_sanctioned_sc is populated on 0.1% of rows and fund_sanctioned_st on 0.9%, so most areas will still return zero. Spent amounts are shown alongside for comparison.',
@@ -4448,7 +4834,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.gp_name, v.block_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.gp_name  -- absent: gp_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.block_name END AS block_name,
        COUNT(*) FILTER (WHERE v.activity_for_label = 'sc') AS sc_targeted_activities,
        SUM(v.sc_amount) AS sc_amount,
        SUM(v.total_expenditure) AS total_amount,
@@ -4477,6 +4875,7 @@ GROUP BY 1,2
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -4511,7 +4910,19 @@ GROUP BY 1,2
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.gp_name, v.block_name, v.district_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.gp_name  -- absent: gp_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.block_name END AS block_name, CASE WHEN $group_by IS NULL THEN v.district_name END AS district_name,
        COUNT(*) AS sanctioned_activities,
        SUM(COALESCE(v.fund_sanctioned_total,0)) AS total_sanctioned,
        SUM(COALESCE(v.fund_sanctioned_sc,0) + COALESCE(v.fund_sanctioned_st,0)) AS sc_st_sanctioned
@@ -4542,6 +4953,7 @@ ORDER BY total_sanctioned DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -4622,7 +5034,19 @@ ORDER BY distinct_schemes DESC, total_expenditure DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COALESCE(v.scheme_name, '(not recorded)') AS scheme_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE COALESCE(v.scheme_name, '(not recorded)')  -- absent: scheme_name
+              END AS group_label,
        COUNT(*) AS activities,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
@@ -4652,6 +5076,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "scheme_name is NULL on 82% of expenditure rows; '(not recorded)' will usually top the list.",
@@ -4866,7 +5291,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COUNT(*) FILTER (WHERE v.tied_untied = 'Untied') AS untied_only_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       COUNT(*) FILTER (WHERE v.tied_untied = 'Untied') AS untied_only_activities,
        COUNT(*) FILTER (WHERE v.tied_untied = 'Tied')   AS tied_activities,
        COUNT(*) FILTER (WHERE v.tied_untied = 'Other')  AS other_component_activities,
        COUNT(*) AS sanctioned_activities,
@@ -4882,6 +5319,8 @@ WHERE v.fiscal_year = $date_range
   AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
   AND ($theme IS NULL OR v.theme = $theme)
   AND ($scheme IS NULL OR v.scheme_name = $scheme)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -4893,6 +5332,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Entirely' is taken from the dominant component on the activity. Six activities have two admin_approval_scheme rows; query that table directly for a true multi-component split. Tied/untied comes from admin_approval_scheme.scheme_component_code: 4249 = Tied Grant, 4211 = Basic Grant (untied), 4250 = Devolution of Fund (treated as untied). Codes 3880, 3907, 4251, 4252 and 0 are reported as 'Other' rather than guessed at. Only sanctioned activities carry a component, so this covers 2,101 activities, not the whole plan.",
@@ -4922,7 +5362,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT SUM(COALESCE(v.fund_sanctioned_total,0)) AS total_sanctioned,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       SUM(COALESCE(v.fund_sanctioned_total,0)) AS total_sanctioned,
        SUM(COALESCE(v.fund_sanctioned_total,0)) FILTER (WHERE v.tied_untied = 'Tied')   AS tied_amount,
        SUM(COALESCE(v.fund_sanctioned_total,0)) FILTER (WHERE v.tied_untied = 'Untied') AS untied_amount,
        SUM(COALESCE(v.fund_sanctioned_total,0)) FILTER (WHERE v.tied_untied = 'Other')  AS other_amount,
@@ -4939,6 +5391,8 @@ WHERE v.fiscal_year = $date_range
   AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
   AND ($theme IS NULL OR v.theme = $theme)
   AND ($scheme IS NULL OR v.scheme_name = $scheme)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -4950,6 +5404,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Tied/untied comes from admin_approval_scheme.scheme_component_code: 4249 = Tied Grant, 4211 = Basic Grant (untied), 4250 = Devolution of Fund (treated as untied). Codes 3880, 3907, 4251, 4252 and 0 are reported as 'Other' rather than guessed at. Only sanctioned activities carry a component, so this covers 2,101 activities, not the whole plan.",
@@ -5288,7 +5743,19 @@ ORDER BY pct_of_sanctioned DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label,
        COUNT(*) AS activities,
        SUM(COALESCE(v.total_cost,0))                AS planned_cost,
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS approved_cost,
@@ -5318,6 +5785,7 @@ ORDER BY planned_cost DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas.',
@@ -5328,6 +5796,9 @@ ORDER BY planned_cost DESC
         "answerable": 'Partial',
         "paraphrases": [
             'How much planned expenditure goes to each GPDP theme in 2024-2025?',
+            # folded from BUD-018 (WP-6 T3): the same measure, answered with $group_by
+            'How much planned expenditure is allocated to each focus area in a given year?',
+            'How much planned expenditure goes to each focus area in 2024-2025?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How much planned expenditure is allocated to each GPDP theme in a given year?',
             'How much planned expenditure is allocated to each GPDP theme in a given year, for a given district?',
@@ -5348,7 +5819,19 @@ ORDER BY planned_cost DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        COUNT(*) AS activities
 FROM v_activity v
@@ -5378,6 +5861,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -5409,7 +5893,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        COUNT(*) AS activities
 FROM v_activity v
@@ -5439,6 +5935,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -5654,7 +6151,19 @@ ORDER BY cost_per_activity ASC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme, COUNT(*) AS activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label, COUNT(*) AS activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
@@ -5682,6 +6191,7 @@ ORDER BY activities DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Only themes that appear in the plan are considered; use PLN-043 for themes with no activities at all.',
@@ -5712,7 +6222,19 @@ ORDER BY activities DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label,
        COUNT(*) AS activities,
        SUM(COALESCE(v.total_cost,0))                AS planned_cost,
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS approved_cost,
@@ -5742,6 +6264,7 @@ ORDER BY planned_cost DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas.',
@@ -5883,70 +6406,24 @@ ORDER BY v.theme, v.fiscal_year
         ],
     },
 
-    'BUD-018': {
-        "abstract_question": 'How much planned expenditure is allocated to each focus area in {date_range}?',
-        "date_filter": None,
-        "date_kind": None,
-        "sql_template": """
-SELECT v.focus_area_name,
-       COUNT(*) AS activities,
-       SUM(COALESCE(v.total_cost,0)) AS planned_cost,
-       SUM(v.total_expenditure) AS actual_expenditure
-FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
-  AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
-  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
-GROUP BY 1
-ORDER BY planned_cost DESC
-""",
-        "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
-            {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
-            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
-        ],
-        "result_ttl_seconds": 600,
-        "bracket": 'Budgeting & Funding',
-        "module": 'GPDP',
-        "submodule": 'Budgeting',
-        "question_type": 'Aggregation',
-        "answerable": 'Yes',
-        "paraphrases": [
-            'How much planned expenditure goes to each focus area in 2024-2025?',
-            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
-            'How much planned expenditure is allocated to each focus area in a given year?',
-            'How much planned expenditure is allocated to each focus area in a given year, for a given district?',
-            'How much planned expenditure is allocated to each focus area in a given year, for a given block?',
-            'How much planned expenditure is allocated to each focus area in a given year, for a given gram panchayat (GP)?',
-            'How much planned expenditure is allocated to each focus area in a given year, in the main GPDP?',
-            'How much planned expenditure is allocated to each focus area in a given year, for ongoing activities?',
-            'How much planned expenditure is allocated to each focus area in a given year, under a given focus area?',
-            'How much planned expenditure is allocated to each focus area in a given year, under a given LSDG theme?',
-            'How much planned expenditure is allocated to each focus area in a given year, under a given scheme?',
-            'How much planned expenditure is allocated to each focus area in a given year, funded from tied grants?',
-            # ── end derived ──
-        ],
-    },
-
     'BUD-019': {
         "abstract_question": 'How many activities under {focus_area} have planned expenditure greater than zero in {date_range}?',
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label,
        COUNT(*) AS total_activities,
        COUNT(*) FILTER (WHERE COALESCE(v.total_cost,0) > 0) AS activities_with_planned_cost,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
@@ -5975,6 +6452,7 @@ ORDER BY activities_with_planned_cost DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Budgeting & Funding',
@@ -6120,7 +6598,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        COUNT(*) AS activities
 FROM v_activity v
@@ -6150,6 +6640,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Budgeting & Funding',
@@ -6179,7 +6670,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        COUNT(*) AS activities
 FROM v_activity v
@@ -6209,6 +6712,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Budgeting & Funding',
@@ -6420,7 +6924,19 @@ ORDER BY cost_per_activity ASC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name, COUNT(*) AS activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label, COUNT(*) AS activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
@@ -6448,6 +6964,7 @@ ORDER BY activities DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Budgeting & Funding',
@@ -6477,7 +6994,19 @@ ORDER BY activities DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COALESCE(v.scheme_name,'(not recorded)') AS scheme_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE COALESCE(v.scheme_name,'(not recorded)')  -- absent: scheme_name
+              END AS group_label,
        COUNT(*) AS activities,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
@@ -6504,6 +7033,7 @@ GROUP BY 1
             {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'scheme_name has only 5 non-null values and is NULL on 82% of rows.',
@@ -6590,7 +7120,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COALESCE(v.scheme_name,'(not recorded)') AS scheme_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE COALESCE(v.scheme_name,'(not recorded)')  -- absent: scheme_name
+              END AS group_label,
        COUNT(*) AS activities,
        SUM(COALESCE(v.total_cost,0)) AS estimated_cost,
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS approved_cost,
@@ -6619,6 +7161,7 @@ GROUP BY 1
             {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'scheme_name coverage is 18%.',
@@ -6648,7 +7191,19 @@ GROUP BY 1
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COALESCE(v.scheme_name,'(not recorded)') AS scheme_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE COALESCE(v.scheme_name,'(not recorded)')  -- absent: scheme_name
+              END AS group_label,
        COUNT(*) AS activities,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
@@ -6678,6 +7233,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'scheme_name coverage is 18%.',
@@ -6795,7 +7351,19 @@ WHERE v.activity_code = $activity_code
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.scheme_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.scheme_name  -- absent: scheme_name
+              END AS group_label,
        COUNT(*) AS activities,
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS approved_cost,
        SUM(v.total_expenditure) AS expenditure,
@@ -6827,6 +7395,7 @@ ORDER BY expenditure DESC
             {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'scheme_name coverage is 18%.',
@@ -6856,7 +7425,19 @@ ORDER BY expenditure DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.status_label, COUNT(*) AS activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.status_label  -- absent: status_label
+              END AS group_label, COUNT(*) AS activities,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
@@ -6883,6 +7464,7 @@ ORDER BY activities DESC
             {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "scheme_name coverage is 18%; activity_status code 173 decodes to 'Buildings', which looks wrong.",
@@ -6912,7 +7494,19 @@ ORDER BY activities DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COALESCE(v.scheme_name,'(not recorded)') AS scheme_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE COALESCE(v.scheme_name,'(not recorded)')  -- absent: scheme_name
+              END AS group_label,
        SUM(v.gen_amount) AS general_amount,
        SUM(v.sc_amount)  AS sc_amount,
        SUM(v.st_amount)  AS st_amount,
@@ -6941,6 +7535,7 @@ GROUP BY 1
             {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'sc and st amounts are sparsely populated.',
@@ -6970,7 +7565,19 @@ GROUP BY 1
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.district_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.district_name  -- absent: district_name
+              END AS group_label,
        COUNT(*) AS activities,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
@@ -6992,6 +7599,7 @@ ORDER BY activities DESC
             {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'scheme_name coverage is 18%.',
@@ -7080,7 +7688,19 @@ ORDER BY total_expenditure DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.fiscal_year,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.fiscal_year  -- absent: fiscal_year
+              END AS group_label,
        COUNT(*) AS activities,
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS planned_cost,
        SUM(v.total_expenditure) AS actual_expenditure,
@@ -7110,6 +7730,7 @@ ORDER BY 1
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Six years are present: 2020-2021 to 2025-2026.',
@@ -7140,7 +7761,19 @@ ORDER BY 1
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT SUM(COALESCE(v.approved_cost_action_plan,0)) AS planned_cost,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       SUM(COALESCE(v.approved_cost_action_plan,0)) AS planned_cost,
        SUM(v.total_expenditure) AS actual_expenditure,
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(COALESCE(v.approved_cost_action_plan,0)),0), 2) AS pct_utilised
@@ -7155,6 +7788,8 @@ WHERE v.fiscal_year = $date_range
   AND ($theme IS NULL OR v.theme = $theme)
   AND ($scheme IS NULL OR v.scheme_name = $scheme)
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -7167,6 +7802,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Expenditure',
@@ -7196,7 +7832,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT SUM(COALESCE(v.approved_cost_action_plan,0)) AS planned_cost,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       SUM(COALESCE(v.approved_cost_action_plan,0)) AS planned_cost,
        SUM(v.total_expenditure) AS actual_expenditure,
        SUM(COALESCE(v.approved_cost_action_plan,0)) - SUM(v.total_expenditure) AS unspent_amount,
        ROUND(100.0 * (SUM(COALESCE(v.approved_cost_action_plan,0)) - SUM(v.total_expenditure))
@@ -7212,6 +7860,8 @@ WHERE v.fiscal_year = $date_range
   AND ($theme IS NULL OR v.theme = $theme)
   AND ($scheme IS NULL OR v.scheme_name = $scheme)
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -7224,6 +7874,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Unspent' here is plan versus spend, not a cash balance - there is no opening/closing balance table.",
@@ -7255,7 +7906,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COUNT(*) AS total_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       COUNT(*) AS total_activities,
        COUNT(*) FILTER (WHERE v.total_expenditure > 0) AS activities_with_expenditure,
        ROUND(100.0 * COUNT(*) FILTER (WHERE v.total_expenditure > 0)
              / NULLIF(COUNT(*),0), 2) AS pct_with_expenditure
@@ -7270,6 +7933,8 @@ WHERE v.fiscal_year = $date_range
   AND ($theme IS NULL OR v.theme = $theme)
   AND ($scheme IS NULL OR v.scheme_name = $scheme)
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -7282,6 +7947,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Expenditure',
@@ -7555,7 +8221,19 @@ ORDER BY actual_expenditure DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label,
        COUNT(*) AS activities,
        COUNT(*) FILTER (WHERE v.total_expenditure > 0) AS activities_with_expenditure,
        SUM(v.total_expenditure) AS expenditure
@@ -7584,6 +8262,7 @@ ORDER BY expenditure DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Expenditure',
@@ -7673,7 +8352,19 @@ ORDER BY actual_expenditure DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COALESCE(v.scheme_name,'(not recorded)') AS funding_source,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE COALESCE(v.scheme_name,'(not recorded)')  -- absent: funding_source
+              END AS group_label,
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS planned_cost,
        SUM(v.total_expenditure) AS expenditure,
        SUM(COALESCE(v.approved_cost_action_plan,0)) - SUM(v.total_expenditure) AS unspent_amount,
@@ -7706,6 +8397,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Funding source proxied by scheme_name.',
@@ -7737,7 +8429,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COALESCE(v.scheme_name,'(not recorded)') AS funding_source,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE COALESCE(v.scheme_name,'(not recorded)')  -- absent: funding_source
+              END AS group_label,
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS planned_cost,
        SUM(v.total_expenditure) AS expenditure,
        SUM(COALESCE(v.approved_cost_action_plan,0)) - SUM(v.total_expenditure) AS unspent_amount,
@@ -7770,6 +8474,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Funding source proxied by scheme_name.',
@@ -7800,7 +8505,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label,
        COUNT(*) AS activities,
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS planned_cost,
        SUM(v.total_expenditure) AS actual_expenditure
@@ -7829,6 +8546,7 @@ ORDER BY actual_expenditure DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas.',
@@ -7839,6 +8557,9 @@ ORDER BY actual_expenditure DESC
         "answerable": 'Partial',
         "paraphrases": [
             'What is the expenditure per GPDP theme in 2024-2025?',
+            # folded from EXP-025 (WP-6 T3): the same measure, answered with $group_by
+            'What is the total actual expenditure under each focus area in a given year?',
+            'What is the expenditure per focus area in 2024-2025?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the total actual expenditure under each GPDP theme in a given year?',
             'What is the total actual expenditure under each GPDP theme in a given year, for a given district?',
@@ -7859,7 +8580,19 @@ ORDER BY actual_expenditure DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme, SUM(v.total_expenditure) AS actual_expenditure, COUNT(*) AS activities
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label, SUM(v.total_expenditure) AS actual_expenditure, COUNT(*) AS activities
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
@@ -7887,6 +8620,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -7917,7 +8651,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme, SUM(v.total_expenditure) AS actual_expenditure, COUNT(*) AS activities
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label, SUM(v.total_expenditure) AS actual_expenditure, COUNT(*) AS activities
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
@@ -7945,6 +8691,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -8034,7 +8781,19 @@ ORDER BY pct_of_expenditure DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label,
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS planned_cost,
        SUM(v.total_expenditure) AS actual_expenditure,
        ROUND(100.0 * SUM(v.total_expenditure)
@@ -8067,6 +8826,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -8097,7 +8857,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label,
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS planned_cost,
        SUM(v.total_expenditure) AS actual_expenditure,
        SUM(COALESCE(v.approved_cost_action_plan,0)) - SUM(v.total_expenditure) AS gap_amount,
@@ -8130,6 +8902,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -8355,7 +9128,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT SUM(COALESCE(v.admin_approved_cost,0)) AS admin_sanctioned,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       SUM(COALESCE(v.admin_approved_cost,0)) AS admin_sanctioned,
        SUM(v.total_expenditure) AS actual_expenditure,
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(COALESCE(v.admin_approved_cost,0)),0), 2) AS pct_of_sanctioned_utilised
@@ -8370,6 +9155,8 @@ WHERE v.fiscal_year = $date_range
   AND ($theme IS NULL OR v.theme = $theme)
   AND ($scheme IS NULL OR v.scheme_name = $scheme)
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -8382,6 +9169,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'admin_approved_cost is populated on only 2,247 of 12,730 expenditure rows, so the denominator is incomplete.',
@@ -8456,70 +9244,24 @@ ORDER BY closing_balance DESC
         ],
     },
 
-    'EXP-025': {
-        "abstract_question": 'What is the total actual expenditure under each focus area in {date_range}?',
-        "date_filter": None,
-        "date_kind": None,
-        "sql_template": """
-SELECT v.focus_area_name,
-       COUNT(*) AS activities,
-       SUM(COALESCE(v.approved_cost_action_plan,0)) AS planned_cost,
-       SUM(v.total_expenditure) AS actual_expenditure
-FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
-  AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
-  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
-GROUP BY 1
-ORDER BY actual_expenditure DESC
-""",
-        "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
-            {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
-            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
-        ],
-        "result_ttl_seconds": 600,
-        "bracket": 'Expenditure',
-        "module": 'GPDP',
-        "submodule": 'Expenditure',
-        "question_type": 'Aggregation',
-        "answerable": 'Yes',
-        "paraphrases": [
-            'What is the expenditure per focus area in 2024-2025?',
-            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
-            'What is the total actual expenditure under each focus area in a given year?',
-            'What is the total actual expenditure under each focus area in a given year, for a given district?',
-            'What is the total actual expenditure under each focus area in a given year, for a given block?',
-            'What is the total actual expenditure under each focus area in a given year, for a given gram panchayat (GP)?',
-            'What is the total actual expenditure under each focus area in a given year, in the main GPDP?',
-            'What is the total actual expenditure under each focus area in a given year, for ongoing activities?',
-            'What is the total actual expenditure under each focus area in a given year, under a given focus area?',
-            'What is the total actual expenditure under each focus area in a given year, under a given LSDG theme?',
-            'What is the total actual expenditure under each focus area in a given year, under a given scheme?',
-            'What is the total actual expenditure under each focus area in a given year, funded from tied grants?',
-            # ── end derived ──
-        ],
-    },
-
     'EXP-026': {
         "abstract_question": 'How many activities have expenditure under {focus_area} in {date_range}?',
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label,
        COUNT(*) FILTER (WHERE v.total_expenditure > 0) AS activities_with_expenditure,
        COUNT(*) AS total_activities,
        SUM(v.total_expenditure) AS expenditure
@@ -8548,6 +9290,7 @@ ORDER BY activities_with_expenditure DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Duplicate of EXP-010 in the source list.',
@@ -8636,7 +9379,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name, SUM(v.total_expenditure) AS actual_expenditure, COUNT(*) AS activities
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label, SUM(v.total_expenditure) AS actual_expenditure, COUNT(*) AS activities
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
@@ -8664,6 +9419,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Set the geography parameters to choose the GP, Block or District level.',
@@ -8695,7 +9451,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name, SUM(v.total_expenditure) AS actual_expenditure, COUNT(*) AS activities
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label, SUM(v.total_expenditure) AS actual_expenditure, COUNT(*) AS activities
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
@@ -8723,6 +9491,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Set the geography parameters to choose the GP, Block or District level.',
@@ -8754,7 +9523,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label,
        COUNT(*) FILTER (WHERE v.total_expenditure > 0) AS activities_with_expenditure,
        COUNT(*) AS total_activities,
        SUM(v.total_expenditure) AS expenditure
@@ -8783,6 +9564,7 @@ ORDER BY activities_with_expenditure DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Duplicate of EXP-010 in the source list.',
@@ -9231,7 +10013,19 @@ GROUP BY 1
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label,
        COUNT(*) AS activities,
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS planned_cost,
        SUM(v.total_expenditure) AS actual_expenditure
@@ -9259,6 +10053,7 @@ ORDER BY actual_expenditure DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Administrative' is interpreted as the focus areas 'Administrative & Technical Support' and 'GP Office Infrastructure'; there is no explicit admin-expenditure flag.",
@@ -9289,7 +10084,19 @@ ORDER BY actual_expenditure DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS admin_approved_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS admin_approved_activities,
        COUNT(*) AS total_activities,
        ROUND(100.0 * COUNT(*) FILTER (WHERE v.is_admin_approved = 1)
              / NULLIF(COUNT(*),0), 2) AS pct_approved
@@ -9304,6 +10111,8 @@ WHERE v.fiscal_year = $date_range
   AND ($theme IS NULL OR v.theme = $theme)
   AND ($scheme IS NULL OR v.scheme_name = $scheme)
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -9316,6 +10125,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'There is no approval-date or approval-flag column. Administrative approval is proxied by admin_approved_cost > 0, populated on 2,247 of 12,730 rows.',
@@ -9346,7 +10156,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COUNT(*) AS total_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       COUNT(*) AS total_activities,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS sanctioned,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 0) AS awaiting_sanction,
        COUNT(*) FILTER (WHERE v.has_approval_cost_only = 1) AS cost_recorded_but_no_approval_row,
@@ -9362,6 +10184,8 @@ WHERE v.fiscal_year = $date_range
   AND ($theme IS NULL OR v.theme = $theme)
   AND ($scheme IS NULL OR v.scheme_name = $scheme)
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -9374,6 +10198,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Now based on the presence of an admin_approval row rather than a non-zero cost. The third column counts the 140 activities that have an admin_approved_cost but no approval record - a data-quality signal worth watching. Administrative approval now comes from the admin_approval table: 2,101 of 12,704 activities (17%) have a sanction record. A further 140 activities carry an admin_approved_cost with no approval row - v_activity.has_approval_cost_only flags those.',
@@ -9404,7 +10229,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.gp_name, v.block_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.gp_name  -- absent: gp_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.block_name END AS block_name,
        SUM(COALESCE(v.admin_approved_cost,0))     AS admin_sanctioned_amount,
        SUM(COALESCE(v.technical_approved_cost,0)) AS technical_sanctioned_amount,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS sanctioned_activities
@@ -9433,6 +10270,7 @@ ORDER BY admin_sanctioned_amount DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -9466,7 +10304,19 @@ ORDER BY admin_sanctioned_amount DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.block_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.block_name  -- absent: block_name
+              END AS group_label,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS sanctioned_activities,
        SUM(COALESCE(v.admin_approved_cost,0)) AS admin_sanctioned_amount,
        SUM(v.total_expenditure) AS expenditure
@@ -9491,6 +10341,7 @@ ORDER BY admin_sanctioned_amount DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Sanctions & Approvals',
@@ -9618,7 +10469,19 @@ ORDER BY sanctioned_activities DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.block_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.block_name  -- absent: block_name
+              END AS group_label,
        COUNT(*) AS planned_activities,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS approved_activities,
        ROUND(100.0 * COUNT(*) FILTER (WHERE v.is_admin_approved = 1)
@@ -9648,6 +10511,7 @@ ORDER BY pct_approved DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -9681,7 +10545,19 @@ ORDER BY pct_approved DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.block_name, v.district_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.block_name  -- absent: block_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.district_name END AS district_name,
        COUNT(*) AS planned_activities,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS approved_activities,
        ROUND(100.0 * COUNT(*) FILTER (WHERE v.is_admin_approved = 1)
@@ -9709,6 +10585,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -9922,7 +10799,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.gp_name, v.block_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.gp_name  -- absent: gp_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.block_name END AS block_name,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 0) AS activities_awaiting,
        SUM(COALESCE(v.total_cost,0)) FILTER (WHERE v.is_admin_approved = 0) AS proposed_cost_awaiting,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS sanctioned_activities,
@@ -9954,6 +10843,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -10110,7 +11000,19 @@ ORDER BY total_sanctioned DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.status_label, COUNT(*) AS activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.status_label  -- absent: status_label
+              END AS group_label, COUNT(*) AS activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
@@ -10138,6 +11040,7 @@ ORDER BY activities DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "activity_status code 173 decodes to 'Buildings' in dim_code, which is not a status and needs verifying.",
@@ -10218,7 +11121,19 @@ ORDER BY v.block_name, activities DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.status_label, COUNT(*) AS activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.status_label  -- absent: status_label
+              END AS group_label, COUNT(*) AS activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
@@ -10245,6 +11160,7 @@ GROUP BY 1
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": '$status must match a decoded label exactly: Activity Approved, WORK ONGOING, WORK COMPLETED, WORK ABANDONED, UNDER APPROVAL.',
@@ -10274,7 +11190,19 @@ GROUP BY 1
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.gp_name, v.block_name, v.district_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.gp_name  -- absent: gp_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.block_name END AS block_name, CASE WHEN $group_by IS NULL THEN v.district_name END AS district_name,
        SUM(v.is_abandoned) AS abandoned_activities,
        COUNT(*) AS total_activities,
        SUM(v.total_expenditure) FILTER (WHERE v.is_abandoned = 1) AS expenditure_on_abandoned
@@ -10300,6 +11228,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -10386,7 +11315,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT SUM(v.is_started)   AS taken_up_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       SUM(v.is_started)   AS taken_up_activities,
        SUM(v.is_completed) AS completed_activities,
        ROUND(100.0 * SUM(v.is_completed) / NULLIF(SUM(v.is_started),0), 2) AS pct_completed
 FROM v_activity v
@@ -10399,6 +11340,8 @@ WHERE v.fiscal_year = $date_range
   AND ($theme IS NULL OR v.theme = $theme)
   AND ($scheme IS NULL OR v.scheme_name = $scheme)
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -10410,6 +11353,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.',
@@ -10439,7 +11383,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.block_name, v.district_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.block_name  -- absent: block_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.district_name END AS district_name,
        COUNT(*) AS activities,
        SUM(v.is_started)   AS started,
        SUM(v.is_completed) AS completed,
@@ -10465,6 +11421,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -10495,7 +11452,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COUNT(*) AS activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       COUNT(*) AS activities,
        COUNT(*) FILTER (WHERE v.status_label = 'Activity Approved') AS approved_not_started,
        SUM(v.is_started) AS started,
        ROUND(100.0 * COUNT(*) FILTER (WHERE v.status_label = 'Activity Approved')
@@ -10510,6 +11479,8 @@ WHERE v.fiscal_year = $date_range
   AND ($theme IS NULL OR v.theme = $theme)
   AND ($scheme IS NULL OR v.scheme_name = $scheme)
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -10521,6 +11492,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Not started' is read as status 'Activity Approved' - approved but with no work status recorded.",
@@ -10550,7 +11522,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.gp_name, v.block_name, v.district_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.gp_name  -- absent: gp_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.block_name END AS block_name, CASE WHEN $group_by IS NULL THEN v.district_name END AS district_name,
        COUNT(*) AS activities,
        SUM(v.is_completed) AS completed
 FROM v_activity v
@@ -10577,6 +11561,7 @@ ORDER BY activities DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -10611,7 +11596,19 @@ ORDER BY activities DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COUNT(*) FILTER (WHERE v.is_under_approval = 1) AS under_approval,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       COUNT(*) FILTER (WHERE v.is_under_approval = 1) AS under_approval,
        COUNT(*) AS total_activities,
        SUM(COALESCE(v.total_cost,0)) FILTER (WHERE v.is_under_approval = 1) AS cost_under_approval
 FROM v_activity v
@@ -10624,6 +11621,8 @@ WHERE v.fiscal_year = $date_range
   AND ($theme IS NULL OR v.theme = $theme)
   AND ($scheme IS NULL OR v.scheme_name = $scheme)
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -10635,6 +11634,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": '36 activities carry this status across the whole database.',
@@ -10664,7 +11664,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.block_name, v.district_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.block_name  -- absent: block_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.district_name END AS district_name,
        COUNT(*) AS activities,
        SUM(v.is_started) AS started,
        ROUND(100.0 * SUM(v.is_started) / NULLIF(COUNT(*),0), 2) AS pct_started
@@ -10688,6 +11700,7 @@ ORDER BY activities DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -10718,7 +11731,19 @@ ORDER BY activities DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.gp_name, v.block_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.gp_name  -- absent: gp_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.block_name END AS block_name,
        COUNT(DISTINCT v.plan_code) AS plan_units,
        COUNT(*) AS planned_activities,
        SUM(v.is_started)   AS taken_up_activities,
@@ -10746,6 +11771,7 @@ ORDER BY planned_activities DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -10778,7 +11804,19 @@ ORDER BY planned_activities DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.district_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.district_name  -- absent: district_name
+              END AS group_label,
        COUNT(*) AS activities,
        COUNT(*) FILTER (WHERE v.status_label = 'Activity Approved') AS approved_not_started,
        SUM(v.is_ongoing)   AS ongoing,
@@ -10802,6 +11840,7 @@ ORDER BY activities DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.',
@@ -10829,7 +11868,19 @@ ORDER BY activities DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COUNT(*) AS planned_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       COUNT(*) AS planned_activities,
        SUM(v.is_started) AS initiated_activities,
        ROUND(100.0 * SUM(v.is_started) / NULLIF(COUNT(*),0), 2) AS initiation_rate_pct
 FROM v_activity v
@@ -10842,6 +11893,8 @@ WHERE v.fiscal_year = $date_range
   AND ($theme IS NULL OR v.theme = $theme)
   AND ($scheme IS NULL OR v.scheme_name = $scheme)
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -10853,6 +11906,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Initiated' = status WORK ONGOING or WORK COMPLETED.",
@@ -10882,7 +11936,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT SUM(v.is_started)   AS initiated_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       SUM(v.is_started)   AS initiated_activities,
        SUM(v.is_completed) AS completed_activities,
        ROUND(100.0 * SUM(v.is_completed) / NULLIF(SUM(v.is_started),0), 2) AS completion_rate_pct
 FROM v_activity v
@@ -10895,6 +11961,8 @@ WHERE v.fiscal_year = $date_range
   AND ($theme IS NULL OR v.theme = $theme)
   AND ($scheme IS NULL OR v.scheme_name = $scheme)
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -10906,6 +11974,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.',
@@ -10935,7 +12004,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COUNT(*) AS planned_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       COUNT(*) AS planned_activities,
        COUNT(*) - SUM(v.is_started) AS not_initiated,
        SUM(COALESCE(v.total_cost,0)) FILTER (WHERE v.is_started = 0) AS cost_not_initiated
 FROM v_activity v
@@ -10948,6 +12029,8 @@ WHERE v.fiscal_year = $date_range
   AND ($theme IS NULL OR v.theme = $theme)
   AND ($scheme IS NULL OR v.scheme_name = $scheme)
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -10959,6 +12042,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Includes both 'Activity Approved' and 'UNDER APPROVAL' activities.",
@@ -11102,7 +12186,19 @@ ORDER BY completion_rate_pct DESC, planned_activities DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label,
        COUNT(*) AS planned_activities,
        SUM(v.is_completed) AS completed_activities,
        ROUND(100.0 * SUM(v.is_completed) / NULLIF(COUNT(*),0), 2) AS completion_rate_pct
@@ -11131,6 +12227,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.',
@@ -11161,7 +12258,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label,
        COUNT(*) AS planned_activities,
        SUM(v.is_started) AS initiated_activities,
        COUNT(*) - SUM(v.is_started) AS implementation_gap,
@@ -11191,6 +12300,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.',
@@ -11221,7 +12331,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label,
        COUNT(*) AS planned_activities,
        SUM(v.is_completed) AS completed_activities
 FROM v_activity v
@@ -11249,6 +12371,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.',
@@ -11278,7 +12401,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label,
        COUNT(*) AS planned_activities,
        SUM(v.is_completed) AS completed_activities,
        ROUND(100.0 * SUM(v.is_completed) / NULLIF(COUNT(*),0), 2) AS completion_rate_pct
@@ -11309,6 +12444,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": '$threshold sets a minimum activity count so focus areas with one or two activities do not dominate the ranking. Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.',
@@ -11338,7 +12474,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label,
        COUNT(*) AS planned_activities,
        SUM(v.is_started) AS initiated_activities,
        COUNT(*) - SUM(v.is_started) AS implementation_gap,
@@ -11368,6 +12516,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.',
@@ -11398,7 +12547,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label,
        SUM(v.is_ongoing) AS ongoing_activities,
        COUNT(*) AS planned_activities,
        SUM(v.total_expenditure) FILTER (WHERE v.is_ongoing = 1) AS expenditure_on_ongoing
@@ -11427,6 +12588,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Implementation & Progress',
@@ -11455,7 +12617,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label,
        COUNT(*) AS planned_activities,
        SUM(v.total_expenditure) AS expenditure,
        SUM(v.is_completed) AS completed_activities,
@@ -11484,6 +12658,7 @@ ORDER BY expenditure DESC, completion_rate_pct ASC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Poor implementation' is undefined in the source question; the query ranks by spend and shows the completion rate alongside. Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.",
@@ -11636,7 +12811,19 @@ ORDER BY ABS(share_gap_pts) DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label,
        COUNT(DISTINCT v.fiscal_year) AS years_present,
        COUNT(*) AS total_activities,
        SUM(v.is_started)   AS started,
@@ -11664,6 +12851,7 @@ ORDER BY avg_initiation_rate_pct DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Consistently' is not defined in the source question; the query pools all years and reports the overall initiation rate per theme. Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.",
@@ -11693,7 +12881,19 @@ ORDER BY avg_initiation_rate_pct DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label,
        COUNT(DISTINCT v.fiscal_year) AS years_present,
        COUNT(*) AS total_activities,
        SUM(v.is_started)   AS started,
@@ -11721,6 +12921,7 @@ ORDER BY avg_initiation_rate_pct ASC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Consistently' is not defined in the source question; the query pools all years and reports the overall initiation rate per theme. Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.",
@@ -11870,7 +13071,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label,
        COUNT(*) AS planned_activities,
        SUM(v.is_started) AS started,
        ROUND(100.0 * SUM(v.is_started) / NULLIF(COUNT(*),0), 2) AS initiation_rate_pct,
@@ -11905,6 +13118,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Advisory question with no defined rule. Ranks by lowest initiation rate among groups with at least $threshold activities.',
@@ -11935,7 +13149,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label,
        COUNT(*) AS planned_activities,
        SUM(v.is_started) AS started,
        ROUND(100.0 * SUM(v.is_started) / NULLIF(COUNT(*),0), 2) AS initiation_rate_pct,
@@ -11970,6 +13196,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Advisory question with no defined rule. Ranks by lowest initiation rate among groups with at least $threshold activities.',
@@ -12059,7 +13286,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COALESCE(v.scheme_name,'(not recorded)') AS scheme_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE COALESCE(v.scheme_name,'(not recorded)')  -- absent: scheme_name
+              END AS group_label,
        COUNT(*) AS activities,
        COUNT(*) FILTER (WHERE v.is_completed = 0) AS incomplete_activities,
        SUM(v.is_ongoing) AS ongoing,
@@ -12089,6 +13328,7 @@ ORDER BY incomplete_activities DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "No planned end-date exists, so 'delayed' cannot be measured; only 'incomplete' is returned. scheme_name is NULL on 82% of rows.",
@@ -12155,7 +13395,18 @@ WHERE v.activity_code = $activity_code
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.gp_name, v.block_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.gp_name  -- absent: gp_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.block_name END AS block_name,
        COUNT(*) AS asset_rows,
        COUNT(*) FILTER (WHERE v.status_label = 'WORK COMPLETED') AS assets_under_completed_activities
 FROM v_asset v
@@ -12177,6 +13428,7 @@ ORDER BY asset_rows DESC
             {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
             {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -12208,7 +13460,19 @@ ORDER BY asset_rows DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.status_label,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.status_label  -- absent: status_label
+              END AS group_label,
        COUNT(*) AS activities,
        COUNT(*) FILTER (WHERE v.has_progress_evidence = 1) AS with_evidence,
        SUM(v.evidence_uploads) AS total_uploads,
@@ -12239,6 +13503,7 @@ ORDER BY activities DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Rewritten from 'assets at each implementation stage' to 'activities with progress evidence', which is what physical_progress actually supports. Grouped by activity status as the nearest stage proxy.",
@@ -12269,7 +13534,18 @@ ORDER BY activities DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.gp_name, v.block_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.gp_name  -- absent: gp_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.block_name END AS block_name,
        COUNT(*) AS asset_rows,
        COUNT(DISTINCT v.activity_code) AS asset_creating_activities,
        COUNT(*) FILTER (WHERE v.asset_category_label <> 'Uncategorised') AS categorised_assets
@@ -12294,6 +13570,7 @@ ORDER BY asset_rows DESC
             {'name': 'status', 'entity_type': 'status', 'optional': True},
             {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -12539,7 +13816,18 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme, COUNT(*) AS asset_rows,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label, COUNT(*) AS asset_rows,
        COUNT(DISTINCT v.activity_code) AS activities,
        SUM(v.total_expenditure) AS expenditure
 FROM v_asset v
@@ -12563,6 +13851,7 @@ ORDER BY asset_rows DESC
             {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
             {'name': 'status', 'entity_type': 'status', 'optional': True},
             {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas. activity_asset is sparsely populated: asset_category has values on 4,286 of 12,704 rows and asset_subcategory on 4,286; asset_name, asset_unit_count and asset_unit_cost are 100% NULL. Uncategorised rows are reported separately rather than dropped.',
@@ -12640,7 +13929,18 @@ ORDER BY g.zp_name, g.block_name, g.gp_name
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.fiscal_year,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.fiscal_year  -- absent: fiscal_year
+              END AS group_label,
        COUNT(*) AS asset_rows,
        COUNT(*) FILTER (WHERE v.asset_category_label <> 'Uncategorised') AS categorised_assets,
        COUNT(DISTINCT v.activity_code) AS activities,
@@ -12665,6 +13965,7 @@ ORDER BY 1
             {'name': 'status', 'entity_type': 'status', 'optional': True},
             {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'activity_asset is sparsely populated: asset_category has values on 4,286 of 12,704 rows and asset_subcategory on 4,286; asset_name, asset_unit_count and asset_unit_cost are 100% NULL. Uncategorised rows are reported separately rather than dropped.',
@@ -12693,7 +13994,19 @@ ORDER BY 1
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'Grey Water Management activities' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'Grey Water Management activities' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -12704,12 +14017,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -12735,7 +14051,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'Grey Water Management activities' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'Grey Water Management activities' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.total_expenditure) AS expenditure,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -12746,12 +14074,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -12777,7 +14108,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'community soak pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'community soak pits' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -12788,12 +14131,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -12819,7 +14165,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'community soak pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'community soak pits' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS approved_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -12830,12 +14188,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -12861,7 +14222,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'community soak pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'community soak pits' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_ongoing) AS ongoing_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -12872,12 +14245,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -12903,7 +14279,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'community soak pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'community soak pits' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_completed) AS completed_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -12914,12 +14302,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -12945,7 +14336,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'community soak pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'community soak pits' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.total_expenditure) AS expenditure,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -12956,12 +14359,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -12987,7 +14393,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'household soak pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'household soak pits' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -12998,12 +14416,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -13029,7 +14450,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'household soak pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'household soak pits' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS approved_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -13040,12 +14473,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -13071,7 +14507,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'household soak pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'household soak pits' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_ongoing) AS ongoing_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -13082,12 +14530,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -13113,7 +14564,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'household soak pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'household soak pits' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_completed) AS completed_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -13124,12 +14587,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -13155,7 +14621,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'household soak pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'household soak pits' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.total_expenditure) AS expenditure,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -13166,12 +14644,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -13197,7 +14678,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'community sanitary complexes' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'community sanitary complexes' AS item,
        COUNT(*) AS maintenance_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS om_expenditure
@@ -13208,12 +14701,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'O&M is read as work_type Maintenance or Upgradation, combined with a keyword match on the activity text. SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -13239,7 +14735,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'community compost pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'community compost pits' AS item,
        COUNT(*) AS maintenance_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS om_expenditure
@@ -13250,12 +14758,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'O&M is read as work_type Maintenance or Upgradation, combined with a keyword match on the activity text. SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -13281,7 +14792,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'segregation sheds' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'segregation sheds' AS item,
        COUNT(*) AS maintenance_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS om_expenditure
@@ -13292,12 +14815,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'O&M is read as work_type Maintenance or Upgradation, combined with a keyword match on the activity text. SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -13323,7 +14849,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'Plastic Waste Management Units' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'Plastic Waste Management Units' AS item,
        COUNT(*) AS maintenance_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS om_expenditure
@@ -13334,12 +14872,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'O&M is read as work_type Maintenance or Upgradation, combined with a keyword match on the activity text. SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -13365,7 +14906,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'Gobardhan units' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'Gobardhan units' AS item,
        COUNT(*) AS maintenance_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS om_expenditure
@@ -13376,12 +14929,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'O&M is read as work_type Maintenance or Upgradation, combined with a keyword match on the activity text. SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -13407,7 +14963,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'community Grey Water Management systems and soak pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'community Grey Water Management systems and soak pits' AS item,
        COUNT(*) AS maintenance_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS om_expenditure
@@ -13418,12 +14986,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'O&M is read as work_type Maintenance or Upgradation, combined with a keyword match on the activity text. SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -13449,7 +15020,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'Faecal Sludge Management plants' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'Faecal Sludge Management plants' AS item,
        COUNT(*) AS maintenance_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS om_expenditure
@@ -13460,12 +15043,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'O&M is read as work_type Maintenance or Upgradation, combined with a keyword match on the activity text. SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -13491,7 +15077,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'PPE kits and safety equipment purchases' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'PPE kits and safety equipment purchases' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -13502,12 +15100,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -13533,7 +15134,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'waste-management and safety equipment' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'waste-management and safety equipment' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.total_expenditure) AS expenditure,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -13544,12 +15157,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -13575,7 +15191,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label,
        COUNT(*) AS maintenance_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS om_expenditure
@@ -13595,6 +15223,7 @@ ORDER BY om_expenditure DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "O&M is read as work_type Maintenance or Upgradation. Pass $focus_area = 'Sanitation' to restrict to SBM assets.",
@@ -13620,7 +15249,19 @@ ORDER BY om_expenditure DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'toilets in public institutions' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'toilets in public institutions' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -13631,12 +15272,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -13661,7 +15305,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'toilets in public institutions' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'toilets in public institutions' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS approved_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -13672,12 +15328,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -13702,7 +15361,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'toilets in public institutions' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'toilets in public institutions' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_ongoing) AS ongoing_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -13713,12 +15384,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -13743,7 +15417,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'toilets in public institutions' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'toilets in public institutions' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_completed) AS completed_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -13754,12 +15440,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -13784,7 +15473,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'toilets in public institutions' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'toilets in public institutions' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.total_expenditure) AS expenditure,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -13795,12 +15496,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -13826,7 +15530,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'Individual Household Latrines (IHHLs)' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'Individual Household Latrines (IHHLs)' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -13837,12 +15553,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -13868,7 +15587,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'Individual Household Latrines (IHHLs)' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'Individual Household Latrines (IHHLs)' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS approved_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -13879,12 +15610,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -13910,7 +15644,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'Individual Household Latrines (IHHLs)' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'Individual Household Latrines (IHHLs)' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_ongoing) AS ongoing_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -13921,12 +15667,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -13952,7 +15701,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'Individual Household Latrines (IHHLs)' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'Individual Household Latrines (IHHLs)' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_completed) AS completed_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -13963,12 +15724,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -13994,7 +15758,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'Individual Household Latrines (IHHLs)' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'Individual Household Latrines (IHHLs)' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.total_expenditure) AS expenditure,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14005,12 +15781,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -14036,7 +15815,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'toilets and handwash units in AWCs and schools' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'toilets and handwash units in AWCs and schools' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14047,12 +15838,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -14078,7 +15872,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'toilets and handwash units in AWCs and schools' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'toilets and handwash units in AWCs and schools' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS approved_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14089,12 +15895,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -14120,7 +15929,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'toilets and handwash units in AWCs and schools' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'toilets and handwash units in AWCs and schools' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_ongoing) AS ongoing_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14131,12 +15952,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -14162,7 +15986,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'toilets and handwash units in AWCs and schools' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'toilets and handwash units in AWCs and schools' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_completed) AS completed_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14173,12 +16009,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -14204,7 +16043,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'toilets and handwash units in AWCs and schools' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'toilets and handwash units in AWCs and schools' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.total_expenditure) AS expenditure,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14215,12 +16066,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -14246,7 +16100,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'single-pit to twin-pit toilet retrofits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'single-pit to twin-pit toilet retrofits' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14257,12 +16123,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -14287,7 +16156,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'single-pit to twin-pit toilet retrofits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'single-pit to twin-pit toilet retrofits' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS approved_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14298,12 +16179,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -14328,7 +16212,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'single-pit to twin-pit toilet retrofits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'single-pit to twin-pit toilet retrofits' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_ongoing) AS ongoing_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14339,12 +16235,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -14369,7 +16268,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'single-pit to twin-pit toilet retrofits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'single-pit to twin-pit toilet retrofits' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_completed) AS completed_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14380,12 +16291,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -14410,7 +16324,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'single-pit to twin-pit toilet retrofits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'single-pit to twin-pit toilet retrofits' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.total_expenditure) AS expenditure,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14421,12 +16347,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -14452,7 +16381,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'septic-tank-with-soak-pit retrofits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'septic-tank-with-soak-pit retrofits' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14463,12 +16404,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -14493,7 +16437,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'septic-tank-with-soak-pit retrofits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'septic-tank-with-soak-pit retrofits' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS approved_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14504,12 +16460,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -14534,7 +16493,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'septic-tank-with-soak-pit retrofits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'septic-tank-with-soak-pit retrofits' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_ongoing) AS ongoing_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14545,12 +16516,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -14575,7 +16549,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'septic-tank-with-soak-pit retrofits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'septic-tank-with-soak-pit retrofits' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_completed) AS completed_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14586,12 +16572,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -14616,7 +16605,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'septic-tank-with-soak-pit retrofits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'septic-tank-with-soak-pit retrofits' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.total_expenditure) AS expenditure,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14627,12 +16628,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -14658,7 +16662,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'Solid Waste Management activities' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'Solid Waste Management activities' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14669,12 +16685,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -14700,7 +16719,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'community compost pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'community compost pits' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14711,12 +16742,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -14741,7 +16775,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'community compost pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'community compost pits' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS approved_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14752,12 +16798,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -14782,7 +16831,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'community compost pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'community compost pits' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_ongoing) AS ongoing_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14793,12 +16854,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -14823,7 +16887,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'community compost pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'community compost pits' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_completed) AS completed_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14834,12 +16910,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -14864,7 +16943,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'community compost pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'community compost pits' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.total_expenditure) AS expenditure,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14875,12 +16966,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -14906,7 +17000,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'household compost pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'household compost pits' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14917,12 +17023,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -14947,7 +17056,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'household compost pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'household compost pits' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS approved_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14958,12 +17079,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -14988,7 +17112,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'household compost pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'household compost pits' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_ongoing) AS ongoing_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -14999,12 +17135,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -15029,7 +17168,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'household compost pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'household compost pits' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_completed) AS completed_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15040,12 +17191,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -15070,7 +17224,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'household compost pits' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'household compost pits' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.total_expenditure) AS expenditure,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15081,12 +17247,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -15112,7 +17281,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'segregation sheds' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'segregation sheds' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15123,12 +17304,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -15153,7 +17337,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'segregation sheds' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'segregation sheds' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS approved_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15164,12 +17360,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -15194,7 +17393,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'segregation sheds' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'segregation sheds' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_ongoing) AS ongoing_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15205,12 +17416,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -15235,7 +17449,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'segregation sheds' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'segregation sheds' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_completed) AS completed_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15246,12 +17472,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -15276,7 +17505,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'segregation sheds' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'segregation sheds' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.total_expenditure) AS expenditure,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15287,12 +17528,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -15318,7 +17562,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'segregation bins' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'segregation bins' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15329,12 +17585,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -15360,7 +17619,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'segregation bins' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'segregation bins' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS approved_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15371,12 +17642,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -15402,7 +17676,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'segregation bins' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'segregation bins' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_ongoing) AS ongoing_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15413,12 +17699,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -15444,7 +17733,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'segregation bins' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'segregation bins' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_completed) AS completed_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15455,12 +17756,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -15486,7 +17790,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'household segregation bins' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'household segregation bins' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15497,12 +17813,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -15528,7 +17847,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'community segregation bins' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'community segregation bins' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15539,12 +17870,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -15570,7 +17904,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'segregation bins' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'segregation bins' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.total_expenditure) AS expenditure,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15581,12 +17927,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -15612,7 +17961,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'Gobardhan units' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'Gobardhan units' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15623,12 +17984,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -15654,7 +18018,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'Gobardhan units' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'Gobardhan units' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS approved_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15665,12 +18041,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -15696,7 +18075,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'Gobardhan units' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'Gobardhan units' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_ongoing) AS ongoing_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15707,12 +18098,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -15738,7 +18132,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'Gobardhan units' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'Gobardhan units' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_completed) AS completed_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15749,12 +18155,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -15780,7 +18189,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'Gobardhan units' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'Gobardhan units' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.total_expenditure) AS expenditure,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15791,12 +18212,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -15822,7 +18246,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'door-to-door waste-collection vehicles' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'door-to-door waste-collection vehicles' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15833,12 +18269,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -15864,7 +18303,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'door-to-door waste-collection vehicles' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'door-to-door waste-collection vehicles' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS approved_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15875,12 +18326,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -15906,7 +18360,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'door-to-door waste-collection vehicles' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'door-to-door waste-collection vehicles' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_ongoing) AS ongoing_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15917,12 +18383,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -15948,7 +18417,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'door-to-door waste-collection vehicles' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'door-to-door waste-collection vehicles' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_completed) AS completed_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -15959,12 +18440,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -15990,7 +18474,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'door-to-door waste-collection vehicles' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'door-to-door waste-collection vehicles' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.total_expenditure) AS expenditure,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -16001,12 +18497,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -16032,7 +18531,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'weighing machines' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'weighing machines' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -16043,12 +18554,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -16074,7 +18588,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'weighing machines' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'weighing machines' AS item,
        COUNT(*) AS matching_activities,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS approved_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -16085,12 +18611,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -16115,7 +18644,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'weighing machines' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'weighing machines' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_ongoing) AS ongoing_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -16126,12 +18667,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -16157,7 +18701,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'weighing machines' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'weighing machines' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.is_completed) AS completed_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -16168,12 +18724,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones. Only 17 activities database-wide are marked WORK COMPLETED, so 'completed' counts will be near zero. 'Approved' uses admin_approved_cost > 0.",
@@ -16199,7 +18758,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT 'weighing machines' AS item,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       'weighing machines' AS item,
        COUNT(*) AS matching_activities,
        SUM(v.total_expenditure) AS expenditure,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
@@ -16210,12 +18781,15 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'SBM activity types are not coded anywhere in the database - asset_subcategory is missing on two-thirds of asset rows and asset_name is 100% NULL. These queries therefore identify the activity by matching activity_name and activity_desc against the regular expression shown in the SQL. Review and tune the pattern before relying on the number: it can both miss differently-worded activities and pick up unrelated ones.',
@@ -16241,7 +18815,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.gp_name, v.block_name, v.district_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.gp_name  -- absent: gp_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.block_name END AS block_name, CASE WHEN $group_by IS NULL THEN v.district_name END AS district_name,
        COUNT(*) AS activities,
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS planned_cost,
        SUM(v.total_expenditure) AS actual_expenditure,
@@ -16269,6 +18855,7 @@ ORDER BY actual_expenditure DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'gp_name',
@@ -16299,7 +18886,19 @@ ORDER BY actual_expenditure DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.block_name, v.district_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.block_name  -- absent: block_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.district_name END AS district_name,
        COUNT(DISTINCT v.gp_lgd_code) AS gps,
        COUNT(*) AS activities,
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS planned_cost,
@@ -16327,6 +18926,7 @@ ORDER BY actual_expenditure DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -16417,7 +19017,19 @@ ORDER BY expenditure_per_gp DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label,
        COUNT(*) AS activities,
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS approved_cost,
        SUM(v.total_expenditure) AS expenditure,
@@ -16448,6 +19060,7 @@ ORDER BY expenditure DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -16477,7 +19090,19 @@ ORDER BY expenditure DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name AS sector,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: sector
+              END AS group_label,
        COUNT(*) AS activities,
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS approved_cost,
        SUM(v.total_expenditure) AS expenditure,
@@ -16508,6 +19133,7 @@ ORDER BY expenditure DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Sector' is read as focus area, the closest sectoral classification in the data.",
@@ -16538,7 +19164,19 @@ ORDER BY expenditure DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label,
        COUNT(*) AS activities,
        SUM(v.total_expenditure) AS expenditure,
        SUM(v.is_completed) AS completed,
@@ -16567,6 +19205,7 @@ ORDER BY expenditure DESC, completion_rate_pct ASC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'High' and 'low' are undefined; ordered by spend with completion rate shown beside it.",
@@ -16596,7 +19235,19 @@ ORDER BY expenditure DESC, completion_rate_pct ASC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label,
        COUNT(*) FILTER (WHERE v.fiscal_year = $date_range_2) AS planned_year1,
        COUNT(*) FILTER (WHERE v.fiscal_year = $date_range)   AS planned_year2,
        SUM(v.is_started) FILTER (WHERE v.fiscal_year = $date_range_2) AS started_year1,
@@ -16625,6 +19276,7 @@ ORDER BY planned_year2 DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas.',
@@ -16655,7 +19307,19 @@ ORDER BY planned_year2 DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.theme,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.theme  -- absent: theme
+              END AS group_label,
        SUM(COALESCE(v.approved_cost_action_plan,0)) FILTER (WHERE v.fiscal_year = $date_range_2) AS approved_cost_year1,
        SUM(COALESCE(v.approved_cost_action_plan,0)) FILTER (WHERE v.fiscal_year = $date_range)   AS approved_cost_year2,
        SUM(v.total_expenditure) FILTER (WHERE v.fiscal_year = $date_range_2) AS expenditure_year1,
@@ -16686,6 +19350,7 @@ ORDER BY expenditure_year2 DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -16717,7 +19382,19 @@ ORDER BY expenditure_year2 DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.fiscal_year,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.fiscal_year  -- absent: fiscal_year
+              END AS group_label,
        COUNT(*) AS activities,
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS approved_cost,
        SUM(v.total_expenditure) AS expenditure,
@@ -16747,6 +19424,7 @@ ORDER BY 1 DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Expenditure is recorded against the year of the plan it belongs to; there is no separate cash-year column, so cross-year carry-over cannot be traced.',
@@ -16777,7 +19455,19 @@ ORDER BY 1 DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT SUM(v.total_expenditure) FILTER (WHERE v.fiscal_year = $date_range_2) AS expenditure_year1,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       SUM(v.total_expenditure) FILTER (WHERE v.fiscal_year = $date_range_2) AS expenditure_year1,
        SUM(v.total_expenditure) FILTER (WHERE v.fiscal_year = $date_range)   AS expenditure_year2,
        SUM(v.total_expenditure) FILTER (WHERE v.fiscal_year = $date_range)
        - SUM(v.total_expenditure) FILTER (WHERE v.fiscal_year = $date_range_2) AS change_amount,
@@ -16795,6 +19485,8 @@ WHERE v.fiscal_year IN ($date_range, $date_range_2)
   AND ($theme IS NULL OR v.theme = $theme)
   AND ($scheme IS NULL OR v.scheme_name = $scheme)
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -16808,6 +19500,7 @@ WHERE v.fiscal_year IN ($date_range, $date_range_2)
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Trends & Comparison',
@@ -16837,7 +19530,19 @@ WHERE v.fiscal_year IN ($date_range, $date_range_2)
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.fiscal_year,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.fiscal_year  -- absent: fiscal_year
+              END AS group_label,
        COUNT(*) AS activities,
        SUM(v.is_started)   AS started,
        SUM(v.is_completed) AS completed,
@@ -16865,6 +19570,7 @@ ORDER BY 1
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Only 17 activities in the whole database are marked WORK COMPLETED, so completion rates are near zero throughout.',
@@ -17449,7 +20155,19 @@ ORDER BY total_activities DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.block_name, v.district_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.block_name  -- absent: block_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.district_name END AS district_name,
        COUNT(*) AS activities,
        SUM(v.is_completed) AS completed,
        SUM(v.is_started)   AS started,
@@ -17475,6 +20193,7 @@ ORDER BY completion_rate_pct ASC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -17753,7 +20472,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.gp_name, v.block_name, v.district_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.gp_name  -- absent: gp_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.block_name END AS block_name, CASE WHEN $group_by IS NULL THEN v.district_name END AS district_name,
        COUNT(*) AS activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS approved_cost,
@@ -17784,6 +20515,7 @@ ORDER BY activities DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -17883,7 +20615,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COUNT(*) AS total_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       COUNT(*) AS total_activities,
        COUNT(*) FILTER (WHERE v.focus_area_name LIKE 'Code %') AS undecoded_focus_area,
        COUNT(*) FILTER (WHERE v.focus_area IS NULL) AS missing_focus_area,
        ROUND(100.0 * COUNT(*) FILTER (WHERE v.focus_area IS NULL OR v.focus_area_name LIKE 'Code %')
@@ -17898,6 +20642,8 @@ WHERE v.fiscal_year = $date_range
   AND ($theme IS NULL OR v.theme = $theme)
   AND ($scheme IS NULL OR v.scheme_name = $scheme)
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -17909,6 +20655,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Separates genuinely missing focus areas from codes that exist but are not in the decoder.',
@@ -18058,7 +20805,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT COUNT(*) AS total_activities,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       COUNT(*) AS total_activities,
        COUNT(*) FILTER (WHERE v.scheme_name IS NULL) AS missing_scheme,
        ROUND(100.0 * COUNT(*) FILTER (WHERE v.scheme_name IS NULL)
              / NULLIF(COUNT(*),0), 2) AS pct_missing_scheme
@@ -18072,6 +20831,8 @@ WHERE v.fiscal_year = $date_range
   AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
   AND ($theme IS NULL OR v.theme = $theme)
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -18083,6 +20844,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Monitoring, Alerts & Data Quality',
@@ -18111,7 +20873,19 @@ WHERE v.fiscal_year = $date_range
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.focus_area_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.focus_area_name  -- absent: focus_area_name
+              END AS group_label,
        COUNT(*) AS activities,
        SUM(COALESCE(v.admin_approved_cost,0)) AS approved_cost,
        SUM(v.total_expenditure) AS expenditure,
@@ -18144,6 +20918,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Only 17 activities database-wide are complete, so almost every focus area falls below any threshold.',
@@ -18173,7 +20948,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.block_name, v.district_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.block_name  -- absent: block_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.district_name END AS district_name,
        COUNT(*) AS activities,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 0) AS pending_sanctions,
        ROUND(100.0 * COUNT(*) FILTER (WHERE v.is_admin_approved = 0)
@@ -18205,6 +20992,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -18354,7 +21142,19 @@ LIMIT $top_n
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.gp_name, v.block_name,
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.gp_name  -- absent: gp_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.block_name END AS block_name,
        COUNT(*) AS activities,
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS approved_cost,
        SUM(v.total_expenditure) AS expenditure,
@@ -18388,6 +21188,7 @@ LIMIT $top_n
             {'name': 'theme', 'entity_type': 'theme', 'optional': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',

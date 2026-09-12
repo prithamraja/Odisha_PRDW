@@ -48,7 +48,7 @@ FAMILY_MOVES: dict[str, list[str]] = {
         "PLN-012",   # GPDP status for this panchayat
         "EXP-001",   # total actual expenditure
         "EXP-002",   # how its expenditure has moved across years
-        "PLN-050",   # what it planned, by focus area
+        "PLN-024",   # what it planned (PLN-050, by focus area, folded in: WP-6 T3)
         "STS-001",   # activity status counts
         "SAN-001",   # activities that received administrative approval
     ],

@@ -1,0 +1,82 @@
+{
+ "BUD-018": {
+  "group_by": "focus_area",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": null,
+   "gp_name": null,
+   "group_by": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
+  },
+  "question": "How much planned expenditure is allocated to each focus area in {date_range}?",
+  "retired_in": "WP-6 T3",
+  "rows": 25,
+  "survivor": "BUD-006"
+ },
+ "EXP-025": {
+  "group_by": "focus_area",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": null,
+   "gp_name": null,
+   "group_by": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
+  },
+  "question": "What is the total actual expenditure under each focus area in {date_range}?",
+  "retired_in": "WP-6 T3",
+  "rows": 25,
+  "survivor": "EXP-014"
+ },
+ "PLN-050": {
+  "group_by": "focus_area",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": null,
+   "gp_name": null,
+   "group_by": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
+  },
+  "question": "How many activities are planned under each focus area in {gp_name} in {date_range}?",
+  "retired_in": "WP-6 T3",
+  "rows": 25,
+  "survivor": "PLN-024"
+ },
+ "PLN-051": {
+  "group_by": "focus_area",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": null,
+   "gp_name": null,
+   "group_by": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
+  },
+  "question": "How many activities are planned under each focus area in {block_name} in {date_range}?",
+  "retired_in": "WP-6 T3",
+  "rows": 25,
+  "survivor": "PLN-024"
+ }
+}

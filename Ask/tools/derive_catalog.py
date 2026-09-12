@@ -191,9 +191,23 @@ def grouped_geo_slots(sql: str, slots: list[dict]) -> list[str]:
                 expressions.append(select[index])
         else:
             expressions.append(item)
+    # WP-6 T3: a `$group_by` CASE groups by its ELSE branch when the slot is
+    # absent, and by its `$group_by IS NULL` branch for a blanked finer column —
+    # that is the reading grouped_geo describes. A chosen breakdown is resolved
+    # at run time (query_router/breakdown.effective_grouped_geo).
+    expressions = [_absent_branch(e) for e in expressions]
     joined = mask_literals(" , ".join(expressions))
     return [slot for slot, pattern in _GEO_COLUMNS.items()
             if slot in names and pattern.search(joined)]
+
+
+def _absent_branch(expr: str) -> str:
+    """What a `$group_by` expression groups by when the slot is ABSENT."""
+    if "$group_by" not in expr:
+        return expr
+    m = (re.search(r"\bELSE\s+(.+?)(?:\s+--[^\n]*)?\s+END\b", expr, re.S)
+         or re.search(r"\$group_by\s+IS\s+NULL\s+THEN\s+(.+?)\s+END\b", expr, re.S))
+    return m.group(1) if m else ""
 
 
 def alias_relations(sql: str) -> dict[str, str]:
@@ -309,6 +323,7 @@ PARAM_ENTITY_TYPES = {
     "focus_area": "focus_area", "theme": "theme",
     "scheme": "scheme", "scheme_2": "scheme_2", "status": "status",
     "plan_type": "plan_type", "tied_untied": "tied_untied",
+    "group_by": "group_by",
     "asset_category": "asset_category", "asset_sub_category": "asset_subcategory",
     "activity_code": "activity_code", "top_n": "top_n",
     "threshold": "threshold", "amount_threshold": "amount_threshold",
@@ -340,6 +355,11 @@ DEFAULTED_SLOTS = {"top_n": "10"}
 # carry a default, each with its reason. `contract_problems` already refuses a
 # default on anything outside DEFAULTED_SLOTS; this names the ones where the
 # temptation is real, so the refusal has its reason written next to it.
+# WP-6 T3: the only values a `$group_by` CASE may list (query_router/breakdown.py
+# and entity_validator carry the same tuple; a test pins all three together).
+GROUP_BY_VALUES = ("district", "block", "gp", "theme", "focus_area", "status",
+                   "scheme", "plan_type", "fiscal_year", "total")
+
 UNDEFAULTED_SLOTS = {
     # WP-6 T1. "How many activities are planned?" with no qualifier means BOTH
     # plan types; that is the signed-off Test Report count. Defaulting to Main
@@ -1086,7 +1106,8 @@ def _select_columns(sql: str) -> list[str]:
 
 
 GEO_COLUMNS = {"gp_name", "block_name", "district_name", "gp_lgd_code",
-               "state_name", "activity_code", "plan_code", "fiscal_year", "item"}
+               "state_name", "activity_code", "plan_code", "fiscal_year", "item",
+               "group_label"}   # WP-6 T3: the breakdown label, not a measure
 
 # slot name -> how it reads in prose, the inverse of QUESTION_TOKENS.
 SLOT_PROSE = {slot: TOKEN_PROSE[token] for token, slot in QUESTION_TOKENS.items()}
@@ -1127,7 +1148,18 @@ def describe_family(entry: dict, member_ids: list[str]) -> str:
     group_cols = [c for c in columns[:3] if c in GEO_COLUMNS or c in
                   ("theme", "focus_area_name", "status_label", "work_type_label",
                    "asset_category_label", "funding_source", "sanction_authority")]
-    if grain and group_cols:
+    if "$group_by" in masked:
+        # WP-6 T3: the grain is the statement's own unless a breakdown is asked
+        # for. Read off the CASE's absent branch, which is what runs by default.
+        default = re.search(r"--\s*absent:\s*(\w+)", sql)
+        finer = re.findall(r"\$group_by\s+IS\s+NULL\s+THEN\s+\S+\s+END\s+AS\s+(\w+)",
+                           sql)
+        if default:
+            parts.append("One row per " + " × ".join([default.group(1), *finer])
+                         + " by default; other breakdowns on request.")
+        else:
+            parts.append("A single summary row by default; breakdowns on request.")
+    elif grain and group_cols:
         parts.append("One row per " + " × ".join(group_cols) + ".")
     elif not grain and entry["question_type"] in ("Count", "Aggregation",
                                                   "Rate/Percentage"):
@@ -1349,6 +1381,26 @@ def contract_problems(catalog: dict) -> list[str]:
                 problems.append(
                     f"{qid} ${name}: entity_type {slot.get('entity_type')!r}, "
                     f"PARAM_ENTITY_TYPES says {PARAM_ENTITY_TYPES.get(name)!r}")
+            if name == "group_by":
+                # WP-6 T3. Optional through its CASE's ELSE (the statement's own
+                # breakdown), not through a `$p IS NULL OR` guard, and only ever
+                # one of the whitelisted values.
+                case = re.search(r"CASE\s+\$group_by\b(.*?)\bEND\s+AS\s+group_label",
+                                 sql, re.S)
+                if not slot.get("optional") or "default" in slot:
+                    problems.append(f"{qid} $group_by: must be optional with no "
+                                    f"default — absent means the statement's own "
+                                    f"breakdown")
+                if not case or not re.search(r"\bELSE\b", mask_literals(case.group(1))):
+                    problems.append(f"{qid} $group_by: needs `CASE $group_by … ELSE … "
+                                    f"END AS group_label`")
+                else:
+                    stray = set(re.findall(r"WHEN\s+'(\w+)'", case.group(1))) \
+                        - set(GROUP_BY_VALUES)
+                    if stray:
+                        problems.append(f"{qid} $group_by: {sorted(stray)} is outside "
+                                        f"the breakdown whitelist")
+                continue
             if name in DEFAULTED_SLOTS:
                 if not slot.get("optional") or slot.get("default") != DEFAULTED_SLOTS[name]:
                     problems.append(f"{qid} ${name}: must be optional with default "

@@ -398,6 +398,9 @@ CLARIFICATION_REASONS = {
     "ambiguous_fragment", "ambiguous_templates", "broad_question",
     "known_unanswerable", "missing_parameter", "no_match", "tier_collision",
     "unknown_entity",
+    # WP-6 T3: "sector" used as a breakdown is asked about (operator ruling
+    # 2026-09-12) — "focus area or LSDG theme?"
+    "ambiguous_term",
 }
 
 

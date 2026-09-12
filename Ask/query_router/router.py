@@ -55,6 +55,7 @@ from .unanswerable_catalog import UNANSWERABLE_CATALOG, refusal_for
 from .fragment_reroute   import drill_target, templates_share_subject
 from .sql_params         import NAMED, param_style
 from .suggestions       import elicitation_chips
+from .                  import breakdown
 from .config            import (
     CLARIFY_SCORE_MARGIN,
     MAX_CLARIFY_OPTIONS,
@@ -316,6 +317,12 @@ _AMOUNT_ENTITY_TYPES = frozenset({"amount_threshold", "threshold"})
 # what promoted it from a fallback to a prefill (D30.4, WP-4c §4.3).
 _FISCAL_YEAR_ENTITY_TYPES = frozenset({"fiscal_year", "fiscal_year_2"})
 
+# Slots ONLY a deterministic reader fills, and the extractor is never asked for
+# (WP-6 T3). A breakdown is structure, not an entity: a model guessing one would
+# regroup a correct answer. No reader match means the slot stays absent and the
+# statement keeps its own breakdown — see query_router/breakdown.py.
+_READER_ONLY_ENTITY_TYPES = frozenset({"group_by"})
+
 # A rupee amount stated outright — "above ₹1 lakh", "more than 50,000",
 # "over 2.5 crore". Reading it here means the frequent case never depends on the
 # LLM at all: not just deterministic arithmetic (the validator handles that),
@@ -394,10 +401,15 @@ def _extract_slot_values(
             year = _fiscal_year_from_text(user_query, etype, validator)
             if year is not None:
                 prefilled[slot] = year
+        elif etype in _READER_ONLY_ENTITY_TYPES:
+            found = breakdown.group_by_from_text(user_query)
+            if found is not None:
+                prefilled[slot] = found
 
     askable = [
         s for s, etype in slot_type.items()
         if etype not in _CONSTANT_ENTITY_TYPES and s not in prefilled
+        and etype not in _READER_ONLY_ENTITY_TYPES
     ]
     raw: dict[str, str | None] = (
         extract_entities(user_query, askable, openai_client, intent=intent)
@@ -1139,10 +1151,10 @@ def requery_template(
         )
         param_values = _merge_date_binds(param_values, offset, date_params)
 
-    return _exec_template(
+    return breakdown.reshape(template, params.get("group_by"), _exec_template(
         cache_conn, query_id, sql, param_values,
         template.get("result_ttl_seconds", RESULT_CACHE_DEFAULT_TTL),
-    )
+    ))
 
 
 # ── Frame scope inheritance ───────────────────────────────────────────────────
@@ -1762,6 +1774,12 @@ def _serve_query_id(
     template    = template_map[query_id]
     param_slots = template["param_slots"]
 
+    # WP-6 T3: a breakdown must be one THIS statement's CASE lists, or it would
+    # fall to the default while the echo claimed otherwise.
+    validated_entities = breakdown.drop_unsupported(template, validated_entities)
+    group_by = next((e.resolved_value for e in validated_entities
+                     if e.slot_name == "group_by"), None)
+
     # Build query description with resolved entity values. An Aadhaar is masked
     # to its last four digits — query_description is echoed back to the user and
     # a full Aadhaar must never appear in an answer.
@@ -1791,7 +1809,7 @@ def _serve_query_id(
         template["abstract_question"],
         entity_values,
         unfilled_phrases(param_slots, set(entity_values),
-                         template.get("grouped_geo")),
+                         breakdown.effective_grouped_geo(template, group_by)),
     )
     # A GP whose name is shared resolves to "Naugaon of Barpali" so the
     # panchayat survives a round trip — which renders "…of Barpali of Barpali"
@@ -1800,6 +1818,7 @@ def _serve_query_id(
     query_description = re.sub(
         r"\bof\s+(\S+)\s+of\s+\1\b", r"of \1", query_description, flags=re.IGNORECASE
     )
+    query_description = breakdown.describe(query_description, group_by)
 
     params_by_name = {e.slot_name: e.resolved_value for e in validated_entities}
     person_ids = {
@@ -1837,6 +1856,7 @@ def _serve_query_id(
         )
     except Exception as ex:
         return _fallback(f"Query failed to execute: {ex}", user_query, normalized, start)
+    result_rows = breakdown.reshape(template, group_by, result_rows)
 
     return RouteResult(
         tier=RouteTier.TIER2_TEMPLATE,
@@ -1985,6 +2005,19 @@ def _route_vector(
     dashboard_results, template_map, dashboard_questions,
     start_date, end_date,
 ) -> RouteResult:
+    # "Sector" is not assumed to mean focus area (operator ruling 2026-09-12).
+    # Used as the BREAKDOWN with no value named, it is asked about — before any
+    # retrieval, because a guess here is a whole table about the wrong dimension.
+    sector = breakdown.sector_clarification(
+        user_query, lambda: breakdown.focus_area_names(validator))
+    if sector is not None:
+        prompt, options = sector
+        return _clarify(
+            "ambiguous_term", prompt,
+            [Chip(label=label, send_text=text) for label, text in options],
+            user_query, normalized, start,
+        )
+
     scored = retriever.retrieve_scored(normalized, VECTOR_TOP_K)
 
     # Three-zone confidence handling on retrieval scores

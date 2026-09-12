@@ -37,6 +37,14 @@ _ORACLE_PATH = Path(__file__).parent / "data" / "workbook_test_report.json"
 
 _ORACLE = json.loads(_ORACLE_PATH.read_text(encoding="utf-8"))
 
+# WP-6 T3 retired ids whose measure a surviving template now answers through
+# `$group_by`; each is still executed, via its survivor, by
+# test_wp6_catalog_dimensions. WP-6 T5 adds templates of its own.
+_RETIRED_PATH = Path(__file__).parent / "data" / "retired_templates.json"
+_RETIRED = (json.loads(_RETIRED_PATH.read_text(encoding="utf-8"))
+            if _RETIRED_PATH.exists() else {})
+_ADDED_IN_WP6: set[str] = set()
+
 _STATE: dict = {}
 
 
@@ -70,8 +78,10 @@ class CatalogueShapeTests(unittest.TestCase):
     """Checks that need no database."""
 
     def test_the_catalogue_holds_every_answerable_workbook_question(self):
-        self.assertEqual(len(TEMPLATE_CATALOG), 346)
+        # 346 signed off on 2026-08-13; WP-6 folded some and added some.
+        self.assertEqual(len(TEMPLATE_CATALOG), 346 - len(_RETIRED) + len(_ADDED_IN_WP6))
         self.assertEqual(set(TEMPLATE_CATALOG), set(_ORACLE))
+        self.assertFalse(set(_RETIRED) & set(TEMPLATE_CATALOG))
 
     def test_the_oracle_binds_exactly_the_slots_each_template_declares(self):
         for qid, entry in TEMPLATE_CATALOG.items():
