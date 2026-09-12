@@ -146,7 +146,7 @@ class BindParamValuesTests(unittest.TestCase):
         declares it per slot (the authority since D18.P1) while
         `_DEFAULT_ENTITY_VALUES` keeps the entity-type fallback the AP fixtures
         still use."""
-        from tools.build_catalog import DEFAULTED_SLOTS
+        from tools.derive_catalog import DEFAULTED_SLOTS
         for name, value in DEFAULTED_SLOTS.items():
             with self.subTest(slot=name):
                 self.assertEqual(router._DEFAULT_ENTITY_VALUES.get(name), value)
@@ -223,7 +223,7 @@ class BindParamValuesTests(unittest.TestCase):
         which is worse because it answers.
         """
         import re
-        from tools.build_catalog import mask_literals
+        from tools.derive_catalog import mask_literals
         for qid, template in TEMPLATE_CATALOG.items():
             with self.subTest(qid=qid):
                 declared = {s["name"] for s in template["param_slots"]}

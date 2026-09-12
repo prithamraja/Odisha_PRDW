@@ -30,7 +30,7 @@ WHAT A FAMILY IS HERE
     choosing between them blind.
 
 WHAT A DESCRIPTION SAYS, and why it is generated
-    Descriptions are BUILT FROM THE SQL by tools/build_catalog.py, because what
+    Descriptions are BUILT FROM THE SQL by tools/derive_catalog.py, because what
     the reranker is missing is exactly what the SQL knows and the question text
     does not:
 
@@ -47,7 +47,7 @@ WHAT A DESCRIPTION SAYS, and why it is generated
       5. the scope behaviour — one entry answers state-wide or narrowed.
 
     Hand-written prose would be a less accurate way of saying the same things
-    and would drift from the SQL at the first re-ratification. The hand-authored
+    and would drift from the SQL at the first edit. The hand-authored
     half is `_DISAMBIGUATION` in the builder: the near-miss warnings no amount of
     SQL parsing can infer ("uploaded a GPDP is any plan row, not the approved
     subset").
@@ -58,10 +58,10 @@ CONTRACT (mirrors _RERANK_SYS in reranker.py — do not break it)
       families. tests/test_rerank_context.py enforces both.
 """
 # ── GENERATED FILE — do not edit by hand ─────────────────────────────────────
-# Built from AI_Chatbot_Questions.xlsx by tools/build_catalog.py.
-# To change a question, a caveat or a SQL string, change the WORKBOOK and
-# regenerate; `python tools/build_catalog.py --check` fails if this file and the
-# workbook have drifted apart.
+# Built from query_router/template_catalog.py by tools/derive_catalog.py.
+# To change a description, change the template's SQL or question (or the
+# hand-authored `_DISAMBIGUATION` notes in the script) and re-run it;
+# `python tools/derive_catalog.py --check` fails if this file has drifted.
 
 
 FAMILY_DESCRIPTIONS: dict[str, dict] = {

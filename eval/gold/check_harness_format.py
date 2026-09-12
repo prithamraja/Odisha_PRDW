@@ -185,21 +185,15 @@ try:
     import query_router.template_catalog as tc  # noqa: E402
     print(f"    TEMPLATE_CATALOG holds {len(tc.TEMPLATE_CATALOG)} entries. "
           f"grade_full_eval builds Q_TO_ID from")
-    print( "    abstract_question text, which a real chip label may not match verbatim,")
-    print( "    so inject the workbook's own question text for the gold ids to exercise")
-    print( "    chip_ids() -> grade() end to end.")
+    print( "    abstract_question text; the chips below carry that text for the gold ids,")
+    print( "    exercising chip_ids() -> grade() end to end.")
 
-    import openpyxl  # noqa: E402
-    wb = openpyxl.load_workbook(REPO / "AI_Chatbot_Questions.xlsx",
-                                read_only=True, data_only=True)
-    ws = wb["Questions"]
-    hdr = [c.value for c in next(ws.iter_rows(max_row=1))]
-    qtext = {}
-    for row in ws.iter_rows(min_row=2, values_only=True):
-        rec = dict(zip(hdr, row))
-        pq = (rec.get("Parameterized Question") or "").strip()
-        if rec.get("Question ID") and pq:
-            qtext[rec["Question ID"]] = pq
+    # The catalogue file is the source of truth since WP-6 T0; the workbook this
+    # used to read is archived and no tool reads it. A chip label is the
+    # template's own question, which is what a real clarification offers.
+    qtext = {qid: t["abstract_question"].strip()
+             for qid, t in tc.TEMPLATE_CATALOG.items()
+             if (t.get("abstract_question") or "").strip()}
     for qid, text in qtext.items():
         grade_full_eval.Q_TO_ID.setdefault(text.lower(), qid)
 

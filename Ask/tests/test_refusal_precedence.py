@@ -148,7 +148,7 @@ class RefusalRetrievalSurfaceTests(unittest.TestCase):
     vectors on average (abstract question, example question with real values, one
     scope line per tier — D2), while the 13 Dropped rows carried exactly one, and
     that one is mostly the workbook's "a given Scheme in a given GP Name during a
-    given Plan Year" filler. `tools/build_catalog.scope_free_question` adds the
+    given Plan Year" filler. `tools/derive_catalog.scope_free_question` adds the
     missing shape. After: rank 1, rank 12, rank 0.
     """
 
@@ -161,7 +161,7 @@ class RefusalRetrievalSurfaceTests(unittest.TestCase):
                                    "unreachable")
 
     def test_the_scope_free_line_drops_the_place_and_the_period(self):
-        from tools.build_catalog import scope_free_question
+        from tools.derive_catalog import scope_free_question
         self.assertEqual(
             scope_free_question("How many beneficiaries received benefits under "
                                 "a given Scheme in a given GP Name during a "
@@ -171,7 +171,7 @@ class RefusalRetrievalSurfaceTests(unittest.TestCase):
     def test_it_keeps_the_measure_and_the_non_geographic_parameters(self):
         """Only geography and period go. The SCHEME is the subject of BEN-001 and
         removing it would leave a question about nothing."""
-        from tools.build_catalog import scope_free_question
+        from tools.derive_catalog import scope_free_question
         stripped = scope_free_question(
             "Which assets in a given Block have not advanced a stage in the "
             "last a given Threshold days?")
@@ -181,7 +181,7 @@ class RefusalRetrievalSurfaceTests(unittest.TestCase):
     def test_a_question_naming_no_parameter_gets_no_second_line(self):
         """PLN-041 says "over the last five years" in words — there is no second
         shape of it, and inventing one would be padding the index."""
-        from tools.build_catalog import scope_free_question
+        from tools.derive_catalog import scope_free_question
         self.assertIsNone(scope_free_question(
             "Which themes have remained consistently among the top priorities "
             "over the last five years?"))

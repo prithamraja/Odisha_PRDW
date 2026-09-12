@@ -297,7 +297,7 @@ _CONSTANT_ENTITY_TYPES: dict[str, str] = {}
 #
 # KEYED BY ENTITY TYPE, and now the FALLBACK rather than the authority: since
 # D18.P1 the PR&DW catalogue declares the default on the slot itself
-# (`{"optional": True, "default": "10"}`, emitted by tools/build_catalog.py), and
+# (`{"optional": True, "default": "10"}`, emitted by tools/derive_catalog.py), and
 # slot_defaults() below wins over this table. The table stays for templates whose
 # slots carry no declaration — the AP fixtures still in the test suite — and
 # tests/test_param_binding.py asserts the two agree, so they cannot drift.
@@ -580,7 +580,7 @@ def optional_slots(param_slots: list[dict]) -> set[str]:
 def slot_defaults(param_slots: list[dict]) -> dict[str, str]:
     """Slot name -> the value to use when the question did not state one.
 
-    Declared by the catalogue (`tools/build_catalog.py::DEFAULTED_SLOTS`), so
+    Declared by the catalogue (`tools/derive_catalog.py::DEFAULTED_SLOTS`), so
     the generated file is the single source of truth and a future defaulted slot
     needs no runtime edit. Decision D18.P1 puts exactly one slot here: `$top_n`,
     the presentational LIMIT on 91 templates that no officer ever states.

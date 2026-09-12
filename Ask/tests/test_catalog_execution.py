@@ -91,7 +91,7 @@ class CatalogueShapeTests(unittest.TestCase):
         AP name-collision defect transplanted into geography.
         """
         import re
-        from tools.build_catalog import mask_literals
+        from tools.derive_catalog import mask_literals
         offenders = sorted(
             qid for qid, entry in TEMPLATE_CATALOG.items()
             if re.search(r"\w+\.gp_name\s*(?:=|\bIN\b)\s*\(?\s*\$",

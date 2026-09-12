@@ -34,11 +34,11 @@ KEYS
                 the workbook's note names one. Offered as a chip, never
                 substituted silently.
 """
-# ── GENERATED FILE — do not edit by hand ─────────────────────────────────────
-# Built from AI_Chatbot_Questions.xlsx by tools/build_catalog.py.
-# To change a question, a caveat or a SQL string, change the WORKBOOK and
-# regenerate; `python tools/build_catalog.py --check` fails if this file and the
-# workbook have drifted apart.
+# ── EDITING RULES (since WP-6, 2026-09-12) ───────────────────────────────────
+# THIS FILE IS THE SOURCE OF TRUTH, edited by hand; the workbook it was first
+# built from is archived in handoffs/archive/. The paraphrase lines BETWEEN the
+# `# ── derived` markers are rebuilt from each entry's question by
+# `python tools/derive_catalog.py`; everything else here is authored.
 
 
 UNANSWERABLE_CATALOG: dict[str, dict] = {
@@ -53,7 +53,9 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "alternative": 'PLN-010',
         "paraphrases": [
             'Which Blocks consistently experience delays in GPDP approvals in FY 2025-26?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which Blocks consistently experience delays in GPDP approvals?',
+            # ── end derived ──
         ],
     },
 
@@ -67,7 +69,9 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "alternative": 'PLN-022',
         "paraphrases": [
             'Which Districts consistently experience delays in GPDP approvals in FY 2025-26?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which Districts consistently experience delays in GPDP approvals?',
+            # ── end derived ──
         ],
     },
 
@@ -81,6 +85,8 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "alternative": 'PLN-038',
         "paraphrases": [
             'Which themes have remained consistently among the top priorities over the 2022-23 to 2026-27?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
+            # ── end derived ──
         ],
     },
 
@@ -94,6 +100,8 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "alternative": 'PLN-041',
         "paraphrases": [
             'Which themes have remained consistently among the lowest priorities over the 2022-23 to 2026-27?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
+            # ── end derived ──
         ],
     },
 
@@ -106,7 +114,9 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'How many activities in Attabira are delegated to another panchayat tier for execution in 2025-26?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities are delegated to another panchayat tier for execution?',
+            # ── end derived ──
         ],
     },
 
@@ -119,7 +129,9 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'What is the fund allocated under XV Finance Commission at ZP, Block, and GP tiers in Khordha for 2025-26?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the fund allocated under a given Scheme at ZP, Block, and GP tiers?',
+            # ── end derived ──
         ],
     },
 
@@ -132,6 +144,8 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'What are the stage-wise completion dates for asset 509018477?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
+            # ── end derived ──
         ],
     },
 
@@ -144,7 +158,9 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'Which assets in Attabira have not advanced a stage in the last 90 days?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which assets have not advanced a stage in the last a given Threshold days?',
+            # ── end derived ──
         ],
     },
 
@@ -157,6 +173,8 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'Where are the assets under activity 125711758 located, and how many units at each location?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
+            # ── end derived ──
         ],
     },
 
@@ -169,6 +187,8 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'What are the unit count and unit cost of assets created under activity 125711758?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
+            # ── end derived ──
         ],
     },
 
@@ -181,7 +201,9 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'What is the average unit cost of tap connections across Khordha for 2025-26?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the average unit cost of a given Asset Sub Category?',
+            # ── end derived ──
         ],
     },
 
@@ -194,7 +216,9 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'Which overhead tank assets in Khordha have a unit cost more than 50 percent above the district average in FY 2025-26?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which a given Asset Sub Category assets have a unit cost more than a given Threshold percent above the district average?',
+            # ── end derived ──
         ],
     },
 
@@ -207,7 +231,9 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'How many such vehicles have been repaired in FY 2025-26?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many such vehicles have been repaired?',
+            # ── end derived ──
         ],
     },
 
@@ -220,7 +246,9 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'Which suspended activities in Attabira have payment vouchers dated after suspension in FY 2025-26?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which suspended activities have payment vouchers dated after suspension?',
+            # ── end derived ──
         ],
     },
 
@@ -233,7 +261,9 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'Which activities in Begunia have been ongoing longer than their planned duration in FY 2025-26?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities have been ongoing longer than their planned duration?',
+            # ── end derived ──
         ],
     },
 
@@ -246,7 +276,9 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'Which GPs in Khordha have a resource envelope allocation but no uploaded plan for 2025-26?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPs have a resource envelope allocation but no uploaded plan?',
+            # ── end derived ──
         ],
     },
 
@@ -259,7 +291,9 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "source": 'No',
         "paraphrases": [
             'Which GPs in Attabira could reach the next PAI grade with the smallest score improvement, and on which themes are they weakest in FY 2025-26?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPs could reach the next PAI grade with the smallest score improvement, and on which themes are they weakest?',
+            # ── end derived ──
         ],
     },
 
@@ -271,8 +305,10 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many beneficiaries received benefits under a given Scheme?',
             'Kitne beneficiaries ko benefit mila har Scheme?',
+            # ── end derived ──
         ],
     },
 
@@ -284,8 +320,10 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the village-wise count of beneficiaries under a given Scheme?',
             'Village-wise count of beneficiaries har Scheme kya hai?',
+            # ── end derived ──
         ],
     },
 
@@ -297,8 +335,10 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many beneficiaries are recorded across GPs under a given Scheme?',
             'Kitne beneficiaries darj hain GPs me har Scheme?',
+            # ── end derived ──
         ],
     },
 
@@ -310,8 +350,10 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the cash versus kind split of benefits distributed?',
             'Cash versus kind split of benefits distributed kya hai?',
+            # ── end derived ──
         ],
     },
 
@@ -323,8 +365,10 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the total cash benefit quantum distributed under a given Scheme?',
             'Total cash benefit quantum distributed har Scheme kitna hai?',
+            # ── end derived ──
         ],
     },
 
@@ -336,8 +380,10 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many beneficiaries received benefits for each stated purpose?',
             'Kitne beneficiaries ko benefit mila har stated purpose?',
+            # ── end derived ──
         ],
     },
 
@@ -349,8 +395,10 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which scheme has the most recorded beneficiaries?',
             'Sabse zyada recorded beneficiaries kis scheme me hain?',
+            # ── end derived ──
         ],
     },
 
@@ -362,8 +410,10 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPs have no recorded beneficiaries under a given Scheme?',
             'Kin GPs me koi recorded beneficiaries har Scheme nahi hai?',
+            # ── end derived ──
         ],
     },
 
@@ -375,8 +425,10 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'List the beneficiaries of a given Scheme with village and benefit details.',
             'Beneficiaries ke Scheme ke saath village and benefit details ki list dikhao',
+            # ── end derived ──
         ],
     },
 
@@ -388,8 +440,10 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many beneficiaries are recorded under each pension scheme?',
             'Kitne beneficiaries darj hain har pension scheme?',
+            # ── end derived ──
         ],
     },
 
@@ -401,8 +455,10 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Compare beneficiary counts under a given Scheme between a given Block and a given Block 2.',
             'Beneficiary counts har Scheme ke beech Block and Block 2 compare karo',
+            # ── end derived ──
         ],
     },
 
@@ -414,8 +470,10 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Beneficiary',
         "source": 'Dropped',
         "paraphrases": [
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How has the beneficiary count under a given Scheme changed?',
             'The beneficiary count har Scheme me kya change aaya?',
+            # ── end derived ──
         ],
     },
 
@@ -427,8 +485,10 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         "submodule": 'Data Quality',
         "source": 'Dropped',
         "paraphrases": [
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many beneficiary records are missing the village field?',
             'Kitne beneficiary records are missing the village field hain?',
+            # ── end derived ──
         ],
     },
 }

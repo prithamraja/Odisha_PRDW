@@ -46,7 +46,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 HERE = Path(__file__).resolve().parent
-# THE REPO-SIDE ARTEFACTS (the workbook, eval/gold) live one level up — except
+# THE REPO-SIDE ARTEFACTS (eval/gold) live one level up — except
 # when the backend is being run from a local mirror, which is the documented way
 # to run anything here: DuckDB cannot create temp files inside the Drive folder
 # (bootstrap 6). `PRDW_REPO` points at the real repo in that case, the same
@@ -61,7 +61,6 @@ if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
                                   errors="replace")
 
 PYTHON = sys.executable
-WORKBOOK = REPO / "AI_Chatbot_Questions.xlsx"
 GOLD = REPO / "eval" / "gold"
 
 # The bootstrap's model-risk lesson, quoted where a mismatch will read it.
@@ -151,28 +150,26 @@ def check_suite(args):
 # ── 2. the catalogue executes ────────────────────────────────────────────────
 
 def check_validate_catalog(args):
-    """All 346 templates bind, execute, and agree with the workbook's own row
-    counts. The only check here that touches the database with real SQL."""
+    """Every template binds, executes, and returns the Test Report's row count
+    (`tests/data/workbook_test_report.json`) with any newer slot left absent.
+    The only check here that touches the database with real SQL, and the
+    regression contract that lets the catalogue file be edited by hand."""
     code, out = _run([PYTHON, "validate_catalog.py"], HERE)
     ok = code == 0 and "All clear" in out
     return ok, _tail(out, 2 if ok else 12)
 
 
-# ── 3. the catalogue matches the workbook ────────────────────────────────────
+# ── 3. the derived artefacts match the catalogue ─────────────────────────────
 
 def check_catalog_drift(args):
-    """THE CATALOGUE IS GENERATED. Edit the workbook and regenerate; a
-    hand-edited `template_catalog.py` is a change nothing can reproduce."""
-    if not WORKBOOK.exists():
-        return False, f"workbook not found at {WORKBOOK}"
-    code, out = _run([PYTHON, "tools/build_catalog.py", "--check",
-                      "--workbook", str(WORKBOOK)], HERE)
-    if "No module named 'openpyxl'" in out:
-        return False, ("openpyxl is not installed — it is a BUILD-TIME "
-                       "dependency, deliberately not in requirements.txt. "
-                       "`pip install openpyxl` to run this check.")
-    ok = code == 0 and "in step with the workbook" in out
-    return ok, _tail(out, 1 if ok else 10)
+    """THE CATALOGUE FILE IS THE SOURCE OF TRUTH (WP-6 T0). Its SQL and slots
+    are edited by hand; the derived paraphrase blocks, `grouped_geo` and
+    `rerank_context.py` are rebuilt from them by `tools/derive_catalog.py`.
+    This refuses a hand-edited derived part, and a slot declaration that
+    disagrees with its own SQL — the two edits nothing else would notice."""
+    code, out = _run([PYTHON, "tools/derive_catalog.py", "--check"], HERE)
+    ok = code == 0 and "derived artefacts in step with the catalogue" in out
+    return ok, _tail(out, 1 if ok else 12)
 
 
 # ── 4. the gold set ──────────────────────────────────────────────────────────
@@ -416,8 +413,8 @@ def check_static_invariants(args):
 
 CHECKS = [
     Check(1, "Full test suite, fresh caches", check_suite),
-    Check(2, "Catalogue executes (346 templates, row counts)", check_validate_catalog),
-    Check(3, "Catalogue in step with the workbook", check_catalog_drift),
+    Check(2, "Catalogue executes (Test Report row counts)", check_validate_catalog),
+    Check(3, "Derived artefacts in step with the catalogue", check_catalog_drift),
     Check(4, "Gold set + harness format", check_gold),
     Check(5, "Model identity (config + live model list)", check_model_identity),
     Check(6, "Served-refusal invariant (result is None, never [])", check_served_refusal),
@@ -438,13 +435,12 @@ def main() -> int:
     ap.add_argument("--only", type=int, nargs="*", metavar="N",
                     help="run only these check numbers (for iterating on one)")
     ap.add_argument("--repo", type=Path,
-                    help="the repo holding the workbook and eval/gold, when the "
+                    help="the repo holding eval/gold, when the "
                          "backend is run from a local mirror (or set PRDW_REPO)")
     args = ap.parse_args()
 
     if args.repo:
         globals()["REPO"] = args.repo.resolve()
-        globals()["WORKBOOK"] = REPO / "AI_Chatbot_Questions.xlsx"
         globals()["GOLD"] = REPO / "eval" / "gold"
 
     if args.list:

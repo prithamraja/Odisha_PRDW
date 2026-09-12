@@ -71,8 +71,8 @@ THE VIEWS
 ENTRY KEYS
     abstract_question   the parameterised question, placeholders renamed to slot
                         names so `.format()` works in suggestions.
-    sql_template        the workbook's SQL, verbatim but for the geography
-                        rewrite above.
+    sql_template        the SQL. Imported from the workbook verbatim but for
+                        the geography rewrite above; edited here since WP-6.
     param_slots         [{name, entity_type, optional?, bind?}] in the
                         workbook's bind order. `entity_type` matches
                         entity_validator.PARAM_ENTITY_TYPES (a test asserts it).
@@ -84,16 +84,27 @@ ENTRY KEYS
     paraphrases         extra retrieval surface; see D2 above.
 
 VALIDATION
-    tests/test_catalog_execution.py executes all 346 against the sample database
-    with the workbook's own sample parameters and compares row counts against
-    the Test Report sheet. SQL is deterministic, so any mismatch is a real
+    tests/test_catalog_execution.py executes every template against the sample
+    database with its Test Report sample parameters and compares row counts
+    against tests/data/workbook_test_report.json (carried over from the
+    workbook's Test Report sheet; a new template adds its own line). SQL is deterministic, so any mismatch is a real
     defect rather than replay noise.
 """
-# ── GENERATED FILE — do not edit by hand ─────────────────────────────────────
-# Built from AI_Chatbot_Questions.xlsx by tools/build_catalog.py.
-# To change a question, a caveat or a SQL string, change the WORKBOOK and
-# regenerate; `python tools/build_catalog.py --check` fails if this file and the
-# workbook have drifted apart.
+# ── EDITING RULES (since WP-6, 2026-09-12) ───────────────────────────────────
+# THIS FILE IS THE SOURCE OF TRUTH. SQL, slots, caveats and the hand-written
+# paraphrases (the lines ABOVE each `# ── derived` marker) are edited here — by
+# hand, or by a one-shot script in tools/migrations/ whose diff is reviewed and
+# committed. The workbook this file was first built from is archived in
+# handoffs/archive/ as the record of the 2026-08-13 sign-off.
+#   * The paraphrase lines BETWEEN the `# ── derived` markers, every
+#     `grouped_geo`, and query_router/rerank_context.py are DERIVED from the
+#     SQL and slots: run `python tools/derive_catalog.py` after any edit.
+#     `--check` (gate 3) fails if they drift, or if a slot disagrees with its SQL.
+#   * Every statement, bound with its Test Report sample parameters and any
+#     newer slot left ABSENT, must return the row count recorded in
+#     tests/data/workbook_test_report.json (gate 2). A new template adds its line.
+#   * A filter is optional only through the `($p IS NULL OR …)` idiom (D2), and
+#     a bound value is never interpolated into SQL.
 
 
 TEMPLATE_CATALOG: dict[str, dict] = {
@@ -126,10 +137,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many Gram Panchayats in Khordha have uploaded the GPDP in 2024-2025?',
             'How many Gram panchayats in a block/District have uploaded the GPDP in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many Gram Panchayats in a given district/a given block have uploaded the GPDP in a given year?',
             'How many Gram Panchayats in a given district have uploaded the GPDP in a given year?',
             'How many Gram Panchayats in a given block have uploaded the GPDP in a given year?',
             'How many Gram Panchayats in a given gram panchayat have uploaded the GPDP in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -161,10 +174,12 @@ WHERE v.fiscal_year = $date_range AND v.is_approved = 1
         "paraphrases": [
             'How many GPs in Bhubaneswar block have the GPDP approved in 2024-2025?',
             'How many GPs in a Block/District have the GPDP approved in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many GPs in a given district/a given block have the GPDP approved in a given year?',
             'How many GPs in a given district have the GPDP approved in a given year?',
             'How many GPs in a given block have the GPDP approved in a given year?',
             'How many GPs in a given gram panchayat have the GPDP approved in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -203,8 +218,10 @@ ORDER BY pct_uploaded DESC
         "paraphrases": [
             'What percentage of Gram Panchayats in Bhubaneswar have uploaded their GPDP in 2024-2025?',
             'What percentage of Gram Panchayats in a Block have uploaded their GPDP in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What percentage of Gram Panchayats in a given block have uploaded their GPDP in a given year?',
             'What percentage of Gram Panchayats in a given district have uploaded their GPDP in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -243,8 +260,10 @@ ORDER BY pct_uploaded DESC
         "paraphrases": [
             'What percentage of Gram Panchayats in Khordha have uploaded their GPDP in 2024-2025?',
             'What percentage of Gram Panchayats in a District have uploaded their GPDP in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What percentage of Gram Panchayats in a given district have uploaded their GPDP in a given year?',
             'What percentage of Gram Panchayats in a given block have uploaded their GPDP in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -275,9 +294,11 @@ ORDER BY g.zp_name, g.block_name, g.gp_name
         "answerable": 'Yes',
         "paraphrases": [
             'Which Gram Panchayats have not yet uploaded their GPDP in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which Gram Panchayats have not yet uploaded their GPDP in a given year?',
             'Which Gram Panchayats have not yet uploaded their GPDP in a given year, for a given district?',
             'Which Gram Panchayats have not yet uploaded their GPDP in a given year, for a given block?',
+            # ── end derived ──
         ],
     },
 
@@ -312,8 +333,10 @@ ORDER BY total_gps DESC
         "answerable": 'Partial',
         "paraphrases": [
             'Which Blocks have achieved 100% GPDP submission in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which Blocks have achieved 100% GPDP submission in a given year?',
             'Which Blocks have achieved 100% GPDP submission in a given year, for a given district?',
+            # ── end derived ──
         ],
     },
 
@@ -346,7 +369,9 @@ LIMIT $top_n
         "answerable": 'Partial',
         "paraphrases": [
             'Which Districts have the lowest GPDP submission rate in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which Districts have the lowest GPDP submission rate in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -380,9 +405,11 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many GPs in Bhubaneswar uploaded the GPDP after the deadline 2024-06-30 in 2024-2025?',
             'How many GPs in a block uploaded the GPDP after the deadline in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many GPs in a given block uploaded the GPDP after the deadline a given deadline in a given year?',
             'How many GPs in a given district uploaded the GPDP after the deadline a given deadline in a given year?',
             'How many GPs in a given gram panchayat uploaded the GPDP after the deadline a given deadline in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -416,9 +443,11 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many GPs in Khordha uploaded the GPDP after the deadline 2024-06-30 in 2024-2025?',
             'How many GPs in a District uploaded the GPDP after the deadline in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many GPs in a given district uploaded the GPDP after the deadline a given deadline in a given year?',
             'How many GPs in a given block uploaded the GPDP after the deadline a given deadline in a given year?',
             'How many GPs in a given gram panchayat uploaded the GPDP after the deadline a given deadline in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -455,10 +484,12 @@ ORDER BY days_late DESC
         "paraphrases": [
             'Which GPs in Bhubaneswar uploaded the GPDP after 2024-06-30 in 2024-2025?',
             'Which GPs in a Block/District uploaded the GPDP after the deadline in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPs in a given block/a given district uploaded the GPDP after the deadline a given deadline in a given year?',
             'Which GPs in a given district uploaded the GPDP after the deadline a given deadline in a given year?',
             'Which GPs in a given block uploaded the GPDP after the deadline a given deadline in a given year?',
             'Which GPs in a given gram panchayat uploaded the GPDP after the deadline a given deadline in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -495,10 +526,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many GPs uploaded the GPDP before and after 2024-06-30 in 2024-2025?',
             'How many GPs uploaded the GPDP before the deadline and how many after the deadline in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many GPs uploaded the GPDP before and how many after the deadline a given deadline in a given year?',
             'How many GPs uploaded the GPDP before and how many after the deadline a given deadline in a given year, for a given district?',
             'How many GPs uploaded the GPDP before and how many after the deadline a given deadline in a given year, for a given block?',
             'How many GPs uploaded the GPDP before and how many after the deadline a given deadline in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -534,9 +567,11 @@ ORDER BY v.plan_type
         "paraphrases": [
             'What is the status of the GPDP for Andhrua in 2024-2025?',
             'What is the status of GPDP for a particular panchayat in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the status of the GPDP for a given gram panchayat in a given year?',
             'What is the status of the GPDP for a given district in a given year?',
             'What is the status of the GPDP for a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -568,10 +603,12 @@ WHERE v.fiscal_year = $date_range AND v.is_approved = 1
         "paraphrases": [
             'How many Gram Panchayats in Bhubaneswar have their GPDP approved in 2024-2025?',
             'How many Gram Panchayats in a Block/District have their GPDP approved in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many Gram Panchayats in a given block/a given district have their GPDP approved in a given year?',
             'How many Gram Panchayats in a given district have their GPDP approved in a given year?',
             'How many Gram Panchayats in a given block have their GPDP approved in a given year?',
             'How many Gram Panchayats in a given gram panchayat have their GPDP approved in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -603,10 +640,12 @@ WHERE v.fiscal_year = $date_range AND v.is_approved = 0
         "paraphrases": [
             'How many Gram Panchayats in Bhubaneswar are awaiting GPDP approval in 2024-2025?',
             'How many Gram Panchayats in a Block/District are still awaiting GPDP approval in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many Gram Panchayats in a given block/a given district are still awaiting GPDP approval in a given year?',
             'How many Gram Panchayats in a given district are still awaiting GPDP approval in a given year?',
             'How many Gram Panchayats in a given block are still awaiting GPDP approval in a given year?',
             'How many Gram Panchayats in a given gram panchayat are still awaiting GPDP approval in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -639,8 +678,10 @@ ORDER BY approval_rate_pct DESC
         "answerable": 'Partial',
         "paraphrases": [
             'What is the GPDP approval rate for each Block in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the GPDP approval rate for each Block in a given year?',
             'What is the GPDP approval rate for each Block in a given year, for a given district?',
+            # ── end derived ──
         ],
     },
 
@@ -676,8 +717,10 @@ ORDER BY approval_rate_pct DESC
         "answerable": 'Partial',
         "paraphrases": [
             'What is the GPDP approval rate for each District in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the GPDP approval rate for each District in a given year?',
             'What is the GPDP approval rate for each District in a given year, for a given district?',
+            # ── end derived ──
         ],
     },
 
@@ -708,7 +751,9 @@ ORDER BY total_gps DESC
         "answerable": 'Partial',
         "paraphrases": [
             'Which Districts completed GPDP approval for all GPs in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which Districts have completed GPDP approval for all Gram Panchayats in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -740,7 +785,9 @@ ORDER BY total_gps DESC
         "paraphrases": [
             'Which Blocks completed GPDP approval for all GPs in 2024-2025?',
             'Which block has completed GPDP approval for all Gram Panchayats in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which Blocks have completed GPDP approval for all Gram Panchayats in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -772,10 +819,12 @@ ORDER BY v.district_name, v.block_name, v.gp_name
         "answerable": 'Partial',
         "paraphrases": [
             'Which GPs uploaded the GPDP but await approval in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which Gram Panchayats have uploaded the GPDP but are still awaiting approval in a given year?',
             'Which Gram Panchayats have uploaded the GPDP but are still awaiting approval in a given year, for a given district?',
             'Which Gram Panchayats have uploaded the GPDP but are still awaiting approval in a given year, for a given block?',
             'Which Gram Panchayats have uploaded the GPDP but are still awaiting approval in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -808,8 +857,10 @@ LIMIT $top_n
         "answerable": 'Partial',
         "paraphrases": [
             'Which Blocks have the most pending GPDP approvals in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which Blocks have the highest number of pending GPDP approvals in a given year?',
             'Which Blocks have the highest number of pending GPDP approvals in a given year, for a given district?',
+            # ── end derived ──
         ],
     },
 
@@ -846,8 +897,10 @@ LIMIT $top_n
         "paraphrases": [
             'Which district have the most pending GPDP approvals in 2024-2025?',
             'Which district has the highest number of pending GPDP approvals in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which district have the highest number of pending GPDP approvals in a given year?',
             'Which district have the highest number of pending GPDP approvals in a given year, for a given district?',
+            # ── end derived ──
         ],
     },
 
@@ -882,9 +935,11 @@ ORDER BY planned_activities DESC
         "paraphrases": [
             'How many activities are planned under each GPDP theme in Andhrua in 2024-2025?',
             'How many activities are planned under each of the nine GPDP themes in a Gram Panchayat in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities are planned under each GPDP theme in a given gram panchayat in a given year?',
             'How many activities are planned under each GPDP theme in a given district in a given year?',
             'How many activities are planned under each GPDP theme in a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -921,9 +976,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which GPDP theme has the highest number of planned activities in Andhrua in 2024-2025?',
             'Which GPDP theme has the highest number of planned activities in a Gram Panchayat in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPDP theme has the highest number of planned activities in a given gram panchayat in a given year?',
             'Which GPDP theme has the highest number of planned activities in a given district in a given year?',
             'Which GPDP theme has the highest number of planned activities in a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -960,9 +1017,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which GPDP theme has the lowest number of planned activities in Andhrua in 2024-2025?',
             'Which GPDP theme has the lowest number of planned activities in a Gram Panchayat in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPDP theme has the lowest number of planned activities in a given gram panchayat in a given year?',
             'Which GPDP theme has the lowest number of planned activities in a given district in a given year?',
             'Which GPDP theme has the lowest number of planned activities in a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -999,9 +1058,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which GPDP theme has the highest number of planned activities in Bhubaneswar in 2024-2025?',
             'Which GPDP theme has the highest number of planned activities in a Block in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPDP theme has the highest number of planned activities in a given block in a given year?',
             'Which GPDP theme has the highest number of planned activities in a given district in a given year?',
             'Which GPDP theme has the highest number of planned activities in a given gram panchayat in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -1038,9 +1099,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which GPDP theme has the lowest number of planned activities in Bhubaneswar in 2024-2025?',
             'Which GPDP theme has the lowest number of planned activities in a Block in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPDP theme has the lowest number of planned activities in a given block in a given year?',
             'Which GPDP theme has the lowest number of planned activities in a given district in a given year?',
             'Which GPDP theme has the lowest number of planned activities in a given gram panchayat in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -1077,9 +1140,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which GPDP theme has the highest number of planned activities in Khordha in 2024-2025?',
             'Which GPDP theme has the highest number of planned activities in a District in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPDP theme has the highest number of planned activities in a given district in a given year?',
             'Which GPDP theme has the highest number of planned activities in a given block in a given year?',
             'Which GPDP theme has the highest number of planned activities in a given gram panchayat in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -1116,9 +1181,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which GPDP theme has the lowest number of planned activities in Khordha in 2024-2025?',
             'Which GPDP theme has the lowest number of planned activities in a District in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPDP theme has the lowest number of planned activities in a given district in a given year?',
             'Which GPDP theme has the lowest number of planned activities in a given block in a given year?',
             'Which GPDP theme has the lowest number of planned activities in a given gram panchayat in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -1160,9 +1227,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which GPs planned the most activities under Theme 5 - Clean and Green Village in 2024-2025?',
             'Which Gram Panchayats have planned the highest number of activities under a particular theme in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which Gram Panchayats have planned the highest number of activities under a given LSDG theme in a given year?',
             'Which Gram Panchayats have planned the highest number of activities under a given LSDG theme in a given year, for a given district?',
             'Which Gram Panchayats have planned the highest number of activities under a given LSDG theme in a given year, for a given block?',
+            # ── end derived ──
         ],
     },
 
@@ -1198,9 +1267,11 @@ ORDER BY g.zp_name, g.block_name, g.gp_name
         "paraphrases": [
             'Which GPs planned nothing under Theme 5 - Clean and Green Village in 2024-2025?',
             'Which Gram Panchayats have not planned any activities under a particular theme in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which Gram Panchayats have not planned any activities under a given LSDG theme in a given year?',
             'Which Gram Panchayats have not planned any activities under a given LSDG theme in a given year, for a given district?',
             'Which Gram Panchayats have not planned any activities under a given LSDG theme in a given year, for a given block?',
+            # ── end derived ──
         ],
     },
 
@@ -1233,8 +1304,10 @@ ORDER BY planned_activities DESC
         "answerable": 'Partial',
         "paraphrases": [
             'Which GP leads on each GPDP theme in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GP has the highest number of planned activities under each GPDP theme in a given year?',
             'Which GP has the highest number of planned activities under each GPDP theme in a given year, for a given district?',
+            # ── end derived ──
         ],
     },
 
@@ -1267,8 +1340,10 @@ ORDER BY planned_activities DESC
         "answerable": 'Partial',
         "paraphrases": [
             'Which Block leads on each GPDP theme in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which Block has the highest number of planned activities under each GPDP theme in a given year?',
             'Which Block has the highest number of planned activities under each GPDP theme in a given year, for a given district?',
+            # ── end derived ──
         ],
     },
 
@@ -1301,8 +1376,10 @@ ORDER BY planned_activities DESC
         "answerable": 'Partial',
         "paraphrases": [
             'Which District leads on each GPDP theme in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which District has the highest number of planned activities under each GPDP theme in a given year?',
             'Which District has the highest number of planned activities under each GPDP theme in a given year, for a given district?',
+            # ── end derived ──
         ],
     },
 
@@ -1337,7 +1414,9 @@ LIMIT $top_n
         "paraphrases": [
             'Which theme receives the greatest planning attention across Khordha in 2024-2025?',
             'Which theme receives the greatest planning attention across the District in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which theme receives the greatest planning attention across a given district in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -1372,7 +1451,9 @@ LIMIT $top_n
         "paraphrases": [
             'Which theme receives the least planning attention across Khordha in 2024-2025?',
             'Which theme receives the least planning attention across the District in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which theme receives the least planning attention across a given district in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -1406,9 +1487,11 @@ ORDER BY v.theme, v.fiscal_year
         "answerable": 'Yes',
         "paraphrases": [
             'How has the number of planned activities per theme changed year on year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How has the number of planned activities under each theme changed over the last five years, for a given district?',
             'How has the number of planned activities under each theme changed over the last five years, for a given block?',
             'How has the number of planned activities under each theme changed over the last five years, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -1449,10 +1532,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which themes showed the greatest increase between 2023-2024 and 2024-2025?',
             'Which themes have shown the greatest increase in planned activities in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which themes have shown the greatest increase in planned activities between a second year and a given year?',
             'Which themes have shown the greatest increase in planned activities between a second year and a given year, for a given district?',
             'Which themes have shown the greatest increase in planned activities between a second year and a given year, for a given block?',
             'Which themes have shown the greatest increase in planned activities between a second year and a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -1493,10 +1578,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which themes showed the greatest decline between 2023-2024 and 2024-2025?',
             'Which themes have shown the greatest decline in planned activities in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which themes have shown the greatest decline in planned activities between a second year and a given year?',
             'Which themes have shown the greatest decline in planned activities between a second year and a given year, for a given district?',
             'Which themes have shown the greatest decline in planned activities between a second year and a given year, for a given block?',
             'Which themes have shown the greatest decline in planned activities between a second year and a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -1531,10 +1618,12 @@ ORDER BY 1
         "answerable": 'Partial',
         "paraphrases": [
             'Which GPDP themes have no planned activities in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPDP themes have no planned activities in a given year?',
             'Which GPDP themes have no planned activities in a given year, for a given district?',
             'Which GPDP themes have no planned activities in a given year, for a given block?',
             'Which GPDP themes have no planned activities in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -1572,10 +1661,12 @@ ORDER BY pct_share DESC
         "paraphrases": [
             'Are planned activities balanced across themes in Bhubaneswar in 2024-2025?',
             'Are the planned activities balanced across themes in a GP/Block in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Are the planned activities balanced across themes in a given gram panchayat/a given block in a given year?',
             'Are the planned activities balanced across themes in a given district in a given year?',
             'Are the planned activities balanced across themes in a given block in a given year?',
             'Are the planned activities balanced across themes in a given gram panchayat in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -1610,10 +1701,12 @@ ORDER BY planned_activities ASC
         "paraphrases": [
             'Which GPDP themes have fewer than 50 planned activities in 2024-2025?',
             'Which GPDP themes have fewer than a specified number of planned activities in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPDP themes have fewer than a given threshold planned activities in a given year?',
             'Which GPDP themes have fewer than a given threshold planned activities in a given year, for a given district?',
             'Which GPDP themes have fewer than a given threshold planned activities in a given year, for a given block?',
             'Which GPDP themes have fewer than a given threshold planned activities in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -1653,9 +1746,11 @@ ORDER BY years_in_bottom_3 DESC, avg_activities_per_year ASC
         "answerable": 'Partial',
         "paraphrases": [
             'Which themes rank lowest on planned activities in every year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which themes consistently receive low planning attention across multiple years, for a given district?',
             'Which themes consistently receive low planning attention across multiple years, for a given block?',
             'Which themes consistently receive low planning attention across multiple years, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -1693,10 +1788,12 @@ ORDER BY planned_activities ASC, pct_completed ASC
         "answerable": 'Partial',
         "paraphrases": [
             'Which themes need more planning attention after 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which themes require greater planning attention in the next GPDP cycle in a given year?',
             'Which themes require greater planning attention in the next GPDP cycle in a given year, for a given district?',
             'Which themes require greater planning attention in the next GPDP cycle in a given year, for a given block?',
             'Which themes require greater planning attention in the next GPDP cycle in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -1731,9 +1828,11 @@ GROUP BY 1
         "paraphrases": [
             'How many activities are planned under Sanitation in Andhrua in 2024-2025?',
             'How many activities are planned under a particular focus area in a particular Gram Panchayat in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities are planned under a given focus area in a given gram panchayat in a given year?',
             'How many activities are planned under a given focus area in a given district in a given year?',
             'How many activities are planned under a given focus area in a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -1767,9 +1866,11 @@ ORDER BY planned_activities DESC
         "paraphrases": [
             'How many activities are planned under each focus area in Andhrua in 2024-2025?',
             'How many activities are planned under each focus area in a Gram Panchayat in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities are planned under each focus area in a given gram panchayat in a given year?',
             'How many activities are planned under each focus area in a given district in a given year?',
             'How many activities are planned under each focus area in a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -1803,9 +1904,11 @@ ORDER BY planned_activities DESC
         "paraphrases": [
             'How many activities are planned under each focus area in Bhubaneswar in 2024-2025?',
             'How many total activities are planned under each focus area in a block in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities are planned under each focus area in a given block in a given year?',
             'How many activities are planned under each focus area in a given district in a given year?',
             'How many activities are planned under each focus area in a given gram panchayat in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -1842,10 +1945,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which focus area has the highest number of planned activities in 2024-2025?',
             'Which focus area has the highest number of planned activities in the selected year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus area has the highest number of planned activities in a given year?',
             'Which focus area has the highest number of planned activities in a given year, for a given district?',
             'Which focus area has the highest number of planned activities in a given year, for a given block?',
             'Which focus area has the highest number of planned activities in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -1882,10 +1987,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which focus area has the lowest number of planned activities in 2024-2025?',
             'Which focus area has the lowest number of planned activities in the selected year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus area has the lowest number of planned activities in a given year?',
             'Which focus area has the lowest number of planned activities in a given year, for a given district?',
             'Which focus area has the lowest number of planned activities in a given year, for a given block?',
             'Which focus area has the lowest number of planned activities in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -1922,9 +2029,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which focus area has the highest number of planned activities in 2024-2025?',
             'Which focus area has the highest number of planned activities in a Block in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus area has the highest number of planned activities in a given block in a given year?',
             'Which focus area has the highest number of planned activities in a given district in a given year?',
             'Which focus area has the highest number of planned activities in a given gram panchayat in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -1961,9 +2070,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which focus area has the lowest number of planned activities in 2024-2025?',
             'Which focus area has the lowest number of planned activities in a Block in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus area has the lowest number of planned activities in a given block in a given year?',
             'Which focus area has the lowest number of planned activities in a given district in a given year?',
             'Which focus area has the lowest number of planned activities in a given gram panchayat in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -2000,9 +2111,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which focus area has the highest number of planned activities in 2024-2025?',
             'Which focus area has the highest number of planned activities in a District in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus area has the highest number of planned activities in a given district in a given year?',
             'Which focus area has the highest number of planned activities in a given block in a given year?',
             'Which focus area has the highest number of planned activities in a given gram panchayat in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -2039,9 +2152,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which focus area has the lowest number of planned activities in 2024-2025?',
             'Which focus area has the lowest number of planned activities in a District in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus area has the lowest number of planned activities in a given district in a given year?',
             'Which focus area has the lowest number of planned activities in a given block in a given year?',
             'Which focus area has the lowest number of planned activities in a given gram panchayat in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -2079,10 +2194,12 @@ LIMIT $top_n
         "paraphrases": [
             'What activities are planned under Sanitation in 2024-2025?',
             'What activities are planned under a particular focus area in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What activities are planned under a given focus area in a given year?',
             'What activities are planned under a given focus area in a given year, for a given district?',
             'What activities are planned under a given focus area in a given year, for a given block?',
             'What activities are planned under a given focus area in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -2117,9 +2234,11 @@ ORDER BY g.zp_name, g.block_name, g.gp_name
         "paraphrases": [
             'Which GPs planned nothing under Sanitation in 2024-2025?',
             'Which Gram Panchayats have not planned any activities under a particular focus area in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which Gram Panchayats have not planned any activities under a given focus area in a given year?',
             'Which Gram Panchayats have not planned any activities under a given focus area in a given year, for a given district?',
             'Which Gram Panchayats have not planned any activities under a given focus area in a given year, for a given block?',
+            # ── end derived ──
         ],
     },
 
@@ -2151,9 +2270,11 @@ ORDER BY v.focus_area_name, planned_activities DESC
         "answerable": 'Yes',
         "paraphrases": [
             'How do focus-area activity counts compare across GPs in Bhubaneswar in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How does the number of planned activities under each focus area compare across Gram Panchayats in a Block in a given year?',
             'How does the number of planned activities under each focus area compare across Gram Panchayats in a Block in a given year, for a given block?',
             'How does the number of planned activities under each focus area compare across Gram Panchayats in a Block in a given year, for a given district?',
+            # ── end derived ──
         ],
     },
 
@@ -2188,9 +2309,11 @@ ORDER BY v.focus_area_name, planned_activities DESC
         "answerable": 'Yes',
         "paraphrases": [
             'How do focus-area activity counts compare across blocks in Khordha in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How does the number of planned activities under each focus area compare across Blocks in a District in a given year?',
             'How does the number of planned activities under each focus area compare across Blocks in a District in a given year, for a given block?',
             'How does the number of planned activities under each focus area compare across Blocks in a District in a given year, for a given district?',
+            # ── end derived ──
         ],
     },
 
@@ -2223,7 +2346,9 @@ LIMIT $top_n
         "paraphrases": [
             'Which focus area gets the highest planning attention in Khordha in 2024-2025?',
             'Which focus area receives the highest planning attention across the District in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus area receives the highest planning attention across a given district in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -2256,7 +2381,9 @@ LIMIT $top_n
         "paraphrases": [
             'Which focus area gets the lowest planning attention in Khordha in 2024-2025?',
             'Which focus area receives the lowest planning attention across the District in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus area receives the lowest planning attention across a given district in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -2295,9 +2422,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which focus areas take the largest share in Andhrua in 2024-2025?',
             'Which focus areas account for the largest share of planned activities in a Gram Panchayat in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus areas account for the largest share of planned activities in a given gram panchayat in a given year?',
             'Which focus areas account for the largest share of planned activities in a given district in a given year?',
             'Which focus areas account for the largest share of planned activities in a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -2336,9 +2465,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which focus areas take the smallest share in Andhrua in 2024-2025?',
             'Which focus areas account for the smallest share of planned activities in a Gram Panchayat in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus areas account for the smallest share of planned activities in a given gram panchayat in a given year?',
             'Which focus areas account for the smallest share of planned activities in a given district in a given year?',
             'Which focus areas account for the smallest share of planned activities in a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -2378,9 +2509,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which activity names recur across the most years?',
             'Which type of activities are repeatedly planned across years in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which types of activity are repeatedly planned across years, for a given district?',
             'Which types of activity are repeatedly planned across years, for a given block?',
             'Which types of activity are repeatedly planned across years, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -2416,10 +2549,12 @@ ORDER BY 1
         "answerable": 'Yes',
         "paraphrases": [
             'Which focus areas have no planned activities in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus areas have no planned activities in a given year?',
             'Which focus areas have no planned activities in a given year, for a given district?',
             'Which focus areas have no planned activities in a given year, for a given block?',
             'Which focus areas have no planned activities in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -2454,10 +2589,12 @@ ORDER BY planned_activities ASC
         "paraphrases": [
             'Which focus areas have fewer than 50 planned activities in 2024-2025?',
             'Which focus areas have fewer than a specified number of planned activities in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus areas have fewer than a given threshold planned activities in a given year?',
             'Which focus areas have fewer than a given threshold planned activities in a given year, for a given district?',
             'Which focus areas have fewer than a given threshold planned activities in a given year, for a given block?',
             'Which focus areas have fewer than a given threshold planned activities in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -2491,9 +2628,11 @@ ORDER BY years_present DESC, total_activities DESC
         "answerable": 'Yes',
         "paraphrases": [
             "Which focus areas appear in every year's GPDP?",
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus areas are repeatedly included in the GPDP across multiple years, for a given district?',
             'Which focus areas are repeatedly included in the GPDP across multiple years, for a given block?',
             'Which focus areas are repeatedly included in the GPDP across multiple years, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -2532,10 +2671,12 @@ ORDER BY planned_activities ASC, pct_completed ASC
         "paraphrases": [
             'Which focus areas need more attention after 2024-2025?',
             'Which focus areas require greater planning attention in the next GPDP cycle in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus areas require greater planning attention in the next GPDP cycle after a given year?',
             'Which focus areas require greater planning attention in the next GPDP cycle after a given year, for a given district?',
             'Which focus areas require greater planning attention in the next GPDP cycle after a given year, for a given block?',
             'Which focus areas require greater planning attention in the next GPDP cycle after a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -2571,10 +2712,12 @@ ORDER BY pct_share DESC
         "answerable": 'Partial',
         "paraphrases": [
             'Are planned activities balanced across themes in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Are the planned activities balanced across themes in a given year?',
             'Are the planned activities balanced across themes in a given year, for a given district?',
             'Are the planned activities balanced across themes in a given year, for a given block?',
             'Are the planned activities balanced across themes in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -2615,10 +2758,12 @@ ORDER BY low_cost_activities DESC
         "paraphrases": [
             'How many activities below Rs 1000 are planned theme-wise in 2024-2025?',
             'How many low-cost activities (below Rs. 1000) are registered theme-wise in the state plan for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many low-cost activities (below a given threshold rupees) are planned theme-wise in a given year?',
             'How many low-cost activities (below a given threshold rupees) are planned theme-wise in a given year, for a given district?',
             'How many low-cost activities (below a given threshold rupees) are planned theme-wise in a given year, for a given block?',
             'How many low-cost activities (below a given threshold rupees) are planned theme-wise in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -2657,9 +2802,11 @@ ORDER BY activities DESC
         "paraphrases": [
             'What is the cost-band split of activities in Khordha for 2024-2025?',
             'What is the cost-band split (below 500, 500-1000, above 1000) of activities in a given District for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the cost-band split (below 500, 500-1000, above 1000) of activities in a given district for a given year?',
             'What is the cost-band split (below 500, 500-1000, above 1000) of activities in a given block for a given year?',
             'What is the cost-band split (below 500, 500-1000, above 1000) of activities in a given gram panchayat for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -2696,9 +2843,11 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many no-cost activities are planned in Bhubaneswar for 2024-2025?',
             'How many no-cost or flagship activities are planned in a given Block for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many no-cost activities are planned in a given block for a given year?',
             'How many no-cost activities are planned in a given district for a given year?',
             'How many no-cost activities are planned in a given gram panchayat for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -2742,9 +2891,11 @@ ORDER BY pct_low_cost DESC
         "paraphrases": [
             "What share of Andhrua's planned activities are below Rs 1000 in 2024-2025?",
             'What share of planned activities in a given GP Name are low-cost activities in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What share of planned activities in a given gram panchayat are low-cost (below a given threshold) in a given year?',
             'What share of planned activities in a given district are low-cost (below a given threshold) in a given year?',
             'What share of planned activities in a given block are low-cost (below a given threshold) in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -2781,9 +2932,11 @@ ORDER BY v.plan_type
         "paraphrases": [
             'What is the status of the 2024-2025 plan of Andhrua?',
             'What is the status of the a given Plan Year plan of a given GP Name?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the status of the a given year plan of a given gram panchayat?',
             'What is the status of the a given year plan of a given district?',
             'What is the status of the a given year plan of a given block?',
+            # ── end derived ──
         ],
     },
 
@@ -2825,9 +2978,11 @@ ORDER BY 1
         "paraphrases": [
             'Does Andhrua have a supplementary plan for 2024-2025?',
             'Does a given GP Name have a supplementary plan in addition to the main plan for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Does a given gram panchayat have a supplementary plan in addition to the main plan for a given year?',
             'Does a given district have a supplementary plan in addition to the main plan for a given year?',
             'Does a given block have a supplementary plan in addition to the main plan for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -2860,9 +3015,11 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many GPs in Bhubaneswar uploaded supplementary plans for 2024-2025?',
             'How many GPs in a given Block uploaded supplementary plans for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many GPs in a given block uploaded supplementary plans for a given year?',
             'How many GPs in a given district uploaded supplementary plans for a given year?',
             'How many GPs in a given gram panchayat uploaded supplementary plans for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -2899,9 +3056,11 @@ ORDER BY activities DESC
         "paraphrases": [
             'How many fresh vs maintenance activities does Andhrua have in 2024-2025?',
             'How many fresh and how many maintenance activities does a given GP Name have in a given Financial Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many fresh and how many maintenance activities does a given gram panchayat have in a given year?',
             'How many fresh and how many maintenance activities does a given district have in a given year?',
             'How many fresh and how many maintenance activities does a given block have in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -2939,9 +3098,11 @@ ORDER BY actual_expenditure DESC
         "paraphrases": [
             'What is the fresh vs maintenance expenditure in Bhubaneswar for 2024-2025?',
             'What is the expenditure on fresh versus maintenance activities in a given Block for a given Financial Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the expenditure on fresh versus maintenance activities in a given block for a given year?',
             'What is the expenditure on fresh versus maintenance activities in a given district for a given year?',
             'What is the expenditure on fresh versus maintenance activities in a given gram panchayat for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -2975,9 +3136,11 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             "What share of Khordha's expenditure went to maintenance in 2024-2025?",
             'What share of total expenditure in a given District went to maintenance activities in a given Financial Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What share of total expenditure in a given district went to maintenance activities in a given year?',
             'What share of total expenditure in a given block went to maintenance activities in a given year?',
             'What share of total expenditure in a given gram panchayat went to maintenance activities in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -3016,9 +3179,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which asset sub-categories see the most maintenance in Khordha in 2024-2025?',
             'Which asset sub-categories have the highest number of maintenance activities in a given District in a given Financial Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which asset sub-categories have the highest number of maintenance activities in a given district in a given year?',
             'Which asset sub-categories have the highest number of maintenance activities in a given block in a given year?',
             'Which asset sub-categories have the highest number of maintenance activities in a given gram panchayat in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -3060,9 +3225,11 @@ ORDER BY maintenance_exp DESC
         "paraphrases": [
             'Which GPs in Bhubaneswar spend more on maintenance than fresh in 2024-2025?',
             'Which GPs in a given Block spend more on maintenance than on fresh assets in a given Financial Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPs in a given block spend more on maintenance than on fresh assets in a given year?',
             'Which GPs in a given district spend more on maintenance than on fresh assets in a given year?',
             'Which GPs in a given gram panchayat spend more on maintenance than on fresh assets in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -3099,9 +3266,11 @@ ORDER BY 1
         "paraphrases": [
             'How has maintenance expenditure in Bhubaneswar changed year on year?',
             'How has maintenance expenditure in a given Block changed over a given Date Range?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How has maintenance expenditure in a given block changed over the years?',
             'How has maintenance expenditure in a given district changed over the years?',
             'How has maintenance expenditure in a given gram panchayat changed over the years?',
+            # ── end derived ──
         ],
     },
 
@@ -3139,9 +3308,11 @@ ORDER BY v.asset_category_label, expenditure DESC
         "paraphrases": [
             'What is the fresh vs maintenance split for a given asset category in Khordha in 2024-2025?',
             'What is the fresh versus maintenance split for a given Asset Category activities in a given District in a given Financial Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the fresh versus maintenance split for a given asset category activities in a given district in a given year?',
             'What is the fresh versus maintenance split for a given asset category activities in a given block in a given year?',
             'What is the fresh versus maintenance split for a given asset category activities in a given gram panchayat in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -3181,9 +3352,11 @@ ORDER BY years_with_maintenance DESC, total_maintenance_expenditure DESC
         "paraphrases": [
             'Which assets in Andhrua saw maintenance in more than one year?',
             'Which assets in a given GP Name have had maintenance activities in more than one of the last three years?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which assets in a given gram panchayat have had maintenance activities in more than one year?',
             'Which assets in a given district have had maintenance activities in more than one year?',
             'Which assets in a given block have had maintenance activities in more than one year?',
+            # ── end derived ──
         ],
     },
 
@@ -3224,9 +3397,11 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How much Bhubaneswar funding is earmarked for SC/ST in 2024-2025?',
             'How much of the planned activity funding in a given Block is earmarked for SC and ST categories in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How much of the sanctioned funding in a given block is earmarked for SC and ST categories in a given year?',
             'How much of the sanctioned funding in a given district is earmarked for SC and ST categories in a given year?',
             'How much of the sanctioned funding in a given gram panchayat is earmarked for SC and ST categories in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -3267,9 +3442,11 @@ GROUP BY 1,2
         "paraphrases": [
             "How does Andhrua's SC-category funding compare with its total in 2024-2025?",
             'Does the SC-category planned funding of a given GP Name match its SC-category envelope allocation for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How does the SC-category funding of a given gram panchayat compare with its total for a given year?',
             'How does the SC-category funding of a given district compare with its total for a given year?',
             'How does the SC-category funding of a given block compare with its total for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -3313,9 +3490,11 @@ ORDER BY total_sanctioned DESC
         "paraphrases": [
             'Which Bhubaneswar GPs sanctioned nothing for SC/ST in 2024-2025?',
             'Which GPs in a given Block have an SC or ST envelope allocation but no SC/ST-earmarked activities in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPs in a given block have sanctioned activities but no SC/ST earmark in a given year?',
             'Which GPs in a given district have sanctioned activities but no SC/ST earmark in a given year?',
             'Which GPs in a given gram panchayat have sanctioned activities but no SC/ST earmark in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -3356,9 +3535,11 @@ ORDER BY distinct_schemes DESC, total_expenditure DESC
         "paraphrases": [
             'Which activities in Andhrua draw on more than one scheme in 2024-2025?',
             'Which activities in a given GP Name are funded from more than one scheme in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities in a given gram panchayat are funded from more than one scheme in a given year?',
             'Which activities in a given district are funded from more than one scheme in a given year?',
             'Which activities in a given block are funded from more than one scheme in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -3396,9 +3577,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which scheme funds the most activities in Bhubaneswar in 2024-2025?',
             'Which scheme funds the largest number of activities in a given Block in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which scheme funds the largest number of activities in a given block in a given year?',
             'Which scheme funds the largest number of activities in a given district in a given year?',
             'Which scheme funds the largest number of activities in a given gram panchayat in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -3437,9 +3620,11 @@ ORDER BY expenditure DESC
         "paraphrases": [
             'What is the total per scheme across Khordha in 2024-2025?',
             'What is the total fund allocated per scheme across a given District in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the total amount recorded per scheme across a given district in a given year?',
             'What is the total amount recorded per scheme across a given block in a given year?',
             'What is the total amount recorded per scheme across a given gram panchayat in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -3478,9 +3663,11 @@ ORDER BY sanctioned_amount DESC
         "paraphrases": [
             "What is Andhrua's tied vs untied split in 2024-2025?",
             'What is the split of tied and untied funds allocated to activities of a given GP Name in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the split of tied and untied funds sanctioned to activities of a given gram panchayat in a given year?',
             'What is the split of tied and untied funds sanctioned to activities of a given district in a given year?',
             'What is the split of tied and untied funds sanctioned to activities of a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -3523,9 +3710,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which focus areas absorb the most tied funding in Bhubaneswar in 2024-2025?',
             'Which focus areas consume the largest share of tied funds in a given Block in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus areas consume the largest share of tied funds in a given block in a given year?',
             'Which focus areas consume the largest share of tied funds in a given district in a given year?',
             'Which focus areas consume the largest share of tied funds in a given gram panchayat in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -3562,9 +3751,11 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many Andhrua activities are wholly untied-funded in 2024-2025?',
             'How many activities in a given GP Name are funded entirely from untied funds in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities in a given gram panchayat are funded entirely from untied funds in a given year?',
             'How many activities in a given district are funded entirely from untied funds in a given year?',
             'How many activities in a given block are funded entirely from untied funds in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -3602,9 +3793,11 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             "What share of Khordha's sanctioned funds is tied in 2024-2025?",
             'What percentage of total planned funds in a given District is tied in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What percentage of sanctioned funds in a given district is tied in a given year?',
             'What percentage of sanctioned funds in a given block is tied in a given year?',
             'What percentage of sanctioned funds in a given gram panchayat is tied in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -3646,9 +3839,11 @@ GROUP BY 1,2,3
         "paraphrases": [
             'How much total funding is recorded for Andhrua in 2024-2025?',
             'How much total funding is available to the Gram Panchayat for the financial year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How much total funding is recorded for a given gram panchayat in a given year?',
             'How much total funding is recorded for a given district in a given year?',
             'How much total funding is recorded for a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -3686,10 +3881,12 @@ ORDER BY amount DESC
         "paraphrases": [
             'How much funding came from each source in 2024-2025?',
             'How much funding is available from each funding source (CFC, SFC, Own Funds, MGNREGS, etc.) in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How much funding is recorded from each funding source in a given year?',
             'How much funding is recorded from each funding source in a given year, for a given district?',
             'How much funding is recorded from each funding source in a given year, for a given block?',
             'How much funding is recorded from each funding source in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -3729,10 +3926,12 @@ ORDER BY sanctioned_amount DESC
         "paraphrases": [
             'How much was sanctioned as tied vs untied in 2024-2025?',
             'How much funding is available under Tied and Untied Funds in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How much funding is sanctioned under tied and untied components in a given year?',
             'How much funding is sanctioned under tied and untied components in a given year, for a given district?',
             'How much funding is sanctioned under tied and untied components in a given year, for a given block?',
             'How much funding is sanctioned under tied and untied components in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -3769,10 +3968,12 @@ ORDER BY pct_of_total DESC
         "paraphrases": [
             'What share came from each funding source in 2024-2025?',
             'What percentage of the total budget comes from each funding source in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What percentage of the total comes from each funding source in a given year?',
             'What percentage of the total comes from each funding source in a given year, for a given district?',
             'What percentage of the total comes from each funding source in a given year, for a given block?',
             'What percentage of the total comes from each funding source in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -3810,10 +4011,12 @@ ORDER BY pct_of_sanctioned DESC
         "paraphrases": [
             'What is the tied/untied share of the sanctioned budget in 2024-2025?',
             'What percentage of the total budget is tied and untied in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What percentage of the sanctioned budget is tied and untied in a given year?',
             'What percentage of the sanctioned budget is tied and untied in a given year, for a given district?',
             'What percentage of the sanctioned budget is tied and untied in a given year, for a given block?',
             'What percentage of the sanctioned budget is tied and untied in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -3850,10 +4053,12 @@ ORDER BY planned_cost DESC
         "answerable": 'Partial',
         "paraphrases": [
             'How much planned expenditure goes to each GPDP theme in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How much planned expenditure is allocated to each GPDP theme in a given year?',
             'How much planned expenditure is allocated to each GPDP theme in a given year, for a given district?',
             'How much planned expenditure is allocated to each GPDP theme in a given year, for a given block?',
             'How much planned expenditure is allocated to each GPDP theme in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -3891,10 +4096,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which GPDP theme has the highest planned expenditure in 2024-2025?',
             'Which GPDP theme has the highest planned expenditure in a GP in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPDP theme has the highest planned expenditure in a given year?',
             'Which GPDP theme has the highest planned expenditure in a given year, for a given district?',
             'Which GPDP theme has the highest planned expenditure in a given year, for a given block?',
             'Which GPDP theme has the highest planned expenditure in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -3931,10 +4138,12 @@ LIMIT $top_n
         "answerable": 'Partial',
         "paraphrases": [
             'Which GPDP theme has the lowest planned expenditure in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPDP theme has the lowest planned expenditure in a given year?',
             'Which GPDP theme has the lowest planned expenditure in a given year, for a given district?',
             'Which GPDP theme has the lowest planned expenditure in a given year, for a given block?',
             'Which GPDP theme has the lowest planned expenditure in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -3970,10 +4179,12 @@ ORDER BY pct_of_planned_cost DESC
         "answerable": 'Partial',
         "paraphrases": [
             'What share of planned expenditure goes to each theme in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What percentage of total planned expenditure is allocated to each GPDP theme in a given year?',
             'What percentage of total planned expenditure is allocated to each GPDP theme in a given year, for a given district?',
             'What percentage of total planned expenditure is allocated to each GPDP theme in a given year, for a given block?',
             'What percentage of total planned expenditure is allocated to each GPDP theme in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -4013,10 +4224,12 @@ ORDER BY cost_per_activity DESC
         "paraphrases": [
             'Which themes show high planned expenditure but relatively few activities in 2024-2025?',
             'Which GPDP themes receive high planned expenditure but relatively few activities in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPDP themes have high planned expenditure but relatively few activities in a given year?',
             'Which GPDP themes have high planned expenditure but relatively few activities in a given year, for a given district?',
             'Which GPDP themes have high planned expenditure but relatively few activities in a given year, for a given block?',
             'Which GPDP themes have high planned expenditure but relatively few activities in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -4056,10 +4269,12 @@ ORDER BY cost_per_activity ASC
         "paraphrases": [
             'Which themes show many activities but relatively low planned expenditure in 2024-2025?',
             'Which GPDP themes receive many activities but relatively low planned expenditure in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPDP themes have many activities but relatively low planned expenditure in a given year?',
             'Which GPDP themes have many activities but relatively low planned expenditure in a given year, for a given district?',
             'Which GPDP themes have many activities but relatively low planned expenditure in a given year, for a given block?',
             'Which GPDP themes have many activities but relatively low planned expenditure in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -4094,10 +4309,12 @@ ORDER BY activities DESC
         "answerable": 'Partial',
         "paraphrases": [
             'Which themes have no planned expenditure in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPDP themes have no planned expenditure in a given year?',
             'Which GPDP themes have no planned expenditure in a given year, for a given district?',
             'Which GPDP themes have no planned expenditure in a given year, for a given block?',
             'Which GPDP themes have no planned expenditure in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -4135,9 +4352,11 @@ ORDER BY planned_cost DESC
         "paraphrases": [
             'How much planned expenditure goes to each GPDP theme in 2024-2025?',
             'How much expenditure is planned under each theme for a GP in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How much expenditure is planned under each theme for a given gram panchayat in a given year?',
             'How much expenditure is planned under each theme for a given district in a given year?',
             'How much expenditure is planned under each theme for a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -4173,9 +4392,11 @@ ORDER BY v.theme, v.fiscal_year
         "paraphrases": [
             'How has planned expenditure per theme changed year on year?',
             'How much expenditure is planned under each theme for a GP over the years?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How has planned expenditure under each GPDP theme changed over the years, for a given district?',
             'How has planned expenditure under each GPDP theme changed over the years, for a given block?',
             'How has planned expenditure under each GPDP theme changed over the years, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -4211,9 +4432,11 @@ ORDER BY v.theme, v.fiscal_year
         "paraphrases": [
             'How has planned expenditure per theme changed year on year?',
             'How has planned expenditure under each GPDP theme changed over the last five years?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How has planned expenditure under each GPDP theme changed over the years, for a given district?',
             'How has planned expenditure under each GPDP theme changed over the years, for a given block?',
             'How has planned expenditure under each GPDP theme changed over the years, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -4248,10 +4471,12 @@ ORDER BY planned_cost DESC
         "answerable": 'Yes',
         "paraphrases": [
             'How much planned expenditure goes to each focus area in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How much planned expenditure is allocated to each focus area in a given year?',
             'How much planned expenditure is allocated to each focus area in a given year, for a given district?',
             'How much planned expenditure is allocated to each focus area in a given year, for a given block?',
             'How much planned expenditure is allocated to each focus area in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -4289,10 +4514,12 @@ ORDER BY activities_with_planned_cost DESC
         "paraphrases": [
             'How many Sanitation activities have a planned cost above zero in 2024-2025?',
             'How many activities under a focus area with planned expenditure more than 0 in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities under a given focus area have planned expenditure greater than zero in a given year?',
             'How many activities under a given focus area have planned expenditure greater than zero in a given year, for a given district?',
             'How many activities under a given focus area have planned expenditure greater than zero in a given year, for a given block?',
             'How many activities under a given focus area have planned expenditure greater than zero in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -4330,10 +4557,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which Sanitation activities have with expenditure in 2024-2025?',
             'What are the different activities with expenditure under a focus area in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What are the activities with expenditure under a given focus area in a given year?',
             'What are the activities with expenditure under a given focus area in a given year, for a given district?',
             'What are the activities with expenditure under a given focus area in a given year, for a given block?',
             'What are the activities with expenditure under a given focus area in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -4371,10 +4600,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which Sanitation activities have with zero expenditure in 2024-2025?',
             'What are the different activities with zero expenditure under a focus area in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What are the activities with zero expenditure under a given focus area in a given year?',
             'What are the activities with zero expenditure under a given focus area in a given year, for a given district?',
             'What are the activities with zero expenditure under a given focus area in a given year, for a given block?',
             'What are the activities with zero expenditure under a given focus area in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -4410,10 +4641,12 @@ LIMIT $top_n
         "answerable": 'Yes',
         "paraphrases": [
             'Which focus area has the highest planned expenditure in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus area has the highest planned expenditure in a given year?',
             'Which focus area has the highest planned expenditure in a given year, for a given district?',
             'Which focus area has the highest planned expenditure in a given year, for a given block?',
             'Which focus area has the highest planned expenditure in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -4449,10 +4682,12 @@ LIMIT $top_n
         "answerable": 'Yes',
         "paraphrases": [
             'Which focus area has the lowest planned expenditure in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus area has the lowest planned expenditure in a given year?',
             'Which focus area has the lowest planned expenditure in a given year, for a given district?',
             'Which focus area has the lowest planned expenditure in a given year, for a given block?',
             'Which focus area has the lowest planned expenditure in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -4487,10 +4722,12 @@ ORDER BY pct_of_planned_cost DESC
         "answerable": 'Yes',
         "paraphrases": [
             'What share of planned expenditure goes to each focus area in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What percentage of total planned expenditure is allocated to each focus area in a given year?',
             'What percentage of total planned expenditure is allocated to each focus area in a given year, for a given district?',
             'What percentage of total planned expenditure is allocated to each focus area in a given year, for a given block?',
             'What percentage of total planned expenditure is allocated to each focus area in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -4529,10 +4766,12 @@ ORDER BY cost_per_activity DESC
         "answerable": 'Partial',
         "paraphrases": [
             'Which focus areas are out of step between cost and activity count in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus areas receive high planned expenditure but relatively few activities in a given year?',
             'Which focus areas receive high planned expenditure but relatively few activities in a given year, for a given district?',
             'Which focus areas receive high planned expenditure but relatively few activities in a given year, for a given block?',
             'Which focus areas receive high planned expenditure but relatively few activities in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -4571,10 +4810,12 @@ ORDER BY cost_per_activity ASC
         "answerable": 'Partial',
         "paraphrases": [
             'Which focus areas are out of step between cost and activity count in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus areas receive many activities but relatively low planned expenditure in a given year?',
             'Which focus areas receive many activities but relatively low planned expenditure in a given year, for a given district?',
             'Which focus areas receive many activities but relatively low planned expenditure in a given year, for a given block?',
             'Which focus areas receive many activities but relatively low planned expenditure in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -4608,10 +4849,12 @@ ORDER BY activities DESC
         "answerable": 'Yes',
         "paraphrases": [
             'Which focus areas get no planned expenditure in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus areas receive no planned expenditure in a given year?',
             'Which focus areas receive no planned expenditure in a given year, for a given district?',
             'Which focus areas receive no planned expenditure in a given year, for a given block?',
             'Which focus areas receive no planned expenditure in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -4648,9 +4891,11 @@ GROUP BY 1
         "paraphrases": [
             'How many activities fall under XV Finance Commission in Khordha in 2024-2025?',
             'How many activities are recorded under a given Scheme in a given District for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities are recorded under a given scheme in a given district for a given year?',
             'How many activities are recorded under a given scheme in a given block for a given year?',
             'How many activities are recorded under a given scheme in a given gram panchayat for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -4688,9 +4933,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which Andhrua activities are funded under XV Finance Commission in 2024-2025?',
             'Which activities of a given GP Name are funded under a given Scheme in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities of a given gram panchayat are funded under a given scheme in a given year?',
             'Which activities of a given district are funded under a given scheme in a given year?',
             'Which activities of a given block are funded under a given scheme in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -4729,9 +4976,11 @@ GROUP BY 1
         "paraphrases": [
             'What is the estimated cost under XV Finance Commission in Bhubaneswar in 2024-2025?',
             'What is the total estimated cost of activities under a given Scheme in a given Block for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the total estimated cost of activities under a given scheme in a given block for a given year?',
             'What is the total estimated cost of activities under a given scheme in a given district for a given year?',
             'What is the total estimated cost of activities under a given scheme in a given gram panchayat for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -4769,9 +5018,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which scheme has the highest expenditure in Bhubaneswar in 2024-2025?',
             'Which scheme has the highest expenditure in a given Block for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which scheme has the highest expenditure in a given block for a given year?',
             'Which scheme has the highest expenditure in a given district for a given year?',
             'Which scheme has the highest expenditure in a given gram panchayat for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -4807,8 +5058,10 @@ ORDER BY g.zp_name, g.block_name, g.gp_name
         "paraphrases": [
             'Which GPs in Bhubaneswar have nothing under XV Finance Commission in 2024-2025?',
             'Which GPs in a given Block have no activities under a given Scheme in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPs in a given block have no activities under a given scheme in a given year?',
             'Which GPs in a given district have no activities under a given scheme in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -4839,7 +5092,9 @@ WHERE v.activity_code = $activity_code
         "paraphrases": [
             'Which scheme and component fund a given activity?',
             'Under which scheme and component is activity a given Activity Code funded?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Under which scheme and fund component is activity a given activity sanctioned?',
+            # ── end derived ──
         ],
     },
 
@@ -4881,9 +5136,11 @@ ORDER BY expenditure DESC
         "paraphrases": [
             'Compare XV Finance Commission with 5TH STATE FINANCE COMMISSION in Khordha in 2024-2025.',
             'Compare the activity counts and expenditure of a given Scheme and a given Scheme 2 in a given District for a given Plan Year.',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Compare the activity counts and expenditure of a given scheme and a second scheme in a given district for a given year.',
             'Compare the activity counts and expenditure of a given scheme and a second scheme in a given block for a given year.',
             'Compare the activity counts and expenditure of a given scheme and a second scheme in a given gram panchayat for a given year.',
+            # ── end derived ──
         ],
     },
 
@@ -4920,9 +5177,11 @@ ORDER BY activities DESC
         "paraphrases": [
             'What is the status breakdown under XV Finance Commission in Khordha in 2024-2025?',
             'What is the status breakdown of activities under a given Scheme in a given District for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the status breakdown of activities under a given scheme in a given district for a given year?',
             'What is the status breakdown of activities under a given scheme in a given block for a given year?',
             'What is the status breakdown of activities under a given scheme in a given gram panchayat for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -4961,9 +5220,11 @@ GROUP BY 1
         "paraphrases": [
             'What is the General/SC/ST split under XV Finance Commission in Bhubaneswar in 2024-2025?',
             'What is the General/SC/ST funding split under a given Scheme in a given Block for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the General/SC/ST funding split under a given scheme in a given block for a given year?',
             'What is the General/SC/ST funding split under a given scheme in a given district for a given year?',
             'What is the General/SC/ST funding split under a given scheme in a given gram panchayat for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -4995,7 +5256,9 @@ ORDER BY activities DESC
         "paraphrases": [
             'What is the district-wise count under XV Finance Commission in 2024-2025?',
             'What is the district-wise activity count under a given Scheme across the state for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the district-wise activity count under a given scheme for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -5034,9 +5297,11 @@ ORDER BY total_expenditure DESC
         "paraphrases": [
             "What is Andhrua's total actual expenditure in 2024-2025?",
             'What is the total actual expenditure incurred by the Gram Panchayat in the selected financial year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the total actual expenditure incurred by a given gram panchayat in a given year?',
             'What is the total actual expenditure incurred by a given district in a given year?',
             'What is the total actual expenditure incurred by a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -5074,9 +5339,11 @@ ORDER BY 1
         "paraphrases": [
             "How has Andhrua's expenditure changed year on year?",
             'How has the total actual expenditure changed over the last five years?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How has the total actual expenditure of a given gram panchayat changed over the years?',
             'How has the total actual expenditure of a given district changed over the years?',
             'How has the total actual expenditure of a given block changed over the years?',
+            # ── end derived ──
         ],
     },
 
@@ -5109,10 +5376,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Yes',
         "paraphrases": [
             'What share of planned expenditure was utilised in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What percentage of the planned expenditure has been utilised in a given year?',
             'What percentage of the planned expenditure has been utilised in a given year, for a given district?',
             'What percentage of the planned expenditure has been utilised in a given year, for a given block?',
             'What percentage of the planned expenditure has been utilised in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -5148,10 +5417,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the unspent amount in 2024-2025?',
             'What is the total unspent amount (planned expenditure vs. actual expenditure) in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the total unspent amount (planned minus actual) in a given year?',
             'What is the total unspent amount (planned minus actual) in a given year, for a given district?',
             'What is the total unspent amount (planned minus actual) in a given year, for a given block?',
             'What is the total unspent amount (planned minus actual) in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -5184,10 +5455,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Yes',
         "paraphrases": [
             'How many planned activities recorded expenditure in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many planned activities have recorded actual expenditure in a given year?',
             'How many planned activities have recorded actual expenditure in a given year, for a given district?',
             'How many planned activities have recorded actual expenditure in a given year, for a given block?',
             'How many planned activities have recorded actual expenditure in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -5225,10 +5498,12 @@ ORDER BY expenditure DESC
         "paraphrases": [
             'How much expenditure came from each funding source in 2024-2025?',
             'How much actual expenditure has been incurred under each funding source (15th FC Tied, 15th FC Untied, SFC, Own Funds, etc.) in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How much actual expenditure has been incurred under each funding source in a given year?',
             'How much actual expenditure has been incurred under each funding source in a given year, for a given district?',
             'How much actual expenditure has been incurred under each funding source in a given year, for a given block?',
             'How much actual expenditure has been incurred under each funding source in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -5266,10 +5541,12 @@ ORDER BY expenditure DESC
         "paraphrases": [
             'How much expenditure came from each funding source in 2024-2025?',
             'What percentage of total actual expenditure is contributed by each funding source in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What percentage of total actual expenditure comes from each funding source in a given year?',
             'What percentage of total actual expenditure comes from each funding source in a given year, for a given district?',
             'What percentage of total actual expenditure comes from each funding source in a given year, for a given block?',
             'What percentage of total actual expenditure comes from each funding source in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -5309,9 +5586,11 @@ ORDER BY actual_expenditure DESC
         "paraphrases": [
             'How much was spent from tied vs untied funds in 2024-2025?',
             'How much actual expenditure has been incurred under Tied and Untied Funds in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How much actual expenditure has been incurred under tied and untied funds in a given year, for a given district?',
             'How much actual expenditure has been incurred under tied and untied funds in a given year, for a given block?',
             'How much actual expenditure has been incurred under tied and untied funds in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -5351,10 +5630,12 @@ ORDER BY actual_expenditure DESC
         "paraphrases": [
             'How much tied-fund spending went to Sanitation in 2024-2025?',
             'Under ties funds, how much expenditure done under a given subject in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How much tied-fund expenditure was incurred under a given focus area in a given year?',
             'How much tied-fund expenditure was incurred under a given focus area in a given year, for a given district?',
             'How much tied-fund expenditure was incurred under a given focus area in a given year, for a given block?',
             'How much tied-fund expenditure was incurred under a given focus area in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -5392,10 +5673,12 @@ ORDER BY expenditure DESC
         "paraphrases": [
             'How many Sanitation activities have expenditure in 2024-2025?',
             'How many activities have expenditure under a given subject in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities have expenditure under a given focus area in a given year?',
             'How many activities have expenditure under a given focus area in a given year, for a given district?',
             'How many activities have expenditure under a given focus area in a given year, for a given block?',
             'How many activities have expenditure under a given focus area in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -5435,10 +5718,12 @@ ORDER BY actual_expenditure DESC
         "paraphrases": [
             'How much tied-fund spending went to Sanitation in 2024-2025?',
             'Under the ties funds, how much expenditure was done under a given subject in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How much tied-fund expenditure was incurred under a given focus area in a given year?',
             'How much tied-fund expenditure was incurred under a given focus area in a given year, for a given district?',
             'How much tied-fund expenditure was incurred under a given focus area in a given year, for a given block?',
             'How much tied-fund expenditure was incurred under a given focus area in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -5479,10 +5764,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which funding source has the highest utilisation in 2024-2025?',
             'Which funding source has the highest expenditure utilisation in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which funding source has the highest utilisation in a given year?',
             'Which funding source has the highest utilisation in a given year, for a given district?',
             'Which funding source has the highest utilisation in a given year, for a given block?',
             'Which funding source has the highest utilisation in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -5522,10 +5809,12 @@ LIMIT $top_n
         "answerable": 'Partial',
         "paraphrases": [
             'Which funding source has the largest unspent amount in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which funding source has the largest unspent amount in a given year?',
             'Which funding source has the largest unspent amount in a given year, for a given district?',
             'Which funding source has the largest unspent amount in a given year, for a given block?',
             'Which funding source has the largest unspent amount in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -5561,10 +5850,12 @@ ORDER BY actual_expenditure DESC
         "answerable": 'Partial',
         "paraphrases": [
             'What is the expenditure per GPDP theme in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the total actual expenditure under each GPDP theme in a given year?',
             'What is the total actual expenditure under each GPDP theme in a given year, for a given district?',
             'What is the total actual expenditure under each GPDP theme in a given year, for a given block?',
             'What is the total actual expenditure under each GPDP theme in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -5599,10 +5890,12 @@ LIMIT $top_n
         "answerable": 'Partial',
         "paraphrases": [
             'Which theme has the highest actual expenditure in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPDP theme has the highest actual expenditure in a given year?',
             'Which GPDP theme has the highest actual expenditure in a given year, for a given district?',
             'Which GPDP theme has the highest actual expenditure in a given year, for a given block?',
             'Which GPDP theme has the highest actual expenditure in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -5637,10 +5930,12 @@ LIMIT $top_n
         "answerable": 'Partial',
         "paraphrases": [
             'Which theme has the lowest actual expenditure in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPDP theme has the lowest actual expenditure in a given year?',
             'Which GPDP theme has the lowest actual expenditure in a given year, for a given district?',
             'Which GPDP theme has the lowest actual expenditure in a given year, for a given block?',
             'Which GPDP theme has the lowest actual expenditure in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -5676,10 +5971,12 @@ ORDER BY pct_of_expenditure DESC
         "paraphrases": [
             'What share of expenditure goes to each theme in 2024-2025?',
             'What percentage of total actual expenditure is allocated to each GPDP theme in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What percentage of total actual expenditure goes to each GPDP theme in a given year?',
             'What percentage of total actual expenditure goes to each GPDP theme in a given year, for a given district?',
             'What percentage of total actual expenditure goes to each GPDP theme in a given year, for a given block?',
             'What percentage of total actual expenditure goes to each GPDP theme in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -5719,10 +6016,12 @@ LIMIT $top_n
         "answerable": 'Partial',
         "paraphrases": [
             'Which themes utilise their planned cost best in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPDP themes have the highest expenditure utilisation in a given year?',
             'Which GPDP themes have the highest expenditure utilisation in a given year, for a given district?',
             'Which GPDP themes have the highest expenditure utilisation in a given year, for a given block?',
             'Which GPDP themes have the highest expenditure utilisation in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -5762,10 +6061,12 @@ LIMIT $top_n
         "answerable": 'Partial',
         "paraphrases": [
             'Which themes show the largest plan-versus-spend gap in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPDP themes have the largest gap between planned and actual expenditure in a given year?',
             'Which GPDP themes have the largest gap between planned and actual expenditure in a given year, for a given district?',
             'Which GPDP themes have the largest gap between planned and actual expenditure in a given year, for a given block?',
             'Which GPDP themes have the largest gap between planned and actual expenditure in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -5809,10 +6110,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which theme utilises 15th CFC funds best in 2024-2025?',
             'Which theme has the highest utilisation funds from the 15th CFC at Block level in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which theme has the highest utilisation of 15th CFC funds at Block level in a given year?',
             'Which theme has the highest utilisation of 15th CFC funds at Block level in a given year, for a given district?',
             'Which theme has the highest utilisation of 15th CFC funds at Block level in a given year, for a given block?',
             'Which theme has the highest utilisation of 15th CFC funds at Block level in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -5856,10 +6159,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which theme utilises 15th CFC funds best in 2024-2025?',
             'Which theme has the highest utilisation of funds from the 15th CFC at the district level in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which theme has the highest utilisation of 15th CFC funds at District level in a given year?',
             'Which theme has the highest utilisation of 15th CFC funds at District level in a given year, for a given district?',
             'Which theme has the highest utilisation of 15th CFC funds at District level in a given year, for a given block?',
             'Which theme has the highest utilisation of 15th CFC funds at District level in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -5903,10 +6208,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which theme utilises SFC funds best in 2024-2025?',
             'Which theme has the highest utilisation of funds from the SFC at the district level in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which theme has the highest utilisation of SFC funds at District level in a given year?',
             'Which theme has the highest utilisation of SFC funds at District level in a given year, for a given district?',
             'Which theme has the highest utilisation of SFC funds at District level in a given year, for a given block?',
             'Which theme has the highest utilisation of SFC funds at District level in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -5941,10 +6248,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What share of sanctioned funds was utilised in 2024-2025?',
             'What percentage of sanctioned funds was utilized last financial year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What percentage of sanctioned funds was utilised in a given year?',
             'What percentage of sanctioned funds was utilised in a given year, for a given district?',
             'What percentage of sanctioned funds was utilised in a given year, for a given block?',
             'What percentage of sanctioned funds was utilised in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -5988,9 +6297,11 @@ ORDER BY closing_balance DESC
         "paraphrases": [
             "What are Andhrua's receipts, payments and closing balance in 2024-2025?",
             'What is the closing/unspent balance carried forward to the next financial year, and as a percentage of total funds available?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What are the receipts, payments and closing balance for a given gram panchayat in a given year?',
             'What are the receipts, payments and closing balance for a given district in a given year?',
             'What are the receipts, payments and closing balance for a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -6025,10 +6336,12 @@ ORDER BY actual_expenditure DESC
         "answerable": 'Yes',
         "paraphrases": [
             'What is the expenditure per focus area in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the total actual expenditure under each focus area in a given year?',
             'What is the total actual expenditure under each focus area in a given year, for a given district?',
             'What is the total actual expenditure under each focus area in a given year, for a given block?',
             'What is the total actual expenditure under each focus area in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -6067,10 +6380,12 @@ ORDER BY activities_with_expenditure DESC
         "paraphrases": [
             'How many activities have expenditure under Sanitation in 2024-2025?',
             'How many activities have expenditure done under a given subject in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities have expenditure under a given focus area in a given year?',
             'How many activities have expenditure under a given focus area in a given year, for a given district?',
             'How many activities have expenditure under a given focus area in a given year, for a given block?',
             'How many activities have expenditure under a given focus area in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -6108,10 +6423,12 @@ LIMIT $top_n
         "paraphrases": [
             'List Sanitation activities with expenditure in 2024-2025.',
             'List the activities with expenditure done under a given subject or any particular Focus area in a given year.',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'List the activities with expenditure under a given focus area in a given year.',
             'List the activities with expenditure under a given focus area in a given year, for a given district?',
             'List the activities with expenditure under a given focus area in a given year, for a given block?',
             'List the activities with expenditure under a given focus area in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -6147,10 +6464,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which focus area has the highest expenditure in 2024-2025?',
             'Which focus area has the highest actual expenditure in a year at the GP/Block/District level?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus area has the highest actual expenditure in a given year?',
             'Which focus area has the highest actual expenditure in a given year, for a given district?',
             'Which focus area has the highest actual expenditure in a given year, for a given block?',
             'Which focus area has the highest actual expenditure in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -6186,10 +6505,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which focus area has the lowest expenditure in 2024-2025?',
             'Which focus area has the lowest actual expenditure in a year at the GP/Block/District level?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus area has the lowest actual expenditure in a given year?',
             'Which focus area has the lowest actual expenditure in a given year, for a given district?',
             'Which focus area has the lowest actual expenditure in a given year, for a given block?',
             'Which focus area has the lowest actual expenditure in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -6228,10 +6549,12 @@ ORDER BY activities_with_expenditure DESC
         "paraphrases": [
             'How many activities have expenditure under Sanitation in 2024-2025?',
             'How many activities with expenditure under a Focus areas in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities have expenditure under a given focus area in a given year?',
             'How many activities have expenditure under a given focus area in a given year, for a given district?',
             'How many activities have expenditure under a given focus area in a given year, for a given block?',
             'How many activities have expenditure under a given focus area in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -6266,10 +6589,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which activities had the highest expenditure in 2024-2025?',
             'Which activities have the highest expenditure done in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities have the highest expenditure in a given year?',
             'Which activities have the highest expenditure in a given year, for a given district?',
             'Which activities have the highest expenditure in a given year, for a given block?',
             'Which activities have the highest expenditure in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -6304,10 +6629,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which activities had the highest expenditure in 2024-2025?',
             'Give a list of the top activities with expenditure in a GP in a given year.',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities have the highest expenditure in a given year?',
             'Which activities have the highest expenditure in a given year, for a given district?',
             'Which activities have the highest expenditure in a given year, for a given block?',
             'Which activities have the highest expenditure in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -6346,10 +6673,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which activities above Rs 1,00,000 recorded no expenditure in 2024-2025?',
             'Which high-value activities have recorded no expenditure in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which high-value activities (planned cost above a given amount) have no expenditure in a given year?',
             'Which high-value activities (planned cost above a given amount) have no expenditure in a given year, for a given district?',
             'Which high-value activities (planned cost above a given amount) have no expenditure in a given year, for a given block?',
             'Which high-value activities (planned cost above a given amount) have no expenditure in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -6388,9 +6717,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which Andhrua activities have expenditure equal to plan in 2024-2025?',
             'Which activities have actual expenditure equal to the planned expenditure in a GP in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities have actual expenditure equal to the planned expenditure in a given gram panchayat in a given year?',
             'Which activities have actual expenditure equal to the planned expenditure in a given district in a given year?',
             'Which activities have actual expenditure equal to the planned expenditure in a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -6429,9 +6760,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which Andhrua activities have expenditure exceeding plan in 2024-2025?',
             'Which activities have actual expenditure exceeding the planned expenditure in a GP in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities have actual expenditure exceeding the planned expenditure in a given gram panchayat in a given year?',
             'Which activities have actual expenditure exceeding the planned expenditure in a given district in a given year?',
             'Which activities have actual expenditure exceeding the planned expenditure in a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -6468,9 +6801,11 @@ GROUP BY 1
         "paraphrases": [
             'How much did Andhrua spend on creation of new assets in 2024-2025?',
             'How much expenditure done on the creation of new assets in a GP in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How much expenditure went on creation of new assets in a given gram panchayat in a given year?',
             'How much expenditure went on creation of new assets in a given district in a given year?',
             'How much expenditure went on creation of new assets in a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -6507,9 +6842,11 @@ GROUP BY 1
         "paraphrases": [
             'How much did Andhrua spend on repair and maintenance in 2024-2025?',
             'How much expenditure done on repair of Infrastructure in a GP in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How much expenditure went on repair and maintenance in a given gram panchayat in a given year?',
             'How much expenditure went on repair and maintenance in a given district in a given year?',
             'How much expenditure went on repair and maintenance in a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -6547,10 +6884,12 @@ ORDER BY actual_expenditure DESC
         "paraphrases": [
             'How much was spent on administrative activities in 2024-2025?',
             'How much expenditure is done on administrative activities in a year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How much expenditure went on administrative activities in a given year?',
             'How much expenditure went on administrative activities in a given year, for a given district?',
             'How much expenditure went on administrative activities in a given year, for a given block?',
             'How much expenditure went on administrative activities in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -6585,9 +6924,11 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many Andhrua activities got administrative approval in 2024-2025?',
             'How many activities in a given GP Name received administrative approval in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities in a given gram panchayat received administrative approval in a given year?',
             'How many activities in a given district received administrative approval in a given year?',
             'How many activities in a given block received administrative approval in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -6623,9 +6964,11 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many Bhubaneswar activities await sanction in 2024-2025?',
             'How many approved-plan activities in a given Block are still awaiting administrative approval in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities in a given block are still awaiting administrative approval in a given year?',
             'How many activities in a given district are still awaiting administrative approval in a given year?',
             'How many activities in a given gram panchayat are still awaiting administrative approval in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -6665,9 +7008,11 @@ ORDER BY admin_sanctioned_amount DESC
         "paraphrases": [
             "What is Andhrua's total administratively sanctioned amount in 2024-2025?",
             'What is the total administratively sanctioned amount for activities of a given GP Name in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the total administratively sanctioned amount for a given gram panchayat in a given year?',
             'What is the total administratively sanctioned amount for a given district in a given year?',
             'What is the total administratively sanctioned amount for a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -6699,7 +7044,9 @@ ORDER BY admin_sanctioned_amount DESC
         "paraphrases": [
             'What is the block-wise sanctioned amount in Khordha in 2024-2025?',
             'What is the total administratively sanctioned amount in a given District in a given Plan Year, block-wise?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the block-wise administratively sanctioned amount in a given district in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -6735,7 +7082,9 @@ WHERE v.activity_code = $activity_code
         "paraphrases": [
             'What are the sanction details for a given activity code?',
             'What are the administrative approval order number, date, and issuing authority for activity a given Activity Code?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What are the administrative approval order number, date and issuing authority for activity a given activity?',
+            # ── end derived ──
         ],
     },
 
@@ -6775,9 +7124,11 @@ ORDER BY sanctioned_activities DESC
         "paraphrases": [
             'How many Bhubaneswar activities did each authority sanction in 2024-2025?',
             'How many activities in a given Block were administratively sanctioned by each issuing authority in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities in a given block were administratively sanctioned by each issuing authority in a given year?',
             'How many activities in a given district were administratively sanctioned by each issuing authority in a given year?',
             'How many activities in a given gram panchayat were administratively sanctioned by each issuing authority in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -6818,9 +7169,11 @@ ORDER BY pct_approved DESC
         "paraphrases": [
             'What share of Bhubaneswar activities are administratively approved in 2024-2025?',
             'What percentage of planned activities in a given Block have received administrative approval in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What percentage of planned activities in a given block have received administrative approval in a given year?',
             'What percentage of planned activities in a given district have received administrative approval in a given year?',
             'What percentage of planned activities in a given gram panchayat have received administrative approval in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -6859,7 +7212,9 @@ LIMIT $top_n
         "paraphrases": [
             'Which Khordha blocks have the weakest approval coverage in 2024-2025?',
             'Which blocks in a given District have the lowest administrative approval coverage of planned activities in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which blocks in a given district have the lowest administrative approval coverage in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -6897,9 +7252,11 @@ ORDER BY 1
         "paraphrases": [
             'What is the monthly sanction profile for Bhubaneswar in 2024-2025?',
             'How many activities were administratively sanctioned in each month of a given Plan Year in a given Block?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities were administratively sanctioned in each month of a given year in a given block?',
             'How many activities were administratively sanctioned in each month of a given year in a given district?',
             'How many activities were administratively sanctioned in each month of a given year in a given gram panchayat?',
+            # ── end derived ──
         ],
     },
 
@@ -6937,9 +7294,11 @@ ORDER BY sanction_year, calendar_quarter
         "paraphrases": [
             'What is the quarterly sanction profile for Khordha in 2024-2025?',
             'How many administrative approvals in a given District were issued in the last quarter of a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many administrative approvals in a given district were issued in each quarter of a given year?',
             'How many administrative approvals in a given block were issued in each quarter of a given year?',
             'How many administrative approvals in a given gram panchayat were issued in each quarter of a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -6979,9 +7338,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which Khordha activities got the biggest sanctions in 2024-2025?',
             'Which activities in a given District received the highest administratively sanctioned amounts in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities in a given district received the highest administratively sanctioned amounts in a given year?',
             'Which activities in a given block received the highest administratively sanctioned amounts in a given year?',
             'Which activities in a given gram panchayat received the highest administratively sanctioned amounts in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -7025,9 +7386,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which Bhubaneswar GPs have the most value awaiting sanction in 2024-2025?',
             'Which GPs in a given Block have the highest total proposed cost of activities awaiting administrative sanction in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPs in a given block have the highest total proposed cost awaiting administrative sanction in a given year?',
             'Which GPs in a given district have the highest total proposed cost awaiting administrative sanction in a given year?',
             'Which GPs in a given gram panchayat have the highest total proposed cost awaiting administrative sanction in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -7065,9 +7428,11 @@ ORDER BY sanctioned_amount DESC
         "paraphrases": [
             "What is Andhrua's scheme-wise sanction split in 2024-2025?",
             'What is the scheme-wise split of administratively sanctioned amounts in a given GP Name for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the scheme-wise split of administratively sanctioned amounts in a given gram panchayat for a given year?',
             'What is the scheme-wise split of administratively sanctioned amounts in a given district for a given year?',
             'What is the scheme-wise split of administratively sanctioned amounts in a given block for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -7107,9 +7472,11 @@ ORDER BY total_sanctioned DESC
         "paraphrases": [
             'What is the General/SC/ST sanction split in Bhubaneswar in 2024-2025?',
             'What is the General/SC/ST split of administratively sanctioned funds in a given Block for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the General/SC/ST split of administratively sanctioned funds in a given block for a given year?',
             'What is the General/SC/ST split of administratively sanctioned funds in a given district for a given year?',
             'What is the General/SC/ST split of administratively sanctioned funds in a given gram panchayat for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -7145,9 +7512,11 @@ ORDER BY activities DESC
         "paraphrases": [
             'How many Andhrua activities are in each status in 2024-2025?',
             'How many activities in a given GP Name are in each progress status for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities in a given gram panchayat are in each progress status for a given year?',
             'How many activities in a given district are in each progress status for a given year?',
             'How many activities in a given block are in each progress status for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -7177,7 +7546,9 @@ ORDER BY v.block_name, activities DESC
         "paraphrases": [
             'What is the block-wise status breakdown in Khordha in 2024-2025?',
             'What is the block-wise activity status breakdown in a given District for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the block-wise activity status breakdown in a given district for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -7214,9 +7585,11 @@ GROUP BY 1
         "paraphrases": [
             'How many Bhubaneswar activities are WORK ONGOING in 2024-2025?',
             'How many activities in a given Block are in a given Status status for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities in a given block are in a given status status for a given year?',
             'How many activities in a given district are in a given status status for a given year?',
             'How many activities in a given gram panchayat are in a given status status for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -7254,7 +7627,9 @@ LIMIT $top_n
         "paraphrases": [
             'Which Khordha GPs have the most abandoned activities in 2024-2025?',
             'Which GPs in a given District have the highest number of abandoned activities in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPs in a given district have the highest number of abandoned activities in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -7292,9 +7667,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which Bhubaneswar activities are abandoned and at what cost in 2024-2025?',
             'Which activities in a given Block are currently suspended, and what are their estimated costs in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities in a given block are abandoned, and what are their costs in a given year?',
             'Which activities in a given district are abandoned, and what are their costs in a given year?',
             'Which activities in a given gram panchayat are abandoned, and what are their costs in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -7328,9 +7705,11 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             "What share of Bhubaneswar's started activities are complete in 2024-2025?",
             'What percentage of taken-up activities in a given Block are completed in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What percentage of taken-up activities in a given block are completed in a given year?',
             'What percentage of taken-up activities in a given district are completed in a given year?',
             'What percentage of taken-up activities in a given gram panchayat are completed in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -7369,7 +7748,9 @@ LIMIT $top_n
         "paraphrases": [
             'Which Khordha blocks complete the most activities in 2024-2025?',
             'Which blocks in a given District have the highest activity completion rate for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which blocks in a given district have the highest activity completion rate for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -7405,9 +7786,11 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             "What share of Khordha's approved activities have not started in 2024-2025?",
             'What share of approved activities in a given District has not yet started in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What share of approved activities in a given district has not yet started in a given year?',
             'What share of approved activities in a given block has not yet started in a given year?',
             'What share of approved activities in a given gram panchayat has not yet started in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -7449,9 +7832,11 @@ ORDER BY activities DESC
         "paraphrases": [
             'Which Bhubaneswar GPs completed nothing in 2024-2025?',
             'Which GPs in a given Block have zero completed activities in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPs in a given block have zero completed activities in a given year?',
             'Which GPs in a given district have zero completed activities in a given year?',
             'Which GPs in a given gram panchayat have zero completed activities in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -7485,9 +7870,11 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many Bhubaneswar activities sit in Under Approval in 2024-2025?',
             'How many activities in a given Block are stuck in Under Approval status for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities in a given block are stuck in Under Approval status for a given year?',
             'How many activities in a given district are stuck in Under Approval status for a given year?',
             'How many activities in a given gram panchayat are stuck in Under Approval status for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -7524,7 +7911,9 @@ ORDER BY activities DESC
         "paraphrases": [
             'Which Khordha blocks have started every taken-up activity in 2024-2025?',
             'Which blocks in a given District have every taken-up activity started for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which blocks in a given district have every taken-up activity started for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -7565,9 +7954,11 @@ ORDER BY planned_activities DESC
         "paraphrases": [
             'How many plans and started activities does Andhrua have in 2024-2025?',
             'How many plan units and how many taken-up activities does a given GP Name have for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many plan units and taken-up activities does a given gram panchayat have for a given year?',
             'How many plan units and taken-up activities does a given district have for a given year?',
             'How many plan units and taken-up activities does a given block have for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -7601,7 +7992,9 @@ ORDER BY activities DESC
         "paraphrases": [
             'What is the district-wise status summary in 2024-2025?',
             'What is the district-wise activity status summary across the state for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the district-wise activity status summary for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -7635,9 +8028,11 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many Andhrua activities were initiated in 2024-2025?',
             'How many planned activities have been initiated in a GP in a year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many planned activities have been initiated in a given gram panchayat in a given year?',
             'How many planned activities have been initiated in a given district in a given year?',
             'How many planned activities have been initiated in a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -7670,10 +8065,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many initiated activities were completed in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many initiated activities have been completed in a given year?',
             'How many initiated activities have been completed in a given year, for a given district?',
             'How many initiated activities have been completed in a given year, for a given block?',
             'How many initiated activities have been completed in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -7707,9 +8104,11 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many Andhrua activities have not started in 2024-2025?',
             'How many planned activities have not yet been initiated in a GP in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many planned activities have not yet been initiated in a given gram panchayat in a given year?',
             'How many planned activities have not yet been initiated in a given district in a given year?',
             'How many planned activities have not yet been initiated in a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -7746,10 +8145,12 @@ ORDER BY initiation_rate_pct DESC, planned_activities DESC
         "paraphrases": [
             'What is the initiation rate per theme in 2024-2025?',
             'What is the initiation rate under each theme/focus area in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the initiation rate under each theme and focus area in a given year?',
             'What is the initiation rate under each theme and focus area in a given year, for a given district?',
             'What is the initiation rate under each theme and focus area in a given year, for a given block?',
             'What is the initiation rate under each theme and focus area in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -7786,10 +8187,12 @@ ORDER BY completion_rate_pct DESC, planned_activities DESC
         "paraphrases": [
             'What is the completion rate per theme in 2024-2025?',
             'What is the completion rate under each theme/focus area in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the completion rate under each theme and focus area in a given year?',
             'What is the completion rate under each theme and focus area in a given year, for a given district?',
             'What is the completion rate under each theme and focus area in a given year, for a given block?',
             'What is the completion rate under each theme and focus area in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -7828,10 +8231,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which themes completed the most activities in 2024-2025?',
             'Which themes/focus areas have the highest number of completed activities in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which themes have the highest number of completed activities in a given year?',
             'Which themes have the highest number of completed activities in a given year, for a given district?',
             'Which themes have the highest number of completed activities in a given year, for a given block?',
             'Which themes have the highest number of completed activities in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -7871,10 +8276,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which themes show the biggest planned-versus-started gap in 2024-2025?',
             'Which themes have the largest implementation gap(planned vs initiated) in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which themes have the largest implementation gap (planned versus initiated) in a given year?',
             'Which themes have the largest implementation gap (planned versus initiated) in a given year, for a given district?',
             'Which themes have the largest implementation gap (planned versus initiated) in a given year, for a given block?',
             'Which themes have the largest implementation gap (planned versus initiated) in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -7911,10 +8318,12 @@ LIMIT $top_n
         "answerable": 'Partial',
         "paraphrases": [
             'Which focus area completed the most activities in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus area has the highest number of completed activities in a given year?',
             'Which focus area has the highest number of completed activities in a given year, for a given district?',
             'Which focus area has the highest number of completed activities in a given year, for a given block?',
             'Which focus area has the highest number of completed activities in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -7954,10 +8363,12 @@ LIMIT $top_n
         "answerable": 'Partial',
         "paraphrases": [
             'Which focus area completes least in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus area has the lowest completion rate in a given year?',
             'Which focus area has the lowest completion rate in a given year, for a given district?',
             'Which focus area has the lowest completion rate in a given year, for a given block?',
             'Which focus area has the lowest completion rate in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -7997,10 +8408,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which focus areas show the biggest planned-versus-started gap in 2024-2025?',
             'Which focus areas have the largest implementation gap in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus areas have the largest implementation gap (planned versus initiated) in a given year?',
             'Which focus areas have the largest implementation gap (planned versus initiated) in a given year, for a given district?',
             'Which focus areas have the largest implementation gap (planned versus initiated) in a given year, for a given block?',
             'Which focus areas have the largest implementation gap (planned versus initiated) in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -8037,10 +8450,12 @@ LIMIT $top_n
         "answerable": 'Yes',
         "paraphrases": [
             'Which focus areas have the most ongoing work in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus areas have the largest number of ongoing activities in a given year?',
             'Which focus areas have the largest number of ongoing activities in a given year, for a given district?',
             'Which focus areas have the largest number of ongoing activities in a given year, for a given block?',
             'Which focus areas have the largest number of ongoing activities in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -8079,10 +8494,12 @@ ORDER BY expenditure DESC, completion_rate_pct ASC
         "paraphrases": [
             'Which themes spend but do not complete in 2024-2025?',
             'Which themes consistently receive funds but show poor implementation in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which themes receive funds but show poor implementation in a given year?',
             'Which themes receive funds but show poor implementation in a given year, for a given district?',
             'Which themes receive funds but show poor implementation in a given year, for a given block?',
             'Which themes receive funds but show poor implementation in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -8120,10 +8537,12 @@ LIMIT $top_n
         "answerable": 'Yes',
         "paraphrases": [
             'Which costly activities have not started in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which high-expenditure activities have not yet started in a given year?',
             'Which high-expenditure activities have not yet started in a given year, for a given district?',
             'Which high-expenditure activities have not yet started in a given year, for a given block?',
             'Which high-expenditure activities have not yet started in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -8164,10 +8583,12 @@ ORDER BY ABS(share_gap_pts) DESC
         "answerable": 'Partial',
         "paraphrases": [
             'Which themes plan much and spend little in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which themes have the greatest mismatch between planning and expenditure in a given year?',
             'Which themes have the greatest mismatch between planning and expenditure in a given year, for a given district?',
             'Which themes have the greatest mismatch between planning and expenditure in a given year, for a given block?',
             'Which themes have the greatest mismatch between planning and expenditure in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -8205,9 +8626,11 @@ ORDER BY avg_initiation_rate_pct DESC
         "paraphrases": [
             'Which themes consistently perform well in implementation?',
             'Which GPDP themes consistently perform well in implementation in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPDP themes consistently perform well in implementation across years, for a given district?',
             'Which GPDP themes consistently perform well in implementation across years, for a given block?',
             'Which GPDP themes consistently perform well in implementation across years, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -8245,9 +8668,11 @@ ORDER BY avg_initiation_rate_pct ASC
         "paraphrases": [
             'Which themes consistently underperform in implementation?',
             'Which GPDP themes consistently underperform in implementation in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPDP themes consistently underperform in implementation across years, for a given district?',
             'Which GPDP themes consistently underperform in implementation across years, for a given block?',
             'Which GPDP themes consistently underperform in implementation across years, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -8287,9 +8712,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which activity types stay incomplete year after year?',
             'Which type of activities remain incomplete across multiple years?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which types of activity remain incomplete across multiple years, for a given district?',
             'Which types of activity remain incomplete across multiple years, for a given block?',
             'Which types of activity remain incomplete across multiple years, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -8330,10 +8757,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which ongoing activities have already spent their approved cost in 2024-2025?',
             'Which activities are marked "Work Ongoing" despite actual expenditure equaling expected expenditure in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities are marked Work Ongoing despite expenditure reaching the approved cost in a given year?',
             'Which activities are marked Work Ongoing despite expenditure reaching the approved cost in a given year, for a given district?',
             'Which activities are marked Work Ongoing despite expenditure reaching the approved cost in a given year, for a given block?',
             'Which activities are marked Work Ongoing despite expenditure reaching the approved cost in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -8378,10 +8807,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which themes need implementation support in 2024-2025?',
             'Which Gram Panchayat themes require immediate administrative intervention based on implementation performance in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which themes should be prioritised for implementation support in a given year?',
             'Which themes should be prioritised for implementation support in a given year, for a given district?',
             'Which themes should be prioritised for implementation support in a given year, for a given block?',
             'Which themes should be prioritised for implementation support in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -8425,10 +8856,12 @@ LIMIT $top_n
         "answerable": 'Partial',
         "paraphrases": [
             'Which focus areas need implementation support in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus areas should be prioritised for implementation support in a given year?',
             'Which focus areas should be prioritised for implementation support in a given year, for a given district?',
             'Which focus areas should be prioritised for implementation support in a given year, for a given block?',
             'Which focus areas should be prioritised for implementation support in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -8468,10 +8901,12 @@ LIMIT $top_n
         "paraphrases": [
             'Which incomplete activities should carry forward from 2024-2025?',
             'Which activities should be carried forward to the next GPDP due to incomplete implementation in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities should be carried forward to the next GPDP because they are incomplete in a given year?',
             'Which activities should be carried forward to the next GPDP because they are incomplete in a given year, for a given district?',
             'Which activities should be carried forward to the next GPDP because they are incomplete in a given year, for a given block?',
             'Which activities should be carried forward to the next GPDP because they are incomplete in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -8510,10 +8945,12 @@ ORDER BY incomplete_activities DESC
         "answerable": 'Partial',
         "paraphrases": [
             'Which schemes carry the most incomplete work in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which schemes have the highest number of delayed or incomplete activities in a given year?',
             'Which schemes have the highest number of delayed or incomplete activities in a given year, for a given district?',
             'Which schemes have the highest number of delayed or incomplete activities in a given year, for a given block?',
             'Which schemes have the highest number of delayed or incomplete activities in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -8548,7 +8985,9 @@ WHERE v.activity_code = $activity_code
         "paraphrases": [
             'What progress evidence exists for a given activity code?',
             'What is the current stage of each asset under activity a given Activity Code?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What physical-progress evidence has been recorded for activity a given activity?',
+            # ── end derived ──
         ],
     },
 
@@ -8588,9 +9027,11 @@ ORDER BY asset_rows DESC
         "paraphrases": [
             'How many Andhrua assets sit under completed activities in 2024-2025?',
             'How many assets in a given GP Name are marked fully completed in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many assets in a given gram panchayat belong to completed activities in a given year?',
             'How many assets in a given district belong to completed activities in a given year?',
             'How many assets in a given block belong to completed activities in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -8629,9 +9070,11 @@ ORDER BY activities DESC
         "paraphrases": [
             'How many Bhubaneswar activities have progress evidence in 2024-2025?',
             'How many assets in a given Block are at each implementation stage in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities in a given block have physical-progress evidence recorded in a given year?',
             'How many activities in a given district have physical-progress evidence recorded in a given year?',
             'How many activities in a given gram panchayat have physical-progress evidence recorded in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -8672,9 +9115,11 @@ ORDER BY asset_rows DESC
         "paraphrases": [
             'How many assets were created in Andhrua in 2024-2025?',
             'How many assets were created in a given GP Name during a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many assets were created in a given gram panchayat during a given year?',
             'How many assets were created in a given district during a given year?',
             'How many assets were created in a given block during a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -8711,9 +9156,11 @@ ORDER BY asset_rows DESC
         "paraphrases": [
             'What is the category-wise asset count in Bhubaneswar in 2024-2025?',
             'What is the asset category-wise count of assets created in a given Block for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the asset category-wise count of assets created in a given block for a given year?',
             'What is the asset category-wise count of assets created in a given district for a given year?',
             'What is the asset category-wise count of assets created in a given gram panchayat for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -8752,9 +9199,11 @@ ORDER BY asset_rows DESC
         "paraphrases": [
             'How many assets of a given sub-category exist in Khordha in 2024-2025?',
             'How many a given Asset Sub Category assets exist across a given District as per a given Plan Year records?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many a given asset sub-category assets exist across a given district for a given year?',
             'How many a given asset sub-category assets exist across a given block for a given year?',
             'How many a given asset sub-category assets exist across a given gram panchayat for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -8789,9 +9238,11 @@ ORDER BY asset_rows DESC
         "paraphrases": [
             'How many immovable assets were created in Bhubaneswar in 2024-2025?',
             'How many permanent-type assets were created in a given Block during a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many immovable-type assets were created in a given block during a given year?',
             'How many immovable-type assets were created in a given district during a given year?',
             'How many immovable-type assets were created in a given gram panchayat during a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -8829,9 +9280,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which asset category absorbed the most spend in Khordha in 2024-2025?',
             'Which asset category received the highest expenditure in a given District for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which asset category received the highest expenditure in a given district for a given year?',
             'Which asset category received the highest expenditure in a given block for a given year?',
             'Which asset category received the highest expenditure in a given gram panchayat for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -8869,9 +9322,11 @@ ORDER BY asset_rows DESC
         "paraphrases": [
             'How many assets fall under a given theme in Bhubaneswar in 2024-2025?',
             'How many assets were created under the a given Theme theme in a given Block for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many assets were created under a given LSDG theme in a given block for a given year?',
             'How many assets were created under a given LSDG theme in a given district for a given year?',
             'How many assets were created under a given LSDG theme in a given gram panchayat for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -8906,8 +9361,10 @@ ORDER BY g.zp_name, g.block_name, g.gp_name
         "paraphrases": [
             'Which Bhubaneswar GPs created no assets in 2024-2025?',
             'Which GPs in a given Block created no assets in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPs in a given block created no assets in a given year?',
             'Which GPs in a given district created no assets in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -8944,9 +9401,11 @@ ORDER BY 1
         "paraphrases": [
             'How has asset creation in Bhubaneswar changed year on year?',
             'How has the number of assets created per year in a given Block changed over a given Date Range?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How has the number of assets created per year in a given block changed?',
             'How has the number of assets created per year in a given district changed?',
             'How has the number of assets created per year in a given gram panchayat changed?',
+            # ── end derived ──
         ],
     },
 
@@ -8983,10 +9442,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many Grey Water Management activities have been planned in 2024-2025?',
             'How many activities fall under Grey Water Management (GWM) in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many Grey Water Management activities have been planned in a given year?',
             'How many Grey Water Management activities have been planned in a given year, for a given district?',
             'How many Grey Water Management activities have been planned in a given year, for a given block?',
             'How many Grey Water Management activities have been planned in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9023,10 +9484,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the expenditure on Grey Water Management activities in 2024-2025?',
             'What is the total expenditure on Grey Water Management (GWM) activities in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the expenditure on Grey Water Management activities in a given year?',
             'What is the expenditure on Grey Water Management activities in a given year, for a given district?',
             'What is the expenditure on Grey Water Management activities in a given year, for a given block?',
             'What is the expenditure on Grey Water Management activities in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9063,10 +9526,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many community soak pits have been planned in 2024-2025?',
             'How many community soak pits for Grey Water Management (GWM) have been planned in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many community soak pits have been planned in a given year?',
             'How many community soak pits have been planned in a given year, for a given district?',
             'How many community soak pits have been planned in a given year, for a given block?',
             'How many community soak pits have been planned in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9103,10 +9568,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many community soak pits have been approved in 2024-2025?',
             'How many community soak pits for Grey Water Management (GWM) have been approved in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many community soak pits have been approved in a given year?',
             'How many community soak pits have been approved in a given year, for a given district?',
             'How many community soak pits have been approved in a given year, for a given block?',
             'How many community soak pits have been approved in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9143,10 +9610,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many community soak pits are ongoing in 2024-2025?',
             'How many community soak pits for Grey Water Management (GWM) are ongoing in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many community soak pits are ongoing in a given year?',
             'How many community soak pits are ongoing in a given year, for a given district?',
             'How many community soak pits are ongoing in a given year, for a given block?',
             'How many community soak pits are ongoing in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9183,10 +9652,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many community soak pits have been completed in 2024-2025?',
             'How many community soak pits for Grey Water Management (GWM) have been completed in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many community soak pits have been completed in a given year?',
             'How many community soak pits have been completed in a given year, for a given district?',
             'How many community soak pits have been completed in a given year, for a given block?',
             'How many community soak pits have been completed in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9223,10 +9694,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the expenditure on community soak pits in 2024-2025?',
             'What is the expenditure on construction of community soak pits for Grey Water Management (GWM) in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the expenditure on community soak pits in a given year?',
             'What is the expenditure on community soak pits in a given year, for a given district?',
             'What is the expenditure on community soak pits in a given year, for a given block?',
             'What is the expenditure on community soak pits in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9263,10 +9736,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many household soak pits have been planned in 2024-2025?',
             'How many soak pits for individual households have been planned under Grey Water Management (GWM) in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many household soak pits have been planned in a given year?',
             'How many household soak pits have been planned in a given year, for a given district?',
             'How many household soak pits have been planned in a given year, for a given block?',
             'How many household soak pits have been planned in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9303,10 +9778,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many household soak pits have been approved in 2024-2025?',
             'How many soak pits for individual households have been approved under Grey Water Management (GWM) in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many household soak pits have been approved in a given year?',
             'How many household soak pits have been approved in a given year, for a given district?',
             'How many household soak pits have been approved in a given year, for a given block?',
             'How many household soak pits have been approved in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9343,10 +9820,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many household soak pits are ongoing in 2024-2025?',
             'How many soak pits for individual households are ongoing under Grey Water Management (GWM) in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many household soak pits are ongoing in a given year?',
             'How many household soak pits are ongoing in a given year, for a given district?',
             'How many household soak pits are ongoing in a given year, for a given block?',
             'How many household soak pits are ongoing in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9383,10 +9862,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many household soak pits have been completed in 2024-2025?',
             'How many soak pits for individual households have been completed under Grey Water Management (GWM) in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many household soak pits have been completed in a given year?',
             'How many household soak pits have been completed in a given year, for a given district?',
             'How many household soak pits have been completed in a given year, for a given block?',
             'How many household soak pits have been completed in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9423,10 +9904,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the expenditure on household soak pits in 2024-2025?',
             'What is the expenditure on creation of soak pits for individual households under Grey Water Management (GWM) in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the expenditure on household soak pits in a given year?',
             'What is the expenditure on household soak pits in a given year, for a given district?',
             'What is the expenditure on household soak pits in a given year, for a given block?',
             'What is the expenditure on household soak pits in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9463,10 +9946,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the Operation & Maintenance expenditure on community sanitary complexes in 2024-2025?',
             'What is the expenditure on Operation & Maintenance of Community a given subject Complexes in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the Operation & Maintenance expenditure on community sanitary complexes in a given year?',
             'What is the Operation & Maintenance expenditure on community sanitary complexes in a given year, for a given district?',
             'What is the Operation & Maintenance expenditure on community sanitary complexes in a given year, for a given block?',
             'What is the Operation & Maintenance expenditure on community sanitary complexes in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9503,10 +9988,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the Operation & Maintenance expenditure on community compost pits in 2024-2025?',
             'What is the expenditure on Operation & Maintenance of community compost pits in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the Operation & Maintenance expenditure on community compost pits in a given year?',
             'What is the Operation & Maintenance expenditure on community compost pits in a given year, for a given district?',
             'What is the Operation & Maintenance expenditure on community compost pits in a given year, for a given block?',
             'What is the Operation & Maintenance expenditure on community compost pits in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9543,10 +10030,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the Operation & Maintenance expenditure on segregation sheds in 2024-2025?',
             'What is the expenditure on Operation & Maintenance of segregation sheds (community level) in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the Operation & Maintenance expenditure on segregation sheds in a given year?',
             'What is the Operation & Maintenance expenditure on segregation sheds in a given year, for a given district?',
             'What is the Operation & Maintenance expenditure on segregation sheds in a given year, for a given block?',
             'What is the Operation & Maintenance expenditure on segregation sheds in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9583,10 +10072,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the Operation & Maintenance expenditure on Plastic Waste Management Units in 2024-2025?',
             'What is the expenditure on Operation & Maintenance of Plastic Waste Management Units (PWMUs) in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the Operation & Maintenance expenditure on Plastic Waste Management Units in a given year?',
             'What is the Operation & Maintenance expenditure on Plastic Waste Management Units in a given year, for a given district?',
             'What is the Operation & Maintenance expenditure on Plastic Waste Management Units in a given year, for a given block?',
             'What is the Operation & Maintenance expenditure on Plastic Waste Management Units in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9623,10 +10114,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the Operation & Maintenance expenditure on Gobardhan units in 2024-2025?',
             'What is the expenditure on Operation & Maintenance of Gobardhan units (including forward linkages) in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the Operation & Maintenance expenditure on Gobardhan units in a given year?',
             'What is the Operation & Maintenance expenditure on Gobardhan units in a given year, for a given district?',
             'What is the Operation & Maintenance expenditure on Gobardhan units in a given year, for a given block?',
             'What is the Operation & Maintenance expenditure on Gobardhan units in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9663,10 +10156,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the Operation & Maintenance expenditure on community Grey Water Management systems and soak pits in 2024-2025?',
             'What is the expenditure on Operation & Maintenance of community Grey Water Management (GWM) systems / soak pits in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the Operation & Maintenance expenditure on community Grey Water Management systems and soak pits in a given year?',
             'What is the Operation & Maintenance expenditure on community Grey Water Management systems and soak pits in a given year, for a given district?',
             'What is the Operation & Maintenance expenditure on community Grey Water Management systems and soak pits in a given year, for a given block?',
             'What is the Operation & Maintenance expenditure on community Grey Water Management systems and soak pits in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9703,10 +10198,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the Operation & Maintenance expenditure on Faecal Sludge Management plants in 2024-2025?',
             'What is the expenditure on Operation & Maintenance of the Faecal Sludge Management (FSM) plant in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the Operation & Maintenance expenditure on Faecal Sludge Management plants in a given year?',
             'What is the Operation & Maintenance expenditure on Faecal Sludge Management plants in a given year, for a given district?',
             'What is the Operation & Maintenance expenditure on Faecal Sludge Management plants in a given year, for a given block?',
             'What is the Operation & Maintenance expenditure on Faecal Sludge Management plants in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9743,10 +10240,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many PPE kits and safety equipment purchases have been planned in 2024-2025?',
             'How many Personal Protective Equipment (PPE) kits / sets of safety equipment (gloves, masks) have been purchased for waste management in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many PPE kits and safety equipment purchases have been planned in a given year?',
             'How many PPE kits and safety equipment purchases have been planned in a given year, for a given district?',
             'How many PPE kits and safety equipment purchases have been planned in a given year, for a given block?',
             'How many PPE kits and safety equipment purchases have been planned in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9783,10 +10282,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the expenditure on waste-management and safety equipment in 2024-2025?',
             'What is the expenditure on purchase of waste-management equipment, including safety equipment in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the expenditure on waste-management and safety equipment in a given year?',
             'What is the expenditure on waste-management and safety equipment in a given year, for a given district?',
             'What is the expenditure on waste-management and safety equipment in a given year, for a given block?',
             'What is the expenditure on waste-management and safety equipment in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9826,9 +10327,11 @@ ORDER BY om_expenditure DESC
         "paraphrases": [
             "What is Andhrua's total O&M expenditure in 2024-2025?",
             'What is the total Operation & Maintenance (O&M) expenditure on a given subject assets in the panchayat in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the total Operation & Maintenance expenditure in a given gram panchayat in a given year?',
             'What is the total Operation & Maintenance expenditure in a given district in a given year?',
             'What is the total Operation & Maintenance expenditure in a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -9864,10 +10367,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many toilets in public institutions have been planned in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many toilets in public institutions have been planned in a given year?',
             'How many toilets in public institutions have been planned in a given year, for a given district?',
             'How many toilets in public institutions have been planned in a given year, for a given block?',
             'How many toilets in public institutions have been planned in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9903,10 +10408,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many toilets in public institutions have been approved in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many toilets in public institutions have been approved in a given year?',
             'How many toilets in public institutions have been approved in a given year, for a given district?',
             'How many toilets in public institutions have been approved in a given year, for a given block?',
             'How many toilets in public institutions have been approved in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9942,10 +10449,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many toilets in public institutions are ongoing in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many toilets in public institutions are ongoing in a given year?',
             'How many toilets in public institutions are ongoing in a given year, for a given district?',
             'How many toilets in public institutions are ongoing in a given year, for a given block?',
             'How many toilets in public institutions are ongoing in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -9981,10 +10490,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many toilets in public institutions have been completed in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many toilets in public institutions have been completed in a given year?',
             'How many toilets in public institutions have been completed in a given year, for a given district?',
             'How many toilets in public institutions have been completed in a given year, for a given block?',
             'How many toilets in public institutions have been completed in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10021,10 +10532,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the expenditure on toilets in public institutions in 2024-2025?',
             'What is the expenditure on construction of toilets in public institutions in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the expenditure on toilets in public institutions in a given year?',
             'What is the expenditure on toilets in public institutions in a given year, for a given district?',
             'What is the expenditure on toilets in public institutions in a given year, for a given block?',
             'What is the expenditure on toilets in public institutions in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10061,10 +10574,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many Individual Household Latrines (IHHLs) have been planned in 2024-2025?',
             'How many Individual Household Latrines (IHHLs) for eligible households have been planned in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many Individual Household Latrines (IHHLs) have been planned in a given year?',
             'How many Individual Household Latrines (IHHLs) have been planned in a given year, for a given district?',
             'How many Individual Household Latrines (IHHLs) have been planned in a given year, for a given block?',
             'How many Individual Household Latrines (IHHLs) have been planned in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10101,10 +10616,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many Individual Household Latrines (IHHLs) have been approved in 2024-2025?',
             'How many Individual Household Latrines (IHHLs) for eligible households have been approved in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many Individual Household Latrines (IHHLs) have been approved in a given year?',
             'How many Individual Household Latrines (IHHLs) have been approved in a given year, for a given district?',
             'How many Individual Household Latrines (IHHLs) have been approved in a given year, for a given block?',
             'How many Individual Household Latrines (IHHLs) have been approved in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10141,10 +10658,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many Individual Household Latrines (IHHLs) are ongoing in 2024-2025?',
             'How many Individual Household Latrines (IHHLs) for eligible households are ongoing in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many Individual Household Latrines (IHHLs) are ongoing in a given year?',
             'How many Individual Household Latrines (IHHLs) are ongoing in a given year, for a given district?',
             'How many Individual Household Latrines (IHHLs) are ongoing in a given year, for a given block?',
             'How many Individual Household Latrines (IHHLs) are ongoing in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10181,10 +10700,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many Individual Household Latrines (IHHLs) have been completed in 2024-2025?',
             'How many Individual Household Latrines (IHHLs) for eligible households have been completed in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many Individual Household Latrines (IHHLs) have been completed in a given year?',
             'How many Individual Household Latrines (IHHLs) have been completed in a given year, for a given district?',
             'How many Individual Household Latrines (IHHLs) have been completed in a given year, for a given block?',
             'How many Individual Household Latrines (IHHLs) have been completed in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10221,10 +10742,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the expenditure on Individual Household Latrines (IHHLs) in 2024-2025?',
             'What is the expenditure on construction of Individual Household Latrines (IHHLs) in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the expenditure on Individual Household Latrines (IHHLs) in a given year?',
             'What is the expenditure on Individual Household Latrines (IHHLs) in a given year, for a given district?',
             'What is the expenditure on Individual Household Latrines (IHHLs) in a given year, for a given block?',
             'What is the expenditure on Individual Household Latrines (IHHLs) in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10261,10 +10784,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many toilets and handwash units in AWCs and schools have been planned in 2024-2025?',
             'How many toilets / handwash units in Anganwadi Centres (AWCs) and schools have been planned in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many toilets and handwash units in AWCs and schools have been planned in a given year?',
             'How many toilets and handwash units in AWCs and schools have been planned in a given year, for a given district?',
             'How many toilets and handwash units in AWCs and schools have been planned in a given year, for a given block?',
             'How many toilets and handwash units in AWCs and schools have been planned in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10301,10 +10826,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many toilets and handwash units in AWCs and schools have been approved in 2024-2025?',
             'How many toilets / handwash units in Anganwadi Centres (AWCs) and schools have been approved in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many toilets and handwash units in AWCs and schools have been approved in a given year?',
             'How many toilets and handwash units in AWCs and schools have been approved in a given year, for a given district?',
             'How many toilets and handwash units in AWCs and schools have been approved in a given year, for a given block?',
             'How many toilets and handwash units in AWCs and schools have been approved in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10341,10 +10868,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many toilets and handwash units in AWCs and schools are ongoing in 2024-2025?',
             'How many toilets / handwash units in Anganwadi Centres (AWCs) and schools are ongoing in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many toilets and handwash units in AWCs and schools are ongoing in a given year?',
             'How many toilets and handwash units in AWCs and schools are ongoing in a given year, for a given district?',
             'How many toilets and handwash units in AWCs and schools are ongoing in a given year, for a given block?',
             'How many toilets and handwash units in AWCs and schools are ongoing in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10381,10 +10910,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many toilets and handwash units in AWCs and schools have been completed in 2024-2025?',
             'How many toilets / handwash units in Anganwadi Centres (AWCs) and schools have been completed in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many toilets and handwash units in AWCs and schools have been completed in a given year?',
             'How many toilets and handwash units in AWCs and schools have been completed in a given year, for a given district?',
             'How many toilets and handwash units in AWCs and schools have been completed in a given year, for a given block?',
             'How many toilets and handwash units in AWCs and schools have been completed in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10421,10 +10952,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the expenditure on toilets and handwash units in AWCs and schools in 2024-2025?',
             'What is the expenditure on construction of toilets / handwash units in Anganwadi Centres (AWCs) and schools in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the expenditure on toilets and handwash units in AWCs and schools in a given year?',
             'What is the expenditure on toilets and handwash units in AWCs and schools in a given year, for a given district?',
             'What is the expenditure on toilets and handwash units in AWCs and schools in a given year, for a given block?',
             'What is the expenditure on toilets and handwash units in AWCs and schools in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10460,10 +10993,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many single-pit to twin-pit toilet retrofits have been planned in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many single-pit to twin-pit toilet retrofits have been planned in a given year?',
             'How many single-pit to twin-pit toilet retrofits have been planned in a given year, for a given district?',
             'How many single-pit to twin-pit toilet retrofits have been planned in a given year, for a given block?',
             'How many single-pit to twin-pit toilet retrofits have been planned in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10499,10 +11034,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many single-pit to twin-pit toilet retrofits have been approved in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many single-pit to twin-pit toilet retrofits have been approved in a given year?',
             'How many single-pit to twin-pit toilet retrofits have been approved in a given year, for a given district?',
             'How many single-pit to twin-pit toilet retrofits have been approved in a given year, for a given block?',
             'How many single-pit to twin-pit toilet retrofits have been approved in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10538,10 +11075,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many single-pit to twin-pit toilet retrofits are ongoing in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many single-pit to twin-pit toilet retrofits are ongoing in a given year?',
             'How many single-pit to twin-pit toilet retrofits are ongoing in a given year, for a given district?',
             'How many single-pit to twin-pit toilet retrofits are ongoing in a given year, for a given block?',
             'How many single-pit to twin-pit toilet retrofits are ongoing in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10577,10 +11116,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many single-pit to twin-pit toilet retrofits have been completed in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many single-pit to twin-pit toilet retrofits have been completed in a given year?',
             'How many single-pit to twin-pit toilet retrofits have been completed in a given year, for a given district?',
             'How many single-pit to twin-pit toilet retrofits have been completed in a given year, for a given block?',
             'How many single-pit to twin-pit toilet retrofits have been completed in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10617,10 +11158,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the expenditure on single-pit to twin-pit toilet retrofits in 2024-2025?',
             'What is the expenditure on retrofitting single-pit toilets to twin-pit in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the expenditure on single-pit to twin-pit toilet retrofits in a given year?',
             'What is the expenditure on single-pit to twin-pit toilet retrofits in a given year, for a given district?',
             'What is the expenditure on single-pit to twin-pit toilet retrofits in a given year, for a given block?',
             'What is the expenditure on single-pit to twin-pit toilet retrofits in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10656,10 +11199,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many septic-tank-with-soak-pit retrofits have been planned in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many septic-tank-with-soak-pit retrofits have been planned in a given year?',
             'How many septic-tank-with-soak-pit retrofits have been planned in a given year, for a given district?',
             'How many septic-tank-with-soak-pit retrofits have been planned in a given year, for a given block?',
             'How many septic-tank-with-soak-pit retrofits have been planned in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10695,10 +11240,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many septic-tank-with-soak-pit retrofits have been approved in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many septic-tank-with-soak-pit retrofits have been approved in a given year?',
             'How many septic-tank-with-soak-pit retrofits have been approved in a given year, for a given district?',
             'How many septic-tank-with-soak-pit retrofits have been approved in a given year, for a given block?',
             'How many septic-tank-with-soak-pit retrofits have been approved in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10734,10 +11281,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many septic-tank-with-soak-pit retrofits are ongoing in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many septic-tank-with-soak-pit retrofits are ongoing in a given year?',
             'How many septic-tank-with-soak-pit retrofits are ongoing in a given year, for a given district?',
             'How many septic-tank-with-soak-pit retrofits are ongoing in a given year, for a given block?',
             'How many septic-tank-with-soak-pit retrofits are ongoing in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10773,10 +11322,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many septic-tank-with-soak-pit retrofits have been completed in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many septic-tank-with-soak-pit retrofits have been completed in a given year?',
             'How many septic-tank-with-soak-pit retrofits have been completed in a given year, for a given district?',
             'How many septic-tank-with-soak-pit retrofits have been completed in a given year, for a given block?',
             'How many septic-tank-with-soak-pit retrofits have been completed in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10813,10 +11364,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the expenditure on septic-tank-with-soak-pit retrofits in 2024-2025?',
             'What is the expenditure on retrofitting septic-tank toilets with soak pits in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the expenditure on septic-tank-with-soak-pit retrofits in a given year?',
             'What is the expenditure on septic-tank-with-soak-pit retrofits in a given year, for a given district?',
             'What is the expenditure on septic-tank-with-soak-pit retrofits in a given year, for a given block?',
             'What is the expenditure on septic-tank-with-soak-pit retrofits in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10853,10 +11406,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many Solid Waste Management activities have been planned in 2024-2025?',
             'How many activities fall under Solid Waste Management (SWM) in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many Solid Waste Management activities have been planned in a given year?',
             'How many Solid Waste Management activities have been planned in a given year, for a given district?',
             'How many Solid Waste Management activities have been planned in a given year, for a given block?',
             'How many Solid Waste Management activities have been planned in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10892,10 +11447,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many community compost pits have been planned in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many community compost pits have been planned in a given year?',
             'How many community compost pits have been planned in a given year, for a given district?',
             'How many community compost pits have been planned in a given year, for a given block?',
             'How many community compost pits have been planned in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10931,10 +11488,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many community compost pits have been approved in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many community compost pits have been approved in a given year?',
             'How many community compost pits have been approved in a given year, for a given district?',
             'How many community compost pits have been approved in a given year, for a given block?',
             'How many community compost pits have been approved in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -10970,10 +11529,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many community compost pits are ongoing in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many community compost pits are ongoing in a given year?',
             'How many community compost pits are ongoing in a given year, for a given district?',
             'How many community compost pits are ongoing in a given year, for a given block?',
             'How many community compost pits are ongoing in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11009,10 +11570,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many community compost pits have been completed in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many community compost pits have been completed in a given year?',
             'How many community compost pits have been completed in a given year, for a given district?',
             'How many community compost pits have been completed in a given year, for a given block?',
             'How many community compost pits have been completed in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11049,10 +11612,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the expenditure on community compost pits in 2024-2025?',
             'What is the expenditure on construction of community compost pits in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the expenditure on community compost pits in a given year?',
             'What is the expenditure on community compost pits in a given year, for a given district?',
             'What is the expenditure on community compost pits in a given year, for a given block?',
             'What is the expenditure on community compost pits in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11088,10 +11653,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many household compost pits have been planned in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many household compost pits have been planned in a given year?',
             'How many household compost pits have been planned in a given year, for a given district?',
             'How many household compost pits have been planned in a given year, for a given block?',
             'How many household compost pits have been planned in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11127,10 +11694,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many household compost pits have been approved in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many household compost pits have been approved in a given year?',
             'How many household compost pits have been approved in a given year, for a given district?',
             'How many household compost pits have been approved in a given year, for a given block?',
             'How many household compost pits have been approved in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11166,10 +11735,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many household compost pits are ongoing in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many household compost pits are ongoing in a given year?',
             'How many household compost pits are ongoing in a given year, for a given district?',
             'How many household compost pits are ongoing in a given year, for a given block?',
             'How many household compost pits are ongoing in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11205,10 +11776,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many household compost pits have been completed in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many household compost pits have been completed in a given year?',
             'How many household compost pits have been completed in a given year, for a given district?',
             'How many household compost pits have been completed in a given year, for a given block?',
             'How many household compost pits have been completed in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11245,10 +11818,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the expenditure on household compost pits in 2024-2025?',
             'What is the expenditure on creation of household compost pits in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the expenditure on household compost pits in a given year?',
             'What is the expenditure on household compost pits in a given year, for a given district?',
             'What is the expenditure on household compost pits in a given year, for a given block?',
             'What is the expenditure on household compost pits in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11284,10 +11859,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many segregation sheds have been planned in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many segregation sheds have been planned in a given year?',
             'How many segregation sheds have been planned in a given year, for a given district?',
             'How many segregation sheds have been planned in a given year, for a given block?',
             'How many segregation sheds have been planned in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11323,10 +11900,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many segregation sheds have been approved in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many segregation sheds have been approved in a given year?',
             'How many segregation sheds have been approved in a given year, for a given district?',
             'How many segregation sheds have been approved in a given year, for a given block?',
             'How many segregation sheds have been approved in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11362,10 +11941,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many segregation sheds are ongoing in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many segregation sheds are ongoing in a given year?',
             'How many segregation sheds are ongoing in a given year, for a given district?',
             'How many segregation sheds are ongoing in a given year, for a given block?',
             'How many segregation sheds are ongoing in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11401,10 +11982,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many segregation sheds have been completed in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many segregation sheds have been completed in a given year?',
             'How many segregation sheds have been completed in a given year, for a given district?',
             'How many segregation sheds have been completed in a given year, for a given block?',
             'How many segregation sheds have been completed in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11441,10 +12024,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the expenditure on segregation sheds in 2024-2025?',
             'What is the expenditure on construction of segregation sheds in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the expenditure on segregation sheds in a given year?',
             'What is the expenditure on segregation sheds in a given year, for a given district?',
             'What is the expenditure on segregation sheds in a given year, for a given block?',
             'What is the expenditure on segregation sheds in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11481,10 +12066,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many segregation bins have been planned in 2024-2025?',
             'How many segregation bins (total) have been planned in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many segregation bins have been planned in a given year?',
             'How many segregation bins have been planned in a given year, for a given district?',
             'How many segregation bins have been planned in a given year, for a given block?',
             'How many segregation bins have been planned in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11521,10 +12108,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many segregation bins have been approved in 2024-2025?',
             'How many segregation bins (total) have been approved in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many segregation bins have been approved in a given year?',
             'How many segregation bins have been approved in a given year, for a given district?',
             'How many segregation bins have been approved in a given year, for a given block?',
             'How many segregation bins have been approved in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11561,10 +12150,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many segregation bins are ongoing in 2024-2025?',
             'How many segregation bins (total) are ongoing in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many segregation bins are ongoing in a given year?',
             'How many segregation bins are ongoing in a given year, for a given district?',
             'How many segregation bins are ongoing in a given year, for a given block?',
             'How many segregation bins are ongoing in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11601,10 +12192,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many segregation bins have been completed in 2024-2025?',
             'How many segregation bins (total) have been delivered in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many segregation bins have been completed in a given year?',
             'How many segregation bins have been completed in a given year, for a given district?',
             'How many segregation bins have been completed in a given year, for a given block?',
             'How many segregation bins have been completed in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11641,10 +12234,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many household segregation bins have been planned in 2024-2025?',
             'How many segregation bins have been purchased for households in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many household segregation bins have been planned in a given year?',
             'How many household segregation bins have been planned in a given year, for a given district?',
             'How many household segregation bins have been planned in a given year, for a given block?',
             'How many household segregation bins have been planned in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11681,10 +12276,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many community segregation bins have been planned in 2024-2025?',
             'How many segregation bins have been purchased at community level in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many community segregation bins have been planned in a given year?',
             'How many community segregation bins have been planned in a given year, for a given district?',
             'How many community segregation bins have been planned in a given year, for a given block?',
             'How many community segregation bins have been planned in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11721,10 +12318,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the expenditure on segregation bins in 2024-2025?',
             'What is the expenditure on purchase of segregation bins in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the expenditure on segregation bins in a given year?',
             'What is the expenditure on segregation bins in a given year, for a given district?',
             'What is the expenditure on segregation bins in a given year, for a given block?',
             'What is the expenditure on segregation bins in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11761,10 +12360,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many Gobardhan units have been planned in 2024-2025?',
             'How many Gobardhan units (community / cluster level) have been planned in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many Gobardhan units have been planned in a given year?',
             'How many Gobardhan units have been planned in a given year, for a given district?',
             'How many Gobardhan units have been planned in a given year, for a given block?',
             'How many Gobardhan units have been planned in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11801,10 +12402,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many Gobardhan units have been approved in 2024-2025?',
             'How many Gobardhan units (community / cluster level) have been approved in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many Gobardhan units have been approved in a given year?',
             'How many Gobardhan units have been approved in a given year, for a given district?',
             'How many Gobardhan units have been approved in a given year, for a given block?',
             'How many Gobardhan units have been approved in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11841,10 +12444,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many Gobardhan units are ongoing in 2024-2025?',
             'How many Gobardhan units (community / cluster level) are ongoing in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many Gobardhan units are ongoing in a given year?',
             'How many Gobardhan units are ongoing in a given year, for a given district?',
             'How many Gobardhan units are ongoing in a given year, for a given block?',
             'How many Gobardhan units are ongoing in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11881,10 +12486,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many Gobardhan units have been completed in 2024-2025?',
             'How many Gobardhan units (community / cluster level) have been completed in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many Gobardhan units have been completed in a given year?',
             'How many Gobardhan units have been completed in a given year, for a given district?',
             'How many Gobardhan units have been completed in a given year, for a given block?',
             'How many Gobardhan units have been completed in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11921,10 +12528,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the expenditure on Gobardhan units in 2024-2025?',
             'What is the expenditure on construction of Gobardhan units at community / cluster level in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the expenditure on Gobardhan units in a given year?',
             'What is the expenditure on Gobardhan units in a given year, for a given district?',
             'What is the expenditure on Gobardhan units in a given year, for a given block?',
             'What is the expenditure on Gobardhan units in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -11961,10 +12570,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many door-to-door waste-collection vehicles have been planned in 2024-2025?',
             'How many door-to-door waste-collection vehicles (tricycle / battery-operated, including for Gobardhan units) have been planned in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many door-to-door waste-collection vehicles have been planned in a given year?',
             'How many door-to-door waste-collection vehicles have been planned in a given year, for a given district?',
             'How many door-to-door waste-collection vehicles have been planned in a given year, for a given block?',
             'How many door-to-door waste-collection vehicles have been planned in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -12001,10 +12612,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many door-to-door waste-collection vehicles have been approved in 2024-2025?',
             'How many such vehicles have been approved in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many door-to-door waste-collection vehicles have been approved in a given year?',
             'How many door-to-door waste-collection vehicles have been approved in a given year, for a given district?',
             'How many door-to-door waste-collection vehicles have been approved in a given year, for a given block?',
             'How many door-to-door waste-collection vehicles have been approved in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -12041,10 +12654,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many door-to-door waste-collection vehicles are ongoing in 2024-2025?',
             'How many such vehicles are ongoing (in procurement) in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many door-to-door waste-collection vehicles are ongoing in a given year?',
             'How many door-to-door waste-collection vehicles are ongoing in a given year, for a given district?',
             'How many door-to-door waste-collection vehicles are ongoing in a given year, for a given block?',
             'How many door-to-door waste-collection vehicles are ongoing in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -12081,10 +12696,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many door-to-door waste-collection vehicles have been completed in 2024-2025?',
             'How many such vehicles have been procured in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many door-to-door waste-collection vehicles have been completed in a given year?',
             'How many door-to-door waste-collection vehicles have been completed in a given year, for a given district?',
             'How many door-to-door waste-collection vehicles have been completed in a given year, for a given block?',
             'How many door-to-door waste-collection vehicles have been completed in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -12121,10 +12738,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the expenditure on door-to-door waste-collection vehicles in 2024-2025?',
             'What is the expenditure on purchase and repair of door-to-door waste-collection vehicles in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the expenditure on door-to-door waste-collection vehicles in a given year?',
             'What is the expenditure on door-to-door waste-collection vehicles in a given year, for a given district?',
             'What is the expenditure on door-to-door waste-collection vehicles in a given year, for a given block?',
             'What is the expenditure on door-to-door waste-collection vehicles in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -12161,10 +12780,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many weighing machines have been planned in 2024-2025?',
             'How many weighing machines for Solid Waste Management (SWM) a given subject have been planned in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many weighing machines have been planned in a given year?',
             'How many weighing machines have been planned in a given year, for a given district?',
             'How many weighing machines have been planned in a given year, for a given block?',
             'How many weighing machines have been planned in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -12200,10 +12821,12 @@ WHERE v.fiscal_year = $date_range
         "answerable": 'Partial',
         "paraphrases": [
             'How many weighing machines have been approved in 2024-2025?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many weighing machines have been approved in a given year?',
             'How many weighing machines have been approved in a given year, for a given district?',
             'How many weighing machines have been approved in a given year, for a given block?',
             'How many weighing machines have been approved in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -12240,10 +12863,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many weighing machines are ongoing in 2024-2025?',
             'How many weighing machines are ongoing (in procurement) in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many weighing machines are ongoing in a given year?',
             'How many weighing machines are ongoing in a given year, for a given district?',
             'How many weighing machines are ongoing in a given year, for a given block?',
             'How many weighing machines are ongoing in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -12280,10 +12905,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many weighing machines have been completed in 2024-2025?',
             'How many weighing machines have been procured in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many weighing machines have been completed in a given year?',
             'How many weighing machines have been completed in a given year, for a given district?',
             'How many weighing machines have been completed in a given year, for a given block?',
             'How many weighing machines have been completed in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -12320,10 +12947,12 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'What is the expenditure on weighing machines in 2024-2025?',
             'What is the expenditure on purchase of weighing machines for Solid Waste Management (SWM) a given subject in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the expenditure on weighing machines in a given year?',
             'What is the expenditure on weighing machines in a given year, for a given district?',
             'What is the expenditure on weighing machines in a given year, for a given block?',
             'What is the expenditure on weighing machines in a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -12364,7 +12993,9 @@ ORDER BY actual_expenditure DESC
         "paraphrases": [
             'Compare Andhrua and Balianta on plan, spend and completion in 2024-2025.',
             'Compare planned expenditure, actual expenditure, and completion rate between a given GP Name and a given GP Name 2 for a given Financial Year.',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Compare planned expenditure, actual expenditure and completion rate between a given gram panchayat and a second gram panchayat for a given year.',
+            # ── end derived ──
         ],
     },
 
@@ -12405,7 +13036,9 @@ ORDER BY actual_expenditure DESC
         "paraphrases": [
             'Compare Bhubaneswar and Barpali in 2024-2025.',
             'Compare activity counts, expenditure, and completion rates between a given Block and a given Block 2 for a given Plan Year.',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Compare activity counts, expenditure and completion rates between a given block and a second block for a given year.',
+            # ── end derived ──
         ],
     },
 
@@ -12448,7 +13081,9 @@ ORDER BY expenditure_per_gp DESC
         "paraphrases": [
             'How does Khordha compare with the state average in 2024-2025?',
             'How does a given District compare with the state average on expenditure per GP and completion rate for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How does a given district compare with the state average on expenditure per GP and completion rate for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -12489,9 +13124,11 @@ ORDER BY expenditure DESC
         "paraphrases": [
             "What is Andhrua's theme-wise physical-financial picture in 2024-2025?",
             'What are the approved cost, expenditure, and activity status counts theme-wise for a given GP Name in a given Financial Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What are the approved cost, expenditure and status counts theme-wise for a given gram panchayat in a given year?',
             'What are the approved cost, expenditure and status counts theme-wise for a given district in a given year?',
             'What are the approved cost, expenditure and status counts theme-wise for a given block in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -12530,9 +13167,11 @@ ORDER BY expenditure DESC
         "paraphrases": [
             "What is Khordha's focus-area-wise cost and spend in 2024-2025?",
             'What are the approved cost and expenditure sector-wise in a given District for a given Financial Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What are the approved cost and expenditure sector-wise in a given district for a given year?',
             'What are the approved cost and expenditure sector-wise in a given block for a given year?',
             'What are the approved cost and expenditure sector-wise in a given gram panchayat for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -12571,9 +13210,11 @@ ORDER BY expenditure DESC, completion_rate_pct ASC
         "paraphrases": [
             'Which Bhubaneswar themes spend a lot but complete little in 2024-2025?',
             'Which themes in a given Block show high expenditure but low activity completion in a given Financial Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which themes in a given block show high expenditure but low activity completion in a given year?',
             'Which themes in a given district show high expenditure but low activity completion in a given year?',
             'Which themes in a given gram panchayat show high expenditure but low activity completion in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -12612,10 +13253,12 @@ ORDER BY planned_year2 DESC
         "paraphrases": [
             'Compare theme-wise planned and started activities between 2023-2024 and 2024-2025.',
             'Compare the number of activities planned and started theme-wise between a given Plan Year and a given Plan Year 2.',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Compare the activities planned and started theme-wise between a second year and a given year.',
             'Compare the activities planned and started theme-wise between a second year and a given year, for a given district?',
             'Compare the activities planned and started theme-wise between a second year and a given year, for a given block?',
             'Compare the activities planned and started theme-wise between a second year and a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -12654,10 +13297,12 @@ ORDER BY expenditure_year2 DESC
         "paraphrases": [
             'Compare theme-wise cost and spend between 2023-2024 and 2024-2025.',
             'Compare the approved cost and expenditure theme-wise between a given Plan Year and a given Plan Year 2.',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Compare the approved cost and expenditure theme-wise between a second year and a given year.',
             'Compare the approved cost and expenditure theme-wise between a second year and a given year, for a given district?',
             'Compare the approved cost and expenditure theme-wise between a second year and a given year, for a given block?',
             'Compare the approved cost and expenditure theme-wise between a second year and a given year, for a given gram panchayat (GP)?',
+            # ── end derived ──
         ],
     },
 
@@ -12695,9 +13340,11 @@ ORDER BY 1 DESC
         "paraphrases": [
             "How does Andhrua's spend compare with its plan each year?",
             'What is the current-year expenditure of a given GP Name against the plans of each of the last three years?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the year-wise expenditure of a given gram panchayat against the plan of each year?',
             'What is the year-wise expenditure of a given district against the plan of each year?',
             'What is the year-wise expenditure of a given block against the plan of each year?',
+            # ── end derived ──
         ],
     },
 
@@ -12735,9 +13382,11 @@ WHERE v.fiscal_year IN ($date_range, $date_range_2)
         "paraphrases": [
             "How did Bhubaneswar's expenditure change from 2023-2024 to 2024-2025?",
             'How did the total expenditure of a given Block change between a given Financial Year and a given Financial Year 2?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How did the total expenditure of a given block change between a second year and a given year?',
             'How did the total expenditure of a given district change between a second year and a given year?',
             'How did the total expenditure of a given gram panchayat change between a second year and a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -12775,9 +13424,11 @@ ORDER BY 1
         "paraphrases": [
             "How has Khordha's completion rate moved year on year?",
             'How has the activity completion rate of a given District changed over a given Date Range?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How has the activity completion rate of a given district changed over the years?',
             'How has the activity completion rate of a given block changed over the years?',
             'How has the activity completion rate of a given gram panchayat changed over the years?',
+            # ── end derived ──
         ],
     },
 
@@ -12814,9 +13465,11 @@ ORDER BY v.gp_name, v.fiscal_year
         "paraphrases": [
             "What is Andhrua's year-wise expenditure?",
             'What is the year-wise total expenditure of a given GP Name over a given Date Range?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the year-wise total expenditure of a given gram panchayat?',
             'What is the year-wise total expenditure of a given district?',
             'What is the year-wise total expenditure of a given block?',
+            # ── end derived ──
         ],
     },
 
@@ -12859,9 +13512,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which Bhubaneswar activities have spent nothing 180 days after sanction?',
             'Which administratively approved activities in a given Block have zero expenditure a given Threshold days after sanction in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which administratively approved activities in a given block still have zero expenditure a given threshold days after sanction?',
             'Which administratively approved activities in a given district still have zero expenditure a given threshold days after sanction?',
             'Which administratively approved activities in a given gram panchayat still have zero expenditure a given threshold days after sanction?',
+            # ── end derived ──
         ],
     },
 
@@ -12901,8 +13556,10 @@ LIMIT $top_n
         "paraphrases": [
             'Which Khordha activities overshot their sanction in 2024-2025?',
             'Which activities in a given District have expenditure exceeding their administratively approved cost in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities in a given block have expenditure exceeding their administratively approved cost in a given year?',
             'Which activities in a given gram panchayat have expenditure exceeding their administratively approved cost in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -12942,8 +13599,10 @@ LIMIT $top_n
         "paraphrases": [
             'Which Bhubaneswar activities exceed their estimate by 50% in 2024-2025?',
             'Which activities in a given Block have expenditure more than a given Threshold percent above estimated cost in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities in a given district have expenditure more than a given threshold percent above estimated cost in a given year?',
             'Which activities in a given gram panchayat have expenditure more than a given threshold percent above estimated cost in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -12982,8 +13641,10 @@ LIMIT $top_n
         "paraphrases": [
             'Which Khordha activities have TS above AS in 2024-2025?',
             'Which activities in a given District have a technically approved cost higher than the administratively approved cost in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities in a given block have a technically approved cost higher than the administratively approved cost in a given year?',
             'Which activities in a given gram panchayat have a technically approved cost higher than the administratively approved cost in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -13021,9 +13682,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which abandoned Khordha activities still spent money in 2024-2025?',
             'Which abandoned activities in a given District had expenditure incurred before abandonment, and how much in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which abandoned activities in a given district had expenditure incurred, and how much in a given year?',
             'Which abandoned activities in a given block had expenditure incurred, and how much in a given year?',
             'Which abandoned activities in a given gram panchayat had expenditure incurred, and how much in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -13061,8 +13724,10 @@ ORDER BY g.zp_name, g.block_name, g.gp_name
         "paraphrases": [
             'Which Bhubaneswar GPs recorded nothing in 2024-2025?',
             'Which GPs in a given Block have recorded no new activities, sanctions, or payments in the last a given Threshold days?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPs in a given block recorded no activity in a given year?',
             'Which GPs in a given district recorded no activity in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -13101,8 +13766,10 @@ ORDER BY district_name, block_name, gp_name
         "paraphrases": [
             'Which Khordha GPs have no data at all for 2024-2025?',
             'Which GPs in a given District have no data entry for a given Plan Year in any module?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPs in a given district have no data entry for a given year in any module?',
             'Which GPs in a given block have no data entry for a given year in any module?',
+            # ── end derived ──
         ],
     },
 
@@ -13144,9 +13811,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which Bhubaneswar activities sanctioned over 180 days ago have not started?',
             'Which activities approved more than a given Threshold days ago in a given Block are still marked Not Started?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities approved more than a given threshold days ago in a given block are still not started?',
             'Which activities approved more than a given threshold days ago in a given district are still not started?',
             'Which activities approved more than a given threshold days ago in a given gram panchayat are still not started?',
+            # ── end derived ──
         ],
     },
 
@@ -13188,8 +13857,10 @@ ORDER BY total_activities DESC
         "paraphrases": [
             'Which Bhubaneswar GPs have a plan but no sanctions in 2024-2025?',
             'Which GPs in a given Block have an approved plan but no administratively approved activities in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPs in a given block have an approved plan but no administratively approved activities in a given year?',
             'Which GPs in a given district have an approved plan but no administratively approved activities in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -13228,7 +13899,9 @@ ORDER BY completion_rate_pct ASC
         "paraphrases": [
             'Which Khordha blocks sit below 50% completion in 2024-2025?',
             'Which blocks in a given District are below a given Threshold percent activity completion at mid-year of a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which blocks in a given district are below a given threshold percent activity completion in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -13267,9 +13940,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which Bhubaneswar activities claim progress with no evidence in 2024-2025?',
             'Which activities in a given Block are marked completed in the status report but have incomplete asset stages in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities in a given block are marked completed or ongoing but have no progress evidence in a given year?',
             'Which activities in a given district are marked completed or ongoing but have no progress evidence in a given year?',
             'Which activities in a given gram panchayat are marked completed or ongoing but have no progress evidence in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -13308,8 +13983,10 @@ LIMIT $top_n
         "paraphrases": [
             'Which Khordha activities have a zero or negative cost in 2024-2025?',
             'Which activities in a given District have a zero or negative estimated cost recorded in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities in a given block have a zero or negative estimated cost recorded in a given year?',
             'Which activities in a given gram panchayat have a zero or negative estimated cost recorded in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -13352,9 +14029,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which Andhrua activities have duplicate descriptions in 2024-2025?',
             'Which activities within a given GP Name share identical descriptions in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities within a given gram panchayat share identical descriptions in a given year?',
             'Which activities within a given district share identical descriptions in a given year?',
             'Which activities within a given block share identical descriptions in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -13397,9 +14076,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which Bhubaneswar activities have a scheme-funding mismatch in 2024-2025?',
             'For which activities in a given Block does the sum of scheme-wise fund allocations not equal the total activity cost in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'For which activities in a given block does the sanctioned scheme funding not equal the approved cost in a given year?',
             'For which activities in a given district does the sanctioned scheme funding not equal the approved cost in a given year?',
             'For which activities in a given gram panchayat does the sanctioned scheme funding not equal the approved cost in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -13444,9 +14125,11 @@ ORDER BY activities DESC
         "paraphrases": [
             'Which Khordha GPs are all-zero in 2024-2025?',
             'Which GPs in a given District show all-zero values in the physical-financial comparison for a given Financial Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPs in a given district show all-zero values in the physical-financial comparison for a given year?',
             'Which GPs in a given block show all-zero values in the physical-financial comparison for a given year?',
             'Which GPs in a given gram panchayat show all-zero values in the physical-financial comparison for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -13490,9 +14173,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which Bhubaneswar activities spent money with no voucher in 2024-2025?',
             'Which activities in a given Block report expenditure but have zero payment vouchers in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities in a given block report expenditure but have no payment vouchers in a given year?',
             'Which activities in a given district report expenditure but have no payment vouchers in a given year?',
             'Which activities in a given gram panchayat report expenditure but have no payment vouchers in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -13528,9 +14213,11 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many Khordha activities lack a focus area in 2024-2025?',
             'How many activities in a given District have no focus area recorded for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities in a given district have no focus area recorded for a given year?',
             'How many activities in a given block have no focus area recorded for a given year?',
             'How many activities in a given gram panchayat have no focus area recorded for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -13569,8 +14256,10 @@ LIMIT $top_n
         "paraphrases": [
             'Which Bhubaneswar activities have no asset detail in 2024-2025?',
             'Which asset-creating activities in a given Block have no asset details recorded in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which asset-creating activities in a given district have no asset details recorded in a given year?',
             'Which asset-creating activities in a given gram panchayat have no asset details recorded in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -13614,9 +14303,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which Bhubaneswar sanctions are missing their date or authority in 2024-2025?',
             'Which administratively approved activities in a given Block have a missing sanction order date in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which administratively approved activities in a given block have a missing sanction order date or authority in a given year?',
             'Which administratively approved activities in a given district have a missing sanction order date or authority in a given year?',
             'Which administratively approved activities in a given gram panchayat have a missing sanction order date or authority in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -13650,9 +14341,11 @@ WHERE v.fiscal_year = $date_range
         "paraphrases": [
             'How many Khordha activities lack a scheme in 2024-2025?',
             'Which activities in a given District have no funding scheme recorded for a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities in a given district have no funding scheme recorded for a given year?',
             'How many activities in a given block have no funding scheme recorded for a given year?',
             'How many activities in a given gram panchayat have no funding scheme recorded for a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -13695,9 +14388,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which Andhrua focus areas are costly but under 50% complete in 2024-2025?',
             'Which focus areas in a given GP Name have high approved cost but completion below a given Threshold percent in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus areas in a given gram panchayat have high approved cost but completion below a given threshold percent in a given year?',
             'Which focus areas in a given district have high approved cost but completion below a given threshold percent in a given year?',
             'Which focus areas in a given block have high approved cost but completion below a given threshold percent in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -13740,7 +14435,9 @@ LIMIT $top_n
         "paraphrases": [
             'Which Khordha blocks have many pending sanctions and little spend in 2024-2025?',
             'Which blocks in a given District combine high pending sanctions with low expenditure in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which blocks in a given district combine high pending sanctions with low expenditure in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -13780,9 +14477,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which Bhubaneswar asset sub-categories need repeat maintenance most?',
             'Which asset sub-categories in a given Block show the highest repeat-maintenance frequency and should be prioritised for replacement budgeting in a given year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which asset sub-categories in a given block show the highest repeat-maintenance frequency in a given year?',
             'Which asset sub-categories in a given district show the highest repeat-maintenance frequency in a given year?',
             'Which asset sub-categories in a given gram panchayat show the highest repeat-maintenance frequency in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -13825,9 +14524,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which ongoing Bhubaneswar activities are under 50% spent in 2024-2025?',
             'Which ongoing activities in a given Block have spent less than a given Threshold percent of sanctioned cost with one quarter left in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which ongoing activities in a given block have spent less than a given threshold percent of their sanctioned cost in a given year?',
             'Which ongoing activities in a given district have spent less than a given threshold percent of their sanctioned cost in a given year?',
             'Which ongoing activities in a given gram panchayat have spent less than a given threshold percent of their sanctioned cost in a given year?',
+            # ── end derived ──
         ],
     },
 
@@ -13873,9 +14574,11 @@ LIMIT $top_n
         "paraphrases": [
             'Which Bhubaneswar GPs have the most unspent money in 2024-2025?',
             'Which GPs in a given Block have large unprogrammed envelope balances that could absorb additional activities in a given Plan Year?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPs in a given block have the largest unspent balance in a given year?',
             'Which GPs in a given district have the largest unspent balance in a given year?',
             'Which GPs in a given gram panchayat have the largest unspent balance in a given year?',
+            # ── end derived ──
         ],
     },
 }

@@ -60,13 +60,13 @@ def main() -> int:
     from query_router.entity_validator import EntityValidator
     from query_router.sql_params import NAMED, param_style
     from query_router.template_catalog import TEMPLATE_CATALOG, bind
-    from tools.build_catalog import mask_literals
+    from tools.derive_catalog import mask_literals
 
     if not args.db.exists():
         print(f"no database at {args.db}", file=sys.stderr)
         return 2
     if not ORACLE_PATH.exists():
-        print(f"no oracle at {ORACLE_PATH} — run tools/build_catalog.py",
+        print(f"no oracle at {ORACLE_PATH} — it is committed beside the catalogue",
               file=sys.stderr)
         return 2
 

@@ -116,7 +116,7 @@ def _unit_nouns(slot: str) -> tuple[str, ...]:
 # answer covering all of them is a wrong description of the query that ran.
 #
 # TWO READINGS, decided by the template's `grouped_geo` (emitted by
-# tools/build_catalog.py from the outermost GROUP BY):
+# tools/derive_catalog.py from the outermost GROUP BY):
 #   collective   the filter is simply off — one figure spanning them all
 #                ("How many GPs across all districts uploaded the GPDP?")
 #   distributive the statement returns ONE ROW PER unit
