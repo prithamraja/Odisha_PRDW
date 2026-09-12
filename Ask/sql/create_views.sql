@@ -192,9 +192,15 @@ SELECT
     CASE WHEN ap.sanction_day IS NOT NULL
          THEN DATE_DIFF('day', ap.sanction_day, CURRENT_DATE) END AS days_since_sanction,
     COALESCE(pp.evidence_uploads, 0) AS evidence_uploads,
-    CASE WHEN pp.activity_code IS NOT NULL THEN 1 ELSE 0 END AS has_progress_evidence
+    CASE WHEN pp.activity_code IS NOT NULL THEN 1 ELSE 0 END AS has_progress_evidence,
+    -- WP-6 T1: the plan an activity belongs to is Main or Supplementary.
+    -- plan_code is unique in `plan` and every activity's plan_code is
+    -- present there (12,704 of 12,704, verified 2026-09-12), so this join
+    -- adds a column and no rows. Appended last so no column moves.
+    pl.plan_type
 FROM planned_activity a
 JOIN gram_panchayat g ON g.gp_lgd_code = a.gp_lgd_code
+LEFT JOIN plan pl     ON pl.plan_code = a.plan_code
 LEFT JOIN v_exp   e   ON e.activity_code = a.activity_code
 LEFT JOIN v_approval ap ON ap.activity_code = a.activity_code
 LEFT JOIN (SELECT activity_code, COUNT(*) AS evidence_uploads
@@ -234,7 +240,8 @@ SELECT aa.*,
        COALESCE(ac.description, 'Uncategorised') AS asset_category_label,
        COALESCE(asc_.description,'Uncategorised') AS asset_subcategory_label,
        COALESCE(mac.description,'Uncategorised') AS main_asset_category_label,
-       COALESCE(ast.description,'Unknown')       AS asset_type_label
+       COALESCE(ast.description,'Unknown')       AS asset_type_label,
+       a.plan_type                               -- WP-6 T1, inherited like fiscal_year
 FROM activity_asset aa
 JOIN v_activity a ON a.activity_code = aa.activity_code
 LEFT JOIN dim_code ac   ON ac.variable  = 'asset_category'
@@ -257,7 +264,8 @@ SELECT pp.row_id, pp.parent_row_id, pp.pos, pp.activity_code,
        pp.file_upload_id, pp.longitude, pp.latitude, pp.n_coords,
        a.fiscal_year, a.gp_name, a.block_name, a.district_name,
        a.activity_name, a.focus_area_name, a.theme, a.status_label,
-       a.total_expenditure, a.total_cost
+       a.total_expenditure, a.total_cost,
+       a.plan_type                               -- WP-6 T1, inherited like fiscal_year
 FROM physical_progress pp
 JOIN v_activity a ON a.activity_code = pp.activity_code;
 

@@ -7,6 +7,7 @@
     "unit": "dimension",
     "sector": "dimension",
     "tied_untied": "dimension",
+    "plan_type": "dimension",
     "funding_source": "dimension",
     "sanction_authority": "dimension",
     "sanction_authority_raw": "dimension",

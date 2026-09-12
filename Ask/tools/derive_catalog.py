@@ -308,6 +308,7 @@ PARAM_ENTITY_TYPES = {
     "gp_name": "gp", "gp_name_2": "gp_2",
     "focus_area": "focus_area", "theme": "theme",
     "scheme": "scheme", "scheme_2": "scheme_2", "status": "status",
+    "plan_type": "plan_type",
     "asset_category": "asset_category", "asset_sub_category": "asset_subcategory",
     "activity_code": "activity_code", "top_n": "top_n",
     "threshold": "threshold", "amount_threshold": "amount_threshold",
@@ -334,6 +335,18 @@ CODE_BOUND = {"gp_name", "gp_name_2"}
 # The value is a string because ExtractedEntity carries strings and DuckDB casts
 # at bind time, including inside LIMIT.
 DEFAULTED_SLOTS = {"top_n": "10"}
+
+# The other half of the D18 table: dimensions that are optional and must NEVER
+# carry a default, each with its reason. `contract_problems` already refuses a
+# default on anything outside DEFAULTED_SLOTS; this names the ones where the
+# temptation is real, so the refusal has its reason written next to it.
+UNDEFAULTED_SLOTS = {
+    # WP-6 T1. "How many activities are planned?" with no qualifier means BOTH
+    # plan types; that is the signed-off Test Report count. Defaulting to Main
+    # (the plan most questions are about) would silently drop the Supplementary
+    # activities from every answer that did not ask for them.
+    "plan_type": "absent means both plan types (Main and Supplementary)",
+}
 
 # {Token} in the question text -> the slot it stands for. `.format()` is called
 # on abstract_question by suggestions._chip_for, so every placeholder must be a

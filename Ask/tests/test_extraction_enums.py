@@ -59,6 +59,9 @@ WORKBOOK_BIND_NAMES = [
     "gp_name", "gp_name_2", "focus_area", "theme", "scheme", "scheme_2",
     "status", "asset_category", "asset_sub_category", "activity_code",
     "top_n", "threshold", "amount_threshold", "deadline",
+    # Not on the sheet: added by the catalogue file itself since WP-6 T0 made
+    # it the source of truth. Each is a dimension the views already carried.
+    "plan_type",
 ]
 
 

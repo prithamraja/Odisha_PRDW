@@ -281,6 +281,26 @@ _THEME_ALIASES = {
     "good governance":    "Theme 8 - Village with Good Governance",
 }
 
+# GPDP plan type (WP-6 T1). Two values, loaded from v_activity like every other
+# categorical. Officers say "main GPDP" / "primary GPDP" for the annual plan and
+# "supplementary plan" for the mid-year one. It is a FILTER ON ACTIVITIES
+# ("activities in the main plan"), not on plans; plan-grain questions read v_plan.
+_PLAN_TYPE_ALIASES = {
+    "main":                "Main",
+    "main plan":           "Main",
+    "main plans":          "Main",
+    "main gpdp":           "Main",
+    "main gpdps":          "Main",
+    "primary gpdp":        "Main",
+    "primary gpdps":       "Main",
+    "annual gpdp":         "Main",
+    "supplementary":       "Supplementary",
+    "supplementary plan":  "Supplementary",
+    "supplementary plans": "Supplementary",
+    "supplementary gpdp":  "Supplementary",
+    "supplementary gpdps": "Supplementary",
+}
+
 _ASSET_CATEGORY_ALIASES = {
     "toilet":           "Household Sanitation",
     "toilets":          "Household Sanitation",
@@ -343,6 +363,10 @@ REGISTRY_CONFIG: dict[str, dict] = {
                    "aliases": _SCHEME_ALIASES},
     "status":     {"kind": "categorical", "fuzzy_threshold": 88,
                    "aliases": _STATUS_ALIASES},
+    # WP-6 T1. No default anywhere: "how many activities are planned" with no
+    # qualifier means BOTH plan types, which is the signed-off row count.
+    "plan_type":  {"kind": "categorical", "fuzzy_threshold": 88,
+                   "aliases": _PLAN_TYPE_ALIASES},
     # Asset coverage is sparse (4,286 of 12,704 activity rows carry a category)
     # and 8 of 36 category codes / 56 of 198 subcategory codes have no decode.
     # Both are WP-3 answer caveats; the registry's job is only to accept the
@@ -412,6 +436,7 @@ PARAM_ENTITY_TYPES: dict[str, str] = {
     "scheme":             "scheme",
     "scheme_2":           "scheme_2",
     "status":             "status",
+    "plan_type":          "plan_type",          # WP-6 T1; not a workbook bind name
     "asset_category":     "asset_category",
     "asset_sub_category": "asset_subcategory",
     "activity_code":      "activity_code",
@@ -682,6 +707,8 @@ class EntityValidator:
                        'WHERE scheme_name IS NOT NULL',
         "status":            'SELECT DISTINCT status_label FROM v_activity '
                              'WHERE status_label IS NOT NULL',
+        "plan_type":         'SELECT DISTINCT plan_type FROM v_activity '
+                             'WHERE plan_type IS NOT NULL',
         "asset_category":    'SELECT DISTINCT asset_category_label FROM v_asset '
                              'WHERE asset_category_label IS NOT NULL',
         "asset_subcategory": 'SELECT DISTINCT asset_subcategory_label FROM v_asset '

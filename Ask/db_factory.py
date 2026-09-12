@@ -91,7 +91,8 @@ def _seed_views(adapter) -> list[str]:
     added to it — it is opened read-only, on Drive, deliberately. They are
     created in the adapter's writable in-memory catalog instead, where their
     unqualified base-table references resolve through search_path into the
-    attached file. Byte-identical to the supplied Data/create_views.sql.
+    attached file. Byte-identical to the supplied Data/create_views.sql until WP-6 T1, which
+    appended `plan_type` to v_activity, v_asset and v_progress (Ask-side only).
 
     Returns the view names that exist afterwards. A missing DDL file is fatal
     rather than degraded: every one of the 346 catalogue queries reads a view, so

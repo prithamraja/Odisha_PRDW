@@ -41,7 +41,7 @@ from dataclasses import dataclass, field
 _DATE_SLOTS = {"date_range", "date_range_2"}
 _PLACE_SLOTS = {"district_name", "block_name", "block_name_2",
                 "gp_name", "gp_name_2"}
-_CATEGORICAL_SLOTS = {"theme", "scheme", "scheme_2", "status", "focus_area",
+_CATEGORICAL_SLOTS = {"theme", "scheme", "scheme_2", "status", "plan_type", "focus_area",
                       "asset_category", "asset_sub_category", "activity_code"}
 _NUMERIC_SLOTS = {"top_n", "threshold", "amount_threshold"}
 
