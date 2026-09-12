@@ -206,6 +206,8 @@ _STATUS_ALIASES = {
     "in progress":        "WORK ONGOING",
     "under execution":    "WORK ONGOING",
     "running":            "WORK ONGOING",
+    "underway":           "WORK ONGOING",
+    "currently underway": "WORK ONGOING",
     "completed":          "WORK COMPLETED",
     "complete":           "WORK COMPLETED",
     "finished":           "WORK COMPLETED",
@@ -233,9 +235,13 @@ _FOCUS_AREA_ALIASES = {
     "water":             "Drinking water",
     "drinking water supply": "Drinking water",
     "piped water":       "Drinking water",
+    "piped water supply": "Drinking water",
     "jal jeevan":        "Drinking water",
     "road":              "Roads",
     "rural roads":       "Roads",
+    "road construction": "Roads",
+    "road works":        "Roads",
+    "road work":         "Roads",
     "school":            "Education",
     "schools":           "Education",
     "anganwadi":         "Women and child development",
@@ -299,6 +305,26 @@ _PLAN_TYPE_ALIASES = {
     "supplementary plans": "Supplementary",
     "supplementary gpdp":  "Supplementary",
     "supplementary gpdps": "Supplementary",
+}
+
+# The sanctioned grant component (WP-6 T2), as v_approval classifies it: 4249 is
+# the Tied Grant, 4211/4250 the Basic (untied) Grant, anything else 'Other'.
+# Only the 2,101 administratively approved activities carry a value; the rest
+# are NULL, so a tied/untied filter answers over approved activities only —
+# which is what "tied-fund expenditure" means anyway.
+_TIED_UNTIED_ALIASES = {
+    "tied":           "Tied",
+    "tied fund":      "Tied",
+    "tied funds":     "Tied",
+    "tied grant":     "Tied",
+    "tied grants":    "Tied",
+    "untied":         "Untied",
+    "untied fund":    "Untied",
+    "untied funds":   "Untied",
+    "untied grant":   "Untied",
+    "untied grants":  "Untied",
+    "basic grant":    "Untied",
+    "basic grants":   "Untied",
 }
 
 _ASSET_CATEGORY_ALIASES = {
@@ -367,6 +393,11 @@ REGISTRY_CONFIG: dict[str, dict] = {
     # qualifier means BOTH plan types, which is the signed-off row count.
     "plan_type":  {"kind": "categorical", "fuzzy_threshold": 88,
                    "aliases": _PLAN_TYPE_ALIASES},
+    # WP-6 T2. Exact and alias only in practice: "tied" and "untied" are one
+    # prefix apart, so the fuzzy threshold is set where neither can reach the
+    # other.
+    "tied_untied": {"kind": "categorical", "fuzzy_threshold": 95,
+                    "aliases": _TIED_UNTIED_ALIASES},
     # Asset coverage is sparse (4,286 of 12,704 activity rows carry a category)
     # and 8 of 36 category codes / 56 of 198 subcategory codes have no decode.
     # Both are WP-3 answer caveats; the registry's job is only to accept the
@@ -437,6 +468,7 @@ PARAM_ENTITY_TYPES: dict[str, str] = {
     "scheme_2":           "scheme_2",
     "status":             "status",
     "plan_type":          "plan_type",          # WP-6 T1; not a workbook bind name
+    "tied_untied":        "tied_untied",        # WP-6 T2; not a workbook bind name
     "asset_category":     "asset_category",
     "asset_sub_category": "asset_subcategory",
     "activity_code":      "activity_code",
@@ -709,6 +741,8 @@ class EntityValidator:
                              'WHERE status_label IS NOT NULL',
         "plan_type":         'SELECT DISTINCT plan_type FROM v_activity '
                              'WHERE plan_type IS NOT NULL',
+        "tied_untied":       'SELECT DISTINCT tied_untied FROM v_activity '
+                             'WHERE tied_untied IS NOT NULL',
         "asset_category":    'SELECT DISTINCT asset_category_label FROM v_asset '
                              'WHERE asset_category_label IS NOT NULL',
         "asset_subcategory": 'SELECT DISTINCT asset_subcategory_label FROM v_asset '

@@ -8,6 +8,7 @@ That defect was found on the AP catalogue, where repetition was occasional
 (Q098's twice-filtered crop). It is the NORM here: decision D2's optional-filter
 idiom `($p IS NULL OR col = $p)` writes every geography parameter twice, so all
 346 PR&DW templates repeat at least one slot and most repeat three."""
+import re
 import time
 import unittest
 from types import SimpleNamespace
@@ -77,7 +78,12 @@ class BindParamValuesTests(unittest.TestCase):
         })
         self.assertEqual(sql.count("$gp_name"), 2)
         self.assertEqual(params["gp_name"], "116350")
-        self.assertEqual(len(params), 4)
+        # One entry per declared slot NAME — counted off the template rather
+        # than pinned as a number, since WP-6's universal filters add slots.
+        self.assertEqual(len(params), len({s["name"] for s in
+                                           TEMPLATE_CATALOG["PLN-001"]["param_slots"]}))
+        self.assertLess(len(params), len(re.findall(r"\$\w+", sql)),
+                        "the point of the test: fewer entries than occurrences")
 
     def test_a_code_bound_slot_binds_the_code_not_the_name(self):
         """Decision D4/D10: a GP name is not an identity. This is the AP

@@ -135,6 +135,7 @@ _SLOT_COLLECTIVES: dict[str, str] = {
     "scheme_2":           "all schemes",
     "status":             "all statuses",
     "plan_type":          "both plan types",
+    "tied_untied":        "tied and untied funds",
     "asset_category":     "all categories",
     "asset_sub_category": "all categories",
     "activity_code":      "all activities",

@@ -5,8 +5,14 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
    "threshold": 50,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -18,7 +24,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 0,
@@ -30,8 +42,14 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
    "threshold": 50,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 0,
@@ -43,7 +61,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 2,
@@ -55,7 +79,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 0,
@@ -67,8 +96,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
    "threshold": 50,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 2,
@@ -79,7 +113,8 @@
   "params": {
    "block_name": null,
    "date_range": "2024-2025",
-   "district_name": null
+   "district_name": null,
+   "plan_type": null
   },
   "rows": 1,
   "status": "PASS"
@@ -89,7 +124,12 @@
   "params": {
    "date_range": "2024-2025",
    "district_name": null,
-   "threshold": 50
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "threshold": 50,
+   "tied_untied": null
   },
   "rows": 16,
   "status": "PASS"
@@ -120,7 +160,11 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "status": null,
+   "theme": null
   },
   "rows": 20,
   "status": "PASS"
@@ -131,7 +175,11 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "status": null,
+   "theme": null
   },
   "rows": 25,
   "status": "PASS"
@@ -143,7 +191,11 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "status": null,
+   "theme": null
   },
   "rows": 1,
   "status": "PASS"
@@ -154,7 +206,11 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "status": null,
+   "theme": null
   },
   "rows": 3,
   "status": "PASS"
@@ -165,7 +221,11 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "status": null,
+   "theme": null,
    "top_n": 10
   },
   "rows": 10,
@@ -177,7 +237,10 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "status": null,
    "theme": "Theme 5 - Clean and Green Village "
   },
   "rows": 1,
@@ -188,7 +251,11 @@
   "params": {
    "block_name": null,
    "date_range": "2024-2025",
-   "district_name": null
+   "district_name": null,
+   "focus_area": null,
+   "plan_type": null,
+   "status": null,
+   "theme": null
   },
   "rows": 0,
   "status": "PASS (0 rows)"
@@ -198,7 +265,11 @@
   "params": {
    "block_name": null,
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "status": null,
+   "theme": null
   },
   "rows": 6,
   "status": "PASS"
@@ -209,7 +280,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 20,
   "status": "PASS"
@@ -220,7 +297,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 3,
   "status": "PASS"
@@ -231,7 +314,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 3,
   "status": "PASS"
@@ -242,7 +331,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 3,
   "status": "PASS"
@@ -253,7 +348,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 3,
   "status": "PASS"
@@ -264,7 +365,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -275,7 +382,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 7,
@@ -287,7 +400,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 7,
@@ -299,7 +418,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -310,7 +435,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -321,7 +452,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -332,7 +469,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 0,
   "status": "PASS (0 rows)"
@@ -343,7 +486,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -353,7 +502,13 @@
   "params": {
    "block_name": null,
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 39,
   "status": "PASS"
@@ -363,7 +518,13 @@
   "params": {
    "block_name": null,
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 39,
   "status": "PASS"
@@ -374,7 +535,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 25,
   "status": "PASS"
@@ -386,7 +553,12 @@
    "date_range": "2024-2025",
    "district_name": null,
    "focus_area": "Sanitation",
-   "gp_name": null
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -399,6 +571,11 @@
    "district_name": null,
    "focus_area": "Sanitation",
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -412,6 +589,11 @@
    "district_name": null,
    "focus_area": "Sanitation",
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -423,7 +605,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -435,7 +623,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -447,7 +641,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 25,
   "status": "PASS"
@@ -458,7 +658,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 25,
   "status": "PASS"
@@ -469,7 +675,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 25,
   "status": "PASS"
@@ -480,7 +692,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 6,
   "status": "PASS"
@@ -491,7 +709,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -502,7 +725,11 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "status": null,
+   "theme": null,
    "top_n": 10
   },
   "rows": 10,
@@ -514,7 +741,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 7,
@@ -526,7 +759,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -537,7 +775,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -549,7 +792,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 0,
@@ -561,7 +810,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -573,7 +828,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 0,
@@ -585,7 +846,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 0,
   "status": "PASS (0 rows)"
@@ -596,7 +862,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 0,
@@ -608,8 +880,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
    "threshold": 50,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -620,6 +897,12 @@
   "params": {
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -630,7 +913,11 @@
   "params": {
    "block_name": null,
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "status": null,
+   "theme": null,
    "top_n": 10
   },
   "rows": 10,
@@ -642,8 +929,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
    "threshold": 50,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -655,7 +947,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -667,7 +965,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 20,
   "status": "PASS"
@@ -677,7 +981,13 @@
   "params": {
    "block_name": null,
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 6,
   "status": "PASS"
@@ -688,7 +998,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -699,7 +1015,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -710,7 +1032,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -721,7 +1049,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 3,
   "status": "PASS"
@@ -732,7 +1066,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 3,
   "status": "PASS"
@@ -743,7 +1083,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 3,
   "status": "PASS"
@@ -755,7 +1101,12 @@
    "date_range": "2024-2025",
    "district_name": null,
    "focus_area": "Sanitation",
-   "gp_name": null
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 2,
   "status": "PASS"
@@ -767,7 +1118,12 @@
    "date_range": "2024-2025",
    "district_name": null,
    "focus_area": "Sanitation",
-   "gp_name": null
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -779,7 +1135,12 @@
    "date_range": "2024-2025",
    "district_name": null,
    "focus_area": "Sanitation",
-   "gp_name": null
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 2,
   "status": "PASS"
@@ -790,7 +1151,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 3,
@@ -802,7 +1169,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 3,
@@ -814,7 +1187,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -825,7 +1204,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 7,
@@ -837,7 +1222,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 7,
@@ -849,7 +1240,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -860,7 +1257,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 7,
@@ -872,7 +1275,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 7,
@@ -884,8 +1293,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
    "scheme": "XV Finance Commission",
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 6,
@@ -897,8 +1311,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
    "scheme": "XV Finance Commission",
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 6,
@@ -910,8 +1329,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
    "scheme": "XV Finance Commission",
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 6,
@@ -923,7 +1347,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -945,7 +1375,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 25,
   "status": "PASS"
@@ -957,7 +1393,12 @@
    "date_range": "2024-2025",
    "district_name": null,
    "focus_area": "Sanitation",
-   "gp_name": null
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -970,6 +1411,11 @@
    "district_name": null,
    "focus_area": "Sanitation",
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -981,7 +1427,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -993,7 +1445,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -1006,7 +1464,12 @@
    "date_range": "2024-2025",
    "district_name": null,
    "focus_area": "Sanitation",
-   "gp_name": null
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -1017,7 +1480,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -1029,7 +1498,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -1042,7 +1517,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -1054,7 +1535,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -1066,7 +1553,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 0,
@@ -1078,7 +1571,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -1089,7 +1588,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -1100,7 +1605,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 2,
   "status": "PASS"
@@ -1111,7 +1621,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 5,
   "status": "PASS"
@@ -1122,7 +1638,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
    "top_n": 10
   },
   "rows": 2,
@@ -1134,7 +1655,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null
   },
   "rows": 1,
   "status": "PASS"
@@ -1145,7 +1671,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null
   },
   "rows": 1,
   "status": "PASS"
@@ -1156,7 +1687,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -1167,7 +1704,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 20,
   "status": "PASS"
@@ -1178,7 +1721,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 18,
   "status": "PASS"
@@ -1200,7 +1749,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 3,
@@ -1212,7 +1767,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 3,
   "status": "PASS"
@@ -1223,7 +1784,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -1234,7 +1800,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -1245,7 +1816,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -1256,7 +1832,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 25,
   "status": "PASS"
@@ -1267,7 +1848,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 25,
   "status": "PASS"
@@ -1278,7 +1864,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 7,
@@ -1290,7 +1881,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 7,
@@ -1302,7 +1898,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -1314,8 +1915,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
    "threshold": 50,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -1327,7 +1933,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -1339,7 +1950,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -1351,7 +1967,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -1363,7 +1984,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -1375,7 +2001,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -1385,7 +2017,12 @@
   "params": {
    "block_name": null,
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -1395,7 +2032,12 @@
   "params": {
    "block_name": null,
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -1405,7 +2047,12 @@
   "params": {
    "block_name": null,
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -1417,7 +2064,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -1429,8 +2081,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
    "threshold": 50,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 7,
@@ -1442,8 +2099,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
    "threshold": 50,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -1455,7 +2117,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -1467,7 +2134,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 3,
   "status": "PASS"
@@ -1486,7 +2158,10 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "theme": null
   },
   "rows": 20,
   "status": "PASS"
@@ -1497,7 +2172,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 6,
   "status": "PASS"
@@ -1508,7 +2189,8 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "gp_name": null,
+   "plan_type": null
   },
   "rows": 1,
   "status": "PASS"
@@ -1519,7 +2201,8 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "gp_name": null,
+   "plan_type": null
   },
   "rows": 1,
   "status": "PASS"
@@ -1579,7 +2262,8 @@
    "date_range": "2024-2025",
    "deadline": "2024-06-30",
    "district_name": null,
-   "gp_name": null
+   "gp_name": null,
+   "plan_type": null
   },
   "rows": 1,
   "status": "PASS"
@@ -1591,7 +2275,8 @@
    "date_range": "2024-2025",
    "deadline": "2024-06-30",
    "district_name": null,
-   "gp_name": null
+   "gp_name": null,
+   "plan_type": null
   },
   "rows": 1,
   "status": "PASS"
@@ -1603,7 +2288,8 @@
    "date_range": "2024-2025",
    "deadline": "2024-06-30",
    "district_name": null,
-   "gp_name": null
+   "gp_name": null,
+   "plan_type": null
   },
   "rows": 9,
   "status": "PASS"
@@ -1615,7 +2301,8 @@
    "date_range": "2024-2025",
    "deadline": "2024-06-30",
    "district_name": null,
-   "gp_name": null
+   "gp_name": null,
+   "plan_type": null
   },
   "rows": 1,
   "status": "PASS"
@@ -1626,7 +2313,8 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "gp_name": null,
+   "plan_type": null
   },
   "rows": 28,
   "status": "PASS"
@@ -1637,7 +2325,8 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "gp_name": null,
+   "plan_type": null
   },
   "rows": 1,
   "status": "PASS"
@@ -1648,7 +2337,8 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "gp_name": null,
+   "plan_type": null
   },
   "rows": 1,
   "status": "PASS"
@@ -1657,7 +2347,8 @@
   "answerable": "Partial",
   "params": {
    "date_range": "2024-2025",
-   "district_name": null
+   "district_name": null,
+   "plan_type": null
   },
   "rows": 16,
   "status": "PASS"
@@ -1666,7 +2357,8 @@
   "answerable": "Partial",
   "params": {
    "date_range": "2024-2025",
-   "district_name": null
+   "district_name": null,
+   "plan_type": null
   },
   "rows": 9,
   "status": "PASS"
@@ -1693,7 +2385,8 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "gp_name": null,
+   "plan_type": null
   },
   "rows": 0,
   "status": "PASS (0 rows)"
@@ -1703,6 +2396,7 @@
   "params": {
    "date_range": "2024-2025",
    "district_name": null,
+   "plan_type": null,
    "top_n": 10
   },
   "rows": 10,
@@ -1713,6 +2407,7 @@
   "params": {
    "date_range": "2024-2025",
    "district_name": null,
+   "plan_type": null,
    "top_n": 10
   },
   "rows": 9,
@@ -1724,7 +2419,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -1735,7 +2436,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 7,
@@ -1747,7 +2454,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 7,
@@ -1759,7 +2472,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 7,
@@ -1771,7 +2490,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 7,
@@ -1783,7 +2508,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 7,
@@ -1795,7 +2526,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 7,
@@ -1807,7 +2544,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
    "theme": "Theme 5 - Clean and Green Village ",
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -1819,7 +2561,11 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "theme": "Theme 5 - Clean and Green Village "
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": "Theme 5 - Clean and Green Village ",
+   "tied_untied": null
   },
   "rows": 0,
   "status": "PASS (0 rows)"
@@ -1828,7 +2574,13 @@
   "answerable": "Partial",
   "params": {
    "date_range": "2024-2025",
-   "district_name": null
+   "district_name": null,
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -1837,7 +2589,13 @@
   "answerable": "Partial",
   "params": {
    "date_range": "2024-2025",
-   "district_name": null
+   "district_name": null,
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -1846,7 +2604,13 @@
   "answerable": "Partial",
   "params": {
    "date_range": "2024-2025",
-   "district_name": null
+   "district_name": null,
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -1856,6 +2620,12 @@
   "params": {
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 7,
@@ -1866,6 +2636,12 @@
   "params": {
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 7,
@@ -1876,7 +2652,13 @@
   "params": {
    "block_name": null,
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 39,
   "status": "PASS"
@@ -1888,7 +2670,13 @@
    "date_range": "2024-2025",
    "date_range_2": "2023-2024",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 7,
@@ -1901,7 +2689,13 @@
    "date_range": "2024-2025",
    "date_range_2": "2023-2024",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 7,
@@ -1913,7 +2707,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "tied_untied": null
   },
   "rows": 0,
   "status": "PASS (0 rows)"
@@ -1924,7 +2723,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -1935,8 +2740,14 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
-   "threshold": 50
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "threshold": 50,
+   "tied_untied": null
   },
   "rows": 0,
   "status": "PASS (0 rows)"
@@ -1946,7 +2757,13 @@
   "params": {
    "block_name": null,
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -1957,7 +2774,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -1969,7 +2791,12 @@
    "date_range": "2024-2025",
    "district_name": null,
    "focus_area": "Sanitation",
-   "gp_name": null
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -1980,7 +2807,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 25,
   "status": "PASS"
@@ -1991,7 +2824,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 25,
   "status": "PASS"
@@ -2002,7 +2841,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -2014,7 +2859,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -2026,7 +2877,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -2038,7 +2895,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -2050,7 +2913,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -2062,7 +2931,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -2076,6 +2951,11 @@
    "district_name": null,
    "focus_area": "Sanitation",
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -2087,7 +2967,11 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "focus_area": "Sanitation"
+   "focus_area": "Sanitation",
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "tied_untied": null
   },
   "rows": 0,
   "status": "PASS (0 rows)"
@@ -2097,7 +2981,13 @@
   "params": {
    "block_name": null,
    "date_range": "2024-2025",
-   "district_name": null
+   "district_name": null,
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 354,
   "status": "PASS"
@@ -2107,7 +2997,13 @@
   "params": {
    "block_name": null,
    "date_range": "2024-2025",
-   "district_name": null
+   "district_name": null,
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 296,
   "status": "PASS"
@@ -2117,6 +3013,12 @@
   "params": {
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -2127,6 +3029,12 @@
   "params": {
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -2138,7 +3046,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -2150,7 +3064,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -2161,7 +3081,13 @@
   "params": {
    "block_name": null,
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -2173,7 +3099,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 5,
   "status": "PASS"
@@ -2184,8 +3115,14 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
-   "threshold": 50
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "threshold": 50,
+   "tied_untied": null
   },
   "rows": 10,
   "status": "PASS"
@@ -2195,7 +3132,13 @@
   "params": {
    "block_name": null,
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 30,
   "status": "PASS"
@@ -2206,7 +3149,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 25,
   "status": "PASS"
@@ -2217,7 +3165,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -2228,7 +3182,8 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "gp_name": null,
+   "plan_type": null
   },
   "rows": 28,
   "status": "PASS"
@@ -2261,8 +3216,14 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
-   "threshold": 50
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "threshold": 50,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -2273,7 +3234,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 4,
   "status": "PASS"
@@ -2284,7 +3251,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -2295,8 +3268,14 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
-   "threshold": 50
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "threshold": 50,
+   "tied_untied": null
   },
   "rows": 20,
   "status": "PASS"
@@ -2307,7 +3286,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -2318,7 +3303,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -2329,7 +3320,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 20,
   "status": "PASS"
@@ -2338,7 +3335,13 @@
   "answerable": "Yes",
   "params": {
    "date_range": "2024-2025",
-   "district_name": null
+   "district_name": null,
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 16,
   "status": "PASS"
@@ -2357,7 +3360,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -2368,7 +3377,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 16,
   "status": "PASS"
@@ -2378,6 +3393,12 @@
   "params": {
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -2389,7 +3410,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 33,
   "status": "PASS"
@@ -2400,7 +3427,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 14,
   "status": "PASS"
@@ -2411,7 +3444,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -2423,7 +3462,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -2435,7 +3480,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 5,
   "status": "PASS"
@@ -2446,7 +3497,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 3,
   "status": "PASS"
@@ -3393,8 +4450,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
-   "scheme": "XV Finance Commission"
+   "plan_type": null,
+   "scheme": "XV Finance Commission",
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -3405,8 +4467,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
    "scheme": "XV Finance Commission",
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -3418,8 +4485,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
-   "scheme": "XV Finance Commission"
+   "plan_type": null,
+   "scheme": "XV Finance Commission",
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -3430,7 +4502,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 3,
@@ -3442,7 +4520,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "scheme": "XV Finance Commission"
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": "XV Finance Commission",
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 0,
   "status": "PASS (0 rows)"
@@ -3461,9 +4544,14 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
    "scheme": "XV Finance Commission",
-   "scheme_2": "5TH STATE FINANCE COMMISSION"
+   "scheme_2": "5TH STATE FINANCE COMMISSION",
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 2,
   "status": "PASS"
@@ -3474,8 +4562,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
-   "scheme": "XV Finance Commission"
+   "plan_type": null,
+   "scheme": "XV Finance Commission",
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 4,
   "status": "PASS"
@@ -3486,8 +4579,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
-   "scheme": "XV Finance Commission"
+   "plan_type": null,
+   "scheme": "XV Finance Commission",
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -3496,7 +4594,12 @@
   "answerable": "Partial",
   "params": {
    "date_range": "2024-2025",
-   "scheme": "XV Finance Commission"
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": "XV Finance Commission",
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 9,
   "status": "PASS"
@@ -3507,7 +4610,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 6,
   "status": "PASS"
@@ -3516,7 +4625,13 @@
   "answerable": "Partial",
   "params": {
    "date_range": "2024-2025",
-   "district_name": null
+   "district_name": null,
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 43,
   "status": "PASS"
@@ -3527,8 +4642,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
-   "status": "WORK ONGOING"
+   "plan_type": null,
+   "scheme": null,
+   "status": "WORK ONGOING",
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -3538,6 +4658,11 @@
   "params": {
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 6,
@@ -3549,7 +4674,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -3561,7 +4691,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -3571,6 +4706,11 @@
   "params": {
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null,
    "top_n": 10
   },
   "rows": 10,
@@ -3582,7 +4722,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -3593,7 +4738,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 19,
   "status": "PASS"
@@ -3604,7 +4754,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -3613,7 +4768,12 @@
   "answerable": "Partial",
   "params": {
    "date_range": "2024-2025",
-   "district_name": null
+   "district_name": null,
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 0,
   "status": "PASS (0 rows)"
@@ -3624,7 +4784,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 20,
   "status": "PASS"
@@ -3632,7 +4797,12 @@
  "STS-013": {
   "answerable": "Partial",
   "params": {
-   "date_range": "2024-2025"
+   "date_range": "2024-2025",
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 9,
   "status": "PASS"
@@ -3644,7 +4814,12 @@
    "date_range": "2024-2025",
    "date_range_2": "2023-2024",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -3656,7 +4831,13 @@
    "date_range": "2024-2025",
    "date_range_2": "2023-2024",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -3666,7 +4847,13 @@
   "params": {
    "block_name": null,
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 6,
   "status": "PASS"
@@ -3678,7 +4865,13 @@
    "date_range": "2024-2025",
    "date_range_2": "2023-2024",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -3688,7 +4881,12 @@
   "params": {
    "block_name": null,
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 6,
   "status": "PASS"
@@ -3698,7 +4896,13 @@
   "params": {
    "block_name": null,
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 120,
   "status": "PASS"
@@ -3709,7 +4913,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -3720,7 +4929,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 25,
   "status": "PASS"
@@ -3731,7 +4946,12 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 7,
   "status": "PASS"
@@ -3740,8 +4960,13 @@
   "answerable": "Partial",
   "params": {
    "date_range": "2024-2025",
+   "focus_area": null,
    "gp_name": null,
-   "gp_name_2": "Bandhpali"
+   "gp_name_2": "Bandhpali",
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -3751,7 +4976,12 @@
   "params": {
    "block_name": null,
    "block_name_2": "Barpali",
-   "date_range": "2024-2025"
+   "date_range": "2024-2025",
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -3760,7 +4990,12 @@
   "answerable": "Partial",
   "params": {
    "date_range": "2024-2025",
-   "district_name": null
+   "district_name": null,
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 9,
   "status": "PASS"
@@ -3771,7 +5006,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 4,
   "status": "PASS"
@@ -3782,7 +5023,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 4,
   "status": "PASS"
@@ -3793,7 +5040,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 1,
   "status": "PASS"
@@ -3804,7 +5057,11 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
+   "focus_area": null,
    "gp_name": null,
+   "plan_type": null,
+   "status": null,
+   "theme": null,
    "top_n": 10
   },
   "rows": 10,
@@ -3816,7 +5073,13 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 3,
   "status": "PASS"
@@ -3826,7 +5089,13 @@
   "params": {
    "block_name": null,
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
   },
   "rows": 6,
   "status": "PASS"
@@ -3838,7 +5107,11 @@
    "block_name": null,
    "date_range": "2024-2025",
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "status": null,
+   "theme": null
   },
   "rows": 1,
   "status": "PASS"
@@ -3848,7 +5121,11 @@
   "params": {
    "block_name": null,
    "district_name": null,
-   "gp_name": null
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "status": null,
+   "theme": null
   },
   "rows": 31,
   "status": "PASS"

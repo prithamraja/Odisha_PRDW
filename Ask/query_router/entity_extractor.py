@@ -43,7 +43,8 @@ _log = logging.getLogger(__name__)
 # job is to tell the model what a district looks like, not to be exhaustive —
 # the validator's fuzzy+alias cascade catches the rest, and an unresolvable
 # place clarifies rather than mis-binding.
-_FULLY_ENUMERATED = {"status", "scheme", "theme", "fiscal_year", "plan_type"}
+_FULLY_ENUMERATED = {"status", "scheme", "theme", "fiscal_year", "plan_type",
+                     "tied_untied"}
 _ENUM_SAMPLE = 12
 
 
@@ -119,6 +120,9 @@ ABANDONED"; pending/awaiting approval → "UNDER APPROVAL".
 - For plan_type: the GPDP plan type, exactly one of: {plan_type_enum}. "main GPDP", \
 "main plan", "primary GPDP" → "Main"; "supplementary plan" → "Supplementary". Return \
 null unless the query names a plan type.
+- For tied_untied: the sanctioned grant component, exactly one of: \
+{tied_untied_enum}. "tied funds", "tied grant" → "Tied"; "untied funds", "basic \
+grant" → "Untied". Return null unless the query names one.
 - For asset_category / asset_subcategory: the asset classification as written, e.g. \
 {asset_category_enum}
 - For activity_code: the activity identifier, copied exactly as given. Never invent one.
@@ -162,7 +166,7 @@ _EXTRACTION_PROMPT: str = ""
 
 _ENUM_SLOTS = (
     "district", "block", "fiscal_year", "focus_area",
-    "theme", "scheme", "status", "asset_category", "plan_type",
+    "theme", "scheme", "status", "asset_category", "plan_type", "tied_untied",
 )
 
 

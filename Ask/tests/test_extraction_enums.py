@@ -61,7 +61,7 @@ WORKBOOK_BIND_NAMES = [
     "top_n", "threshold", "amount_threshold", "deadline",
     # Not on the sheet: added by the catalogue file itself since WP-6 T0 made
     # it the source of truth. Each is a dimension the views already carried.
-    "plan_type",
+    "plan_type", "tied_untied",
 ]
 
 

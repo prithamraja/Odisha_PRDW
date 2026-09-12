@@ -120,12 +120,14 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'A row in plan = an uploaded GPDP. Pass NULL to any geography parameter to drop that filter.',
@@ -142,6 +144,7 @@ WHERE v.fiscal_year = $date_range
             'How many Gram Panchayats in a given district have uploaded the GPDP in a given year?',
             'How many Gram Panchayats in a given block have uploaded the GPDP in a given year?',
             'How many Gram Panchayats in a given gram panchayat have uploaded the GPDP in a given year?',
+            'How many Gram Panchayats in a given district/a given block have uploaded the GPDP in a given year, in the main GPDP?',
             # ── end derived ──
         ],
     },
@@ -157,12 +160,14 @@ WHERE v.fiscal_year = $date_range AND v.is_approved = 1
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'plan_code_status is 100% NULL, so approval is proxied by approval_date IS NOT NULL. Every plan row has one, so this currently equals PLN-001.',
@@ -179,6 +184,7 @@ WHERE v.fiscal_year = $date_range AND v.is_approved = 1
             'How many GPs in a given district have the GPDP approved in a given year?',
             'How many GPs in a given block have the GPDP approved in a given year?',
             'How many GPs in a given gram panchayat have the GPDP approved in a given year?',
+            'How many GPs in a given district/a given block have the GPDP approved in a given year, in the main GPDP?',
             # ── end derived ──
         ],
     },
@@ -387,6 +393,7 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -394,6 +401,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'No upload-date column exists; approval_date is used as the timestamp and the deadline is supplied by the user as $deadline.',
@@ -409,6 +417,7 @@ WHERE v.fiscal_year = $date_range
             'How many GPs in a given block uploaded the GPDP after the deadline a given deadline in a given year?',
             'How many GPs in a given district uploaded the GPDP after the deadline a given deadline in a given year?',
             'How many GPs in a given gram panchayat uploaded the GPDP after the deadline a given deadline in a given year?',
+            'How many GPs in a given block uploaded the GPDP after the deadline a given deadline in a given year, in the main GPDP?',
             # ── end derived ──
         ],
     },
@@ -425,6 +434,7 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -432,6 +442,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'No upload-date column exists; approval_date is used as the timestamp and the deadline is supplied by the user as $deadline.',
@@ -447,6 +458,7 @@ WHERE v.fiscal_year = $date_range
             'How many GPs in a given district uploaded the GPDP after the deadline a given deadline in a given year?',
             'How many GPs in a given block uploaded the GPDP after the deadline a given deadline in a given year?',
             'How many GPs in a given gram panchayat uploaded the GPDP after the deadline a given deadline in a given year?',
+            'How many GPs in a given district uploaded the GPDP after the deadline a given deadline in a given year, in the main GPDP?',
             # ── end derived ──
         ],
     },
@@ -465,6 +477,7 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
 ORDER BY days_late DESC
 """,
         "param_slots": [
@@ -473,6 +486,7 @@ ORDER BY days_late DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'approval_date used as the upload timestamp; deadline supplied by the user.',
@@ -489,6 +503,7 @@ ORDER BY days_late DESC
             'Which GPs in a given district uploaded the GPDP after the deadline a given deadline in a given year?',
             'Which GPs in a given block uploaded the GPDP after the deadline a given deadline in a given year?',
             'Which GPs in a given gram panchayat uploaded the GPDP after the deadline a given deadline in a given year?',
+            'Which GPs in a given block/a given district uploaded the GPDP after the deadline a given deadline in a given year, in the main GPDP?',
             # ── end derived ──
         ],
     },
@@ -508,6 +523,7 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -515,6 +531,7 @@ WHERE v.fiscal_year = $date_range
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'approval_date used as the upload timestamp.',
@@ -531,6 +548,7 @@ WHERE v.fiscal_year = $date_range
             'How many GPs uploaded the GPDP before and how many after the deadline a given deadline in a given year, for a given district?',
             'How many GPs uploaded the GPDP before and how many after the deadline a given deadline in a given year, for a given block?',
             'How many GPs uploaded the GPDP before and how many after the deadline a given deadline in a given year, for a given gram panchayat (GP)?',
+            'How many GPs uploaded the GPDP before and how many after the deadline a given deadline in a given year, in the main GPDP?',
             # ── end derived ──
         ],
     },
@@ -549,6 +567,7 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
 ORDER BY v.plan_type
 """,
         "param_slots": [
@@ -556,6 +575,7 @@ ORDER BY v.plan_type
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Only two states are distinguishable because plan_code_status is NULL throughout.',
@@ -571,6 +591,7 @@ ORDER BY v.plan_type
             'What is the status of the GPDP for a given gram panchayat in a given year?',
             'What is the status of the GPDP for a given district in a given year?',
             'What is the status of the GPDP for a given block in a given year?',
+            'What is the status of the GPDP for a given gram panchayat in a given year, in the main GPDP?',
             # ── end derived ──
         ],
     },
@@ -586,12 +607,14 @@ WHERE v.fiscal_year = $date_range AND v.is_approved = 1
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Duplicate of PLN-002 in the source list; same approval proxy applies.',
@@ -608,6 +631,7 @@ WHERE v.fiscal_year = $date_range AND v.is_approved = 1
             'How many Gram Panchayats in a given district have their GPDP approved in a given year?',
             'How many Gram Panchayats in a given block have their GPDP approved in a given year?',
             'How many Gram Panchayats in a given gram panchayat have their GPDP approved in a given year?',
+            'How many Gram Panchayats in a given block/a given district have their GPDP approved in a given year, in the main GPDP?',
             # ── end derived ──
         ],
     },
@@ -623,12 +647,14 @@ WHERE v.fiscal_year = $date_range AND v.is_approved = 0
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Returns 0 because every plan row carries an approval_date. Genuinely-pending plans are not represented in the data.',
@@ -645,6 +671,7 @@ WHERE v.fiscal_year = $date_range AND v.is_approved = 0
             'How many Gram Panchayats in a given district are still awaiting GPDP approval in a given year?',
             'How many Gram Panchayats in a given block are still awaiting GPDP approval in a given year?',
             'How many Gram Panchayats in a given gram panchayat are still awaiting GPDP approval in a given year?',
+            'How many Gram Panchayats in a given block/a given district are still awaiting GPDP approval in a given year, in the main GPDP?',
             # ── end derived ──
         ],
     },
@@ -662,12 +689,14 @@ SELECT v.block_name,
 FROM v_plan v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
 GROUP BY 1
 ORDER BY approval_rate_pct DESC
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Approval proxied by approval_date, so the rate is 100% everywhere.',
@@ -681,6 +710,7 @@ ORDER BY approval_rate_pct DESC
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the GPDP approval rate for each Block in a given year?',
             'What is the GPDP approval rate for each Block in a given year, for a given district?',
+            'What is the GPDP approval rate for each Block in a given year, in the main GPDP?',
             # ── end derived ──
         ],
     },
@@ -698,12 +728,14 @@ SELECT v.district_name,
 FROM v_plan v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
 GROUP BY 1
 ORDER BY approval_rate_pct DESC
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -720,6 +752,7 @@ ORDER BY approval_rate_pct DESC
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the GPDP approval rate for each District in a given year?',
             'What is the GPDP approval rate for each District in a given year, for a given district?',
+            'What is the GPDP approval rate for each District in a given year, in the main GPDP?',
             # ── end derived ──
         ],
     },
@@ -802,6 +835,7 @@ WHERE v.fiscal_year = $date_range AND v.is_approved = 0
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
 ORDER BY v.district_name, v.block_name, v.gp_name
 """,
         "param_slots": [
@@ -809,6 +843,7 @@ ORDER BY v.district_name, v.block_name, v.gp_name
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Returns no rows: approval_date is populated on every plan.',
@@ -824,6 +859,7 @@ ORDER BY v.district_name, v.block_name, v.gp_name
             'Which Gram Panchayats have uploaded the GPDP but are still awaiting approval in a given year, for a given district?',
             'Which Gram Panchayats have uploaded the GPDP but are still awaiting approval in a given year, for a given block?',
             'Which Gram Panchayats have uploaded the GPDP but are still awaiting approval in a given year, for a given gram panchayat (GP)?',
+            'Which Gram Panchayats have uploaded the GPDP but are still awaiting approval in a given year, in the main GPDP?',
             # ── end derived ──
         ],
     },
@@ -839,6 +875,7 @@ SELECT v.block_name,
 FROM v_plan v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
 GROUP BY 1
 ORDER BY pending_approvals DESC, gps_with_plan DESC
 LIMIT $top_n
@@ -847,6 +884,7 @@ LIMIT $top_n
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'pending_approvals is 0 everywhere because approval_date is always populated.',
@@ -860,6 +898,7 @@ LIMIT $top_n
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which Blocks have the highest number of pending GPDP approvals in a given year?',
             'Which Blocks have the highest number of pending GPDP approvals in a given year, for a given district?',
+            'Which Blocks have the highest number of pending GPDP approvals in a given year, in the main GPDP?',
             # ── end derived ──
         ],
     },
@@ -875,6 +914,7 @@ SELECT v.district_name,
 FROM v_plan v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
 GROUP BY 1
 ORDER BY pending_approvals DESC, gps_with_plan DESC
 LIMIT $top_n
@@ -883,6 +923,7 @@ LIMIT $top_n
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -900,6 +941,7 @@ LIMIT $top_n
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which district have the highest number of pending GPDP approvals in a given year?',
             'Which district have the highest number of pending GPDP approvals in a given year, for a given district?',
+            'Which district have the highest number of pending GPDP approvals in a given year, in the main GPDP?',
             # ── end derived ──
         ],
     },
@@ -916,6 +958,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities DESC
 """,
@@ -924,6 +972,12 @@ ORDER BY planned_activities DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Themes come from dim_lsdg_theme, which maps only 17 of 30 focus areas; the rest fall into 'Unmapped theme'.",
@@ -939,6 +993,12 @@ ORDER BY planned_activities DESC
             'How many activities are planned under each GPDP theme in a given gram panchayat in a given year?',
             'How many activities are planned under each GPDP theme in a given district in a given year?',
             'How many activities are planned under each GPDP theme in a given block in a given year?',
+            'How many activities are planned under each GPDP theme in a given gram panchayat in a given year, in the main GPDP?',
+            'How many activities are planned under each GPDP theme in a given gram panchayat in a given year, for ongoing activities?',
+            'How many activities are planned under each GPDP theme in a given gram panchayat in a given year, under a given focus area?',
+            'How many activities are planned under each GPDP theme in a given gram panchayat in a given year, under a given LSDG theme?',
+            'How many activities are planned under each GPDP theme in a given gram panchayat in a given year, under a given scheme?',
+            'How many activities are planned under each GPDP theme in a given gram panchayat in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -955,6 +1015,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities DESC
 LIMIT $top_n
@@ -965,6 +1031,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas. Set $top_n = 1 for a single answer.',
@@ -980,6 +1052,12 @@ LIMIT $top_n
             'Which GPDP theme has the highest number of planned activities in a given gram panchayat in a given year?',
             'Which GPDP theme has the highest number of planned activities in a given district in a given year?',
             'Which GPDP theme has the highest number of planned activities in a given block in a given year?',
+            'Which GPDP theme has the highest number of planned activities in a given gram panchayat in a given year, in the main GPDP?',
+            'Which GPDP theme has the highest number of planned activities in a given gram panchayat in a given year, for ongoing activities?',
+            'Which GPDP theme has the highest number of planned activities in a given gram panchayat in a given year, under a given focus area?',
+            'Which GPDP theme has the highest number of planned activities in a given gram panchayat in a given year, under a given LSDG theme?',
+            'Which GPDP theme has the highest number of planned activities in a given gram panchayat in a given year, under a given scheme?',
+            'Which GPDP theme has the highest number of planned activities in a given gram panchayat in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -996,6 +1074,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities ASC
 LIMIT $top_n
@@ -1006,6 +1090,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas. Set $top_n = 1 for a single answer.',
@@ -1021,6 +1111,12 @@ LIMIT $top_n
             'Which GPDP theme has the lowest number of planned activities in a given gram panchayat in a given year?',
             'Which GPDP theme has the lowest number of planned activities in a given district in a given year?',
             'Which GPDP theme has the lowest number of planned activities in a given block in a given year?',
+            'Which GPDP theme has the lowest number of planned activities in a given gram panchayat in a given year, in the main GPDP?',
+            'Which GPDP theme has the lowest number of planned activities in a given gram panchayat in a given year, for ongoing activities?',
+            'Which GPDP theme has the lowest number of planned activities in a given gram panchayat in a given year, under a given focus area?',
+            'Which GPDP theme has the lowest number of planned activities in a given gram panchayat in a given year, under a given LSDG theme?',
+            'Which GPDP theme has the lowest number of planned activities in a given gram panchayat in a given year, under a given scheme?',
+            'Which GPDP theme has the lowest number of planned activities in a given gram panchayat in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1037,6 +1133,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities DESC
 LIMIT $top_n
@@ -1047,6 +1149,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas. Set $top_n = 1 for a single answer.',
@@ -1062,6 +1170,12 @@ LIMIT $top_n
             'Which GPDP theme has the highest number of planned activities in a given block in a given year?',
             'Which GPDP theme has the highest number of planned activities in a given district in a given year?',
             'Which GPDP theme has the highest number of planned activities in a given gram panchayat in a given year?',
+            'Which GPDP theme has the highest number of planned activities in a given block in a given year, in the main GPDP?',
+            'Which GPDP theme has the highest number of planned activities in a given block in a given year, for ongoing activities?',
+            'Which GPDP theme has the highest number of planned activities in a given block in a given year, under a given focus area?',
+            'Which GPDP theme has the highest number of planned activities in a given block in a given year, under a given LSDG theme?',
+            'Which GPDP theme has the highest number of planned activities in a given block in a given year, under a given scheme?',
+            'Which GPDP theme has the highest number of planned activities in a given block in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1078,6 +1192,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities ASC
 LIMIT $top_n
@@ -1088,6 +1208,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas. Set $top_n = 1 for a single answer.',
@@ -1103,6 +1229,12 @@ LIMIT $top_n
             'Which GPDP theme has the lowest number of planned activities in a given block in a given year?',
             'Which GPDP theme has the lowest number of planned activities in a given district in a given year?',
             'Which GPDP theme has the lowest number of planned activities in a given gram panchayat in a given year?',
+            'Which GPDP theme has the lowest number of planned activities in a given block in a given year, in the main GPDP?',
+            'Which GPDP theme has the lowest number of planned activities in a given block in a given year, for ongoing activities?',
+            'Which GPDP theme has the lowest number of planned activities in a given block in a given year, under a given focus area?',
+            'Which GPDP theme has the lowest number of planned activities in a given block in a given year, under a given LSDG theme?',
+            'Which GPDP theme has the lowest number of planned activities in a given block in a given year, under a given scheme?',
+            'Which GPDP theme has the lowest number of planned activities in a given block in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1119,6 +1251,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities DESC
 LIMIT $top_n
@@ -1129,6 +1267,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas. Set $top_n = 1 for a single answer.',
@@ -1144,6 +1288,12 @@ LIMIT $top_n
             'Which GPDP theme has the highest number of planned activities in a given district in a given year?',
             'Which GPDP theme has the highest number of planned activities in a given block in a given year?',
             'Which GPDP theme has the highest number of planned activities in a given gram panchayat in a given year?',
+            'Which GPDP theme has the highest number of planned activities in a given district in a given year, in the main GPDP?',
+            'Which GPDP theme has the highest number of planned activities in a given district in a given year, for ongoing activities?',
+            'Which GPDP theme has the highest number of planned activities in a given district in a given year, under a given focus area?',
+            'Which GPDP theme has the highest number of planned activities in a given district in a given year, under a given LSDG theme?',
+            'Which GPDP theme has the highest number of planned activities in a given district in a given year, under a given scheme?',
+            'Which GPDP theme has the highest number of planned activities in a given district in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1160,6 +1310,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities ASC
 LIMIT $top_n
@@ -1170,6 +1326,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas. Set $top_n = 1 for a single answer.',
@@ -1185,6 +1347,12 @@ LIMIT $top_n
             'Which GPDP theme has the lowest number of planned activities in a given district in a given year?',
             'Which GPDP theme has the lowest number of planned activities in a given block in a given year?',
             'Which GPDP theme has the lowest number of planned activities in a given gram panchayat in a given year?',
+            'Which GPDP theme has the lowest number of planned activities in a given district in a given year, in the main GPDP?',
+            'Which GPDP theme has the lowest number of planned activities in a given district in a given year, for ongoing activities?',
+            'Which GPDP theme has the lowest number of planned activities in a given district in a given year, under a given focus area?',
+            'Which GPDP theme has the lowest number of planned activities in a given district in a given year, under a given LSDG theme?',
+            'Which GPDP theme has the lowest number of planned activities in a given district in a given year, under a given scheme?',
+            'Which GPDP theme has the lowest number of planned activities in a given district in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1202,6 +1370,11 @@ WHERE v.fiscal_year = $date_range
   AND v.theme = $theme
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2,3
 ORDER BY planned_activities DESC
 LIMIT $top_n
@@ -1212,6 +1385,11 @@ LIMIT $top_n
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -1231,6 +1409,11 @@ LIMIT $top_n
             'Which Gram Panchayats have planned the highest number of activities under a given LSDG theme in a given year?',
             'Which Gram Panchayats have planned the highest number of activities under a given LSDG theme in a given year, for a given district?',
             'Which Gram Panchayats have planned the highest number of activities under a given LSDG theme in a given year, for a given block?',
+            'Which Gram Panchayats have planned the highest number of activities under a given LSDG theme in a given year, in the main GPDP?',
+            'Which Gram Panchayats have planned the highest number of activities under a given LSDG theme in a given year, for ongoing activities?',
+            'Which Gram Panchayats have planned the highest number of activities under a given LSDG theme in a given year, under a given focus area?',
+            'Which Gram Panchayats have planned the highest number of activities under a given LSDG theme in a given year, under a given scheme?',
+            'Which Gram Panchayats have planned the highest number of activities under a given LSDG theme in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1246,7 +1429,11 @@ WHERE NOT EXISTS (
         SELECT 1 FROM v_activity v
         WHERE v.gp_lgd_code = g.gp_lgd_code
           AND v.fiscal_year = $date_range
-          AND v.theme = $theme)
+          AND v.theme = $theme
+          AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+          AND ($status IS NULL OR v.status_label = $status)
+          AND ($scheme IS NULL OR v.scheme_name = $scheme)
+          AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied))
   AND ($district_name IS NULL OR g.zp_name = $district_name)
   AND ($block_name    IS NULL OR g.block_name = $block_name)
 ORDER BY g.zp_name, g.block_name, g.gp_name
@@ -1256,6 +1443,10 @@ ORDER BY g.zp_name, g.block_name, g.gp_name
             {'name': 'theme', 'entity_type': 'theme'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas.',
@@ -1271,6 +1462,10 @@ ORDER BY g.zp_name, g.block_name, g.gp_name
             'Which Gram Panchayats have not planned any activities under a given LSDG theme in a given year?',
             'Which Gram Panchayats have not planned any activities under a given LSDG theme in a given year, for a given district?',
             'Which Gram Panchayats have not planned any activities under a given LSDG theme in a given year, for a given block?',
+            'Which Gram Panchayats have not planned any activities under a given LSDG theme in a given year, in the main GPDP?',
+            'Which Gram Panchayats have not planned any activities under a given LSDG theme in a given year, for ongoing activities?',
+            'Which Gram Panchayats have not planned any activities under a given LSDG theme in a given year, under a given scheme?',
+            'Which Gram Panchayats have not planned any activities under a given LSDG theme in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1285,6 +1480,12 @@ WITH t AS (
   FROM v_activity v
   WHERE v.fiscal_year = $date_range
     AND ($district_name IS NULL OR v.district_name = $district_name)
+    AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+    AND ($status IS NULL OR v.status_label = $status)
+    AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+    AND ($theme IS NULL OR v.theme = $theme)
+    AND ($scheme IS NULL OR v.scheme_name = $scheme)
+    AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
   GROUP BY 1,2)
 SELECT theme, unit AS gp_name, planned_activities
 FROM (SELECT t.*, ROW_NUMBER() OVER (PARTITION BY theme ORDER BY planned_activities DESC) rn FROM t)
@@ -1294,6 +1495,12 @@ ORDER BY planned_activities DESC
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'One winning unit per theme; ties are broken arbitrarily by ROW_NUMBER.',
@@ -1307,6 +1514,12 @@ ORDER BY planned_activities DESC
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GP has the highest number of planned activities under each GPDP theme in a given year?',
             'Which GP has the highest number of planned activities under each GPDP theme in a given year, for a given district?',
+            'Which GP has the highest number of planned activities under each GPDP theme in a given year, in the main GPDP?',
+            'Which GP has the highest number of planned activities under each GPDP theme in a given year, for ongoing activities?',
+            'Which GP has the highest number of planned activities under each GPDP theme in a given year, under a given focus area?',
+            'Which GP has the highest number of planned activities under each GPDP theme in a given year, under a given LSDG theme?',
+            'Which GP has the highest number of planned activities under each GPDP theme in a given year, under a given scheme?',
+            'Which GP has the highest number of planned activities under each GPDP theme in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1321,6 +1534,12 @@ WITH t AS (
   FROM v_activity v
   WHERE v.fiscal_year = $date_range
     AND ($district_name IS NULL OR v.district_name = $district_name)
+    AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+    AND ($status IS NULL OR v.status_label = $status)
+    AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+    AND ($theme IS NULL OR v.theme = $theme)
+    AND ($scheme IS NULL OR v.scheme_name = $scheme)
+    AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
   GROUP BY 1,2)
 SELECT theme, unit AS block_name, planned_activities
 FROM (SELECT t.*, ROW_NUMBER() OVER (PARTITION BY theme ORDER BY planned_activities DESC) rn FROM t)
@@ -1330,6 +1549,12 @@ ORDER BY planned_activities DESC
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'One winning unit per theme; ties are broken arbitrarily by ROW_NUMBER.',
@@ -1343,6 +1568,12 @@ ORDER BY planned_activities DESC
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which Block has the highest number of planned activities under each GPDP theme in a given year?',
             'Which Block has the highest number of planned activities under each GPDP theme in a given year, for a given district?',
+            'Which Block has the highest number of planned activities under each GPDP theme in a given year, in the main GPDP?',
+            'Which Block has the highest number of planned activities under each GPDP theme in a given year, for ongoing activities?',
+            'Which Block has the highest number of planned activities under each GPDP theme in a given year, under a given focus area?',
+            'Which Block has the highest number of planned activities under each GPDP theme in a given year, under a given LSDG theme?',
+            'Which Block has the highest number of planned activities under each GPDP theme in a given year, under a given scheme?',
+            'Which Block has the highest number of planned activities under each GPDP theme in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1357,6 +1588,12 @@ WITH t AS (
   FROM v_activity v
   WHERE v.fiscal_year = $date_range
     AND ($district_name IS NULL OR v.district_name = $district_name)
+    AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+    AND ($status IS NULL OR v.status_label = $status)
+    AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+    AND ($theme IS NULL OR v.theme = $theme)
+    AND ($scheme IS NULL OR v.scheme_name = $scheme)
+    AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
   GROUP BY 1,2)
 SELECT theme, unit AS district_name, planned_activities
 FROM (SELECT t.*, ROW_NUMBER() OVER (PARTITION BY theme ORDER BY planned_activities DESC) rn FROM t)
@@ -1366,6 +1603,12 @@ ORDER BY planned_activities DESC
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'One winning unit per theme; ties are broken arbitrarily by ROW_NUMBER.',
@@ -1379,6 +1622,12 @@ ORDER BY planned_activities DESC
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which District has the highest number of planned activities under each GPDP theme in a given year?',
             'Which District has the highest number of planned activities under each GPDP theme in a given year, for a given district?',
+            'Which District has the highest number of planned activities under each GPDP theme in a given year, in the main GPDP?',
+            'Which District has the highest number of planned activities under each GPDP theme in a given year, for ongoing activities?',
+            'Which District has the highest number of planned activities under each GPDP theme in a given year, under a given focus area?',
+            'Which District has the highest number of planned activities under each GPDP theme in a given year, under a given LSDG theme?',
+            'Which District has the highest number of planned activities under each GPDP theme in a given year, under a given scheme?',
+            'Which District has the highest number of planned activities under each GPDP theme in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1395,6 +1644,12 @@ SELECT v.theme,
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities DESC
 LIMIT $top_n
@@ -1403,6 +1658,12 @@ LIMIT $top_n
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -1416,6 +1677,12 @@ LIMIT $top_n
             'Which theme receives the greatest planning attention across the District in a given year?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which theme receives the greatest planning attention across a given district in a given year?',
+            'Which theme receives the greatest planning attention across a given district in a given year, in the main GPDP?',
+            'Which theme receives the greatest planning attention across a given district in a given year, for ongoing activities?',
+            'Which theme receives the greatest planning attention across a given district in a given year, under a given focus area?',
+            'Which theme receives the greatest planning attention across a given district in a given year, under a given LSDG theme?',
+            'Which theme receives the greatest planning attention across a given district in a given year, under a given scheme?',
+            'Which theme receives the greatest planning attention across a given district in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1432,6 +1699,12 @@ SELECT v.theme,
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities ASC
 LIMIT $top_n
@@ -1440,6 +1713,12 @@ LIMIT $top_n
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -1453,6 +1732,12 @@ LIMIT $top_n
             'Which theme receives the least planning attention across the District in a given year?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which theme receives the least planning attention across a given district in a given year?',
+            'Which theme receives the least planning attention across a given district in a given year, in the main GPDP?',
+            'Which theme receives the least planning attention across a given district in a given year, for ongoing activities?',
+            'Which theme receives the least planning attention across a given district in a given year, under a given focus area?',
+            'Which theme receives the least planning attention across a given district in a given year, under a given LSDG theme?',
+            'Which theme receives the least planning attention across a given district in a given year, under a given scheme?',
+            'Which theme receives the least planning attention across a given district in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1470,6 +1755,12 @@ WHERE 1=1
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY v.theme, v.fiscal_year
 """,
@@ -1477,6 +1768,12 @@ ORDER BY v.theme, v.fiscal_year
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Covers all six years present (2020-2021 to 2025-2026).',
@@ -1491,6 +1788,12 @@ ORDER BY v.theme, v.fiscal_year
             'How has the number of planned activities under each theme changed over the last five years, for a given district?',
             'How has the number of planned activities under each theme changed over the last five years, for a given block?',
             'How has the number of planned activities under each theme changed over the last five years, for a given gram panchayat (GP)?',
+            'How has the number of planned activities under each theme changed over the last five years, in the main GPDP?',
+            'How has the number of planned activities under each theme changed over the last five years, for ongoing activities?',
+            'How has the number of planned activities under each theme changed over the last five years, under a given focus area?',
+            'How has the number of planned activities under each theme changed over the last five years, under a given LSDG theme?',
+            'How has the number of planned activities under each theme changed over the last five years, under a given scheme?',
+            'How has the number of planned activities under each theme changed over the last five years, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1510,6 +1813,12 @@ WHERE v.fiscal_year IN ($date_range, $date_range_2)
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY change_in_activities DESC
 LIMIT $top_n
@@ -1521,6 +1830,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "The source question said 'in {Date_Range}'; a change needs two years, so a second year parameter was added.",
@@ -1537,6 +1852,12 @@ LIMIT $top_n
             'Which themes have shown the greatest increase in planned activities between a second year and a given year, for a given district?',
             'Which themes have shown the greatest increase in planned activities between a second year and a given year, for a given block?',
             'Which themes have shown the greatest increase in planned activities between a second year and a given year, for a given gram panchayat (GP)?',
+            'Which themes have shown the greatest increase in planned activities between a second year and a given year, in the main GPDP?',
+            'Which themes have shown the greatest increase in planned activities between a second year and a given year, for ongoing activities?',
+            'Which themes have shown the greatest increase in planned activities between a second year and a given year, under a given focus area?',
+            'Which themes have shown the greatest increase in planned activities between a second year and a given year, under a given LSDG theme?',
+            'Which themes have shown the greatest increase in planned activities between a second year and a given year, under a given scheme?',
+            'Which themes have shown the greatest increase in planned activities between a second year and a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1556,6 +1877,12 @@ WHERE v.fiscal_year IN ($date_range, $date_range_2)
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY change_in_activities ASC
 LIMIT $top_n
@@ -1567,6 +1894,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "The source question said 'in {Date_Range}'; a change needs two years, so a second year parameter was added.",
@@ -1583,6 +1916,12 @@ LIMIT $top_n
             'Which themes have shown the greatest decline in planned activities between a second year and a given year, for a given district?',
             'Which themes have shown the greatest decline in planned activities between a second year and a given year, for a given block?',
             'Which themes have shown the greatest decline in planned activities between a second year and a given year, for a given gram panchayat (GP)?',
+            'Which themes have shown the greatest decline in planned activities between a second year and a given year, in the main GPDP?',
+            'Which themes have shown the greatest decline in planned activities between a second year and a given year, for ongoing activities?',
+            'Which themes have shown the greatest decline in planned activities between a second year and a given year, under a given focus area?',
+            'Which themes have shown the greatest decline in planned activities between a second year and a given year, under a given LSDG theme?',
+            'Which themes have shown the greatest decline in planned activities between a second year and a given year, under a given scheme?',
+            'Which themes have shown the greatest decline in planned activities between a second year and a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1600,7 +1939,12 @@ WHERE NOT EXISTS (
           AND v.fiscal_year = $date_range
           AND ($district_name IS NULL OR v.district_name = $district_name)
           AND ($block_name    IS NULL OR v.block_name    = $block_name)
-          AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name))
+          AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+          AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+          AND ($status IS NULL OR v.status_label = $status)
+          AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+          AND ($scheme IS NULL OR v.scheme_name = $scheme)
+          AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied))
 ORDER BY 1
 """,
         "param_slots": [
@@ -1608,6 +1952,11 @@ ORDER BY 1
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Universe is the 7 distinct themes in dim_lsdg_theme, not the official nine LSDG themes.',
@@ -1623,6 +1972,11 @@ ORDER BY 1
             'Which GPDP themes have no planned activities in a given year, for a given district?',
             'Which GPDP themes have no planned activities in a given year, for a given block?',
             'Which GPDP themes have no planned activities in a given year, for a given gram panchayat (GP)?',
+            'Which GPDP themes have no planned activities in a given year, in the main GPDP?',
+            'Which GPDP themes have no planned activities in a given year, for ongoing activities?',
+            'Which GPDP themes have no planned activities in a given year, under a given focus area?',
+            'Which GPDP themes have no planned activities in a given year, under a given scheme?',
+            'Which GPDP themes have no planned activities in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1642,6 +1996,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_share DESC
 """,
@@ -1650,6 +2010,12 @@ ORDER BY pct_share DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Balanced' is undefined in the source question, so the query returns each theme's share and its deviation from an even split for the user to judge.",
@@ -1666,6 +2032,12 @@ ORDER BY pct_share DESC
             'Are the planned activities balanced across themes in a given district in a given year?',
             'Are the planned activities balanced across themes in a given block in a given year?',
             'Are the planned activities balanced across themes in a given gram panchayat in a given year?',
+            'Are the planned activities balanced across themes in a given gram panchayat/a given block in a given year, in the main GPDP?',
+            'Are the planned activities balanced across themes in a given gram panchayat/a given block in a given year, for ongoing activities?',
+            'Are the planned activities balanced across themes in a given gram panchayat/a given block in a given year, under a given focus area?',
+            'Are the planned activities balanced across themes in a given gram panchayat/a given block in a given year, under a given LSDG theme?',
+            'Are the planned activities balanced across themes in a given gram panchayat/a given block in a given year, under a given scheme?',
+            'Are the planned activities balanced across themes in a given gram panchayat/a given block in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1681,6 +2053,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING COUNT(*) < $threshold
 ORDER BY planned_activities ASC
@@ -1691,6 +2069,12 @@ ORDER BY planned_activities ASC
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'threshold', 'entity_type': 'threshold'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -1706,6 +2090,12 @@ ORDER BY planned_activities ASC
             'Which GPDP themes have fewer than a given threshold planned activities in a given year, for a given district?',
             'Which GPDP themes have fewer than a given threshold planned activities in a given year, for a given block?',
             'Which GPDP themes have fewer than a given threshold planned activities in a given year, for a given gram panchayat (GP)?',
+            'Which GPDP themes have fewer than a given threshold planned activities in a given year, in the main GPDP?',
+            'Which GPDP themes have fewer than a given threshold planned activities in a given year, for ongoing activities?',
+            'Which GPDP themes have fewer than a given threshold planned activities in a given year, under a given focus area?',
+            'Which GPDP themes have fewer than a given threshold planned activities in a given year, under a given LSDG theme?',
+            'Which GPDP themes have fewer than a given threshold planned activities in a given year, under a given scheme?',
+            'Which GPDP themes have fewer than a given threshold planned activities in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1723,6 +2113,12 @@ WITH per_year AS (
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
   GROUP BY 1,2)
 SELECT theme,
        COUNT(*) AS years_present,
@@ -1736,6 +2132,12 @@ ORDER BY years_in_bottom_3 DESC, avg_activities_per_year ASC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Consistently low' is operationalised as how often a theme lands in the bottom 3 of a year. Change the 3 if you want a different rule.",
@@ -1750,6 +2152,12 @@ ORDER BY years_in_bottom_3 DESC, avg_activities_per_year ASC
             'Which themes consistently receive low planning attention across multiple years, for a given district?',
             'Which themes consistently receive low planning attention across multiple years, for a given block?',
             'Which themes consistently receive low planning attention across multiple years, for a given gram panchayat (GP)?',
+            'Which themes consistently receive low planning attention across multiple years, in the main GPDP?',
+            'Which themes consistently receive low planning attention across multiple years, for ongoing activities?',
+            'Which themes consistently receive low planning attention across multiple years, under a given focus area?',
+            'Which themes consistently receive low planning attention across multiple years, under a given LSDG theme?',
+            'Which themes consistently receive low planning attention across multiple years, under a given scheme?',
+            'Which themes consistently receive low planning attention across multiple years, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1770,6 +2178,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities ASC, pct_completed ASC
 """,
@@ -1778,6 +2191,11 @@ ORDER BY planned_activities ASC, pct_completed ASC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Advisory question with no defined rule; the query surfaces the low-activity, low-completion themes and leaves the judgement to the user.',
@@ -1793,6 +2211,11 @@ ORDER BY planned_activities ASC, pct_completed ASC
             'Which themes require greater planning attention in the next GPDP cycle in a given year, for a given district?',
             'Which themes require greater planning attention in the next GPDP cycle in a given year, for a given block?',
             'Which themes require greater planning attention in the next GPDP cycle in a given year, for a given gram panchayat (GP)?',
+            'Which themes require greater planning attention in the next GPDP cycle in a given year, in the main GPDP?',
+            'Which themes require greater planning attention in the next GPDP cycle in a given year, under a given focus area?',
+            'Which themes require greater planning attention in the next GPDP cycle in a given year, under a given LSDG theme?',
+            'Which themes require greater planning attention in the next GPDP cycle in a given year, under a given scheme?',
+            'Which themes require greater planning attention in the next GPDP cycle in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1810,6 +2233,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 """,
         "param_slots": [
@@ -1818,6 +2246,11 @@ GROUP BY 1
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -1832,6 +2265,11 @@ GROUP BY 1
             'How many activities are planned under a given focus area in a given gram panchayat in a given year?',
             'How many activities are planned under a given focus area in a given district in a given year?',
             'How many activities are planned under a given focus area in a given block in a given year?',
+            'How many activities are planned under a given focus area in a given gram panchayat in a given year, in the main GPDP?',
+            'How many activities are planned under a given focus area in a given gram panchayat in a given year, for ongoing activities?',
+            'How many activities are planned under a given focus area in a given gram panchayat in a given year, under a given LSDG theme?',
+            'How many activities are planned under a given focus area in a given gram panchayat in a given year, under a given scheme?',
+            'How many activities are planned under a given focus area in a given gram panchayat in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1848,6 +2286,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities DESC
 """,
@@ -1856,6 +2300,12 @@ ORDER BY planned_activities DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -1870,6 +2320,12 @@ ORDER BY planned_activities DESC
             'How many activities are planned under each focus area in a given gram panchayat in a given year?',
             'How many activities are planned under each focus area in a given district in a given year?',
             'How many activities are planned under each focus area in a given block in a given year?',
+            'How many activities are planned under each focus area in a given gram panchayat in a given year, in the main GPDP?',
+            'How many activities are planned under each focus area in a given gram panchayat in a given year, for ongoing activities?',
+            'How many activities are planned under each focus area in a given gram panchayat in a given year, under a given focus area?',
+            'How many activities are planned under each focus area in a given gram panchayat in a given year, under a given LSDG theme?',
+            'How many activities are planned under each focus area in a given gram panchayat in a given year, under a given scheme?',
+            'How many activities are planned under each focus area in a given gram panchayat in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1886,6 +2342,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities DESC
 """,
@@ -1894,6 +2356,12 @@ ORDER BY planned_activities DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -1908,6 +2376,12 @@ ORDER BY planned_activities DESC
             'How many activities are planned under each focus area in a given block in a given year?',
             'How many activities are planned under each focus area in a given district in a given year?',
             'How many activities are planned under each focus area in a given gram panchayat in a given year?',
+            'How many activities are planned under each focus area in a given block in a given year, in the main GPDP?',
+            'How many activities are planned under each focus area in a given block in a given year, for ongoing activities?',
+            'How many activities are planned under each focus area in a given block in a given year, under a given focus area?',
+            'How many activities are planned under each focus area in a given block in a given year, under a given LSDG theme?',
+            'How many activities are planned under each focus area in a given block in a given year, under a given scheme?',
+            'How many activities are planned under each focus area in a given block in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1924,6 +2398,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities DESC
 LIMIT $top_n
@@ -1934,6 +2414,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Set $top_n = 1 for a single answer.',
@@ -1950,6 +2436,12 @@ LIMIT $top_n
             'Which focus area has the highest number of planned activities in a given year, for a given district?',
             'Which focus area has the highest number of planned activities in a given year, for a given block?',
             'Which focus area has the highest number of planned activities in a given year, for a given gram panchayat (GP)?',
+            'Which focus area has the highest number of planned activities in a given year, in the main GPDP?',
+            'Which focus area has the highest number of planned activities in a given year, for ongoing activities?',
+            'Which focus area has the highest number of planned activities in a given year, under a given focus area?',
+            'Which focus area has the highest number of planned activities in a given year, under a given LSDG theme?',
+            'Which focus area has the highest number of planned activities in a given year, under a given scheme?',
+            'Which focus area has the highest number of planned activities in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -1966,6 +2458,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities ASC
 LIMIT $top_n
@@ -1976,6 +2474,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Set $top_n = 1 for a single answer.',
@@ -1992,6 +2496,12 @@ LIMIT $top_n
             'Which focus area has the lowest number of planned activities in a given year, for a given district?',
             'Which focus area has the lowest number of planned activities in a given year, for a given block?',
             'Which focus area has the lowest number of planned activities in a given year, for a given gram panchayat (GP)?',
+            'Which focus area has the lowest number of planned activities in a given year, in the main GPDP?',
+            'Which focus area has the lowest number of planned activities in a given year, for ongoing activities?',
+            'Which focus area has the lowest number of planned activities in a given year, under a given focus area?',
+            'Which focus area has the lowest number of planned activities in a given year, under a given LSDG theme?',
+            'Which focus area has the lowest number of planned activities in a given year, under a given scheme?',
+            'Which focus area has the lowest number of planned activities in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2008,6 +2518,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities DESC
 LIMIT $top_n
@@ -2018,6 +2534,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Set $top_n = 1 for a single answer.',
@@ -2033,6 +2555,12 @@ LIMIT $top_n
             'Which focus area has the highest number of planned activities in a given block in a given year?',
             'Which focus area has the highest number of planned activities in a given district in a given year?',
             'Which focus area has the highest number of planned activities in a given gram panchayat in a given year?',
+            'Which focus area has the highest number of planned activities in a given block in a given year, in the main GPDP?',
+            'Which focus area has the highest number of planned activities in a given block in a given year, for ongoing activities?',
+            'Which focus area has the highest number of planned activities in a given block in a given year, under a given focus area?',
+            'Which focus area has the highest number of planned activities in a given block in a given year, under a given LSDG theme?',
+            'Which focus area has the highest number of planned activities in a given block in a given year, under a given scheme?',
+            'Which focus area has the highest number of planned activities in a given block in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2049,6 +2577,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities ASC
 LIMIT $top_n
@@ -2059,6 +2593,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Set $top_n = 1 for a single answer.',
@@ -2074,6 +2614,12 @@ LIMIT $top_n
             'Which focus area has the lowest number of planned activities in a given block in a given year?',
             'Which focus area has the lowest number of planned activities in a given district in a given year?',
             'Which focus area has the lowest number of planned activities in a given gram panchayat in a given year?',
+            'Which focus area has the lowest number of planned activities in a given block in a given year, in the main GPDP?',
+            'Which focus area has the lowest number of planned activities in a given block in a given year, for ongoing activities?',
+            'Which focus area has the lowest number of planned activities in a given block in a given year, under a given focus area?',
+            'Which focus area has the lowest number of planned activities in a given block in a given year, under a given LSDG theme?',
+            'Which focus area has the lowest number of planned activities in a given block in a given year, under a given scheme?',
+            'Which focus area has the lowest number of planned activities in a given block in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2090,6 +2636,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities DESC
 LIMIT $top_n
@@ -2100,6 +2652,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Set $top_n = 1 for a single answer.',
@@ -2115,6 +2673,12 @@ LIMIT $top_n
             'Which focus area has the highest number of planned activities in a given district in a given year?',
             'Which focus area has the highest number of planned activities in a given block in a given year?',
             'Which focus area has the highest number of planned activities in a given gram panchayat in a given year?',
+            'Which focus area has the highest number of planned activities in a given district in a given year, in the main GPDP?',
+            'Which focus area has the highest number of planned activities in a given district in a given year, for ongoing activities?',
+            'Which focus area has the highest number of planned activities in a given district in a given year, under a given focus area?',
+            'Which focus area has the highest number of planned activities in a given district in a given year, under a given LSDG theme?',
+            'Which focus area has the highest number of planned activities in a given district in a given year, under a given scheme?',
+            'Which focus area has the highest number of planned activities in a given district in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2131,6 +2695,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities ASC
 LIMIT $top_n
@@ -2141,6 +2711,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Set $top_n = 1 for a single answer.',
@@ -2156,6 +2732,12 @@ LIMIT $top_n
             'Which focus area has the lowest number of planned activities in a given district in a given year?',
             'Which focus area has the lowest number of planned activities in a given block in a given year?',
             'Which focus area has the lowest number of planned activities in a given gram panchayat in a given year?',
+            'Which focus area has the lowest number of planned activities in a given district in a given year, in the main GPDP?',
+            'Which focus area has the lowest number of planned activities in a given district in a given year, for ongoing activities?',
+            'Which focus area has the lowest number of planned activities in a given district in a given year, under a given focus area?',
+            'Which focus area has the lowest number of planned activities in a given district in a given year, under a given LSDG theme?',
+            'Which focus area has the lowest number of planned activities in a given district in a given year, under a given scheme?',
+            'Which focus area has the lowest number of planned activities in a given district in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2173,6 +2755,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_cost DESC NULLS LAST
 LIMIT $top_n
 """,
@@ -2183,6 +2770,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Raise $top_n to list more than the default page.',
@@ -2199,6 +2791,11 @@ LIMIT $top_n
             'What activities are planned under a given focus area in a given year, for a given district?',
             'What activities are planned under a given focus area in a given year, for a given block?',
             'What activities are planned under a given focus area in a given year, for a given gram panchayat (GP)?',
+            'What activities are planned under a given focus area in a given year, in the main GPDP?',
+            'What activities are planned under a given focus area in a given year, for ongoing activities?',
+            'What activities are planned under a given focus area in a given year, under a given LSDG theme?',
+            'What activities are planned under a given focus area in a given year, under a given scheme?',
+            'What activities are planned under a given focus area in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2214,7 +2811,11 @@ WHERE NOT EXISTS (
         SELECT 1 FROM v_activity v
         WHERE v.gp_lgd_code = g.gp_lgd_code
           AND v.fiscal_year = $date_range
-          AND v.focus_area_name = $focus_area)
+          AND v.focus_area_name = $focus_area
+          AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+          AND ($status IS NULL OR v.status_label = $status)
+          AND ($scheme IS NULL OR v.scheme_name = $scheme)
+          AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied))
   AND ($district_name IS NULL OR g.zp_name = $district_name)
   AND ($block_name    IS NULL OR g.block_name = $block_name)
 ORDER BY g.zp_name, g.block_name, g.gp_name
@@ -2224,6 +2825,10 @@ ORDER BY g.zp_name, g.block_name, g.gp_name
             {'name': 'focus_area', 'entity_type': 'focus_area'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -2238,6 +2843,10 @@ ORDER BY g.zp_name, g.block_name, g.gp_name
             'Which Gram Panchayats have not planned any activities under a given focus area in a given year?',
             'Which Gram Panchayats have not planned any activities under a given focus area in a given year, for a given district?',
             'Which Gram Panchayats have not planned any activities under a given focus area in a given year, for a given block?',
+            'Which Gram Panchayats have not planned any activities under a given focus area in a given year, in the main GPDP?',
+            'Which Gram Panchayats have not planned any activities under a given focus area in a given year, for ongoing activities?',
+            'Which Gram Panchayats have not planned any activities under a given focus area in a given year, under a given scheme?',
+            'Which Gram Panchayats have not planned any activities under a given focus area in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2253,6 +2862,12 @@ FROM v_activity v
 WHERE v.fiscal_year = $date_range
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($district_name IS NULL OR v.district_name = $district_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY v.focus_area_name, planned_activities DESC
 """,
@@ -2260,6 +2875,12 @@ ORDER BY v.focus_area_name, planned_activities DESC
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Long format - one row per focus area per unit; pivot in the presentation layer.',
@@ -2274,6 +2895,12 @@ ORDER BY v.focus_area_name, planned_activities DESC
             'How does the number of planned activities under each focus area compare across Gram Panchayats in a Block in a given year?',
             'How does the number of planned activities under each focus area compare across Gram Panchayats in a Block in a given year, for a given block?',
             'How does the number of planned activities under each focus area compare across Gram Panchayats in a Block in a given year, for a given district?',
+            'How does the number of planned activities under each focus area compare across Gram Panchayats in a Block in a given year, in the main GPDP?',
+            'How does the number of planned activities under each focus area compare across Gram Panchayats in a Block in a given year, for ongoing activities?',
+            'How does the number of planned activities under each focus area compare across Gram Panchayats in a Block in a given year, under a given focus area?',
+            'How does the number of planned activities under each focus area compare across Gram Panchayats in a Block in a given year, under a given LSDG theme?',
+            'How does the number of planned activities under each focus area compare across Gram Panchayats in a Block in a given year, under a given scheme?',
+            'How does the number of planned activities under each focus area compare across Gram Panchayats in a Block in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2289,6 +2916,12 @@ FROM v_activity v
 WHERE v.fiscal_year = $date_range
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($district_name IS NULL OR v.district_name = $district_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY v.focus_area_name, planned_activities DESC
 """,
@@ -2296,6 +2929,12 @@ ORDER BY v.focus_area_name, planned_activities DESC
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -2313,6 +2952,12 @@ ORDER BY v.focus_area_name, planned_activities DESC
             'How does the number of planned activities under each focus area compare across Blocks in a District in a given year?',
             'How does the number of planned activities under each focus area compare across Blocks in a District in a given year, for a given block?',
             'How does the number of planned activities under each focus area compare across Blocks in a District in a given year, for a given district?',
+            'How does the number of planned activities under each focus area compare across Blocks in a District in a given year, in the main GPDP?',
+            'How does the number of planned activities under each focus area compare across Blocks in a District in a given year, for ongoing activities?',
+            'How does the number of planned activities under each focus area compare across Blocks in a District in a given year, under a given focus area?',
+            'How does the number of planned activities under each focus area compare across Blocks in a District in a given year, under a given LSDG theme?',
+            'How does the number of planned activities under each focus area compare across Blocks in a District in a given year, under a given scheme?',
+            'How does the number of planned activities under each focus area compare across Blocks in a District in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2328,6 +2973,12 @@ SELECT v.focus_area_name, COUNT(*) AS planned_activities,
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities DESC
 LIMIT $top_n
@@ -2336,6 +2987,12 @@ LIMIT $top_n
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -2348,6 +3005,12 @@ LIMIT $top_n
             'Which focus area receives the highest planning attention across the District in a given year?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus area receives the highest planning attention across a given district in a given year?',
+            'Which focus area receives the highest planning attention across a given district in a given year, in the main GPDP?',
+            'Which focus area receives the highest planning attention across a given district in a given year, for ongoing activities?',
+            'Which focus area receives the highest planning attention across a given district in a given year, under a given focus area?',
+            'Which focus area receives the highest planning attention across a given district in a given year, under a given LSDG theme?',
+            'Which focus area receives the highest planning attention across a given district in a given year, under a given scheme?',
+            'Which focus area receives the highest planning attention across a given district in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2363,6 +3026,12 @@ SELECT v.focus_area_name, COUNT(*) AS planned_activities,
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities ASC
 LIMIT $top_n
@@ -2371,6 +3040,12 @@ LIMIT $top_n
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -2383,6 +3058,12 @@ LIMIT $top_n
             'Which focus area receives the lowest planning attention across the District in a given year?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which focus area receives the lowest planning attention across a given district in a given year?',
+            'Which focus area receives the lowest planning attention across a given district in a given year, in the main GPDP?',
+            'Which focus area receives the lowest planning attention across a given district in a given year, for ongoing activities?',
+            'Which focus area receives the lowest planning attention across a given district in a given year, under a given focus area?',
+            'Which focus area receives the lowest planning attention across a given district in a given year, under a given LSDG theme?',
+            'Which focus area receives the lowest planning attention across a given district in a given year, under a given scheme?',
+            'Which focus area receives the lowest planning attention across a given district in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2402,6 +3083,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_share DESC
 LIMIT $top_n
@@ -2412,6 +3099,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -2426,6 +3119,12 @@ LIMIT $top_n
             'Which focus areas account for the largest share of planned activities in a given gram panchayat in a given year?',
             'Which focus areas account for the largest share of planned activities in a given district in a given year?',
             'Which focus areas account for the largest share of planned activities in a given block in a given year?',
+            'Which focus areas account for the largest share of planned activities in a given gram panchayat in a given year, in the main GPDP?',
+            'Which focus areas account for the largest share of planned activities in a given gram panchayat in a given year, for ongoing activities?',
+            'Which focus areas account for the largest share of planned activities in a given gram panchayat in a given year, under a given focus area?',
+            'Which focus areas account for the largest share of planned activities in a given gram panchayat in a given year, under a given LSDG theme?',
+            'Which focus areas account for the largest share of planned activities in a given gram panchayat in a given year, under a given scheme?',
+            'Which focus areas account for the largest share of planned activities in a given gram panchayat in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2445,6 +3144,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_share ASC
 LIMIT $top_n
@@ -2455,6 +3160,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -2469,6 +3180,12 @@ LIMIT $top_n
             'Which focus areas account for the smallest share of planned activities in a given gram panchayat in a given year?',
             'Which focus areas account for the smallest share of planned activities in a given district in a given year?',
             'Which focus areas account for the smallest share of planned activities in a given block in a given year?',
+            'Which focus areas account for the smallest share of planned activities in a given gram panchayat in a given year, in the main GPDP?',
+            'Which focus areas account for the smallest share of planned activities in a given gram panchayat in a given year, for ongoing activities?',
+            'Which focus areas account for the smallest share of planned activities in a given gram panchayat in a given year, under a given focus area?',
+            'Which focus areas account for the smallest share of planned activities in a given gram panchayat in a given year, under a given LSDG theme?',
+            'Which focus areas account for the smallest share of planned activities in a given gram panchayat in a given year, under a given scheme?',
+            'Which focus areas account for the smallest share of planned activities in a given gram panchayat in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2488,6 +3205,12 @@ WHERE 1=1
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING COUNT(DISTINCT v.fiscal_year) > 1
 ORDER BY years_planned DESC, total_occurrences DESC
@@ -2498,6 +3221,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Matches on the exact activity_name string; near-duplicate wording will not group together.',
@@ -2513,6 +3242,12 @@ LIMIT $top_n
             'Which types of activity are repeatedly planned across years, for a given district?',
             'Which types of activity are repeatedly planned across years, for a given block?',
             'Which types of activity are repeatedly planned across years, for a given gram panchayat (GP)?',
+            'Which types of activity are repeatedly planned across years, in the main GPDP?',
+            'Which types of activity are repeatedly planned across years, for ongoing activities?',
+            'Which types of activity are repeatedly planned across years, under a given focus area?',
+            'Which types of activity are repeatedly planned across years, under a given LSDG theme?',
+            'Which types of activity are repeatedly planned across years, under a given scheme?',
+            'Which types of activity are repeatedly planned across years, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2531,7 +3266,12 @@ WHERE d.variable = 'focus_area'
           AND v.fiscal_year = $date_range
           AND ($district_name IS NULL OR v.district_name = $district_name)
           AND ($block_name    IS NULL OR v.block_name    = $block_name)
-          AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name))
+          AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+          AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+          AND ($status IS NULL OR v.status_label = $status)
+          AND ($theme IS NULL OR v.theme = $theme)
+          AND ($scheme IS NULL OR v.scheme_name = $scheme)
+          AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied))
 ORDER BY 1
 """,
         "param_slots": [
@@ -2539,6 +3279,11 @@ ORDER BY 1
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Universe is the 30 focus-area codes in dim_code.',
@@ -2554,6 +3299,11 @@ ORDER BY 1
             'Which focus areas have no planned activities in a given year, for a given district?',
             'Which focus areas have no planned activities in a given year, for a given block?',
             'Which focus areas have no planned activities in a given year, for a given gram panchayat (GP)?',
+            'Which focus areas have no planned activities in a given year, in the main GPDP?',
+            'Which focus areas have no planned activities in a given year, for ongoing activities?',
+            'Which focus areas have no planned activities in a given year, under a given LSDG theme?',
+            'Which focus areas have no planned activities in a given year, under a given scheme?',
+            'Which focus areas have no planned activities in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2569,6 +3319,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING COUNT(*) < $threshold
 ORDER BY planned_activities ASC
@@ -2579,6 +3335,12 @@ ORDER BY planned_activities ASC
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'threshold', 'entity_type': 'threshold'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -2594,6 +3356,12 @@ ORDER BY planned_activities ASC
             'Which focus areas have fewer than a given threshold planned activities in a given year, for a given district?',
             'Which focus areas have fewer than a given threshold planned activities in a given year, for a given block?',
             'Which focus areas have fewer than a given threshold planned activities in a given year, for a given gram panchayat (GP)?',
+            'Which focus areas have fewer than a given threshold planned activities in a given year, in the main GPDP?',
+            'Which focus areas have fewer than a given threshold planned activities in a given year, for ongoing activities?',
+            'Which focus areas have fewer than a given threshold planned activities in a given year, under a given focus area?',
+            'Which focus areas have fewer than a given threshold planned activities in a given year, under a given LSDG theme?',
+            'Which focus areas have fewer than a given threshold planned activities in a given year, under a given scheme?',
+            'Which focus areas have fewer than a given threshold planned activities in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2612,6 +3380,12 @@ WHERE 1=1
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY years_present DESC, total_activities DESC
 """,
@@ -2619,6 +3393,12 @@ ORDER BY years_present DESC, total_activities DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -2632,6 +3412,12 @@ ORDER BY years_present DESC, total_activities DESC
             'Which focus areas are repeatedly included in the GPDP across multiple years, for a given district?',
             'Which focus areas are repeatedly included in the GPDP across multiple years, for a given block?',
             'Which focus areas are repeatedly included in the GPDP across multiple years, for a given gram panchayat (GP)?',
+            'Which focus areas are repeatedly included in the GPDP across multiple years, in the main GPDP?',
+            'Which focus areas are repeatedly included in the GPDP across multiple years, for ongoing activities?',
+            'Which focus areas are repeatedly included in the GPDP across multiple years, under a given focus area?',
+            'Which focus areas are repeatedly included in the GPDP across multiple years, under a given LSDG theme?',
+            'Which focus areas are repeatedly included in the GPDP across multiple years, under a given scheme?',
+            'Which focus areas are repeatedly included in the GPDP across multiple years, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2652,6 +3438,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities ASC, pct_completed ASC
 """,
@@ -2660,6 +3451,11 @@ ORDER BY planned_activities ASC, pct_completed ASC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Advisory; no rule defined in the source question. Surfaces low-activity, low-completion focus areas.',
@@ -2676,6 +3472,11 @@ ORDER BY planned_activities ASC, pct_completed ASC
             'Which focus areas require greater planning attention in the next GPDP cycle after a given year, for a given district?',
             'Which focus areas require greater planning attention in the next GPDP cycle after a given year, for a given block?',
             'Which focus areas require greater planning attention in the next GPDP cycle after a given year, for a given gram panchayat (GP)?',
+            'Which focus areas require greater planning attention in the next GPDP cycle after a given year, in the main GPDP?',
+            'Which focus areas require greater planning attention in the next GPDP cycle after a given year, under a given focus area?',
+            'Which focus areas require greater planning attention in the next GPDP cycle after a given year, under a given LSDG theme?',
+            'Which focus areas require greater planning attention in the next GPDP cycle after a given year, under a given scheme?',
+            'Which focus areas require greater planning attention in the next GPDP cycle after a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2694,6 +3495,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_share DESC
 """,
@@ -2702,6 +3509,12 @@ ORDER BY pct_share DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Same caveat as PLN-044: 'balanced' is not defined, so shares and the even-split benchmark are returned.",
@@ -2717,6 +3530,12 @@ ORDER BY pct_share DESC
             'Are the planned activities balanced across themes in a given year, for a given district?',
             'Are the planned activities balanced across themes in a given year, for a given block?',
             'Are the planned activities balanced across themes in a given year, for a given gram panchayat (GP)?',
+            'Are the planned activities balanced across themes in a given year, in the main GPDP?',
+            'Are the planned activities balanced across themes in a given year, for ongoing activities?',
+            'Are the planned activities balanced across themes in a given year, under a given focus area?',
+            'Are the planned activities balanced across themes in a given year, under a given LSDG theme?',
+            'Are the planned activities balanced across themes in a given year, under a given scheme?',
+            'Are the planned activities balanced across themes in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2738,6 +3557,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY low_cost_activities DESC
 """,
@@ -2747,6 +3572,12 @@ ORDER BY low_cost_activities DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Pass $threshold = 1000 to reproduce the 'below Rs. 1000' band in the source question.",
@@ -2763,6 +3594,12 @@ ORDER BY low_cost_activities DESC
             'How many low-cost activities (below a given threshold rupees) are planned theme-wise in a given year, for a given district?',
             'How many low-cost activities (below a given threshold rupees) are planned theme-wise in a given year, for a given block?',
             'How many low-cost activities (below a given threshold rupees) are planned theme-wise in a given year, for a given gram panchayat (GP)?',
+            'How many low-cost activities (below a given threshold rupees) are planned theme-wise in a given year, in the main GPDP?',
+            'How many low-cost activities (below a given threshold rupees) are planned theme-wise in a given year, for ongoing activities?',
+            'How many low-cost activities (below a given threshold rupees) are planned theme-wise in a given year, under a given focus area?',
+            'How many low-cost activities (below a given threshold rupees) are planned theme-wise in a given year, under a given LSDG theme?',
+            'How many low-cost activities (below a given threshold rupees) are planned theme-wise in a given year, under a given scheme?',
+            'How many low-cost activities (below a given threshold rupees) are planned theme-wise in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2784,6 +3621,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY activities DESC
 """,
@@ -2792,6 +3635,12 @@ ORDER BY activities DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -2806,6 +3655,12 @@ ORDER BY activities DESC
             'What is the cost-band split (below 500, 500-1000, above 1000) of activities in a given district for a given year?',
             'What is the cost-band split (below 500, 500-1000, above 1000) of activities in a given block for a given year?',
             'What is the cost-band split (below 500, 500-1000, above 1000) of activities in a given gram panchayat for a given year?',
+            'What is the cost-band split (below 500, 500-1000, above 1000) of activities in a given district for a given year, in the main GPDP?',
+            'What is the cost-band split (below 500, 500-1000, above 1000) of activities in a given district for a given year, for ongoing activities?',
+            'What is the cost-band split (below 500, 500-1000, above 1000) of activities in a given district for a given year, under a given focus area?',
+            'What is the cost-band split (below 500, 500-1000, above 1000) of activities in a given district for a given year, under a given LSDG theme?',
+            'What is the cost-band split (below 500, 500-1000, above 1000) of activities in a given district for a given year, under a given scheme?',
+            'What is the cost-band split (below 500, 500-1000, above 1000) of activities in a given district for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2826,12 +3681,24 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Flagship' activities are not identifiable - no flagship flag exists. Only the no-cost half of the question is answered.",
@@ -2847,6 +3714,12 @@ WHERE v.fiscal_year = $date_range
             'How many no-cost activities are planned in a given block for a given year?',
             'How many no-cost activities are planned in a given district for a given year?',
             'How many no-cost activities are planned in a given gram panchayat for a given year?',
+            'How many no-cost activities are planned in a given block for a given year, in the main GPDP?',
+            'How many no-cost activities are planned in a given block for a given year, for ongoing activities?',
+            'How many no-cost activities are planned in a given block for a given year, under a given focus area?',
+            'How many no-cost activities are planned in a given block for a given year, under a given LSDG theme?',
+            'How many no-cost activities are planned in a given block for a given year, under a given scheme?',
+            'How many no-cost activities are planned in a given block for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2868,6 +3741,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY pct_low_cost DESC
 """,
@@ -2877,6 +3756,12 @@ ORDER BY pct_low_cost DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -2895,6 +3780,12 @@ ORDER BY pct_low_cost DESC
             'What share of planned activities in a given gram panchayat are low-cost (below a given threshold) in a given year?',
             'What share of planned activities in a given district are low-cost (below a given threshold) in a given year?',
             'What share of planned activities in a given block are low-cost (below a given threshold) in a given year?',
+            'What share of planned activities in a given gram panchayat are low-cost (below a given threshold) in a given year, in the main GPDP?',
+            'What share of planned activities in a given gram panchayat are low-cost (below a given threshold) in a given year, for ongoing activities?',
+            'What share of planned activities in a given gram panchayat are low-cost (below a given threshold) in a given year, under a given focus area?',
+            'What share of planned activities in a given gram panchayat are low-cost (below a given threshold) in a given year, under a given LSDG theme?',
+            'What share of planned activities in a given gram panchayat are low-cost (below a given threshold) in a given year, under a given scheme?',
+            'What share of planned activities in a given gram panchayat are low-cost (below a given threshold) in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -2914,6 +3805,7 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
 ORDER BY v.plan_type
 """,
         "param_slots": [
@@ -2921,6 +3813,7 @@ ORDER BY v.plan_type
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'plan_code_status is NULL throughout, so only Approved / Not approved can be distinguished.',
@@ -2936,6 +3829,7 @@ ORDER BY v.plan_type
             'What is the status of the a given year plan of a given gram panchayat?',
             'What is the status of the a given year plan of a given district?',
             'What is the status of the a given year plan of a given block?',
+            'What is the status of the a given year plan of a given gram panchayat, in the main GPDP?',
             # ── end derived ──
         ],
     },
@@ -3037,6 +3931,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY activities DESC
 """,
@@ -3045,6 +3945,12 @@ ORDER BY activities DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'work_type decodes to New/Fresh, Maintenance, Upgradation, None; 346 activities have no work_type and show as Unknown.',
@@ -3060,6 +3966,12 @@ ORDER BY activities DESC
             'How many fresh and how many maintenance activities does a given gram panchayat have in a given year?',
             'How many fresh and how many maintenance activities does a given district have in a given year?',
             'How many fresh and how many maintenance activities does a given block have in a given year?',
+            'How many fresh and how many maintenance activities does a given gram panchayat have in a given year, in the main GPDP?',
+            'How many fresh and how many maintenance activities does a given gram panchayat have in a given year, for ongoing activities?',
+            'How many fresh and how many maintenance activities does a given gram panchayat have in a given year, under a given focus area?',
+            'How many fresh and how many maintenance activities does a given gram panchayat have in a given year, under a given LSDG theme?',
+            'How many fresh and how many maintenance activities does a given gram panchayat have in a given year, under a given scheme?',
+            'How many fresh and how many maintenance activities does a given gram panchayat have in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -3080,6 +3992,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY actual_expenditure DESC
 """,
@@ -3088,6 +4006,12 @@ ORDER BY actual_expenditure DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -3102,6 +4026,12 @@ ORDER BY actual_expenditure DESC
             'What is the expenditure on fresh versus maintenance activities in a given block for a given year?',
             'What is the expenditure on fresh versus maintenance activities in a given district for a given year?',
             'What is the expenditure on fresh versus maintenance activities in a given gram panchayat for a given year?',
+            'What is the expenditure on fresh versus maintenance activities in a given block for a given year, in the main GPDP?',
+            'What is the expenditure on fresh versus maintenance activities in a given block for a given year, for ongoing activities?',
+            'What is the expenditure on fresh versus maintenance activities in a given block for a given year, under a given focus area?',
+            'What is the expenditure on fresh versus maintenance activities in a given block for a given year, under a given LSDG theme?',
+            'What is the expenditure on fresh versus maintenance activities in a given block for a given year, under a given scheme?',
+            'What is the expenditure on fresh versus maintenance activities in a given block for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -3120,12 +4050,24 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -3140,6 +4082,12 @@ WHERE v.fiscal_year = $date_range
             'What share of total expenditure in a given district went to maintenance activities in a given year?',
             'What share of total expenditure in a given block went to maintenance activities in a given year?',
             'What share of total expenditure in a given gram panchayat went to maintenance activities in a given year?',
+            'What share of total expenditure in a given district went to maintenance activities in a given year, in the main GPDP?',
+            'What share of total expenditure in a given district went to maintenance activities in a given year, for ongoing activities?',
+            'What share of total expenditure in a given district went to maintenance activities in a given year, under a given focus area?',
+            'What share of total expenditure in a given district went to maintenance activities in a given year, under a given LSDG theme?',
+            'What share of total expenditure in a given district went to maintenance activities in a given year, under a given scheme?',
+            'What share of total expenditure in a given district went to maintenance activities in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -3158,6 +4106,10 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
 GROUP BY 1
 ORDER BY maintenance_activities DESC
 LIMIT $top_n
@@ -3168,6 +4120,10 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "asset_subcategory is populated on 4,286 of 12,704 asset rows, so most maintenance activity lands in 'Uncategorised'.",
@@ -3183,6 +4139,10 @@ LIMIT $top_n
             'Which asset sub-categories have the highest number of maintenance activities in a given district in a given year?',
             'Which asset sub-categories have the highest number of maintenance activities in a given block in a given year?',
             'Which asset sub-categories have the highest number of maintenance activities in a given gram panchayat in a given year?',
+            'Which asset sub-categories have the highest number of maintenance activities in a given district in a given year, in the main GPDP?',
+            'Which asset sub-categories have the highest number of maintenance activities in a given district in a given year, for ongoing activities?',
+            'Which asset sub-categories have the highest number of maintenance activities in a given district in a given year, under a given focus area?',
+            'Which asset sub-categories have the highest number of maintenance activities in a given district in a given year, under a given LSDG theme?',
             # ── end derived ──
         ],
     },
@@ -3201,6 +4161,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 HAVING COALESCE(SUM(v.total_expenditure) FILTER (WHERE v.work_type_label = 'Maintenance'),0)
      > COALESCE(SUM(v.total_expenditure) FILTER (WHERE v.work_type_label = 'New/Fresh'),0)
@@ -3211,6 +4177,12 @@ ORDER BY maintenance_exp DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -3229,6 +4201,12 @@ ORDER BY maintenance_exp DESC
             'Which GPs in a given block spend more on maintenance than on fresh assets in a given year?',
             'Which GPs in a given district spend more on maintenance than on fresh assets in a given year?',
             'Which GPs in a given gram panchayat spend more on maintenance than on fresh assets in a given year?',
+            'Which GPs in a given block spend more on maintenance than on fresh assets in a given year, in the main GPDP?',
+            'Which GPs in a given block spend more on maintenance than on fresh assets in a given year, for ongoing activities?',
+            'Which GPs in a given block spend more on maintenance than on fresh assets in a given year, under a given focus area?',
+            'Which GPs in a given block spend more on maintenance than on fresh assets in a given year, under a given LSDG theme?',
+            'Which GPs in a given block spend more on maintenance than on fresh assets in a given year, under a given scheme?',
+            'Which GPs in a given block spend more on maintenance than on fresh assets in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -3249,6 +4227,12 @@ WHERE 1=1
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY 1
 """,
@@ -3256,6 +4240,12 @@ ORDER BY 1
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Planning',
@@ -3270,6 +4260,12 @@ ORDER BY 1
             'How has maintenance expenditure in a given block changed over the years?',
             'How has maintenance expenditure in a given district changed over the years?',
             'How has maintenance expenditure in a given gram panchayat changed over the years?',
+            'How has maintenance expenditure in a given block changed over the years, in the main GPDP?',
+            'How has maintenance expenditure in a given block changed over the years, for ongoing activities?',
+            'How has maintenance expenditure in a given block changed over the years, under a given focus area?',
+            'How has maintenance expenditure in a given block changed over the years, under a given LSDG theme?',
+            'How has maintenance expenditure in a given block changed over the years, under a given scheme?',
+            'How has maintenance expenditure in a given block changed over the years, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -3288,6 +4284,10 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
 GROUP BY 1,2
 ORDER BY v.asset_category_label, expenditure DESC
 """,
@@ -3297,6 +4297,10 @@ ORDER BY v.asset_category_label, expenditure DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'asset_category is populated on 4,286 of 12,704 rows. Pass NULL to $asset_category to see every category.',
@@ -3312,6 +4316,10 @@ ORDER BY v.asset_category_label, expenditure DESC
             'What is the fresh versus maintenance split for a given asset category activities in a given district in a given year?',
             'What is the fresh versus maintenance split for a given asset category activities in a given block in a given year?',
             'What is the fresh versus maintenance split for a given asset category activities in a given gram panchayat in a given year?',
+            'What is the fresh versus maintenance split for a given asset category activities in a given district in a given year, in the main GPDP?',
+            'What is the fresh versus maintenance split for a given asset category activities in a given district in a given year, for ongoing activities?',
+            'What is the fresh versus maintenance split for a given asset category activities in a given district in a given year, under a given focus area?',
+            'What is the fresh versus maintenance split for a given asset category activities in a given district in a given year, under a given LSDG theme?',
             # ── end derived ──
         ],
     },
@@ -3330,6 +4338,10 @@ WHERE v.work_type_label = 'Maintenance'
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
 GROUP BY 1,2,3
 HAVING COUNT(DISTINCT v.fiscal_year) > 1
 ORDER BY years_with_maintenance DESC, total_maintenance_expenditure DESC
@@ -3338,6 +4350,10 @@ ORDER BY years_with_maintenance DESC, total_maintenance_expenditure DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
         ],
         "grouped_geo": [
     'gp_name',
@@ -3356,6 +4372,10 @@ ORDER BY years_with_maintenance DESC, total_maintenance_expenditure DESC
             'Which assets in a given gram panchayat have had maintenance activities in more than one year?',
             'Which assets in a given district have had maintenance activities in more than one year?',
             'Which assets in a given block have had maintenance activities in more than one year?',
+            'Which assets in a given gram panchayat have had maintenance activities in more than one year, in the main GPDP?',
+            'Which assets in a given gram panchayat have had maintenance activities in more than one year, for ongoing activities?',
+            'Which assets in a given gram panchayat have had maintenance activities in more than one year, under a given focus area?',
+            'Which assets in a given gram panchayat have had maintenance activities in more than one year, under a given LSDG theme?',
             # ── end derived ──
         ],
     },
@@ -3380,12 +4400,24 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Now uses the real earmark columns from admin_approval_scheme rather than the spent split. Coverage is thin in the source: fund_sanctioned_sc is populated on 0.1% of rows and fund_sanctioned_st on 0.9%, so most areas will still return zero. Spent amounts are shown alongside for comparison.',
@@ -3401,6 +4433,12 @@ WHERE v.fiscal_year = $date_range
             'How much of the sanctioned funding in a given block is earmarked for SC and ST categories in a given year?',
             'How much of the sanctioned funding in a given district is earmarked for SC and ST categories in a given year?',
             'How much of the sanctioned funding in a given gram panchayat is earmarked for SC and ST categories in a given year?',
+            'How much of the sanctioned funding in a given block is earmarked for SC and ST categories in a given year, in the main GPDP?',
+            'How much of the sanctioned funding in a given block is earmarked for SC and ST categories in a given year, for ongoing activities?',
+            'How much of the sanctioned funding in a given block is earmarked for SC and ST categories in a given year, under a given focus area?',
+            'How much of the sanctioned funding in a given block is earmarked for SC and ST categories in a given year, under a given LSDG theme?',
+            'How much of the sanctioned funding in a given block is earmarked for SC and ST categories in a given year, under a given scheme?',
+            'How much of the sanctioned funding in a given block is earmarked for SC and ST categories in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -3420,6 +4458,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 """,
         "param_slots": [
@@ -3427,6 +4471,12 @@ GROUP BY 1,2
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -3446,6 +4496,12 @@ GROUP BY 1,2
             'How does the SC-category funding of a given gram panchayat compare with its total for a given year?',
             'How does the SC-category funding of a given district compare with its total for a given year?',
             'How does the SC-category funding of a given block compare with its total for a given year?',
+            'How does the SC-category funding of a given gram panchayat compare with its total for a given year, in the main GPDP?',
+            'How does the SC-category funding of a given gram panchayat compare with its total for a given year, for ongoing activities?',
+            'How does the SC-category funding of a given gram panchayat compare with its total for a given year, under a given focus area?',
+            'How does the SC-category funding of a given gram panchayat compare with its total for a given year, under a given LSDG theme?',
+            'How does the SC-category funding of a given gram panchayat compare with its total for a given year, under a given scheme?',
+            'How does the SC-category funding of a given gram panchayat compare with its total for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -3465,6 +4521,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2,3
 HAVING COALESCE(SUM(COALESCE(v.fund_sanctioned_sc,0) + COALESCE(v.fund_sanctioned_st,0)),0) = 0
 ORDER BY total_sanctioned DESC
@@ -3474,6 +4536,12 @@ ORDER BY total_sanctioned DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -3494,6 +4562,12 @@ ORDER BY total_sanctioned DESC
             'Which GPs in a given block have sanctioned activities but no SC/ST earmark in a given year?',
             'Which GPs in a given district have sanctioned activities but no SC/ST earmark in a given year?',
             'Which GPs in a given gram panchayat have sanctioned activities but no SC/ST earmark in a given year?',
+            'Which GPs in a given block have sanctioned activities but no SC/ST earmark in a given year, in the main GPDP?',
+            'Which GPs in a given block have sanctioned activities but no SC/ST earmark in a given year, for ongoing activities?',
+            'Which GPs in a given block have sanctioned activities but no SC/ST earmark in a given year, under a given focus area?',
+            'Which GPs in a given block have sanctioned activities but no SC/ST earmark in a given year, under a given LSDG theme?',
+            'Which GPs in a given block have sanctioned activities but no SC/ST earmark in a given year, under a given scheme?',
+            'Which GPs in a given block have sanctioned activities but no SC/ST earmark in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -3556,6 +4630,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY activities DESC
 LIMIT $top_n
@@ -3566,6 +4646,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "scheme_name is NULL on 82% of expenditure rows; '(not recorded)' will usually top the list.",
@@ -3581,6 +4667,12 @@ LIMIT $top_n
             'Which scheme funds the largest number of activities in a given block in a given year?',
             'Which scheme funds the largest number of activities in a given district in a given year?',
             'Which scheme funds the largest number of activities in a given gram panchayat in a given year?',
+            'Which scheme funds the largest number of activities in a given block in a given year, in the main GPDP?',
+            'Which scheme funds the largest number of activities in a given block in a given year, for ongoing activities?',
+            'Which scheme funds the largest number of activities in a given block in a given year, under a given focus area?',
+            'Which scheme funds the largest number of activities in a given block in a given year, under a given LSDG theme?',
+            'Which scheme funds the largest number of activities in a given block in a given year, under a given scheme?',
+            'Which scheme funds the largest number of activities in a given block in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -3601,6 +4693,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY expenditure DESC
 """,
@@ -3609,6 +4707,12 @@ ORDER BY expenditure DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Fund allocated' is not stored; approved cost and actual expenditure are returned instead.",
@@ -3624,6 +4728,12 @@ ORDER BY expenditure DESC
             'What is the total amount recorded per scheme across a given district in a given year?',
             'What is the total amount recorded per scheme across a given block in a given year?',
             'What is the total amount recorded per scheme across a given gram panchayat in a given year?',
+            'What is the total amount recorded per scheme across a given district in a given year, in the main GPDP?',
+            'What is the total amount recorded per scheme across a given district in a given year, for ongoing activities?',
+            'What is the total amount recorded per scheme across a given district in a given year, under a given focus area?',
+            'What is the total amount recorded per scheme across a given district in a given year, under a given LSDG theme?',
+            'What is the total amount recorded per scheme across a given district in a given year, under a given scheme?',
+            'What is the total amount recorded per scheme across a given district in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -3644,6 +4754,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY sanctioned_amount DESC
 """,
@@ -3652,6 +4768,12 @@ ORDER BY sanctioned_amount DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Tied/untied comes from admin_approval_scheme.scheme_component_code: 4249 = Tied Grant, 4211 = Basic Grant (untied), 4250 = Devolution of Fund (treated as untied). Codes 3880, 3907, 4251, 4252 and 0 are reported as 'Other' rather than guessed at. Only sanctioned activities carry a component, so this covers 2,101 activities, not the whole plan.",
@@ -3667,6 +4789,12 @@ ORDER BY sanctioned_amount DESC
             'What is the split of tied and untied funds sanctioned to activities of a given gram panchayat in a given year?',
             'What is the split of tied and untied funds sanctioned to activities of a given district in a given year?',
             'What is the split of tied and untied funds sanctioned to activities of a given block in a given year?',
+            'What is the split of tied and untied funds sanctioned to activities of a given gram panchayat in a given year, in the main GPDP?',
+            'What is the split of tied and untied funds sanctioned to activities of a given gram panchayat in a given year, for ongoing activities?',
+            'What is the split of tied and untied funds sanctioned to activities of a given gram panchayat in a given year, under a given focus area?',
+            'What is the split of tied and untied funds sanctioned to activities of a given gram panchayat in a given year, under a given LSDG theme?',
+            'What is the split of tied and untied funds sanctioned to activities of a given gram panchayat in a given year, under a given scheme?',
+            'What is the split of tied and untied funds sanctioned to activities of a given gram panchayat in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -3688,6 +4816,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
 GROUP BY 1
 HAVING SUM(COALESCE(v.fund_sanctioned_total,0)) FILTER (WHERE v.tied_untied = 'Tied') > 0
 ORDER BY tied_amount DESC
@@ -3699,6 +4832,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Tied/untied comes from admin_approval_scheme.scheme_component_code: 4249 = Tied Grant, 4211 = Basic Grant (untied), 4250 = Devolution of Fund (treated as untied). Codes 3880, 3907, 4251, 4252 and 0 are reported as 'Other' rather than guessed at. Only sanctioned activities carry a component, so this covers 2,101 activities, not the whole plan.",
@@ -3714,6 +4852,11 @@ LIMIT $top_n
             'Which focus areas consume the largest share of tied funds in a given block in a given year?',
             'Which focus areas consume the largest share of tied funds in a given district in a given year?',
             'Which focus areas consume the largest share of tied funds in a given gram panchayat in a given year?',
+            'Which focus areas consume the largest share of tied funds in a given block in a given year, in the main GPDP?',
+            'Which focus areas consume the largest share of tied funds in a given block in a given year, for ongoing activities?',
+            'Which focus areas consume the largest share of tied funds in a given block in a given year, under a given focus area?',
+            'Which focus areas consume the largest share of tied funds in a given block in a given year, under a given LSDG theme?',
+            'Which focus areas consume the largest share of tied funds in a given block in a given year, under a given scheme?',
             # ── end derived ──
         ],
     },
@@ -3734,12 +4877,22 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Entirely' is taken from the dominant component on the activity. Six activities have two admin_approval_scheme rows; query that table directly for a true multi-component split. Tied/untied comes from admin_approval_scheme.scheme_component_code: 4249 = Tied Grant, 4211 = Basic Grant (untied), 4250 = Devolution of Fund (treated as untied). Codes 3880, 3907, 4251, 4252 and 0 are reported as 'Other' rather than guessed at. Only sanctioned activities carry a component, so this covers 2,101 activities, not the whole plan.",
@@ -3755,6 +4908,11 @@ WHERE v.fiscal_year = $date_range
             'How many activities in a given gram panchayat are funded entirely from untied funds in a given year?',
             'How many activities in a given district are funded entirely from untied funds in a given year?',
             'How many activities in a given block are funded entirely from untied funds in a given year?',
+            'How many activities in a given gram panchayat are funded entirely from untied funds in a given year, in the main GPDP?',
+            'How many activities in a given gram panchayat are funded entirely from untied funds in a given year, for ongoing activities?',
+            'How many activities in a given gram panchayat are funded entirely from untied funds in a given year, under a given focus area?',
+            'How many activities in a given gram panchayat are funded entirely from untied funds in a given year, under a given LSDG theme?',
+            'How many activities in a given gram panchayat are funded entirely from untied funds in a given year, under a given scheme?',
             # ── end derived ──
         ],
     },
@@ -3776,12 +4934,22 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Tied/untied comes from admin_approval_scheme.scheme_component_code: 4249 = Tied Grant, 4211 = Basic Grant (untied), 4250 = Devolution of Fund (treated as untied). Codes 3880, 3907, 4251, 4252 and 0 are reported as 'Other' rather than guessed at. Only sanctioned activities carry a component, so this covers 2,101 activities, not the whole plan.",
@@ -3797,6 +4965,11 @@ WHERE v.fiscal_year = $date_range
             'What percentage of sanctioned funds in a given district is tied in a given year?',
             'What percentage of sanctioned funds in a given block is tied in a given year?',
             'What percentage of sanctioned funds in a given gram panchayat is tied in a given year?',
+            'What percentage of sanctioned funds in a given district is tied in a given year, in the main GPDP?',
+            'What percentage of sanctioned funds in a given district is tied in a given year, for ongoing activities?',
+            'What percentage of sanctioned funds in a given district is tied in a given year, under a given focus area?',
+            'What percentage of sanctioned funds in a given district is tied in a given year, under a given LSDG theme?',
+            'What percentage of sanctioned funds in a given district is tied in a given year, under a given scheme?',
             # ── end derived ──
         ],
     },
@@ -3817,6 +4990,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2,3
 """,
         "param_slots": [
@@ -3824,6 +5003,12 @@ GROUP BY 1,2,3
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -3843,6 +5028,12 @@ GROUP BY 1,2,3
             'How much total funding is recorded for a given gram panchayat in a given year?',
             'How much total funding is recorded for a given district in a given year?',
             'How much total funding is recorded for a given block in a given year?',
+            'How much total funding is recorded for a given gram panchayat in a given year, in the main GPDP?',
+            'How much total funding is recorded for a given gram panchayat in a given year, for ongoing activities?',
+            'How much total funding is recorded for a given gram panchayat in a given year, under a given focus area?',
+            'How much total funding is recorded for a given gram panchayat in a given year, under a given LSDG theme?',
+            'How much total funding is recorded for a given gram panchayat in a given year, under a given scheme?',
+            'How much total funding is recorded for a given gram panchayat in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -3862,6 +5053,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY amount DESC
 """,
@@ -3870,6 +5067,12 @@ ORDER BY amount DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Funding source is proxied by activity_expenditure.scheme_name, which has only 5 non-null values and is NULL on 82% of rows. MGNREGS and similar sources are not separable.',
@@ -3886,6 +5089,12 @@ ORDER BY amount DESC
             'How much funding is recorded from each funding source in a given year, for a given district?',
             'How much funding is recorded from each funding source in a given year, for a given block?',
             'How much funding is recorded from each funding source in a given year, for a given gram panchayat (GP)?',
+            'How much funding is recorded from each funding source in a given year, in the main GPDP?',
+            'How much funding is recorded from each funding source in a given year, for ongoing activities?',
+            'How much funding is recorded from each funding source in a given year, under a given focus area?',
+            'How much funding is recorded from each funding source in a given year, under a given LSDG theme?',
+            'How much funding is recorded from each funding source in a given year, under a given scheme?',
+            'How much funding is recorded from each funding source in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -3907,6 +5116,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY sanctioned_amount DESC
 """,
@@ -3915,6 +5130,12 @@ ORDER BY sanctioned_amount DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Tied/untied comes from admin_approval_scheme.scheme_component_code: 4249 = Tied Grant, 4211 = Basic Grant (untied), 4250 = Devolution of Fund (treated as untied). Codes 3880, 3907, 4251, 4252 and 0 are reported as 'Other' rather than guessed at. Only sanctioned activities carry a component, so this covers 2,101 activities, not the whole plan.",
@@ -3931,6 +5152,12 @@ ORDER BY sanctioned_amount DESC
             'How much funding is sanctioned under tied and untied components in a given year, for a given district?',
             'How much funding is sanctioned under tied and untied components in a given year, for a given block?',
             'How much funding is sanctioned under tied and untied components in a given year, for a given gram panchayat (GP)?',
+            'How much funding is sanctioned under tied and untied components in a given year, in the main GPDP?',
+            'How much funding is sanctioned under tied and untied components in a given year, for ongoing activities?',
+            'How much funding is sanctioned under tied and untied components in a given year, under a given focus area?',
+            'How much funding is sanctioned under tied and untied components in a given year, under a given LSDG theme?',
+            'How much funding is sanctioned under tied and untied components in a given year, under a given scheme?',
+            'How much funding is sanctioned under tied and untied components in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -3949,6 +5176,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_of_total DESC
 """,
@@ -3957,6 +5190,12 @@ ORDER BY pct_of_total DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Same scheme_name coverage caveat as BUD-002.',
@@ -3973,6 +5212,12 @@ ORDER BY pct_of_total DESC
             'What percentage of the total comes from each funding source in a given year, for a given district?',
             'What percentage of the total comes from each funding source in a given year, for a given block?',
             'What percentage of the total comes from each funding source in a given year, for a given gram panchayat (GP)?',
+            'What percentage of the total comes from each funding source in a given year, in the main GPDP?',
+            'What percentage of the total comes from each funding source in a given year, for ongoing activities?',
+            'What percentage of the total comes from each funding source in a given year, under a given focus area?',
+            'What percentage of the total comes from each funding source in a given year, under a given LSDG theme?',
+            'What percentage of the total comes from each funding source in a given year, under a given scheme?',
+            'What percentage of the total comes from each funding source in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -3992,6 +5237,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_of_sanctioned DESC
 """,
@@ -4000,6 +5251,12 @@ ORDER BY pct_of_sanctioned DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Tied/untied comes from admin_approval_scheme.scheme_component_code: 4249 = Tied Grant, 4211 = Basic Grant (untied), 4250 = Devolution of Fund (treated as untied). Codes 3880, 3907, 4251, 4252 and 0 are reported as 'Other' rather than guessed at. Only sanctioned activities carry a component, so this covers 2,101 activities, not the whole plan.",
@@ -4016,6 +5273,12 @@ ORDER BY pct_of_sanctioned DESC
             'What percentage of the sanctioned budget is tied and untied in a given year, for a given district?',
             'What percentage of the sanctioned budget is tied and untied in a given year, for a given block?',
             'What percentage of the sanctioned budget is tied and untied in a given year, for a given gram panchayat (GP)?',
+            'What percentage of the sanctioned budget is tied and untied in a given year, in the main GPDP?',
+            'What percentage of the sanctioned budget is tied and untied in a given year, for ongoing activities?',
+            'What percentage of the sanctioned budget is tied and untied in a given year, under a given focus area?',
+            'What percentage of the sanctioned budget is tied and untied in a given year, under a given LSDG theme?',
+            'What percentage of the sanctioned budget is tied and untied in a given year, under a given scheme?',
+            'What percentage of the sanctioned budget is tied and untied in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4035,6 +5298,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_cost DESC
 """,
@@ -4043,6 +5312,12 @@ ORDER BY planned_cost DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas.',
@@ -4058,6 +5333,12 @@ ORDER BY planned_cost DESC
             'How much planned expenditure is allocated to each GPDP theme in a given year, for a given district?',
             'How much planned expenditure is allocated to each GPDP theme in a given year, for a given block?',
             'How much planned expenditure is allocated to each GPDP theme in a given year, for a given gram panchayat (GP)?',
+            'How much planned expenditure is allocated to each GPDP theme in a given year, in the main GPDP?',
+            'How much planned expenditure is allocated to each GPDP theme in a given year, for ongoing activities?',
+            'How much planned expenditure is allocated to each GPDP theme in a given year, under a given focus area?',
+            'How much planned expenditure is allocated to each GPDP theme in a given year, under a given LSDG theme?',
+            'How much planned expenditure is allocated to each GPDP theme in a given year, under a given scheme?',
+            'How much planned expenditure is allocated to each GPDP theme in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4075,6 +5356,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_cost DESC
 LIMIT $top_n
@@ -4085,6 +5372,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -4101,6 +5394,12 @@ LIMIT $top_n
             'Which GPDP theme has the highest planned expenditure in a given year, for a given district?',
             'Which GPDP theme has the highest planned expenditure in a given year, for a given block?',
             'Which GPDP theme has the highest planned expenditure in a given year, for a given gram panchayat (GP)?',
+            'Which GPDP theme has the highest planned expenditure in a given year, in the main GPDP?',
+            'Which GPDP theme has the highest planned expenditure in a given year, for ongoing activities?',
+            'Which GPDP theme has the highest planned expenditure in a given year, under a given focus area?',
+            'Which GPDP theme has the highest planned expenditure in a given year, under a given LSDG theme?',
+            'Which GPDP theme has the highest planned expenditure in a given year, under a given scheme?',
+            'Which GPDP theme has the highest planned expenditure in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4118,6 +5417,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_cost ASC
 LIMIT $top_n
@@ -4128,6 +5433,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -4143,6 +5454,12 @@ LIMIT $top_n
             'Which GPDP theme has the lowest planned expenditure in a given year, for a given district?',
             'Which GPDP theme has the lowest planned expenditure in a given year, for a given block?',
             'Which GPDP theme has the lowest planned expenditure in a given year, for a given gram panchayat (GP)?',
+            'Which GPDP theme has the lowest planned expenditure in a given year, in the main GPDP?',
+            'Which GPDP theme has the lowest planned expenditure in a given year, for ongoing activities?',
+            'Which GPDP theme has the lowest planned expenditure in a given year, under a given focus area?',
+            'Which GPDP theme has the lowest planned expenditure in a given year, under a given LSDG theme?',
+            'Which GPDP theme has the lowest planned expenditure in a given year, under a given scheme?',
+            'Which GPDP theme has the lowest planned expenditure in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4161,6 +5478,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_of_planned_cost DESC
 """,
@@ -4169,6 +5492,12 @@ ORDER BY pct_of_planned_cost DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -4184,6 +5513,12 @@ ORDER BY pct_of_planned_cost DESC
             'What percentage of total planned expenditure is allocated to each GPDP theme in a given year, for a given district?',
             'What percentage of total planned expenditure is allocated to each GPDP theme in a given year, for a given block?',
             'What percentage of total planned expenditure is allocated to each GPDP theme in a given year, for a given gram panchayat (GP)?',
+            'What percentage of total planned expenditure is allocated to each GPDP theme in a given year, in the main GPDP?',
+            'What percentage of total planned expenditure is allocated to each GPDP theme in a given year, for ongoing activities?',
+            'What percentage of total planned expenditure is allocated to each GPDP theme in a given year, under a given focus area?',
+            'What percentage of total planned expenditure is allocated to each GPDP theme in a given year, under a given LSDG theme?',
+            'What percentage of total planned expenditure is allocated to each GPDP theme in a given year, under a given scheme?',
+            'What percentage of total planned expenditure is allocated to each GPDP theme in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4205,6 +5540,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY cost_per_activity DESC
 """,
@@ -4213,6 +5554,12 @@ ORDER BY cost_per_activity DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'High' and 'low' are not defined in the source question, so the query ranks by cost per activity and shows both share columns.",
@@ -4229,6 +5576,12 @@ ORDER BY cost_per_activity DESC
             'Which GPDP themes have high planned expenditure but relatively few activities in a given year, for a given district?',
             'Which GPDP themes have high planned expenditure but relatively few activities in a given year, for a given block?',
             'Which GPDP themes have high planned expenditure but relatively few activities in a given year, for a given gram panchayat (GP)?',
+            'Which GPDP themes have high planned expenditure but relatively few activities in a given year, in the main GPDP?',
+            'Which GPDP themes have high planned expenditure but relatively few activities in a given year, for ongoing activities?',
+            'Which GPDP themes have high planned expenditure but relatively few activities in a given year, under a given focus area?',
+            'Which GPDP themes have high planned expenditure but relatively few activities in a given year, under a given LSDG theme?',
+            'Which GPDP themes have high planned expenditure but relatively few activities in a given year, under a given scheme?',
+            'Which GPDP themes have high planned expenditure but relatively few activities in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4250,6 +5603,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY cost_per_activity ASC
 """,
@@ -4258,6 +5617,12 @@ ORDER BY cost_per_activity ASC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'High' and 'low' are not defined in the source question, so the query ranks by cost per activity and shows both share columns.",
@@ -4274,6 +5639,12 @@ ORDER BY cost_per_activity ASC
             'Which GPDP themes have many activities but relatively low planned expenditure in a given year, for a given district?',
             'Which GPDP themes have many activities but relatively low planned expenditure in a given year, for a given block?',
             'Which GPDP themes have many activities but relatively low planned expenditure in a given year, for a given gram panchayat (GP)?',
+            'Which GPDP themes have many activities but relatively low planned expenditure in a given year, in the main GPDP?',
+            'Which GPDP themes have many activities but relatively low planned expenditure in a given year, for ongoing activities?',
+            'Which GPDP themes have many activities but relatively low planned expenditure in a given year, under a given focus area?',
+            'Which GPDP themes have many activities but relatively low planned expenditure in a given year, under a given LSDG theme?',
+            'Which GPDP themes have many activities but relatively low planned expenditure in a given year, under a given scheme?',
+            'Which GPDP themes have many activities but relatively low planned expenditure in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4290,6 +5661,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING COALESCE(SUM(COALESCE(v.total_cost,0)),0) = 0
 ORDER BY activities DESC
@@ -4299,6 +5676,12 @@ ORDER BY activities DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Only themes that appear in the plan are considered; use PLN-043 for themes with no activities at all.',
@@ -4314,6 +5697,12 @@ ORDER BY activities DESC
             'Which GPDP themes have no planned expenditure in a given year, for a given district?',
             'Which GPDP themes have no planned expenditure in a given year, for a given block?',
             'Which GPDP themes have no planned expenditure in a given year, for a given gram panchayat (GP)?',
+            'Which GPDP themes have no planned expenditure in a given year, in the main GPDP?',
+            'Which GPDP themes have no planned expenditure in a given year, for ongoing activities?',
+            'Which GPDP themes have no planned expenditure in a given year, under a given focus area?',
+            'Which GPDP themes have no planned expenditure in a given year, under a given LSDG theme?',
+            'Which GPDP themes have no planned expenditure in a given year, under a given scheme?',
+            'Which GPDP themes have no planned expenditure in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4333,6 +5722,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_cost DESC
 """,
@@ -4341,6 +5736,12 @@ ORDER BY planned_cost DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas.',
@@ -4356,6 +5757,12 @@ ORDER BY planned_cost DESC
             'How much expenditure is planned under each theme for a given gram panchayat in a given year?',
             'How much expenditure is planned under each theme for a given district in a given year?',
             'How much expenditure is planned under each theme for a given block in a given year?',
+            'How much expenditure is planned under each theme for a given gram panchayat in a given year, in the main GPDP?',
+            'How much expenditure is planned under each theme for a given gram panchayat in a given year, for ongoing activities?',
+            'How much expenditure is planned under each theme for a given gram panchayat in a given year, under a given focus area?',
+            'How much expenditure is planned under each theme for a given gram panchayat in a given year, under a given LSDG theme?',
+            'How much expenditure is planned under each theme for a given gram panchayat in a given year, under a given scheme?',
+            'How much expenditure is planned under each theme for a given gram panchayat in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4374,6 +5781,12 @@ WHERE 1=1
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY v.theme, v.fiscal_year
 """,
@@ -4381,6 +5794,12 @@ ORDER BY v.theme, v.fiscal_year
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -4396,6 +5815,12 @@ ORDER BY v.theme, v.fiscal_year
             'How has planned expenditure under each GPDP theme changed over the years, for a given district?',
             'How has planned expenditure under each GPDP theme changed over the years, for a given block?',
             'How has planned expenditure under each GPDP theme changed over the years, for a given gram panchayat (GP)?',
+            'How has planned expenditure under each GPDP theme changed over the years, in the main GPDP?',
+            'How has planned expenditure under each GPDP theme changed over the years, for ongoing activities?',
+            'How has planned expenditure under each GPDP theme changed over the years, under a given focus area?',
+            'How has planned expenditure under each GPDP theme changed over the years, under a given LSDG theme?',
+            'How has planned expenditure under each GPDP theme changed over the years, under a given scheme?',
+            'How has planned expenditure under each GPDP theme changed over the years, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4414,6 +5839,12 @@ WHERE 1=1
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY v.theme, v.fiscal_year
 """,
@@ -4421,6 +5852,12 @@ ORDER BY v.theme, v.fiscal_year
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -4436,6 +5873,12 @@ ORDER BY v.theme, v.fiscal_year
             'How has planned expenditure under each GPDP theme changed over the years, for a given district?',
             'How has planned expenditure under each GPDP theme changed over the years, for a given block?',
             'How has planned expenditure under each GPDP theme changed over the years, for a given gram panchayat (GP)?',
+            'How has planned expenditure under each GPDP theme changed over the years, in the main GPDP?',
+            'How has planned expenditure under each GPDP theme changed over the years, for ongoing activities?',
+            'How has planned expenditure under each GPDP theme changed over the years, under a given focus area?',
+            'How has planned expenditure under each GPDP theme changed over the years, under a given LSDG theme?',
+            'How has planned expenditure under each GPDP theme changed over the years, under a given scheme?',
+            'How has planned expenditure under each GPDP theme changed over the years, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4454,6 +5897,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_cost DESC
 """,
@@ -4462,6 +5911,12 @@ ORDER BY planned_cost DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Budgeting & Funding',
@@ -4476,6 +5931,12 @@ ORDER BY planned_cost DESC
             'How much planned expenditure is allocated to each focus area in a given year, for a given district?',
             'How much planned expenditure is allocated to each focus area in a given year, for a given block?',
             'How much planned expenditure is allocated to each focus area in a given year, for a given gram panchayat (GP)?',
+            'How much planned expenditure is allocated to each focus area in a given year, in the main GPDP?',
+            'How much planned expenditure is allocated to each focus area in a given year, for ongoing activities?',
+            'How much planned expenditure is allocated to each focus area in a given year, under a given focus area?',
+            'How much planned expenditure is allocated to each focus area in a given year, under a given LSDG theme?',
+            'How much planned expenditure is allocated to each focus area in a given year, under a given scheme?',
+            'How much planned expenditure is allocated to each focus area in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4495,6 +5956,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY activities_with_planned_cost DESC
 """,
@@ -4504,6 +5970,11 @@ ORDER BY activities_with_planned_cost DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Budgeting & Funding',
@@ -4519,6 +5990,11 @@ ORDER BY activities_with_planned_cost DESC
             'How many activities under a given focus area have planned expenditure greater than zero in a given year, for a given district?',
             'How many activities under a given focus area have planned expenditure greater than zero in a given year, for a given block?',
             'How many activities under a given focus area have planned expenditure greater than zero in a given year, for a given gram panchayat (GP)?',
+            'How many activities under a given focus area have planned expenditure greater than zero in a given year, in the main GPDP?',
+            'How many activities under a given focus area have planned expenditure greater than zero in a given year, for ongoing activities?',
+            'How many activities under a given focus area have planned expenditure greater than zero in a given year, under a given LSDG theme?',
+            'How many activities under a given focus area have planned expenditure greater than zero in a given year, under a given scheme?',
+            'How many activities under a given focus area have planned expenditure greater than zero in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4537,6 +6013,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_expenditure DESC, v.total_cost DESC
 LIMIT $top_n
 """,
@@ -4547,6 +6028,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Budgeting & Funding',
@@ -4562,6 +6048,11 @@ LIMIT $top_n
             'What are the activities with expenditure under a given focus area in a given year, for a given district?',
             'What are the activities with expenditure under a given focus area in a given year, for a given block?',
             'What are the activities with expenditure under a given focus area in a given year, for a given gram panchayat (GP)?',
+            'What are the activities with expenditure under a given focus area in a given year, in the main GPDP?',
+            'What are the activities with expenditure under a given focus area in a given year, for ongoing activities?',
+            'What are the activities with expenditure under a given focus area in a given year, under a given LSDG theme?',
+            'What are the activities with expenditure under a given focus area in a given year, under a given scheme?',
+            'What are the activities with expenditure under a given focus area in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4580,6 +6071,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_expenditure DESC, v.total_cost DESC
 LIMIT $top_n
 """,
@@ -4590,6 +6086,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Budgeting & Funding',
@@ -4605,6 +6106,11 @@ LIMIT $top_n
             'What are the activities with zero expenditure under a given focus area in a given year, for a given district?',
             'What are the activities with zero expenditure under a given focus area in a given year, for a given block?',
             'What are the activities with zero expenditure under a given focus area in a given year, for a given gram panchayat (GP)?',
+            'What are the activities with zero expenditure under a given focus area in a given year, in the main GPDP?',
+            'What are the activities with zero expenditure under a given focus area in a given year, for ongoing activities?',
+            'What are the activities with zero expenditure under a given focus area in a given year, under a given LSDG theme?',
+            'What are the activities with zero expenditure under a given focus area in a given year, under a given scheme?',
+            'What are the activities with zero expenditure under a given focus area in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4622,6 +6128,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_cost DESC
 LIMIT $top_n
@@ -4632,6 +6144,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Budgeting & Funding',
@@ -4646,6 +6164,12 @@ LIMIT $top_n
             'Which focus area has the highest planned expenditure in a given year, for a given district?',
             'Which focus area has the highest planned expenditure in a given year, for a given block?',
             'Which focus area has the highest planned expenditure in a given year, for a given gram panchayat (GP)?',
+            'Which focus area has the highest planned expenditure in a given year, in the main GPDP?',
+            'Which focus area has the highest planned expenditure in a given year, for ongoing activities?',
+            'Which focus area has the highest planned expenditure in a given year, under a given focus area?',
+            'Which focus area has the highest planned expenditure in a given year, under a given LSDG theme?',
+            'Which focus area has the highest planned expenditure in a given year, under a given scheme?',
+            'Which focus area has the highest planned expenditure in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4663,6 +6187,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_cost ASC
 LIMIT $top_n
@@ -4673,6 +6203,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Budgeting & Funding',
@@ -4687,6 +6223,12 @@ LIMIT $top_n
             'Which focus area has the lowest planned expenditure in a given year, for a given district?',
             'Which focus area has the lowest planned expenditure in a given year, for a given block?',
             'Which focus area has the lowest planned expenditure in a given year, for a given gram panchayat (GP)?',
+            'Which focus area has the lowest planned expenditure in a given year, in the main GPDP?',
+            'Which focus area has the lowest planned expenditure in a given year, for ongoing activities?',
+            'Which focus area has the lowest planned expenditure in a given year, under a given focus area?',
+            'Which focus area has the lowest planned expenditure in a given year, under a given LSDG theme?',
+            'Which focus area has the lowest planned expenditure in a given year, under a given scheme?',
+            'Which focus area has the lowest planned expenditure in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4705,6 +6247,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_of_planned_cost DESC
 """,
@@ -4713,6 +6261,12 @@ ORDER BY pct_of_planned_cost DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Budgeting & Funding',
@@ -4727,6 +6281,12 @@ ORDER BY pct_of_planned_cost DESC
             'What percentage of total planned expenditure is allocated to each focus area in a given year, for a given district?',
             'What percentage of total planned expenditure is allocated to each focus area in a given year, for a given block?',
             'What percentage of total planned expenditure is allocated to each focus area in a given year, for a given gram panchayat (GP)?',
+            'What percentage of total planned expenditure is allocated to each focus area in a given year, in the main GPDP?',
+            'What percentage of total planned expenditure is allocated to each focus area in a given year, for ongoing activities?',
+            'What percentage of total planned expenditure is allocated to each focus area in a given year, under a given focus area?',
+            'What percentage of total planned expenditure is allocated to each focus area in a given year, under a given LSDG theme?',
+            'What percentage of total planned expenditure is allocated to each focus area in a given year, under a given scheme?',
+            'What percentage of total planned expenditure is allocated to each focus area in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4748,6 +6308,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY cost_per_activity DESC
 """,
@@ -4756,6 +6322,12 @@ ORDER BY cost_per_activity DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'High' and 'low' are undefined; ranked by cost per activity with both share columns shown.",
@@ -4771,6 +6343,12 @@ ORDER BY cost_per_activity DESC
             'Which focus areas receive high planned expenditure but relatively few activities in a given year, for a given district?',
             'Which focus areas receive high planned expenditure but relatively few activities in a given year, for a given block?',
             'Which focus areas receive high planned expenditure but relatively few activities in a given year, for a given gram panchayat (GP)?',
+            'Which focus areas receive high planned expenditure but relatively few activities in a given year, in the main GPDP?',
+            'Which focus areas receive high planned expenditure but relatively few activities in a given year, for ongoing activities?',
+            'Which focus areas receive high planned expenditure but relatively few activities in a given year, under a given focus area?',
+            'Which focus areas receive high planned expenditure but relatively few activities in a given year, under a given LSDG theme?',
+            'Which focus areas receive high planned expenditure but relatively few activities in a given year, under a given scheme?',
+            'Which focus areas receive high planned expenditure but relatively few activities in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4792,6 +6370,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY cost_per_activity ASC
 """,
@@ -4800,6 +6384,12 @@ ORDER BY cost_per_activity ASC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'High' and 'low' are undefined; ranked by cost per activity with both share columns shown.",
@@ -4815,6 +6405,12 @@ ORDER BY cost_per_activity ASC
             'Which focus areas receive many activities but relatively low planned expenditure in a given year, for a given district?',
             'Which focus areas receive many activities but relatively low planned expenditure in a given year, for a given block?',
             'Which focus areas receive many activities but relatively low planned expenditure in a given year, for a given gram panchayat (GP)?',
+            'Which focus areas receive many activities but relatively low planned expenditure in a given year, in the main GPDP?',
+            'Which focus areas receive many activities but relatively low planned expenditure in a given year, for ongoing activities?',
+            'Which focus areas receive many activities but relatively low planned expenditure in a given year, under a given focus area?',
+            'Which focus areas receive many activities but relatively low planned expenditure in a given year, under a given LSDG theme?',
+            'Which focus areas receive many activities but relatively low planned expenditure in a given year, under a given scheme?',
+            'Which focus areas receive many activities but relatively low planned expenditure in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4831,6 +6427,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING COALESCE(SUM(COALESCE(v.total_cost,0)),0) = 0
 ORDER BY activities DESC
@@ -4840,6 +6442,12 @@ ORDER BY activities DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Budgeting & Funding',
@@ -4854,6 +6462,12 @@ ORDER BY activities DESC
             'Which focus areas receive no planned expenditure in a given year, for a given district?',
             'Which focus areas receive no planned expenditure in a given year, for a given block?',
             'Which focus areas receive no planned expenditure in a given year, for a given gram panchayat (GP)?',
+            'Which focus areas receive no planned expenditure in a given year, in the main GPDP?',
+            'Which focus areas receive no planned expenditure in a given year, for ongoing activities?',
+            'Which focus areas receive no planned expenditure in a given year, under a given focus area?',
+            'Which focus areas receive no planned expenditure in a given year, under a given LSDG theme?',
+            'Which focus areas receive no planned expenditure in a given year, under a given scheme?',
+            'Which focus areas receive no planned expenditure in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4872,6 +6486,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 """,
         "param_slots": [
@@ -4880,6 +6499,11 @@ GROUP BY 1
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'scheme_name has only 5 non-null values and is NULL on 82% of rows.',
@@ -4895,6 +6519,11 @@ GROUP BY 1
             'How many activities are recorded under a given scheme in a given district for a given year?',
             'How many activities are recorded under a given scheme in a given block for a given year?',
             'How many activities are recorded under a given scheme in a given gram panchayat for a given year?',
+            'How many activities are recorded under a given scheme in a given district for a given year, in the main GPDP?',
+            'How many activities are recorded under a given scheme in a given district for a given year, for ongoing activities?',
+            'How many activities are recorded under a given scheme in a given district for a given year, under a given focus area?',
+            'How many activities are recorded under a given scheme in a given district for a given year, under a given LSDG theme?',
+            'How many activities are recorded under a given scheme in a given district for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4912,6 +6541,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_expenditure DESC
 LIMIT $top_n
 """,
@@ -4922,6 +6556,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'scheme_name coverage is 18%.',
@@ -4937,6 +6576,11 @@ LIMIT $top_n
             'Which activities of a given gram panchayat are funded under a given scheme in a given year?',
             'Which activities of a given district are funded under a given scheme in a given year?',
             'Which activities of a given block are funded under a given scheme in a given year?',
+            'Which activities of a given gram panchayat are funded under a given scheme in a given year, in the main GPDP?',
+            'Which activities of a given gram panchayat are funded under a given scheme in a given year, for ongoing activities?',
+            'Which activities of a given gram panchayat are funded under a given scheme in a given year, under a given focus area?',
+            'Which activities of a given gram panchayat are funded under a given scheme in a given year, under a given LSDG theme?',
+            'Which activities of a given gram panchayat are funded under a given scheme in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4957,6 +6601,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 """,
         "param_slots": [
@@ -4965,6 +6614,11 @@ GROUP BY 1
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'scheme_name coverage is 18%.',
@@ -4980,6 +6634,11 @@ GROUP BY 1
             'What is the total estimated cost of activities under a given scheme in a given block for a given year?',
             'What is the total estimated cost of activities under a given scheme in a given district for a given year?',
             'What is the total estimated cost of activities under a given scheme in a given gram panchayat for a given year?',
+            'What is the total estimated cost of activities under a given scheme in a given block for a given year, in the main GPDP?',
+            'What is the total estimated cost of activities under a given scheme in a given block for a given year, for ongoing activities?',
+            'What is the total estimated cost of activities under a given scheme in a given block for a given year, under a given focus area?',
+            'What is the total estimated cost of activities under a given scheme in a given block for a given year, under a given LSDG theme?',
+            'What is the total estimated cost of activities under a given scheme in a given block for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -4997,6 +6656,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY expenditure DESC
 LIMIT $top_n
@@ -5007,6 +6672,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'scheme_name coverage is 18%.',
@@ -5022,6 +6693,12 @@ LIMIT $top_n
             'Which scheme has the highest expenditure in a given block for a given year?',
             'Which scheme has the highest expenditure in a given district for a given year?',
             'Which scheme has the highest expenditure in a given gram panchayat for a given year?',
+            'Which scheme has the highest expenditure in a given block for a given year, in the main GPDP?',
+            'Which scheme has the highest expenditure in a given block for a given year, for ongoing activities?',
+            'Which scheme has the highest expenditure in a given block for a given year, under a given focus area?',
+            'Which scheme has the highest expenditure in a given block for a given year, under a given LSDG theme?',
+            'Which scheme has the highest expenditure in a given block for a given year, under a given scheme?',
+            'Which scheme has the highest expenditure in a given block for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5037,7 +6714,12 @@ WHERE NOT EXISTS (
         SELECT 1 FROM v_activity v
         WHERE v.gp_lgd_code = g.gp_lgd_code
           AND v.fiscal_year = $date_range
-          AND v.scheme_name = $scheme)
+          AND v.scheme_name = $scheme
+          AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+          AND ($status IS NULL OR v.status_label = $status)
+          AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+          AND ($theme IS NULL OR v.theme = $theme)
+          AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied))
   AND ($block_name    IS NULL OR g.block_name = $block_name)
   AND ($district_name IS NULL OR g.zp_name = $district_name)
 ORDER BY g.zp_name, g.block_name, g.gp_name
@@ -5047,6 +6729,11 @@ ORDER BY g.zp_name, g.block_name, g.gp_name
             {'name': 'scheme', 'entity_type': 'scheme'},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Because scheme_name is NULL on 82% of rows, many GPs appear here purely from missing data rather than genuine absence.',
@@ -5061,6 +6748,11 @@ ORDER BY g.zp_name, g.block_name, g.gp_name
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPs in a given block have no activities under a given scheme in a given year?',
             'Which GPs in a given district have no activities under a given scheme in a given year?',
+            'Which GPs in a given block have no activities under a given scheme in a given year, in the main GPDP?',
+            'Which GPs in a given block have no activities under a given scheme in a given year, for ongoing activities?',
+            'Which GPs in a given block have no activities under a given scheme in a given year, under a given focus area?',
+            'Which GPs in a given block have no activities under a given scheme in a given year, under a given LSDG theme?',
+            'Which GPs in a given block have no activities under a given scheme in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5115,6 +6807,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY expenditure DESC
 """,
@@ -5125,6 +6822,11 @@ ORDER BY expenditure DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'scheme_name coverage is 18%.',
@@ -5140,6 +6842,11 @@ ORDER BY expenditure DESC
             'Compare the activity counts and expenditure of a given scheme and a second scheme in a given district for a given year.',
             'Compare the activity counts and expenditure of a given scheme and a second scheme in a given block for a given year.',
             'Compare the activity counts and expenditure of a given scheme and a second scheme in a given gram panchayat for a given year.',
+            'Compare the activity counts and expenditure of a given scheme and a second scheme in a given district for a given year, in the main GPDP?',
+            'Compare the activity counts and expenditure of a given scheme and a second scheme in a given district for a given year, for ongoing activities?',
+            'Compare the activity counts and expenditure of a given scheme and a second scheme in a given district for a given year, under a given focus area?',
+            'Compare the activity counts and expenditure of a given scheme and a second scheme in a given district for a given year, under a given LSDG theme?',
+            'Compare the activity counts and expenditure of a given scheme and a second scheme in a given district for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5157,6 +6864,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY activities DESC
 """,
@@ -5166,6 +6878,11 @@ ORDER BY activities DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "scheme_name coverage is 18%; activity_status code 173 decodes to 'Buildings', which looks wrong.",
@@ -5181,6 +6898,11 @@ ORDER BY activities DESC
             'What is the status breakdown of activities under a given scheme in a given district for a given year?',
             'What is the status breakdown of activities under a given scheme in a given block for a given year?',
             'What is the status breakdown of activities under a given scheme in a given gram panchayat for a given year?',
+            'What is the status breakdown of activities under a given scheme in a given district for a given year, in the main GPDP?',
+            'What is the status breakdown of activities under a given scheme in a given district for a given year, for ongoing activities?',
+            'What is the status breakdown of activities under a given scheme in a given district for a given year, under a given focus area?',
+            'What is the status breakdown of activities under a given scheme in a given district for a given year, under a given LSDG theme?',
+            'What is the status breakdown of activities under a given scheme in a given district for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5201,6 +6923,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 """,
         "param_slots": [
@@ -5209,6 +6936,11 @@ GROUP BY 1
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'sc and st amounts are sparsely populated.',
@@ -5224,6 +6956,11 @@ GROUP BY 1
             'What is the General/SC/ST funding split under a given scheme in a given block for a given year?',
             'What is the General/SC/ST funding split under a given scheme in a given district for a given year?',
             'What is the General/SC/ST funding split under a given scheme in a given gram panchayat for a given year?',
+            'What is the General/SC/ST funding split under a given scheme in a given block for a given year, in the main GPDP?',
+            'What is the General/SC/ST funding split under a given scheme in a given block for a given year, for ongoing activities?',
+            'What is the General/SC/ST funding split under a given scheme in a given block for a given year, under a given focus area?',
+            'What is the General/SC/ST funding split under a given scheme in a given block for a given year, under a given LSDG theme?',
+            'What is the General/SC/ST funding split under a given scheme in a given block for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5238,6 +6975,11 @@ SELECT v.district_name,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
   AND ($scheme IS NULL OR v.scheme_name = $scheme)
 GROUP BY 1
 ORDER BY activities DESC
@@ -5245,6 +6987,11 @@ ORDER BY activities DESC
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'scheme_name coverage is 18%.',
@@ -5258,6 +7005,11 @@ ORDER BY activities DESC
             'What is the district-wise activity count under a given Scheme across the state for a given Plan Year?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the district-wise activity count under a given scheme for a given year?',
+            'What is the district-wise activity count under a given scheme for a given year, in the main GPDP?',
+            'What is the district-wise activity count under a given scheme for a given year, for ongoing activities?',
+            'What is the district-wise activity count under a given scheme for a given year, under a given focus area?',
+            'What is the district-wise activity count under a given scheme for a given year, under a given LSDG theme?',
+            'What is the district-wise activity count under a given scheme for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5275,6 +7027,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2,3
 ORDER BY total_expenditure DESC
 """,
@@ -5283,6 +7041,12 @@ ORDER BY total_expenditure DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -5301,6 +7065,12 @@ ORDER BY total_expenditure DESC
             'What is the total actual expenditure incurred by a given gram panchayat in a given year?',
             'What is the total actual expenditure incurred by a given district in a given year?',
             'What is the total actual expenditure incurred by a given block in a given year?',
+            'What is the total actual expenditure incurred by a given gram panchayat in a given year, in the main GPDP?',
+            'What is the total actual expenditure incurred by a given gram panchayat in a given year, for ongoing activities?',
+            'What is the total actual expenditure incurred by a given gram panchayat in a given year, under a given focus area?',
+            'What is the total actual expenditure incurred by a given gram panchayat in a given year, under a given LSDG theme?',
+            'What is the total actual expenditure incurred by a given gram panchayat in a given year, under a given scheme?',
+            'What is the total actual expenditure incurred by a given gram panchayat in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5321,6 +7091,12 @@ WHERE 1=1
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY 1
 """,
@@ -5328,6 +7104,12 @@ ORDER BY 1
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Six years are present: 2020-2021 to 2025-2026.',
@@ -5343,6 +7125,12 @@ ORDER BY 1
             'How has the total actual expenditure of a given gram panchayat changed over the years?',
             'How has the total actual expenditure of a given district changed over the years?',
             'How has the total actual expenditure of a given block changed over the years?',
+            'How has the total actual expenditure of a given gram panchayat changed over the years, in the main GPDP?',
+            'How has the total actual expenditure of a given gram panchayat changed over the years, for ongoing activities?',
+            'How has the total actual expenditure of a given gram panchayat changed over the years, under a given focus area?',
+            'How has the total actual expenditure of a given gram panchayat changed over the years, under a given LSDG theme?',
+            'How has the total actual expenditure of a given gram panchayat changed over the years, under a given scheme?',
+            'How has the total actual expenditure of a given gram panchayat changed over the years, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5361,12 +7149,24 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Expenditure',
@@ -5381,6 +7181,12 @@ WHERE v.fiscal_year = $date_range
             'What percentage of the planned expenditure has been utilised in a given year, for a given district?',
             'What percentage of the planned expenditure has been utilised in a given year, for a given block?',
             'What percentage of the planned expenditure has been utilised in a given year, for a given gram panchayat (GP)?',
+            'What percentage of the planned expenditure has been utilised in a given year, in the main GPDP?',
+            'What percentage of the planned expenditure has been utilised in a given year, for ongoing activities?',
+            'What percentage of the planned expenditure has been utilised in a given year, under a given focus area?',
+            'What percentage of the planned expenditure has been utilised in a given year, under a given LSDG theme?',
+            'What percentage of the planned expenditure has been utilised in a given year, under a given scheme?',
+            'What percentage of the planned expenditure has been utilised in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5400,12 +7206,24 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Unspent' here is plan versus spend, not a cash balance - there is no opening/closing balance table.",
@@ -5422,6 +7240,12 @@ WHERE v.fiscal_year = $date_range
             'What is the total unspent amount (planned minus actual) in a given year, for a given district?',
             'What is the total unspent amount (planned minus actual) in a given year, for a given block?',
             'What is the total unspent amount (planned minus actual) in a given year, for a given gram panchayat (GP)?',
+            'What is the total unspent amount (planned minus actual) in a given year, in the main GPDP?',
+            'What is the total unspent amount (planned minus actual) in a given year, for ongoing activities?',
+            'What is the total unspent amount (planned minus actual) in a given year, under a given focus area?',
+            'What is the total unspent amount (planned minus actual) in a given year, under a given LSDG theme?',
+            'What is the total unspent amount (planned minus actual) in a given year, under a given scheme?',
+            'What is the total unspent amount (planned minus actual) in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5440,12 +7264,24 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Expenditure',
@@ -5460,6 +7296,12 @@ WHERE v.fiscal_year = $date_range
             'How many planned activities have recorded actual expenditure in a given year, for a given district?',
             'How many planned activities have recorded actual expenditure in a given year, for a given block?',
             'How many planned activities have recorded actual expenditure in a given year, for a given gram panchayat (GP)?',
+            'How many planned activities have recorded actual expenditure in a given year, in the main GPDP?',
+            'How many planned activities have recorded actual expenditure in a given year, for ongoing activities?',
+            'How many planned activities have recorded actual expenditure in a given year, under a given focus area?',
+            'How many planned activities have recorded actual expenditure in a given year, under a given LSDG theme?',
+            'How many planned activities have recorded actual expenditure in a given year, under a given scheme?',
+            'How many planned activities have recorded actual expenditure in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5479,6 +7321,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY expenditure DESC
 """,
@@ -5487,6 +7335,12 @@ ORDER BY expenditure DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Funding source is proxied by scheme_name (5 non-null values, NULL on 82% of rows). 15th FC Tied/Untied cannot be separated.',
@@ -5503,6 +7357,12 @@ ORDER BY expenditure DESC
             'How much actual expenditure has been incurred under each funding source in a given year, for a given district?',
             'How much actual expenditure has been incurred under each funding source in a given year, for a given block?',
             'How much actual expenditure has been incurred under each funding source in a given year, for a given gram panchayat (GP)?',
+            'How much actual expenditure has been incurred under each funding source in a given year, in the main GPDP?',
+            'How much actual expenditure has been incurred under each funding source in a given year, for ongoing activities?',
+            'How much actual expenditure has been incurred under each funding source in a given year, under a given focus area?',
+            'How much actual expenditure has been incurred under each funding source in a given year, under a given LSDG theme?',
+            'How much actual expenditure has been incurred under each funding source in a given year, under a given scheme?',
+            'How much actual expenditure has been incurred under each funding source in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5522,6 +7382,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY expenditure DESC
 """,
@@ -5530,6 +7396,12 @@ ORDER BY expenditure DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Funding source is proxied by scheme_name (5 non-null values, NULL on 82% of rows). 15th FC Tied/Untied cannot be separated.',
@@ -5546,6 +7418,12 @@ ORDER BY expenditure DESC
             'What percentage of total actual expenditure comes from each funding source in a given year, for a given district?',
             'What percentage of total actual expenditure comes from each funding source in a given year, for a given block?',
             'What percentage of total actual expenditure comes from each funding source in a given year, for a given gram panchayat (GP)?',
+            'What percentage of total actual expenditure comes from each funding source in a given year, in the main GPDP?',
+            'What percentage of total actual expenditure comes from each funding source in a given year, for ongoing activities?',
+            'What percentage of total actual expenditure comes from each funding source in a given year, under a given focus area?',
+            'What percentage of total actual expenditure comes from each funding source in a given year, under a given LSDG theme?',
+            'What percentage of total actual expenditure comes from each funding source in a given year, under a given scheme?',
+            'What percentage of total actual expenditure comes from each funding source in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5567,6 +7445,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY actual_expenditure DESC
 """,
@@ -5575,6 +7459,12 @@ ORDER BY actual_expenditure DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Expenditure can only be split tied/untied for sanctioned activities. Tied/untied comes from admin_approval_scheme.scheme_component_code: 4249 = Tied Grant, 4211 = Basic Grant (untied), 4250 = Devolution of Fund (treated as untied). Codes 3880, 3907, 4251, 4252 and 0 are reported as 'Other' rather than guessed at. Only sanctioned activities carry a component, so this covers 2,101 activities, not the whole plan.",
@@ -5590,6 +7480,12 @@ ORDER BY actual_expenditure DESC
             'How much actual expenditure has been incurred under tied and untied funds in a given year, for a given district?',
             'How much actual expenditure has been incurred under tied and untied funds in a given year, for a given block?',
             'How much actual expenditure has been incurred under tied and untied funds in a given year, for a given gram panchayat (GP)?',
+            'How much actual expenditure has been incurred under tied and untied funds in a given year, in the main GPDP?',
+            'How much actual expenditure has been incurred under tied and untied funds in a given year, for ongoing activities?',
+            'How much actual expenditure has been incurred under tied and untied funds in a given year, under a given focus area?',
+            'How much actual expenditure has been incurred under tied and untied funds in a given year, under a given LSDG theme?',
+            'How much actual expenditure has been incurred under tied and untied funds in a given year, under a given scheme?',
+            'How much actual expenditure has been incurred under tied and untied funds in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5610,6 +7506,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY actual_expenditure DESC
 """,
@@ -5619,6 +7520,11 @@ ORDER BY actual_expenditure DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Pass $focus_area = NULL to see every focus area. Tied/untied comes from admin_approval_scheme.scheme_component_code: 4249 = Tied Grant, 4211 = Basic Grant (untied), 4250 = Devolution of Fund (treated as untied). Codes 3880, 3907, 4251, 4252 and 0 are reported as 'Other' rather than guessed at. Only sanctioned activities carry a component, so this covers 2,101 activities, not the whole plan.",
@@ -5635,6 +7541,11 @@ ORDER BY actual_expenditure DESC
             'How much tied-fund expenditure was incurred under a given focus area in a given year, for a given district?',
             'How much tied-fund expenditure was incurred under a given focus area in a given year, for a given block?',
             'How much tied-fund expenditure was incurred under a given focus area in a given year, for a given gram panchayat (GP)?',
+            'How much tied-fund expenditure was incurred under a given focus area in a given year, in the main GPDP?',
+            'How much tied-fund expenditure was incurred under a given focus area in a given year, for ongoing activities?',
+            'How much tied-fund expenditure was incurred under a given focus area in a given year, under a given LSDG theme?',
+            'How much tied-fund expenditure was incurred under a given focus area in a given year, under a given scheme?',
+            'How much tied-fund expenditure was incurred under a given focus area in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5654,6 +7565,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY expenditure DESC
 """,
@@ -5663,6 +7579,11 @@ ORDER BY expenditure DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Expenditure',
@@ -5678,6 +7599,11 @@ ORDER BY expenditure DESC
             'How many activities have expenditure under a given focus area in a given year, for a given district?',
             'How many activities have expenditure under a given focus area in a given year, for a given block?',
             'How many activities have expenditure under a given focus area in a given year, for a given gram panchayat (GP)?',
+            'How many activities have expenditure under a given focus area in a given year, in the main GPDP?',
+            'How many activities have expenditure under a given focus area in a given year, for ongoing activities?',
+            'How many activities have expenditure under a given focus area in a given year, under a given LSDG theme?',
+            'How many activities have expenditure under a given focus area in a given year, under a given scheme?',
+            'How many activities have expenditure under a given focus area in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5698,6 +7624,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY actual_expenditure DESC
 """,
@@ -5707,6 +7638,11 @@ ORDER BY actual_expenditure DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Pass $focus_area = NULL to see every focus area. Tied/untied comes from admin_approval_scheme.scheme_component_code: 4249 = Tied Grant, 4211 = Basic Grant (untied), 4250 = Devolution of Fund (treated as untied). Codes 3880, 3907, 4251, 4252 and 0 are reported as 'Other' rather than guessed at. Only sanctioned activities carry a component, so this covers 2,101 activities, not the whole plan.",
@@ -5723,6 +7659,11 @@ ORDER BY actual_expenditure DESC
             'How much tied-fund expenditure was incurred under a given focus area in a given year, for a given district?',
             'How much tied-fund expenditure was incurred under a given focus area in a given year, for a given block?',
             'How much tied-fund expenditure was incurred under a given focus area in a given year, for a given gram panchayat (GP)?',
+            'How much tied-fund expenditure was incurred under a given focus area in a given year, in the main GPDP?',
+            'How much tied-fund expenditure was incurred under a given focus area in a given year, for ongoing activities?',
+            'How much tied-fund expenditure was incurred under a given focus area in a given year, under a given LSDG theme?',
+            'How much tied-fund expenditure was incurred under a given focus area in a given year, under a given scheme?',
+            'How much tied-fund expenditure was incurred under a given focus area in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5743,6 +7684,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_utilised DESC NULLS LAST
 LIMIT $top_n
@@ -5753,6 +7700,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Funding source proxied by scheme_name.',
@@ -5769,6 +7722,12 @@ LIMIT $top_n
             'Which funding source has the highest utilisation in a given year, for a given district?',
             'Which funding source has the highest utilisation in a given year, for a given block?',
             'Which funding source has the highest utilisation in a given year, for a given gram panchayat (GP)?',
+            'Which funding source has the highest utilisation in a given year, in the main GPDP?',
+            'Which funding source has the highest utilisation in a given year, for ongoing activities?',
+            'Which funding source has the highest utilisation in a given year, under a given focus area?',
+            'Which funding source has the highest utilisation in a given year, under a given LSDG theme?',
+            'Which funding source has the highest utilisation in a given year, under a given scheme?',
+            'Which funding source has the highest utilisation in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5789,6 +7748,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY unspent_amount DESC NULLS LAST
 LIMIT $top_n
@@ -5799,6 +7764,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Funding source proxied by scheme_name.',
@@ -5814,6 +7785,12 @@ LIMIT $top_n
             'Which funding source has the largest unspent amount in a given year, for a given district?',
             'Which funding source has the largest unspent amount in a given year, for a given block?',
             'Which funding source has the largest unspent amount in a given year, for a given gram panchayat (GP)?',
+            'Which funding source has the largest unspent amount in a given year, in the main GPDP?',
+            'Which funding source has the largest unspent amount in a given year, for ongoing activities?',
+            'Which funding source has the largest unspent amount in a given year, under a given focus area?',
+            'Which funding source has the largest unspent amount in a given year, under a given LSDG theme?',
+            'Which funding source has the largest unspent amount in a given year, under a given scheme?',
+            'Which funding source has the largest unspent amount in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5832,6 +7809,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY actual_expenditure DESC
 """,
@@ -5840,6 +7823,12 @@ ORDER BY actual_expenditure DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas.',
@@ -5855,6 +7844,12 @@ ORDER BY actual_expenditure DESC
             'What is the total actual expenditure under each GPDP theme in a given year, for a given district?',
             'What is the total actual expenditure under each GPDP theme in a given year, for a given block?',
             'What is the total actual expenditure under each GPDP theme in a given year, for a given gram panchayat (GP)?',
+            'What is the total actual expenditure under each GPDP theme in a given year, in the main GPDP?',
+            'What is the total actual expenditure under each GPDP theme in a given year, for ongoing activities?',
+            'What is the total actual expenditure under each GPDP theme in a given year, under a given focus area?',
+            'What is the total actual expenditure under each GPDP theme in a given year, under a given LSDG theme?',
+            'What is the total actual expenditure under each GPDP theme in a given year, under a given scheme?',
+            'What is the total actual expenditure under each GPDP theme in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5870,6 +7865,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY actual_expenditure DESC
 LIMIT $top_n
@@ -5880,6 +7881,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -5895,6 +7902,12 @@ LIMIT $top_n
             'Which GPDP theme has the highest actual expenditure in a given year, for a given district?',
             'Which GPDP theme has the highest actual expenditure in a given year, for a given block?',
             'Which GPDP theme has the highest actual expenditure in a given year, for a given gram panchayat (GP)?',
+            'Which GPDP theme has the highest actual expenditure in a given year, in the main GPDP?',
+            'Which GPDP theme has the highest actual expenditure in a given year, for ongoing activities?',
+            'Which GPDP theme has the highest actual expenditure in a given year, under a given focus area?',
+            'Which GPDP theme has the highest actual expenditure in a given year, under a given LSDG theme?',
+            'Which GPDP theme has the highest actual expenditure in a given year, under a given scheme?',
+            'Which GPDP theme has the highest actual expenditure in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5910,6 +7923,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY actual_expenditure ASC
 LIMIT $top_n
@@ -5920,6 +7939,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -5935,6 +7960,12 @@ LIMIT $top_n
             'Which GPDP theme has the lowest actual expenditure in a given year, for a given district?',
             'Which GPDP theme has the lowest actual expenditure in a given year, for a given block?',
             'Which GPDP theme has the lowest actual expenditure in a given year, for a given gram panchayat (GP)?',
+            'Which GPDP theme has the lowest actual expenditure in a given year, in the main GPDP?',
+            'Which GPDP theme has the lowest actual expenditure in a given year, for ongoing activities?',
+            'Which GPDP theme has the lowest actual expenditure in a given year, under a given focus area?',
+            'Which GPDP theme has the lowest actual expenditure in a given year, under a given LSDG theme?',
+            'Which GPDP theme has the lowest actual expenditure in a given year, under a given scheme?',
+            'Which GPDP theme has the lowest actual expenditure in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5952,6 +7983,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_of_expenditure DESC
 """,
@@ -5960,6 +7997,12 @@ ORDER BY pct_of_expenditure DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -5976,6 +8019,12 @@ ORDER BY pct_of_expenditure DESC
             'What percentage of total actual expenditure goes to each GPDP theme in a given year, for a given district?',
             'What percentage of total actual expenditure goes to each GPDP theme in a given year, for a given block?',
             'What percentage of total actual expenditure goes to each GPDP theme in a given year, for a given gram panchayat (GP)?',
+            'What percentage of total actual expenditure goes to each GPDP theme in a given year, in the main GPDP?',
+            'What percentage of total actual expenditure goes to each GPDP theme in a given year, for ongoing activities?',
+            'What percentage of total actual expenditure goes to each GPDP theme in a given year, under a given focus area?',
+            'What percentage of total actual expenditure goes to each GPDP theme in a given year, under a given LSDG theme?',
+            'What percentage of total actual expenditure goes to each GPDP theme in a given year, under a given scheme?',
+            'What percentage of total actual expenditure goes to each GPDP theme in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -5995,6 +8044,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING SUM(COALESCE(v.approved_cost_action_plan,0)) > 0
 ORDER BY pct_utilised DESC
@@ -6006,6 +8061,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -6021,6 +8082,12 @@ LIMIT $top_n
             'Which GPDP themes have the highest expenditure utilisation in a given year, for a given district?',
             'Which GPDP themes have the highest expenditure utilisation in a given year, for a given block?',
             'Which GPDP themes have the highest expenditure utilisation in a given year, for a given gram panchayat (GP)?',
+            'Which GPDP themes have the highest expenditure utilisation in a given year, in the main GPDP?',
+            'Which GPDP themes have the highest expenditure utilisation in a given year, for ongoing activities?',
+            'Which GPDP themes have the highest expenditure utilisation in a given year, under a given focus area?',
+            'Which GPDP themes have the highest expenditure utilisation in a given year, under a given LSDG theme?',
+            'Which GPDP themes have the highest expenditure utilisation in a given year, under a given scheme?',
+            'Which GPDP themes have the highest expenditure utilisation in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6041,6 +8108,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY gap_amount DESC
 LIMIT $top_n
@@ -6051,6 +8124,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -6066,6 +8145,12 @@ LIMIT $top_n
             'Which GPDP themes have the largest gap between planned and actual expenditure in a given year, for a given district?',
             'Which GPDP themes have the largest gap between planned and actual expenditure in a given year, for a given block?',
             'Which GPDP themes have the largest gap between planned and actual expenditure in a given year, for a given gram panchayat (GP)?',
+            'Which GPDP themes have the largest gap between planned and actual expenditure in a given year, in the main GPDP?',
+            'Which GPDP themes have the largest gap between planned and actual expenditure in a given year, for ongoing activities?',
+            'Which GPDP themes have the largest gap between planned and actual expenditure in a given year, under a given focus area?',
+            'Which GPDP themes have the largest gap between planned and actual expenditure in a given year, under a given LSDG theme?',
+            'Which GPDP themes have the largest gap between planned and actual expenditure in a given year, under a given scheme?',
+            'Which GPDP themes have the largest gap between planned and actual expenditure in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6087,6 +8172,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 HAVING SUM(COALESCE(v.approved_cost_action_plan,0)) > 0
 ORDER BY pct_utilised DESC
@@ -6099,6 +8189,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Pass $scheme = 'XV Finance Commission' for CFC or '5TH STATE FINANCE COMMISSION' for SFC. scheme_name is NULL on 82% of rows, so these totals understate reality.",
@@ -6115,6 +8210,12 @@ LIMIT $top_n
             'Which theme has the highest utilisation of 15th CFC funds at Block level in a given year, for a given district?',
             'Which theme has the highest utilisation of 15th CFC funds at Block level in a given year, for a given block?',
             'Which theme has the highest utilisation of 15th CFC funds at Block level in a given year, for a given gram panchayat (GP)?',
+            'Which theme has the highest utilisation of 15th CFC funds at Block level in a given year, under a given scheme?',
+            'Which theme has the highest utilisation of 15th CFC funds at Block level in a given year, in the main GPDP?',
+            'Which theme has the highest utilisation of 15th CFC funds at Block level in a given year, for ongoing activities?',
+            'Which theme has the highest utilisation of 15th CFC funds at Block level in a given year, under a given focus area?',
+            'Which theme has the highest utilisation of 15th CFC funds at Block level in a given year, under a given LSDG theme?',
+            'Which theme has the highest utilisation of 15th CFC funds at Block level in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6136,6 +8237,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 HAVING SUM(COALESCE(v.approved_cost_action_plan,0)) > 0
 ORDER BY pct_utilised DESC
@@ -6148,6 +8254,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Pass $scheme = 'XV Finance Commission' for CFC or '5TH STATE FINANCE COMMISSION' for SFC. scheme_name is NULL on 82% of rows, so these totals understate reality.",
@@ -6164,6 +8275,12 @@ LIMIT $top_n
             'Which theme has the highest utilisation of 15th CFC funds at District level in a given year, for a given district?',
             'Which theme has the highest utilisation of 15th CFC funds at District level in a given year, for a given block?',
             'Which theme has the highest utilisation of 15th CFC funds at District level in a given year, for a given gram panchayat (GP)?',
+            'Which theme has the highest utilisation of 15th CFC funds at District level in a given year, under a given scheme?',
+            'Which theme has the highest utilisation of 15th CFC funds at District level in a given year, in the main GPDP?',
+            'Which theme has the highest utilisation of 15th CFC funds at District level in a given year, for ongoing activities?',
+            'Which theme has the highest utilisation of 15th CFC funds at District level in a given year, under a given focus area?',
+            'Which theme has the highest utilisation of 15th CFC funds at District level in a given year, under a given LSDG theme?',
+            'Which theme has the highest utilisation of 15th CFC funds at District level in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6185,6 +8302,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 HAVING SUM(COALESCE(v.approved_cost_action_plan,0)) > 0
 ORDER BY pct_utilised DESC
@@ -6197,6 +8319,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Pass $scheme = 'XV Finance Commission' for CFC or '5TH STATE FINANCE COMMISSION' for SFC. scheme_name is NULL on 82% of rows, so these totals understate reality.",
@@ -6213,6 +8340,12 @@ LIMIT $top_n
             'Which theme has the highest utilisation of SFC funds at District level in a given year, for a given district?',
             'Which theme has the highest utilisation of SFC funds at District level in a given year, for a given block?',
             'Which theme has the highest utilisation of SFC funds at District level in a given year, for a given gram panchayat (GP)?',
+            'Which theme has the highest utilisation of SFC funds at District level in a given year, under a given scheme?',
+            'Which theme has the highest utilisation of SFC funds at District level in a given year, in the main GPDP?',
+            'Which theme has the highest utilisation of SFC funds at District level in a given year, for ongoing activities?',
+            'Which theme has the highest utilisation of SFC funds at District level in a given year, under a given focus area?',
+            'Which theme has the highest utilisation of SFC funds at District level in a given year, under a given LSDG theme?',
+            'Which theme has the highest utilisation of SFC funds at District level in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6231,12 +8364,24 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'admin_approved_cost is populated on only 2,247 of 12,730 expenditure rows, so the denominator is incomplete.',
@@ -6253,6 +8398,12 @@ WHERE v.fiscal_year = $date_range
             'What percentage of sanctioned funds was utilised in a given year, for a given district?',
             'What percentage of sanctioned funds was utilised in a given year, for a given block?',
             'What percentage of sanctioned funds was utilised in a given year, for a given gram panchayat (GP)?',
+            'What percentage of sanctioned funds was utilised in a given year, in the main GPDP?',
+            'What percentage of sanctioned funds was utilised in a given year, for ongoing activities?',
+            'What percentage of sanctioned funds was utilised in a given year, under a given focus area?',
+            'What percentage of sanctioned funds was utilised in a given year, under a given LSDG theme?',
+            'What percentage of sanctioned funds was utilised in a given year, under a given scheme?',
+            'What percentage of sanctioned funds was utilised in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6319,6 +8470,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY actual_expenditure DESC
 """,
@@ -6327,6 +8484,12 @@ ORDER BY actual_expenditure DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Expenditure',
@@ -6341,6 +8504,12 @@ ORDER BY actual_expenditure DESC
             'What is the total actual expenditure under each focus area in a given year, for a given district?',
             'What is the total actual expenditure under each focus area in a given year, for a given block?',
             'What is the total actual expenditure under each focus area in a given year, for a given gram panchayat (GP)?',
+            'What is the total actual expenditure under each focus area in a given year, in the main GPDP?',
+            'What is the total actual expenditure under each focus area in a given year, for ongoing activities?',
+            'What is the total actual expenditure under each focus area in a given year, under a given focus area?',
+            'What is the total actual expenditure under each focus area in a given year, under a given LSDG theme?',
+            'What is the total actual expenditure under each focus area in a given year, under a given scheme?',
+            'What is the total actual expenditure under each focus area in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6360,6 +8529,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY activities_with_expenditure DESC
 """,
@@ -6369,6 +8543,11 @@ ORDER BY activities_with_expenditure DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Duplicate of EXP-010 in the source list.',
@@ -6385,6 +8564,11 @@ ORDER BY activities_with_expenditure DESC
             'How many activities have expenditure under a given focus area in a given year, for a given district?',
             'How many activities have expenditure under a given focus area in a given year, for a given block?',
             'How many activities have expenditure under a given focus area in a given year, for a given gram panchayat (GP)?',
+            'How many activities have expenditure under a given focus area in a given year, in the main GPDP?',
+            'How many activities have expenditure under a given focus area in a given year, for ongoing activities?',
+            'How many activities have expenditure under a given focus area in a given year, under a given LSDG theme?',
+            'How many activities have expenditure under a given focus area in a given year, under a given scheme?',
+            'How many activities have expenditure under a given focus area in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6403,6 +8587,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_expenditure DESC
 LIMIT $top_n
 """,
@@ -6413,6 +8602,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Expenditure',
@@ -6428,6 +8622,11 @@ LIMIT $top_n
             'List the activities with expenditure under a given focus area in a given year, for a given district?',
             'List the activities with expenditure under a given focus area in a given year, for a given block?',
             'List the activities with expenditure under a given focus area in a given year, for a given gram panchayat (GP)?',
+            'List the activities with expenditure under a given focus area in a given year, in the main GPDP?',
+            'List the activities with expenditure under a given focus area in a given year, for ongoing activities?',
+            'List the activities with expenditure under a given focus area in a given year, under a given LSDG theme?',
+            'List the activities with expenditure under a given focus area in a given year, under a given scheme?',
+            'List the activities with expenditure under a given focus area in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6443,6 +8642,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY actual_expenditure DESC
 LIMIT $top_n
@@ -6453,6 +8658,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Set the geography parameters to choose the GP, Block or District level.',
@@ -6469,6 +8680,12 @@ LIMIT $top_n
             'Which focus area has the highest actual expenditure in a given year, for a given district?',
             'Which focus area has the highest actual expenditure in a given year, for a given block?',
             'Which focus area has the highest actual expenditure in a given year, for a given gram panchayat (GP)?',
+            'Which focus area has the highest actual expenditure in a given year, in the main GPDP?',
+            'Which focus area has the highest actual expenditure in a given year, for ongoing activities?',
+            'Which focus area has the highest actual expenditure in a given year, under a given focus area?',
+            'Which focus area has the highest actual expenditure in a given year, under a given LSDG theme?',
+            'Which focus area has the highest actual expenditure in a given year, under a given scheme?',
+            'Which focus area has the highest actual expenditure in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6484,6 +8701,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY actual_expenditure ASC
 LIMIT $top_n
@@ -6494,6 +8717,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Set the geography parameters to choose the GP, Block or District level.',
@@ -6510,6 +8739,12 @@ LIMIT $top_n
             'Which focus area has the lowest actual expenditure in a given year, for a given district?',
             'Which focus area has the lowest actual expenditure in a given year, for a given block?',
             'Which focus area has the lowest actual expenditure in a given year, for a given gram panchayat (GP)?',
+            'Which focus area has the lowest actual expenditure in a given year, in the main GPDP?',
+            'Which focus area has the lowest actual expenditure in a given year, for ongoing activities?',
+            'Which focus area has the lowest actual expenditure in a given year, under a given focus area?',
+            'Which focus area has the lowest actual expenditure in a given year, under a given LSDG theme?',
+            'Which focus area has the lowest actual expenditure in a given year, under a given scheme?',
+            'Which focus area has the lowest actual expenditure in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6529,6 +8764,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY activities_with_expenditure DESC
 """,
@@ -6538,6 +8778,11 @@ ORDER BY activities_with_expenditure DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Duplicate of EXP-010 in the source list.',
@@ -6554,6 +8799,11 @@ ORDER BY activities_with_expenditure DESC
             'How many activities have expenditure under a given focus area in a given year, for a given district?',
             'How many activities have expenditure under a given focus area in a given year, for a given block?',
             'How many activities have expenditure under a given focus area in a given year, for a given gram panchayat (GP)?',
+            'How many activities have expenditure under a given focus area in a given year, in the main GPDP?',
+            'How many activities have expenditure under a given focus area in a given year, for ongoing activities?',
+            'How many activities have expenditure under a given focus area in a given year, under a given LSDG theme?',
+            'How many activities have expenditure under a given focus area in a given year, under a given scheme?',
+            'How many activities have expenditure under a given focus area in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6570,6 +8820,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_expenditure DESC
 LIMIT $top_n
 """,
@@ -6579,6 +8835,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Expenditure',
@@ -6594,6 +8856,12 @@ LIMIT $top_n
             'Which activities have the highest expenditure in a given year, for a given district?',
             'Which activities have the highest expenditure in a given year, for a given block?',
             'Which activities have the highest expenditure in a given year, for a given gram panchayat (GP)?',
+            'Which activities have the highest expenditure in a given year, in the main GPDP?',
+            'Which activities have the highest expenditure in a given year, for ongoing activities?',
+            'Which activities have the highest expenditure in a given year, under a given focus area?',
+            'Which activities have the highest expenditure in a given year, under a given LSDG theme?',
+            'Which activities have the highest expenditure in a given year, under a given scheme?',
+            'Which activities have the highest expenditure in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6610,6 +8878,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_expenditure DESC
 LIMIT $top_n
 """,
@@ -6619,6 +8893,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Expenditure',
@@ -6634,6 +8914,12 @@ LIMIT $top_n
             'Which activities have the highest expenditure in a given year, for a given district?',
             'Which activities have the highest expenditure in a given year, for a given block?',
             'Which activities have the highest expenditure in a given year, for a given gram panchayat (GP)?',
+            'Which activities have the highest expenditure in a given year, in the main GPDP?',
+            'Which activities have the highest expenditure in a given year, for ongoing activities?',
+            'Which activities have the highest expenditure in a given year, under a given focus area?',
+            'Which activities have the highest expenditure in a given year, under a given LSDG theme?',
+            'Which activities have the highest expenditure in a given year, under a given scheme?',
+            'Which activities have the highest expenditure in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6652,6 +8938,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY COALESCE(v.approved_cost_action_plan, v.total_cost) DESC
 LIMIT $top_n
 """,
@@ -6662,6 +8954,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'High-value' was undefined in the source question, so it is now the $amount_threshold parameter.",
@@ -6678,6 +8976,12 @@ LIMIT $top_n
             'Which high-value activities (planned cost above a given amount) have no expenditure in a given year, for a given district?',
             'Which high-value activities (planned cost above a given amount) have no expenditure in a given year, for a given block?',
             'Which high-value activities (planned cost above a given amount) have no expenditure in a given year, for a given gram panchayat (GP)?',
+            'Which high-value activities (planned cost above a given amount) have no expenditure in a given year, in the main GPDP?',
+            'Which high-value activities (planned cost above a given amount) have no expenditure in a given year, for ongoing activities?',
+            'Which high-value activities (planned cost above a given amount) have no expenditure in a given year, under a given focus area?',
+            'Which high-value activities (planned cost above a given amount) have no expenditure in a given year, under a given LSDG theme?',
+            'Which high-value activities (planned cost above a given amount) have no expenditure in a given year, under a given scheme?',
+            'Which high-value activities (planned cost above a given amount) have no expenditure in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6698,6 +9002,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY variance DESC, v.total_expenditure DESC
 LIMIT $top_n
 """,
@@ -6707,6 +9017,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Expenditure',
@@ -6721,6 +9037,12 @@ LIMIT $top_n
             'Which activities have actual expenditure equal to the planned expenditure in a given gram panchayat in a given year?',
             'Which activities have actual expenditure equal to the planned expenditure in a given district in a given year?',
             'Which activities have actual expenditure equal to the planned expenditure in a given block in a given year?',
+            'Which activities have actual expenditure equal to the planned expenditure in a given gram panchayat in a given year, in the main GPDP?',
+            'Which activities have actual expenditure equal to the planned expenditure in a given gram panchayat in a given year, for ongoing activities?',
+            'Which activities have actual expenditure equal to the planned expenditure in a given gram panchayat in a given year, under a given focus area?',
+            'Which activities have actual expenditure equal to the planned expenditure in a given gram panchayat in a given year, under a given LSDG theme?',
+            'Which activities have actual expenditure equal to the planned expenditure in a given gram panchayat in a given year, under a given scheme?',
+            'Which activities have actual expenditure equal to the planned expenditure in a given gram panchayat in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6741,6 +9063,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY variance DESC, v.total_expenditure DESC
 LIMIT $top_n
 """,
@@ -6750,6 +9078,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Expenditure',
@@ -6764,6 +9098,12 @@ LIMIT $top_n
             'Which activities have actual expenditure exceeding the planned expenditure in a given gram panchayat in a given year?',
             'Which activities have actual expenditure exceeding the planned expenditure in a given district in a given year?',
             'Which activities have actual expenditure exceeding the planned expenditure in a given block in a given year?',
+            'Which activities have actual expenditure exceeding the planned expenditure in a given gram panchayat in a given year, in the main GPDP?',
+            'Which activities have actual expenditure exceeding the planned expenditure in a given gram panchayat in a given year, for ongoing activities?',
+            'Which activities have actual expenditure exceeding the planned expenditure in a given gram panchayat in a given year, under a given focus area?',
+            'Which activities have actual expenditure exceeding the planned expenditure in a given gram panchayat in a given year, under a given LSDG theme?',
+            'Which activities have actual expenditure exceeding the planned expenditure in a given gram panchayat in a given year, under a given scheme?',
+            'Which activities have actual expenditure exceeding the planned expenditure in a given gram panchayat in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6783,6 +9123,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 """,
         "param_slots": [
@@ -6790,6 +9136,12 @@ GROUP BY 1
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Uses work_type = 'New/Fresh'.",
@@ -6805,6 +9157,12 @@ GROUP BY 1
             'How much expenditure went on creation of new assets in a given gram panchayat in a given year?',
             'How much expenditure went on creation of new assets in a given district in a given year?',
             'How much expenditure went on creation of new assets in a given block in a given year?',
+            'How much expenditure went on creation of new assets in a given gram panchayat in a given year, in the main GPDP?',
+            'How much expenditure went on creation of new assets in a given gram panchayat in a given year, for ongoing activities?',
+            'How much expenditure went on creation of new assets in a given gram panchayat in a given year, under a given focus area?',
+            'How much expenditure went on creation of new assets in a given gram panchayat in a given year, under a given LSDG theme?',
+            'How much expenditure went on creation of new assets in a given gram panchayat in a given year, under a given scheme?',
+            'How much expenditure went on creation of new assets in a given gram panchayat in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6824,6 +9182,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 """,
         "param_slots": [
@@ -6831,6 +9195,12 @@ GROUP BY 1
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Uses work_type = 'Maintenance'.",
@@ -6846,6 +9216,12 @@ GROUP BY 1
             'How much expenditure went on repair and maintenance in a given gram panchayat in a given year?',
             'How much expenditure went on repair and maintenance in a given district in a given year?',
             'How much expenditure went on repair and maintenance in a given block in a given year?',
+            'How much expenditure went on repair and maintenance in a given gram panchayat in a given year, in the main GPDP?',
+            'How much expenditure went on repair and maintenance in a given gram panchayat in a given year, for ongoing activities?',
+            'How much expenditure went on repair and maintenance in a given gram panchayat in a given year, under a given focus area?',
+            'How much expenditure went on repair and maintenance in a given gram panchayat in a given year, under a given LSDG theme?',
+            'How much expenditure went on repair and maintenance in a given gram panchayat in a given year, under a given scheme?',
+            'How much expenditure went on repair and maintenance in a given gram panchayat in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6865,6 +9241,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY actual_expenditure DESC
 """,
@@ -6873,6 +9254,11 @@ ORDER BY actual_expenditure DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Administrative' is interpreted as the focus areas 'Administrative & Technical Support' and 'GP Office Infrastructure'; there is no explicit admin-expenditure flag.",
@@ -6889,6 +9275,11 @@ ORDER BY actual_expenditure DESC
             'How much expenditure went on administrative activities in a given year, for a given district?',
             'How much expenditure went on administrative activities in a given year, for a given block?',
             'How much expenditure went on administrative activities in a given year, for a given gram panchayat (GP)?',
+            'How much expenditure went on administrative activities in a given year, in the main GPDP?',
+            'How much expenditure went on administrative activities in a given year, for ongoing activities?',
+            'How much expenditure went on administrative activities in a given year, under a given LSDG theme?',
+            'How much expenditure went on administrative activities in a given year, under a given scheme?',
+            'How much expenditure went on administrative activities in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6907,12 +9298,24 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'There is no approval-date or approval-flag column. Administrative approval is proxied by admin_approved_cost > 0, populated on 2,247 of 12,730 rows.',
@@ -6928,6 +9331,12 @@ WHERE v.fiscal_year = $date_range
             'How many activities in a given gram panchayat received administrative approval in a given year?',
             'How many activities in a given district received administrative approval in a given year?',
             'How many activities in a given block received administrative approval in a given year?',
+            'How many activities in a given gram panchayat received administrative approval in a given year, in the main GPDP?',
+            'How many activities in a given gram panchayat received administrative approval in a given year, for ongoing activities?',
+            'How many activities in a given gram panchayat received administrative approval in a given year, under a given focus area?',
+            'How many activities in a given gram panchayat received administrative approval in a given year, under a given LSDG theme?',
+            'How many activities in a given gram panchayat received administrative approval in a given year, under a given scheme?',
+            'How many activities in a given gram panchayat received administrative approval in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6947,12 +9356,24 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Now based on the presence of an admin_approval row rather than a non-zero cost. The third column counts the 140 activities that have an admin_approved_cost but no approval record - a data-quality signal worth watching. Administrative approval now comes from the admin_approval table: 2,101 of 12,704 activities (17%) have a sanction record. A further 140 activities carry an admin_approved_cost with no approval row - v_activity.has_approval_cost_only flags those.',
@@ -6968,6 +9389,12 @@ WHERE v.fiscal_year = $date_range
             'How many activities in a given block are still awaiting administrative approval in a given year?',
             'How many activities in a given district are still awaiting administrative approval in a given year?',
             'How many activities in a given gram panchayat are still awaiting administrative approval in a given year?',
+            'How many activities in a given block are still awaiting administrative approval in a given year, in the main GPDP?',
+            'How many activities in a given block are still awaiting administrative approval in a given year, for ongoing activities?',
+            'How many activities in a given block are still awaiting administrative approval in a given year, under a given focus area?',
+            'How many activities in a given block are still awaiting administrative approval in a given year, under a given LSDG theme?',
+            'How many activities in a given block are still awaiting administrative approval in a given year, under a given scheme?',
+            'How many activities in a given block are still awaiting administrative approval in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -6986,6 +9413,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY admin_sanctioned_amount DESC
 """,
@@ -6994,6 +9427,12 @@ ORDER BY admin_sanctioned_amount DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -7012,6 +9451,12 @@ ORDER BY admin_sanctioned_amount DESC
             'What is the total administratively sanctioned amount for a given gram panchayat in a given year?',
             'What is the total administratively sanctioned amount for a given district in a given year?',
             'What is the total administratively sanctioned amount for a given block in a given year?',
+            'What is the total administratively sanctioned amount for a given gram panchayat in a given year, in the main GPDP?',
+            'What is the total administratively sanctioned amount for a given gram panchayat in a given year, for ongoing activities?',
+            'What is the total administratively sanctioned amount for a given gram panchayat in a given year, under a given focus area?',
+            'What is the total administratively sanctioned amount for a given gram panchayat in a given year, under a given LSDG theme?',
+            'What is the total administratively sanctioned amount for a given gram panchayat in a given year, under a given scheme?',
+            'What is the total administratively sanctioned amount for a given gram panchayat in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7028,12 +9473,24 @@ SELECT v.block_name,
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY admin_sanctioned_amount DESC
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Sanctions & Approvals',
@@ -7046,6 +9503,12 @@ ORDER BY admin_sanctioned_amount DESC
             'What is the total administratively sanctioned amount in a given District in a given Plan Year, block-wise?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the block-wise administratively sanctioned amount in a given district in a given year?',
+            'What is the block-wise administratively sanctioned amount in a given district in a given year, in the main GPDP?',
+            'What is the block-wise administratively sanctioned amount in a given district in a given year, for ongoing activities?',
+            'What is the block-wise administratively sanctioned amount in a given district in a given year, under a given focus area?',
+            'What is the block-wise administratively sanctioned amount in a given district in a given year, under a given LSDG theme?',
+            'What is the block-wise administratively sanctioned amount in a given district in a given year, under a given scheme?',
+            'What is the block-wise administratively sanctioned amount in a given district in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7105,6 +9568,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY sanctioned_activities DESC
 """,
@@ -7113,6 +9582,12 @@ ORDER BY sanctioned_activities DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "adm_approval_authority is free text with many spellings of the same office. The view collapses the obvious variants (SARPANCH / SARAPANCH / Sarapancha / sarpancha all become 'Sarpanch') into sanction_authority; sanction_authority_raw keeps the original. A long tail of one-off spellings remains.",
@@ -7128,6 +9603,12 @@ ORDER BY sanctioned_activities DESC
             'How many activities in a given block were administratively sanctioned by each issuing authority in a given year?',
             'How many activities in a given district were administratively sanctioned by each issuing authority in a given year?',
             'How many activities in a given gram panchayat were administratively sanctioned by each issuing authority in a given year?',
+            'How many activities in a given block were administratively sanctioned by each issuing authority in a given year, in the main GPDP?',
+            'How many activities in a given block were administratively sanctioned by each issuing authority in a given year, for ongoing activities?',
+            'How many activities in a given block were administratively sanctioned by each issuing authority in a given year, under a given focus area?',
+            'How many activities in a given block were administratively sanctioned by each issuing authority in a given year, under a given LSDG theme?',
+            'How many activities in a given block were administratively sanctioned by each issuing authority in a given year, under a given scheme?',
+            'How many activities in a given block were administratively sanctioned by each issuing authority in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7147,6 +9628,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_approved DESC
 """,
@@ -7155,6 +9642,12 @@ ORDER BY pct_approved DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -7173,6 +9666,12 @@ ORDER BY pct_approved DESC
             'What percentage of planned activities in a given block have received administrative approval in a given year?',
             'What percentage of planned activities in a given district have received administrative approval in a given year?',
             'What percentage of planned activities in a given gram panchayat have received administrative approval in a given year?',
+            'What percentage of planned activities in a given block have received administrative approval in a given year, in the main GPDP?',
+            'What percentage of planned activities in a given block have received administrative approval in a given year, for ongoing activities?',
+            'What percentage of planned activities in a given block have received administrative approval in a given year, under a given focus area?',
+            'What percentage of planned activities in a given block have received administrative approval in a given year, under a given LSDG theme?',
+            'What percentage of planned activities in a given block have received administrative approval in a given year, under a given scheme?',
+            'What percentage of planned activities in a given block have received administrative approval in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7190,6 +9689,12 @@ SELECT v.block_name, v.district_name,
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY pct_approved ASC
 LIMIT $top_n
@@ -7198,6 +9703,12 @@ LIMIT $top_n
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -7214,6 +9725,12 @@ LIMIT $top_n
             'Which blocks in a given District have the lowest administrative approval coverage of planned activities in a given year?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which blocks in a given district have the lowest administrative approval coverage in a given year?',
+            'Which blocks in a given district have the lowest administrative approval coverage in a given year, in the main GPDP?',
+            'Which blocks in a given district have the lowest administrative approval coverage in a given year, for ongoing activities?',
+            'Which blocks in a given district have the lowest administrative approval coverage in a given year, under a given focus area?',
+            'Which blocks in a given district have the lowest administrative approval coverage in a given year, under a given LSDG theme?',
+            'Which blocks in a given district have the lowest administrative approval coverage in a given year, under a given scheme?',
+            'Which blocks in a given district have the lowest administrative approval coverage in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7233,6 +9750,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY 1
 """,
@@ -7241,6 +9764,12 @@ ORDER BY 1
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Unblocked by admin_approval.adm_approval_sanction_date. Note that sanction dates run well outside the plan year they belong to - 2020-2021 activities carry sanction dates as late as 2026 - so months will spread beyond the twelve you might expect.',
@@ -7256,6 +9785,12 @@ ORDER BY 1
             'How many activities were administratively sanctioned in each month of a given year in a given block?',
             'How many activities were administratively sanctioned in each month of a given year in a given district?',
             'How many activities were administratively sanctioned in each month of a given year in a given gram panchayat?',
+            'How many activities were administratively sanctioned in each month of a given year in a given block, in the main GPDP?',
+            'How many activities were administratively sanctioned in each month of a given year in a given block, for ongoing activities?',
+            'How many activities were administratively sanctioned in each month of a given year in a given block, under a given focus area?',
+            'How many activities were administratively sanctioned in each month of a given year in a given block, under a given LSDG theme?',
+            'How many activities were administratively sanctioned in each month of a given year in a given block, under a given scheme?',
+            'How many activities were administratively sanctioned in each month of a given year in a given block, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7275,6 +9810,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY sanction_year, calendar_quarter
 """,
@@ -7283,6 +9824,12 @@ ORDER BY sanction_year, calendar_quarter
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Quarters are calendar quarters of the sanction date, shown with their year because sanctions for one plan year are spread across several calendar years in this data.',
@@ -7298,6 +9845,12 @@ ORDER BY sanction_year, calendar_quarter
             'How many administrative approvals in a given district were issued in each quarter of a given year?',
             'How many administrative approvals in a given block were issued in each quarter of a given year?',
             'How many administrative approvals in a given gram panchayat were issued in each quarter of a given year?',
+            'How many administrative approvals in a given district were issued in each quarter of a given year, in the main GPDP?',
+            'How many administrative approvals in a given district were issued in each quarter of a given year, for ongoing activities?',
+            'How many administrative approvals in a given district were issued in each quarter of a given year, under a given focus area?',
+            'How many administrative approvals in a given district were issued in each quarter of a given year, under a given LSDG theme?',
+            'How many administrative approvals in a given district were issued in each quarter of a given year, under a given scheme?',
+            'How many administrative approvals in a given district were issued in each quarter of a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7318,6 +9871,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.admin_approved_cost DESC NULLS LAST
 LIMIT $top_n
 """,
@@ -7327,6 +9886,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Now enriched with the sanction date, authority, scheme and tied/untied component.',
@@ -7342,6 +9907,12 @@ LIMIT $top_n
             'Which activities in a given district received the highest administratively sanctioned amounts in a given year?',
             'Which activities in a given block received the highest administratively sanctioned amounts in a given year?',
             'Which activities in a given gram panchayat received the highest administratively sanctioned amounts in a given year?',
+            'Which activities in a given district received the highest administratively sanctioned amounts in a given year, in the main GPDP?',
+            'Which activities in a given district received the highest administratively sanctioned amounts in a given year, for ongoing activities?',
+            'Which activities in a given district received the highest administratively sanctioned amounts in a given year, under a given focus area?',
+            'Which activities in a given district received the highest administratively sanctioned amounts in a given year, under a given LSDG theme?',
+            'Which activities in a given district received the highest administratively sanctioned amounts in a given year, under a given scheme?',
+            'Which activities in a given district received the highest administratively sanctioned amounts in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7361,6 +9932,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY proposed_cost_awaiting DESC
 LIMIT $top_n
@@ -7371,6 +9948,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -7390,6 +9973,12 @@ LIMIT $top_n
             'Which GPs in a given block have the highest total proposed cost awaiting administrative sanction in a given year?',
             'Which GPs in a given district have the highest total proposed cost awaiting administrative sanction in a given year?',
             'Which GPs in a given gram panchayat have the highest total proposed cost awaiting administrative sanction in a given year?',
+            'Which GPs in a given block have the highest total proposed cost awaiting administrative sanction in a given year, in the main GPDP?',
+            'Which GPs in a given block have the highest total proposed cost awaiting administrative sanction in a given year, for ongoing activities?',
+            'Which GPs in a given block have the highest total proposed cost awaiting administrative sanction in a given year, under a given focus area?',
+            'Which GPs in a given block have the highest total proposed cost awaiting administrative sanction in a given year, under a given LSDG theme?',
+            'Which GPs in a given block have the highest total proposed cost awaiting administrative sanction in a given year, under a given scheme?',
+            'Which GPs in a given block have the highest total proposed cost awaiting administrative sanction in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7409,6 +9998,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2,3
 ORDER BY sanctioned_amount DESC
 """,
@@ -7417,6 +10012,12 @@ ORDER BY sanctioned_amount DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Uses the sanctioned scheme from admin_approval_scheme, which is far more reliable than activity_expenditure.scheme_name (82% NULL). Two scheme codes, 1518 and 1526, are not in the decoder and show as 'Code nnnn'.",
@@ -7432,6 +10033,12 @@ ORDER BY sanctioned_amount DESC
             'What is the scheme-wise split of administratively sanctioned amounts in a given gram panchayat for a given year?',
             'What is the scheme-wise split of administratively sanctioned amounts in a given district for a given year?',
             'What is the scheme-wise split of administratively sanctioned amounts in a given block for a given year?',
+            'What is the scheme-wise split of administratively sanctioned amounts in a given gram panchayat for a given year, in the main GPDP?',
+            'What is the scheme-wise split of administratively sanctioned amounts in a given gram panchayat for a given year, for ongoing activities?',
+            'What is the scheme-wise split of administratively sanctioned amounts in a given gram panchayat for a given year, under a given focus area?',
+            'What is the scheme-wise split of administratively sanctioned amounts in a given gram panchayat for a given year, under a given LSDG theme?',
+            'What is the scheme-wise split of administratively sanctioned amounts in a given gram panchayat for a given year, under a given scheme?',
+            'What is the scheme-wise split of administratively sanctioned amounts in a given gram panchayat for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7453,6 +10060,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY total_sanctioned DESC
 """,
@@ -7461,6 +10074,12 @@ ORDER BY total_sanctioned DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Now uses the real sanctioned-fund category columns. SC and ST earmarks are populated on under 1% of approval rows, so the split is dominated by the general column.',
@@ -7476,6 +10095,12 @@ ORDER BY total_sanctioned DESC
             'What is the General/SC/ST split of administratively sanctioned funds in a given block for a given year?',
             'What is the General/SC/ST split of administratively sanctioned funds in a given district for a given year?',
             'What is the General/SC/ST split of administratively sanctioned funds in a given gram panchayat for a given year?',
+            'What is the General/SC/ST split of administratively sanctioned funds in a given block for a given year, in the main GPDP?',
+            'What is the General/SC/ST split of administratively sanctioned funds in a given block for a given year, for ongoing activities?',
+            'What is the General/SC/ST split of administratively sanctioned funds in a given block for a given year, under a given focus area?',
+            'What is the General/SC/ST split of administratively sanctioned funds in a given block for a given year, under a given LSDG theme?',
+            'What is the General/SC/ST split of administratively sanctioned funds in a given block for a given year, under a given scheme?',
+            'What is the General/SC/ST split of administratively sanctioned funds in a given block for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7493,6 +10118,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY activities DESC
 """,
@@ -7501,6 +10132,12 @@ ORDER BY activities DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "activity_status code 173 decodes to 'Buildings' in dim_code, which is not a status and needs verifying.",
@@ -7516,6 +10153,12 @@ ORDER BY activities DESC
             'How many activities in a given gram panchayat are in each progress status for a given year?',
             'How many activities in a given district are in each progress status for a given year?',
             'How many activities in a given block are in each progress status for a given year?',
+            'How many activities in a given gram panchayat are in each progress status for a given year, in the main GPDP?',
+            'How many activities in a given gram panchayat are in each progress status for a given year, for ongoing activities?',
+            'How many activities in a given gram panchayat are in each progress status for a given year, under a given focus area?',
+            'How many activities in a given gram panchayat are in each progress status for a given year, under a given LSDG theme?',
+            'How many activities in a given gram panchayat are in each progress status for a given year, under a given scheme?',
+            'How many activities in a given gram panchayat are in each progress status for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7529,12 +10172,24 @@ SELECT v.block_name, v.status_label, COUNT(*) AS activities
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY v.block_name, activities DESC
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'See STS-001 note on code 173.',
@@ -7548,6 +10203,12 @@ ORDER BY v.block_name, activities DESC
             'What is the block-wise activity status breakdown in a given District for a given Plan Year?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the block-wise activity status breakdown in a given district for a given year?',
+            'What is the block-wise activity status breakdown in a given district for a given year, in the main GPDP?',
+            'What is the block-wise activity status breakdown in a given district for a given year, for ongoing activities?',
+            'What is the block-wise activity status breakdown in a given district for a given year, under a given focus area?',
+            'What is the block-wise activity status breakdown in a given district for a given year, under a given LSDG theme?',
+            'What is the block-wise activity status breakdown in a given district for a given year, under a given scheme?',
+            'What is the block-wise activity status breakdown in a given district for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7566,6 +10227,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 """,
         "param_slots": [
@@ -7574,6 +10240,11 @@ GROUP BY 1
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": '$status must match a decoded label exactly: Activity Approved, WORK ONGOING, WORK COMPLETED, WORK ABANDONED, UNDER APPROVAL.',
@@ -7589,6 +10260,11 @@ GROUP BY 1
             'How many activities in a given block are in a given status status for a given year?',
             'How many activities in a given district are in a given status status for a given year?',
             'How many activities in a given gram panchayat are in a given status status for a given year?',
+            'How many activities in a given block are in a given status status for a given year, in the main GPDP?',
+            'How many activities in a given block are in a given status status for a given year, under a given focus area?',
+            'How many activities in a given block are in a given status status for a given year, under a given LSDG theme?',
+            'How many activities in a given block are in a given status status for a given year, under a given scheme?',
+            'How many activities in a given block are in a given status status for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7605,6 +10281,11 @@ SELECT v.gp_name, v.block_name, v.district_name,
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2,3
 HAVING SUM(v.is_abandoned) > 0
 ORDER BY abandoned_activities DESC
@@ -7614,6 +10295,11 @@ LIMIT $top_n
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -7629,6 +10315,11 @@ LIMIT $top_n
             'Which GPs in a given District have the highest number of abandoned activities in a given Plan Year?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPs in a given district have the highest number of abandoned activities in a given year?',
+            'Which GPs in a given district have the highest number of abandoned activities in a given year, in the main GPDP?',
+            'Which GPs in a given district have the highest number of abandoned activities in a given year, under a given focus area?',
+            'Which GPs in a given district have the highest number of abandoned activities in a given year, under a given LSDG theme?',
+            'Which GPs in a given district have the highest number of abandoned activities in a given year, under a given scheme?',
+            'Which GPs in a given district have the highest number of abandoned activities in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7647,6 +10338,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_cost DESC NULLS LAST
 LIMIT $top_n
 """,
@@ -7656,6 +10352,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "There is no 'suspended' status in the data; the closest is WORK ABANDONED, which is what this query returns.",
@@ -7671,6 +10372,11 @@ LIMIT $top_n
             'Which activities in a given block are abandoned, and what are their costs in a given year?',
             'Which activities in a given district are abandoned, and what are their costs in a given year?',
             'Which activities in a given gram panchayat are abandoned, and what are their costs in a given year?',
+            'Which activities in a given block are abandoned, and what are their costs in a given year, in the main GPDP?',
+            'Which activities in a given block are abandoned, and what are their costs in a given year, under a given focus area?',
+            'Which activities in a given block are abandoned, and what are their costs in a given year, under a given LSDG theme?',
+            'Which activities in a given block are abandoned, and what are their costs in a given year, under a given scheme?',
+            'Which activities in a given block are abandoned, and what are their costs in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7688,12 +10394,22 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.',
@@ -7709,6 +10425,11 @@ WHERE v.fiscal_year = $date_range
             'What percentage of taken-up activities in a given block are completed in a given year?',
             'What percentage of taken-up activities in a given district are completed in a given year?',
             'What percentage of taken-up activities in a given gram panchayat are completed in a given year?',
+            'What percentage of taken-up activities in a given block are completed in a given year, in the main GPDP?',
+            'What percentage of taken-up activities in a given block are completed in a given year, under a given focus area?',
+            'What percentage of taken-up activities in a given block are completed in a given year, under a given LSDG theme?',
+            'What percentage of taken-up activities in a given block are completed in a given year, under a given scheme?',
+            'What percentage of taken-up activities in a given block are completed in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7726,6 +10447,11 @@ SELECT v.block_name, v.district_name,
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY pct_completed DESC, activities DESC
 LIMIT $top_n
@@ -7734,6 +10460,11 @@ LIMIT $top_n
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -7750,6 +10481,11 @@ LIMIT $top_n
             'Which blocks in a given District have the highest activity completion rate for a given Plan Year?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which blocks in a given district have the highest activity completion rate for a given year?',
+            'Which blocks in a given district have the highest activity completion rate for a given year, in the main GPDP?',
+            'Which blocks in a given district have the highest activity completion rate for a given year, under a given focus area?',
+            'Which blocks in a given district have the highest activity completion rate for a given year, under a given LSDG theme?',
+            'Which blocks in a given district have the highest activity completion rate for a given year, under a given scheme?',
+            'Which blocks in a given district have the highest activity completion rate for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7769,12 +10505,22 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Not started' is read as status 'Activity Approved' - approved but with no work status recorded.",
@@ -7790,6 +10536,11 @@ WHERE v.fiscal_year = $date_range
             'What share of approved activities in a given district has not yet started in a given year?',
             'What share of approved activities in a given block has not yet started in a given year?',
             'What share of approved activities in a given gram panchayat has not yet started in a given year?',
+            'What share of approved activities in a given district has not yet started in a given year, in the main GPDP?',
+            'What share of approved activities in a given district has not yet started in a given year, under a given focus area?',
+            'What share of approved activities in a given district has not yet started in a given year, under a given LSDG theme?',
+            'What share of approved activities in a given district has not yet started in a given year, under a given scheme?',
+            'What share of approved activities in a given district has not yet started in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7807,6 +10558,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2,3
 HAVING SUM(v.is_completed) = 0
 ORDER BY activities DESC
@@ -7816,6 +10572,11 @@ ORDER BY activities DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -7836,6 +10597,11 @@ ORDER BY activities DESC
             'Which GPs in a given block have zero completed activities in a given year?',
             'Which GPs in a given district have zero completed activities in a given year?',
             'Which GPs in a given gram panchayat have zero completed activities in a given year?',
+            'Which GPs in a given block have zero completed activities in a given year, in the main GPDP?',
+            'Which GPs in a given block have zero completed activities in a given year, under a given focus area?',
+            'Which GPs in a given block have zero completed activities in a given year, under a given LSDG theme?',
+            'Which GPs in a given block have zero completed activities in a given year, under a given scheme?',
+            'Which GPs in a given block have zero completed activities in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7853,12 +10619,22 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": '36 activities carry this status across the whole database.',
@@ -7874,6 +10650,11 @@ WHERE v.fiscal_year = $date_range
             'How many activities in a given block are stuck in Under Approval status for a given year?',
             'How many activities in a given district are stuck in Under Approval status for a given year?',
             'How many activities in a given gram panchayat are stuck in Under Approval status for a given year?',
+            'How many activities in a given block are stuck in Under Approval status for a given year, in the main GPDP?',
+            'How many activities in a given block are stuck in Under Approval status for a given year, under a given focus area?',
+            'How many activities in a given block are stuck in Under Approval status for a given year, under a given LSDG theme?',
+            'How many activities in a given block are stuck in Under Approval status for a given year, under a given scheme?',
+            'How many activities in a given block are stuck in Under Approval status for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7890,6 +10671,11 @@ SELECT v.block_name, v.district_name,
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 HAVING SUM(v.is_started) = COUNT(*)
 ORDER BY activities DESC
@@ -7897,6 +10683,11 @@ ORDER BY activities DESC
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -7913,6 +10704,11 @@ ORDER BY activities DESC
             'Which blocks in a given District have every taken-up activity started for a given Plan Year?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which blocks in a given district have every taken-up activity started for a given year?',
+            'Which blocks in a given district have every taken-up activity started for a given year, in the main GPDP?',
+            'Which blocks in a given district have every taken-up activity started for a given year, under a given focus area?',
+            'Which blocks in a given district have every taken-up activity started for a given year, under a given LSDG theme?',
+            'Which blocks in a given district have every taken-up activity started for a given year, under a given scheme?',
+            'Which blocks in a given district have every taken-up activity started for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7932,6 +10728,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY planned_activities DESC
 """,
@@ -7940,6 +10741,11 @@ ORDER BY planned_activities DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -7958,6 +10764,11 @@ ORDER BY planned_activities DESC
             'How many plan units and taken-up activities does a given gram panchayat have for a given year?',
             'How many plan units and taken-up activities does a given district have for a given year?',
             'How many plan units and taken-up activities does a given block have for a given year?',
+            'How many plan units and taken-up activities does a given gram panchayat have for a given year, in the main GPDP?',
+            'How many plan units and taken-up activities does a given gram panchayat have for a given year, under a given focus area?',
+            'How many plan units and taken-up activities does a given gram panchayat have for a given year, under a given LSDG theme?',
+            'How many plan units and taken-up activities does a given gram panchayat have for a given year, under a given scheme?',
+            'How many plan units and taken-up activities does a given gram panchayat have for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -7976,11 +10787,21 @@ SELECT v.district_name,
        SUM(v.is_under_approval) AS under_approval
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY activities DESC
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.',
@@ -7994,6 +10815,11 @@ ORDER BY activities DESC
             'What is the district-wise activity status summary across the state for a given Plan Year?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the district-wise activity status summary for a given year?',
+            'What is the district-wise activity status summary for a given year, in the main GPDP?',
+            'What is the district-wise activity status summary for a given year, under a given focus area?',
+            'What is the district-wise activity status summary for a given year, under a given LSDG theme?',
+            'What is the district-wise activity status summary for a given year, under a given scheme?',
+            'What is the district-wise activity status summary for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8011,12 +10837,22 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Initiated' = status WORK ONGOING or WORK COMPLETED.",
@@ -8032,6 +10868,11 @@ WHERE v.fiscal_year = $date_range
             'How many planned activities have been initiated in a given gram panchayat in a given year?',
             'How many planned activities have been initiated in a given district in a given year?',
             'How many planned activities have been initiated in a given block in a given year?',
+            'How many planned activities have been initiated in a given gram panchayat in a given year, in the main GPDP?',
+            'How many planned activities have been initiated in a given gram panchayat in a given year, under a given focus area?',
+            'How many planned activities have been initiated in a given gram panchayat in a given year, under a given LSDG theme?',
+            'How many planned activities have been initiated in a given gram panchayat in a given year, under a given scheme?',
+            'How many planned activities have been initiated in a given gram panchayat in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8049,12 +10890,22 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.',
@@ -8070,6 +10921,11 @@ WHERE v.fiscal_year = $date_range
             'How many initiated activities have been completed in a given year, for a given district?',
             'How many initiated activities have been completed in a given year, for a given block?',
             'How many initiated activities have been completed in a given year, for a given gram panchayat (GP)?',
+            'How many initiated activities have been completed in a given year, in the main GPDP?',
+            'How many initiated activities have been completed in a given year, under a given focus area?',
+            'How many initiated activities have been completed in a given year, under a given LSDG theme?',
+            'How many initiated activities have been completed in a given year, under a given scheme?',
+            'How many initiated activities have been completed in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8087,12 +10943,22 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Includes both 'Activity Approved' and 'UNDER APPROVAL' activities.",
@@ -8108,6 +10974,11 @@ WHERE v.fiscal_year = $date_range
             'How many planned activities have not yet been initiated in a given gram panchayat in a given year?',
             'How many planned activities have not yet been initiated in a given district in a given year?',
             'How many planned activities have not yet been initiated in a given block in a given year?',
+            'How many planned activities have not yet been initiated in a given gram panchayat in a given year, in the main GPDP?',
+            'How many planned activities have not yet been initiated in a given gram panchayat in a given year, under a given focus area?',
+            'How many planned activities have not yet been initiated in a given gram panchayat in a given year, under a given LSDG theme?',
+            'How many planned activities have not yet been initiated in a given gram panchayat in a given year, under a given scheme?',
+            'How many planned activities have not yet been initiated in a given gram panchayat in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8126,6 +10997,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY initiation_rate_pct DESC, planned_activities DESC
 """,
@@ -8134,6 +11010,11 @@ ORDER BY initiation_rate_pct DESC, planned_activities DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.',
@@ -8150,6 +11031,11 @@ ORDER BY initiation_rate_pct DESC, planned_activities DESC
             'What is the initiation rate under each theme and focus area in a given year, for a given district?',
             'What is the initiation rate under each theme and focus area in a given year, for a given block?',
             'What is the initiation rate under each theme and focus area in a given year, for a given gram panchayat (GP)?',
+            'What is the initiation rate under each theme and focus area in a given year, in the main GPDP?',
+            'What is the initiation rate under each theme and focus area in a given year, under a given focus area?',
+            'What is the initiation rate under each theme and focus area in a given year, under a given LSDG theme?',
+            'What is the initiation rate under each theme and focus area in a given year, under a given scheme?',
+            'What is the initiation rate under each theme and focus area in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8168,6 +11054,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY completion_rate_pct DESC, planned_activities DESC
 """,
@@ -8176,6 +11067,11 @@ ORDER BY completion_rate_pct DESC, planned_activities DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.',
@@ -8192,6 +11088,11 @@ ORDER BY completion_rate_pct DESC, planned_activities DESC
             'What is the completion rate under each theme and focus area in a given year, for a given district?',
             'What is the completion rate under each theme and focus area in a given year, for a given block?',
             'What is the completion rate under each theme and focus area in a given year, for a given gram panchayat (GP)?',
+            'What is the completion rate under each theme and focus area in a given year, in the main GPDP?',
+            'What is the completion rate under each theme and focus area in a given year, under a given focus area?',
+            'What is the completion rate under each theme and focus area in a given year, under a given LSDG theme?',
+            'What is the completion rate under each theme and focus area in a given year, under a given scheme?',
+            'What is the completion rate under each theme and focus area in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8210,6 +11111,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY completed_activities DESC
 LIMIT $top_n
@@ -8220,6 +11126,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.',
@@ -8236,6 +11147,11 @@ LIMIT $top_n
             'Which themes have the highest number of completed activities in a given year, for a given district?',
             'Which themes have the highest number of completed activities in a given year, for a given block?',
             'Which themes have the highest number of completed activities in a given year, for a given gram panchayat (GP)?',
+            'Which themes have the highest number of completed activities in a given year, in the main GPDP?',
+            'Which themes have the highest number of completed activities in a given year, under a given focus area?',
+            'Which themes have the highest number of completed activities in a given year, under a given LSDG theme?',
+            'Which themes have the highest number of completed activities in a given year, under a given scheme?',
+            'Which themes have the highest number of completed activities in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8255,6 +11171,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY implementation_gap DESC
 LIMIT $top_n
@@ -8265,6 +11186,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.',
@@ -8281,6 +11207,11 @@ LIMIT $top_n
             'Which themes have the largest implementation gap (planned versus initiated) in a given year, for a given district?',
             'Which themes have the largest implementation gap (planned versus initiated) in a given year, for a given block?',
             'Which themes have the largest implementation gap (planned versus initiated) in a given year, for a given gram panchayat (GP)?',
+            'Which themes have the largest implementation gap (planned versus initiated) in a given year, in the main GPDP?',
+            'Which themes have the largest implementation gap (planned versus initiated) in a given year, under a given focus area?',
+            'Which themes have the largest implementation gap (planned versus initiated) in a given year, under a given LSDG theme?',
+            'Which themes have the largest implementation gap (planned versus initiated) in a given year, under a given scheme?',
+            'Which themes have the largest implementation gap (planned versus initiated) in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8298,6 +11229,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY completed_activities DESC, planned_activities DESC
 LIMIT $top_n
@@ -8308,6 +11244,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.',
@@ -8323,6 +11264,11 @@ LIMIT $top_n
             'Which focus area has the highest number of completed activities in a given year, for a given district?',
             'Which focus area has the highest number of completed activities in a given year, for a given block?',
             'Which focus area has the highest number of completed activities in a given year, for a given gram panchayat (GP)?',
+            'Which focus area has the highest number of completed activities in a given year, in the main GPDP?',
+            'Which focus area has the highest number of completed activities in a given year, under a given focus area?',
+            'Which focus area has the highest number of completed activities in a given year, under a given LSDG theme?',
+            'Which focus area has the highest number of completed activities in a given year, under a given scheme?',
+            'Which focus area has the highest number of completed activities in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8341,6 +11287,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING COUNT(*) >= $threshold
 ORDER BY completion_rate_pct ASC, planned_activities DESC
@@ -8353,6 +11304,11 @@ LIMIT $top_n
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
             {'name': 'threshold', 'entity_type': 'threshold'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": '$threshold sets a minimum activity count so focus areas with one or two activities do not dominate the ranking. Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.',
@@ -8368,6 +11324,11 @@ LIMIT $top_n
             'Which focus area has the lowest completion rate in a given year, for a given district?',
             'Which focus area has the lowest completion rate in a given year, for a given block?',
             'Which focus area has the lowest completion rate in a given year, for a given gram panchayat (GP)?',
+            'Which focus area has the lowest completion rate in a given year, in the main GPDP?',
+            'Which focus area has the lowest completion rate in a given year, under a given focus area?',
+            'Which focus area has the lowest completion rate in a given year, under a given LSDG theme?',
+            'Which focus area has the lowest completion rate in a given year, under a given scheme?',
+            'Which focus area has the lowest completion rate in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8387,6 +11348,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY implementation_gap DESC
 LIMIT $top_n
@@ -8397,6 +11363,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.',
@@ -8413,6 +11384,11 @@ LIMIT $top_n
             'Which focus areas have the largest implementation gap (planned versus initiated) in a given year, for a given district?',
             'Which focus areas have the largest implementation gap (planned versus initiated) in a given year, for a given block?',
             'Which focus areas have the largest implementation gap (planned versus initiated) in a given year, for a given gram panchayat (GP)?',
+            'Which focus areas have the largest implementation gap (planned versus initiated) in a given year, in the main GPDP?',
+            'Which focus areas have the largest implementation gap (planned versus initiated) in a given year, under a given focus area?',
+            'Which focus areas have the largest implementation gap (planned versus initiated) in a given year, under a given LSDG theme?',
+            'Which focus areas have the largest implementation gap (planned versus initiated) in a given year, under a given scheme?',
+            'Which focus areas have the largest implementation gap (planned versus initiated) in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8431,6 +11407,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY ongoing_activities DESC
 LIMIT $top_n
@@ -8441,6 +11422,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Implementation & Progress',
@@ -8455,6 +11441,11 @@ LIMIT $top_n
             'Which focus areas have the largest number of ongoing activities in a given year, for a given district?',
             'Which focus areas have the largest number of ongoing activities in a given year, for a given block?',
             'Which focus areas have the largest number of ongoing activities in a given year, for a given gram panchayat (GP)?',
+            'Which focus areas have the largest number of ongoing activities in a given year, in the main GPDP?',
+            'Which focus areas have the largest number of ongoing activities in a given year, under a given focus area?',
+            'Which focus areas have the largest number of ongoing activities in a given year, under a given LSDG theme?',
+            'Which focus areas have the largest number of ongoing activities in a given year, under a given scheme?',
+            'Which focus areas have the largest number of ongoing activities in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8474,6 +11465,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING SUM(v.total_expenditure) > 0
 ORDER BY expenditure DESC, completion_rate_pct ASC
@@ -8483,6 +11479,11 @@ ORDER BY expenditure DESC, completion_rate_pct ASC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Poor implementation' is undefined in the source question; the query ranks by spend and shows the completion rate alongside. Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.",
@@ -8499,6 +11500,11 @@ ORDER BY expenditure DESC, completion_rate_pct ASC
             'Which themes receive funds but show poor implementation in a given year, for a given district?',
             'Which themes receive funds but show poor implementation in a given year, for a given block?',
             'Which themes receive funds but show poor implementation in a given year, for a given gram panchayat (GP)?',
+            'Which themes receive funds but show poor implementation in a given year, in the main GPDP?',
+            'Which themes receive funds but show poor implementation in a given year, under a given focus area?',
+            'Which themes receive funds but show poor implementation in a given year, under a given LSDG theme?',
+            'Which themes receive funds but show poor implementation in a given year, under a given scheme?',
+            'Which themes receive funds but show poor implementation in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8517,6 +11523,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY COALESCE(v.approved_cost_action_plan, v.total_cost) DESC
 LIMIT $top_n
 """,
@@ -8527,6 +11538,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'High-expenditure' is now the $amount_threshold parameter.",
@@ -8542,6 +11558,11 @@ LIMIT $top_n
             'Which high-expenditure activities have not yet started in a given year, for a given district?',
             'Which high-expenditure activities have not yet started in a given year, for a given block?',
             'Which high-expenditure activities have not yet started in a given year, for a given gram panchayat (GP)?',
+            'Which high-expenditure activities have not yet started in a given year, in the main GPDP?',
+            'Which high-expenditure activities have not yet started in a given year, under a given focus area?',
+            'Which high-expenditure activities have not yet started in a given year, under a given LSDG theme?',
+            'Which high-expenditure activities have not yet started in a given year, under a given scheme?',
+            'Which high-expenditure activities have not yet started in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8565,6 +11586,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY ABS(share_gap_pts) DESC
 """,
@@ -8573,6 +11600,12 @@ ORDER BY ABS(share_gap_pts) DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Mismatch is measured as the gap between a theme's share of activities and its share of spend.",
@@ -8588,6 +11621,12 @@ ORDER BY ABS(share_gap_pts) DESC
             'Which themes have the greatest mismatch between planning and expenditure in a given year, for a given district?',
             'Which themes have the greatest mismatch between planning and expenditure in a given year, for a given block?',
             'Which themes have the greatest mismatch between planning and expenditure in a given year, for a given gram panchayat (GP)?',
+            'Which themes have the greatest mismatch between planning and expenditure in a given year, in the main GPDP?',
+            'Which themes have the greatest mismatch between planning and expenditure in a given year, for ongoing activities?',
+            'Which themes have the greatest mismatch between planning and expenditure in a given year, under a given focus area?',
+            'Which themes have the greatest mismatch between planning and expenditure in a given year, under a given LSDG theme?',
+            'Which themes have the greatest mismatch between planning and expenditure in a given year, under a given scheme?',
+            'Which themes have the greatest mismatch between planning and expenditure in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8608,6 +11647,11 @@ WHERE 1=1
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY avg_initiation_rate_pct DESC
 """,
@@ -8615,6 +11659,11 @@ ORDER BY avg_initiation_rate_pct DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Consistently' is not defined in the source question; the query pools all years and reports the overall initiation rate per theme. Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.",
@@ -8630,6 +11679,11 @@ ORDER BY avg_initiation_rate_pct DESC
             'Which GPDP themes consistently perform well in implementation across years, for a given district?',
             'Which GPDP themes consistently perform well in implementation across years, for a given block?',
             'Which GPDP themes consistently perform well in implementation across years, for a given gram panchayat (GP)?',
+            'Which GPDP themes consistently perform well in implementation across years, in the main GPDP?',
+            'Which GPDP themes consistently perform well in implementation across years, under a given focus area?',
+            'Which GPDP themes consistently perform well in implementation across years, under a given LSDG theme?',
+            'Which GPDP themes consistently perform well in implementation across years, under a given scheme?',
+            'Which GPDP themes consistently perform well in implementation across years, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8650,6 +11704,11 @@ WHERE 1=1
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY avg_initiation_rate_pct ASC
 """,
@@ -8657,6 +11716,11 @@ ORDER BY avg_initiation_rate_pct ASC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Consistently' is not defined in the source question; the query pools all years and reports the overall initiation rate per theme. Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.",
@@ -8672,6 +11736,11 @@ ORDER BY avg_initiation_rate_pct ASC
             'Which GPDP themes consistently underperform in implementation across years, for a given district?',
             'Which GPDP themes consistently underperform in implementation across years, for a given block?',
             'Which GPDP themes consistently underperform in implementation across years, for a given gram panchayat (GP)?',
+            'Which GPDP themes consistently underperform in implementation across years, in the main GPDP?',
+            'Which GPDP themes consistently underperform in implementation across years, under a given focus area?',
+            'Which GPDP themes consistently underperform in implementation across years, under a given LSDG theme?',
+            'Which GPDP themes consistently underperform in implementation across years, under a given scheme?',
+            'Which GPDP themes consistently underperform in implementation across years, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8691,6 +11760,11 @@ WHERE 1=1
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING COUNT(DISTINCT v.fiscal_year) > 1 AND SUM(v.is_completed) = 0
 ORDER BY years_appearing DESC, occurrences DESC
@@ -8701,6 +11775,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Groups on the exact activity_name string. Progress is read from activity_status. Only 17 of 12,704 activities are marked WORK COMPLETED, so completion figures will look near-zero - that is what the data says, not a query fault.',
@@ -8716,6 +11795,11 @@ LIMIT $top_n
             'Which types of activity remain incomplete across multiple years, for a given district?',
             'Which types of activity remain incomplete across multiple years, for a given block?',
             'Which types of activity remain incomplete across multiple years, for a given gram panchayat (GP)?',
+            'Which types of activity remain incomplete across multiple years, in the main GPDP?',
+            'Which types of activity remain incomplete across multiple years, under a given focus area?',
+            'Which types of activity remain incomplete across multiple years, under a given LSDG theme?',
+            'Which types of activity remain incomplete across multiple years, under a given scheme?',
+            'Which types of activity remain incomplete across multiple years, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8738,6 +11822,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY pct_of_approved_spent DESC
 LIMIT $top_n
 """,
@@ -8747,6 +11836,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Implementation & Progress',
@@ -8762,6 +11856,11 @@ LIMIT $top_n
             'Which activities are marked Work Ongoing despite expenditure reaching the approved cost in a given year, for a given district?',
             'Which activities are marked Work Ongoing despite expenditure reaching the approved cost in a given year, for a given block?',
             'Which activities are marked Work Ongoing despite expenditure reaching the approved cost in a given year, for a given gram panchayat (GP)?',
+            'Which activities are marked Work Ongoing despite expenditure reaching the approved cost in a given year, in the main GPDP?',
+            'Which activities are marked Work Ongoing despite expenditure reaching the approved cost in a given year, under a given focus area?',
+            'Which activities are marked Work Ongoing despite expenditure reaching the approved cost in a given year, under a given LSDG theme?',
+            'Which activities are marked Work Ongoing despite expenditure reaching the approved cost in a given year, under a given scheme?',
+            'Which activities are marked Work Ongoing despite expenditure reaching the approved cost in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8784,6 +11883,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING COUNT(*) >= $threshold
 ORDER BY initiation_rate_pct ASC, approved_cost DESC
@@ -8796,6 +11900,11 @@ LIMIT $top_n
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'threshold', 'entity_type': 'threshold'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Advisory question with no defined rule. Ranks by lowest initiation rate among groups with at least $threshold activities.',
@@ -8812,6 +11921,11 @@ LIMIT $top_n
             'Which themes should be prioritised for implementation support in a given year, for a given district?',
             'Which themes should be prioritised for implementation support in a given year, for a given block?',
             'Which themes should be prioritised for implementation support in a given year, for a given gram panchayat (GP)?',
+            'Which themes should be prioritised for implementation support in a given year, in the main GPDP?',
+            'Which themes should be prioritised for implementation support in a given year, under a given focus area?',
+            'Which themes should be prioritised for implementation support in a given year, under a given LSDG theme?',
+            'Which themes should be prioritised for implementation support in a given year, under a given scheme?',
+            'Which themes should be prioritised for implementation support in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8834,6 +11948,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING COUNT(*) >= $threshold
 ORDER BY initiation_rate_pct ASC, approved_cost DESC
@@ -8846,6 +11965,11 @@ LIMIT $top_n
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'threshold', 'entity_type': 'threshold'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Advisory question with no defined rule. Ranks by lowest initiation rate among groups with at least $threshold activities.',
@@ -8861,6 +11985,11 @@ LIMIT $top_n
             'Which focus areas should be prioritised for implementation support in a given year, for a given district?',
             'Which focus areas should be prioritised for implementation support in a given year, for a given block?',
             'Which focus areas should be prioritised for implementation support in a given year, for a given gram panchayat (GP)?',
+            'Which focus areas should be prioritised for implementation support in a given year, in the main GPDP?',
+            'Which focus areas should be prioritised for implementation support in a given year, under a given focus area?',
+            'Which focus areas should be prioritised for implementation support in a given year, under a given LSDG theme?',
+            'Which focus areas should be prioritised for implementation support in a given year, under a given scheme?',
+            'Which focus areas should be prioritised for implementation support in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8881,6 +12010,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY unspent_amount DESC
 LIMIT $top_n
 """,
@@ -8890,6 +12024,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Should be carried forward' is a policy judgement; the query returns every non-completed, non-abandoned activity ordered by unspent amount.",
@@ -8906,6 +12045,11 @@ LIMIT $top_n
             'Which activities should be carried forward to the next GPDP because they are incomplete in a given year, for a given district?',
             'Which activities should be carried forward to the next GPDP because they are incomplete in a given year, for a given block?',
             'Which activities should be carried forward to the next GPDP because they are incomplete in a given year, for a given gram panchayat (GP)?',
+            'Which activities should be carried forward to the next GPDP because they are incomplete in a given year, in the main GPDP?',
+            'Which activities should be carried forward to the next GPDP because they are incomplete in a given year, under a given focus area?',
+            'Which activities should be carried forward to the next GPDP because they are incomplete in a given year, under a given LSDG theme?',
+            'Which activities should be carried forward to the next GPDP because they are incomplete in a given year, under a given scheme?',
+            'Which activities should be carried forward to the next GPDP because they are incomplete in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -8927,6 +12071,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY incomplete_activities DESC
 """,
@@ -8935,6 +12084,11 @@ ORDER BY incomplete_activities DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "No planned end-date exists, so 'delayed' cannot be measured; only 'incomplete' is returned. scheme_name is NULL on 82% of rows.",
@@ -8950,6 +12104,11 @@ ORDER BY incomplete_activities DESC
             'Which schemes have the highest number of delayed or incomplete activities in a given year, for a given district?',
             'Which schemes have the highest number of delayed or incomplete activities in a given year, for a given block?',
             'Which schemes have the highest number of delayed or incomplete activities in a given year, for a given gram panchayat (GP)?',
+            'Which schemes have the highest number of delayed or incomplete activities in a given year, in the main GPDP?',
+            'Which schemes have the highest number of delayed or incomplete activities in a given year, under a given focus area?',
+            'Which schemes have the highest number of delayed or incomplete activities in a given year, under a given LSDG theme?',
+            'Which schemes have the highest number of delayed or incomplete activities in a given year, under a given scheme?',
+            'Which schemes have the highest number of delayed or incomplete activities in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -9004,6 +12163,9 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
 GROUP BY 1,2
 ORDER BY asset_rows DESC
 """,
@@ -9012,6 +12174,9 @@ ORDER BY asset_rows DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -9031,6 +12196,9 @@ ORDER BY asset_rows DESC
             'How many assets in a given gram panchayat belong to completed activities in a given year?',
             'How many assets in a given district belong to completed activities in a given year?',
             'How many assets in a given block belong to completed activities in a given year?',
+            'How many assets in a given gram panchayat belong to completed activities in a given year, in the main GPDP?',
+            'How many assets in a given gram panchayat belong to completed activities in a given year, under a given focus area?',
+            'How many assets in a given gram panchayat belong to completed activities in a given year, under a given LSDG theme?',
             # ── end derived ──
         ],
     },
@@ -9051,6 +12219,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY activities DESC
 """,
@@ -9059,6 +12233,12 @@ ORDER BY activities DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Rewritten from 'assets at each implementation stage' to 'activities with progress evidence', which is what physical_progress actually supports. Grouped by activity status as the nearest stage proxy.",
@@ -9074,6 +12254,12 @@ ORDER BY activities DESC
             'How many activities in a given block have physical-progress evidence recorded in a given year?',
             'How many activities in a given district have physical-progress evidence recorded in a given year?',
             'How many activities in a given gram panchayat have physical-progress evidence recorded in a given year?',
+            'How many activities in a given block have physical-progress evidence recorded in a given year, in the main GPDP?',
+            'How many activities in a given block have physical-progress evidence recorded in a given year, for ongoing activities?',
+            'How many activities in a given block have physical-progress evidence recorded in a given year, under a given focus area?',
+            'How many activities in a given block have physical-progress evidence recorded in a given year, under a given LSDG theme?',
+            'How many activities in a given block have physical-progress evidence recorded in a given year, under a given scheme?',
+            'How many activities in a given block have physical-progress evidence recorded in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -9092,6 +12278,10 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
 GROUP BY 1,2
 ORDER BY asset_rows DESC
 """,
@@ -9100,6 +12290,10 @@ ORDER BY asset_rows DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -9119,6 +12313,10 @@ ORDER BY asset_rows DESC
             'How many assets were created in a given gram panchayat during a given year?',
             'How many assets were created in a given district during a given year?',
             'How many assets were created in a given block during a given year?',
+            'How many assets were created in a given gram panchayat during a given year, in the main GPDP?',
+            'How many assets were created in a given gram panchayat during a given year, for ongoing activities?',
+            'How many assets were created in a given gram panchayat during a given year, under a given focus area?',
+            'How many assets were created in a given gram panchayat during a given year, under a given LSDG theme?',
             # ── end derived ──
         ],
     },
@@ -9137,6 +12335,10 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
 GROUP BY 1
 ORDER BY asset_rows DESC
 """,
@@ -9145,6 +12347,10 @@ ORDER BY asset_rows DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'activity_asset is sparsely populated: asset_category has values on 4,286 of 12,704 rows and asset_subcategory on 4,286; asset_name, asset_unit_count and asset_unit_cost are 100% NULL. Uncategorised rows are reported separately rather than dropped.',
@@ -9160,6 +12366,10 @@ ORDER BY asset_rows DESC
             'What is the asset category-wise count of assets created in a given block for a given year?',
             'What is the asset category-wise count of assets created in a given district for a given year?',
             'What is the asset category-wise count of assets created in a given gram panchayat for a given year?',
+            'What is the asset category-wise count of assets created in a given block for a given year, in the main GPDP?',
+            'What is the asset category-wise count of assets created in a given block for a given year, for ongoing activities?',
+            'What is the asset category-wise count of assets created in a given block for a given year, under a given focus area?',
+            'What is the asset category-wise count of assets created in a given block for a given year, under a given LSDG theme?',
             # ── end derived ──
         ],
     },
@@ -9179,6 +12389,10 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
 GROUP BY 1
 ORDER BY asset_rows DESC
 """,
@@ -9188,6 +12402,10 @@ ORDER BY asset_rows DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'activity_asset is sparsely populated: asset_category has values on 4,286 of 12,704 rows and asset_subcategory on 4,286; asset_name, asset_unit_count and asset_unit_cost are 100% NULL. Uncategorised rows are reported separately rather than dropped.',
@@ -9203,6 +12421,10 @@ ORDER BY asset_rows DESC
             'How many a given asset sub-category assets exist across a given district for a given year?',
             'How many a given asset sub-category assets exist across a given block for a given year?',
             'How many a given asset sub-category assets exist across a given gram panchayat for a given year?',
+            'How many a given asset sub-category assets exist across a given district for a given year, in the main GPDP?',
+            'How many a given asset sub-category assets exist across a given district for a given year, for ongoing activities?',
+            'How many a given asset sub-category assets exist across a given district for a given year, under a given focus area?',
+            'How many a given asset sub-category assets exist across a given district for a given year, under a given LSDG theme?',
             # ── end derived ──
         ],
     },
@@ -9219,6 +12441,10 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
 GROUP BY 1
 ORDER BY asset_rows DESC
 """,
@@ -9227,6 +12453,10 @@ ORDER BY asset_rows DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "asset_type decodes to movable / Immovable but is populated on only a small share of rows; 'permanent' maps to Immovable.",
@@ -9242,6 +12472,10 @@ ORDER BY asset_rows DESC
             'How many immovable-type assets were created in a given block during a given year?',
             'How many immovable-type assets were created in a given district during a given year?',
             'How many immovable-type assets were created in a given gram panchayat during a given year?',
+            'How many immovable-type assets were created in a given block during a given year, in the main GPDP?',
+            'How many immovable-type assets were created in a given block during a given year, for ongoing activities?',
+            'How many immovable-type assets were created in a given block during a given year, under a given focus area?',
+            'How many immovable-type assets were created in a given block during a given year, under a given LSDG theme?',
             # ── end derived ──
         ],
     },
@@ -9259,6 +12493,10 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
 GROUP BY 1
 ORDER BY expenditure DESC
 LIMIT $top_n
@@ -9269,6 +12507,10 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'activity_asset is sparsely populated: asset_category has values on 4,286 of 12,704 rows and asset_subcategory on 4,286; asset_name, asset_unit_count and asset_unit_cost are 100% NULL. Uncategorised rows are reported separately rather than dropped.',
@@ -9284,6 +12526,10 @@ LIMIT $top_n
             'Which asset category received the highest expenditure in a given district for a given year?',
             'Which asset category received the highest expenditure in a given block for a given year?',
             'Which asset category received the highest expenditure in a given gram panchayat for a given year?',
+            'Which asset category received the highest expenditure in a given district for a given year, in the main GPDP?',
+            'Which asset category received the highest expenditure in a given district for a given year, for ongoing activities?',
+            'Which asset category received the highest expenditure in a given district for a given year, under a given focus area?',
+            'Which asset category received the highest expenditure in a given district for a given year, under a given LSDG theme?',
             # ── end derived ──
         ],
     },
@@ -9302,6 +12548,9 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
 GROUP BY 1
 ORDER BY asset_rows DESC
 """,
@@ -9311,6 +12560,9 @@ ORDER BY asset_rows DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas. activity_asset is sparsely populated: asset_category has values on 4,286 of 12,704 rows and asset_subcategory on 4,286; asset_name, asset_unit_count and asset_unit_cost are 100% NULL. Uncategorised rows are reported separately rather than dropped.',
@@ -9326,6 +12578,9 @@ ORDER BY asset_rows DESC
             'How many assets were created under a given LSDG theme in a given block for a given year?',
             'How many assets were created under a given LSDG theme in a given district for a given year?',
             'How many assets were created under a given LSDG theme in a given gram panchayat for a given year?',
+            'How many assets were created under a given LSDG theme in a given block for a given year, in the main GPDP?',
+            'How many assets were created under a given LSDG theme in a given block for a given year, for ongoing activities?',
+            'How many assets were created under a given LSDG theme in a given block for a given year, under a given focus area?',
             # ── end derived ──
         ],
     },
@@ -9341,7 +12596,11 @@ WHERE NOT EXISTS (
         SELECT 1 FROM v_asset v
         WHERE v.gp_name = g.gp_name
           AND v.fiscal_year = $date_range
-          AND v.asset_category_label <> 'Uncategorised')
+          AND v.asset_category_label <> 'Uncategorised'
+          AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+          AND ($status IS NULL OR v.status_label = $status)
+          AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+          AND ($theme IS NULL OR v.theme = $theme))
   AND ($block_name    IS NULL OR g.block_name = $block_name)
   AND ($district_name IS NULL OR g.zp_name = $district_name)
 ORDER BY g.zp_name, g.block_name, g.gp_name
@@ -9350,6 +12609,10 @@ ORDER BY g.zp_name, g.block_name, g.gp_name
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Created no assets' means no categorised asset row. Because asset_category is missing on two-thirds of rows, GPs may appear here from missing data alone.",
@@ -9364,6 +12627,10 @@ ORDER BY g.zp_name, g.block_name, g.gp_name
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPs in a given block created no assets in a given year?',
             'Which GPs in a given district created no assets in a given year?',
+            'Which GPs in a given block created no assets in a given year, in the main GPDP?',
+            'Which GPs in a given block created no assets in a given year, for ongoing activities?',
+            'Which GPs in a given block created no assets in a given year, under a given focus area?',
+            'Which GPs in a given block created no assets in a given year, under a given LSDG theme?',
             # ── end derived ──
         ],
     },
@@ -9383,6 +12650,10 @@ WHERE 1=1
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
 GROUP BY 1
 ORDER BY 1
 """,
@@ -9390,6 +12661,10 @@ ORDER BY 1
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'activity_asset is sparsely populated: asset_category has values on 4,286 of 12,704 rows and asset_subcategory on 4,286; asset_name, asset_unit_count and asset_unit_cost are 100% NULL. Uncategorised rows are reported separately rather than dropped.',
@@ -9405,6 +12680,10 @@ ORDER BY 1
             'How has the number of assets created per year in a given block changed?',
             'How has the number of assets created per year in a given district changed?',
             'How has the number of assets created per year in a given gram panchayat changed?',
+            'How has the number of assets created per year in a given block changed, in the main GPDP?',
+            'How has the number of assets created per year in a given block changed, for ongoing activities?',
+            'How has the number of assets created per year in a given block changed, under a given focus area?',
+            'How has the number of assets created per year in a given block changed, under a given LSDG theme?',
             # ── end derived ──
         ],
     },
@@ -10331,6 +13610,7 @@ ORDER BY om_expenditure DESC
             'What is the total Operation & Maintenance expenditure in a given gram panchayat in a given year?',
             'What is the total Operation & Maintenance expenditure in a given district in a given year?',
             'What is the total Operation & Maintenance expenditure in a given block in a given year?',
+            'What is the total Operation & Maintenance expenditure in a given gram panchayat in a given year, under a given focus area?',
             # ── end derived ──
         ],
     },
@@ -12971,6 +16251,11 @@ SELECT v.gp_name, v.block_name, v.district_name,
        ROUND(100.0 * SUM(v.is_completed) / NULLIF(COUNT(*),0), 2) AS completion_rate_pct
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
   AND v.gp_lgd_code IN ($gp_name, $gp_name_2)
 GROUP BY 1,2,3
 ORDER BY actual_expenditure DESC
@@ -12979,6 +16264,11 @@ ORDER BY actual_expenditure DESC
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'gp_name', 'entity_type': 'gp', 'bind': 'code'},
             {'name': 'gp_name_2', 'entity_type': 'gp_2', 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'gp_name',
@@ -12995,6 +16285,11 @@ ORDER BY actual_expenditure DESC
             'Compare planned expenditure, actual expenditure, and completion rate between a given GP Name and a given GP Name 2 for a given Financial Year.',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Compare planned expenditure, actual expenditure and completion rate between a given gram panchayat and a second gram panchayat for a given year.',
+            'Compare planned expenditure, actual expenditure and completion rate between a given gram panchayat and a second gram panchayat for a given year, in the main GPDP?',
+            'Compare planned expenditure, actual expenditure and completion rate between a given gram panchayat and a second gram panchayat for a given year, under a given focus area?',
+            'Compare planned expenditure, actual expenditure and completion rate between a given gram panchayat and a second gram panchayat for a given year, under a given LSDG theme?',
+            'Compare planned expenditure, actual expenditure and completion rate between a given gram panchayat and a second gram panchayat for a given year, under a given scheme?',
+            'Compare planned expenditure, actual expenditure and completion rate between a given gram panchayat and a second gram panchayat for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -13014,6 +16309,11 @@ SELECT v.block_name, v.district_name,
        ROUND(100.0 * SUM(v.is_completed) / NULLIF(COUNT(*),0), 2) AS completion_rate_pct
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
   AND v.block_name IN ($block_name, $block_name_2)
 GROUP BY 1,2
 ORDER BY actual_expenditure DESC
@@ -13022,6 +16322,11 @@ ORDER BY actual_expenditure DESC
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'block_name', 'entity_type': 'block'},
             {'name': 'block_name_2', 'entity_type': 'block_2'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -13038,6 +16343,11 @@ ORDER BY actual_expenditure DESC
             'Compare activity counts, expenditure, and completion rates between a given Block and a given Block 2 for a given Plan Year.',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Compare activity counts, expenditure and completion rates between a given block and a second block for a given year.',
+            'Compare activity counts, expenditure and completion rates between a given block and a second block for a given year, in the main GPDP?',
+            'Compare activity counts, expenditure and completion rates between a given block and a second block for a given year, under a given focus area?',
+            'Compare activity counts, expenditure and completion rates between a given block and a second block for a given year, under a given LSDG theme?',
+            'Compare activity counts, expenditure and completion rates between a given block and a second block for a given year, under a given scheme?',
+            'Compare activity counts, expenditure and completion rates between a given block and a second block for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -13055,6 +16365,11 @@ WITH per_district AS (
          SUM(v.is_completed) AS completed
   FROM v_activity v
   WHERE v.fiscal_year = $date_range
+    AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+    AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+    AND ($theme IS NULL OR v.theme = $theme)
+    AND ($scheme IS NULL OR v.scheme_name = $scheme)
+    AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
   GROUP BY 1)
 SELECT district_name,
        gps, activities,
@@ -13070,6 +16385,11 @@ ORDER BY expenditure_per_gp DESC
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Every district is returned alongside the state benchmark so the chosen district can be read in context. 'State' means the 9 districts loaded.",
@@ -13083,6 +16403,11 @@ ORDER BY expenditure_per_gp DESC
             'How does a given District compare with the state average on expenditure per GP and completion rate for a given Plan Year?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How does a given district compare with the state average on expenditure per GP and completion rate for a given year?',
+            'How does a given district compare with the state average on expenditure per GP and completion rate for a given year, in the main GPDP?',
+            'How does a given district compare with the state average on expenditure per GP and completion rate for a given year, under a given focus area?',
+            'How does a given district compare with the state average on expenditure per GP and completion rate for a given year, under a given LSDG theme?',
+            'How does a given district compare with the state average on expenditure per GP and completion rate for a given year, under a given scheme?',
+            'How does a given district compare with the state average on expenditure per GP and completion rate for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -13105,6 +16430,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY expenditure DESC
 """,
@@ -13113,6 +16443,11 @@ ORDER BY expenditure DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -13128,6 +16463,11 @@ ORDER BY expenditure DESC
             'What are the approved cost, expenditure and status counts theme-wise for a given gram panchayat in a given year?',
             'What are the approved cost, expenditure and status counts theme-wise for a given district in a given year?',
             'What are the approved cost, expenditure and status counts theme-wise for a given block in a given year?',
+            'What are the approved cost, expenditure and status counts theme-wise for a given gram panchayat in a given year, in the main GPDP?',
+            'What are the approved cost, expenditure and status counts theme-wise for a given gram panchayat in a given year, under a given focus area?',
+            'What are the approved cost, expenditure and status counts theme-wise for a given gram panchayat in a given year, under a given LSDG theme?',
+            'What are the approved cost, expenditure and status counts theme-wise for a given gram panchayat in a given year, under a given scheme?',
+            'What are the approved cost, expenditure and status counts theme-wise for a given gram panchayat in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -13148,6 +16488,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY expenditure DESC
 """,
@@ -13156,6 +16502,12 @@ ORDER BY expenditure DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Sector' is read as focus area, the closest sectoral classification in the data.",
@@ -13171,6 +16523,12 @@ ORDER BY expenditure DESC
             'What are the approved cost and expenditure sector-wise in a given district for a given year?',
             'What are the approved cost and expenditure sector-wise in a given block for a given year?',
             'What are the approved cost and expenditure sector-wise in a given gram panchayat for a given year?',
+            'What are the approved cost and expenditure sector-wise in a given district for a given year, in the main GPDP?',
+            'What are the approved cost and expenditure sector-wise in a given district for a given year, for ongoing activities?',
+            'What are the approved cost and expenditure sector-wise in a given district for a given year, under a given focus area?',
+            'What are the approved cost and expenditure sector-wise in a given district for a given year, under a given LSDG theme?',
+            'What are the approved cost and expenditure sector-wise in a given district for a given year, under a given scheme?',
+            'What are the approved cost and expenditure sector-wise in a given district for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -13190,6 +16548,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING SUM(v.total_expenditure) > 0
 ORDER BY expenditure DESC, completion_rate_pct ASC
@@ -13199,6 +16562,11 @@ ORDER BY expenditure DESC, completion_rate_pct ASC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'High' and 'low' are undefined; ordered by spend with completion rate shown beside it.",
@@ -13214,6 +16582,11 @@ ORDER BY expenditure DESC, completion_rate_pct ASC
             'Which themes in a given block show high expenditure but low activity completion in a given year?',
             'Which themes in a given district show high expenditure but low activity completion in a given year?',
             'Which themes in a given gram panchayat show high expenditure but low activity completion in a given year?',
+            'Which themes in a given block show high expenditure but low activity completion in a given year, in the main GPDP?',
+            'Which themes in a given block show high expenditure but low activity completion in a given year, under a given focus area?',
+            'Which themes in a given block show high expenditure but low activity completion in a given year, under a given LSDG theme?',
+            'Which themes in a given block show high expenditure but low activity completion in a given year, under a given scheme?',
+            'Which themes in a given block show high expenditure but low activity completion in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -13233,6 +16606,11 @@ WHERE v.fiscal_year IN ($date_range, $date_range_2)
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_year2 DESC
 """,
@@ -13242,6 +16620,11 @@ ORDER BY planned_year2 DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping covers 17 of 30 focus areas.',
@@ -13258,6 +16641,11 @@ ORDER BY planned_year2 DESC
             'Compare the activities planned and started theme-wise between a second year and a given year, for a given district?',
             'Compare the activities planned and started theme-wise between a second year and a given year, for a given block?',
             'Compare the activities planned and started theme-wise between a second year and a given year, for a given gram panchayat (GP)?',
+            'Compare the activities planned and started theme-wise between a second year and a given year, in the main GPDP?',
+            'Compare the activities planned and started theme-wise between a second year and a given year, under a given focus area?',
+            'Compare the activities planned and started theme-wise between a second year and a given year, under a given LSDG theme?',
+            'Compare the activities planned and started theme-wise between a second year and a given year, under a given scheme?',
+            'Compare the activities planned and started theme-wise between a second year and a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -13277,6 +16665,12 @@ WHERE v.fiscal_year IN ($date_range, $date_range_2)
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY expenditure_year2 DESC
 """,
@@ -13286,6 +16680,12 @@ ORDER BY expenditure_year2 DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Theme mapping is partial.',
@@ -13302,6 +16702,12 @@ ORDER BY expenditure_year2 DESC
             'Compare the approved cost and expenditure theme-wise between a second year and a given year, for a given district?',
             'Compare the approved cost and expenditure theme-wise between a second year and a given year, for a given block?',
             'Compare the approved cost and expenditure theme-wise between a second year and a given year, for a given gram panchayat (GP)?',
+            'Compare the approved cost and expenditure theme-wise between a second year and a given year, in the main GPDP?',
+            'Compare the approved cost and expenditure theme-wise between a second year and a given year, for ongoing activities?',
+            'Compare the approved cost and expenditure theme-wise between a second year and a given year, under a given focus area?',
+            'Compare the approved cost and expenditure theme-wise between a second year and a given year, under a given LSDG theme?',
+            'Compare the approved cost and expenditure theme-wise between a second year and a given year, under a given scheme?',
+            'Compare the approved cost and expenditure theme-wise between a second year and a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -13322,6 +16728,12 @@ WHERE 1=1
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY 1 DESC
 """,
@@ -13329,6 +16741,12 @@ ORDER BY 1 DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Expenditure is recorded against the year of the plan it belongs to; there is no separate cash-year column, so cross-year carry-over cannot be traced.',
@@ -13344,6 +16762,12 @@ ORDER BY 1 DESC
             'What is the year-wise expenditure of a given gram panchayat against the plan of each year?',
             'What is the year-wise expenditure of a given district against the plan of each year?',
             'What is the year-wise expenditure of a given block against the plan of each year?',
+            'What is the year-wise expenditure of a given gram panchayat against the plan of each year, in the main GPDP?',
+            'What is the year-wise expenditure of a given gram panchayat against the plan of each year, for ongoing activities?',
+            'What is the year-wise expenditure of a given gram panchayat against the plan of each year, under a given focus area?',
+            'What is the year-wise expenditure of a given gram panchayat against the plan of each year, under a given LSDG theme?',
+            'What is the year-wise expenditure of a given gram panchayat against the plan of each year, under a given scheme?',
+            'What is the year-wise expenditure of a given gram panchayat against the plan of each year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -13365,6 +16789,12 @@ WHERE v.fiscal_year IN ($date_range, $date_range_2)
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
@@ -13372,6 +16802,12 @@ WHERE v.fiscal_year IN ($date_range, $date_range_2)
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Trends & Comparison',
@@ -13386,6 +16822,12 @@ WHERE v.fiscal_year IN ($date_range, $date_range_2)
             'How did the total expenditure of a given block change between a second year and a given year?',
             'How did the total expenditure of a given district change between a second year and a given year?',
             'How did the total expenditure of a given gram panchayat change between a second year and a given year?',
+            'How did the total expenditure of a given block change between a second year and a given year, in the main GPDP?',
+            'How did the total expenditure of a given block change between a second year and a given year, for ongoing activities?',
+            'How did the total expenditure of a given block change between a second year and a given year, under a given focus area?',
+            'How did the total expenditure of a given block change between a second year and a given year, under a given LSDG theme?',
+            'How did the total expenditure of a given block change between a second year and a given year, under a given scheme?',
+            'How did the total expenditure of a given block change between a second year and a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -13406,6 +16848,11 @@ WHERE 1=1
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY 1
 """,
@@ -13413,6 +16860,11 @@ ORDER BY 1
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Only 17 activities in the whole database are marked WORK COMPLETED, so completion rates are near zero throughout.',
@@ -13428,6 +16880,11 @@ ORDER BY 1
             'How has the activity completion rate of a given district changed over the years?',
             'How has the activity completion rate of a given block changed over the years?',
             'How has the activity completion rate of a given gram panchayat changed over the years?',
+            'How has the activity completion rate of a given district changed over the years, in the main GPDP?',
+            'How has the activity completion rate of a given district changed over the years, under a given focus area?',
+            'How has the activity completion rate of a given district changed over the years, under a given LSDG theme?',
+            'How has the activity completion rate of a given district changed over the years, under a given scheme?',
+            'How has the activity completion rate of a given district changed over the years, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -13445,6 +16902,12 @@ WHERE 1=1
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY v.gp_name, v.fiscal_year
 """,
@@ -13452,6 +16915,12 @@ ORDER BY v.gp_name, v.fiscal_year
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'gp_name',
@@ -13469,6 +16938,12 @@ ORDER BY v.gp_name, v.fiscal_year
             'What is the year-wise total expenditure of a given gram panchayat?',
             'What is the year-wise total expenditure of a given district?',
             'What is the year-wise total expenditure of a given block?',
+            'What is the year-wise total expenditure of a given gram panchayat, in the main GPDP?',
+            'What is the year-wise total expenditure of a given gram panchayat, for ongoing activities?',
+            'What is the year-wise total expenditure of a given gram panchayat, under a given focus area?',
+            'What is the year-wise total expenditure of a given gram panchayat, under a given LSDG theme?',
+            'What is the year-wise total expenditure of a given gram panchayat, under a given scheme?',
+            'What is the year-wise total expenditure of a given gram panchayat, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -13491,6 +16966,12 @@ WHERE v.is_admin_approved = 1
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY days_since_sanction DESC
 LIMIT $top_n
 """,
@@ -13501,6 +16982,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Unblocked by the sanction date. Measured against today's date, so results move as time passes. Pass $date_range = NULL to sweep every year. Administrative approval now comes from the admin_approval table: 2,101 of 12,704 activities (17%) have a sanction record. A further 140 activities carry an admin_approved_cost with no approval row - v_activity.has_approval_cost_only flags those.",
@@ -13516,6 +17003,12 @@ LIMIT $top_n
             'Which administratively approved activities in a given block still have zero expenditure a given threshold days after sanction?',
             'Which administratively approved activities in a given district still have zero expenditure a given threshold days after sanction?',
             'Which administratively approved activities in a given gram panchayat still have zero expenditure a given threshold days after sanction?',
+            'Which administratively approved activities in a given block still have zero expenditure a given threshold days after sanction, in the main GPDP?',
+            'Which administratively approved activities in a given block still have zero expenditure a given threshold days after sanction, for ongoing activities?',
+            'Which administratively approved activities in a given block still have zero expenditure a given threshold days after sanction, under a given focus area?',
+            'Which administratively approved activities in a given block still have zero expenditure a given threshold days after sanction, under a given LSDG theme?',
+            'Which administratively approved activities in a given block still have zero expenditure a given threshold days after sanction, under a given scheme?',
+            'Which administratively approved activities in a given block still have zero expenditure a given threshold days after sanction, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -13537,6 +17030,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY overrun_amount DESC
 LIMIT $top_n
 """,
@@ -13546,6 +17045,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Monitoring, Alerts & Data Quality',
@@ -13559,6 +17064,12 @@ LIMIT $top_n
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities in a given block have expenditure exceeding their administratively approved cost in a given year?',
             'Which activities in a given gram panchayat have expenditure exceeding their administratively approved cost in a given year?',
+            'Which activities in a given district have expenditure exceeding their administratively approved cost in a given year, in the main GPDP?',
+            'Which activities in a given district have expenditure exceeding their administratively approved cost in a given year, for ongoing activities?',
+            'Which activities in a given district have expenditure exceeding their administratively approved cost in a given year, under a given focus area?',
+            'Which activities in a given district have expenditure exceeding their administratively approved cost in a given year, under a given LSDG theme?',
+            'Which activities in a given district have expenditure exceeding their administratively approved cost in a given year, under a given scheme?',
+            'Which activities in a given district have expenditure exceeding their administratively approved cost in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -13579,6 +17090,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY overrun_pct DESC
 LIMIT $top_n
 """,
@@ -13589,6 +17106,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Monitoring, Alerts & Data Quality',
@@ -13602,6 +17125,12 @@ LIMIT $top_n
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities in a given district have expenditure more than a given threshold percent above estimated cost in a given year?',
             'Which activities in a given gram panchayat have expenditure more than a given threshold percent above estimated cost in a given year?',
+            'Which activities in a given block have expenditure more than a given threshold percent above estimated cost in a given year, in the main GPDP?',
+            'Which activities in a given block have expenditure more than a given threshold percent above estimated cost in a given year, for ongoing activities?',
+            'Which activities in a given block have expenditure more than a given threshold percent above estimated cost in a given year, under a given focus area?',
+            'Which activities in a given block have expenditure more than a given threshold percent above estimated cost in a given year, under a given LSDG theme?',
+            'Which activities in a given block have expenditure more than a given threshold percent above estimated cost in a given year, under a given scheme?',
+            'Which activities in a given block have expenditure more than a given threshold percent above estimated cost in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -13622,6 +17151,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY difference DESC
 LIMIT $top_n
 """,
@@ -13631,6 +17166,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Monitoring, Alerts & Data Quality',
@@ -13644,6 +17185,12 @@ LIMIT $top_n
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities in a given block have a technically approved cost higher than the administratively approved cost in a given year?',
             'Which activities in a given gram panchayat have a technically approved cost higher than the administratively approved cost in a given year?',
+            'Which activities in a given district have a technically approved cost higher than the administratively approved cost in a given year, in the main GPDP?',
+            'Which activities in a given district have a technically approved cost higher than the administratively approved cost in a given year, for ongoing activities?',
+            'Which activities in a given district have a technically approved cost higher than the administratively approved cost in a given year, under a given focus area?',
+            'Which activities in a given district have a technically approved cost higher than the administratively approved cost in a given year, under a given LSDG theme?',
+            'Which activities in a given district have a technically approved cost higher than the administratively approved cost in a given year, under a given scheme?',
+            'Which activities in a given district have a technically approved cost higher than the administratively approved cost in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -13662,6 +17209,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_expenditure DESC
 LIMIT $top_n
 """,
@@ -13671,6 +17223,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "There is no abandonment date, so 'before abandonment' cannot be tested; all expenditure on abandoned activities is returned.",
@@ -13686,6 +17243,11 @@ LIMIT $top_n
             'Which abandoned activities in a given district had expenditure incurred, and how much in a given year?',
             'Which abandoned activities in a given block had expenditure incurred, and how much in a given year?',
             'Which abandoned activities in a given gram panchayat had expenditure incurred, and how much in a given year?',
+            'Which abandoned activities in a given district had expenditure incurred, and how much in a given year, in the main GPDP?',
+            'Which abandoned activities in a given district had expenditure incurred, and how much in a given year, under a given focus area?',
+            'Which abandoned activities in a given district had expenditure incurred, and how much in a given year, under a given LSDG theme?',
+            'Which abandoned activities in a given district had expenditure incurred, and how much in a given year, under a given scheme?',
+            'Which abandoned activities in a given district had expenditure incurred, and how much in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -13790,6 +17352,11 @@ WHERE v.is_admin_approved = 1
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY days_since_sanction DESC
 LIMIT $top_n
 """,
@@ -13800,6 +17367,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Unblocked by the sanction date. 'Not started' means the status is not WORK ONGOING or WORK COMPLETED.",
@@ -13815,6 +17387,11 @@ LIMIT $top_n
             'Which activities approved more than a given threshold days ago in a given block are still not started?',
             'Which activities approved more than a given threshold days ago in a given district are still not started?',
             'Which activities approved more than a given threshold days ago in a given gram panchayat are still not started?',
+            'Which activities approved more than a given threshold days ago in a given block are still not started, in the main GPDP?',
+            'Which activities approved more than a given threshold days ago in a given block are still not started, under a given focus area?',
+            'Which activities approved more than a given threshold days ago in a given block are still not started, under a given LSDG theme?',
+            'Which activities approved more than a given threshold days ago in a given block are still not started, under a given scheme?',
+            'Which activities approved more than a given threshold days ago in a given block are still not started, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -13834,6 +17411,7 @@ WHERE p.fiscal_year = $date_range
   AND p.is_approved = 1
   AND ($district_name IS NULL OR p.district_name = $district_name)
   AND ($block_name    IS NULL OR p.block_name    = $block_name)
+  AND ($plan_type IS NULL OR p.plan_type = $plan_type)
 GROUP BY 1,2,3
 HAVING COALESCE(SUM(a.is_admin_approved),0) = 0
 ORDER BY total_activities DESC
@@ -13842,6 +17420,7 @@ ORDER BY total_activities DESC
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -13860,6 +17439,7 @@ ORDER BY total_activities DESC
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which GPs in a given block have an approved plan but no administratively approved activities in a given year?',
             'Which GPs in a given district have an approved plan but no administratively approved activities in a given year?',
+            'Which GPs in a given block have an approved plan but no administratively approved activities in a given year, in the main GPDP?',
             # ── end derived ──
         ],
     },
@@ -13877,6 +17457,11 @@ SELECT v.block_name, v.district_name,
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 HAVING 100.0 * SUM(v.is_completed) / NULLIF(COUNT(*),0) < $threshold
 ORDER BY completion_rate_pct ASC
@@ -13885,6 +17470,11 @@ ORDER BY completion_rate_pct ASC
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'threshold', 'entity_type': 'threshold'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -13901,6 +17491,11 @@ ORDER BY completion_rate_pct ASC
             'Which blocks in a given District are below a given Threshold percent activity completion at mid-year of a given Plan Year?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which blocks in a given district are below a given threshold percent activity completion in a given year?',
+            'Which blocks in a given district are below a given threshold percent activity completion in a given year, in the main GPDP?',
+            'Which blocks in a given district are below a given threshold percent activity completion in a given year, under a given focus area?',
+            'Which blocks in a given district are below a given threshold percent activity completion in a given year, under a given LSDG theme?',
+            'Which blocks in a given district are below a given threshold percent activity completion in a given year, under a given scheme?',
+            'Which blocks in a given district are below a given threshold percent activity completion in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -13920,6 +17515,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_expenditure DESC
 LIMIT $top_n
 """,
@@ -13929,6 +17529,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Rewritten: the original compared status against asset stages, which do not exist. This instead flags activities reported as started or completed that have no geotagged upload behind them.',
@@ -13944,6 +17549,11 @@ LIMIT $top_n
             'Which activities in a given block are marked completed or ongoing but have no progress evidence in a given year?',
             'Which activities in a given district are marked completed or ongoing but have no progress evidence in a given year?',
             'Which activities in a given gram panchayat are marked completed or ongoing but have no progress evidence in a given year?',
+            'Which activities in a given block are marked completed or ongoing but have no progress evidence in a given year, in the main GPDP?',
+            'Which activities in a given block are marked completed or ongoing but have no progress evidence in a given year, under a given focus area?',
+            'Which activities in a given block are marked completed or ongoing but have no progress evidence in a given year, under a given LSDG theme?',
+            'Which activities in a given block are marked completed or ongoing but have no progress evidence in a given year, under a given scheme?',
+            'Which activities in a given block are marked completed or ongoing but have no progress evidence in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -13963,6 +17573,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_expenditure DESC
 LIMIT $top_n
 """,
@@ -13972,6 +17588,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Activities flagged is_costless_activity = 1 are excluded, since a zero cost is legitimate for those. Verified clean: all 7,074 zero-cost activities carry the costless flag, so this returns no rows in every year.',
@@ -13986,6 +17608,12 @@ LIMIT $top_n
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which activities in a given block have a zero or negative estimated cost recorded in a given year?',
             'Which activities in a given gram panchayat have a zero or negative estimated cost recorded in a given year?',
+            'Which activities in a given district have a zero or negative estimated cost recorded in a given year, in the main GPDP?',
+            'Which activities in a given district have a zero or negative estimated cost recorded in a given year, for ongoing activities?',
+            'Which activities in a given district have a zero or negative estimated cost recorded in a given year, under a given focus area?',
+            'Which activities in a given district have a zero or negative estimated cost recorded in a given year, under a given LSDG theme?',
+            'Which activities in a given district have a zero or negative estimated cost recorded in a given year, under a given scheme?',
+            'Which activities in a given district have a zero or negative estimated cost recorded in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -14004,6 +17632,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 HAVING COUNT(*) > 1
 ORDER BY duplicate_count DESC
@@ -14015,6 +17649,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'gp_name',
@@ -14033,6 +17673,12 @@ LIMIT $top_n
             'Which activities within a given gram panchayat share identical descriptions in a given year?',
             'Which activities within a given district share identical descriptions in a given year?',
             'Which activities within a given block share identical descriptions in a given year?',
+            'Which activities within a given gram panchayat share identical descriptions in a given year, in the main GPDP?',
+            'Which activities within a given gram panchayat share identical descriptions in a given year, for ongoing activities?',
+            'Which activities within a given gram panchayat share identical descriptions in a given year, under a given focus area?',
+            'Which activities within a given gram panchayat share identical descriptions in a given year, under a given LSDG theme?',
+            'Which activities within a given gram panchayat share identical descriptions in a given year, under a given scheme?',
+            'Which activities within a given gram panchayat share identical descriptions in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -14056,6 +17702,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY ABS(v.fund_sanctioned_total - COALESCE(v.admin_approved_cost,0)) DESC
 LIMIT $top_n
 """,
@@ -14065,6 +17717,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Unblocked by admin_approval_scheme. Compares the sum of scheme-wise sanctioned funds against the administratively approved cost for the same activity. A tolerance of 1 rupee absorbs rounding.',
@@ -14080,6 +17738,12 @@ LIMIT $top_n
             'For which activities in a given block does the sanctioned scheme funding not equal the approved cost in a given year?',
             'For which activities in a given district does the sanctioned scheme funding not equal the approved cost in a given year?',
             'For which activities in a given gram panchayat does the sanctioned scheme funding not equal the approved cost in a given year?',
+            'For which activities in a given block does the sanctioned scheme funding not equal the approved cost in a given year, in the main GPDP?',
+            'For which activities in a given block does the sanctioned scheme funding not equal the approved cost in a given year, for ongoing activities?',
+            'For which activities in a given block does the sanctioned scheme funding not equal the approved cost in a given year, under a given focus area?',
+            'For which activities in a given block does the sanctioned scheme funding not equal the approved cost in a given year, under a given LSDG theme?',
+            'For which activities in a given block does the sanctioned scheme funding not equal the approved cost in a given year, under a given scheme?',
+            'For which activities in a given block does the sanctioned scheme funding not equal the approved cost in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -14100,6 +17764,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2,3
 HAVING COALESCE(SUM(COALESCE(v.total_cost,0)),0) = 0
    AND COALESCE(SUM(v.total_expenditure),0) = 0
@@ -14110,6 +17779,11 @@ ORDER BY activities DESC
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -14129,6 +17803,11 @@ ORDER BY activities DESC
             'Which GPs in a given district show all-zero values in the physical-financial comparison for a given year?',
             'Which GPs in a given block show all-zero values in the physical-financial comparison for a given year?',
             'Which GPs in a given gram panchayat show all-zero values in the physical-financial comparison for a given year?',
+            'Which GPs in a given district show all-zero values in the physical-financial comparison for a given year, in the main GPDP?',
+            'Which GPs in a given district show all-zero values in the physical-financial comparison for a given year, under a given focus area?',
+            'Which GPs in a given district show all-zero values in the physical-financial comparison for a given year, under a given LSDG theme?',
+            'Which GPs in a given district show all-zero values in the physical-financial comparison for a given year, under a given scheme?',
+            'Which GPs in a given district show all-zero values in the physical-financial comparison for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -14153,6 +17832,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_expenditure DESC
 LIMIT $top_n
 """,
@@ -14162,6 +17847,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Verified clean: all 1,911 activities with expenditure above zero have at least one linked voucher, so this query correctly returns no rows in every year. It is worth keeping as an ongoing check.',
@@ -14177,6 +17868,12 @@ LIMIT $top_n
             'Which activities in a given block report expenditure but have no payment vouchers in a given year?',
             'Which activities in a given district report expenditure but have no payment vouchers in a given year?',
             'Which activities in a given gram panchayat report expenditure but have no payment vouchers in a given year?',
+            'Which activities in a given block report expenditure but have no payment vouchers in a given year, in the main GPDP?',
+            'Which activities in a given block report expenditure but have no payment vouchers in a given year, for ongoing activities?',
+            'Which activities in a given block report expenditure but have no payment vouchers in a given year, under a given focus area?',
+            'Which activities in a given block report expenditure but have no payment vouchers in a given year, under a given LSDG theme?',
+            'Which activities in a given block report expenditure but have no payment vouchers in a given year, under a given scheme?',
+            'Which activities in a given block report expenditure but have no payment vouchers in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -14196,12 +17893,22 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Separates genuinely missing focus areas from codes that exist but are not in the decoder.',
@@ -14217,6 +17924,11 @@ WHERE v.fiscal_year = $date_range
             'How many activities in a given district have no focus area recorded for a given year?',
             'How many activities in a given block have no focus area recorded for a given year?',
             'How many activities in a given gram panchayat have no focus area recorded for a given year?',
+            'How many activities in a given district have no focus area recorded for a given year, in the main GPDP?',
+            'How many activities in a given district have no focus area recorded for a given year, for ongoing activities?',
+            'How many activities in a given district have no focus area recorded for a given year, under a given LSDG theme?',
+            'How many activities in a given district have no focus area recorded for a given year, under a given scheme?',
+            'How many activities in a given district have no focus area recorded for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -14236,6 +17948,10 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
 ORDER BY v.total_expenditure DESC
 LIMIT $top_n
 """,
@@ -14245,6 +17961,10 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'This is the single biggest data-quality gap: asset detail is missing on roughly two-thirds of asset rows.',
@@ -14259,6 +17979,10 @@ LIMIT $top_n
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which asset-creating activities in a given district have no asset details recorded in a given year?',
             'Which asset-creating activities in a given gram panchayat have no asset details recorded in a given year?',
+            'Which asset-creating activities in a given block have no asset details recorded in a given year, in the main GPDP?',
+            'Which asset-creating activities in a given block have no asset details recorded in a given year, for ongoing activities?',
+            'Which asset-creating activities in a given block have no asset details recorded in a given year, under a given focus area?',
+            'Which asset-creating activities in a given block have no asset details recorded in a given year, under a given LSDG theme?',
             # ── end derived ──
         ],
     },
@@ -14283,6 +18007,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.admin_approved_cost DESC
 LIMIT $top_n
 """,
@@ -14292,6 +18022,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Unblocked by the new approval tables. Sanction dates are 100% populated, so this mostly surfaces the 'NR' placeholder in technical order numbers (3.5% of rows) and stray authority values.",
@@ -14307,6 +18043,12 @@ LIMIT $top_n
             'Which administratively approved activities in a given block have a missing sanction order date or authority in a given year?',
             'Which administratively approved activities in a given district have a missing sanction order date or authority in a given year?',
             'Which administratively approved activities in a given gram panchayat have a missing sanction order date or authority in a given year?',
+            'Which administratively approved activities in a given block have a missing sanction order date or authority in a given year, in the main GPDP?',
+            'Which administratively approved activities in a given block have a missing sanction order date or authority in a given year, for ongoing activities?',
+            'Which administratively approved activities in a given block have a missing sanction order date or authority in a given year, under a given focus area?',
+            'Which administratively approved activities in a given block have a missing sanction order date or authority in a given year, under a given LSDG theme?',
+            'Which administratively approved activities in a given block have a missing sanction order date or authority in a given year, under a given scheme?',
+            'Which administratively approved activities in a given block have a missing sanction order date or authority in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -14325,12 +18067,22 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 """,
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "bracket": 'Monitoring, Alerts & Data Quality',
@@ -14345,6 +18097,11 @@ WHERE v.fiscal_year = $date_range
             'How many activities in a given district have no funding scheme recorded for a given year?',
             'How many activities in a given block have no funding scheme recorded for a given year?',
             'How many activities in a given gram panchayat have no funding scheme recorded for a given year?',
+            'How many activities in a given district have no funding scheme recorded for a given year, in the main GPDP?',
+            'How many activities in a given district have no funding scheme recorded for a given year, for ongoing activities?',
+            'How many activities in a given district have no funding scheme recorded for a given year, under a given focus area?',
+            'How many activities in a given district have no funding scheme recorded for a given year, under a given LSDG theme?',
+            'How many activities in a given district have no funding scheme recorded for a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -14365,6 +18122,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING 100.0 * SUM(v.is_completed) / NULLIF(COUNT(*),0) < $threshold
 ORDER BY approved_cost DESC
@@ -14377,6 +18139,11 @@ LIMIT $top_n
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'threshold', 'entity_type': 'threshold'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Only 17 activities database-wide are complete, so almost every focus area falls below any threshold.',
@@ -14392,6 +18159,11 @@ LIMIT $top_n
             'Which focus areas in a given gram panchayat have high approved cost but completion below a given threshold percent in a given year?',
             'Which focus areas in a given district have high approved cost but completion below a given threshold percent in a given year?',
             'Which focus areas in a given block have high approved cost but completion below a given threshold percent in a given year?',
+            'Which focus areas in a given gram panchayat have high approved cost but completion below a given threshold percent in a given year, in the main GPDP?',
+            'Which focus areas in a given gram panchayat have high approved cost but completion below a given threshold percent in a given year, under a given focus area?',
+            'Which focus areas in a given gram panchayat have high approved cost but completion below a given threshold percent in a given year, under a given LSDG theme?',
+            'Which focus areas in a given gram panchayat have high approved cost but completion below a given threshold percent in a given year, under a given scheme?',
+            'Which focus areas in a given gram panchayat have high approved cost but completion below a given threshold percent in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -14413,6 +18185,12 @@ SELECT v.block_name, v.district_name,
 FROM v_activity v
 WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY pct_pending DESC, pct_utilised ASC
 LIMIT $top_n
@@ -14421,6 +18199,12 @@ LIMIT $top_n
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -14437,6 +18221,12 @@ LIMIT $top_n
             'Which blocks in a given District combine high pending sanctions with low expenditure in a given Plan Year?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which blocks in a given district combine high pending sanctions with low expenditure in a given year?',
+            'Which blocks in a given district combine high pending sanctions with low expenditure in a given year, in the main GPDP?',
+            'Which blocks in a given district combine high pending sanctions with low expenditure in a given year, for ongoing activities?',
+            'Which blocks in a given district combine high pending sanctions with low expenditure in a given year, under a given focus area?',
+            'Which blocks in a given district combine high pending sanctions with low expenditure in a given year, under a given LSDG theme?',
+            'Which blocks in a given district combine high pending sanctions with low expenditure in a given year, under a given scheme?',
+            'Which blocks in a given district combine high pending sanctions with low expenditure in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -14456,6 +18246,10 @@ WHERE 1=1
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
 GROUP BY 1
 HAVING COUNT(*) FILTER (WHERE v.work_type_label = 'Maintenance') > 0
 ORDER BY years_with_maintenance DESC, maintenance_activities DESC
@@ -14466,6 +18260,10 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Pooled across all years because a single year cannot show repeat maintenance. asset_subcategory is missing on two-thirds of rows.',
@@ -14481,6 +18279,10 @@ LIMIT $top_n
             'Which asset sub-categories in a given block show the highest repeat-maintenance frequency in a given year?',
             'Which asset sub-categories in a given district show the highest repeat-maintenance frequency in a given year?',
             'Which asset sub-categories in a given gram panchayat show the highest repeat-maintenance frequency in a given year?',
+            'Which asset sub-categories in a given block show the highest repeat-maintenance frequency in a given year, in the main GPDP?',
+            'Which asset sub-categories in a given block show the highest repeat-maintenance frequency in a given year, for ongoing activities?',
+            'Which asset sub-categories in a given block show the highest repeat-maintenance frequency in a given year, under a given focus area?',
+            'Which asset sub-categories in a given block show the highest repeat-maintenance frequency in a given year, under a given LSDG theme?',
             # ── end derived ──
         ],
     },
@@ -14503,6 +18305,11 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.admin_approved_cost DESC
 LIMIT $top_n
 """,
@@ -14513,6 +18320,11 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "There is no date on activities, so 'with one quarter left' cannot be evaluated; the whole year is used.",
@@ -14528,6 +18340,11 @@ LIMIT $top_n
             'Which ongoing activities in a given block have spent less than a given threshold percent of their sanctioned cost in a given year?',
             'Which ongoing activities in a given district have spent less than a given threshold percent of their sanctioned cost in a given year?',
             'Which ongoing activities in a given gram panchayat have spent less than a given threshold percent of their sanctioned cost in a given year?',
+            'Which ongoing activities in a given block have spent less than a given threshold percent of their sanctioned cost in a given year, in the main GPDP?',
+            'Which ongoing activities in a given block have spent less than a given threshold percent of their sanctioned cost in a given year, under a given focus area?',
+            'Which ongoing activities in a given block have spent less than a given threshold percent of their sanctioned cost in a given year, under a given LSDG theme?',
+            'Which ongoing activities in a given block have spent less than a given threshold percent of their sanctioned cost in a given year, under a given scheme?',
+            'Which ongoing activities in a given block have spent less than a given threshold percent of their sanctioned cost in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },
@@ -14549,6 +18366,12 @@ WHERE v.fiscal_year = $date_range
   AND ($district_name IS NULL OR v.district_name = $district_name)
   AND ($block_name    IS NULL OR v.block_name    = $block_name)
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($status IS NULL OR v.status_label = $status)
+  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY unspent_balance DESC
 LIMIT $top_n
@@ -14559,6 +18382,12 @@ LIMIT $top_n
             {'name': 'block_name', 'entity_type': 'block', 'optional': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -14578,6 +18407,12 @@ LIMIT $top_n
             'Which GPs in a given block have the largest unspent balance in a given year?',
             'Which GPs in a given district have the largest unspent balance in a given year?',
             'Which GPs in a given gram panchayat have the largest unspent balance in a given year?',
+            'Which GPs in a given block have the largest unspent balance in a given year, in the main GPDP?',
+            'Which GPs in a given block have the largest unspent balance in a given year, for ongoing activities?',
+            'Which GPs in a given block have the largest unspent balance in a given year, under a given focus area?',
+            'Which GPs in a given block have the largest unspent balance in a given year, under a given LSDG theme?',
+            'Which GPs in a given block have the largest unspent balance in a given year, under a given scheme?',
+            'Which GPs in a given block have the largest unspent balance in a given year, funded from tied grants?',
             # ── end derived ──
         ],
     },

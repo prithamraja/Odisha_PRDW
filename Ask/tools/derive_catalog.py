@@ -308,7 +308,7 @@ PARAM_ENTITY_TYPES = {
     "gp_name": "gp", "gp_name_2": "gp_2",
     "focus_area": "focus_area", "theme": "theme",
     "scheme": "scheme", "scheme_2": "scheme_2", "status": "status",
-    "plan_type": "plan_type",
+    "plan_type": "plan_type", "tied_untied": "tied_untied",
     "asset_category": "asset_category", "asset_sub_category": "asset_subcategory",
     "activity_code": "activity_code", "top_n": "top_n",
     "threshold": "threshold", "amount_threshold": "amount_threshold",
@@ -628,12 +628,32 @@ def token_form(abstract: str) -> str:
                   abstract or "")
 
 
+# WP-6 T2: how each universal filter reads when appended to a question. ONE line
+# per dimension per template, and only for a dimension the question does not
+# already name — a universal slot is invisible to retrieval unless some line
+# mentions it ("main GPDP totals" will not reach PLN-024 on the word "main"
+# otherwise), and the retriever scores a template as the MAX over its vectors, so
+# these can raise their own template and cannot crowd the window (brief §3).
+# "Sector" is deliberately absent: the operator ruled it is not assumed to mean
+# focus area (2026-09-12).
+DIMENSION_SUFFIX = {
+    "plan_type":   "in the main GPDP",
+    "status":      "for ongoing activities",
+    "focus_area":  "under a given focus area",
+    "theme":       "under a given LSDG theme",
+    "scheme":      "under a given scheme",
+    "tied_untied": "funded from tied grants",
+}
+
+
 def derived_template_paraphrases(entry: dict, hand: list[str]) -> list[str]:
     """The derived lines for one template, deduplicated against the hand lines.
 
       * the abstract question written out in prose ("a given district");
       * one scope line per optional geography tier (D2), so one consolidated
-        template is retrievable at district, block and GP phrasing.
+        template is retrievable at district, block and GP phrasing;
+      * one line per optional filter DIMENSION the question does not already
+        name (WP-6 T2), from `DIMENSION_SUFFIX`.
     """
     abstract = entry["abstract_question"]
     seen = {to_prose(abstract).lower()} | {h.lower() for h in hand}
@@ -663,6 +683,12 @@ def derived_template_paraphrases(entry: dict, hand: list[str]) -> list[str]:
                 # A naturally state-wide question, which D2 says the same
                 # template must also answer for one district / block / GP.
                 add(f"{to_prose(source).rstrip('?. ')}, {SCOPE_SUFFIX[slot]}?")
+
+    for slot in entry["param_slots"]:
+        name = slot["name"]
+        if (name in DIMENSION_SUFFIX and slot.get("optional")
+                and "{" + name + "}" not in abstract):
+            add(f"{to_prose(source).rstrip('?. ')}, {DIMENSION_SUFFIX[name]}?")
     return out
 
 
@@ -1004,6 +1030,17 @@ _DISAMBIGUATION: dict[str, str] = {
                "filter deliberately does not narrow the table.",
     "DQY-001": "A DATA-QUALITY check on how much of the data decodes at all, not a "
                "programme measure. Do not answer a coverage or spend question with it.",
+    # WP-6 T2. With universal filters many templates accept the same filters,
+    # so the "accepts filters:" line stops telling siblings apart; these two say
+    # what the filters are FOR.
+    "PLN-024": "PLAN TYPE is a filter on ACTIVITIES, not on plans: 'activities in "
+               "the main GPDP' is this entry with plan_type bound, not a plan-count "
+               "question.",
+    "BUD-006": "PLAN TYPE is a filter on ACTIVITIES, not on plans: 'planned cost of "
+               "the main GPDPs' is this entry with plan_type bound.",
+    "PLN-049": "FOCUS AREA is a filter. 'Sector' is NOT assumed to mean focus area "
+               "(operator ruling 2026-09-12): a named value such as 'sanitation "
+               "sector' is a focus area, but 'which sector…' is asked about.",
 }
 
 

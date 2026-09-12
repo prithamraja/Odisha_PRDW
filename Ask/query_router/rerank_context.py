@@ -182,7 +182,7 @@ FAMILY_DESCRIPTIONS: dict[str, dict] = {
     },
 
     'bud_006__budgeting': {
-        "desc": 'TOTALS: How much planned expenditure is allocated to each GPDP theme in a given year. Returns theme, activities, planned_cost, approved_cost, actual_expenditure. One row per theme. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Theme mapping covers 17 of 30 focus areas.',
+        "desc": "TOTALS: How much planned expenditure is allocated to each GPDP theme in a given year. Returns theme, activities, planned_cost, approved_cost, actual_expenditure. One row per theme. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. PLAN TYPE is a filter on ACTIVITIES, not on plans: 'planned cost of the main GPDPs' is this entry with plan_type bound. Caveat: Theme mapping covers 17 of 30 focus areas.",
         "members": ['BUD-006', 'BUD-013'],
     },
 
@@ -777,7 +777,7 @@ FAMILY_DESCRIPTIONS: dict[str, dict] = {
     },
 
     'pln_024__planning': {
-        "desc": 'COUNTS: How many activities are planned under each GPDP theme in a given gram panchayat in a given year. Returns theme, planned_activities, planned_cost. One row per theme. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Themes come from dim_lsdg_theme, which maps only 17 of 30 focus areas;.',
+        "desc": "COUNTS: How many activities are planned under each GPDP theme in a given gram panchayat in a given year. Returns theme, planned_activities, planned_cost. One row per theme. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. PLAN TYPE is a filter on ACTIVITIES, not on plans: 'activities in the main GPDP' is this entry with plan_type bound, not a plan-count question. Caveat: Themes come from dim_lsdg_theme, which maps only 17 of 30 focus areas;.",
         "members": ['PLN-024'],
     },
 
@@ -867,7 +867,7 @@ FAMILY_DESCRIPTIONS: dict[str, dict] = {
     },
 
     'pln_049__planning': {
-        "desc": 'COUNTS: How many activities are planned under a given focus area in a given gram panchayat in a given year. Returns focus_area_name, planned_activities, planned_cost. One row per focus_area_name. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "desc": "COUNTS: How many activities are planned under a given focus area in a given gram panchayat in a given year. Returns focus_area_name, planned_activities, planned_cost. One row per focus_area_name. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. FOCUS AREA is a filter. 'Sector' is NOT assumed to mean focus area (operator ruling 2026-09-12): a named value such as 'sanitation sector' is a focus area, but 'which sector…' is asked about.",
         "members": ['PLN-049'],
     },
 
