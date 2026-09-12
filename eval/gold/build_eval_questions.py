@@ -73,6 +73,10 @@ BRACKET_FILES = [
     "decision_support.jsonl",
     "beneficiaries_dropped.jsonl",
     "out_of_domain.jsonl",
+    # WP-6 T6: the 26 distinct officer questions of Eval_1.xlsx, each as its
+    # canonical phrasing and as the phrasing with the LOWEST lexical overlap
+    # to the catalogue wording.
+    "eval1_officer.jsonl",
 ]
 
 # The clarification reasons the router can emit, mirrored from `_clarify` call

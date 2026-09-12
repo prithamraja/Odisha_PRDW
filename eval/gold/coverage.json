@@ -1,23 +1,23 @@
 {
- "total_questions": 223,
- "in_catalogue_brackets": 213,
+ "total_questions": 275,
+ "in_catalogue_brackets": 265,
  "by_bracket": {
-  "Assets": 11,
+  "Assets": 13,
   "Beneficiaries": 4,
-  "Budgeting & Funding": 27,
+  "Budgeting & Funding": 33,
   "Decision Support": 6,
-  "Expenditure": 24,
-  "Implementation & Progress": 26,
+  "Expenditure": 28,
+  "Implementation & Progress": 38,
   "Monitoring, Alerts & Data Quality": 15,
   "Out of domain": 6,
-  "Planning": 49,
+  "Planning": 75,
   "Sanctions & Approvals": 11,
   "Sanitation (SBM)": 34,
-  "Trends & Comparison": 10
+  "Trends & Comparison": 12
  },
  "by_language": {
   "code_mixed": 53,
-  "en": 136,
+  "en": 188,
   "odia": 19,
   "odia_translit": 15
  },
@@ -25,20 +25,20 @@
   "ambiguity": 11,
   "followup": 12,
   "out_of_domain": 6,
-  "standard": 175,
+  "standard": 227,
   "unanswerable": 19
  },
  "by_expected_behavior": {
-  "answer": 175,
+  "answer": 225,
   "cannot_answer": 19,
-  "clarify": 11,
+  "clarify": 13,
   "context_preserving_reroute": 12,
   "graceful_fallback": 6
  },
  "dashboard_eligible": 80,
  "with_expected_result": 45,
  "needing_sme_review": 37,
- "distinct_workbook_ids_covered": 178,
+ "distinct_workbook_ids_covered": 184,
  "catalogue_distribution": {
   "Planning": 23.7,
   "Budgeting & Funding": 12.7,
@@ -51,32 +51,36 @@
   "Monitoring, Alerts & Data Quality": 6.3,
   "Decision Support": 1.7
  },
- "with_expected_entities": 194,
- "ratified_clarifications": 1,
+ "with_expected_entities": 242,
+ "ratified_clarifications": 3,
  "entity_expectations": {
   "activity_code": 2,
   "amount_threshold": 2,
   "block_name": 42,
   "block_name_2": 1,
-  "date_range": 183,
+  "date_range": 231,
   "date_range_2": 5,
   "deadline": 1,
-  "district_name": 31,
-  "focus_area": 2,
+  "district_name": 33,
+  "focus_area": 12,
   "gp_name": 25,
   "gp_name_2": 1,
+  "group_by": 12,
+  "plan_type": 8,
   "scheme": 9,
   "scheme_2": 1,
-  "status": 6,
+  "status": 14,
   "theme": 6,
-  "threshold": 7
+  "threshold": 7,
+  "tied_untied": 2,
+  "top_n": 4
  },
- "entity_expectations_total": 324,
+ "entity_expectations_total": 418,
  "categorical_expectations": {
   "theme": 6,
   "scheme": 9,
   "scheme_2": 1,
-  "status": 6
+  "status": 14
  },
- "categorical_expectations_total": 22
+ "categorical_expectations_total": 30
 }

@@ -184,3 +184,55 @@ DSS-005,2024-2025 re Bhubaneswar re kaun chalu kama manjuri rashira 25 percent t
 DSS-002,Which blocks in Khordha combine high pending sanctions with low expenditure in 2024-25?,Decision Support,en
 DSS-001,Andhrua me kaun se focus area ka approved cost zyada hai lekin completion 50 percent se kam hai 2024-25 me?,Decision Support,code_mixed
 DSS-003,Which asset sub-categories in Bhubaneswar show the highest repeat-maintenance frequency in 2024-2025?,Decision Support,en
+BUD-006,What is the total budget outlay planned across all main GPDPs for 2024 to 2025?,Budgeting & Funding,en
+BUD-006,What's the aggregate budget outlay for all primary GPDPs for 2025 to 2026?,Budgeting & Funding,en
+PLU-008,Which GPs have planned zero-cost activities for 2024 to 2025?,Planning,en
+PLU-008,Which GPs proposed activities costing zero rupees for 2024 to 2025?,Planning,en
+STS-003,How many sanitation activities have been completed under Swachh Bharat for 2025 to 2026?,Implementation & Progress,en
+STS-003,What is the count of finished sanitation projects for Swachh Bharat for 2025 to 2026?,Implementation & Progress,en
+EXP-004,What is the total unspent balance across all GPs in the state for 2020 to 2021?,Expenditure,en
+EXP-004,What is the aggregate unutilized balance for all GPs in the state for 2020 to 2021?,Expenditure,en
+EXP-009,Show the breakdown of tied fund expenditure by sector (water vs sanitation) for 2025 to 2026.,Expenditure,en
+EXP-009,Show me the distribution of tied funds spent on water versus sanitation for 2025 to 2026.,Expenditure,en
+BUD-006,What is the total allocation for the 9 Sankalp themes state-wide for 2024 to 2025?,Budgeting & Funding,en
+BUD-006,Total state-wide funding for the 9 Sankalp themes for 2025 to 2026.,Budgeting & Funding,en
+PLN-032,List the GPs that have not allocated any funds to Sankalp themes for 2025 to 2026.,Planning,en
+PLN-032,Find GPs that have zero funds allocated toward Sankalp themes for 2025 to 2026.,Planning,en
+PLN-001,How many GPs have uploaded their main GPDP for FY 2025-26?,Planning,en
+PLN-001,Count the GPs that completed main GPDP uploads for FY 25-26.,Planning,en
+PLN-005,List the GPs that have not yet uploaded any GPDP for 2024 to 2026.,Planning,en
+PLN-005,Which GPs failed to upload any GPDP so far for 2024 to 2025?,Planning,en
+PLN-002,What is the total number of supplementary plans approved state-wide for 2025 to 2026?,Planning,en
+PLN-002,Provide the total number of approved supplementary plans at the state level for 2024 to 2025.,Planning,en
+PLU-004,How many GPs have submitted at least one supplementary plan in Ganjam district for 2024 to 2025?,Planning,en
+PLU-004,Count the GPs from Ganjam that have at least one supplementary plan for 2025 to 2026.,Planning,en
+PLN-024,What is the total number of activities planned in the main GPDPs for 2025 to 2026?,Planning,en
+PLN-024,What is the overall number of activities proposed in main GPDPs for 2025 to 2026?,Planning,en
+PLN-031,Which GP has the highest number of planned activities for 2024 to 2025?,Planning,en
+PLN-031,Identify the GP with the highest activity count for 2024 to 2025.,Planning,en
+BUD-006,What is the total estimated cost of all planned activities state-wide for 2024 to 2026?,Budgeting & Funding,en
+BUD-006,State-wide total of estimated costs for all activities for 2025 to 2026.,Budgeting & Funding,en
+PLN-024,Show the breakdown of planned activities by theme for 2024 to 2025.,Planning,en
+PLN-024,How are planned activities distributed across different themes for 2024 to 2025?,Planning,en
+PLN-049,How many activities are planned under the sanitation sector for 2024 to 2025?,Planning,en
+PLN-049,Number of activities proposed within the sanitation category for 2024 to 2025.,Planning,en
+PLN-031,Which GP has planned the most activities under piped water supply for 2024 to 2025?,Planning,en
+PLN-031,Find the GP with the greatest count of piped water supply plans for 2024 to 2026.,Planning,en
+PLN-014,How many GPs have their GPDPs still pending approval for 2024 to 2026?,Planning,en
+PLN-014,Count of GPs with GPDPs in pending approval status for 2024 to 2025.,Planning,en
+STS-003,How many activities have been completed across the state for 2025 to 2026?,Implementation & Progress,en
+STS-003,What is the total completed activity count for all districts in 2025 to 2026?,Implementation & Progress,en
+STS-003,How many activities are in progress during 2024 to 2025?,Implementation & Progress,en
+STS-003,Give the total count of activities currently in progress for 2024 to 2025.,Implementation & Progress,en
+IMP-005,Which sector has the best activity completion rate for 2024 to 2026?,Implementation & Progress,en
+IMP-005,Identify the sector with the highest percentage of completed activities for 2024 to 2026.,Implementation & Progress,en
+STS-003,How many road construction activities are in progress for 2024 to 2026?,Implementation & Progress,en
+STS-003,What is the number of road works currently in progress for 2024 to 2026?,Implementation & Progress,en
+PLN-007,Which districts are behind on GPDP submission for 2024 to 2026?,Planning,en
+PLN-007,Identify districts with delayed GPDP submissions for 2024 to 2026.,Planning,en
+PHY-006,Which GPs have expenditure recorded but zero physical progress for 2024 to 2025?,Implementation & Progress,en
+PHY-006,Find GPs with non-zero expenditure and zero physical progress for 2024 to 2025.,Implementation & Progress,en
+AST-001,Give a district-wise summary of asset creation for 2024 to 2025.,Assets,en
+AST-001,Show asset creation totals across all districts for 2024 to 2025.,Assets,en
+TRD-003,Show a five-year time series of fund utilization for 2025 to 2026.,Trends & Comparison,en
+TRD-003,Give a time-series view of fund utilization covering the previous five years for 2025 to 2026.,Trends & Comparison,en
