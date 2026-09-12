@@ -1415,6 +1415,21 @@ def contract_problems(catalog: dict) -> list[str]:
                 if "default" in slot:
                     problems.append(f"{qid} ${name}: only {sorted(DEFAULTED_SLOTS)} may "
                                     f"carry a default (D18.P1/P2)")
+            # WP-6 T4: a list-capable slot filters with IN (SELECT UNNEST($slot))
+            # and nothing else; a scalar slot never does. The flag is what the
+            # binders read, so the two must agree — or a bare scalar reaches a
+            # list filter (a binder error) and a list reaches an equality (a
+            # silently empty answer).
+            unnest = f"UNNEST(${name})" in sql
+            equality = bool(re.search(r"=\s*\$" + re.escape(name) + r"\b",
+                                      mask_literals(sql)))
+            if slot.get("list") and (not unnest or equality):
+                problems.append(
+                    f"{qid} ${name}: marked list but the SQL "
+                    + ("still compares it with =" if equality else "has no UNNEST"))
+            if not slot.get("list") and unnest:
+                problems.append(f"{qid} ${name}: filters with UNNEST but carries "
+                                f"no list flag")
             if name in CODE_BOUND and slot.get("bind") != "code":
                 problems.append(f"{qid} ${name}: a GP slot must bind a code (D4/D10)")
     return problems

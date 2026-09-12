@@ -148,15 +148,24 @@ class T2UniversalSlotStructureTests(unittest.TestCase):
                     self.assertTrue(slot.get("optional"))
                     self.assertNotIn("default", slot)
                     col = UNIVERSAL[slot["name"]]
-                    idiom = re.compile(r"\(\$%s IS NULL OR \w+\.%s = \$%s\)"
-                                       % (slot["name"], col, slot["name"]))
-                    self.assertRegex(entry["sql_template"], idiom)
+                    name = slot["name"]
+                    scalar = re.compile(r"\(\$%s\s+IS NULL OR \w+\.%s\s*= \$%s\)"
+                                        % (name, col, name))
+                    # WP-6 T4 rewrote the same idiom to bind a LIST; the slot's
+                    # flag and the form it is written in must agree.
+                    listed = re.compile(
+                        r"\(\$%s\s+IS NULL OR \w+\.%s\s*IN \(SELECT UNNEST\(\$%s\)\)\)"
+                        % (name, col, name))
+                    form = listed if slot.get("list") else scalar
+                    self.assertRegex(entry["sql_template"], form)
 
     def test_a_statement_that_owns_a_dimension_keeps_it(self):
         """STS-003 already filters on $status; PLU-004 fixes the plan type as
         'Supplementary'. Neither may gain a second predicate on the column."""
+        import re
         from query_router.template_catalog import TEMPLATE_CATALOG as T
-        self.assertEqual(T["STS-003"]["sql_template"].count("v.status_label ="), 1)
+        status = re.findall(r"v\.status_label\s*(?:=|IN)", T["STS-003"]["sql_template"])
+        self.assertEqual(len(status), 1, "one status predicate, not two")
         self.assertNotIn("plan_type", {s["name"] for s in T["PLU-004"]["param_slots"]})
 
     def test_the_no_data_in_any_module_questions_stay_unfiltered(self):
@@ -456,6 +465,136 @@ class T3RouterTests(unittest.TestCase):
         self.assertEqual(result.clarification.reason, "ambiguous_term")
         self.assertEqual([c.label for c in result.clarification.options],
                          ["By focus area", "By LSDG theme"])
+
+
+class T4YearSpanTests(unittest.TestCase):
+    """"2024 to 2026" is a span of fiscal years, and "2024 to 2025" is one."""
+
+    YEARS = ["2020-2021", "2021-2022", "2022-2023", "2023-2024", "2024-2025",
+             "2025-2026"]
+
+    def test_spans(self):
+        from query_router.date_phrase import resolve_fiscal_years
+        for question, want in (
+                ("What is the total unspent balance for 2024 to 2025?", ["2024-2025"]),
+                ("Compare tied fund spending for 2024 to 2026.",
+                 ["2024-2025", "2025-2026"]),
+                ("activities planned for 2022 through 2025",
+                 ["2022-2023", "2023-2024", "2024-2025"]),
+                ("GPDP uploads in FY 2025-26", ["2025-2026"]),
+                ("2024-25 vs 2023-24", ["2023-2024", "2024-2025"])):
+            with self.subTest(question=question):
+                self.assertEqual(resolve_fiscal_years(question, self.YEARS), want)
+
+    def test_the_reader_refuses_a_span_the_data_does_not_hold(self):
+        """Whole-or-nothing: answering about the loaded half of "2019 to 2022"
+        would be a smaller answer wearing the question's words."""
+        from query_router import router
+        from types import SimpleNamespace
+        validator = SimpleNamespace(fiscal_years=lambda: self.YEARS)
+        self.assertEqual(
+            router._fiscal_years_from_text("spend for 2019 to 2022", validator), [])
+        self.assertEqual(
+            router._fiscal_years_from_text("spend for 2021 to 2023", validator),
+            ["2021-2022", "2022-2023"])
+
+
+@unittest.skipIf(_adapter() is None, f"no sample database at {_DB_PATH}")
+class T4ListFilterTests(unittest.TestCase):
+    """The brief's own two proofs, executed."""
+
+    def _rows(self, qid, values):
+        from query_router.template_catalog import bind
+        sql, params = bind(qid, values)
+        return _adapter().execute(sql, params).fetchall()
+
+    def test_a_single_value_still_binds(self):
+        """Every Test Report sample is a scalar; the binder wraps it."""
+        from query_router.template_catalog import TEMPLATE_CATALOG as T, bind
+        _, params = bind("EXP-009", {"date_range": "2024-2025",
+                                     "focus_area": "Sanitation"})
+        self.assertEqual(params["focus_area"], ["Sanitation"])
+        self.assertEqual(params["date_range"], ["2024-2025"])
+        self.assertTrue(any(s["name"] == "focus_area" and s.get("list")
+                            for s in T["EXP-009"]["param_slots"]))
+
+    def test_exp009_two_values_equal_two_scalar_calls(self):
+        base = {"date_range": "2024-2025", "tied_untied": "Tied"}
+        both = self._rows("EXP-009", {**base,
+                                      "focus_area": ["Drinking water", "Sanitation"]})
+        singles = [self._rows("EXP-009", {**base, "focus_area": one})
+                   for one in ("Drinking water", "Sanitation")]
+        self.assertEqual(len(both), sum(len(rows) for rows in singles))
+        # column 4 is actual_expenditure; the two values are never summed into one
+        self.assertEqual(sorted(row[4] for row in both),
+                         sorted(row[4] for rows in singles for row in rows))
+
+    def test_pln001_a_two_year_span_equals_the_two_years(self):
+        span = self._rows("PLN-001", {"date_range": ["2024-2025", "2025-2026"],
+                                      "group_by": "fiscal_year"})
+        singles = [self._rows("PLN-001", {"date_range": year})[0][1]
+                   for year in ("2024-2025", "2025-2026")]
+        self.assertEqual(len(span), 2)
+        self.assertEqual(sum(row[1] for row in span), sum(singles))
+
+    def test_one_bad_element_refuses_the_whole_list(self):
+        """Never a silent partial bind: "water and Atlantis" must not answer
+        about water alone."""
+        from query_router import router
+        from query_router.entity_validator import EntityValidator
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        validator = EntityValidator(_adapter())
+        slot_type = router._template_slot_types(T["EXP-009"])
+        validated, clarify = router._fill_slots_or_clarify(
+            "EXP-009", slot_type,
+            {"date_range": "2024-2025", "focus_area": ["Drinking water", "Atlantis"]},
+            validator, "q", "q", 0.0,
+            optional=router.optional_slots(T["EXP-009"]["param_slots"]),
+            list_slots=router._list_slots(T["EXP-009"]["param_slots"]))
+        self.assertIsNotNone(clarify)
+        self.assertFalse(any(e.slot_name == "focus_area" for e in validated))
+
+    def test_a_one_value_at_a_time_statement_asks(self):
+        """PLN-049's focus area is its subject and stays scalar, so two values
+        are a question, not a filter."""
+        from query_router import router
+        from query_router.entity_validator import EntityValidator
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        validator = EntityValidator(_adapter())
+        slot_type = router._template_slot_types(T["PLN-049"])
+        validated, clarify = router._fill_slots_or_clarify(
+            "PLN-049", slot_type,
+            {"date_range": "2024-2025", "focus_area": ["Drinking water", "Sanitation"]},
+            validator, "q", "q", 0.0,
+            optional=router.optional_slots(T["PLN-049"]["param_slots"]),
+            list_slots=router._list_slots(T["PLN-049"]["param_slots"]))
+        self.assertIsNotNone(clarify)
+        self.assertEqual([c.label for c in clarify.clarification.options],
+                         ["Drinking water", "Sanitation"])
+        self.assertEqual(clarify.pending.missing_slot, "focus_area")
+
+    def test_a_comparison_is_grouped_rather_than_summed(self):
+        """PLN-024 counts per theme; two focus areas must land in two rows."""
+        import time
+        from query_router import router
+        from query_router.entity_validator import EntityValidator
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        validator = EntityValidator(_adapter())
+        year = validator.validate("2024-2025", "fiscal_year")
+        year.slot_name = "date_range"
+        focus = validator.validate("Drinking water", "focus_area")
+        focus.slot_name = "focus_area"
+        focus.values = ["Drinking water", "Sanitation"]
+        focus.resolved_value = "Drinking water, Sanitation"
+        result = router._serve_query_id(
+            "PLN-024", [year, focus], None, user_query="q", normalized="q",
+            start=time.monotonic(), cache_conn=_adapter(), dashboard_results={},
+            template_map=T, dashboard_questions={}, start_date=None, end_date=None)
+        self.assertEqual(len(result.result), 2)
+        self.assertEqual({row["focus_area_name"] for row in result.result},
+                         {"Drinking water", "Sanitation"})
+        self.assertIn("broken down by focus area", result.query_description)
+        self.assertIn("Drinking water and Sanitation", result.query_description)
 
 
 if __name__ == "__main__":

@@ -119,6 +119,15 @@ _FY_TWO_RE = re.compile(
     _FY_LABEL + r"(?<!\d)(\d{2})\s*[-–—/]\s*(\d{2})(?!\d)", re.IGNORECASE
 )
 
+# '2024 to 2026' — a SPAN of fiscal years (WP-6 T4), the form Eval_1 uses
+# throughout. It names the years that START in 2024 and in 2025, so "2024 to
+# 2025" is the single year 2024-2025. Read as two bare years instead, "for 2024
+# to 2025" produced 2024-2025 AND 2025-2026, and a one-year slot took the later
+# one — an answer about a year the officer had not asked about.
+_FY_SPAN_RE = re.compile(
+    _FY_LABEL + _YEAR + r"\s*(?:to|till|until|through|thru)\s*(20\d{2})(?!\d)",
+    re.IGNORECASE)
+
 _MONTH_RE = re.compile(rf"\b({_MONTH_ALT})\b{_LINK}{_YEAR}", re.IGNORECASE)
 _BARE_YEAR_RE = re.compile(_YEAR)
 
@@ -271,6 +280,20 @@ def resolve_fiscal_years(text: str, known_years=()) -> list[str]:
                 continue
             starts.append(start)
             consumed.append(span)
+
+    # The SPAN is claimed first: its two years are one phrase, and every scan
+    # below would otherwise read them as separate fiscal years.
+    for m in _FY_SPAN_RE.finditer(text):
+        span = (m.start(1), m.end(2))
+        if any(span[0] < c_end and c_start < span[1] for c_start, c_end in consumed):
+            continue
+        if not _passes_guards(text, *m.span(1)):
+            continue
+        head, tail = int(m.group(1)), int(m.group(2))
+        if tail < head:
+            continue
+        starts.extend(range(head, tail) if tail > head else [head])
+        consumed.append(span)
 
     # Most specific first, so '2024-25' is read once and never also as a bare
     # 2024 plus a stray 25.

@@ -35,6 +35,7 @@ from .models            import (
     RouteTier,
 )
 from .preprocessor      import normalize
+from .date_phrase       import resolve_fiscal_years
 from .intent_catalog    import INTENT_LOOKUP, INTENT_SLOTS
 from .intent_classifier import classify_intent
 from .entity_extractor  import extract_entities
@@ -373,6 +374,7 @@ def _extract_slot_values(
     *,
     validator: EntityValidator | None = None,
     intent: str | None = None,
+    list_slots: set[str] | frozenset[str] = frozenset(),
 ) -> dict[str, str | None]:
     """extract_entities() over the genuinely user-supplied slots, with the
     catalog's constant slots filled in afterwards, and the two things a
@@ -398,9 +400,14 @@ def _extract_slot_values(
             if found is not None:
                 prefilled[slot] = found
         elif etype in _FISCAL_YEAR_ENTITY_TYPES and validator is not None:
-            year = _fiscal_year_from_text(user_query, etype, validator)
-            if year is not None:
-                prefilled[slot] = year
+            if slot in list_slots:
+                years = _fiscal_years_from_text(user_query, validator)
+                if years:
+                    prefilled[slot] = years if len(years) > 1 else years[0]
+            else:
+                year = _fiscal_year_from_text(user_query, etype, validator)
+                if year is not None:
+                    prefilled[slot] = year
         elif etype in _READER_ONLY_ENTITY_TYPES:
             found = breakdown.group_by_from_text(user_query)
             if found is not None:
@@ -431,6 +438,21 @@ def _extract_slot_values(
         if etype in _CONSTANT_ENTITY_TYPES:
             raw[slot] = _CONSTANT_ENTITY_TYPES[etype]
     return raw
+
+
+def _fiscal_years_from_text(user_query: str, validator: EntityValidator) -> list[str]:
+    """EVERY fiscal year the question names, for a slot whose statement filters
+    with `IN (…)` — "2024 to 2026" is two years, "the last three years" three.
+
+    Whole-or-nothing: a span naming a year the data does not hold returns
+    nothing, so the ordinary validation path refuses it by name rather than this
+    quietly answering about the subset that happens to be loaded.
+    """
+    known = validator.fiscal_years()
+    named = resolve_fiscal_years(user_query, known)
+    if not named or any(year not in known for year in named):
+        return []
+    return named
 
 
 def _fiscal_year_from_text(
@@ -589,6 +611,12 @@ def optional_slots(param_slots: list[dict]) -> set[str]:
     return {s["name"] for s in param_slots if s.get("optional")}
 
 
+def _list_slots(param_slots: list[dict]) -> frozenset:
+    """Slot names whose statement filters with `IN (SELECT UNNEST($slot))`, so
+    the question may name several values for them (WP-6 T4)."""
+    return frozenset(s["name"] for s in param_slots if s.get("list"))
+
+
 def slot_defaults(param_slots: list[dict]) -> dict[str, str]:
     """Slot name -> the value to use when the question did not state one.
 
@@ -640,7 +668,13 @@ def _resolve_slot_value(
                 f"'{name}'{context} did not resolve to one record"
             )
         return code
-    return params_by_name.get(name)
+    value = params_by_name.get(name)
+    if value is not None and slot.get("list"):
+        # WP-6 T4: `IN (SELECT UNNEST($slot))` binds a LIST. A single value is a
+        # one-element list, so nothing upstream has to know which slots take
+        # several — and the Test Report's scalar samples still bind.
+        return list(value) if isinstance(value, (list, tuple)) else [value]
+    return value
 
 
 def _check_required(
@@ -784,6 +818,7 @@ def _fill_slots_or_clarify(
     *,
     optional: set[str] | frozenset[str] = frozenset(),
     defaults: dict[str, str] | None = None,
+    list_slots: set[str] | frozenset[str] = frozenset(),
 ) -> tuple[list[ExtractedEntity], RouteResult | None]:
     """Validate every slot value, or return a clarify carrying pending state so
     the user's next message can resume this exact question.
@@ -842,6 +877,50 @@ def _fill_slots_or_clarify(
             # honest if a future path starts supplying the slot from elsewhere.
             _log_fiscal_year_disagreement(user_query, slot, etype, raw_val,
                                           validator)
+
+        if isinstance(raw_val, (list, tuple)):
+            # SEVERAL VALUES FOR ONE SLOT (WP-6 T4). "Water vs sanitation" is a
+            # comparison where the statement can filter on a list, and a
+            # different question where it cannot: binding one of them silently
+            # would answer about half of what was asked, and there is no reading
+            # under which picking for the officer is safe. So a statement that
+            # takes one value at a time ASKS, with the values as chips — a bare
+            # value resolves the pending clarification through the ordinary path.
+            supplied = [v for v in raw_val if v is not None and str(v).strip()]
+            if not supplied:
+                raw_val = None
+            elif len(supplied) == 1:
+                raw_val = supplied[0]
+            elif slot not in list_slots:
+                clarify = _clarify(
+                    "missing_parameter",
+                    f"I can answer that for one {slot.replace('_', ' ')} at a "
+                    f"time. Which did you mean?",
+                    [Chip(label=str(v), send_text=str(v))
+                     for v in supplied[:MAX_CLARIFY_OPTIONS]],
+                    user_query, normalized, start,
+                )
+                clarify.pending = _pending(slot)
+                return [], clarify
+            else:
+                bad = None
+                try:
+                    resolved = [validator.validate(v, etype) for v in supplied]
+                except (EntityNotFound, ClarificationNeeded) as exc:
+                    resolved, bad = None, getattr(exc, "raw_value", None)
+                if resolved is not None:
+                    entity = resolved[0]
+                    entity.slot_name = slot
+                    entity.values = [e.resolved_value for e in resolved]
+                    entity.resolved_value = ", ".join(entity.values)
+                    validated.append(entity)
+                    continue
+                # ONE BAD ELEMENT REFUSES THE WHOLE LIST, and it is the OFFENDING
+                # value that goes to the ordinary validation path below — so the
+                # officer is asked about the value that failed, rather than
+                # answered about the half of their question that happened to
+                # resolve.
+                raw_val = bad if bad is not None else supplied[0]
 
         if raw_val is None:
             # A slot the question implies is filled from its declared default
@@ -1630,6 +1709,7 @@ def serve_pending_answer(
         pending.original_query, normalized, start,
         optional=optional_slots(template["param_slots"]),
         defaults=slot_defaults(template["param_slots"]),
+        list_slots=_list_slots(template["param_slots"]),
     )
     if clarify_result is not None:
         return clarify_result
@@ -1726,6 +1806,15 @@ def _serve_unanswerable(
     return result
 
 
+def _readable_values(entity) -> str:
+    """How a bound value reads in the echo. Several values are NAMED, never
+    summed away into one figure the officer cannot take apart (WP-6 T4)."""
+    values = entity.values or [entity.resolved_value]
+    if len(values) == 1:
+        return str(values[0])
+    return ", ".join(str(v) for v in values[:-1]) + f" and {values[-1]}"
+
+
 def _serve_query_id(
     query_id: str,
     validated_entities: list,
@@ -1779,6 +1868,16 @@ def _serve_query_id(
     validated_entities = breakdown.drop_unsupported(template, validated_entities)
     group_by = next((e.resolved_value for e in validated_entities
                      if e.slot_name == "group_by"), None)
+    if group_by is None:
+        # A list of values on ONE dimension is a comparison: group by that
+        # dimension so the values land in their own rows instead of one summed
+        # figure (WP-6 T4).
+        group_by = breakdown.comparison_breakdown(template, validated_entities)
+        if group_by is not None:
+            validated_entities = [*validated_entities, ExtractedEntity(
+                slot_name="group_by", raw_value="(comparison)",
+                resolved_value=group_by, entity_type="group_by",
+                confidence="constant")]
 
     # Build query description with resolved entity values. An Aadhaar is masked
     # to its last four digits — query_description is echoed back to the user and
@@ -1797,7 +1896,7 @@ def _serve_query_id(
             # can check the conversion rather than take it on trust.
             entity_values[e.slot_name] = f"{e.raw_value} (₹{e.resolved_value})"
         else:
-            entity_values[e.slot_name] = e.resolved_value
+            entity_values[e.slot_name] = _readable_values(e)
     # PER-PLACEHOLDER, never all-or-nothing. `.format(**entity_values)` raises
     # KeyError on the first unbound slot and the old fallback echoed the RAW
     # abstract question, throwing away the substitutions that HAD resolved: the
@@ -1819,8 +1918,14 @@ def _serve_query_id(
         r"\bof\s+(\S+)\s+of\s+\1\b", r"of \1", query_description, flags=re.IGNORECASE
     )
     query_description = breakdown.describe(query_description, group_by)
+    if group_by is None and any(e.values and len(e.values) > 1
+                                for e in validated_entities):
+        # Nothing could separate them, so say they were added together rather
+        # than leaving one figure standing for two questions.
+        query_description = f"{query_description} (the values combined)"  # noqa: E501
 
-    params_by_name = {e.slot_name: e.resolved_value for e in validated_entities}
+    params_by_name = {e.slot_name: (e.values if e.values else e.resolved_value)
+                      for e in validated_entities}
     person_ids = {
         e.slot_name: e.resolved_code for e in validated_entities if e.resolved_code
     }
@@ -2096,15 +2201,17 @@ def _route_vector(
     if query_id in template_map:
         slot_type = _template_slot_types(template_map[query_id])
         if slot_type:
+            list_slots = _list_slots(template_map[query_id]["param_slots"])
             raw_entities = _extract_slot_values(
                 user_query, slot_type, openai_client,
-                validator=validator, intent=intent,
+                validator=validator, intent=intent, list_slots=list_slots,
             )
             validated_entities, clarify_result = _fill_slots_or_clarify(
                 query_id, slot_type, raw_entities, validator,
                 user_query, normalized, start,
                 optional=optional_slots(template_map[query_id]["param_slots"]),
                 defaults=slot_defaults(template_map[query_id]["param_slots"]),
+                list_slots=list_slots,
             )
             if clarify_result is not None:
                 return clarify_result

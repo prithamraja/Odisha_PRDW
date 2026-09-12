@@ -82,6 +82,13 @@ def _state_wide(template_id: str) -> str:
         "date_range_2": f"'{DASHBOARD_FISCAL_YEAR}'",
         "top_n": str(DASHBOARD_TOP_N),
     }
+    # WP-6 T4: a list-capable slot filters with `IN (SELECT UNNEST($slot))`, and
+    # UNNEST takes a LIST — so its literal is a ONE-ELEMENT list, exactly as the
+    # binder wraps a single value at run time. (An unused slot stays NULL, which
+    # its `$slot IS NULL` guard reads as "no filter" either way.)
+    for slot in template["param_slots"]:
+        if slot.get("list") and slot["name"] in values:
+            values[slot["name"]] = f"[{values[slot['name']]}]"
     slots = {s["name"] for s in template["param_slots"]}
     # Longest name first, so `$date_range` never eats the head of
     # `$date_range_2` and leaves a stray `_2` behind.

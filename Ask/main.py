@@ -1175,7 +1175,9 @@ def query_endpoint(req: QueryRequest):
         intent=result.intent,
         caveat=result.caveat,
         entities=[
-            {"slot": e.slot_name, "value": e.resolved_value, "confidence": e.confidence}
+            {"slot": e.slot_name, "value": e.resolved_value,
+             "confidence": e.confidence,
+             **({"values": e.values} if e.values else {})}
             for e in (result.entities or [])
         ],
         date_range={

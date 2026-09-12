@@ -126,6 +126,10 @@ grant" → "Untied". Return null unless the query names one.
 - For asset_category / asset_subcategory: the asset classification as written, e.g. \
 {asset_category_enum}
 - For activity_code: the activity identifier, copied exactly as given. Never invent one.
+- SEVERAL VALUES FOR ONE SLOT: when the query names more than one value of the \
+SAME slot — "water vs sanitation", "Khordha and Cuttack", "main and supplementary" — \
+return a JSON ARRAY in that slot: ["Drinking water", "Sanitation"]. One value stays a \
+plain string. Never mix two different slots into one array.
 - For numeric slots (top_n, threshold): return a BARE NUMBER with no units, no "%" and \
 no words. Example: "top 20 GPs" → top_n=20. Example: "above 50 percent" → threshold=50. \
 (amount_threshold is the exception — see its own rule below.)
@@ -155,6 +159,8 @@ Q: "activities above 1 lakh in FY 24-25" → {{"amount_threshold": "1 lakh", \
 "fiscal_year": "FY 24-25"}}
 Q: "Compare Attabira and Bheden blocks for drinking water" → {{"block": "Attabira", \
 "block_2": "Bheden", "focus_area": "Drinking water"}}
+Q: "tied fund spend, water vs sanitation, in 2024-25" → {{"focus_area": \
+["Drinking water", "Sanitation"], "fiscal_year": "2024-25"}}
 Q: "How many gram panchayats are there?" → {{}}
 
 Return ONLY a JSON object with these exact keys.

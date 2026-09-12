@@ -181,11 +181,24 @@ def entity_contradictions(rec):
     want = EXPECTED_ENTITIES_BY_N.get(rec.get("n")) or {}
     if not want:
         return []
-    got = {e["slot"]: str(e["value"]) for e in (rec.get("entities") or [])
+    got = {e["slot"]: (e.get("values") or str(e["value"]))
+           for e in (rec.get("entities") or [])
            if isinstance(e, dict) and "slot" in e}
+
+    def _as_list(value):
+        return [str(v) for v in (value if isinstance(value, (list, tuple)) else [value])]
+
+    def _agrees(bound, wanted):
+        # WP-6 T4: a slot may bind SEVERAL values ("water vs sanitation"), and
+        # their order is the question's rather than the answer's — so the two
+        # are compared as sets.
+        if isinstance(bound, (list, tuple)) or isinstance(wanted, (list, tuple)):
+            return sorted(_as_list(bound)) == sorted(_as_list(wanted))
+        return str(bound) == str(wanted)
+
     return [f"{slot}={got[slot]!r} but the gold says {str(value)!r}"
             for slot, value in want.items()
-            if slot in got and got[slot] != str(value)]
+            if slot in got and not _agrees(got[slot], value)]
 
 
 def _as_number(value):

@@ -274,3 +274,64 @@ def focus_area_names(validator) -> list[str]:
     names = set(validator.registry_values("focus_area"))
     names |= set(REGISTRY_CONFIG["focus_area"].get("aliases", {}))
     return sorted((n for n in names if n), key=len, reverse=True)
+
+
+# ── A list of values is a comparison, not a sum (WP-6 T4) ────────────────────
+
+# the slot whose values are compared -> the breakdown that separates them
+SLOT_TO_GROUP = {
+    "focus_area": "focus_area", "theme": "theme", "scheme": "scheme",
+    "status": "status", "plan_type": "plan_type", "district_name": "district",
+    "block_name": "block", "date_range": "fiscal_year",
+}
+
+_GROUP_CLAUSE = re.compile(
+    r"\bGROUP\s+BY\b(.*?)(?:\bHAVING\b|\bORDER\s+BY\b|\bLIMIT\b|$)", re.S | re.I)
+
+
+def _already_separates(sql: str, column: str) -> bool:
+    """True when the statement's own grouping already gives that column a row."""
+    _, absent, _ = _parse(sql)
+    if absent == column:
+        return True
+    # The breakdown CASE names EVERY whitelisted column in its WHEN branches, so
+    # it comes out before asking what the statement groups by — otherwise every
+    # migrated statement looks as though it already separates everything, and no
+    # comparison would ever be grouped.
+    stripped = _CASE_RE.sub("", sql)
+    clause = _GROUP_CLAUSE.search(stripped)
+    if not clause:
+        return False
+    if re.search(rf"\b{re.escape(column)}\b", clause.group(1)):
+        return True
+    # `GROUP BY 1, 2` over a SELECT list that names the column.
+    ordinals = re.fullmatch(r"[\s\d,]+", clause.group(1) or "")
+    # On the KEYWORD, not on " FROM " with spaces: these statements put FROM
+    # at the start of its own line, so a plain split left the WHERE clause (and
+    # its filters, which name every column) inside the "select list".
+    head = re.split(r"\bFROM\b", stripped, maxsplit=1)[0]
+    return bool(ordinals and re.search(rf"\b{re.escape(column)}\b", head))
+
+
+def comparison_breakdown(template: dict, entities) -> str | None:
+    """The breakdown that keeps a multi-value filter side by side, or None.
+
+    "Tied spend, water vs sanitation" names two values of ONE dimension. Added
+    together they answer a question nobody asked, so the statement is grouped by
+    that dimension and the two land in their own rows. None when the statement
+    already reports one row per that dimension (nothing to fix) or cannot group
+    by it at all — the echo then says the values were combined.
+    """
+    offered = template_group_values(template)
+    sql = template.get("sql_template") or ""
+    for entity in entities:
+        values = getattr(entity, "values", None)
+        if not values or len(values) < 2:
+            continue
+        group = SLOT_TO_GROUP.get(entity.slot_name)
+        if group is None or group not in offered:
+            continue
+        if _already_separates(sql, DIMENSIONS[group][0]):
+            continue
+        return group
+    return None

@@ -94,6 +94,12 @@ class ExtractedEntity(BaseModel):
     # public, whereas the AP build's Aadhaar (same mechanism, {"bind":
     # "aadhaar"}) had to be masked. query_description shows resolved_value.
     resolved_code:  Optional[str] = None
+    # Every value bound, when the question named SEVERAL for one slot ("water vs
+    # sanitation") and the statement filters with `IN (SELECT UNNEST($slot))`
+    # (WP-6 T4). None in the ordinary single-value case, and `resolved_value`
+    # always reads them back, so nothing that only displays an answer needs to
+    # know this field exists.
+    values:         Optional[list[str]] = None
 
 class ColumnType(str, Enum):
     DIMENSION       = "dimension"

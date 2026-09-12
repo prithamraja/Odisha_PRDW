@@ -124,20 +124,20 @@ SELECT CASE $group_by
                 ELSE 'All' END AS group_label,
        COUNT(DISTINCT v.gp_lgd_code) AS gps_with_gpdp
 FROM v_plan v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -175,20 +175,20 @@ SELECT CASE $group_by
                 ELSE 'All' END AS group_label,
        COUNT(DISTINCT v.gp_lgd_code) AS gps_approved
 FROM v_plan v
-WHERE v.fiscal_year = $date_range AND v.is_approved = 1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range)) AND v.is_approved = 1
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -222,16 +222,16 @@ SELECT g.block_name AS block_name,
        ROUND(100.0 * COUNT(DISTINCT p.gp_lgd_code)
              / NULLIF(COUNT(DISTINCT g.gp_lgd_code),0), 2) AS pct_uploaded
 FROM gram_panchayat g
-LEFT JOIN plan p ON p.gp_lgd_code = g.gp_lgd_code AND p.fiscal_year = $date_range
-WHERE ($block_name IS NULL OR g.block_name = $block_name)
-  AND ($district_name IS NULL OR g.zp_name = $district_name)
+LEFT JOIN plan p ON p.gp_lgd_code = g.gp_lgd_code AND p.fiscal_year IN (SELECT UNNEST($date_range))
+WHERE ($block_name IS NULL OR g.block_name IN (SELECT UNNEST($block_name)))
+  AND ($district_name IS NULL OR g.zp_name IN (SELECT UNNEST($district_name)))
 GROUP BY 1
 ORDER BY pct_uploaded DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
         ],
         "grouped_geo": [
     'block_name',
@@ -264,16 +264,16 @@ SELECT g.zp_name AS district_name,
        ROUND(100.0 * COUNT(DISTINCT p.gp_lgd_code)
              / NULLIF(COUNT(DISTINCT g.gp_lgd_code),0), 2) AS pct_uploaded
 FROM gram_panchayat g
-LEFT JOIN plan p ON p.gp_lgd_code = g.gp_lgd_code AND p.fiscal_year = $date_range
-WHERE ($block_name IS NULL OR g.block_name = $block_name)
-  AND ($district_name IS NULL OR g.zp_name = $district_name)
+LEFT JOIN plan p ON p.gp_lgd_code = g.gp_lgd_code AND p.fiscal_year IN (SELECT UNNEST($date_range))
+WHERE ($block_name IS NULL OR g.block_name IN (SELECT UNNEST($block_name)))
+  AND ($district_name IS NULL OR g.zp_name IN (SELECT UNNEST($district_name)))
 GROUP BY 1
 ORDER BY pct_uploaded DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -303,15 +303,15 @@ ORDER BY pct_uploaded DESC
 SELECT g.gp_name, g.block_name, g.zp_name AS district_name
 FROM gram_panchayat g
 WHERE NOT EXISTS (SELECT 1 FROM plan p
-                  WHERE p.gp_lgd_code = g.gp_lgd_code AND p.fiscal_year = $date_range)
-  AND ($district_name IS NULL OR g.zp_name = $district_name)
-  AND ($block_name    IS NULL OR g.block_name = $block_name)
+                  WHERE p.gp_lgd_code = g.gp_lgd_code AND p.fiscal_year IN (SELECT UNNEST($date_range)))
+  AND ($district_name IS NULL OR g.zp_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR g.block_name IN (SELECT UNNEST($block_name)))
 ORDER BY g.zp_name, g.block_name, g.gp_name
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Returns zero rows when every loaded GP has a plan for that year.',
@@ -339,15 +339,15 @@ SELECT g.block_name, g.zp_name AS district_name,
        COUNT(DISTINCT g.gp_lgd_code) AS total_gps,
        COUNT(DISTINCT p.gp_lgd_code) AS gps_uploaded
 FROM gram_panchayat g
-LEFT JOIN plan p ON p.gp_lgd_code = g.gp_lgd_code AND p.fiscal_year = $date_range
-WHERE ($district_name IS NULL OR g.zp_name = $district_name)
+LEFT JOIN plan p ON p.gp_lgd_code = g.gp_lgd_code AND p.fiscal_year IN (SELECT UNNEST($date_range))
+WHERE ($district_name IS NULL OR g.zp_name IN (SELECT UNNEST($district_name)))
 GROUP BY 1,2
 HAVING COUNT(DISTINCT p.gp_lgd_code) = COUNT(DISTINCT g.gp_lgd_code)
 ORDER BY total_gps DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -379,13 +379,13 @@ SELECT g.zp_name AS district_name,
        ROUND(100.0 * COUNT(DISTINCT p.gp_lgd_code)
              / NULLIF(COUNT(DISTINCT g.gp_lgd_code),0), 2) AS pct_uploaded
 FROM gram_panchayat g
-LEFT JOIN plan p ON p.gp_lgd_code = g.gp_lgd_code AND p.fiscal_year = $date_range
+LEFT JOIN plan p ON p.gp_lgd_code = g.gp_lgd_code AND p.fiscal_year IN (SELECT UNNEST($date_range))
 GROUP BY 1
 ORDER BY pct_uploaded ASC, total_gps DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
         ],
         "result_ttl_seconds": 600,
@@ -418,22 +418,22 @@ SELECT CASE $group_by
                 ELSE 'All' END AS group_label,
        COUNT(DISTINCT v.gp_lgd_code) AS gps_late
 FROM v_plan v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.approval_date > CAST($deadline AS DATE)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'deadline', 'entity_type': 'deadline'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -470,22 +470,22 @@ SELECT CASE $group_by
                 ELSE 'All' END AS group_label,
        COUNT(DISTINCT v.gp_lgd_code) AS gps_late
 FROM v_plan v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.approval_date > CAST($deadline AS DATE)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'deadline', 'entity_type': 'deadline'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -516,21 +516,21 @@ SELECT v.gp_name, v.block_name, v.district_name, v.plan_type,
        v.approval_date, CAST($deadline AS DATE) AS deadline,
        DATE_DIFF('day', CAST($deadline AS DATE), v.approval_date) AS days_late
 FROM v_plan v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.approval_date > CAST($deadline AS DATE)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
 ORDER BY days_late DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'deadline', 'entity_type': 'deadline'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'approval_date used as the upload timestamp; deadline supplied by the user.',
@@ -571,21 +571,21 @@ SELECT CASE $group_by
                            THEN v.gp_lgd_code END) AS late_gps,
        COUNT(DISTINCT v.gp_lgd_code) AS total_gps
 FROM v_plan v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'deadline', 'entity_type': 'deadline'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -618,19 +618,19 @@ SELECT v.gp_name, v.block_name, v.district_name, v.fiscal_year,
        CASE WHEN v.is_approved = 1 THEN 'Approved' ELSE 'Uploaded, not approved' END AS gpdp_status,
        (SELECT COUNT(*) FROM v_activity a WHERE a.plan_code = v.plan_code) AS activities_in_plan
 FROM v_plan v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
 ORDER BY v.plan_type
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Only two states are distinguishable because plan_code_status is NULL throughout.',
@@ -666,20 +666,20 @@ SELECT CASE $group_by
                 ELSE 'All' END AS group_label,
        COUNT(DISTINCT v.gp_lgd_code) AS gps_approved
 FROM v_plan v
-WHERE v.fiscal_year = $date_range AND v.is_approved = 1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range)) AND v.is_approved = 1
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -717,20 +717,20 @@ SELECT CASE $group_by
                 ELSE 'All' END AS group_label,
        COUNT(DISTINCT v.gp_lgd_code) AS gps_awaiting_approval
 FROM v_plan v
-WHERE v.fiscal_year = $date_range AND v.is_approved = 0
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range)) AND v.is_approved = 0
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -772,16 +772,16 @@ SELECT CASE $group_by
        ROUND(100.0 * COUNT(DISTINCT CASE WHEN v.is_approved = 1 THEN v.gp_lgd_code END)
              / NULLIF(COUNT(DISTINCT v.gp_lgd_code),0), 2) AS approval_rate_pct
 FROM v_plan v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
 GROUP BY 1
 ORDER BY approval_rate_pct DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -820,16 +820,16 @@ SELECT CASE $group_by
        ROUND(100.0 * COUNT(DISTINCT CASE WHEN v.is_approved = 1 THEN v.gp_lgd_code END)
              / NULLIF(COUNT(DISTINCT v.gp_lgd_code),0), 2) AS approval_rate_pct
 FROM v_plan v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
 GROUP BY 1
 ORDER BY approval_rate_pct DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
@@ -861,14 +861,14 @@ SELECT g.zp_name AS district_name,
        COUNT(DISTINCT g.gp_lgd_code) AS total_gps,
        COUNT(DISTINCT CASE WHEN p.approval_date IS NOT NULL THEN g.gp_lgd_code END) AS gps_approved
 FROM gram_panchayat g
-LEFT JOIN plan p ON p.gp_lgd_code = g.gp_lgd_code AND p.fiscal_year = $date_range
+LEFT JOIN plan p ON p.gp_lgd_code = g.gp_lgd_code AND p.fiscal_year IN (SELECT UNNEST($date_range))
 GROUP BY 1
 HAVING COUNT(DISTINCT CASE WHEN p.approval_date IS NOT NULL THEN g.gp_lgd_code END)
      = COUNT(DISTINCT g.gp_lgd_code)
 ORDER BY total_gps DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Approval proxied by approval_date.',
@@ -894,14 +894,14 @@ SELECT g.block_name AS block_name,
        COUNT(DISTINCT g.gp_lgd_code) AS total_gps,
        COUNT(DISTINCT CASE WHEN p.approval_date IS NOT NULL THEN g.gp_lgd_code END) AS gps_approved
 FROM gram_panchayat g
-LEFT JOIN plan p ON p.gp_lgd_code = g.gp_lgd_code AND p.fiscal_year = $date_range
+LEFT JOIN plan p ON p.gp_lgd_code = g.gp_lgd_code AND p.fiscal_year IN (SELECT UNNEST($date_range))
 GROUP BY 1
 HAVING COUNT(DISTINCT CASE WHEN p.approval_date IS NOT NULL THEN g.gp_lgd_code END)
      = COUNT(DISTINCT g.gp_lgd_code)
 ORDER BY total_gps DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Approval proxied by approval_date.',
@@ -926,19 +926,19 @@ ORDER BY total_gps DESC
         "sql_template": """
 SELECT v.gp_name, v.block_name, v.district_name, v.plan_type, v.plan_code
 FROM v_plan v
-WHERE v.fiscal_year = $date_range AND v.is_approved = 0
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range)) AND v.is_approved = 0
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
 ORDER BY v.district_name, v.block_name, v.gp_name
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Returns no rows: approval_date is populated on every plan.',
@@ -976,18 +976,18 @@ SELECT CASE $group_by
        COUNT(DISTINCT CASE WHEN v.is_approved = 0 THEN v.gp_lgd_code END) AS pending_approvals,
        COUNT(DISTINCT v.gp_lgd_code) AS gps_with_plan
 FROM v_plan v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
 GROUP BY 1
 ORDER BY pending_approvals DESC, gps_with_plan DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -1024,18 +1024,18 @@ SELECT CASE $group_by
        COUNT(DISTINCT CASE WHEN v.is_approved = 0 THEN v.gp_lgd_code END) AS pending_approvals,
        COUNT(DISTINCT v.gp_lgd_code) AS gps_with_plan
 FROM v_plan v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
 GROUP BY 1
 ORDER BY pending_approvals DESC, gps_with_plan DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
@@ -1079,29 +1079,29 @@ SELECT CASE $group_by
               END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -1157,31 +1157,31 @@ SELECT CASE $group_by
               END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -1229,31 +1229,31 @@ SELECT CASE $group_by
               END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities ASC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -1301,31 +1301,31 @@ SELECT CASE $group_by
               END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -1373,31 +1373,31 @@ SELECT CASE $group_by
               END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities ASC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -1445,31 +1445,31 @@ SELECT CASE $group_by
               END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -1517,31 +1517,31 @@ SELECT CASE $group_by
               END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities ASC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -1590,29 +1590,29 @@ SELECT CASE $group_by
        COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.theme = $theme
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2,3
 ORDER BY planned_activities DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'theme', 'entity_type': 'theme'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -1653,24 +1653,24 @@ FROM gram_panchayat g
 WHERE NOT EXISTS (
         SELECT 1 FROM v_activity v
         WHERE v.gp_lgd_code = g.gp_lgd_code
-          AND v.fiscal_year = $date_range
+          AND v.fiscal_year IN (SELECT UNNEST($date_range))
           AND v.theme = $theme
-          AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-          AND ($status IS NULL OR v.status_label = $status)
-          AND ($scheme IS NULL OR v.scheme_name = $scheme)
+          AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+          AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+          AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
           AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied))
-  AND ($district_name IS NULL OR g.zp_name = $district_name)
-  AND ($block_name    IS NULL OR g.block_name = $block_name)
+  AND ($district_name IS NULL OR g.zp_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR g.block_name IN (SELECT UNNEST($block_name)))
 ORDER BY g.zp_name, g.block_name, g.gp_name
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'theme', 'entity_type': 'theme'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -1703,13 +1703,13 @@ ORDER BY g.zp_name, g.block_name, g.gp_name
 WITH t AS (
   SELECT v.theme, v.gp_name AS unit, COUNT(*) AS planned_activities
   FROM v_activity v
-  WHERE v.fiscal_year = $date_range
-    AND ($district_name IS NULL OR v.district_name = $district_name)
-    AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-    AND ($status IS NULL OR v.status_label = $status)
-    AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-    AND ($theme IS NULL OR v.theme = $theme)
-    AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+    AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+    AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+    AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+    AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+    AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+    AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
     AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
   GROUP BY 1,2)
 SELECT theme, unit AS gp_name, planned_activities
@@ -1718,13 +1718,13 @@ WHERE rn = 1
 ORDER BY planned_activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -1757,13 +1757,13 @@ ORDER BY planned_activities DESC
 WITH t AS (
   SELECT v.theme, v.block_name AS unit, COUNT(*) AS planned_activities
   FROM v_activity v
-  WHERE v.fiscal_year = $date_range
-    AND ($district_name IS NULL OR v.district_name = $district_name)
-    AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-    AND ($status IS NULL OR v.status_label = $status)
-    AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-    AND ($theme IS NULL OR v.theme = $theme)
-    AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+    AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+    AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+    AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+    AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+    AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+    AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
     AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
   GROUP BY 1,2)
 SELECT theme, unit AS block_name, planned_activities
@@ -1772,13 +1772,13 @@ WHERE rn = 1
 ORDER BY planned_activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -1811,13 +1811,13 @@ ORDER BY planned_activities DESC
 WITH t AS (
   SELECT v.theme, v.district_name AS unit, COUNT(*) AS planned_activities
   FROM v_activity v
-  WHERE v.fiscal_year = $date_range
-    AND ($district_name IS NULL OR v.district_name = $district_name)
-    AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-    AND ($status IS NULL OR v.status_label = $status)
-    AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-    AND ($theme IS NULL OR v.theme = $theme)
-    AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+    AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+    AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+    AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+    AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+    AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+    AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
     AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
   GROUP BY 1,2)
 SELECT theme, unit AS district_name, planned_activities
@@ -1826,13 +1826,13 @@ WHERE rn = 1
 ORDER BY planned_activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -1867,27 +1867,27 @@ SELECT v.theme,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 2) AS pct_of_activities
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -1922,27 +1922,27 @@ SELECT v.theme,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 2) AS pct_of_activities
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities ASC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -1977,27 +1977,27 @@ SELECT v.theme, v.fiscal_year,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
 WHERE 1=1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY v.theme, v.fiscal_year
 """,
         "param_slots": [
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -2047,14 +2047,14 @@ SELECT CASE $group_by
        - COUNT(*) FILTER (WHERE v.fiscal_year = $date_range_2) AS change_in_activities
 FROM v_activity v
 WHERE v.fiscal_year IN ($date_range, $date_range_2)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY change_in_activities DESC
@@ -2063,15 +2063,15 @@ LIMIT $top_n
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'date_range_2', 'entity_type': 'fiscal_year_2'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -2124,14 +2124,14 @@ SELECT CASE $group_by
        - COUNT(*) FILTER (WHERE v.fiscal_year = $date_range_2) AS change_in_activities
 FROM v_activity v
 WHERE v.fiscal_year IN ($date_range, $date_range_2)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY change_in_activities ASC
@@ -2140,15 +2140,15 @@ LIMIT $top_n
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'date_range_2', 'entity_type': 'fiscal_year_2'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -2187,26 +2187,26 @@ FROM (SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme) t
 WHERE NOT EXISTS (
         SELECT 1 FROM v_activity v
         WHERE v.theme = t.lsdg_theme
-          AND v.fiscal_year = $date_range
-          AND ($district_name IS NULL OR v.district_name = $district_name)
-          AND ($block_name    IS NULL OR v.block_name    = $block_name)
+          AND v.fiscal_year IN (SELECT UNNEST($date_range))
+          AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+          AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
           AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-          AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-          AND ($status IS NULL OR v.status_label = $status)
-          AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-          AND ($scheme IS NULL OR v.scheme_name = $scheme)
+          AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+          AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+          AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+          AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
           AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied))
 ORDER BY 1
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -2243,29 +2243,29 @@ SELECT v.theme,
        ROUND(100.0 / COUNT(*) OVER (), 2) AS even_share_pct,
        ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER () - 100.0 / COUNT(*) OVER (), 2) AS deviation_pts
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_share DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -2312,31 +2312,31 @@ SELECT CASE $group_by
                 ELSE v.theme  -- absent: theme
               END AS group_label, COUNT(*) AS planned_activities
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING COUNT(*) < $threshold
 ORDER BY planned_activities ASC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'threshold', 'entity_type': 'threshold'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -2374,14 +2374,14 @@ WITH per_year AS (
          RANK() OVER (PARTITION BY v.fiscal_year ORDER BY COUNT(*) ASC) AS rank_lowest
   FROM v_activity v
   WHERE 1=1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
   GROUP BY 1,2)
 SELECT theme,
@@ -2393,14 +2393,14 @@ GROUP BY 1
 ORDER BY years_in_bottom_3 DESC, avg_activities_per_year ASC
 """,
         "param_slots": [
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -2438,27 +2438,27 @@ SELECT v.theme,
        SUM(v.total_expenditure)      AS actual_expenditure,
        ROUND(100.0 * SUM(v.is_completed) / NULLIF(COUNT(*),0), 2) AS pct_completed
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities ASC, pct_completed ASC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -2504,28 +2504,28 @@ SELECT CASE $group_by
               END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.focus_area_name = $focus_area
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'focus_area', 'entity_type': 'focus_area'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -2571,31 +2571,31 @@ SELECT CASE $group_by
               END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -2644,31 +2644,31 @@ SELECT CASE $group_by
               END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities ASC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -2717,31 +2717,31 @@ SELECT CASE $group_by
               END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -2789,31 +2789,31 @@ SELECT CASE $group_by
               END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities ASC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -2861,31 +2861,31 @@ SELECT CASE $group_by
               END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -2933,31 +2933,31 @@ SELECT CASE $group_by
               END AS group_label, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities ASC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -2993,30 +2993,30 @@ LIMIT $top_n
 SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
        v.total_cost, v.status_label
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.focus_area_name = $focus_area
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_cost DESC NULLS LAST
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'focus_area', 'entity_type': 'focus_area'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -3053,24 +3053,24 @@ FROM gram_panchayat g
 WHERE NOT EXISTS (
         SELECT 1 FROM v_activity v
         WHERE v.gp_lgd_code = g.gp_lgd_code
-          AND v.fiscal_year = $date_range
+          AND v.fiscal_year IN (SELECT UNNEST($date_range))
           AND v.focus_area_name = $focus_area
-          AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-          AND ($status IS NULL OR v.status_label = $status)
-          AND ($scheme IS NULL OR v.scheme_name = $scheme)
+          AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+          AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+          AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
           AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied))
-  AND ($district_name IS NULL OR g.zp_name = $district_name)
-  AND ($block_name    IS NULL OR g.block_name = $block_name)
+  AND ($district_name IS NULL OR g.zp_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR g.block_name IN (SELECT UNNEST($block_name)))
 ORDER BY g.zp_name, g.block_name, g.gp_name
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'focus_area', 'entity_type': 'focus_area'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -3102,27 +3102,27 @@ ORDER BY g.zp_name, g.block_name, g.gp_name
 SELECT v.focus_area_name, v.gp_name AS unit, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY v.focus_area_name, planned_activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -3156,27 +3156,27 @@ ORDER BY v.focus_area_name, planned_activities DESC
 SELECT v.focus_area_name, v.block_name AS unit, COUNT(*) AS planned_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY v.focus_area_name, planned_activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
@@ -3214,27 +3214,27 @@ SELECT v.focus_area_name, COUNT(*) AS planned_activities,
        ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 2) AS pct_of_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -3267,27 +3267,27 @@ SELECT v.focus_area_name, COUNT(*) AS planned_activities,
        ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 2) AS pct_of_activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities ASC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -3322,31 +3322,31 @@ SELECT v.focus_area_name, COUNT(*) AS planned_activities,
        ROUND(100.0 * SUM(COALESCE(v.total_cost,0))
              / NULLIF(SUM(SUM(COALESCE(v.total_cost,0))) OVER (),0), 2) AS pct_cost_share
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_share DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -3383,31 +3383,31 @@ SELECT v.focus_area_name, COUNT(*) AS planned_activities,
        ROUND(100.0 * SUM(COALESCE(v.total_cost,0))
              / NULLIF(SUM(SUM(COALESCE(v.total_cost,0))) OVER (),0), 2) AS pct_cost_share
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_share ASC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -3445,14 +3445,14 @@ SELECT v.activity_name,
        MIN(v.fiscal_year) AS first_year, MAX(v.fiscal_year) AS last_year
 FROM v_activity v
 WHERE 1=1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING COUNT(DISTINCT v.fiscal_year) > 1
@@ -3460,15 +3460,15 @@ ORDER BY years_planned DESC, total_occurrences DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -3506,26 +3506,26 @@ WHERE d.variable = 'focus_area'
   AND NOT EXISTS (
         SELECT 1 FROM v_activity v
         WHERE v.focus_area_name = d.description
-          AND v.fiscal_year = $date_range
-          AND ($district_name IS NULL OR v.district_name = $district_name)
-          AND ($block_name    IS NULL OR v.block_name    = $block_name)
+          AND v.fiscal_year IN (SELECT UNNEST($date_range))
+          AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+          AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
           AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-          AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-          AND ($status IS NULL OR v.status_label = $status)
-          AND ($theme IS NULL OR v.theme = $theme)
-          AND ($scheme IS NULL OR v.scheme_name = $scheme)
+          AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+          AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+          AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+          AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
           AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied))
 ORDER BY 1
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -3570,31 +3570,31 @@ SELECT CASE $group_by
                 ELSE v.focus_area_name  -- absent: focus_area_name
               END AS group_label, COUNT(*) AS planned_activities
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING COUNT(*) < $threshold
 ORDER BY planned_activities ASC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'threshold', 'entity_type': 'threshold'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -3645,27 +3645,27 @@ SELECT CASE $group_by
        ROUND(AVG(COALESCE(v.total_cost,0)),2) AS avg_planned_cost
 FROM v_activity v
 WHERE 1=1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY years_present DESC, total_activities DESC
 """,
         "param_slots": [
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -3703,27 +3703,27 @@ SELECT v.focus_area_name,
        SUM(v.total_expenditure)      AS actual_expenditure,
        ROUND(100.0 * SUM(v.is_completed) / NULLIF(COUNT(*),0), 2) AS pct_completed
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_activities ASC, pct_completed ASC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -3760,29 +3760,29 @@ SELECT v.theme,
        ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 2) AS pct_share,
        ROUND(100.0 / COUNT(*) OVER (), 2) AS even_share_pct
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_share DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -3834,30 +3834,30 @@ SELECT CASE $group_by
                           AND COALESCE(v.total_cost,0) < $threshold)
              / NULLIF(COUNT(*),0), 2) AS pct_low_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY low_cost_activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'threshold', 'entity_type': 'threshold'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -3899,29 +3899,29 @@ SELECT CASE WHEN COALESCE(v.total_cost,0) = 0     THEN '0 (no cost)'
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 2) AS pct_of_activities
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -3971,29 +3971,29 @@ SELECT CASE $group_by
                            OR COALESCE(v.total_cost,0) = 0)
              / NULLIF(COUNT(*),0), 2) AS pct_no_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -4046,30 +4046,30 @@ SELECT CASE $group_by
                           AND COALESCE(v.total_cost,0) < $threshold)
              / NULLIF(COUNT(*),0), 2) AS pct_low_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY pct_low_cost DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'threshold', 'entity_type': 'threshold'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -4111,19 +4111,19 @@ SELECT v.gp_name, v.block_name, v.district_name, v.fiscal_year,
        (SELECT COUNT(*) FROM v_activity a WHERE a.plan_code = v.plan_code) AS activities,
        (SELECT SUM(COALESCE(a.total_cost,0)) FROM v_activity a WHERE a.plan_code = v.plan_code) AS planned_cost
 FROM v_plan v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
 ORDER BY v.plan_type
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'plan_code_status is NULL throughout, so only Approved / Not approved can be distinguished.',
@@ -4163,17 +4163,17 @@ SELECT CASE $group_by
        CASE WHEN COUNT(*) FILTER (WHERE v.plan_type = 'Supplementary') > 0
             THEN 'Yes' ELSE 'No' END AS has_supplementary
 FROM v_plan v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY 1,2,3
 ORDER BY 1
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -4215,18 +4215,18 @@ SELECT CASE $group_by
        COUNT(DISTINCT v.gp_lgd_code) AS gps_with_supplementary,
        COUNT(*) AS supplementary_plans
 FROM v_plan v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.plan_type = 'Supplementary'
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -4257,29 +4257,29 @@ SELECT v.work_type_label,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS actual_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -4318,29 +4318,29 @@ SELECT v.work_type_label,
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(SUM(v.total_expenditure)) OVER (),0), 2) AS pct_of_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY actual_expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -4388,29 +4388,29 @@ SELECT CASE $group_by
        ROUND(100.0 * SUM(v.total_expenditure) FILTER (WHERE v.work_type_label = 'Maintenance')
              / NULLIF(SUM(v.total_expenditure),0), 2) AS pct_maintenance
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -4446,29 +4446,29 @@ SELECT v.asset_subcategory_label,
        COUNT(*) AS maintenance_activities,
        SUM(v.total_expenditure) AS expenditure
 FROM v_asset v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.work_type_label = 'Maintenance'
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
 GROUP BY 1
 ORDER BY maintenance_activities DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "asset_subcategory is populated on 4,286 of 12,704 asset rows, so most maintenance activity lands in 'Uncategorised'.",
@@ -4514,15 +4514,15 @@ SELECT CASE $group_by
        SUM(v.total_expenditure) FILTER (WHERE v.work_type_label = 'New/Fresh')   AS fresh_exp,
        SUM(v.total_expenditure) AS total_exp
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 HAVING COALESCE(SUM(v.total_expenditure) FILTER (WHERE v.work_type_label = 'Maintenance'),0)
@@ -4530,15 +4530,15 @@ HAVING COALESCE(SUM(v.total_expenditure) FILTER (WHERE v.work_type_label = 'Main
 ORDER BY maintenance_exp DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -4594,27 +4594,27 @@ SELECT CASE $group_by
              / NULLIF(SUM(v.total_expenditure),0), 2) AS pct_maintenance
 FROM v_activity v
 WHERE 1=1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY 1
 """,
         "param_slots": [
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -4650,28 +4650,28 @@ SELECT v.asset_category_label, v.work_type_label,
        COUNT(*) AS activities,
        SUM(v.total_expenditure) AS expenditure
 FROM v_asset v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND ($asset_category IS NULL OR v.asset_category_label = $asset_category)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
 GROUP BY 1,2
 ORDER BY v.asset_category_label, expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'asset_category', 'entity_type': 'asset_category', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'asset_category is populated on 4,286 of 12,704 rows. Pass NULL to $asset_category to see every category.',
@@ -4706,25 +4706,25 @@ SELECT v.gp_name, v.asset_subcategory_label, v.activity_name,
        SUM(v.total_expenditure) AS total_maintenance_expenditure
 FROM v_asset v
 WHERE v.work_type_label = 'Maintenance'
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
 GROUP BY 1,2,3
 HAVING COUNT(DISTINCT v.fiscal_year) > 1
 ORDER BY years_with_maintenance DESC, total_maintenance_expenditure DESC
 """,
         "param_slots": [
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
         ],
         "grouped_geo": [
     'gp_name',
@@ -4778,30 +4778,30 @@ SELECT CASE $group_by
        SUM(v.sc_amount) AS sc_spent,
        SUM(v.st_amount) AS st_spent
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_admin_approved = 1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -4852,28 +4852,28 @@ SELECT CASE $group_by
        SUM(v.total_expenditure) AS total_amount,
        ROUND(100.0 * SUM(v.sc_amount) / NULLIF(SUM(v.total_expenditure),0), 2) AS pct_sc
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -4927,31 +4927,31 @@ SELECT CASE $group_by
        SUM(COALESCE(v.fund_sanctioned_total,0)) AS total_sanctioned,
        SUM(COALESCE(v.fund_sanctioned_sc,0) + COALESCE(v.fund_sanctioned_st,0)) AS sc_st_sanctioned
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_admin_approved = 1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2,3
 HAVING COALESCE(SUM(COALESCE(v.fund_sanctioned_sc,0) + COALESCE(v.fund_sanctioned_st,0)),0) = 0
 ORDER BY total_sanctioned DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -4996,19 +4996,19 @@ SELECT a.activity_code, MAX(g.gp_name) AS gp_name, MAX(g.block_name) AS block_na
 FROM activity_expenditure e
 JOIN planned_activity a ON a.activity_code = e.activity_code
 JOIN gram_panchayat g   ON g.gp_lgd_code = a.gp_lgd_code
-WHERE e.fiscal_year = $date_range
+WHERE e.fiscal_year IN (SELECT UNNEST($date_range))
   AND e.scheme_name IS NOT NULL
-  AND ($district_name IS NULL OR g.zp_name = $district_name)
-  AND ($block_name    IS NULL OR g.block_name = $block_name)
+  AND ($district_name IS NULL OR g.zp_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR g.block_name IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR g.gp_lgd_code = $gp_name)
 GROUP BY a.activity_code
 HAVING COUNT(DISTINCT e.scheme_name) > 1
 ORDER BY distinct_schemes DESC, total_expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
         ],
         "result_ttl_seconds": 600,
@@ -5050,31 +5050,31 @@ SELECT CASE $group_by
        COUNT(*) AS activities,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY activities DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -5114,29 +5114,29 @@ SELECT COALESCE(v.scheme_name, '(not recorded)') AS scheme_name,
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(SUM(v.total_expenditure)) OVER (),0), 2) AS pct_of_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -5174,30 +5174,30 @@ SELECT v.tied_untied, v.fund_component_name,
        ROUND(100.0 * SUM(COALESCE(v.fund_sanctioned_total,0))
              / NULLIF(SUM(SUM(COALESCE(v.fund_sanctioned_total,0))) OVER (),0), 2) AS pct_of_sanctioned
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_admin_approved = 1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY sanctioned_amount DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -5236,32 +5236,32 @@ SELECT v.focus_area_name,
              / NULLIF(SUM(SUM(COALESCE(v.fund_sanctioned_total,0)) FILTER (WHERE v.tied_untied = 'Tied')) OVER (),0),
              2) AS pct_of_tied_funds
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_admin_approved = 1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
 GROUP BY 1
 HAVING SUM(COALESCE(v.fund_sanctioned_total,0)) FILTER (WHERE v.tied_untied = 'Tied') > 0
 ORDER BY tied_amount DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "Tied/untied comes from admin_approval_scheme.scheme_component_code: 4249 = Tied Grant, 4211 = Basic Grant (untied), 4250 = Devolution of Fund (treated as untied). Codes 3880, 3907, 4251, 4252 and 0 are reported as 'Other' rather than guessed at. Only sanctioned activities carry a component, so this covers 2,101 activities, not the whole plan.",
@@ -5309,29 +5309,29 @@ SELECT CASE $group_by
        COUNT(*) AS sanctioned_activities,
        SUM(COALESCE(v.fund_sanctioned_total,0)) FILTER (WHERE v.tied_untied = 'Untied') AS untied_amount
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_admin_approved = 1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -5381,29 +5381,29 @@ SELECT CASE $group_by
        ROUND(100.0 * SUM(COALESCE(v.fund_sanctioned_total,0)) FILTER (WHERE v.tied_untied = 'Tied')
              / NULLIF(SUM(COALESCE(v.fund_sanctioned_total,0)),0), 2) AS pct_tied
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_admin_approved = 1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -5441,28 +5441,28 @@ SELECT v.gp_name, v.block_name, v.fiscal_year,
        SUM(COALESCE(v.admin_approved_cost,0))       AS admin_approved_cost,
        SUM(v.total_expenditure)                     AS actual_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2,3
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
@@ -5504,29 +5504,29 @@ SELECT COALESCE(v.scheme_name, '(not recorded)') AS funding_source,
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(SUM(v.total_expenditure)) OVER (),0), 2) AS pct_of_total
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY amount DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -5566,30 +5566,30 @@ SELECT v.tied_untied,
        SUM(COALESCE(v.fund_sanctioned_st,0))      AS st_amount,
        SUM(COALESCE(v.fund_sanctioned_total,0))   AS sanctioned_amount
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_admin_approved = 1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY sanctioned_amount DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -5627,29 +5627,29 @@ SELECT COALESCE(v.scheme_name, '(not recorded)') AS funding_source,
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(SUM(v.total_expenditure)) OVER (),0), 2) AS pct_of_total
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_of_total DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -5687,30 +5687,30 @@ SELECT v.tied_untied,
        ROUND(100.0 * SUM(COALESCE(v.fund_sanctioned_total,0))
              / NULLIF(SUM(SUM(COALESCE(v.fund_sanctioned_total,0))) OVER (),0), 2) AS pct_of_sanctioned
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_admin_approved = 1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_of_sanctioned DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -5761,29 +5761,29 @@ SELECT CASE $group_by
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS approved_cost,
        SUM(v.total_expenditure)                     AS actual_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_cost DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -5835,31 +5835,31 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        COUNT(*) AS activities
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_cost DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -5909,31 +5909,31 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        COUNT(*) AS activities
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_cost ASC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -5971,29 +5971,29 @@ SELECT v.theme,
        ROUND(100.0 * SUM(COALESCE(v.total_cost,0))
              / NULLIF(SUM(SUM(COALESCE(v.total_cost,0))) OVER (),0), 2) AS pct_of_planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_of_planned_cost DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -6033,29 +6033,29 @@ SELECT v.theme,
        ROUND(100.0 * SUM(COALESCE(v.total_cost,0))
              / NULLIF(SUM(SUM(COALESCE(v.total_cost,0))) OVER (),0), 2) AS pct_of_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY cost_per_activity DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -6096,29 +6096,29 @@ SELECT v.theme,
        ROUND(100.0 * SUM(COALESCE(v.total_cost,0))
              / NULLIF(SUM(SUM(COALESCE(v.total_cost,0))) OVER (),0), 2) AS pct_of_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY cost_per_activity ASC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -6166,30 +6166,30 @@ SELECT CASE $group_by
               END AS group_label, COUNT(*) AS activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING COALESCE(SUM(COALESCE(v.total_cost,0)),0) = 0
 ORDER BY activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -6240,29 +6240,29 @@ SELECT CASE $group_by
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS approved_cost,
        SUM(v.total_expenditure)                     AS actual_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_cost DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -6301,27 +6301,27 @@ SELECT v.theme, v.fiscal_year,
        SUM(v.total_expenditure) AS actual_expenditure
 FROM v_activity v
 WHERE 1=1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY v.theme, v.fiscal_year
 """,
         "param_slots": [
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -6359,27 +6359,27 @@ SELECT v.theme, v.fiscal_year,
        SUM(v.total_expenditure) AS actual_expenditure
 FROM v_activity v
 WHERE 1=1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY v.theme, v.fiscal_year
 """,
         "param_slots": [
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -6428,29 +6428,29 @@ SELECT CASE $group_by
        COUNT(*) FILTER (WHERE COALESCE(v.total_cost,0) > 0) AS activities_with_planned_cost,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY activities_with_planned_cost DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -6485,31 +6485,31 @@ ORDER BY activities_with_planned_cost DESC
 SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
        v.total_cost AS planned_cost, v.total_expenditure, v.status_label
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
   AND COALESCE(v.total_expenditure,0) > 0
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_expenditure DESC, v.total_cost DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -6543,31 +6543,31 @@ LIMIT $top_n
 SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
        v.total_cost AS planned_cost, v.total_expenditure, v.status_label
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
   AND COALESCE(v.total_expenditure,0) = 0
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_expenditure DESC, v.total_cost DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -6614,31 +6614,31 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        COUNT(*) AS activities
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_cost DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -6686,31 +6686,31 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        COUNT(*) AS activities
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_cost ASC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -6747,29 +6747,29 @@ SELECT v.focus_area_name,
        ROUND(100.0 * SUM(COALESCE(v.total_cost,0))
              / NULLIF(SUM(SUM(COALESCE(v.total_cost,0))) OVER (),0), 2) AS pct_of_planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_of_planned_cost DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -6808,29 +6808,29 @@ SELECT v.focus_area_name,
        ROUND(100.0 * SUM(COALESCE(v.total_cost,0))
              / NULLIF(SUM(SUM(COALESCE(v.total_cost,0))) OVER (),0), 2) AS pct_of_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY cost_per_activity DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -6870,29 +6870,29 @@ SELECT v.focus_area_name,
        ROUND(100.0 * SUM(COALESCE(v.total_cost,0))
              / NULLIF(SUM(SUM(COALESCE(v.total_cost,0))) OVER (),0), 2) AS pct_of_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY cost_per_activity ASC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -6939,30 +6939,30 @@ SELECT CASE $group_by
               END AS group_label, COUNT(*) AS activities,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING COALESCE(SUM(COALESCE(v.total_cost,0)),0) = 0
 ORDER BY activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -7010,28 +7010,28 @@ SELECT CASE $group_by
        COUNT(*) AS activities,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -7066,30 +7066,30 @@ GROUP BY 1
 SELECT v.activity_code, v.activity_name, v.focus_area_name,
        v.approved_cost_action_plan, v.total_expenditure, v.status_label
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.scheme_name = $scheme
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_expenditure DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'scheme', 'entity_type': 'scheme'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -7138,28 +7138,28 @@ SELECT CASE $group_by
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS approved_cost,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -7207,31 +7207,31 @@ SELECT CASE $group_by
        COUNT(*) AS activities,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY expenditure DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -7269,26 +7269,26 @@ FROM gram_panchayat g
 WHERE NOT EXISTS (
         SELECT 1 FROM v_activity v
         WHERE v.gp_lgd_code = g.gp_lgd_code
-          AND v.fiscal_year = $date_range
+          AND v.fiscal_year IN (SELECT UNNEST($date_range))
           AND v.scheme_name = $scheme
-          AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-          AND ($status IS NULL OR v.status_label = $status)
-          AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-          AND ($theme IS NULL OR v.theme = $theme)
+          AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+          AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+          AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+          AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
           AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied))
-  AND ($block_name    IS NULL OR g.block_name = $block_name)
-  AND ($district_name IS NULL OR g.zp_name = $district_name)
+  AND ($block_name    IS NULL OR g.block_name IN (SELECT UNNEST($block_name)))
+  AND ($district_name IS NULL OR g.zp_name IN (SELECT UNNEST($district_name)))
 ORDER BY g.zp_name, g.block_name, g.gp_name
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'scheme', 'entity_type': 'scheme'},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -7370,30 +7370,30 @@ SELECT CASE $group_by
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(COALESCE(v.approved_cost_action_plan,0)),0), 2) AS pct_utilised
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.scheme_name IN ($scheme, $scheme_2)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'scheme', 'entity_type': 'scheme'},
             {'name': 'scheme_2', 'entity_type': 'scheme_2'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -7440,29 +7440,29 @@ SELECT CASE $group_by
               END AS group_label, COUNT(*) AS activities,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -7512,28 +7512,28 @@ SELECT CASE $group_by
        SUM(v.st_amount)  AS st_amount,
        SUM(v.total_expenditure) AS total_amount
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -7581,23 +7581,23 @@ SELECT CASE $group_by
        COUNT(*) AS activities,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
 GROUP BY 1
 ORDER BY activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -7631,29 +7631,29 @@ SELECT v.gp_name, v.block_name, v.fiscal_year,
        COUNT(*) AS activities,
        SUM(v.total_expenditure) AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2,3
 ORDER BY total_expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
@@ -7708,27 +7708,27 @@ SELECT CASE $group_by
              / NULLIF(SUM(COALESCE(v.approved_cost_action_plan,0)),0), 2) AS pct_utilised
 FROM v_activity v
 WHERE 1=1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY 1
 """,
         "param_slots": [
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -7778,29 +7778,29 @@ SELECT CASE $group_by
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(COALESCE(v.approved_cost_action_plan,0)),0), 2) AS pct_utilised
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -7850,29 +7850,29 @@ SELECT CASE $group_by
        ROUND(100.0 * (SUM(COALESCE(v.approved_cost_action_plan,0)) - SUM(v.total_expenditure))
              / NULLIF(SUM(COALESCE(v.approved_cost_action_plan,0)),0), 2) AS pct_unspent
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -7923,29 +7923,29 @@ SELECT CASE $group_by
        ROUND(100.0 * COUNT(*) FILTER (WHERE v.total_expenditure > 0)
              / NULLIF(COUNT(*),0), 2) AS pct_with_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -7983,29 +7983,29 @@ SELECT COALESCE(v.scheme_name,'(not recorded)') AS funding_source,
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(SUM(v.total_expenditure)) OVER (),0), 2) AS pct_of_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -8044,29 +8044,29 @@ SELECT COALESCE(v.scheme_name,'(not recorded)') AS funding_source,
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(SUM(v.total_expenditure)) OVER (),0), 2) AS pct_of_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -8106,30 +8106,30 @@ SELECT v.tied_untied,
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(COALESCE(v.fund_sanctioned_total,0)),0), 2) AS pct_utilised
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_admin_approved = 1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY actual_expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -8166,30 +8166,30 @@ SELECT v.focus_area_name, v.tied_untied,
        SUM(COALESCE(v.fund_sanctioned_total,0)) AS sanctioned_amount,
        SUM(v.total_expenditure) AS actual_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_admin_approved = 1
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY actual_expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -8238,29 +8238,29 @@ SELECT CASE $group_by
        COUNT(*) FILTER (WHERE v.total_expenditure > 0) AS activities_with_expenditure,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -8297,30 +8297,30 @@ SELECT v.focus_area_name, v.tied_untied,
        SUM(COALESCE(v.fund_sanctioned_total,0)) AS sanctioned_amount,
        SUM(v.total_expenditure) AS actual_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_admin_approved = 1
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY actual_expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -8371,31 +8371,31 @@ SELECT CASE $group_by
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(COALESCE(v.approved_cost_action_plan,0)),0), 2) AS pct_utilised
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_utilised DESC NULLS LAST
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -8448,31 +8448,31 @@ SELECT CASE $group_by
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(COALESCE(v.approved_cost_action_plan,0)),0), 2) AS pct_utilised
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY unspent_amount DESC NULLS LAST
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -8522,29 +8522,29 @@ SELECT CASE $group_by
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS planned_cost,
        SUM(v.total_expenditure) AS actual_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY actual_expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -8594,31 +8594,31 @@ SELECT CASE $group_by
                 ELSE v.theme  -- absent: theme
               END AS group_label, SUM(v.total_expenditure) AS actual_expenditure, COUNT(*) AS activities
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY actual_expenditure DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -8665,31 +8665,31 @@ SELECT CASE $group_by
                 ELSE v.theme  -- absent: theme
               END AS group_label, SUM(v.total_expenditure) AS actual_expenditure, COUNT(*) AS activities
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY actual_expenditure ASC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -8726,29 +8726,29 @@ SELECT v.theme, SUM(v.total_expenditure) AS actual_expenditure,
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(SUM(v.total_expenditure)) OVER (),0), 2) AS pct_of_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_of_expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -8799,15 +8799,15 @@ SELECT CASE $group_by
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(COALESCE(v.approved_cost_action_plan,0)),0), 2) AS pct_utilised
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING SUM(COALESCE(v.approved_cost_action_plan,0)) > 0
@@ -8815,16 +8815,16 @@ ORDER BY pct_utilised DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -8876,31 +8876,31 @@ SELECT CASE $group_by
        ROUND(100.0 * (SUM(COALESCE(v.approved_cost_action_plan,0)) - SUM(v.total_expenditure))
              / NULLIF(SUM(COALESCE(v.approved_cost_action_plan,0)),0), 2) AS gap_pct
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY gap_amount DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -8940,15 +8940,15 @@ SELECT v.theme,
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(COALESCE(v.approved_cost_action_plan,0)),0), 2) AS pct_utilised
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 HAVING SUM(COALESCE(v.approved_cost_action_plan,0)) > 0
@@ -8956,16 +8956,16 @@ ORDER BY pct_utilised DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -9005,15 +9005,15 @@ SELECT v.theme,
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(COALESCE(v.approved_cost_action_plan,0)),0), 2) AS pct_utilised
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 HAVING SUM(COALESCE(v.approved_cost_action_plan,0)) > 0
@@ -9021,16 +9021,16 @@ ORDER BY pct_utilised DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -9070,15 +9070,15 @@ SELECT v.theme,
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(COALESCE(v.approved_cost_action_plan,0)),0), 2) AS pct_utilised
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 HAVING SUM(COALESCE(v.approved_cost_action_plan,0)) > 0
@@ -9086,16 +9086,16 @@ ORDER BY pct_utilised DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -9145,29 +9145,29 @@ SELECT CASE $group_by
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(COALESCE(v.admin_approved_cost,0)),0), 2) AS pct_of_sanctioned_utilised
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -9209,17 +9209,17 @@ SELECT v.gp_name, v.block_name, v.fiscal_year,
        ROUND(100.0 * SUM(v.amount) FILTER (WHERE v.direction = 'payment')
              / NULLIF(SUM(v.amount) FILTER (WHERE v.direction = 'receipt'),0), 2) AS pct_utilised
 FROM v_voucher v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY 1,2,3
 ORDER BY closing_balance DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
         ],
         "grouped_geo": [
@@ -9266,29 +9266,29 @@ SELECT CASE $group_by
        COUNT(*) AS total_activities,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY activities_with_expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -9324,31 +9324,31 @@ ORDER BY activities_with_expenditure DESC
 SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
        v.focus_area_name, v.approved_cost_action_plan, v.total_expenditure, v.status_label
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.total_expenditure > 0
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_expenditure DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -9393,31 +9393,31 @@ SELECT CASE $group_by
                 ELSE v.focus_area_name  -- absent: focus_area_name
               END AS group_label, SUM(v.total_expenditure) AS actual_expenditure, COUNT(*) AS activities
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY actual_expenditure DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -9465,31 +9465,31 @@ SELECT CASE $group_by
                 ELSE v.focus_area_name  -- absent: focus_area_name
               END AS group_label, SUM(v.total_expenditure) AS actual_expenditure, COUNT(*) AS activities
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY actual_expenditure ASC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -9540,29 +9540,29 @@ SELECT CASE $group_by
        COUNT(*) AS total_activities,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY activities_with_expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -9598,30 +9598,30 @@ ORDER BY activities_with_expenditure DESC
 SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name, v.district_name,
        v.focus_area_name, v.approved_cost_action_plan, v.total_expenditure, v.status_label
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_expenditure DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -9656,30 +9656,30 @@ LIMIT $top_n
 SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name, v.district_name,
        v.focus_area_name, v.approved_cost_action_plan, v.total_expenditure, v.status_label
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_expenditure DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -9714,33 +9714,33 @@ LIMIT $top_n
 SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
        v.approved_cost_action_plan, v.total_cost, v.status_label
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND COALESCE(v.total_expenditure,0) = 0
   AND COALESCE(v.approved_cost_action_plan, v.total_cost, 0) >= $amount_threshold
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY COALESCE(v.approved_cost_action_plan, v.total_cost) DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'amount_threshold', 'entity_type': 'amount_threshold'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -9778,32 +9778,32 @@ SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
        v.total_expenditure - COALESCE(v.approved_cost_action_plan,0) AS variance,
        v.status_label
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND COALESCE(v.approved_cost_action_plan,0) > 0
   AND v.total_expenditure = v.approved_cost_action_plan
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY variance DESC, v.total_expenditure DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -9839,32 +9839,32 @@ SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
        v.total_expenditure - COALESCE(v.approved_cost_action_plan,0) AS variance,
        v.status_label
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND COALESCE(v.approved_cost_action_plan,0) > 0
   AND v.total_expenditure > v.approved_cost_action_plan
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY variance DESC, v.total_expenditure DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -9900,29 +9900,29 @@ SELECT v.work_type_label,
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS planned_cost,
        SUM(v.total_expenditure) AS actual_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.work_type_label = 'New/Fresh'
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -9959,29 +9959,29 @@ SELECT v.work_type_label,
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS planned_cost,
        SUM(v.total_expenditure) AS actual_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.work_type_label = 'Maintenance'
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -10030,28 +10030,28 @@ SELECT CASE $group_by
        SUM(COALESCE(v.approved_cost_action_plan,0)) AS planned_cost,
        SUM(v.total_expenditure) AS actual_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.focus_area_name IN ('Administrative & Technical Support', 'GP Office Infrastructure')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY actual_expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -10101,29 +10101,29 @@ SELECT CASE $group_by
        ROUND(100.0 * COUNT(*) FILTER (WHERE v.is_admin_approved = 1)
              / NULLIF(COUNT(*),0), 2) AS pct_approved
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -10174,29 +10174,29 @@ SELECT CASE $group_by
        COUNT(*) FILTER (WHERE v.has_approval_cost_only = 1) AS cost_recorded_but_no_approval_row,
        SUM(COALESCE(v.total_cost,0)) FILTER (WHERE v.is_admin_approved = 0) AS cost_awaiting
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -10246,29 +10246,29 @@ SELECT CASE $group_by
        SUM(COALESCE(v.technical_approved_cost,0)) AS technical_sanctioned_amount,
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS sanctioned_activities
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY admin_sanctioned_amount DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -10321,25 +10321,25 @@ SELECT CASE $group_by
        SUM(COALESCE(v.admin_approved_cost,0)) AS admin_sanctioned_amount,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY admin_sanctioned_amount DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -10414,30 +10414,30 @@ SELECT v.sanction_authority AS issuing_authority,
        MIN(v.sanction_day) AS first_sanction,
        MAX(v.sanction_day) AS last_sanction
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_admin_approved = 1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY sanctioned_activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -10487,29 +10487,29 @@ SELECT CASE $group_by
        ROUND(100.0 * COUNT(*) FILTER (WHERE v.is_admin_approved = 1)
              / NULLIF(COUNT(*),0), 2) AS pct_approved
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY pct_approved DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -10563,27 +10563,27 @@ SELECT CASE $group_by
        ROUND(100.0 * COUNT(*) FILTER (WHERE v.is_admin_approved = 1)
              / NULLIF(COUNT(*),0), 2) AS pct_approved
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY pct_approved ASC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -10622,30 +10622,30 @@ SELECT CAST(v.sanction_month AS DATE) AS month,
        SUM(COALESCE(v.admin_approved_cost,0)) AS sanctioned_amount,
        COUNT(DISTINCT v.gp_lgd_code) AS gps
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_admin_approved = 1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY 1
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -10682,30 +10682,30 @@ SELECT v.sanction_quarter AS calendar_quarter,
        COUNT(*) AS sanctioned_activities,
        SUM(COALESCE(v.admin_approved_cost,0)) AS sanctioned_amount
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_admin_approved = 1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY sanction_year, calendar_quarter
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -10743,31 +10743,31 @@ SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
        v.sanctioned_scheme_name, v.tied_untied,
        v.total_expenditure, v.status_label
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_admin_approved = 1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.admin_approved_cost DESC NULLS LAST
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -10817,31 +10817,31 @@ SELECT CASE $group_by
        COUNT(*) FILTER (WHERE v.is_admin_approved = 1) AS sanctioned_activities,
        SUM(COALESCE(v.fund_sanctioned_total,0)) AS sanctioned_amount
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY proposed_cost_awaiting DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -10883,30 +10883,30 @@ SELECT v.sanctioned_scheme_name, v.fund_component_name, v.tied_untied,
        SUM(COALESCE(v.fund_sanctioned_total,0)) AS sanctioned_amount,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_admin_approved = 1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2,3
 ORDER BY sanctioned_amount DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -10945,30 +10945,30 @@ SELECT v.activity_for_label AS target_category,
        SUM(COALESCE(v.fund_sanctioned_st,0))      AS st_sanctioned,
        SUM(COALESCE(v.fund_sanctioned_total,0))   AS total_sanctioned
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_admin_approved = 1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY total_sanctioned DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -11016,29 +11016,29 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -11073,25 +11073,25 @@ ORDER BY activities DESC
         "sql_template": """
 SELECT v.block_name, v.status_label, COUNT(*) AS activities
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY v.block_name, activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -11137,28 +11137,28 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -11207,12 +11207,12 @@ SELECT CASE $group_by
        COUNT(*) AS total_activities,
        SUM(v.total_expenditure) FILTER (WHERE v.is_abandoned = 1) AS expenditure_on_abandoned
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2,3
 HAVING SUM(v.is_abandoned) > 0
@@ -11220,13 +11220,13 @@ ORDER BY abandoned_activities DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -11262,29 +11262,29 @@ SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
        v.total_cost AS estimated_cost, v.admin_approved_cost,
        v.total_expenditure, v.status_label
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_abandoned = 1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_cost DESC NULLS LAST
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -11331,27 +11331,27 @@ SELECT CASE $group_by
        SUM(v.is_completed) AS completed_activities,
        ROUND(100.0 * SUM(v.is_completed) / NULLIF(SUM(v.is_started),0), 2) AS pct_completed
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -11401,25 +11401,25 @@ SELECT CASE $group_by
        SUM(v.is_completed) AS completed,
        ROUND(100.0 * SUM(v.is_completed) / NULLIF(COUNT(*),0), 2) AS pct_completed
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY pct_completed DESC, activities DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -11470,27 +11470,27 @@ SELECT CASE $group_by
        ROUND(100.0 * COUNT(*) FILTER (WHERE v.status_label = 'Activity Approved')
              / NULLIF(COUNT(*),0), 2) AS pct_not_started
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -11538,28 +11538,28 @@ SELECT CASE $group_by
        COUNT(*) AS activities,
        SUM(v.is_completed) AS completed
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2,3
 HAVING SUM(v.is_completed) = 0
 ORDER BY activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -11612,27 +11612,27 @@ SELECT CASE $group_by
        COUNT(*) AS total_activities,
        SUM(COALESCE(v.total_cost,0)) FILTER (WHERE v.is_under_approval = 1) AS cost_under_approval
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -11681,24 +11681,24 @@ SELECT CASE $group_by
        SUM(v.is_started) AS started,
        ROUND(100.0 * SUM(v.is_started) / NULLIF(COUNT(*),0), 2) AS pct_started
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 HAVING SUM(v.is_started) = COUNT(*)
 ORDER BY activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -11749,27 +11749,27 @@ SELECT CASE $group_by
        SUM(v.is_started)   AS taken_up_activities,
        SUM(v.is_completed) AS completed_activities
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY planned_activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -11824,21 +11824,21 @@ SELECT CASE $group_by
        SUM(v.is_abandoned) AS abandoned,
        SUM(v.is_under_approval) AS under_approval
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -11884,27 +11884,27 @@ SELECT CASE $group_by
        SUM(v.is_started) AS initiated_activities,
        ROUND(100.0 * SUM(v.is_started) / NULLIF(COUNT(*),0), 2) AS initiation_rate_pct
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -11952,27 +11952,27 @@ SELECT CASE $group_by
        SUM(v.is_completed) AS completed_activities,
        ROUND(100.0 * SUM(v.is_completed) / NULLIF(SUM(v.is_started),0), 2) AS completion_rate_pct
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -12020,27 +12020,27 @@ SELECT CASE $group_by
        COUNT(*) - SUM(v.is_started) AS not_initiated,
        SUM(COALESCE(v.total_cost,0)) FILTER (WHERE v.is_started = 0) AS cost_not_initiated
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -12077,27 +12077,27 @@ SELECT v.theme, v.focus_area_name,
        SUM(v.is_started) AS initiation_count,
        ROUND(100.0 * SUM(v.is_started) / NULLIF(COUNT(*),0), 2) AS initiation_rate_pct
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY initiation_rate_pct DESC, planned_activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -12134,27 +12134,27 @@ SELECT v.theme, v.focus_area_name,
        SUM(v.is_completed) AS completion_count,
        ROUND(100.0 * SUM(v.is_completed) / NULLIF(COUNT(*),0), 2) AS completion_rate_pct
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY completion_rate_pct DESC, planned_activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -12203,29 +12203,29 @@ SELECT CASE $group_by
        SUM(v.is_completed) AS completed_activities,
        ROUND(100.0 * SUM(v.is_completed) / NULLIF(COUNT(*),0), 2) AS completion_rate_pct
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY completed_activities DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -12276,29 +12276,29 @@ SELECT CASE $group_by
        COUNT(*) - SUM(v.is_started) AS implementation_gap,
        ROUND(100.0 * (COUNT(*) - SUM(v.is_started)) / NULLIF(COUNT(*),0), 2) AS gap_pct
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY implementation_gap DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -12347,29 +12347,29 @@ SELECT CASE $group_by
        COUNT(*) AS planned_activities,
        SUM(v.is_completed) AS completed_activities
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY completed_activities DESC, planned_activities DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -12418,14 +12418,14 @@ SELECT CASE $group_by
        SUM(v.is_completed) AS completed_activities,
        ROUND(100.0 * SUM(v.is_completed) / NULLIF(COUNT(*),0), 2) AS completion_rate_pct
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING COUNT(*) >= $threshold
@@ -12433,16 +12433,16 @@ ORDER BY completion_rate_pct ASC, planned_activities DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
             {'name': 'threshold', 'entity_type': 'threshold'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -12492,29 +12492,29 @@ SELECT CASE $group_by
        COUNT(*) - SUM(v.is_started) AS implementation_gap,
        ROUND(100.0 * (COUNT(*) - SUM(v.is_started)) / NULLIF(COUNT(*),0), 2) AS gap_pct
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY implementation_gap DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -12564,29 +12564,29 @@ SELECT CASE $group_by
        COUNT(*) AS planned_activities,
        SUM(v.total_expenditure) FILTER (WHERE v.is_ongoing = 1) AS expenditure_on_ongoing
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY ongoing_activities DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -12635,28 +12635,28 @@ SELECT CASE $group_by
        SUM(v.is_completed) AS completed_activities,
        ROUND(100.0 * SUM(v.is_completed) / NULLIF(COUNT(*),0), 2) AS completion_rate_pct
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING SUM(v.total_expenditure) > 0
 ORDER BY expenditure DESC, completion_rate_pct ASC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -12692,31 +12692,31 @@ ORDER BY expenditure DESC, completion_rate_pct ASC
 SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
        v.approved_cost_action_plan, v.total_expenditure, v.status_label
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_started = 0
   AND COALESCE(v.approved_cost_action_plan, v.total_cost, 0) >= $amount_threshold
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY COALESCE(v.approved_cost_action_plan, v.total_cost) DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'amount_threshold', 'entity_type': 'amount_threshold'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -12757,29 +12757,29 @@ SELECT v.theme,
              - 100.0 * SUM(v.total_expenditure)
                / NULLIF(SUM(SUM(v.total_expenditure)) OVER (),0), 2) AS share_gap_pts
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY ABS(share_gap_pts) DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -12831,25 +12831,25 @@ SELECT CASE $group_by
        ROUND(100.0 * SUM(v.is_started) / NULLIF(COUNT(*),0), 2) AS avg_initiation_rate_pct
 FROM v_activity v
 WHERE 1=1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY avg_initiation_rate_pct DESC
 """,
         "param_slots": [
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -12901,25 +12901,25 @@ SELECT CASE $group_by
        ROUND(100.0 * SUM(v.is_started) / NULLIF(COUNT(*),0), 2) AS avg_initiation_rate_pct
 FROM v_activity v
 WHERE 1=1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY avg_initiation_rate_pct ASC
 """,
         "param_slots": [
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -12958,13 +12958,13 @@ SELECT v.activity_name,
        SUM(COALESCE(v.total_cost,0)) AS planned_cost
 FROM v_activity v
 WHERE 1=1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING COUNT(DISTINCT v.fiscal_year) > 1 AND SUM(v.is_completed) = 0
@@ -12972,14 +12972,14 @@ ORDER BY years_appearing DESC, occurrences DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -13016,31 +13016,31 @@ SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
              / NULLIF(v.approved_cost_action_plan,0), 2) AS pct_of_approved_spent,
        v.status_label
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_ongoing = 1
   AND COALESCE(v.approved_cost_action_plan,0) > 0
   AND v.total_expenditure >= v.approved_cost_action_plan
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY pct_of_approved_spent DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -13092,14 +13092,14 @@ SELECT CASE $group_by
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(COALESCE(v.approved_cost_action_plan,0)),0), 2) AS pct_utilised
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING COUNT(*) >= $threshold
@@ -13107,16 +13107,16 @@ ORDER BY initiation_rate_pct ASC, approved_cost DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'threshold', 'entity_type': 'threshold'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -13170,14 +13170,14 @@ SELECT CASE $group_by
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(COALESCE(v.approved_cost_action_plan,0)),0), 2) AS pct_utilised
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING COUNT(*) >= $threshold
@@ -13185,16 +13185,16 @@ ORDER BY initiation_rate_pct ASC, approved_cost DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'threshold', 'entity_type': 'threshold'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -13231,30 +13231,30 @@ SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
        v.approved_cost_action_plan, v.total_expenditure,
        COALESCE(v.approved_cost_action_plan,0) - v.total_expenditure AS unspent_amount
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_completed = 0
   AND v.is_abandoned = 0
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY unspent_amount DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -13306,27 +13306,27 @@ SELECT CASE $group_by
        ROUND(100.0 * COUNT(*) FILTER (WHERE v.is_completed = 0)
              / NULLIF(COUNT(*),0), 2) AS pct_incomplete
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY incomplete_activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -13410,24 +13410,24 @@ SELECT CASE $group_by
        COUNT(*) AS asset_rows,
        COUNT(*) FILTER (WHERE v.status_label = 'WORK COMPLETED') AS assets_under_completed_activities
 FROM v_asset v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
 GROUP BY 1,2
 ORDER BY asset_rows DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
@@ -13479,29 +13479,29 @@ SELECT CASE $group_by
        ROUND(100.0 * COUNT(*) FILTER (WHERE v.has_progress_evidence = 1)
              / NULLIF(COUNT(*),0), 2) AS pct_with_evidence
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -13550,26 +13550,26 @@ SELECT CASE $group_by
        COUNT(DISTINCT v.activity_code) AS asset_creating_activities,
        COUNT(*) FILTER (WHERE v.asset_category_label <> 'Uncategorised') AS categorised_assets
 FROM v_asset v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
 GROUP BY 1,2
 ORDER BY asset_rows DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "grouped_geo": [
@@ -13608,26 +13608,26 @@ SELECT v.asset_category_label,
        COUNT(DISTINCT v.activity_code) AS activities,
        SUM(v.total_expenditure) AS expenditure
 FROM v_asset v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
 GROUP BY 1
 ORDER BY asset_rows DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'activity_asset is sparsely populated: asset_category has values on 4,286 of 12,704 rows and asset_subcategory on 4,286; asset_name, asset_unit_count and asset_unit_cost are 100% NULL. Uncategorised rows are reported separately rather than dropped.',
@@ -13661,28 +13661,28 @@ SELECT v.asset_subcategory_label,
        COUNT(DISTINCT v.gp_name) AS gps,
        SUM(v.total_expenditure) AS expenditure
 FROM v_asset v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND ($asset_sub_category IS NULL OR v.asset_subcategory_label = $asset_sub_category)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
 GROUP BY 1
 ORDER BY asset_rows DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'asset_sub_category', 'entity_type': 'asset_subcategory', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'activity_asset is sparsely populated: asset_category has values on 4,286 of 12,704 rows and asset_subcategory on 4,286; asset_name, asset_unit_count and asset_unit_cost are 100% NULL. Uncategorised rows are reported separately rather than dropped.',
@@ -13714,26 +13714,26 @@ ORDER BY asset_rows DESC
 SELECT v.asset_type_label, COUNT(*) AS asset_rows,
        COUNT(DISTINCT v.activity_code) AS activities
 FROM v_asset v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
 GROUP BY 1
 ORDER BY asset_rows DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "asset_type decodes to movable / Immovable but is populated on only a small share of rows; 'permanent' maps to Immovable.",
@@ -13766,28 +13766,28 @@ SELECT v.asset_category_label,
        COUNT(*) AS asset_rows,
        SUM(v.total_expenditure) AS expenditure
 FROM v_asset v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
 GROUP BY 1
 ORDER BY expenditure DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'activity_asset is sparsely populated: asset_category has values on 4,286 of 12,704 rows and asset_subcategory on 4,286; asset_name, asset_unit_count and asset_unit_cost are 100% NULL. Uncategorised rows are reported separately rather than dropped.',
@@ -13831,26 +13831,26 @@ SELECT CASE $group_by
        COUNT(DISTINCT v.activity_code) AS activities,
        SUM(v.total_expenditure) AS expenditure
 FROM v_asset v
-WHERE v.fiscal_year = $date_range
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
 GROUP BY 1
 ORDER BY asset_rows DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -13884,24 +13884,24 @@ FROM gram_panchayat g
 WHERE NOT EXISTS (
         SELECT 1 FROM v_asset v
         WHERE v.gp_name = g.gp_name
-          AND v.fiscal_year = $date_range
+          AND v.fiscal_year IN (SELECT UNNEST($date_range))
           AND v.asset_category_label <> 'Uncategorised'
-          AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-          AND ($status IS NULL OR v.status_label = $status)
-          AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-          AND ($theme IS NULL OR v.theme = $theme))
-  AND ($block_name    IS NULL OR g.block_name = $block_name)
-  AND ($district_name IS NULL OR g.zp_name = $district_name)
+          AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+          AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+          AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+          AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme))))
+  AND ($block_name    IS NULL OR g.block_name IN (SELECT UNNEST($block_name)))
+  AND ($district_name IS NULL OR g.zp_name IN (SELECT UNNEST($district_name)))
 ORDER BY g.zp_name, g.block_name, g.gp_name
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Created no assets' means no categorised asset row. Because asset_category is missing on two-thirds of rows, GPs may appear here from missing data alone.",
@@ -13947,24 +13947,24 @@ SELECT CASE $group_by
        SUM(v.total_expenditure) AS expenditure
 FROM v_asset v
 WHERE 1=1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
 GROUP BY 1
 ORDER BY 1
 """,
         "param_slots": [
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -14012,18 +14012,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'soak|grey ?water|gwm')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -14069,18 +14069,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'soak|grey ?water|gwm')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -14126,18 +14126,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(soak).*(community|group|cluster)|(community|group|cluster).*(soak)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -14183,18 +14183,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(soak).*(community|group|cluster)|(community|group|cluster).*(soak)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -14240,18 +14240,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(soak).*(community|group|cluster)|(community|group|cluster).*(soak)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -14297,18 +14297,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(soak).*(community|group|cluster)|(community|group|cluster).*(soak)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -14354,18 +14354,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(soak).*(community|group|cluster)|(community|group|cluster).*(soak)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -14411,18 +14411,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(soak).*(household|individual|hh)|(household|individual|hh).*(soak)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -14468,18 +14468,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(soak).*(household|individual|hh)|(household|individual|hh).*(soak)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -14525,18 +14525,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(soak).*(household|individual|hh)|(household|individual|hh).*(soak)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -14582,18 +14582,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(soak).*(household|individual|hh)|(household|individual|hh).*(soak)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -14639,18 +14639,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(soak).*(household|individual|hh)|(household|individual|hh).*(soak)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -14695,19 +14695,19 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS om_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.work_type_label IN ('Maintenance', 'Upgradation')
   AND regexp_matches(v.search_text, '(toilet|sanitary).*(complex|community)|community.*(toilet|complex)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -14752,19 +14752,19 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS om_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.work_type_label IN ('Maintenance', 'Upgradation')
   AND regexp_matches(v.search_text, '(compost).*(community|group|cluster)|(community|group|cluster).*(compost)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -14809,19 +14809,19 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS om_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.work_type_label IN ('Maintenance', 'Upgradation')
   AND regexp_matches(v.search_text, 'segregation shed|sorting shed|waste.*shed')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -14866,19 +14866,19 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS om_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.work_type_label IN ('Maintenance', 'Upgradation')
   AND regexp_matches(v.search_text, 'plastic waste|pwmu')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -14923,19 +14923,19 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS om_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.work_type_label IN ('Maintenance', 'Upgradation')
   AND regexp_matches(v.search_text, 'gobardhan|bio.?gas')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -14980,19 +14980,19 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS om_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.work_type_label IN ('Maintenance', 'Upgradation')
   AND regexp_matches(v.search_text, 'soak|grey ?water|gwm')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -15037,19 +15037,19 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS om_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.work_type_label IN ('Maintenance', 'Upgradation')
   AND regexp_matches(v.search_text, 'faecal|fsm|sludge')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -15095,18 +15095,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'ppe|safety equipment|glove|mask|protective')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -15152,18 +15152,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'ppe|safety equipment|glove|mask|protective|waste.*equipment|equipment.*waste')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -15208,20 +15208,20 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS om_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.work_type_label IN ('Maintenance', 'Upgradation')
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY 1
 ORDER BY om_expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -15267,18 +15267,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(toilet).*(public|institution|community)|(public|institution|community).*(toilet)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -15323,18 +15323,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(toilet).*(public|institution|community)|(public|institution|community).*(toilet)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -15379,18 +15379,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(toilet).*(public|institution|community)|(public|institution|community).*(toilet)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -15435,18 +15435,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(toilet).*(public|institution|community)|(public|institution|community).*(toilet)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -15491,18 +15491,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(toilet).*(public|institution|community)|(public|institution|community).*(toilet)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -15548,18 +15548,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'ihhl|individual household latrine')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -15605,18 +15605,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'ihhl|individual household latrine')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -15662,18 +15662,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'ihhl|individual household latrine')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -15719,18 +15719,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'ihhl|individual household latrine')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -15776,18 +15776,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'ihhl|individual household latrine')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -15833,18 +15833,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(toilet|handwash).*(anganwadi|awc|school)|(anganwadi|awc|school).*(toilet|handwash)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -15890,18 +15890,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(toilet|handwash).*(anganwadi|awc|school)|(anganwadi|awc|school).*(toilet|handwash)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -15947,18 +15947,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(toilet|handwash).*(anganwadi|awc|school)|(anganwadi|awc|school).*(toilet|handwash)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -16004,18 +16004,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(toilet|handwash).*(anganwadi|awc|school)|(anganwadi|awc|school).*(toilet|handwash)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -16061,18 +16061,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(toilet|handwash).*(anganwadi|awc|school)|(anganwadi|awc|school).*(toilet|handwash)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -16118,18 +16118,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'retrofit.*(twin|single)|twin pit|single pit')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -16174,18 +16174,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'retrofit.*(twin|single)|twin pit|single pit')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -16230,18 +16230,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'retrofit.*(twin|single)|twin pit|single pit')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -16286,18 +16286,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'retrofit.*(twin|single)|twin pit|single pit')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -16342,18 +16342,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'retrofit.*(twin|single)|twin pit|single pit')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -16399,18 +16399,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'septic')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -16455,18 +16455,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'septic')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -16511,18 +16511,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'septic')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -16567,18 +16567,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'septic')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -16623,18 +16623,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'septic')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -16680,18 +16680,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'solid waste|waste management|compost|segregat|gobardhan|plastic waste')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -16737,18 +16737,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(compost).*(community|group|cluster)|(community|group|cluster).*(compost)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -16793,18 +16793,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(compost).*(community|group|cluster)|(community|group|cluster).*(compost)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -16849,18 +16849,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(compost).*(community|group|cluster)|(community|group|cluster).*(compost)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -16905,18 +16905,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(compost).*(community|group|cluster)|(community|group|cluster).*(compost)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -16961,18 +16961,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(compost).*(community|group|cluster)|(community|group|cluster).*(compost)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -17018,18 +17018,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(compost).*(household|individual|hh)|(household|individual|hh).*(compost)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -17074,18 +17074,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(compost).*(household|individual|hh)|(household|individual|hh).*(compost)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -17130,18 +17130,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(compost).*(household|individual|hh)|(household|individual|hh).*(compost)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -17186,18 +17186,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(compost).*(household|individual|hh)|(household|individual|hh).*(compost)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -17242,18 +17242,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(compost).*(household|individual|hh)|(household|individual|hh).*(compost)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -17299,18 +17299,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'segregation shed|sorting shed|waste.*shed')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -17355,18 +17355,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'segregation shed|sorting shed|waste.*shed')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -17411,18 +17411,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'segregation shed|sorting shed|waste.*shed')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -17467,18 +17467,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'segregation shed|sorting shed|waste.*shed')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -17523,18 +17523,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'segregation shed|sorting shed|waste.*shed')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -17580,18 +17580,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'bin|dustbin|dust bin')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -17637,18 +17637,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'bin|dustbin|dust bin')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -17694,18 +17694,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'bin|dustbin|dust bin')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -17751,18 +17751,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'bin|dustbin|dust bin')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -17808,18 +17808,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(bin|dustbin).*(household|individual|hh)|(household|individual|hh).*(bin|dustbin)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -17865,18 +17865,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, '(bin|dustbin).*(community|group|cluster|public)|(community|group|cluster|public).*(bin|dustbin)')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -17922,18 +17922,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'bin|dustbin|dust bin')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -17979,18 +17979,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'gobardhan|bio.?gas')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -18036,18 +18036,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'gobardhan|bio.?gas')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -18093,18 +18093,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'gobardhan|bio.?gas')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -18150,18 +18150,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'gobardhan|bio.?gas')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -18207,18 +18207,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'gobardhan|bio.?gas')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -18264,18 +18264,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'tricycle|vehicle|rickshaw|e-?cart|pushcart|collection cart')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -18321,18 +18321,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'tricycle|vehicle|rickshaw|e-?cart|pushcart|collection cart')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -18378,18 +18378,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'tricycle|vehicle|rickshaw|e-?cart|pushcart|collection cart')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -18435,18 +18435,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'tricycle|vehicle|rickshaw|e-?cart|pushcart|collection cart')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -18492,18 +18492,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'tricycle|vehicle|rickshaw|e-?cart|pushcart|collection cart')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -18549,18 +18549,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'weighing')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -18606,18 +18606,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'weighing')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -18662,18 +18662,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'weighing')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -18719,18 +18719,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'weighing')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -18776,18 +18776,18 @@ SELECT CASE $group_by
        SUM(COALESCE(v.total_cost,0)) AS planned_cost,
        SUM(v.total_expenditure)      AS total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND regexp_matches(v.search_text, 'weighing')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -18836,24 +18836,24 @@ SELECT CASE $group_by
        SUM(v.is_completed) AS completed,
        ROUND(100.0 * SUM(v.is_completed) / NULLIF(COUNT(*),0), 2) AS completion_rate_pct
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
   AND v.gp_lgd_code IN ($gp_name, $gp_name_2)
 GROUP BY 1,2,3
 ORDER BY actual_expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'bind': 'code'},
             {'name': 'gp_name_2', 'entity_type': 'gp_2', 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -18907,24 +18907,24 @@ SELECT CASE $group_by
              / NULLIF(SUM(COALESCE(v.approved_cost_action_plan,0)),0), 2) AS pct_utilised,
        ROUND(100.0 * SUM(v.is_completed) / NULLIF(COUNT(*),0), 2) AS completion_rate_pct
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
   AND v.block_name IN ($block_name, $block_name_2)
 GROUP BY 1,2
 ORDER BY actual_expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'block_name', 'entity_type': 'block'},
             {'name': 'block_name_2', 'entity_type': 'block_2'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -18964,11 +18964,11 @@ WITH per_district AS (
          SUM(v.total_expenditure) AS expenditure,
          SUM(v.is_completed) AS completed
   FROM v_activity v
-  WHERE v.fiscal_year = $date_range
-    AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-    AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-    AND ($theme IS NULL OR v.theme = $theme)
-    AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+    AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+    AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+    AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+    AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
     AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
   GROUP BY 1)
 SELECT district_name,
@@ -18983,12 +18983,12 @@ WHERE $district_name IS NULL OR district_name = $district_name OR TRUE
 ORDER BY expenditure_per_gp DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -19038,27 +19038,27 @@ SELECT CASE $group_by
        SUM(v.is_completed) AS completed,
        SUM(v.is_abandoned) AS abandoned
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -19109,29 +19109,29 @@ SELECT CASE $group_by
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(COALESCE(v.approved_cost_action_plan,0)),0), 2) AS pct_utilised
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY expenditure DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -19182,28 +19182,28 @@ SELECT CASE $group_by
        SUM(v.is_completed) AS completed,
        ROUND(100.0 * SUM(v.is_completed) / NULLIF(COUNT(*),0), 2) AS completion_rate_pct
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING SUM(v.total_expenditure) > 0
 ORDER BY expenditure DESC, completion_rate_pct ASC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -19254,13 +19254,13 @@ SELECT CASE $group_by
        SUM(v.is_started) FILTER (WHERE v.fiscal_year = $date_range)   AS started_year2
 FROM v_activity v
 WHERE v.fiscal_year IN ($date_range, $date_range_2)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY planned_year2 DESC
@@ -19268,13 +19268,13 @@ ORDER BY planned_year2 DESC
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'date_range_2', 'entity_type': 'fiscal_year_2'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -19326,14 +19326,14 @@ SELECT CASE $group_by
        SUM(v.total_expenditure) FILTER (WHERE v.fiscal_year = $date_range)   AS expenditure_year2
 FROM v_activity v
 WHERE v.fiscal_year IN ($date_range, $date_range_2)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY expenditure_year2 DESC
@@ -19341,14 +19341,14 @@ ORDER BY expenditure_year2 DESC
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'date_range_2', 'entity_type': 'fiscal_year_2'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -19402,27 +19402,27 @@ SELECT CASE $group_by
              / NULLIF(SUM(COALESCE(v.approved_cost_action_plan,0)),0), 2) AS pct_utilised
 FROM v_activity v
 WHERE 1=1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY 1 DESC
 """,
         "param_slots": [
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -19476,14 +19476,14 @@ SELECT CASE $group_by
              / NULLIF(SUM(v.total_expenditure) FILTER (WHERE v.fiscal_year = $date_range_2),0), 2) AS change_pct
 FROM v_activity v
 WHERE v.fiscal_year IN ($date_range, $date_range_2)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
@@ -19491,14 +19491,14 @@ HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
         "param_slots": [
             {'name': 'date_range', 'entity_type': 'fiscal_year'},
             {'name': 'date_range_2', 'entity_type': 'fiscal_year_2'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -19550,25 +19550,25 @@ SELECT CASE $group_by
        ROUND(100.0 * SUM(v.is_started)   / NULLIF(COUNT(*),0), 2) AS initiation_rate_pct
 FROM v_activity v
 WHERE 1=1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 ORDER BY 1
 """,
         "param_slots": [
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -19605,27 +19605,27 @@ SELECT v.gp_name, v.fiscal_year,
        SUM(v.total_expenditure) AS expenditure
 FROM v_activity v
 WHERE 1=1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY v.gp_name, v.fiscal_year
 """,
         "param_slots": [
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
@@ -19668,31 +19668,31 @@ FROM v_activity v
 WHERE v.is_admin_approved = 1
   AND COALESCE(v.total_expenditure,0) = 0
   AND DATE_DIFF('day', v.sanction_day, CURRENT_DATE) > $threshold
-  AND ($date_range IS NULL OR v.fiscal_year = $date_range)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($date_range IS NULL OR v.fiscal_year IN (SELECT UNNEST($date_range)))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY days_since_sanction DESC
 LIMIT $top_n
 """,
         "param_slots": [
             {'name': 'threshold', 'entity_type': 'threshold'},
-            {'name': 'date_range', 'entity_type': 'fiscal_year', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -19730,32 +19730,32 @@ SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
        ROUND(100.0 * (v.total_expenditure - v.admin_approved_cost)
              / NULLIF(v.admin_approved_cost,0), 2) AS overrun_pct
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND COALESCE(v.admin_approved_cost,0) > 0
   AND v.total_expenditure > v.admin_approved_cost
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY overrun_amount DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -19790,33 +19790,33 @@ SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
        ROUND(100.0 * (v.total_expenditure - v.total_cost)
              / NULLIF(v.total_cost,0), 2) AS overrun_pct
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND COALESCE(v.total_cost,0) > 0
   AND v.total_expenditure > v.total_cost * (1 + $threshold / 100.0)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY overrun_pct DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'threshold', 'entity_type': 'threshold'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -19850,33 +19850,33 @@ SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
        v.technical_approved_cost, v.admin_approved_cost,
        v.technical_approved_cost - v.admin_approved_cost AS difference
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND COALESCE(v.technical_approved_cost,0) > 0
   AND COALESCE(v.admin_approved_cost,0) > 0
   AND v.technical_approved_cost > v.admin_approved_cost
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY difference DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -19909,30 +19909,30 @@ LIMIT $top_n
 SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
        v.admin_approved_cost, v.total_expenditure, v.status_label
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_abandoned = 1
   AND v.total_expenditure > 0
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_expenditure DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -19965,22 +19965,22 @@ LIMIT $top_n
         "sql_template": """
 SELECT g.gp_name, g.block_name, g.zp_name AS district_name,
        (SELECT COUNT(*) FROM v_activity a
-         WHERE a.gp_lgd_code = g.gp_lgd_code AND a.fiscal_year = $date_range) AS activities,
+         WHERE a.gp_lgd_code = g.gp_lgd_code AND a.fiscal_year IN (SELECT UNNEST($date_range))) AS activities,
        (SELECT COUNT(*) FROM v_voucher vv
-         WHERE vv.gp_lgd_code = g.gp_lgd_code AND vv.fiscal_year = $date_range) AS vouchers
+         WHERE vv.gp_lgd_code = g.gp_lgd_code AND vv.fiscal_year IN (SELECT UNNEST($date_range))) AS vouchers
 FROM gram_panchayat g
-WHERE ($block_name    IS NULL OR g.block_name = $block_name)
-  AND ($district_name IS NULL OR g.zp_name = $district_name)
+WHERE ($block_name    IS NULL OR g.block_name IN (SELECT UNNEST($block_name)))
+  AND ($district_name IS NULL OR g.zp_name IN (SELECT UNNEST($district_name)))
   AND NOT EXISTS (SELECT 1 FROM v_activity a
-                  WHERE a.gp_lgd_code = g.gp_lgd_code AND a.fiscal_year = $date_range)
+                  WHERE a.gp_lgd_code = g.gp_lgd_code AND a.fiscal_year IN (SELECT UNNEST($date_range)))
   AND NOT EXISTS (SELECT 1 FROM v_voucher vv
-                  WHERE vv.gp_lgd_code = g.gp_lgd_code AND vv.fiscal_year = $date_range)
+                  WHERE vv.gp_lgd_code = g.gp_lgd_code AND vv.fiscal_year IN (SELECT UNNEST($date_range)))
 ORDER BY g.zp_name, g.block_name, g.gp_name
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": "'Last N days' cannot be evaluated - activities carry no dates. Rewritten as 'no activity and no voucher in the given year'.",
@@ -20007,22 +20007,22 @@ ORDER BY g.zp_name, g.block_name, g.gp_name
 WITH gp_counts AS (
   SELECT g.gp_name, g.block_name, g.zp_name AS district_name,
          (SELECT COUNT(*) FROM plan p
-           WHERE p.gp_lgd_code = g.gp_lgd_code AND p.fiscal_year = $date_range) AS plans,
+           WHERE p.gp_lgd_code = g.gp_lgd_code AND p.fiscal_year IN (SELECT UNNEST($date_range))) AS plans,
          (SELECT COUNT(*) FROM v_activity a
-           WHERE a.gp_lgd_code = g.gp_lgd_code AND a.fiscal_year = $date_range) AS activities,
+           WHERE a.gp_lgd_code = g.gp_lgd_code AND a.fiscal_year IN (SELECT UNNEST($date_range))) AS activities,
          (SELECT COUNT(*) FROM v_voucher vv
-           WHERE vv.gp_lgd_code = g.gp_lgd_code AND vv.fiscal_year = $date_range) AS vouchers
+           WHERE vv.gp_lgd_code = g.gp_lgd_code AND vv.fiscal_year IN (SELECT UNNEST($date_range))) AS vouchers
   FROM gram_panchayat g
-  WHERE ($district_name IS NULL OR g.zp_name = $district_name)
-    AND ($block_name    IS NULL OR g.block_name = $block_name))
+  WHERE ($district_name IS NULL OR g.zp_name IN (SELECT UNNEST($district_name)))
+    AND ($block_name    IS NULL OR g.block_name IN (SELECT UNNEST($block_name))))
 SELECT * FROM gp_counts
 WHERE plans = 0 AND activities = 0 AND vouchers = 0
 ORDER BY district_name, block_name, gp_name
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Checks the three modules that hold GP-level data: plan, activities and vouchers.',
@@ -20054,29 +20054,29 @@ FROM v_activity v
 WHERE v.is_admin_approved = 1
   AND v.is_started = 0
   AND DATE_DIFF('day', v.sanction_day, CURRENT_DATE) > $threshold
-  AND ($date_range IS NULL OR v.fiscal_year = $date_range)
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($date_range IS NULL OR v.fiscal_year IN (SELECT UNNEST($date_range)))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY days_since_sanction DESC
 LIMIT $top_n
 """,
         "param_slots": [
             {'name': 'threshold', 'entity_type': 'threshold'},
-            {'name': 'date_range', 'entity_type': 'fiscal_year', 'optional': True},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'optional': True, 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -20113,20 +20113,20 @@ SELECT p.gp_name, p.block_name, p.district_name,
        COUNT(a.activity_code) AS total_activities
 FROM v_plan p
 LEFT JOIN v_activity a ON a.gp_lgd_code = p.gp_lgd_code AND a.fiscal_year = p.fiscal_year
-WHERE p.fiscal_year = $date_range
+WHERE p.fiscal_year IN (SELECT UNNEST($date_range))
   AND p.is_approved = 1
-  AND ($district_name IS NULL OR p.district_name = $district_name)
-  AND ($block_name    IS NULL OR p.block_name    = $block_name)
-  AND ($plan_type IS NULL OR p.plan_type = $plan_type)
+  AND ($district_name IS NULL OR p.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR p.block_name    IN (SELECT UNNEST($block_name)))
+  AND ($plan_type IS NULL OR p.plan_type IN (SELECT UNNEST($plan_type)))
 GROUP BY 1,2,3
 HAVING COALESCE(SUM(a.is_admin_approved),0) = 0
 ORDER BY total_activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
         ],
         "grouped_geo": [
     'district_name',
@@ -20173,25 +20173,25 @@ SELECT CASE $group_by
        SUM(v.is_started)   AS started,
        ROUND(100.0 * SUM(v.is_completed) / NULLIF(COUNT(*),0), 2) AS completion_rate_pct
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 HAVING 100.0 * SUM(v.is_completed) / NULLIF(COUNT(*),0) < $threshold
 ORDER BY completion_rate_pct ASC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
             {'name': 'threshold', 'entity_type': 'threshold'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -20228,30 +20228,30 @@ SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
        v.status_label, v.evidence_uploads,
        v.admin_approved_cost, v.total_expenditure
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_started = 1
   AND v.has_progress_evidence = 0
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_expenditure DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -20286,32 +20286,32 @@ SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
        v.total_cost, v.approved_cost_action_plan, v.total_expenditure,
        v.is_costless_activity, v.status_label
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND COALESCE(v.total_cost,0) <= 0
   AND COALESCE(v.is_costless_activity,0) <> 1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_expenditure DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -20347,15 +20347,15 @@ SELECT v.gp_name, v.activity_name,
        STRING_AGG(v.activity_code, ', ') AS activity_codes,
        SUM(COALESCE(v.total_cost,0)) AS combined_planned_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 HAVING COUNT(*) > 1
@@ -20363,16 +20363,16 @@ ORDER BY duplicate_count DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "grouped_geo": [
@@ -20414,33 +20414,33 @@ SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
        v.work_proposed_cost,
        v.fund_sanctioned_total - COALESCE(v.admin_approved_cost,0) AS difference
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_admin_approved = 1
   AND v.fund_sanctioned_total IS NOT NULL
   AND ABS(v.fund_sanctioned_total - COALESCE(v.admin_approved_cost,0)) > 1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY ABS(v.fund_sanctioned_total - COALESCE(v.admin_approved_cost,0)) DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -20491,14 +20491,14 @@ SELECT CASE $group_by
        SUM(v.total_expenditure) AS expenditure,
        SUM(v.is_started) AS started
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2,3
 HAVING COALESCE(SUM(COALESCE(v.total_cost,0)),0) = 0
@@ -20506,14 +20506,14 @@ HAVING COALESCE(SUM(COALESCE(v.total_cost,0)),0) = 0
 ORDER BY activities DESC
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -20558,32 +20558,32 @@ LEFT JOIN (SELECT expenditure_id, COUNT(*) AS voucher_count,
                   SUM(voucher_cost) AS voucher_total
            FROM activity_voucher GROUP BY expenditure_id) av
        ON av.expenditure_id = v.expenditure_id
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.total_expenditure > 0
   AND COALESCE(av.voucher_count,0) = 0
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.total_expenditure DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -20633,27 +20633,27 @@ SELECT CASE $group_by
        ROUND(100.0 * COUNT(*) FILTER (WHERE v.focus_area IS NULL OR v.focus_area_name LIKE 'Code %')
              / NULLIF(COUNT(*),0), 2) AS pct_unusable
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -20688,30 +20688,30 @@ HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
        v.asset_category_label, v.asset_subcategory_label, v.total_expenditure
 FROM v_asset v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.asset_category IS NULL
   AND v.asset_subcategory IS NULL
   AND v.main_asset_category IS NULL
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
 ORDER BY v.total_expenditure DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'This is the single biggest data-quality gap: asset detail is missing on roughly two-thirds of asset rows.',
@@ -20744,36 +20744,36 @@ SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
        v.tec_approval_order_no, v.tec_approval_order_date,
        v.admin_approved_cost
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_admin_approved = 1
   AND (v.sanction_day IS NULL
        OR v.sanction_authority_raw IS NULL
        OR TRIM(v.sanction_authority_raw) = ''
        OR UPPER(TRIM(v.sanction_authority_raw)) IN ('NR','NA','N/A','-')
        OR UPPER(TRIM(COALESCE(v.tec_approval_order_no,''))) = 'NR')
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.admin_approved_cost DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -20822,27 +20822,27 @@ SELECT CASE $group_by
        ROUND(100.0 * COUNT(*) FILTER (WHERE v.scheme_name IS NULL)
              / NULLIF(COUNT(*),0), 2) AS pct_missing_scheme
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY GROUPING SETS ((group_label), ())
 HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -20892,14 +20892,14 @@ SELECT CASE $group_by
        SUM(v.is_completed) AS completed,
        ROUND(100.0 * SUM(v.is_completed) / NULLIF(COUNT(*),0), 2) AS completion_rate_pct
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1
 HAVING 100.0 * SUM(v.is_completed) / NULLIF(COUNT(*),0) < $threshold
@@ -20907,16 +20907,16 @@ ORDER BY approved_cost DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'threshold', 'entity_type': 'threshold'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -20970,27 +20970,27 @@ SELECT CASE $group_by
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(COALESCE(v.approved_cost_action_plan,0)),0), 2) AS pct_utilised
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY pct_pending DESC, pct_utilised ASC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -21031,27 +21031,27 @@ SELECT v.asset_subcategory_label,
        SUM(v.total_expenditure) FILTER (WHERE v.work_type_label = 'Maintenance') AS maintenance_expenditure
 FROM v_asset v
 WHERE 1=1
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
 GROUP BY 1
 HAVING COUNT(*) FILTER (WHERE v.work_type_label = 'Maintenance') > 0
 ORDER BY years_with_maintenance DESC, maintenance_activities DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": 'Pooled across all years because a single year cannot show repeat maintenance. asset_subcategory is missing on two-thirds of rows.',
@@ -21086,32 +21086,32 @@ SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name,
              / NULLIF(v.admin_approved_cost,0), 2) AS pct_of_sanction_spent,
        v.status_label
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
   AND v.is_ongoing = 1
   AND COALESCE(v.admin_approved_cost,0) > 0
   AND 100.0 * v.total_expenditure / NULLIF(v.admin_approved_cost,0) < $threshold
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 ORDER BY v.admin_approved_cost DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
             {'name': 'threshold', 'entity_type': 'threshold'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
         ],
         "result_ttl_seconds": 600,
@@ -21162,31 +21162,31 @@ SELECT CASE $group_by
        ROUND(100.0 * SUM(v.total_expenditure)
              / NULLIF(SUM(COALESCE(v.approved_cost_action_plan,0)),0), 2) AS pct_utilised
 FROM v_activity v
-WHERE v.fiscal_year = $date_range
-  AND ($district_name IS NULL OR v.district_name = $district_name)
-  AND ($block_name    IS NULL OR v.block_name    = $block_name)
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
   AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
-  AND ($plan_type IS NULL OR v.plan_type = $plan_type)
-  AND ($status IS NULL OR v.status_label = $status)
-  AND ($focus_area IS NULL OR v.focus_area_name = $focus_area)
-  AND ($theme IS NULL OR v.theme = $theme)
-  AND ($scheme IS NULL OR v.scheme_name = $scheme)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
   AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
 GROUP BY 1,2
 ORDER BY unspent_balance DESC
 LIMIT $top_n
 """,
         "param_slots": [
-            {'name': 'date_range', 'entity_type': 'fiscal_year'},
-            {'name': 'district_name', 'entity_type': 'district', 'optional': True},
-            {'name': 'block_name', 'entity_type': 'block', 'optional': True},
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
             {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
             {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
-            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True},
-            {'name': 'status', 'entity_type': 'status', 'optional': True},
-            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True},
-            {'name': 'theme', 'entity_type': 'theme', 'optional': True},
-            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
             {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
@@ -21223,6 +21223,20 @@ LIMIT $top_n
 ALL_TEMPLATES: dict[str, dict] = TEMPLATE_CATALOG
 
 
+def _bind_value(slot: dict, value):
+    """One slot's bound value, in the shape its statement expects.
+
+    A slot marked {"list": True} filters with `IN (SELECT UNNEST($slot))` (WP-6
+    T4), which DuckDB binds only to a LIST — a bare scalar is a binder error. So
+    a single value binds as a ONE-ELEMENT list and every caller may keep passing
+    one. An absent optional slot still binds None, which its `$slot IS NULL`
+    guard reads as "do not filter".
+    """
+    if value is None or not slot.get("list"):
+        return value
+    return list(value) if isinstance(value, (list, tuple)) else [value]
+
+
 def bind(template_id: str, values: dict):
     """Return (sql, params) for a template and a {slot_name: value} dict.
 
@@ -21245,10 +21259,11 @@ def bind(template_id: str, values: dict):
         raise KeyError(f'{template_id} missing slot values: {sorted(missing)}')
 
     if param_style(t) == NAMED:
-        return t['sql_template'], {s['name']: values.get(s['name']) for s in slots}
+        return t['sql_template'], {s['name']: _bind_value(s, values.get(s['name']))
+                                   for s in slots}
 
     ordered = sorted(slots, key=lambda s: s['position'])
-    return t['sql_template'], [values.get(s['name']) for s in ordered]
+    return t['sql_template'], [_bind_value(s, values.get(s['name'])) for s in ordered]
 
 
 def required_entities(template_id: str) -> list[str]:
