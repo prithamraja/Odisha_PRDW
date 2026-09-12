@@ -1,0 +1,14 @@
+SCALAR PLN-039      $date_range: a paired-year template (D30.3)
+SCALAR PLN-040      $date_range: a paired-year template (D30.3)
+SCALAR TRD-001      $date_range: a paired-year template (D30.3)
+SCALAR TRD-002      $date_range: a paired-year template (D30.3)
+SCALAR TRD-004      $date_range: a paired-year template (D30.3)
+
+list-capable, by slot: $block_name 311, $date_range 317, $district_name 331, $focus_area 219, $plan_type 241, $scheme 207, $status 177, $theme 221
+  $block_name left scalar: no convertible use ×1
+  $date_range left scalar: a paired-year template (D30.3) ×5
+  $district_name left scalar: no convertible use ×1
+  $focus_area left scalar: no convertible use ×3
+  $scheme left scalar: no convertible use ×3
+  $theme left scalar: no convertible use ×2
+wrote query_router\template_catalog.py

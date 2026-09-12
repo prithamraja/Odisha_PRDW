@@ -408,6 +408,64 @@ def check_static_invariants(args):
                         "file replaces it")
     notes.append("pmkisan_gates.py deleted")
 
+    # (g) WP-6: every slot this package added is ABSENT-SAFE, and says so in the
+    # Test Report rather than being assumed. Check 2 executes each statement with
+    # these binds; this is what makes "bound with the new slot absent" a recorded
+    # fact instead of a claim.
+    oracle = json.loads(
+        (HERE / "tests" / "data" / "workbook_test_report.json").read_text(encoding="utf-8"))
+    wp6_slots = {"plan_type", "tied_untied", "group_by"}
+    unrecorded = sorted(
+        f"{qid}.${slot['name']}"
+        for qid, entry in TEMPLATE_CATALOG.items()
+        for slot in entry["param_slots"]
+        if slot["name"] in wp6_slots and qid in oracle
+        and slot["name"] not in (oracle[qid].get("params") or {}))
+    if unrecorded:
+        problems.append(
+            f"{len(unrecorded)} WP-6 slot(s) are not recorded as absent in the "
+            f"Test Report: {', '.join(unrecorded[:6])}"
+            + (" …" if len(unrecorded) > 6 else ""))
+    absent_binds = sum(
+        1 for qid, entry in TEMPLATE_CATALOG.items() for slot in entry["param_slots"]
+        if slot["name"] in wp6_slots and (oracle.get(qid, {}).get("params") or {})
+        .get(slot["name"], "missing") is None)
+    notes.append(f"WP-6 slots bound ABSENT in the Test Report: {absent_binds}")
+
+    # (h) A `$group_by` CASE may only list whitelisted values. The value is never
+    # interpolated, so a stray WHEN would be a breakdown nothing validates.
+    from query_router.breakdown import GROUP_BY_VALUES
+    case = re.compile(r"CASE\s+\$group_by\b(.*?)\bEND\s+AS\s+group_label", re.S)
+    carriers, stray = 0, []
+    for qid, entry in TEMPLATE_CATALOG.items():
+        found = case.search(entry["sql_template"])
+        if not found:
+            continue
+        carriers += 1
+        outside = set(re.findall(r"WHEN\s+'(\w+)'", found.group(1))) - set(GROUP_BY_VALUES)
+        if outside:
+            stray.append(f"{qid}: {sorted(outside)}")
+    if stray:
+        problems.append("$group_by values outside the whitelist: " + "; ".join(stray))
+    notes.append(f"$group_by whitelisted on all {carriers} templates that offer it")
+
+    # (i) `plan_type` is on the three activity views. Everything "main plan"
+    # rests on it, and a view rebuilt from the old DDL would drop it silently.
+    try:
+        from db_factory import open_analytical_db
+        adapter = open_analytical_db(HERE / "data" / "panchayat_1.duckdb")
+        try:
+            for view in ("v_activity", "v_asset", "v_progress"):
+                total, typed = adapter.execute(
+                    f"SELECT COUNT(*), COUNT(plan_type) FROM {view}").fetchone()
+                if not total or typed != total:
+                    problems.append(f"{view}: {typed} of {total} rows carry plan_type")
+            notes.append("plan_type present on v_activity, v_asset and v_progress")
+        finally:
+            adapter.close()
+    except Exception as exc:                                 # noqa: BLE001
+        problems.append(f"plan_type check could not run: {type(exc).__name__}: {exc}")
+
     return not problems, "\n".join(problems or notes)
 
 

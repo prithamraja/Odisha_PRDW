@@ -819,6 +819,7 @@ def _fill_slots_or_clarify(
     optional: set[str] | frozenset[str] = frozenset(),
     defaults: dict[str, str] | None = None,
     list_slots: set[str] | frozenset[str] = frozenset(),
+    splits: set[str] | frozenset[str] = frozenset(),
 ) -> tuple[list[ExtractedEntity], RouteResult | None]:
     """Validate every slot value, or return a clarify carrying pending state so
     the user's next message can resume this exact question.
@@ -891,6 +892,18 @@ def _fill_slots_or_clarify(
                 raw_val = None
             elif len(supplied) == 1:
                 raw_val = supplied[0]
+            elif slot not in list_slots and slot in splits and slot in optional:
+                # A slot that cannot hold a list, on a statement that already
+                # reports one row per value of its column: "tied and untied" is
+                # the split the statement gives, not a filter to bind or a
+                # question to ask. WP-5 answered both of these; WP-6 gave the
+                # extractor a slot to fill and they started asking.
+                # A LIST-CAPABLE slot never comes here — "water vs sanitation"
+                # binds both values and is the comparison T4 exists for.
+                _log.info("%s: %r names %d values of a column %s already "
+                          "reports separately — left unfiltered",
+                          query_id, supplied, len(supplied), query_id)
+                raw_val = None
             elif slot not in list_slots:
                 clarify = _clarify(
                     "missing_parameter",
@@ -1710,6 +1723,7 @@ def serve_pending_answer(
         optional=optional_slots(template["param_slots"]),
         defaults=slot_defaults(template["param_slots"]),
         list_slots=_list_slots(template["param_slots"]),
+        splits=breakdown.slots_the_statement_splits(template),
     )
     if clarify_result is not None:
         return clarify_result
@@ -1932,11 +1946,14 @@ def _serve_query_id(
     query_description = re.sub(
         r"\bof\s+(\S+)\s+of\s+\1\b", r"of \1", query_description, flags=re.IGNORECASE
     )
-    query_description = breakdown.describe(query_description, group_by)
-    if group_by is None and any(e.values and len(e.values) > 1
-                                for e in validated_entities):
+    query_description = breakdown.describe(query_description, group_by, template)
+    splits_already = breakdown.slots_the_statement_splits(template)
+    if group_by is None and any(
+            e.values and len(e.values) > 1 and e.slot_name not in splits_already
+            for e in validated_entities):
         # Nothing could separate them, so say they were added together rather
-        # than leaving one figure standing for two questions.
+        # than leaving one figure standing for two questions. A statement that
+        # already reports one row per value needs no such warning.
         query_description = f"{query_description} (the values combined)"  # noqa: E501
 
     params_by_name = {e.slot_name: (e.values if e.values else e.resolved_value)
@@ -2227,6 +2244,7 @@ def _route_vector(
                 optional=optional_slots(template_map[query_id]["param_slots"]),
                 defaults=slot_defaults(template_map[query_id]["param_slots"]),
                 list_slots=list_slots,
+                splits=breakdown.slots_the_statement_splits(template_map[query_id]),
             )
             if clarify_result is not None:
                 return clarify_result

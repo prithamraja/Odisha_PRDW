@@ -709,5 +709,74 @@ class T5LossyAliasTests(unittest.TestCase):
         self.assertFalse([k for k in LOSSY_ALIASES if k[0] == "theme"])
 
 
+@unittest.skipIf(_adapter() is None, f"no sample database at {_DB_PATH}")
+class T7ReplayFindingsTests(unittest.TestCase):
+    """What the first 3x replay found, which nothing else did."""
+
+    @classmethod
+    def setUpClass(cls):
+        from query_router.entity_validator import EntityValidator
+        cls.validator = EntityValidator(_adapter())
+
+    def test_naming_both_values_of_a_split_is_not_a_question(self):
+        """"What percentage of the sanctioned budget is tied and untied?" —
+        BUD-005 REPORTS both, so the two values are the answer's own shape. WP-5
+        answered it; WP-6 gave the extractor a $tied_untied slot to fill and it
+        started asking which half the officer meant."""
+        from query_router import breakdown, router
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        template = T["BUD-005"]
+        splits = breakdown.slots_the_statement_splits(template)
+        self.assertIn("tied_untied", splits)
+        validated, clarify = router._fill_slots_or_clarify(
+            "BUD-005", router._template_slot_types(template),
+            {"date_range": "2024-2025", "tied_untied": ["Tied", "Untied"]},
+            self.validator, "q", "q", 0.0,
+            optional=router.optional_slots(template["param_slots"]),
+            list_slots=router._list_slots(template["param_slots"]),
+            splits=splits)
+        self.assertIsNone(clarify, "it must answer, not ask")
+        self.assertNotIn("tied_untied", {e.slot_name for e in validated})
+
+    def test_a_comparison_on_a_list_slot_still_binds(self):
+        """The rule above must not swallow "water vs sanitation": EXP-009 also
+        separates focus areas, and there the officer named two of thirty."""
+        from query_router import breakdown, router
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        template = T["EXP-009"]
+        validated, clarify = router._fill_slots_or_clarify(
+            "EXP-009", router._template_slot_types(template),
+            {"date_range": "2024-2025",
+             "focus_area": ["Drinking water", "Sanitation"]},
+            self.validator, "q", "q", 0.0,
+            optional=router.optional_slots(template["param_slots"]),
+            list_slots=router._list_slots(template["param_slots"]),
+            splits=breakdown.slots_the_statement_splits(template))
+        self.assertIsNone(clarify)
+        focus = next(e for e in validated if e.slot_name == "focus_area")
+        self.assertEqual(focus.values, ["Drinking water", "Sanitation"])
+
+    def test_the_echo_only_names_a_breakdown_that_is_news(self):
+        """"Which blocks have the most pending approvals?" reads `block` off its
+        own wording, and block is what PLN-020 groups by anyway."""
+        from query_router import breakdown
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        same = breakdown.describe("Which Blocks have the most pending approvals?",
+                                  "block", T["PLN-020"])
+        self.assertNotIn("broken down", same)
+        different = breakdown.describe("How much planned expenditure per theme?",
+                                       "district", T["BUD-006"])
+        self.assertIn("broken down by district", different)
+
+    def test_the_reranker_is_told_what_the_filters_are_for(self):
+        """Both Eval_1 misses had their template in the window and lost it at the
+        reranker, which never sees paraphrases — only the question and the
+        description."""
+        from query_router.rerank_context import DESC_BY_QID
+        self.assertIn("FOCUS AREA", DESC_BY_QID["STS-003"])
+        self.assertIn("completed sanitation activities", DESC_BY_QID["STS-003"])
+        self.assertIn("PLN-049", DESC_BY_QID["PLN-052"])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,525 @@
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+entity registry query failed (SELECT DISTINCT zp_name FROM gram_panchayat WHERE zp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT block_name FROM gram_panchayat WHERE block_n): no database in this test
+entity registry query failed (SELECT DISTINCT gp_name FROM gram_panchayat WHERE gp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT DISTINCT description FROM dim_code WHERE variable = '): no database in this test
+entity registry query failed (SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_th): no database in this test
+entity registry query failed (SELECT DISTINCT scheme_name FROM activity_expenditure WHERE ): no database in this test
+entity registry query failed (SELECT DISTINCT status_label FROM v_activity WHERE status_la): no database in this test
+entity registry query failed (SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS): no database in this test
+entity registry query failed (SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untie): no database in this test
+entity registry query failed (SELECT DISTINCT asset_category_label FROM v_asset WHERE asse): no database in this test
+entity registry query failed (SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE a): no database in this test
+entity registry query failed (SELECT zp_name FROM gram_panchayat WHERE zp_name IS NOT NULL): no database in this test
+entity registry query failed (SELECT block_name FROM gram_panchayat WHERE block_name IS NO): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT focus_area_name FROM v_activity WHERE focus_area_name): no database in this test
+entity registry query failed (SELECT scheme_name FROM activity_expenditure WHERE scheme_na): no database in this test
+entity registry query failed (SELECT gp_lgd_code, gp_name, block_name, zp_name FROM gram_p): no database in this test
+entity registry query failed (SELECT DISTINCT zp_name FROM gram_panchayat WHERE zp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT block_name FROM gram_panchayat WHERE block_n): no database in this test
+entity registry query failed (SELECT DISTINCT gp_name FROM gram_panchayat WHERE gp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT DISTINCT description FROM dim_code WHERE variable = '): no database in this test
+entity registry query failed (SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_th): no database in this test
+entity registry query failed (SELECT DISTINCT scheme_name FROM activity_expenditure WHERE ): no database in this test
+entity registry query failed (SELECT DISTINCT status_label FROM v_activity WHERE status_la): no database in this test
+entity registry query failed (SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS): no database in this test
+entity registry query failed (SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untie): no database in this test
+entity registry query failed (SELECT DISTINCT asset_category_label FROM v_asset WHERE asse): no database in this test
+entity registry query failed (SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE a): no database in this test
+entity registry query failed (SELECT zp_name FROM gram_panchayat WHERE zp_name IS NOT NULL): no database in this test
+entity registry query failed (SELECT block_name FROM gram_panchayat WHERE block_name IS NO): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT focus_area_name FROM v_activity WHERE focus_area_name): no database in this test
+entity registry query failed (SELECT scheme_name FROM activity_expenditure WHERE scheme_na): no database in this test
+entity registry query failed (SELECT gp_lgd_code, gp_name, block_name, zp_name FROM gram_p): no database in this test
+entity registry query failed (SELECT DISTINCT zp_name FROM gram_panchayat WHERE zp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT block_name FROM gram_panchayat WHERE block_n): no database in this test
+entity registry query failed (SELECT DISTINCT gp_name FROM gram_panchayat WHERE gp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT DISTINCT description FROM dim_code WHERE variable = '): no database in this test
+entity registry query failed (SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_th): no database in this test
+entity registry query failed (SELECT DISTINCT scheme_name FROM activity_expenditure WHERE ): no database in this test
+entity registry query failed (SELECT DISTINCT status_label FROM v_activity WHERE status_la): no database in this test
+entity registry query failed (SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS): no database in this test
+entity registry query failed (SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untie): no database in this test
+entity registry query failed (SELECT DISTINCT asset_category_label FROM v_asset WHERE asse): no database in this test
+entity registry query failed (SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE a): no database in this test
+entity registry query failed (SELECT zp_name FROM gram_panchayat WHERE zp_name IS NOT NULL): no database in this test
+entity registry query failed (SELECT block_name FROM gram_panchayat WHERE block_name IS NO): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT focus_area_name FROM v_activity WHERE focus_area_name): no database in this test
+entity registry query failed (SELECT scheme_name FROM activity_expenditure WHERE scheme_na): no database in this test
+entity registry query failed (SELECT gp_lgd_code, gp_name, block_name, zp_name FROM gram_p): no database in this test
+entity registry query failed (SELECT DISTINCT zp_name FROM gram_panchayat WHERE zp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT block_name FROM gram_panchayat WHERE block_n): no database in this test
+entity registry query failed (SELECT DISTINCT gp_name FROM gram_panchayat WHERE gp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT DISTINCT description FROM dim_code WHERE variable = '): no database in this test
+entity registry query failed (SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_th): no database in this test
+entity registry query failed (SELECT DISTINCT scheme_name FROM activity_expenditure WHERE ): no database in this test
+entity registry query failed (SELECT DISTINCT status_label FROM v_activity WHERE status_la): no database in this test
+entity registry query failed (SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS): no database in this test
+entity registry query failed (SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untie): no database in this test
+entity registry query failed (SELECT DISTINCT asset_category_label FROM v_asset WHERE asse): no database in this test
+entity registry query failed (SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE a): no database in this test
+entity registry query failed (SELECT zp_name FROM gram_panchayat WHERE zp_name IS NOT NULL): no database in this test
+entity registry query failed (SELECT block_name FROM gram_panchayat WHERE block_name IS NO): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT focus_area_name FROM v_activity WHERE focus_area_name): no database in this test
+entity registry query failed (SELECT scheme_name FROM activity_expenditure WHERE scheme_na): no database in this test
+entity registry query failed (SELECT gp_lgd_code, gp_name, block_name, zp_name FROM gram_p): no database in this test
+entity registry query failed (SELECT DISTINCT zp_name FROM gram_panchayat WHERE zp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT block_name FROM gram_panchayat WHERE block_n): no database in this test
+entity registry query failed (SELECT DISTINCT gp_name FROM gram_panchayat WHERE gp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT DISTINCT description FROM dim_code WHERE variable = '): no database in this test
+entity registry query failed (SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_th): no database in this test
+entity registry query failed (SELECT DISTINCT scheme_name FROM activity_expenditure WHERE ): no database in this test
+entity registry query failed (SELECT DISTINCT status_label FROM v_activity WHERE status_la): no database in this test
+entity registry query failed (SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS): no database in this test
+entity registry query failed (SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untie): no database in this test
+entity registry query failed (SELECT DISTINCT asset_category_label FROM v_asset WHERE asse): no database in this test
+entity registry query failed (SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE a): no database in this test
+entity registry query failed (SELECT zp_name FROM gram_panchayat WHERE zp_name IS NOT NULL): no database in this test
+entity registry query failed (SELECT block_name FROM gram_panchayat WHERE block_name IS NO): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT focus_area_name FROM v_activity WHERE focus_area_name): no database in this test
+entity registry query failed (SELECT scheme_name FROM activity_expenditure WHERE scheme_na): no database in this test
+entity registry query failed (SELECT gp_lgd_code, gp_name, block_name, zp_name FROM gram_p): no database in this test
+entity registry query failed (SELECT DISTINCT zp_name FROM gram_panchayat WHERE zp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT block_name FROM gram_panchayat WHERE block_n): no database in this test
+entity registry query failed (SELECT DISTINCT gp_name FROM gram_panchayat WHERE gp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT DISTINCT description FROM dim_code WHERE variable = '): no database in this test
+entity registry query failed (SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_th): no database in this test
+entity registry query failed (SELECT DISTINCT scheme_name FROM activity_expenditure WHERE ): no database in this test
+entity registry query failed (SELECT DISTINCT status_label FROM v_activity WHERE status_la): no database in this test
+entity registry query failed (SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS): no database in this test
+entity registry query failed (SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untie): no database in this test
+entity registry query failed (SELECT DISTINCT asset_category_label FROM v_asset WHERE asse): no database in this test
+entity registry query failed (SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE a): no database in this test
+entity registry query failed (SELECT zp_name FROM gram_panchayat WHERE zp_name IS NOT NULL): no database in this test
+entity registry query failed (SELECT block_name FROM gram_panchayat WHERE block_name IS NO): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT focus_area_name FROM v_activity WHERE focus_area_name): no database in this test
+entity registry query failed (SELECT scheme_name FROM activity_expenditure WHERE scheme_na): no database in this test
+entity registry query failed (SELECT gp_lgd_code, gp_name, block_name, zp_name FROM gram_p): no database in this test
+entity registry query failed (SELECT DISTINCT zp_name FROM gram_panchayat WHERE zp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT block_name FROM gram_panchayat WHERE block_n): no database in this test
+entity registry query failed (SELECT DISTINCT gp_name FROM gram_panchayat WHERE gp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT DISTINCT description FROM dim_code WHERE variable = '): no database in this test
+entity registry query failed (SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_th): no database in this test
+entity registry query failed (SELECT DISTINCT scheme_name FROM activity_expenditure WHERE ): no database in this test
+entity registry query failed (SELECT DISTINCT status_label FROM v_activity WHERE status_la): no database in this test
+entity registry query failed (SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS): no database in this test
+entity registry query failed (SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untie): no database in this test
+entity registry query failed (SELECT DISTINCT asset_category_label FROM v_asset WHERE asse): no database in this test
+entity registry query failed (SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE a): no database in this test
+entity registry query failed (SELECT zp_name FROM gram_panchayat WHERE zp_name IS NOT NULL): no database in this test
+entity registry query failed (SELECT block_name FROM gram_panchayat WHERE block_name IS NO): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT focus_area_name FROM v_activity WHERE focus_area_name): no database in this test
+entity registry query failed (SELECT scheme_name FROM activity_expenditure WHERE scheme_na): no database in this test
+entity registry query failed (SELECT gp_lgd_code, gp_name, block_name, zp_name FROM gram_p): no database in this test
+entity registry query failed (SELECT DISTINCT zp_name FROM gram_panchayat WHERE zp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT block_name FROM gram_panchayat WHERE block_n): no database in this test
+entity registry query failed (SELECT DISTINCT gp_name FROM gram_panchayat WHERE gp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT DISTINCT description FROM dim_code WHERE variable = '): no database in this test
+entity registry query failed (SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_th): no database in this test
+entity registry query failed (SELECT DISTINCT scheme_name FROM activity_expenditure WHERE ): no database in this test
+entity registry query failed (SELECT DISTINCT status_label FROM v_activity WHERE status_la): no database in this test
+entity registry query failed (SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS): no database in this test
+entity registry query failed (SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untie): no database in this test
+entity registry query failed (SELECT DISTINCT asset_category_label FROM v_asset WHERE asse): no database in this test
+entity registry query failed (SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE a): no database in this test
+entity registry query failed (SELECT zp_name FROM gram_panchayat WHERE zp_name IS NOT NULL): no database in this test
+entity registry query failed (SELECT block_name FROM gram_panchayat WHERE block_name IS NO): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT focus_area_name FROM v_activity WHERE focus_area_name): no database in this test
+entity registry query failed (SELECT scheme_name FROM activity_expenditure WHERE scheme_na): no database in this test
+entity registry query failed (SELECT gp_lgd_code, gp_name, block_name, zp_name FROM gram_p): no database in this test
+entity registry query failed (SELECT DISTINCT zp_name FROM gram_panchayat WHERE zp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT block_name FROM gram_panchayat WHERE block_n): no database in this test
+entity registry query failed (SELECT DISTINCT gp_name FROM gram_panchayat WHERE gp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT DISTINCT description FROM dim_code WHERE variable = '): no database in this test
+entity registry query failed (SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_th): no database in this test
+entity registry query failed (SELECT DISTINCT scheme_name FROM activity_expenditure WHERE ): no database in this test
+entity registry query failed (SELECT DISTINCT status_label FROM v_activity WHERE status_la): no database in this test
+entity registry query failed (SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS): no database in this test
+entity registry query failed (SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untie): no database in this test
+entity registry query failed (SELECT DISTINCT asset_category_label FROM v_asset WHERE asse): no database in this test
+entity registry query failed (SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE a): no database in this test
+entity registry query failed (SELECT zp_name FROM gram_panchayat WHERE zp_name IS NOT NULL): no database in this test
+entity registry query failed (SELECT block_name FROM gram_panchayat WHERE block_name IS NO): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT focus_area_name FROM v_activity WHERE focus_area_name): no database in this test
+entity registry query failed (SELECT scheme_name FROM activity_expenditure WHERE scheme_na): no database in this test
+entity registry query failed (SELECT gp_lgd_code, gp_name, block_name, zp_name FROM gram_p): no database in this test
+entity registry query failed (SELECT DISTINCT zp_name FROM gram_panchayat WHERE zp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT block_name FROM gram_panchayat WHERE block_n): no database in this test
+entity registry query failed (SELECT DISTINCT gp_name FROM gram_panchayat WHERE gp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT DISTINCT description FROM dim_code WHERE variable = '): no database in this test
+entity registry query failed (SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_th): no database in this test
+entity registry query failed (SELECT DISTINCT scheme_name FROM activity_expenditure WHERE ): no database in this test
+entity registry query failed (SELECT DISTINCT status_label FROM v_activity WHERE status_la): no database in this test
+entity registry query failed (SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS): no database in this test
+entity registry query failed (SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untie): no database in this test
+entity registry query failed (SELECT DISTINCT asset_category_label FROM v_asset WHERE asse): no database in this test
+entity registry query failed (SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE a): no database in this test
+entity registry query failed (SELECT zp_name FROM gram_panchayat WHERE zp_name IS NOT NULL): no database in this test
+entity registry query failed (SELECT block_name FROM gram_panchayat WHERE block_name IS NO): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT focus_area_name FROM v_activity WHERE focus_area_name): no database in this test
+entity registry query failed (SELECT scheme_name FROM activity_expenditure WHERE scheme_na): no database in this test
+entity registry query failed (SELECT gp_lgd_code, gp_name, block_name, zp_name FROM gram_p): no database in this test
+entity registry query failed (SELECT DISTINCT zp_name FROM gram_panchayat WHERE zp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT block_name FROM gram_panchayat WHERE block_n): no database in this test
+entity registry query failed (SELECT DISTINCT gp_name FROM gram_panchayat WHERE gp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT DISTINCT description FROM dim_code WHERE variable = '): no database in this test
+entity registry query failed (SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_th): no database in this test
+entity registry query failed (SELECT DISTINCT scheme_name FROM activity_expenditure WHERE ): no database in this test
+entity registry query failed (SELECT DISTINCT status_label FROM v_activity WHERE status_la): no database in this test
+entity registry query failed (SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS): no database in this test
+entity registry query failed (SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untie): no database in this test
+entity registry query failed (SELECT DISTINCT asset_category_label FROM v_asset WHERE asse): no database in this test
+entity registry query failed (SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE a): no database in this test
+entity registry query failed (SELECT zp_name FROM gram_panchayat WHERE zp_name IS NOT NULL): no database in this test
+entity registry query failed (SELECT block_name FROM gram_panchayat WHERE block_name IS NO): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT focus_area_name FROM v_activity WHERE focus_area_name): no database in this test
+entity registry query failed (SELECT scheme_name FROM activity_expenditure WHERE scheme_na): no database in this test
+entity registry query failed (SELECT gp_lgd_code, gp_name, block_name, zp_name FROM gram_p): no database in this test
+entity registry query failed (SELECT DISTINCT zp_name FROM gram_panchayat WHERE zp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT block_name FROM gram_panchayat WHERE block_n): no database in this test
+entity registry query failed (SELECT DISTINCT gp_name FROM gram_panchayat WHERE gp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT DISTINCT description FROM dim_code WHERE variable = '): no database in this test
+entity registry query failed (SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_th): no database in this test
+entity registry query failed (SELECT DISTINCT scheme_name FROM activity_expenditure WHERE ): no database in this test
+entity registry query failed (SELECT DISTINCT status_label FROM v_activity WHERE status_la): no database in this test
+entity registry query failed (SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS): no database in this test
+entity registry query failed (SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untie): no database in this test
+entity registry query failed (SELECT DISTINCT asset_category_label FROM v_asset WHERE asse): no database in this test
+entity registry query failed (SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE a): no database in this test
+entity registry query failed (SELECT zp_name FROM gram_panchayat WHERE zp_name IS NOT NULL): no database in this test
+entity registry query failed (SELECT block_name FROM gram_panchayat WHERE block_name IS NO): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT focus_area_name FROM v_activity WHERE focus_area_name): no database in this test
+entity registry query failed (SELECT scheme_name FROM activity_expenditure WHERE scheme_na): no database in this test
+entity registry query failed (SELECT gp_lgd_code, gp_name, block_name, zp_name FROM gram_p): no database in this test
+entity registry query failed (SELECT DISTINCT zp_name FROM gram_panchayat WHERE zp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT block_name FROM gram_panchayat WHERE block_n): no database in this test
+entity registry query failed (SELECT DISTINCT gp_name FROM gram_panchayat WHERE gp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT DISTINCT description FROM dim_code WHERE variable = '): no database in this test
+entity registry query failed (SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_th): no database in this test
+entity registry query failed (SELECT DISTINCT scheme_name FROM activity_expenditure WHERE ): no database in this test
+entity registry query failed (SELECT DISTINCT status_label FROM v_activity WHERE status_la): no database in this test
+entity registry query failed (SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS): no database in this test
+entity registry query failed (SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untie): no database in this test
+entity registry query failed (SELECT DISTINCT asset_category_label FROM v_asset WHERE asse): no database in this test
+entity registry query failed (SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE a): no database in this test
+entity registry query failed (SELECT zp_name FROM gram_panchayat WHERE zp_name IS NOT NULL): no database in this test
+entity registry query failed (SELECT block_name FROM gram_panchayat WHERE block_name IS NO): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT focus_area_name FROM v_activity WHERE focus_area_name): no database in this test
+entity registry query failed (SELECT scheme_name FROM activity_expenditure WHERE scheme_na): no database in this test
+entity registry query failed (SELECT gp_lgd_code, gp_name, block_name, zp_name FROM gram_p): no database in this test
+entity registry query failed (SELECT DISTINCT zp_name FROM gram_panchayat WHERE zp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT block_name FROM gram_panchayat WHERE block_n): no database in this test
+entity registry query failed (SELECT DISTINCT gp_name FROM gram_panchayat WHERE gp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT DISTINCT description FROM dim_code WHERE variable = '): no database in this test
+entity registry query failed (SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_th): no database in this test
+entity registry query failed (SELECT DISTINCT scheme_name FROM activity_expenditure WHERE ): no database in this test
+entity registry query failed (SELECT DISTINCT status_label FROM v_activity WHERE status_la): no database in this test
+entity registry query failed (SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS): no database in this test
+entity registry query failed (SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untie): no database in this test
+entity registry query failed (SELECT DISTINCT asset_category_label FROM v_asset WHERE asse): no database in this test
+entity registry query failed (SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE a): no database in this test
+entity registry query failed (SELECT zp_name FROM gram_panchayat WHERE zp_name IS NOT NULL): no database in this test
+entity registry query failed (SELECT block_name FROM gram_panchayat WHERE block_name IS NO): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT focus_area_name FROM v_activity WHERE focus_area_name): no database in this test
+entity registry query failed (SELECT scheme_name FROM activity_expenditure WHERE scheme_na): no database in this test
+entity registry query failed (SELECT gp_lgd_code, gp_name, block_name, zp_name FROM gram_p): no database in this test
+entity registry query failed (SELECT DISTINCT zp_name FROM gram_panchayat WHERE zp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT block_name FROM gram_panchayat WHERE block_n): no database in this test
+entity registry query failed (SELECT DISTINCT gp_name FROM gram_panchayat WHERE gp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT DISTINCT description FROM dim_code WHERE variable = '): no database in this test
+entity registry query failed (SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_th): no database in this test
+entity registry query failed (SELECT DISTINCT scheme_name FROM activity_expenditure WHERE ): no database in this test
+entity registry query failed (SELECT DISTINCT status_label FROM v_activity WHERE status_la): no database in this test
+entity registry query failed (SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS): no database in this test
+entity registry query failed (SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untie): no database in this test
+entity registry query failed (SELECT DISTINCT asset_category_label FROM v_asset WHERE asse): no database in this test
+entity registry query failed (SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE a): no database in this test
+entity registry query failed (SELECT zp_name FROM gram_panchayat WHERE zp_name IS NOT NULL): no database in this test
+entity registry query failed (SELECT block_name FROM gram_panchayat WHERE block_name IS NO): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT focus_area_name FROM v_activity WHERE focus_area_name): no database in this test
+entity registry query failed (SELECT scheme_name FROM activity_expenditure WHERE scheme_na): no database in this test
+entity registry query failed (SELECT gp_lgd_code, gp_name, block_name, zp_name FROM gram_p): no database in this test
+entity registry query failed (SELECT DISTINCT zp_name FROM gram_panchayat WHERE zp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT block_name FROM gram_panchayat WHERE block_n): no database in this test
+entity registry query failed (SELECT DISTINCT gp_name FROM gram_panchayat WHERE gp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT DISTINCT description FROM dim_code WHERE variable = '): no database in this test
+entity registry query failed (SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_th): no database in this test
+entity registry query failed (SELECT DISTINCT scheme_name FROM activity_expenditure WHERE ): no database in this test
+entity registry query failed (SELECT DISTINCT status_label FROM v_activity WHERE status_la): no database in this test
+entity registry query failed (SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS): no database in this test
+entity registry query failed (SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untie): no database in this test
+entity registry query failed (SELECT DISTINCT asset_category_label FROM v_asset WHERE asse): no database in this test
+entity registry query failed (SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE a): no database in this test
+entity registry query failed (SELECT zp_name FROM gram_panchayat WHERE zp_name IS NOT NULL): no database in this test
+entity registry query failed (SELECT block_name FROM gram_panchayat WHERE block_name IS NO): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT focus_area_name FROM v_activity WHERE focus_area_name): no database in this test
+entity registry query failed (SELECT scheme_name FROM activity_expenditure WHERE scheme_na): no database in this test
+entity registry query failed (SELECT gp_lgd_code, gp_name, block_name, zp_name FROM gram_p): no database in this test
+entity registry query failed (SELECT DISTINCT zp_name FROM gram_panchayat WHERE zp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT block_name FROM gram_panchayat WHERE block_n): no database in this test
+entity registry query failed (SELECT DISTINCT gp_name FROM gram_panchayat WHERE gp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT DISTINCT description FROM dim_code WHERE variable = '): no database in this test
+entity registry query failed (SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_th): no database in this test
+entity registry query failed (SELECT DISTINCT scheme_name FROM activity_expenditure WHERE ): no database in this test
+entity registry query failed (SELECT DISTINCT status_label FROM v_activity WHERE status_la): no database in this test
+entity registry query failed (SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS): no database in this test
+entity registry query failed (SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untie): no database in this test
+entity registry query failed (SELECT DISTINCT asset_category_label FROM v_asset WHERE asse): no database in this test
+entity registry query failed (SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE a): no database in this test
+entity registry query failed (SELECT zp_name FROM gram_panchayat WHERE zp_name IS NOT NULL): no database in this test
+entity registry query failed (SELECT block_name FROM gram_panchayat WHERE block_name IS NO): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT focus_area_name FROM v_activity WHERE focus_area_name): no database in this test
+entity registry query failed (SELECT scheme_name FROM activity_expenditure WHERE scheme_na): no database in this test
+entity registry query failed (SELECT gp_lgd_code, gp_name, block_name, zp_name FROM gram_p): no database in this test
+entity registry query failed (SELECT DISTINCT zp_name FROM gram_panchayat WHERE zp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT block_name FROM gram_panchayat WHERE block_n): no database in this test
+entity registry query failed (SELECT DISTINCT gp_name FROM gram_panchayat WHERE gp_name IS): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT DISTINCT description FROM dim_code WHERE variable = '): no database in this test
+entity registry query failed (SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_th): no database in this test
+entity registry query failed (SELECT DISTINCT scheme_name FROM activity_expenditure WHERE ): no database in this test
+entity registry query failed (SELECT DISTINCT status_label FROM v_activity WHERE status_la): no database in this test
+entity registry query failed (SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS): no database in this test
+entity registry query failed (SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untie): no database in this test
+entity registry query failed (SELECT DISTINCT asset_category_label FROM v_asset WHERE asse): no database in this test
+entity registry query failed (SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE a): no database in this test
+entity registry query failed (SELECT zp_name FROM gram_panchayat WHERE zp_name IS NOT NULL): no database in this test
+entity registry query failed (SELECT block_name FROM gram_panchayat WHERE block_name IS NO): no database in this test
+entity registry query failed (SELECT DISTINCT fiscal_year FROM planned_activity WHERE fisc): no database in this test
+entity registry query failed (SELECT focus_area_name FROM v_activity WHERE focus_area_name): no database in this test
+entity registry query failed (SELECT scheme_name FROM activity_expenditure WHERE scheme_na): no database in this test
+entity registry query failed (SELECT gp_lgd_code, gp_name, block_name, zp_name FROM gram_p): no database in this test
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+entity extraction UNAVAILABLE (timeout): APITimeoutError: Request timed out. | slots=['date_range', 'district_name'] | query='Which GPs have not uploaded their GPDP in 2024-2025?' — these nulls are an API/parse failure, NOT 'the user named nothing'
+entity extraction UNAVAILABLE (bad_json): top-level list, expected object | slots=['date_range', 'district_name'] | query='Which GPs have not uploaded their GPDP in 2024-2025?' — these nulls are an API/parse failure, NOT 'the user named nothing'
+entity extraction UNAVAILABLE (truncated): finish_reason='length' | slots=['date_range', 'district_name'] | query='Which GPs have not uploaded their GPDP in 2024-2025?' — these nulls are an API/parse failure, NOT 'the user named nothing'
+entity extraction UNAVAILABLE (empty_response): finish_reason='stop' | slots=['date_range', 'district_name'] | query='Which GPs have not uploaded their GPDP in 2024-2025?' — these nulls are an API/parse failure, NOT 'the user named nothing'
+entity extraction UNAVAILABLE (rate_limit): SomeFutureRateLimit: 429 | slots=['date_range', 'district_name'] | query='Which GPs have not uploaded their GPDP in 2024-2025?' — these nulls are an API/parse failure, NOT 'the user named nothing'
+entity extraction UNAVAILABLE (timeout): APITimeoutError: Request timed out. | slots=['date_range', 'district_name'] | query='Which GPs have not uploaded their GPDP in 2024-2025?' — these nulls are an API/parse failure, NOT 'the user named nothing'
+entity extraction UNAVAILABLE (connection): APIConnectionError: Connection error. | slots=['date_range', 'district_name'] | query='Which GPs have not uploaded their GPDP in 2024-2025?' — these nulls are an API/parse failure, NOT 'the user named nothing'
+entity extraction UNAVAILABLE (rate_limit): RateLimitError: slow down | slots=['date_range', 'district_name'] | query='Which GPs have not uploaded their GPDP in 2024-2025?' — these nulls are an API/parse failure, NOT 'the user named nothing'
+entity extraction UNAVAILABLE (auth): AuthenticationError: bad key | slots=['date_range', 'district_name'] | query='Which GPs have not uploaded their GPDP in 2024-2025?' — these nulls are an API/parse failure, NOT 'the user named nothing'
+entity extraction UNAVAILABLE (server_error): InternalServerError: boom | slots=['date_range', 'district_name'] | query='Which GPs have not uploaded their GPDP in 2024-2025?' — these nulls are an API/parse failure, NOT 'the user named nothing'
+entity extraction UNAVAILABLE (unexpected_error): RuntimeError: something nobody predicted | slots=['date_range', 'district_name'] | query='Which GPs have not uploaded their GPDP in 2024-2025?' — these nulls are an API/parse failure, NOT 'the user named nothing'
+entity extraction UNAVAILABLE (bad_json): JSONDecodeError: Expecting ',' delimiter: line 1 column 27 (char 26) | finish_reason='stop' | slots=['date_range', 'district_name'] | query='Which GPs have not uploaded their GPDP in 2024-2025?' — these nulls are an API/parse failure, NOT 'the user named nothing'
+entity extraction UNAVAILABLE (timeout): APITimeoutError: Request timed out. | slots=['date_range', 'district_name'] | query='Which GPs have not uploaded their GPDP in 2024-2025?' — these nulls are an API/parse failure, NOT 'the user named nothing'
+entity extraction UNAVAILABLE (timeout): APITimeoutError: Request timed out. | slots=['date_range', 'district_name'] | query='Which GPs have not uploaded their GPDP in 2024-2025?' — these nulls are an API/parse failure, NOT 'the user named nothing'
+entity extraction UNAVAILABLE (truncated): JSONDecodeError: Unterminated string starting at: line 1 column 16 (char 15) | finish_reason='length' | slots=['date_range', 'district_name'] | query='Which GPs have not uploaded their GPDP in 2024-2025?' — these nulls are an API/parse failure, NOT 'the user named nothing'
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+entity registry query failed (SELECT DISTINCT description FROM dim_code WHERE variable = '): Catalog Error: Table with name dim_code does not exist!
+Did you mean "duckdb_indexes"?
+
+LINE 1: SELECT DISTINCT description FROM dim_code WHERE variable = 'focus_area' AND description IS...
+                                         ^
+entity registry query failed (SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_th): Catalog Error: Table with name dim_lsdg_theme does not exist!
+Did you mean "sqlite_temp_schema"?
+
+LINE 1: SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_theme IS NOT NULL
+                                        ^
+entity registry query failed (SELECT DISTINCT scheme_name FROM activity_expenditure WHERE ): Catalog Error: Table with name activity_expenditure does not exist!
+Did you mean "pg_depend"?
+
+LINE 1: SELECT DISTINCT scheme_name FROM activity_expenditure WHERE scheme_name IS NOT NULL
+                                         ^
+entity registry query failed (SELECT DISTINCT status_label FROM v_activity WHERE status_la): Catalog Error: Table with name v_activity does not exist!
+Did you mean "planned_activity"?
+
+LINE 1: SELECT DISTINCT status_label FROM v_activity WHERE status_label IS NOT NULL
+                                          ^
+entity registry query failed (SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS): Catalog Error: Table with name v_activity does not exist!
+Did you mean "planned_activity"?
+
+LINE 1: SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS NOT NULL
+                                       ^
+entity registry query failed (SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untie): Catalog Error: Table with name v_activity does not exist!
+Did you mean "planned_activity"?
+
+LINE 1: SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untied IS NOT NULL
+                                         ^
+entity registry query failed (SELECT DISTINCT asset_category_label FROM v_asset WHERE asse): Catalog Error: Table with name v_asset does not exist!
+Did you mean "pg_class"?
+
+LINE 1: SELECT DISTINCT asset_category_label FROM v_asset WHERE asset_category_label IS NOT NULL
+                                                  ^
+entity registry query failed (SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE a): Catalog Error: Table with name v_asset does not exist!
+Did you mean "pg_class"?
+
+LINE 1: SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE asset_subcategory_label IS NOT NULL
+                                                     ^
+entity registry query failed (SELECT focus_area_name FROM v_activity WHERE focus_area_name): Catalog Error: Table with name v_activity does not exist!
+Did you mean "planned_activity"?
+
+LINE 1: SELECT focus_area_name FROM v_activity WHERE focus_area_name IS NOT NULL GROUP BY focus...
+                                    ^
+entity registry query failed (SELECT scheme_name FROM activity_expenditure WHERE scheme_na): Catalog Error: Table with name activity_expenditure does not exist!
+Did you mean "pg_depend"?
+
+LINE 1: SELECT scheme_name FROM activity_expenditure WHERE scheme_name IS NOT NULL GROUP...
+                                ^
+entity registry query failed (SELECT DISTINCT description FROM dim_code WHERE variable = '): Catalog Error: Table with name dim_code does not exist!
+Did you mean "duckdb_indexes"?
+
+LINE 1: SELECT DISTINCT description FROM dim_code WHERE variable = 'focus_area' AND description IS...
+                                         ^
+entity registry query failed (SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_th): Catalog Error: Table with name dim_lsdg_theme does not exist!
+Did you mean "sqlite_temp_schema"?
+
+LINE 1: SELECT DISTINCT lsdg_theme FROM dim_lsdg_theme WHERE lsdg_theme IS NOT NULL
+                                        ^
+entity registry query failed (SELECT DISTINCT scheme_name FROM activity_expenditure WHERE ): Catalog Error: Table with name activity_expenditure does not exist!
+Did you mean "pg_depend"?
+
+LINE 1: SELECT DISTINCT scheme_name FROM activity_expenditure WHERE scheme_name IS NOT NULL
+                                         ^
+entity registry query failed (SELECT DISTINCT status_label FROM v_activity WHERE status_la): Catalog Error: Table with name v_activity does not exist!
+Did you mean "planned_activity"?
+
+LINE 1: SELECT DISTINCT status_label FROM v_activity WHERE status_label IS NOT NULL
+                                          ^
+entity registry query failed (SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS): Catalog Error: Table with name v_activity does not exist!
+Did you mean "planned_activity"?
+
+LINE 1: SELECT DISTINCT plan_type FROM v_activity WHERE plan_type IS NOT NULL
+                                       ^
+entity registry query failed (SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untie): Catalog Error: Table with name v_activity does not exist!
+Did you mean "planned_activity"?
+
+LINE 1: SELECT DISTINCT tied_untied FROM v_activity WHERE tied_untied IS NOT NULL
+                                         ^
+entity registry query failed (SELECT DISTINCT asset_category_label FROM v_asset WHERE asse): Catalog Error: Table with name v_asset does not exist!
+Did you mean "pg_class"?
+
+LINE 1: SELECT DISTINCT asset_category_label FROM v_asset WHERE asset_category_label IS NOT NULL
+                                                  ^
+entity registry query failed (SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE a): Catalog Error: Table with name v_asset does not exist!
+Did you mean "pg_class"?
+
+LINE 1: SELECT DISTINCT asset_subcategory_label FROM v_asset WHERE asset_subcategory_label IS NOT NULL
+                                                     ^
+entity registry query failed (SELECT focus_area_name FROM v_activity WHERE focus_area_name): Catalog Error: Table with name v_activity does not exist!
+Did you mean "planned_activity"?
+
+LINE 1: SELECT focus_area_name FROM v_activity WHERE focus_area_name IS NOT NULL GROUP BY focus...
+                                    ^
+entity registry query failed (SELECT scheme_name FROM activity_expenditure WHERE scheme_na): Catalog Error: Table with name activity_expenditure does not exist!
+Did you mean "pg_depend"?
+
+LINE 1: SELECT scheme_name FROM activity_expenditure WHERE scheme_name IS NOT NULL GROUP...
+                                ^
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+
+══ PR&DW gates ══  9 checks, from C:\dev\odisha-wp6
+
+[db] Using DuckDB file C:\dev\odisha-wp6\data\panchayat_1.duckdb (read-only, 19 tables; 7 views + cache tables in-memory)
+[startup] DB ready
+[startup] Default date range: 2025-01-01 to 2025-12-31
+[startup] WARNING: OPENAI_API_KEY not set — /query endpoint disabled
+  [PASS] 1. Full test suite, fresh caches
+          639 tests across 31 modules, 22 skipped, 4 caches cleared
+  [PASS] 2. Catalogue executes (Test Report row counts)
+          theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+          status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+  [PASS] 3. Derived artefacts in step with the catalogue
+          derived artefacts in step with the catalogue
+  [PASS] 4. Gold set + harness format
+            categorical expectations (theme/scheme/status — the slot families with no deterministic reader): 30 across theme 6, scheme 9, scheme_2 1, status 14
+          OK — 275 records, invariants hold
+          hard checks: PASS
+          soft failures: none
+  [PASS] 5. Model identity (config + live model list)
+          config: abstraction=gpt-5.4-mini, embedding=text-embedding-3-large, extraction=gpt-5.4-mini, rerank=gpt-5.4-mini
+          live model list NOT CHECKED (--no-spend) — config-only, so an upstream swap would not be visible to this run
+  [PASS] 6. Served-refusal invariant (result is None, never [])
+          10 assertions
+  [PASS] 7. Paired-year direction pins (executed)
+          6 assertions
+  [PASS] 8. Refusal recall (documented refusals retrieve)
+          ── Refusal recall@30 (19 documented refusals, 373-entry index) ──
+            en             15/15 in window   [asserted]
+            code_mixed     2/2 in window   [asserted]
+            odia           0/1 in window   [reported, NOT asserted (deferred)]
+            odia_translit  1/1 in window   [reported, NOT asserted (deferred)]
+            BEN-001 pin: rank 5 (was 51 before WP-4c, 4 after) — OK
+          PASS  every refusal in a ratified register retrieves in window
+  [PASS] 9. Static invariants
+          date_filter unset on all 343 templates
+          no $tag$ dollar quoting in any sql_template
+          all 252 Partial templates carry a caveat
+          extraction sentinel distinguishes failure from empty
+          spend guard present on 3 paid harnesses
+          pmkisan_gates.py deleted
+          WP-6 slots bound ABSENT in the Test Report: 669
+          $group_by whitelisted on all 219 templates that offer it
+          plan_type present on v_activity, v_asset and v_progress
+
+GATE GREEN — 9/9 checks passed.

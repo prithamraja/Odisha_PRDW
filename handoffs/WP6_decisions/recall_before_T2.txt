@@ -1,0 +1,68 @@
+
+── recall_eval: estimated API spend ──
+  catalogue embeddings (2197 vectors over 376 entries)  9 calls
+  query embeddings (235 gold questions)                 1 calls
+  TOTAL                                                 ~10 calls
+  confirmed — running
+
+Index: 376 entries, 2197 vectors (1821 from paraphrases)
+Gold rows: 237 | scorable: 235 | gold id not in catalog: 2
+  (unmatched gold ids: PHY-006)
+
+Language: ENGLISH
+
+── Recall@K (english; optimistic — topics phrased like the catalog) ──
+  recall@5  :  78.7%  (185/235)
+  recall@10 :  86.4%  (203/235)
+  recall@20 :  91.1%  (214/235)
+  recall@30 :  93.6%  (220/235)
+
+── Recall@30 by language ──
+  code_mixed     100.0%  (49/49)
+  en             100.0%  (106/106)
+  en_eval1        86.0%  (43/50)
+  odia            52.9%  (9/17)
+  odia_translit  100.0%  (13/13)
+
+  ranks written to C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\b29f4b0f-cdda-471b-bbd7-a2aea1aa88a8\scratchpad\recall_before_ranks.json
+
+── Gold-answer rank (0-based) ──
+  median: 0   p90: 18   p99: 129   worst: 330
+
+── Crowding 1: extra raw vectors walked to reach 30 distinct ids ──
+  (0 = no paraphrase ever displaced another template)
+  mean: 22.4   max: 94
+  distribution: 0:50, 1:6, 2:9, 3:13, 4:9, 5:4, 6:3, 7:4, 8:3, 9:2, 10:5, 11:2, 12:3, 13:2, 14:2, 15:3, 16:3, 17:3, 18:4, 19:2, 20:6, 21:2, 22:1, 23:3, 24:3, 25:2, 26:2, 27:4, 28:3, 29:5, 30:2, 31:1, 32:3, 33:1, 34:2, 35:2, 36:3, 37:3, 38:2, 39:2, 40:2, 42:1, 43:1, 44:1, 45:2, 47:3, 48:2, 50:1, 51:1, 52:2, 53:3, 54:2, 56:2, 57:2, 62:2, 64:1, 65:1, 66:3, 69:4, 73:2, 74:1, 75:1, 76:2, 77:1, 78:1, 79:1, 80:1, 81:1, 86:2, 87:1, 94:1
+
+── Crowding 2: identical-question siblings in top-30 ──
+  the catalogue ships 4 groups of duplicate question text (9 entries where 4 would do)
+    BUD-014, BUD-017
+    EXP-009, EXP-011
+    EXP-010, EXP-026, EXP-030
+    EXP-031, EXP-032
+  mean: 0.02   max: 2
+  distribution: 0:231, 1:3, 2:1
+
+  note: the AP intent-family crowding metric is REMOVED, not measured-as-zero. INTENT_LOOKUP holds 0 entries here (PR&DW retrieves template-direct), so it printed 'mean: 0.0' on every run and read as evidence of a clean catalogue — see Crowding 2 for the opposite.
+
+── Misses (gold outside top-30) — 15 ──
+  rank 129  PLN-068  2024-2025 ରେ କେଉଁ ଫୋକସ ଏରିଆରେ କୌଣସି ଯୋଜନାବଦ୍ଧ କାର୍ଯ୍ୟ ନାହିଁ?
+  rank  65  SBM-OM-004  2024-2025 ରେ ପ୍ଲାଷ୍ଟିକ ବର୍ଜ୍ୟବସ୍ତୁ ପରିଚାଳନା ୟୁନିଟ ପାଇଁ କେତେ ଖର୍ଚ୍ଚ ହୋଇ
+  rank 219  BUD-027  2024-2025 ରେ କେଉଁ ଫୋକସ ଏରିଆକୁ କୌଣସି ଯୋଜନାବଦ୍ଧ ଖର୍ଚ୍ଚ ମିଳିନାହିଁ?
+  rank 330  BUD-002  2024-2025 ରେ ପ୍ରତ୍ୟେକ ପାଣ୍ଠି ଉତ୍ସରୁ କେତେ ଅର୍ଥ ମିଳିଛି?
+  rank  34  EXP-028  2024-2025 ରେ କେଉଁ ଫୋକସ ଏରିଆରେ ସର୍ବାଧିକ ପ୍ରକୃତ ଖର୍ଚ୍ଚ ହୋଇଛି?
+  rank 127  IMP-002  2024-2025 ରେ ଆରମ୍ଭ ହୋଇଥିବା କେତେ କାର୍ଯ୍ୟ ସମ୍ପୂର୍ଣ୍ଣ ହୋଇଛି?
+  rank  54  ALR-012  2024-2025 ରେ ଭୁବନେଶ୍ୱର ବ୍ଲକର କେଉଁ ଗ୍ରାମ ପଞ୍ଚାୟତରେ କୌଣସି କାର୍ଯ୍ୟ ହୋଇନାହ
+  rank  39  AST-002  2024-2025 ରେ ଭୁବନେଶ୍ୱର ବ୍ଲକରେ ସମ୍ପତ୍ତି ଶ୍ରେଣୀ ଅନୁସାରେ କେତେ ସମ୍ପତ୍ତି ସୃ
+  rank  35  STS-003  How many sanitation activities have been completed under Swachh Bharat
+  rank  61  STS-003  What is the count of finished sanitation projects for Swachh Bharat fo
+  rank  38  PLN-002  What is the total number of supplementary plans approved state-wide fo
+  rank  35  PLN-002  Provide the total number of approved supplementary plans at the state 
+  rank  53  BUD-006  What is the total estimated cost of all planned activities state-wide 
+  rank  85  BUD-006  State-wide total of estimated costs for all activities for 2025 to 202
+  rank  39  PLN-024  Show the breakdown of planned activities by theme for 2024 to 2025.
+
+── recall_eval: token spend ──
+  site          calls     prompt    cached  completion  reasoning       total
+  embed            10     48,669         0           0          0      48,669
+  TOTAL            10     48,669         0           0          0      48,669

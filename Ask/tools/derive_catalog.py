@@ -1058,6 +1058,14 @@ _DISAMBIGUATION: dict[str, str] = {
                "question.",
     "BUD-006": "PLAN TYPE is a filter on ACTIVITIES, not on plans: 'planned cost of "
                "the main GPDPs' is this entry with plan_type bound.",
+    "STS-003": "Filters by STATUS and, since WP-6, by FOCUS AREA too — so "
+               "\"completed sanitation activities\", \"road works in progress\" and "
+               "\"ongoing activities in this block\" are all this entry with both "
+               "bound. The SBM entries answer a different question: they identify "
+               "their subject by a keyword search on the activity text.",
+    "PLN-052": "A RANKING ACROSS focus areas — which one has the most. A COUNT for "
+               "one named focus area (\"how many activities under sanitation\") is "
+               "PLN-049, not this.",
     "PLN-049": "FOCUS AREA is a filter. 'Sector' is NOT assumed to mean focus area "
                "(operator ruling 2026-09-12): a named value such as 'sanitation "
                "sector' is a focus area, but 'which sector…' is asked about.",

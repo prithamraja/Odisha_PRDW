@@ -1,0 +1,126 @@
+replays: 3  (eval_full_graded_wp6b_run1.json, eval_full_graded_wp6b_run2.json, eval_full_graded_wp6b_run3.json)
+questions: 275   majority threshold: 2/3
+
+  eval_full_graded_wp6b_run1   behaving correctly  90.5%  (249/275)  clarify=19 clarify_as_ratified=2 clarify_gold_offered=15 declined_generically=2 hit=231 partial=1 wrong_entities=1 wrong_refusal=1 wrong_template=3
+  eval_full_graded_wp6b_run2   behaving correctly  90.9%  (250/275)  clarify=18 clarify_as_ratified=2 clarify_gold_offered=16 declined_generically=2 hit=232 wrong_entities=1 wrong_template=4
+  eval_full_graded_wp6b_run3   behaving correctly  89.8%  (247/275)  clarify=20 clarify_as_ratified=2 clarify_gold_offered=14 declined_generically=2 hit=229 partial=2 wrong_entities=2 wrong_template=4
+
+── CONFIRMED failures (non-hit in >= 2/3) — 25 ──
+  #1016 [wrong_entities] gold=PLN-012 picked=PLN-012
+      what about last year?
+  #1020 [clarify/wrong_template] gold=PLN-020 picked=None/PLN-014
+      2024-2025 ରେ କେଉଁ ବ୍ଲକରେ ସବୁଠାରୁ ଅଧିକ GPDP ଅନୁମୋଦନ ବାକି ଅଛି?
+  #1028 [clarify] gold=PLN-068 picked=None
+      2024-2025 ରେ କେଉଁ ଫୋକସ ଏରିଆରେ କୌଣସି ଯୋଜନାବଦ୍ଧ କାର୍ଯ୍ୟ ନାହିଁ?
+  #1036 [clarify] gold=PLN-001 picked=None
+      GPDP status?
+  #1039 [wrong_template] gold=PLN-022 picked=PLN-020
+      2025-26 re kaun kaun blockre GPDP anumodan re barambar bilamba huachi?
+  #1230 [clarify] gold=SBM-OM-004 picked=None
+      2024-2025 ରେ ପ୍ଲାଷ୍ଟିକ ବର୍ଜ୍ୟବସ୍ତୁ ପରିଚାଳନା ୟୁନିଟ ପାଇଁ କେତେ ଖର୍ଚ୍ଚ ହୋଇଛି?
+  #1407 [clarify] gold=BUD-027 picked=None
+      2024-2025 ରେ କେଉଁ ଫୋକସ ଏରିଆକୁ କୌଣସି ଯୋଜନାବଦ୍ଧ ଖର୍ଚ୍ଚ ମିଳିନାହିଁ?
+  #1411 [clarify/partial] gold=SCH-008 picked=None
+      SFC vs CFC comparison
+  #1415 [hit/wrong_template] gold=FND-001 picked=BUD-005/FND-001
+      2024-2025 re Andhrua ra kama pain tied o untied panthi kete bhaga heichi?
+  #1419 [clarify] gold=BUD-002 picked=None
+      2024-2025 ରେ ପ୍ରତ୍ୟେକ ପାଣ୍ଠି ଉତ୍ସରୁ କେତେ ଅର୍ଥ ମିଳିଛି?
+  #1503 [clarify] gold=EXP-004 picked=None
+      and the unspent amount?
+  #1505 [clarify/wrong_template] gold=EXP-028 picked=EXP-018/None
+      2024-2025 ରେ କେଉଁ ଫୋକସ ଏରିଆରେ ସର୍ବାଧିକ ପ୍ରକୃତ ଖର୍ଚ୍ଚ ହୋଇଛି?
+  #1519 [clarify] gold=EXP-004 picked=None
+      2024-2025 ରେ ମୋଟ କେତେ ଟଙ୍କା ଖର୍ଚ୍ଚ ହୋଇନାହିଁ?
+  #1521 [clarify] gold=EXP-001 picked=None
+      expenditure Andhrua?
+  #1611 [clarify] gold=IMP-002 picked=None
+      2024-2025 ରେ ଆରମ୍ଭ ହୋଇଥିବା କେତେ କାର୍ଯ୍ୟ ସମ୍ପୂର୍ଣ୍ଣ ହୋଇଛି?
+  #1613 [clarify] gold=IMP-009 picked=None
+      Which focus area has the lowest completion rate in 2024-25?
+  #1614 [clarify] gold=IMP-013 picked=None
+      Which high-expenditure activities have not yet started in 2024-2025?
+  #1616 [clarify] gold=IMP-011 picked=None
+      2024-2025 ରେ କେଉଁ ଫୋକସ ଏରିଆରେ ସବୁଠାରୁ ଅଧିକ ଚାଲୁଥିବା କାର୍ଯ୍ୟ ଅଛି?
+  #1704 [clarify] gold=ALR-012 picked=None
+      2024-2025 ରେ ଭୁବନେଶ୍ୱର ବ୍ଲକର କେଉଁ ଗ୍ରାମ ପଞ୍ଚାୟତରେ କୌଣସି କାର୍ଯ୍ୟ ହୋଇନାହିଁ?
+  #1809 [clarify] gold=SAN-003 picked=None
+      2024-2025 ରେ ଆନ୍ଧ୍ରୁଆ ପାଇଁ ମୋଟ ପ୍ରଶାସନିକ ମଞ୍ଜୁରୀ ରାଶି କେତେ?
+  #1852 [clarify/wrong_template] gold=AST-002 picked=AST-001/None
+      2024-2025 ରେ ଭୁବନେଶ୍ୱର ବ୍ଲକରେ ସମ୍ପତ୍ତି ଶ୍ରେଣୀ ଅନୁସାରେ କେତେ ସମ୍ପତ୍ତି ସୃଷ୍ଟି ହୋଇଛି?
+  #1860 [clarify] gold=AST-001 picked=None
+      Bhubaneswar block ru?
+  #1972 [declined_generically] gold=BEN-003 picked=None
+      Bhubaneswar block ke GPs me kitne beneficiary hain 2024-25 me?
+  #1974 [declined_generically] gold=BEN-010 picked=None
+      2024-2025 ରେ ଆନ୍ଧ୍ରୁଆରେ କେତେ ହିତାଧିକାରୀ ପେନସନ ପାଇଛନ୍ତି?
+  #2005 [clarify/hit] gold=STS-003 picked=None/STS-003
+      How many sanitation activities have been completed under Swachh Bharat for 2025 to 2026?
+
+── REPLAY NOISE (non-hit in a minority) — 7 ──
+  Listed, not acted on: a miss this unstable is the ~3% flip rate,
+  not a defect. Acting on it is how a threshold gets tuned to noise.
+  #1008 hit/hit/wrong_template  ଆର୍ଥିକ ବର୍ଷ ୨୦୨୪-୨୫ରେ ଖୋର୍ଦ୍ଧାରେ କେତେ GP GPDP ଅପଲୋଡ କରିଛନ୍ତି?
+  #1022 hit/hit/wrong_template  Which GPDP theme has the highest number of planned activities in Khord
+  #1624 hit/hit/wrong_entities  and for 2023-24?
+  #1909 hit/hit/clarify  Compare Laxmipur and Kalimela for 2024-25.
+  #2006 hit/hit/clarify  What is the count of finished sanitation projects for Swachh Bharat fo
+  #2026 clarify/clarify_gold_offered/clarify_gold_offered  Identify the GP with the highest activity count for 2024 to 2025.
+  #2046 wrong_refusal/clarify_gold_offered/clarify_gold_offered  Identify districts with delayed GPDP submissions for 2024 to 2026.
+
+── VERDICT FLIPS across replays — 25/275 = 9.1% ──
+  #1008 hit -> hit -> wrong_template  ଆର୍ଥିକ ବର୍ଷ ୨୦୨୪-୨୫ରେ ଖୋର୍ଦ୍ଧାରେ କେତେ GP GPDP ଅପଲୋଡ କରିଛନ୍ତି
+  #1018 clarify_gold_offered -> hit -> hit  Bhubaneswar block me GPDP approval rate kitna hai 2024-25 ka
+  #1020 clarify -> wrong_template -> wrong_template  2024-2025 ରେ କେଉଁ ବ୍ଲକରେ ସବୁଠାରୁ ଅଧିକ GPDP ଅନୁମୋଦନ ବାକି ଅଛି?
+  #1022 hit -> hit -> wrong_template  Which GPDP theme has the highest number of planned activitie
+  #1203 partial -> hit -> partial  How many soak pits were completed in 2024-2025?
+  #1404 hit -> clarify_gold_offered -> hit  and the lowest?
+  #1411 clarify -> clarify -> partial  SFC vs CFC comparison
+  #1415 wrong_template -> wrong_template -> hit  2024-2025 re Andhrua ra kama pain tied o untied panthi kete 
+  #1505 clarify -> wrong_template -> clarify  2024-2025 ରେ କେଉଁ ଫୋକସ ଏରିଆରେ ସର୍ବାଧିକ ପ୍ରକୃତ ଖର୍ଚ୍ଚ ହୋଇଛି?
+  #1624 hit -> hit -> wrong_entities  and for 2023-24?
+  #1852 wrong_template -> clarify -> clarify  2024-2025 ରେ ଭୁବନେଶ୍ୱର ବ୍ଲକରେ ସମ୍ପତ୍ତି ଶ୍ରେଣୀ ଅନୁସାରେ କେତେ ସ
+  #1909 hit -> hit -> clarify  Compare Laxmipur and Kalimela for 2024-25.
+  #2003 clarify_gold_offered -> hit -> hit  Which GPs have planned zero-cost activities for 2024 to 2025
+  #2004 clarify_gold_offered -> hit -> hit  Which GPs proposed activities costing zero rupees for 2024 t
+  #2005 hit -> clarify -> clarify  How many sanitation activities have been completed under Swa
+  #2006 hit -> hit -> clarify  What is the count of finished sanitation projects for Swachh
+  #2013 clarify_gold_offered -> hit -> clarify_gold_offered  List the GPs that have not allocated any funds to Sankalp th
+  #2023 hit -> clarify_gold_offered -> hit  What is the total number of activities planned in the main G
+  #2024 hit -> clarify_gold_offered -> clarify_gold_offered  What is the overall number of activities proposed in main GP
+  #2026 clarify -> clarify_gold_offered -> clarify_gold_offered  Identify the GP with the highest activity count for 2024 to 
+  #2028 clarify_gold_offered -> clarify_gold_offered -> hit  State-wide total of estimated costs for all activities for 2
+  #2042 clarify_gold_offered -> hit -> clarify_gold_offered  Identify the sector with the highest percentage of completed
+  #2046 wrong_refusal -> clarify_gold_offered -> clarify_gold_offered  Identify districts with delayed GPDP submissions for 2024 to
+  #2049 hit -> clarify_gold_offered -> clarify_gold_offered  Give a district-wise summary of asset creation for 2024 to 2
+  #2052 clarify_gold_offered -> clarify_gold_offered -> hit  Give a time-series view of fund utilization covering the pre
+
+── ROUTE FLIPS (different query_id across replays) — 28/275 = 10.2% ──
+  #1002 PLN-001 -> PLN-003 -> PLN-001  GPDP upload status Bhubaneswar block, 24-25?
+  #1003 PLN-001 -> PLN-003 -> PLN-001  and Khajuripada?
+  #1008 PLN-001 -> PLN-001 -> PLN-004  ଆର୍ଥିକ ବର୍ଷ ୨୦୨୪-୨୫ରେ ଖୋର୍ଦ୍ଧାରେ କେତେ GP GPDP ଅପଲୋଡ କରିଛନ୍ତି
+  #1018 None -> PLN-015 -> PLN-015  Bhubaneswar block me GPDP approval rate kitna hai 2024-25 ka
+  #1020 None -> PLN-014 -> PLN-014  2024-2025 ରେ କେଉଁ ବ୍ଲକରେ ସବୁଠାରୁ ଅଧିକ GPDP ଅନୁମୋଦନ ବାକି ଅଛି?
+  #1022 PLN-029 -> PLN-029 -> PLN-036  Which GPDP theme has the highest number of planned activitie
+  #1038 PLN-012 -> PLU-001 -> PLU-001  Bheden ka plan status 2024-25?
+  #1203 None -> SBM-GWM-006 -> None  How many soak pits were completed in 2024-2025?
+  #1404 BUD-022 -> None -> BUD-022  and the lowest?
+  #1415 BUD-005 -> BUD-005 -> FND-001  2024-2025 re Andhrua ra kama pain tied o untied panthi kete 
+  #1505 None -> EXP-018 -> None  2024-2025 ରେ କେଉଁ ଫୋକସ ଏରିଆରେ ସର୍ବାଧିକ ପ୍ରକୃତ ଖର୍ଚ୍ଚ ହୋଇଛି?
+  #1852 AST-001 -> None -> None  2024-2025 ରେ ଭୁବନେଶ୍ୱର ବ୍ଲକରେ ସମ୍ପତ୍ତି ଶ୍ରେଣୀ ଅନୁସାରେ କେତେ ସ
+  #1909 TRD-011 -> TRD-011 -> None  Compare Laxmipur and Kalimela for 2024-25.
+  #2003 None -> PLU-008 -> PLU-008  Which GPs have planned zero-cost activities for 2024 to 2025
+  #2004 None -> PLU-008 -> PLU-008  Which GPs proposed activities costing zero rupees for 2024 t
+  #2005 STS-003 -> None -> None  How many sanitation activities have been completed under Swa
+  #2006 STS-003 -> STS-003 -> None  What is the count of finished sanitation projects for Swachh
+  #2010 EXP-011 -> EXP-009 -> EXP-011  Show me the distribution of tied funds spent on water versus
+  #2011 BUD-013 -> BUD-006 -> BUD-006  What is the total allocation for the 9 Sankalp themes state-
+  #2013 None -> PLN-032 -> None  List the GPs that have not allocated any funds to Sankalp th
+  #2023 PLN-024 -> None -> PLN-024  What is the total number of activities planned in the main G
+  #2024 PLN-024 -> None -> None  What is the overall number of activities proposed in main GP
+  #2028 None -> None -> SCH-003  State-wide total of estimated costs for all activities for 2
+  #2038 STS-013 -> STS-013 -> IMP-002  What is the total completed activity count for all districts
+  #2042 None -> IMP-005 -> None  Identify the sector with the highest percentage of completed
+  #2046 PLN-023 -> None -> None  Identify districts with delayed GPDP submissions for 2024 to
+  #2049 AST-001 -> None -> None  Give a district-wise summary of asset creation for 2024 to 2
+  #2052 None -> None -> TRD-003  Give a time-series view of fund utilization covering the pre

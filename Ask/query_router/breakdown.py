@@ -214,12 +214,24 @@ def effective_grouped_geo(template: dict, group_by: str | None):
     return [GEO_SLOT_FOR[group_by]] if group_by in GEO_SLOT_FOR else []
 
 
-def describe(description: str | None, group_by: str | None) -> str | None:
-    """The echo, with the breakdown that ran said out loud."""
+def describe(description: str | None, group_by: str | None,
+             template: dict | None = None) -> str | None:
+    """The echo, with the breakdown that ran said out loud — WHEN IT IS NEWS.
+
+    "Which blocks have the most pending approvals?" reads the breakdown `block`
+    off its own wording, and block is what the statement groups by anyway; the
+    answer is the same one it always gave, so the sentence would only add noise
+    to every such question. It is said when the breakdown DIFFERS from the
+    statement's own.
+    """
     if not description or group_by is None:
         return description
+    absent = _parse((template or {}).get("sql_template") or "")[1]
     if group_by == "total":
-        return f"{description} (as one total)"
+        # A statement with no breakdown of its own already answers as one total.
+        return description if absent is None else f"{description} (as one total)"
+    if absent and DIMENSIONS[group_by][0] == absent:
+        return description
     return f"{description} (broken down by {DIMENSIONS[group_by][1]})"
 
 
@@ -311,6 +323,27 @@ def _already_separates(sql: str, column: str) -> bool:
     # its filters, which name every column) inside the "select list".
     head = re.split(r"\bFROM\b", stripped, maxsplit=1)[0]
     return bool(ordinals and re.search(rf"\b{re.escape(column)}\b", head))
+
+
+# Every slot that filters on a column a statement might already group by.
+SLOT_COLUMN = {
+    "focus_area": "focus_area_name", "theme": "theme", "scheme": "scheme_name",
+    "status": "status_label", "plan_type": "plan_type", "tied_untied": "tied_untied",
+    "district_name": "district_name", "block_name": "block_name",
+    "date_range": "fiscal_year",
+}
+
+
+def slots_the_statement_splits(template: dict) -> frozenset:
+    """Slots whose column the statement ALREADY gives a row of its own.
+
+    BUD-005 reports the tied and the untied share side by side; EXP-008 reports
+    expenditure under each. "Tied and untied" asked of those is not a filter at
+    all — it is the question naming the split it is asking for.
+    """
+    sql = template.get("sql_template") or ""
+    return frozenset(slot for slot, column in SLOT_COLUMN.items()
+                     if _already_separates(sql, column))
 
 
 def comparison_breakdown(template: dict, entities) -> str | None:

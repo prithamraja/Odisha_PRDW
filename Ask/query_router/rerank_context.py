@@ -867,7 +867,7 @@ FAMILY_DESCRIPTIONS: dict[str, dict] = {
     },
 
     'pln_052__planning': {
-        "desc": "RANKS: Which focus area has the highest number of planned activities in a given year. Returns planned_activities, planned_cost. One row per focus_area_name by default; other breakdowns on request. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: Set $top_n = 1 for a single answer.",
+        "desc": 'RANKS: Which focus area has the highest number of planned activities in a given year. Returns planned_activities, planned_cost. One row per focus_area_name by default; other breakdowns on request. A top-N list, highest first; $top_n = 1 answers \'which is the single highest/lowest\'. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. A RANKING ACROSS focus areas — which one has the most. A COUNT for one named focus area ("how many activities under sanitation") is PLN-049, not this. Caveat: Set $top_n = 1 for a single answer.',
         "members": ['PLN-052', 'PLN-054', 'PLN-056'],
     },
 
@@ -1537,7 +1537,7 @@ FAMILY_DESCRIPTIONS: dict[str, dict] = {
     },
 
     'sts_003__status_counts': {
-        "desc": 'COUNTS: How many activities in a given block are in a given status status for a given year. Returns activities, planned_cost, expenditure. One row per status_label by default; other breakdowns on request. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Caveat: $status must match a decoded label exactly: Activity Approved, WORK ONGOING, WORK COMPLETED, WORK ABANDONED, UNDER APPROVAL.',
+        "desc": 'COUNTS: How many activities in a given block are in a given status status for a given year. Returns activities, planned_cost, expenditure. One row per status_label by default; other breakdowns on request. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Filters by STATUS and, since WP-6, by FOCUS AREA too — so "completed sanitation activities", "road works in progress" and "ongoing activities in this block" are all this entry with both bound. The SBM entries answer a different question: they identify their subject by a keyword search on the activity text. Caveat: $status must match a decoded label exactly: Activity Approved, WORK ONGOING, WORK COMPLETED, WORK ABANDONED, UNDER APPROVAL.',
         "members": ['STS-003'],
     },
 

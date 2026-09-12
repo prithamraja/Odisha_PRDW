@@ -201,6 +201,8 @@ HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
         "paraphrases": [
             'How many GPs in Bhubaneswar block have the GPDP approved in 2024-2025?',
             'How many GPs in a Block/District have the GPDP approved in a given year?',
+            'How many supplementary plans are approved state-wide in a given year?',
+            'Total number of approved supplementary plans at the state level.',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many GPs in a given district/a given block have the GPDP approved in a given year?',
             'How many GPs in a given district have the GPDP approved in a given year?',
@@ -1123,6 +1125,8 @@ ORDER BY planned_activities DESC
             'How many activities are planned under each focus area in a given block in a given year?',
             'How many activities are planned under each focus area in Bhubaneswar in 2024-2025?',
             'How many total activities are planned under each focus area in a block in a given year?',
+            'Show the breakdown of planned activities by theme in a given year.',
+            'Theme-wise breakdown of all planned activities.',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities are planned under each GPDP theme in a given gram panchayat in a given year?',
             'How many activities are planned under each GPDP theme in a given district in a given year?',
@@ -11173,6 +11177,8 @@ GROUP BY 1
         "paraphrases": [
             'How many Bhubaneswar activities are WORK ONGOING in 2024-2025?',
             'How many activities in a given Block are in a given Status status for a given Plan Year?',
+            'How many sanitation activities have been completed under Swachh Bharat in a given year?',
+            'Count of finished sanitation projects under Swachh Bharat.',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many activities in a given block are in a given status status for a given year?',
             'How many activities in a given district are in a given status status for a given year?',

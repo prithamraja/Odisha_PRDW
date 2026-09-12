@@ -1,0 +1,333 @@
+SCRIPT PLN-001      + $plan_type   [v:v_plan; 1 SELECT(s)]
+SCRIPT PLN-002      + $plan_type   [v:v_plan; 1 SELECT(s)]
+SCRIPT PLN-008      + $plan_type   [v:v_plan; 1 SELECT(s)]
+SCRIPT PLN-009      + $plan_type   [v:v_plan; 1 SELECT(s)]
+SCRIPT PLN-010      + $plan_type   [v:v_plan; 1 SELECT(s)]
+SCRIPT PLN-011      + $plan_type   [v:v_plan; 1 SELECT(s)]
+HAND   PLN-012      no insertion point for a (v_activity)
+SCRIPT PLN-013      + $plan_type   [v:v_plan; 1 SELECT(s)]
+SCRIPT PLN-014      + $plan_type   [v:v_plan; 1 SELECT(s)]
+SCRIPT PLN-015      + $plan_type   [v:v_plan; 1 SELECT(s)]
+SCRIPT PLN-016      + $plan_type   [v:v_plan; 1 SELECT(s)]
+SCRIPT PLN-019      + $plan_type   [v:v_plan; 1 SELECT(s)]
+SCRIPT PLN-020      + $plan_type   [v:v_plan; 1 SELECT(s)]
+SCRIPT PLN-021      + $plan_type   [v:v_plan; 1 SELECT(s)]
+SCRIPT PLN-024      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-025      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-026      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-027      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-028      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-029      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-030      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-031      + $plan_type, $status, $focus_area, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $theme: already a slot
+HAND   PLN-032      no insertion point for v (v_activity) — reads the GP roster
+SCRIPT PLN-033      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-034      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-035      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-036      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-037      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-038      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-039      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-040      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-043      + $plan_type, $status, $focus_area, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $theme: compares theme in a predicate
+SCRIPT PLN-044      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-045      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-046      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-047      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_completed
+SCRIPT PLN-049      + $plan_type, $status, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $focus_area: already a slot
+SCRIPT PLN-050      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-051      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-052      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-053      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-054      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-055      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-056      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-057      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-058      + $plan_type, $status, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $focus_area: already a slot
+HAND   PLN-059      no insertion point for v (v_activity) — reads the GP roster
+SCRIPT PLN-060      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-061      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-062      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-063      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-064      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-065      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-066      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-068      + $plan_type, $status, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $focus_area: compares focus_area_name in a predicate
+SCRIPT PLN-069      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-070      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLN-071      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_completed
+SCRIPT PLN-072      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLU-006      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLU-007      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLU-008      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT PLU-009      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+HAND   PLU-001      no insertion point for a (v_activity)
+NONE   PLU-003      every carried dimension is already used: $plan_type compares plan_type in a predicate
+NONE   PLU-004      every carried dimension is already used: $plan_type compares plan_type in a predicate
+SCRIPT WRK-001      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT WRK-002      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT WRK-003      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT WRK-004      + $plan_type, $status, $focus_area, $theme   [v:v_asset; 1 SELECT(s)]
+SCRIPT WRK-005      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT WRK-007      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT WRK-008      + $plan_type, $status, $focus_area, $theme   [v:v_asset; 1 SELECT(s)]
+SCRIPT WRK-009      + $plan_type, $status, $focus_area, $theme   [v:v_asset; 1 SELECT(s)]
+SCRIPT FND-005      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT FND-006      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT FND-007      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT FND-009      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT FND-010      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT FND-001      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT FND-002      + $plan_type, $status, $focus_area, $theme, $scheme   [v:v_activity; 1 SELECT(s)]
+                      skip $tied_untied: compares tied_untied in a predicate
+SCRIPT FND-003      + $plan_type, $status, $focus_area, $theme, $scheme   [v:v_activity; 1 SELECT(s)]
+                      skip $tied_untied: compares tied_untied in a predicate
+SCRIPT FND-004      + $plan_type, $status, $focus_area, $theme, $scheme   [v:v_activity; 1 SELECT(s)]
+                      skip $tied_untied: compares tied_untied in a predicate
+SCRIPT BUD-001      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT BUD-002      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT BUD-003      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT BUD-004      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT BUD-005      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT BUD-006      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT BUD-007      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT BUD-008      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT BUD-009      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT BUD-010      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT BUD-011      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT BUD-012      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT BUD-013      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT BUD-014      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT BUD-017      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT BUD-018      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT BUD-019      + $plan_type, $status, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $focus_area: already a slot
+SCRIPT BUD-020      + $plan_type, $status, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $focus_area: already a slot
+SCRIPT BUD-021      + $plan_type, $status, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $focus_area: already a slot
+SCRIPT BUD-022      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT BUD-023      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT BUD-024      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT BUD-025      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT BUD-026      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT BUD-027      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT SCH-001      + $plan_type, $status, $focus_area, $theme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $scheme: already a slot
+SCRIPT SCH-002      + $plan_type, $status, $focus_area, $theme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $scheme: already a slot
+SCRIPT SCH-003      + $plan_type, $status, $focus_area, $theme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $scheme: already a slot
+SCRIPT SCH-005      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+HAND   SCH-006      no insertion point for v (v_activity) — reads the GP roster
+SCRIPT SCH-008      + $plan_type, $status, $focus_area, $theme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $scheme: already a slot
+SCRIPT SCH-009      + $plan_type, $status, $focus_area, $theme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $scheme: already a slot
+SCRIPT SCH-010      + $plan_type, $status, $focus_area, $theme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $scheme: already a slot
+SCRIPT SCH-011      + $plan_type, $status, $focus_area, $theme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $scheme: already a slot
+SCRIPT EXP-001      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-002      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-003      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-004      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-005      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-006      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-007      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-008      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-009      + $plan_type, $status, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $focus_area: already a slot
+SCRIPT EXP-010      + $plan_type, $status, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $focus_area: already a slot
+SCRIPT EXP-011      + $plan_type, $status, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $focus_area: already a slot
+SCRIPT EXP-012      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-013      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-014      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-015      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-016      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-017      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-018      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-019      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-020      + $plan_type, $status, $focus_area, $theme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $scheme: already a slot
+SCRIPT EXP-021      + $plan_type, $status, $focus_area, $theme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $scheme: already a slot
+SCRIPT EXP-022      + $plan_type, $status, $focus_area, $theme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $scheme: already a slot
+SCRIPT EXP-023      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-025      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-026      + $plan_type, $status, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $focus_area: already a slot
+SCRIPT EXP-027      + $plan_type, $status, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $focus_area: already a slot
+SCRIPT EXP-028      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-029      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-030      + $plan_type, $status, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $focus_area: already a slot
+SCRIPT EXP-031      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-032      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-033      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-034      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-035      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-036      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-037      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT EXP-038      + $plan_type, $status, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $focus_area: compares focus_area_name in a predicate
+SCRIPT SAN-001      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT SAN-002      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT SAN-003      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT SAN-004      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT SAN-006      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT SAN-007      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT SAN-008      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT SAN-009      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT SAN-010      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT SAN-011      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT SAN-012      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT SAN-013      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT SAN-014      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT STS-001      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT STS-002      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT STS-003      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: already a slot
+SCRIPT STS-004      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_abandoned
+SCRIPT STS-005      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_abandoned
+SCRIPT STS-006      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+SCRIPT STS-007      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+SCRIPT STS-008      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+SCRIPT STS-009      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_completed
+SCRIPT STS-010      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_under_approval
+SCRIPT STS-011      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+SCRIPT STS-012      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+SCRIPT STS-013      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_ongoing
+SCRIPT IMP-001      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+SCRIPT IMP-002      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+SCRIPT IMP-003      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+SCRIPT IMP-004      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+SCRIPT IMP-005      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_completed
+SCRIPT IMP-006      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_completed
+SCRIPT IMP-007      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+SCRIPT IMP-008      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_completed
+SCRIPT IMP-009      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_completed
+SCRIPT IMP-010      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+SCRIPT IMP-011      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_ongoing
+SCRIPT IMP-012      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_completed
+SCRIPT IMP-013      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+SCRIPT IMP-014      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT IMP-015      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+SCRIPT IMP-016      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+SCRIPT IMP-017      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_completed
+SCRIPT IMP-018      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_ongoing
+SCRIPT IMP-019      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+SCRIPT IMP-020      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+SCRIPT IMP-021      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_completed
+SCRIPT IMP-022      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_completed
+SCRIPT PHY-003      + $plan_type, $focus_area, $theme   [v:v_asset; 1 SELECT(s)]
+                      skip $status: compares status_label in a predicate
+SCRIPT PHY-004      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT AST-001      + $plan_type, $status, $focus_area, $theme   [v:v_asset; 1 SELECT(s)]
+SCRIPT AST-002      + $plan_type, $status, $focus_area, $theme   [v:v_asset; 1 SELECT(s)]
+SCRIPT AST-003      + $plan_type, $status, $focus_area, $theme   [v:v_asset; 1 SELECT(s)]
+SCRIPT AST-006      + $plan_type, $status, $focus_area, $theme   [v:v_asset; 1 SELECT(s)]
+SCRIPT AST-007      + $plan_type, $status, $focus_area, $theme   [v:v_asset; 1 SELECT(s)]
+SCRIPT AST-008      + $plan_type, $status, $focus_area   [v:v_asset; 1 SELECT(s)]
+                      skip $theme: already a slot
+HAND   AST-009      no insertion point for v (v_asset) — reads the GP roster
+SCRIPT AST-012      + $plan_type, $status, $focus_area, $theme   [v:v_asset; 1 SELECT(s)]
+SCRIPT TRD-010      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_completed
+SCRIPT TRD-011      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_completed
+SCRIPT TRD-012      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_completed
+SCRIPT TRD-007      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+SCRIPT TRD-008      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT TRD-009      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_completed
+SCRIPT TRD-001      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+SCRIPT TRD-002      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT TRD-003      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT TRD-004      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT TRD-005      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+SCRIPT TRD-006      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT ALR-001      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT ALR-002      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT ALR-003      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT ALR-004      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT ALR-005      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_abandoned
+HAND   ALR-012      no insertion point for a (v_activity) — reads the GP roster
+HAND   ALR-013      no insertion point for a (v_activity) — reads the GP roster
+SCRIPT ALR-008      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+HAND   ALR-009      no insertion point for a (v_activity)
+SCRIPT ALR-011      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_completed
+SCRIPT DQY-006      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+SCRIPT DQY-007      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT DQY-008      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT DQY-009      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT DQY-010      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_started
+SCRIPT DQY-011      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT DQY-001      + $plan_type, $status, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $focus_area: compares focus_area_name in a predicate
+SCRIPT DQY-002      + $plan_type, $status, $focus_area, $theme   [v:v_asset; 1 SELECT(s)]
+SCRIPT DQY-003      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT DQY-004      + $plan_type, $status, $focus_area, $theme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $scheme: compares scheme_name in a predicate
+SCRIPT DSS-001      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_completed
+SCRIPT DSS-002      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+SCRIPT DSS-003      + $plan_type, $status, $focus_area, $theme   [v:v_asset; 1 SELECT(s)]
+SCRIPT DSS-005      + $plan_type, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+                      skip $status: uses the derived flag is_ongoing
+SCRIPT DSS-006      + $plan_type, $status, $focus_area, $theme, $scheme, $tied_untied   [v:v_activity; 1 SELECT(s)]
+
+scripted 238 · hand-edit 9 · nothing to add 2 · out of scope 97
+HAND-EDIT LIST: PLN-012, PLN-032, PLN-059, PLU-001, SCH-006, AST-009, ALR-012, ALR-013, ALR-009
+wrote query_router\template_catalog.py and tests\data\workbook_test_report.json

@@ -284,6 +284,9 @@ def main() -> None:
     ap.add_argument("--refresh", action="store_true")
     ap.add_argument("--yes", action="store_true",
                     help="confirm the paid run (or set PRDW_EVAL_CONFIRM=1)")
+    ap.add_argument("--dump-ranks", type=Path, metavar="PATH",
+                    help="also write every scored row's 0-based rank as JSON "
+                         "(WP-6 T7: the rank of each Eval_1 row, not just misses)")
     args = ap.parse_args()
 
     texts, vec_qids, display = build_index()
@@ -394,6 +397,17 @@ def main() -> None:
     for lang in sorted(by_lang):
         hit_n, total = by_lang[lang]
         print(f"  {lang:<14} {hit_n/total:6.1%}  ({hit_n}/{total})")
+
+    if args.dump_ranks:
+        args.dump_ranks.write_text(json.dumps(
+            [{"topic": g["topic"], "gold": g["gold"], "lang": g.get("lang") or "en",
+              "rank": rank}
+             for g, rank in zip(scorable, ranks_in_order)]
+            + [{"topic": g["topic"], "gold": g["gold"], "lang": g.get("lang") or "en",
+                "rank": None, "note": "gold id not in the catalogue"}
+               for g in missing],
+            ensure_ascii=False, indent=1), encoding="utf-8")
+        print(f"\n  ranks written to {args.dump_ranks}")
 
     ranks.sort()
     def pct(p): return ranks[min(len(ranks) - 1, int(len(ranks) * p))]

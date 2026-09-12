@@ -1,0 +1,244 @@
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+SCRIPT PLN-001      v_plan     no breakdown -> 'All'
+SCRIPT PLN-002      v_plan     no breakdown -> 'All'
+SCRIPT PLN-008      v_plan     no breakdown -> 'All'
+SCRIPT PLN-009      v_plan     no breakdown -> 'All'
+SCRIPT PLN-011      v_plan     no breakdown -> 'All'
+SCRIPT PLN-013      v_plan     no breakdown -> 'All'
+SCRIPT PLN-014      v_plan     no breakdown -> 'All'
+SCRIPT PLN-015      v_plan     default block_name
+SCRIPT PLN-016      v_plan     default district_name [grouped_geo carrier]
+SCRIPT PLN-020      v_plan     default block_name
+SCRIPT PLN-021      v_plan     default district_name [grouped_geo carrier]
+SCRIPT PLN-024      v_activity default theme
+SCRIPT PLN-025      v_activity default theme
+SCRIPT PLN-026      v_activity default theme
+SCRIPT PLN-027      v_activity default theme
+SCRIPT PLN-028      v_activity default theme
+SCRIPT PLN-029      v_activity default theme
+SCRIPT PLN-030      v_activity default theme
+SCRIPT PLN-031      v_activity geo grain gp_name x block_name x district_name [grouped_geo carrier]
+SCRIPT PLN-039      v_activity default theme
+SCRIPT PLN-040      v_activity default theme
+SCRIPT PLN-045      v_activity default theme
+SCRIPT PLN-049      v_activity default focus_area_name
+SCRIPT PLN-050      v_activity default focus_area_name
+SCRIPT PLN-051      v_activity default focus_area_name
+SCRIPT PLN-052      v_activity default focus_area_name
+SCRIPT PLN-053      v_activity default focus_area_name
+SCRIPT PLN-054      v_activity default focus_area_name
+SCRIPT PLN-055      v_activity default focus_area_name
+SCRIPT PLN-056      v_activity default focus_area_name
+SCRIPT PLN-057      v_activity default focus_area_name
+SCRIPT PLN-069      v_activity default focus_area_name
+SCRIPT PLN-070      v_activity default focus_area_name
+SCRIPT PLU-006      v_activity default theme
+SCRIPT PLU-008      v_activity no breakdown -> 'All'
+SCRIPT PLU-009      v_activity geo grain gp_name x block_name [grouped_geo carrier]
+SCRIPT PLU-003      v_plan     geo grain gp_name x block_name x district_name [grouped_geo carrier]
+SCRIPT PLU-004      v_plan     no breakdown -> 'All'
+SCRIPT WRK-003      v_activity no breakdown -> 'All'
+SCRIPT WRK-005      v_activity geo grain gp_name x block_name [grouped_geo carrier]
+SCRIPT WRK-007      v_activity default fiscal_year
+SCRIPT FND-005      v_activity no breakdown -> 'All'
+SCRIPT FND-006      v_activity geo grain gp_name x block_name [grouped_geo carrier]
+SCRIPT FND-007      v_activity geo grain gp_name x block_name x district_name [grouped_geo carrier]
+SCRIPT FND-009      v_activity default scheme_name
+SCRIPT FND-003      v_activity no breakdown -> 'All'
+SCRIPT FND-004      v_activity no breakdown -> 'All'
+SCRIPT BUD-006      v_activity default theme
+SCRIPT BUD-007      v_activity default theme
+SCRIPT BUD-008      v_activity default theme
+SCRIPT BUD-012      v_activity default theme
+SCRIPT BUD-013      v_activity default theme
+SCRIPT BUD-018      v_activity default focus_area_name
+SCRIPT BUD-019      v_activity default focus_area_name
+SCRIPT BUD-022      v_activity default focus_area_name
+SCRIPT BUD-023      v_activity default focus_area_name
+SCRIPT BUD-027      v_activity default focus_area_name
+SCRIPT SCH-001      v_activity default scheme_name
+SCRIPT SCH-003      v_activity default scheme_name
+SCRIPT SCH-005      v_activity default scheme_name
+SCRIPT SCH-008      v_activity default scheme_name
+SCRIPT SCH-009      v_activity default status_label
+SCRIPT SCH-010      v_activity default scheme_name
+SCRIPT SCH-011      v_activity default district_name
+SCRIPT EXP-002      v_activity default fiscal_year
+SCRIPT EXP-003      v_activity no breakdown -> 'All'
+SCRIPT EXP-004      v_activity no breakdown -> 'All'
+SCRIPT EXP-005      v_activity no breakdown -> 'All'
+SCRIPT EXP-010      v_activity default focus_area_name
+SCRIPT EXP-012      v_activity default scheme_name
+SCRIPT EXP-013      v_activity default scheme_name
+SCRIPT EXP-014      v_activity default theme
+SCRIPT EXP-015      v_activity default theme
+SCRIPT EXP-016      v_activity default theme
+SCRIPT EXP-018      v_activity default theme
+SCRIPT EXP-019      v_activity default theme
+SCRIPT EXP-023      v_activity no breakdown -> 'All'
+SCRIPT EXP-025      v_activity default focus_area_name
+SCRIPT EXP-026      v_activity default focus_area_name
+SCRIPT EXP-028      v_activity default focus_area_name
+SCRIPT EXP-029      v_activity default focus_area_name
+SCRIPT EXP-030      v_activity default focus_area_name
+SCRIPT EXP-038      v_activity default focus_area_name
+SCRIPT SAN-001      v_activity no breakdown -> 'All'
+SCRIPT SAN-002      v_activity no breakdown -> 'All'
+SCRIPT SAN-003      v_activity geo grain gp_name x block_name [grouped_geo carrier]
+SCRIPT SAN-004      v_activity default block_name
+SCRIPT SAN-007      v_activity default block_name [grouped_geo carrier]
+SCRIPT SAN-008      v_activity geo grain block_name x district_name [grouped_geo carrier]
+SCRIPT SAN-012      v_activity geo grain gp_name x block_name [grouped_geo carrier]
+SCRIPT STS-001      v_activity default status_label
+SCRIPT STS-003      v_activity default status_label
+SCRIPT STS-004      v_activity geo grain gp_name x block_name x district_name [grouped_geo carrier]
+SCRIPT STS-006      v_activity no breakdown -> 'All'
+SCRIPT STS-007      v_activity geo grain block_name x district_name [grouped_geo carrier]
+SCRIPT STS-008      v_activity no breakdown -> 'All'
+SCRIPT STS-009      v_activity geo grain gp_name x block_name x district_name [grouped_geo carrier]
+SCRIPT STS-010      v_activity no breakdown -> 'All'
+SCRIPT STS-011      v_activity geo grain block_name x district_name [grouped_geo carrier]
+SCRIPT STS-012      v_activity geo grain gp_name x block_name [grouped_geo carrier]
+SCRIPT STS-013      v_activity default district_name
+SCRIPT IMP-001      v_activity no breakdown -> 'All'
+SCRIPT IMP-002      v_activity no breakdown -> 'All'
+SCRIPT IMP-003      v_activity no breakdown -> 'All'
+SCRIPT IMP-006      v_activity default theme
+SCRIPT IMP-007      v_activity default theme
+SCRIPT IMP-008      v_activity default focus_area_name
+SCRIPT IMP-009      v_activity default focus_area_name
+SCRIPT IMP-010      v_activity default focus_area_name
+SCRIPT IMP-011      v_activity default focus_area_name
+SCRIPT IMP-012      v_activity default theme
+SCRIPT IMP-015      v_activity default theme
+SCRIPT IMP-016      v_activity default theme
+SCRIPT IMP-019      v_activity default theme
+SCRIPT IMP-020      v_activity default focus_area_name
+SCRIPT IMP-022      v_activity default scheme_name
+SCRIPT PHY-003      v_asset    geo grain gp_name x block_name [grouped_geo carrier]
+SCRIPT PHY-004      v_activity default status_label
+SCRIPT AST-001      v_asset    geo grain gp_name x block_name [grouped_geo carrier]
+SCRIPT AST-008      v_asset    default theme
+SCRIPT AST-012      v_asset    default fiscal_year
+SCRIPT SBM-GWM-001  v_activity no breakdown -> 'All'
+SCRIPT SBM-GWM-002  v_activity no breakdown -> 'All'
+SCRIPT SBM-GWM-003  v_activity no breakdown -> 'All'
+SCRIPT SBM-GWM-004  v_activity no breakdown -> 'All'
+SCRIPT SBM-GWM-005  v_activity no breakdown -> 'All'
+SCRIPT SBM-GWM-006  v_activity no breakdown -> 'All'
+SCRIPT SBM-GWM-007  v_activity no breakdown -> 'All'
+SCRIPT SBM-GWM-008  v_activity no breakdown -> 'All'
+SCRIPT SBM-GWM-009  v_activity no breakdown -> 'All'
+SCRIPT SBM-GWM-010  v_activity no breakdown -> 'All'
+SCRIPT SBM-GWM-011  v_activity no breakdown -> 'All'
+SCRIPT SBM-GWM-012  v_activity no breakdown -> 'All'
+SCRIPT SBM-OM-001   v_activity no breakdown -> 'All'
+SCRIPT SBM-OM-002   v_activity no breakdown -> 'All'
+SCRIPT SBM-OM-003   v_activity no breakdown -> 'All'
+SCRIPT SBM-OM-004   v_activity no breakdown -> 'All'
+SCRIPT SBM-OM-005   v_activity no breakdown -> 'All'
+SCRIPT SBM-OM-006   v_activity no breakdown -> 'All'
+SCRIPT SBM-OM-007   v_activity no breakdown -> 'All'
+SCRIPT SBM-OM-008   v_activity no breakdown -> 'All'
+SCRIPT SBM-OM-009   v_activity no breakdown -> 'All'
+SCRIPT SBM-OM-010   v_activity default focus_area_name
+SCRIPT SBM-SI-001   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-002   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-003   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-004   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-005   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-006   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-007   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-008   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-009   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-010   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-011   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-012   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-013   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-014   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-015   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-016   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-017   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-018   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-019   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-020   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-021   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-022   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-023   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-024   v_activity no breakdown -> 'All'
+SCRIPT SBM-SI-025   v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-001  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-002  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-003  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-004  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-005  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-006  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-007  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-008  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-009  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-010  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-011  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-012  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-013  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-014  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-015  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-016  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-017  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-018  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-019  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-020  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-021  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-022  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-023  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-024  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-025  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-026  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-027  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-028  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-029  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-030  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-031  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-032  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-034  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-035  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-036  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-037  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-038  v_activity no breakdown -> 'All'
+SCRIPT SBM-SWM-039  v_activity no breakdown -> 'All'
+SCRIPT TRD-010      v_activity geo grain gp_name x block_name x district_name [grouped_geo carrier]
+SCRIPT TRD-011      v_activity geo grain block_name x district_name [grouped_geo carrier]
+SCRIPT TRD-007      v_activity default theme
+SCRIPT TRD-008      v_activity default focus_area_name
+SCRIPT TRD-009      v_activity default theme
+SCRIPT TRD-001      v_activity default theme
+SCRIPT TRD-002      v_activity default theme
+SCRIPT TRD-003      v_activity default fiscal_year
+SCRIPT TRD-004      v_activity no breakdown -> 'All'
+SCRIPT TRD-005      v_activity default fiscal_year
+SCRIPT ALR-011      v_activity geo grain block_name x district_name [grouped_geo carrier]
+SCRIPT DQY-010      v_activity geo grain gp_name x block_name x district_name [grouped_geo carrier]
+SCRIPT DQY-001      v_activity no breakdown -> 'All'
+SCRIPT DQY-004      v_activity no breakdown -> 'All'
+SCRIPT DSS-001      v_activity default focus_area_name
+SCRIPT DSS-002      v_activity geo grain block_name x district_name [grouped_geo carrier]
+SCRIPT DSS-006      v_activity geo grain gp_name x block_name [grouped_geo carrier]
+
+scripted 223 · left alone 123
+grouped_geo carriers: 36; migrated 25; left: PLN-003, PLN-004, PLN-006, PLN-061, WRK-009, BUD-001, EXP-001, EXP-024, TRD-006, ALR-009, DQY-008
+  left alone — not an aggregate: 29
+  left alone — a window function: 28
+  left alone — GROUP BY '…' is not a whitelisted column: 23
+  left alone — GROUP BY 2 expressions: 12
+  left alone — more than one SELECT: 10
+  left alone — a JOIN: 9
+  left alone — a CTE: 6
+  left alone — single-activity lookup: 3
+  left alone — GROUP BY 3 expressions: 2
+  left alone — reads ['…']: 1
+  grouped_geo carriers left, with why: PLN-003 (a JOIN); PLN-004 (a JOIN); PLN-006 (a JOIN); PLN-061 (GROUP BY 2 expressions); WRK-009 (GROUP BY 'v.asset_subcategory_label' is not a whitelisted column); BUD-001 (GROUP BY 3 expressions); EXP-001 (GROUP BY 3 expressions); EXP-024 (reads ['v_voucher']); TRD-006 (GROUP BY 2 expressions); ALR-009 (a JOIN); DQY-008 (GROUP BY 'v.activity_name' is not a whitelisted column)
+FOLD   BUD-018 -> BUD-006 with $group_by = 'focus_area': 25 rows = the Test Report's 25
+FOLD   PLN-050 -> PLN-024 with $group_by = 'focus_area': 25 rows = the Test Report's 25
+FOLD   PLN-051 -> PLN-024 with $group_by = 'focus_area': 25 rows = the Test Report's 25
+FOLD   EXP-025 -> EXP-014 with $group_by = 'focus_area': 25 rows = the Test Report's 25
+wrote the catalogue (342 templates), the oracle and tests\data\retired_templates.json
