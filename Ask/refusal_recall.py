@@ -290,6 +290,30 @@ def main() -> int:
         print(f"\n  {MUST_STAY_IN_WINDOW} pin: rank {r['rank']} "
               f"(was 51 before WP-4c, 4 after) — {verdict}")
 
+    # CROWDING, REPORTED AND NOT ASSERTED (D33.9). The raw vectors walked, beyond
+    # k, to collect k distinct ids — `recall_eval`'s "Crowding 1", over the same
+    # gold topics, from their cached vectors and this same index. Every template
+    # carries a line per filter since WP-6, and this is the price: 22.4 -> 32.2
+    # mean, 94 -> 145 max. It informs the next paraphrase batch; it gates nothing,
+    # so a cold cache is reported rather than failed.
+    from recall_eval import crowding_extra, load_gold, load_query_vectors
+    topic_vectors = load_query_vectors()
+    indexed = set(vec_qids)
+    topics = [g["topic"] for g in load_gold() if g["gold"] in indexed]
+    if topics and all(t in topic_vectors for t in topics):
+        extra = []
+        for topic in topics:
+            qv = np.array(topic_vectors[topic], dtype=np.float32)
+            qv = qv / (np.linalg.norm(qv) or 1.0)
+            owners = [vec_qids[i] for i in np.argsort(-(matrix @ qv))]
+            extra.append(crowding_extra(owners, args.k))
+        print(f"\n  crowding (reported, not asserted): mean {sum(extra) / len(extra):.1f}"
+              f", max {max(extra)} raw vectors beyond {args.k} to reach {args.k} "
+              f"distinct ids over {len(topics)} gold topics  [WP-6: 32.2 / 145]")
+    else:
+        print("\n  crowding UNMEASURED (reported, not asserted): the gold-topic "
+              "vectors are not cached — fix: cd Ask && python recall_eval.py --yes")
+
     if failures:
         print(f"\nFAIL  {len(failures)} refusal(s) unreachable in a ratified "
               f"register:")

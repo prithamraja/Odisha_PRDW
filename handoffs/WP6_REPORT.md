@@ -495,6 +495,21 @@ ambiguity threshold — and it is the honest reading of the Eval_1 numbers above
 
 ---
 
+## 9. Compliance with the brief
+
+| constraint | status |
+|---|---|
+| The catalogue file is the source of truth after T0 | Yes — §2 |
+| The Test Report row counts remain the regression contract | Yes — 343 statements, 0 mismatches, on every task |
+| Derived artefacts stay generated from the SQL | Yes — paraphrase blocks, `grouped_geo`, `rerank_context.py`; `--check` is gate 3 |
+| Bound values never interpolated into SQL | Yes — every filter binds a parameter; `$group_by` is a CASE over a fixed whitelist |
+| `$p IS NULL OR` is the only optional idiom (D2) | Yes, extended to `IN (SELECT UNNEST($p))` for list slots, with the same guard |
+| SBM excluded from the universal-slot migration | Yes — 85 templates, asserted by a test |
+| Ask-side paths only (D14); Drive `.duckdb` read-only; `.env` untouched | Yes — everything ran from `C:\dev\odisha-wp6` |
+| LLM spend only in T7 | **Disclosed exception:** the index had to be rebuilt after each catalogue change for gate 8 to be measurable — 9 embedding calls a time, 27 in total, plus 40 for the two recall runs. Every one through `confirm_spend` |
+
+---
+
 ## 10. What the next package should know
 
 1. **The hyphen year form has the same defect T4 fixed.** `2023-2025` reads as
@@ -527,18 +542,3 @@ ambiguity threshold — and it is the honest reading of the Eval_1 numbers above
    of the budget is tied and untied?" had started asking which one the officer
    meant. Budget for a replay after any package that touches slots or
    paraphrases.
-
----
-
-## 9. Compliance with the brief
-
-| constraint | status |
-|---|---|
-| The catalogue file is the source of truth after T0 | Yes — §2 |
-| The Test Report row counts remain the regression contract | Yes — 343 statements, 0 mismatches, on every task |
-| Derived artefacts stay generated from the SQL | Yes — paraphrase blocks, `grouped_geo`, `rerank_context.py`; `--check` is gate 3 |
-| Bound values never interpolated into SQL | Yes — every filter binds a parameter; `$group_by` is a CASE over a fixed whitelist |
-| `$p IS NULL OR` is the only optional idiom (D2) | Yes, extended to `IN (SELECT UNNEST($p))` for list slots, with the same guard |
-| SBM excluded from the universal-slot migration | Yes — 85 templates, asserted by a test |
-| Ask-side paths only (D14); Drive `.duckdb` read-only; `.env` untouched | Yes — everything ran from `C:\dev\odisha-wp6` |
-| LLM spend only in T7 | **Disclosed exception:** the index had to be rebuilt after each catalogue change for gate 8 to be measurable — 9 embedding calls a time, 27 in total, plus 40 for the two recall runs. Every one through `confirm_spend` |

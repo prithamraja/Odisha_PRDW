@@ -73,6 +73,45 @@ HERE       = Path(__file__).parent
 CSV_PATH   = HERE.parent / "test_questions_query_mapping.csv"
 CACHE_PATH = HERE / ".tmp" / "catalog_embeddings.json"
 HINGLISH_PATH = HERE / ".tmp" / "topics_hinglish.json"
+# One vector per gold topic, keyed by its text (WP-6b T1.2). Kept so that
+# `refusal_recall.py --cached-only` — gate 8 — can report the crowding line
+# below without making a call.
+QUERY_CACHE_PATH = HERE / ".tmp" / "recall_query_vectors.json"
+
+
+def load_query_vectors() -> dict[str, list[float]]:
+    """{topic text: vector} for the current embedding model, or {}."""
+    try:
+        cached = json.loads(QUERY_CACHE_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    if cached.get("model") != EMBEDDING_MODEL:
+        return {}
+    return cached.get("vectors") or {}
+
+
+def save_query_vectors(vectors: dict[str, list[float]]) -> None:
+    QUERY_CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    QUERY_CACHE_PATH.write_text(
+        json.dumps({"model": EMBEDDING_MODEL, "vectors": vectors}), encoding="utf-8")
+
+
+def crowding_extra(raw_owners, k: int) -> int:
+    """Raw vectors walked, beyond k, to collect k DISTINCT query_ids.
+
+    0 means no paraphrase ever displaced another template. The mean of this
+    over the gold set was 22.4 before WP-6 and 32.2 after it (max 94 -> 145):
+    the price of a line per filter on every template. D33.9 makes it a
+    reported gate line so the next paraphrase batch is measured against it.
+    """
+    seen: set[str] = set()
+    consumed = 0
+    for qid in raw_owners:
+        consumed += 1
+        seen.add(qid)
+        if len(seen) == k:
+            break
+    return consumed - k
 
 # The AP crowding metric read the intent families out of INTENT_LOOKUP. That
 # table is EMPTY here — the PR&DW catalogue is retrieved template-direct — so
@@ -327,7 +366,16 @@ def main() -> None:
     else:
         q_texts = [g["topic"] for g in scorable]
         print(f"\nLanguage: ENGLISH")
-    q_vecs   = embed_batch(client, q_texts)
+    if args.lang == "english":
+        # Cached by text, so gate 8 can report crowding without a call (WP-6b).
+        known = {} if args.refresh else load_query_vectors()
+        fresh = [t for t in dict.fromkeys(q_texts) if t not in known]
+        if fresh:
+            known.update(zip(fresh, embed_batch(client, fresh)))
+            save_query_vectors(known)
+        q_vecs = [known[t] for t in q_texts]
+    else:
+        q_vecs = embed_batch(client, q_texts)
 
     Ks       = sorted({5, 10, 20, args.k})
     hits     = {k: 0 for k in Ks}
@@ -358,14 +406,7 @@ def main() -> None:
         #    displaced another template; the excess is the price of the D2
         #    scope-paraphrase design, which is the number this harness exists to
         #    keep honest.
-        seen: set[str] = set()
-        consumed = 0
-        for qid in raw:
-            consumed += 1
-            seen.add(qid)
-            if len(seen) == args.k:
-                break
-        crowd.append(consumed - args.k)
+        crowd.append(crowding_extra(raw, args.k))
 
         # 2. Duplicate-row crowding: sibling entries with IDENTICAL question
         #    text that reached the same top-K (WP-4a §6.1). These are distinct

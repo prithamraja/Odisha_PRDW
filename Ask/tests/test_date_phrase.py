@@ -137,12 +137,42 @@ class NoFiscalYearTests(unittest.TestCase):
     def test_empty_message(self):
         self.assertEqual(resolve_fiscal_years("", LOADED_YEARS), [])
 
-    def test_a_non_consecutive_pair_is_a_range_not_a_fiscal_year(self):
-        """'2023-2025' names two fiscal years, not one nine-character label."""
+    def test_a_hyphen_span_is_the_consecutive_years_it_covers(self):
+        """D33.7: '2023-2025' is 2023-24 AND 2024-25 — the reading '2023 to
+        2025' gets. It used to read as 2023-24 and 2025-26, skipping a year."""
         self.assertEqual(
             resolve_fiscal_years("disbursements 2023-2025", LOADED_YEARS),
-            ["2023-2024", "2025-2026"],
+            ["2023-2024", "2024-2025"],
         )
+        self.assertEqual(
+            resolve_fiscal_years("disbursements 2023-2025", LOADED_YEARS),
+            resolve_fiscal_years("disbursements 2023 to 2025", LOADED_YEARS),
+        )
+
+    def test_the_span_runs_head_to_tail_minus_one(self):
+        """The direction pin: a span starts at its head, never at its tail."""
+        self.assertEqual(
+            resolve_fiscal_years("spend 2020-2025", LOADED_YEARS),
+            ["2020-2021", "2021-2022", "2022-2023", "2023-2024", "2024-2025"],
+        )
+        self.assertEqual(resolve_fiscal_years("spend 2023-25", LOADED_YEARS),
+                         ["2023-2024", "2024-2025"])
+
+    def test_a_consecutive_pair_is_still_one_year(self):
+        self.assertEqual(resolve_fiscal_years("spend 2024-2025", LOADED_YEARS),
+                         ["2024-2025"])
+
+    def test_a_backwards_or_too_wide_pair_still_falls_through(self):
+        """Not a span: the bare-year scan reads each year on its own, as before."""
+        self.assertEqual(resolve_fiscal_years("spend 2025-2023", LOADED_YEARS),
+                         ["2023-2024", "2025-2026"])
+        self.assertEqual(resolve_fiscal_years("spend 2019-2025", LOADED_YEARS),
+                         ["2019-2020", "2025-2026"])
+
+    def test_a_two_digit_pair_is_never_widened(self):
+        """'10-15' is a range of figures, not 2010 to 2015."""
+        self.assertEqual(resolve_fiscal_years("10-15 activities", LOADED_YEARS), [])
+        self.assertEqual(resolve_fiscal_years("GPs with 23-25 works", LOADED_YEARS), [])
 
 
 class OdiaNumeralTests(unittest.TestCase):
@@ -228,8 +258,15 @@ class FiscalWindowTests(unittest.TestCase):
             fiscal_year_window("2024-2025"), ("2024-04-01", "2025-03-31")
         )
 
-    def test_a_non_consecutive_pair_is_not_a_fiscal_year(self):
-        self.assertIsNone(fiscal_year_window("2023-2025"))
+    def test_a_span_is_the_window_of_the_years_it_covers(self):
+        """D33.7: 2023-24 and 2024-25 end to end."""
+        self.assertEqual(
+            fiscal_year_window("2023-2025"), ("2023-04-01", "2025-03-31")
+        )
+
+    def test_a_backwards_or_too_wide_pair_is_not_a_window(self):
+        self.assertIsNone(fiscal_year_window("2025-2023"))
+        self.assertIsNone(fiscal_year_window("2019-2025"))
 
     def test_junk_is_none(self):
         self.assertIsNone(fiscal_year_window("last year"))
@@ -272,10 +309,12 @@ class ExtractsExplicitPeriodsTests(unittest.TestCase):
             ("2024-04-01", "2025-03-31"),
         )
 
-    def test_four_digit_range_is_a_range_not_a_fiscal_year(self):
+    def test_a_four_digit_hyphen_span_is_its_fiscal_years(self):
+        """D33.7: the two fiscal years it names, April 2023 to March 2025 — not
+        the calendar years 2023 to 2025."""
         self.assertEqual(
             extract_date_window("approvals 2023-2025"),
-            ("2023-01-01", "2025-12-31"),
+            ("2023-04-01", "2025-03-31"),
         )
 
     def test_month_and_year(self):

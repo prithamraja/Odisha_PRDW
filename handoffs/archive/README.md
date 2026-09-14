@@ -1,3 +1,4 @@
 # Archive
 
 - `AI_Chatbot_Questions.xlsx` — the signed-off question catalogue of **2026-08-13** (363 questions; every answerable one's SQL tested against `panchayat_1.duckdb`). It was the Ask catalogue's source of truth until **WP-6 T0 (2026-09-12)**. Since then `Ask/query_router/template_catalog.py` is the source of truth, and no tool in the build or gate path reads this workbook. To see what the sign-off said as catalogue files, run `python Ask/tools/import_workbook.py --out-dir <new directory>` (it only ever creates files).
+- `Eval_1.xlsx` — the officers' question file of **2026-09-11** (28 question groups, 371 rows of which 314 are non-blank phrasings). Source of the 52 WP-6 T6 gold rows in `eval/gold/eval1_officer.jsonl` and of `handoffs/WP6_eval1_questions.json`, the 314-row standing regression that `Ask/grade_eval1.py` grades (WP-6b). Archived under D33.12; nothing reads the workbook itself.

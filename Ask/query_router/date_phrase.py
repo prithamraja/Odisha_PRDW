@@ -105,9 +105,9 @@ _LINK = r"[\s,]*(?:of\s+)?"
 # required — "2024-25 expenditure" is the commonest form of all.
 _FY_LABEL = r"(?:\b(?:F\.?\s?Y\.?|financial\s+year|fiscal\s+year|plan\s+year)\s*)?"
 
-# '2024-2025' — the stored form. The tail must be a full year AND the pair must
-# be consecutive; `_fiscal_pair` enforces that, so "2023-2025" falls through to
-# the bare-year scan and reads as the range it is.
+# '2024-2025' — the stored form. A consecutive pair is one fiscal year; a wider
+# one, "2023-2025", is the consecutive SPAN 2023-24 and 2024-25 (D33.7), the same
+# reading "2023 to 2025" gets. `_fiscal_pair` decides which.
 _FY_FULL_RE = re.compile(_FY_LABEL + _YEAR + r"\s*[-–—/]\s*(20\d{2})(?!\d)", re.IGNORECASE)
 
 # '2024-25' / 'FY 2024-25' — four-digit head, two-digit tail.
@@ -191,22 +191,38 @@ def _fiscal_label(start_year: int) -> str:
     return f"{start_year}-{start_year + 1}"
 
 
-def _fiscal_pair(head: int, tail: int, tail_digits: int) -> int | None:
-    """The START year of the fiscal year '<head>-<tail>' names, or None.
+# The widest hyphen span read as consecutive fiscal years. "2020-2025" is five;
+# anything wider is likelier a figure than a period.
+_MAX_SPAN_YEARS = 5
 
-    Consecutiveness is the whole test: '2024-2025' and '2024-25' and '24-25' all
-    name one fiscal year, while '2023-2025' names a two-year range and must be
-    refused here so the bare-year scan can read it correctly.
+
+def _fiscal_pair(head: int, tail: int, tail_digits: int) -> list[int] | None:
+    """The START years of the fiscal years '<head>-<tail>' names, or None.
+
+    '2024-2025', '2024-25' and '24-25' all name ONE fiscal year. '2023-2025' names
+    the consecutive span 2023-24 AND 2024-25 (D33.7, head..tail-1) — the reading
+    "2023 to 2025" already gets from the span reader, so two spellings of one
+    period cannot disagree. Before D33 this refused the pair and the bare-year
+    scan read it as 2023-24 and 2025-26, skipping the year in between.
+
+    Still refused, and left to the bare-year scan: a tail before its head, a span
+    wider than five years, and any wider pair with a TWO-DIGIT head — "10-15" is
+    far likelier a range of figures than 2010 to 2015.
 
     A two-digit HEAD is expanded first ('24-25' -> 2024), then the tail takes its
     century from the expanded head, so '99-00' reads as 2099-2100 rather than
     silently crossing back a hundred years.
     """
-    if head < 100:
+    two_digit_head = head < 100
+    if two_digit_head:
         head += 2000
     if tail_digits == 2:
         tail = (head // 100) * 100 + tail
-    return head if tail == head + 1 else None
+    if tail == head + 1:
+        return [head]
+    if not two_digit_head and head + 1 < tail <= head + _MAX_SPAN_YEARS:
+        return list(range(head, tail))
+    return None
 
 
 def _ordered(known_years) -> list[str]:
@@ -275,10 +291,10 @@ def resolve_fiscal_years(text: str, known_years=()) -> list[str]:
                 continue
             if not _passes_guards(text, *m.span(1)):
                 continue
-            start = _fiscal_pair(int(m.group(1)), int(m.group(2)), tail_digits)
-            if start is None:
+            named = _fiscal_pair(int(m.group(1)), int(m.group(2)), tail_digits)
+            if named is None:
                 continue
-            starts.append(start)
+            starts.extend(named)
             consumed.append(span)
 
     # The SPAN is claimed first: its two years are one phrase, and every scan
@@ -332,18 +348,22 @@ def resolve_fiscal_year(text: str, known_years=()) -> str | None:
 def fiscal_year_window(label: str) -> tuple[str, str] | None:
     """'2024-2025' -> ('2024-04-01', '2025-03-31'). None if it is not a label.
 
+    A span reads as the span (D33.7): '2023-2025' -> ('2023-04-01', '2025-03-31'),
+    the two fiscal years 2023-24 and 2024-25 end to end. A tail before its head,
+    or more than five years on, is still None.
+
     Only for the questions that compare a fiscal year against a real DATE column
     (`plan.approval_date`). The fiscal-year SLOT binds the label itself.
     """
     match = re.fullmatch(r"\s*(\d{4})\s*-\s*(\d{4})\s*", normalize_digits(label))
     if not match:
         return None
-    start = int(match.group(1))
-    if int(match.group(2)) != start + 1:
+    start, end = int(match.group(1)), int(match.group(2))
+    if not start < end <= start + _MAX_SPAN_YEARS:
         return None
     return (
         f"{start}-{FISCAL_YEAR_START_MONTH:02d}-01",
-        f"{start + 1}-{FISCAL_YEAR_START_MONTH - 1:02d}-31",
+        f"{end}-{FISCAL_YEAR_START_MONTH - 1:02d}-31",
     )
 
 
@@ -422,8 +442,11 @@ def extract_date_window(message: str) -> tuple[str, str] | None:
     windows: list[tuple[str, str]] = []
 
     def _fy_window(m: re.Match, tail_digits: int):
-        start = _fiscal_pair(int(m.group(1)), int(m.group(2)), tail_digits)
-        return None if start is None else fiscal_year_window(_fiscal_label(start))
+        named = _fiscal_pair(int(m.group(1)), int(m.group(2)), tail_digits)
+        if named is None:
+            return None
+        return (fiscal_year_window(_fiscal_label(named[0]))[0],
+                fiscal_year_window(_fiscal_label(named[-1]))[1])
 
     # Most specific first, so each phrase is read once and at its own precision.
     windows += _collect(_FY_FULL_RE, message, consumed, lambda m: _fy_window(m, 4), 1)
