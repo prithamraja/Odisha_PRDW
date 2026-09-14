@@ -311,5 +311,74 @@ class T2UnboundSubjectGuardTests(unittest.TestCase):
         self.assertIsNone(clarify)
 
 
+# ── T3 ────────────────────────────────────────────────────────────────────────
+
+def _numbers(row: dict) -> dict:
+    """The ADDITIVE columns only: a utilisation percentage over two years is not
+    the sum of the two years' percentages."""
+    from query_router.column_metadata import classify_column
+    from query_router.models import ColumnType
+    additive = (ColumnType.ADDITIVE_COUNT, ColumnType.ADDITIVE_VALUE)
+    return {k: float(v) for k, v in row.items()
+            if isinstance(v, (int, float, Decimal)) and not isinstance(v, bool)
+            and classify_column(k) in additive}
+
+
+def _by_focus(rows: list[dict]) -> dict:
+    key = next(k for k in rows[0]
+               if {r[k] for r in rows} <= {"Drinking water", "Sanitation"})
+    return {r[key]: _numbers(r) for r in rows}
+
+
+@unittest.skipIf(_adapter() is None, f"no sample database at {_DB_PATH}")
+class T3TwoListsTests(unittest.TestCase):
+    """Rows 42 and 44: water vs sanitation, for two years."""
+
+    YEARS = ["2024-2025", "2025-2026"]
+    FOCUS = ["Drinking water", "Sanitation"]
+
+    def _two_lists(self, qid):
+        return _serve(qid, [_entity("date_range", self.YEARS),
+                            _entity("focus_area", self.FOCUS),
+                            _entity("tied_untied", "Tied")])
+
+    def _one_year(self, qid, year):
+        return _serve(qid, [_entity("date_range", year),
+                            _entity("focus_area", self.FOCUS),
+                            _entity("tied_untied", "Tied")])
+
+    def test_the_subject_takes_the_breakdown_and_the_years_combine(self):
+        for qid in ("EXP-011", "TRD-008"):        # row 42's template, row 44's
+            with self.subTest(template=qid):
+                result = self._two_lists(qid)
+                self.assertEqual(len(result.result), 2)
+                both = _by_focus(result.result)
+                self.assertEqual(set(both), set(self.FOCUS))
+                singles = [_by_focus(self._one_year(qid, y).result) for y in self.YEARS]
+                for focus in self.FOCUS:
+                    for column, value in both[focus].items():
+                        self.assertAlmostEqual(
+                            value, sum(s.get(focus, {}).get(column, 0.0) for s in singles),
+                            places=2, msg=f"{focus}.{column}")
+                self.assertIn("(2024-2025 and 2025-2026 combined)",
+                              result.query_description)
+                self.assertNotIn("broken down by year", result.query_description)
+
+    def test_year_wise_in_the_question_keeps_the_year_breakdown(self):
+        """The phrase reader runs first; the two focus areas are then summed."""
+        result = _serve("TRD-008", [_entity("date_range", self.YEARS),
+                                    _entity("focus_area", self.FOCUS),
+                                    _entity("group_by", "fiscal_year")])
+        self.assertEqual({r["fiscal_year"] for r in result.result}, set(self.YEARS))
+        self.assertIn("broken down by year", result.query_description)
+        self.assertIn("(the values combined)", result.query_description)
+
+    def test_a_year_list_alone_still_breaks_down_by_year(self):
+        from query_router import breakdown
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        self.assertEqual(breakdown.comparison_breakdown(
+            T["PLN-001"], [_entity("date_range", self.YEARS)]), "fiscal_year")
+
+
 if __name__ == "__main__":
     unittest.main()

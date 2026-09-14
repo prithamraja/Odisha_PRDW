@@ -346,6 +346,11 @@ def slots_the_statement_splits(template: dict) -> frozenset:
                      if _already_separates(sql, column))
 
 
+def _lists(entities) -> list:
+    return [e for e in entities
+            if len(getattr(e, "values", None) or []) >= 2]
+
+
 def comparison_breakdown(template: dict, entities) -> str | None:
     """The breakdown that keeps a multi-value filter side by side, or None.
 
@@ -354,13 +359,22 @@ def comparison_breakdown(template: dict, entities) -> str | None:
     that dimension and the two land in their own rows. None when the statement
     already reports one row per that dimension (nothing to fix) or cannot group
     by it at all — the echo then says the values were combined.
+
+    TWO LISTS AT ONCE (WP-6b T3, D33.14). "Sector-wise tied spend for water and
+    sanitation for 2024 to 2026" names two focus areas AND two years. This used
+    to take whichever list came first in extractor order, and the year won: one
+    row per year, water and sanitation summed inside each — the opposite of the
+    question. A list on a NON-YEAR dimension is the subject of the comparison and
+    takes the breakdown; the year list is used only when no other list exists,
+    and is otherwise added together, which the echo says out loud. "Year-wise" in
+    the question still keeps the year breakdown: the phrase reader runs first,
+    and this is only consulted when it found nothing.
     """
     offered = template_group_values(template)
     sql = template.get("sql_template") or ""
-    for entity in entities:
-        values = getattr(entity, "values", None)
-        if not values or len(values) < 2:
-            continue
+    lists = _lists(entities)
+    subjects = [e for e in lists if SLOT_TO_GROUP.get(e.slot_name) != "fiscal_year"]
+    for entity in subjects or lists:
         group = SLOT_TO_GROUP.get(entity.slot_name)
         if group is None or group not in offered:
             continue
@@ -368,3 +382,18 @@ def comparison_breakdown(template: dict, entities) -> str | None:
             continue
         return group
     return None
+
+
+def combined_lists(template: dict, entities, group_by: str | None) -> list:
+    """The multi-value filters the answer ADDS TOGETHER, in slot order.
+
+    A list is not combined when the breakdown that ran separates it, or when the
+    statement reports one row per value anyway. "(as one total)" already says a
+    total adds everything, so a total names nothing further.
+    """
+    if group_by == "total":
+        return []
+    splits = slots_the_statement_splits(template)
+    return [e for e in _lists(entities)
+            if e.slot_name not in splits
+            and not (group_by is not None and SLOT_TO_GROUP.get(e.slot_name) == group_by)]

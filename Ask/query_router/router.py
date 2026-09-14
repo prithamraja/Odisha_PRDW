@@ -1983,14 +1983,17 @@ def _serve_query_id(
         r"\bof\s+(\S+)\s+of\s+\1\b", r"of \1", query_description, flags=re.IGNORECASE
     )
     query_description = breakdown.describe(query_description, group_by, template)
-    splits_already = breakdown.slots_the_statement_splits(template)
-    if group_by is None and any(
-            e.values and len(e.values) > 1 and e.slot_name not in splits_already
-            for e in validated_entities):
-        # Nothing could separate them, so say they were added together rather
-        # than leaving one figure standing for two questions. A statement that
-        # already reports one row per value needs no such warning.
-        query_description = f"{query_description} (the values combined)"  # noqa: E501
+    # Values the answer ADDS TOGETHER are said to be, rather than leaving one
+    # figure standing for several questions. A statement that already reports
+    # one row per value, or a breakdown that separates them, needs no warning.
+    # A year list is NAMED (WP-6b T3): now that a subject list wins the
+    # breakdown, the years are what get summed, and the officer should see which.
+    combined = breakdown.combined_lists(template, validated_entities, group_by)
+    if any(e.slot_name != "date_range" for e in combined):
+        query_description = f"{query_description} (the values combined)"
+    for e in combined:
+        if e.slot_name == "date_range":
+            query_description = f"{query_description} ({_readable_values(e)} combined)"
 
     params_by_name = {e.slot_name: (e.values if e.values else e.resolved_value)
                       for e in validated_entities}
