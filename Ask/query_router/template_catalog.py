@@ -5804,6 +5804,8 @@ ORDER BY planned_cost DESC
             # folded from BUD-018 (WP-6 T3): the same measure, answered with $group_by
             'How much planned expenditure is allocated to each focus area in a given year?',
             'How much planned expenditure goes to each focus area in 2024-2025?',
+            # WP-6b T5: Eval_1 rows 175/182 never offered this entry
+            'What is the state-wide total estimated cost of all planned activities in a given year?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How much planned expenditure is allocated to each GPDP theme in a given year?',
             'How much planned expenditure is allocated to each GPDP theme in a given year, for a given district?',
@@ -19507,6 +19509,8 @@ ORDER BY 1 DESC
         "paraphrases": [
             "How does Andhrua's spend compare with its plan each year?",
             'What is the current-year expenditure of a given GP Name against the plans of each of the last three years?',
+            # WP-6b T5: Eval_1 row 348 never offered this entry
+            'Show a five-year time series of fund utilisation, expenditure against plan year by year.',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the year-wise expenditure of a given gram panchayat against the plan of each year?',
             'What is the year-wise expenditure of a given district against the plan of each year?',

@@ -1078,8 +1078,11 @@ _DISAMBIGUATION: dict[str, str] = {
                "breakdown.",
     "BUD-001": "Funding RECORDED against each GP, one row per GP. The total "
                "estimated (planned) cost of planned activities is BUD-006.",
-    "TRD-002": "Compares TWO DIFFERENT named years side by side. Tied-fund "
-               "spending on water vs sanitation within one period is EXP-009.",
+    "TRD-002": "Compares TWO DIFFERENT named years side by side. A question that "
+               "names ONE year or one span is never this: tied-fund spending on "
+               "water vs sanitation for a year is EXP-009.",
+    "PLN-021": "RANKS districts by their pending approvals. 'How many GPs still "
+               "need their GPDP approved' is a COUNT of GPs, PLN-014.",
     "TRD-008": "Approved cost AND expenditure per focus area. 'Tied-fund "
                "expenditure, water vs sanitation' is EXP-009, which reports tied "
                "spend per focus area.",
@@ -1262,8 +1265,9 @@ def describe_family(entry: dict, member_ids: list[str]) -> str:
         if any(qid.startswith("SBM-") for qid in member_ids):
             # WP-6b T5: seven Swachh Bharat questions lost STS-003 to these.
             parts.append("Counts ONE item type by keyword. A question about "
-                         "sanitation activities in general, or a status count, "
-                         "is STS-003.")
+                         "sanitation activities in general is not this: a count "
+                         "of PLANNED sanitation activities is PLN-049, a count "
+                         "by status (completed, ongoing) is STS-003.")
 
     for pattern, clause in STATUS_CLAUSES:
         if re.search(pattern, masked, re.IGNORECASE):
