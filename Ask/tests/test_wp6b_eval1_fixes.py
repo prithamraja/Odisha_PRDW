@@ -248,6 +248,19 @@ class T2SubjectPrefillTests(unittest.TestCase):
         self.assertIn("focus_area", asked)
         self.assertEqual(raw["focus_area"], ["Drinking water", "Sanitation"])
 
+    def test_a_phrase_the_reader_bound_is_not_reused_by_the_extractor(self):
+        """Gold #1423, from the T7 replay: the reader bound scheme = Own Funds,
+        and the extractor — no longer asked for the scheme — put the same words
+        in tied_untied, so the bot asked which tied/untied value 'Own Funds' was."""
+        question = "Which activities of Andhrua are funded under Own Funds in 2024-25?"
+        raw, asked = _extract("SCH-002", question, {"tied_untied": "Own Funds"})
+        self.assertNotIn("scheme", asked)
+        self.assertIsNone(raw.get("tied_untied"))
+        validated, clarify = _fill("SCH-002", question, raw)
+        self.assertIsNone(clarify)
+        self.assertEqual({e.slot_name: e.resolved_value for e in validated}["scheme"],
+                         "Own Funds")
+
     def test_the_longest_reading_wins_across_slots(self):
         from query_router.subject_reader import named_subjects
         slots = {"focus_area": "focus_area", "theme": "theme"}

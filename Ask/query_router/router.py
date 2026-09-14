@@ -444,6 +444,22 @@ def _extract_slot_values(
                 "in the question): %s=%r query=%r",
                 slot, raw[slot], user_query[:120],
             )
+    # A phrase the subject reader bound belongs to ITS slot. With that slot off
+    # the extractor's list the model has been seen to put the same words in a
+    # neighbour — "funded under Own Funds" came back as tied_untied='Own Funds',
+    # and gold #1423, answered 3/3 in WP-6, asked which tied/untied value that was.
+    taken = {" ".join(str(p).lower().split())
+             for s, p in prefilled.items() if s in named}
+    for slot in askable:
+        value = raw.get(slot)
+        if value is None or not taken:
+            continue
+        values = value if isinstance(value, (list, tuple)) else [value]
+        kept = [v for v in values if " ".join(str(v).lower().split()) not in taken]
+        if len(kept) != len(values):
+            _log.info("dropped %s=%r: the subject reader already bound that phrase",
+                      slot, value)
+            raw[slot] = (kept if len(kept) > 1 else kept[0]) if kept else None
     raw.update(prefilled)
     for slot, etype in slot_type.items():
         if etype in _CONSTANT_ENTITY_TYPES:
