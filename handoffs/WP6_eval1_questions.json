@@ -1,0 +1,1572 @@
+[
+ {
+  "n": 1,
+  "q": "What is the total budget outlay planned across all main GPDPs for 2024 to 2025?",
+  "block": 1
+ },
+ {
+  "n": 2,
+  "q": "How much is the overall budget planned for all main GPDPs for 2024 to 2025?",
+  "block": 1
+ },
+ {
+  "n": 3,
+  "q": "Can you give me the total planned budget outlay across main GPDPs for 2025 to 2026?",
+  "block": 1
+ },
+ {
+  "n": 4,
+  "q": "Can you give me the total planned budget outlay across main GPDPs for 2020-2021?",
+  "block": 1
+ },
+ {
+  "n": 5,
+  "q": "Total budget allocated for main GPDPs for 2024 to 2025.",
+  "block": 1
+ },
+ {
+  "n": 6,
+  "q": "What's the aggregate budget outlay for all primary GPDPs for 2025 to 2026?",
+  "block": 1
+ },
+ {
+  "n": 7,
+  "q": "Provide the sum of the planned budget outlay across main GPDPs for 2024 to 2026.",
+  "block": 1
+ },
+ {
+  "n": 8,
+  "q": "Provide the sum of the planned budget outlay across main GPDPs for 2024 to 2025.",
+  "block": 1
+ },
+ {
+  "n": 10,
+  "q": "Which GPs have planned zero-cost activities for 2024 to 2025?",
+  "block": 2
+ },
+ {
+  "n": 11,
+  "q": "List the Gram Panchayats that planned activities with no cost for 2025 to 2026.",
+  "block": 2
+ },
+ {
+  "n": 12,
+  "q": "Show me the GPs whose planned activities have an estimated cost of zero for 2024 to 2026.",
+  "block": 2
+ },
+ {
+  "n": 13,
+  "q": "Which GPs proposed activities costing zero rupees for 2024 to 2025?",
+  "block": 2
+ },
+ {
+  "n": 14,
+  "q": "Find GPs containing zero-cost planned activities for 2024 to 2026.",
+  "block": 2
+ },
+ {
+  "n": 15,
+  "q": "Identify Gram Panchayats with cost-free planned activities for 2025 to 2026.",
+  "block": 2
+ },
+ {
+  "n": 17,
+  "q": "How many sanitation activities have been completed under Swachh Bharat for 2025 to 2026?",
+  "block": 3
+ },
+ {
+  "n": 18,
+  "q": "Total number of completed Swachh Bharat sanitation activities for 2024 to 2025.",
+  "block": 3
+ },
+ {
+  "n": 19,
+  "q": "What is the count of finished sanitation projects for Swachh Bharat for 2025 to 2026?",
+  "block": 3
+ },
+ {
+  "n": 20,
+  "q": "How many sanitation tasks are complete under the Swachh Bharat scheme for 2024 to 2026?",
+  "block": 3
+ },
+ {
+  "n": 21,
+  "q": "Count of completed sanitation activities tied to Swachh Bharat for 2024 to 2025.",
+  "block": 3
+ },
+ {
+  "n": 22,
+  "q": "Provide the number of Swachh Bharat sanitation activities marked complete for 2025 to 2026.",
+  "block": 3
+ },
+ {
+  "n": 25,
+  "q": "What is the total budget outlay planned across all main GPDPs for 2020 to 2021?",
+  "block": 4
+ },
+ {
+  "n": 26,
+  "q": "How much is the overall budget planned for all main GPDPs for 2021 to 2022?",
+  "block": 4
+ },
+ {
+  "n": 27,
+  "q": "Can you give me the total planned budget outlay across main GPDPs for 2022 to 2023?",
+  "block": 4
+ },
+ {
+  "n": 28,
+  "q": "Total budget allocated for main GPDPs for 2020 to 2021.",
+  "block": 4
+ },
+ {
+  "n": 29,
+  "q": "What's the aggregate budget outlay for all primary GPDPs for 2021 to 2022?",
+  "block": 4
+ },
+ {
+  "n": 30,
+  "q": "Provide the sum of the planned budget outlay across main GPDPs for 2022 to 2023.",
+  "block": 4
+ },
+ {
+  "n": 32,
+  "q": "What is the total unspent balance across all GPs in the state for 2020 to 2021?",
+  "block": 5
+ },
+ {
+  "n": 33,
+  "q": "How much unspent money is left across all state GPs for 2021 to 2022?",
+  "block": 5
+ },
+ {
+  "n": 34,
+  "q": "Total unspent balance for all Gram Panchayats statewide for 2022 to 2023.",
+  "block": 5
+ },
+ {
+  "n": 35,
+  "q": "What is the aggregate unutilized balance for all GPs in the state for 2020 to 2021?",
+  "block": 5
+ },
+ {
+  "n": 36,
+  "q": "Can you show the total remaining funds across all GPs for 2021 to 2022?",
+  "block": 5
+ },
+ {
+  "n": 37,
+  "q": "Provide the state-wide sum of unspent balances for GPs for 2022 to 2023.",
+  "block": 5
+ },
+ {
+  "n": 40,
+  "q": "Show the breakdown of tied fund expenditure by sector (water vs sanitation) for 2025 to 2026.",
+  "block": 6
+ },
+ {
+  "n": 41,
+  "q": "How are tied funds spent across water and sanitation sectors for 2025 to 2026?",
+  "block": 6
+ },
+ {
+  "n": 42,
+  "q": "Compare tied fund spending between water and sanitation for 2024 to 2026.",
+  "block": 6
+ },
+ {
+  "n": 43,
+  "q": "Tied fund expenditure breakdown: water vs. sanitation for 2024 to 2025.",
+  "block": 6
+ },
+ {
+  "n": 44,
+  "q": "What is the sector-wise expenditure of tied funds for water and sanitation for 2024 to 2026?",
+  "block": 6
+ },
+ {
+  "n": 45,
+  "q": "Show me the distribution of tied funds spent on water versus sanitation for 2025 to 2026.",
+  "block": 6
+ },
+ {
+  "n": 47,
+  "q": "Show the breakdown of tied fund expenditure by sector (water vs sanitation) for 2020 to 2021.",
+  "block": 7
+ },
+ {
+  "n": 48,
+  "q": "How are tied funds spent across water and sanitation sectors for 2021 to 2022?",
+  "block": 7
+ },
+ {
+  "n": 49,
+  "q": "Compare tied fund spending between water and sanitation for 2022 to 2023.",
+  "block": 7
+ },
+ {
+  "n": 50,
+  "q": "Tied fund expenditure breakdown: water vs. sanitation for 2020 to 2021.",
+  "block": 7
+ },
+ {
+  "n": 51,
+  "q": "What is the sector-wise expenditure of tied funds for water and sanitation for 2021 to 2022?",
+  "block": 7
+ },
+ {
+  "n": 52,
+  "q": "Show me the distribution of tied funds spent on water versus sanitation for 2022 to 2023.",
+  "block": 7
+ },
+ {
+  "n": 54,
+  "q": "What is the total allocation for the 9 Sankalp themes state-wide for 2024 to 2025?",
+  "block": 8
+ },
+ {
+  "n": 55,
+  "q": "How much money is allocated to the 9 Sankalp themes across the state for 2024 to 2026?",
+  "block": 8
+ },
+ {
+  "n": 56,
+  "q": "Total state-wide funding for the 9 Sankalp themes for 2025 to 2026.",
+  "block": 8
+ },
+ {
+  "n": 57,
+  "q": "What is the aggregate allocation for Sankalp themes at the state level for 2024 to 2026?",
+  "block": 8
+ },
+ {
+  "n": 58,
+  "q": "State-wide allocation amount for all 9 Sankalp themes for 2024 to 2025.",
+  "block": 8
+ },
+ {
+  "n": 59,
+  "q": "Provide the total funds set aside for the 9 Sankalp themes statewide for 2024 to 2025.",
+  "block": 8
+ },
+ {
+  "n": 61,
+  "q": "What is the total allocation for the 9 Sankalp themes state-wide for 2020 to 2021?",
+  "block": 9
+ },
+ {
+  "n": 62,
+  "q": "How much money is allocated to the 9 Sankalp themes across the state for 2021 to 2022?",
+  "block": 9
+ },
+ {
+  "n": 63,
+  "q": "Total state-wide funding for the 9 Sankalp themes for 2022 to 2023.",
+  "block": 9
+ },
+ {
+  "n": 64,
+  "q": "What is the aggregate allocation for Sankalp themes at the state level for 2020 to 2021?",
+  "block": 9
+ },
+ {
+  "n": 65,
+  "q": "State-wide allocation amount for all 9 Sankalp themes for 2021 to 2022.",
+  "block": 9
+ },
+ {
+  "n": 66,
+  "q": "Provide the total funds set aside for the 9 Sankalp themes statewide for 2022 to 2023.",
+  "block": 9
+ },
+ {
+  "n": 68,
+  "q": "List the GPs that have not allocated any funds to Sankalp themes for 2025 to 2026.",
+  "block": 10
+ },
+ {
+  "n": 69,
+  "q": "Which Gram Panchayats have zero allocation for Sankalp themes for 2024 to 2026?",
+  "block": 10
+ },
+ {
+  "n": 70,
+  "q": "Show me the GPs with no funds given to Sankalp themes for 2024 to 2025.",
+  "block": 10
+ },
+ {
+  "n": 71,
+  "q": "Provide a list of GPs lacking funding for Sankalp themes for 2025 to 2026.",
+  "block": 10
+ },
+ {
+  "n": 72,
+  "q": "Which GPs didn't allocate money to any Sankalp theme for 2024 to 2026?",
+  "block": 10
+ },
+ {
+  "n": 73,
+  "q": "Find GPs that have zero funds allocated toward Sankalp themes for 2025 to 2026.",
+  "block": 10
+ },
+ {
+  "n": 75,
+  "q": "List the GPs that have not allocated any funds to Sankalp themes for 2020 to 2021.",
+  "block": 11
+ },
+ {
+  "n": 76,
+  "q": "Which Gram Panchayats have zero allocation for Sankalp themes for 2021 to 2022?",
+  "block": 11
+ },
+ {
+  "n": 77,
+  "q": "Show me the GPs with no funds given to Sankalp themes for 2022 to 2023.",
+  "block": 11
+ },
+ {
+  "n": 78,
+  "q": "Provide a list of GPs lacking funding for Sankalp themes for 2020 to 2021.",
+  "block": 11
+ },
+ {
+  "n": 79,
+  "q": "Which GPs didn't allocate money to any Sankalp theme for 2021 to 2022?",
+  "block": 11
+ },
+ {
+  "n": 80,
+  "q": "Find GPs that have zero funds allocated toward Sankalp themes for 2022 to 2023.",
+  "block": 11
+ },
+ {
+  "n": 83,
+  "q": "How many GPs have uploaded their main GPDP for FY 2025-26 for 2024 to 2025?",
+  "block": 12
+ },
+ {
+  "n": 84,
+  "q": "What is the count of GPs that uploaded their main GPDP for 2025-26 for 2024 to 2025?",
+  "block": 12
+ },
+ {
+  "n": 85,
+  "q": "Number of GPs with uploaded main GPDPs for FY 2025-26 for 2025 to 2026.",
+  "block": 12
+ },
+ {
+  "n": 86,
+  "q": "How many Gram Panchayats submitted their main GPDPs for the 25-26 fiscal year for 2025 to 2026?",
+  "block": 12
+ },
+ {
+  "n": 87,
+  "q": "Total GPs that have uploaded main GPDPs for 2025-2026 for 2024 to 2026.",
+  "block": 12
+ },
+ {
+  "n": 88,
+  "q": "Count the GPs that completed main GPDP uploads for FY 25-26 for 2025 to 2026.",
+  "block": 12
+ },
+ {
+  "n": 89,
+  "q": "How many GPs have uploaded their main GPDP for FY 2025-26 for 2020 to 2021?",
+  "block": 12
+ },
+ {
+  "n": 90,
+  "q": "What is the count of GPs that uploaded their main GPDP for 2025-26 for 2021 to 2022?",
+  "block": 12
+ },
+ {
+  "n": 91,
+  "q": "Number of GPs with uploaded main GPDPs for FY 2025-26 for 2022 to 2023.",
+  "block": 12
+ },
+ {
+  "n": 92,
+  "q": "How many Gram Panchayats submitted their main GPDPs for the 25-26 fiscal year for 2020 to 2021?",
+  "block": 12
+ },
+ {
+  "n": 93,
+  "q": "Total GPs that have uploaded main GPDPs for 2025-2026 for 2021 to 2022.",
+  "block": 12
+ },
+ {
+  "n": 94,
+  "q": "Count the GPs that completed main GPDP uploads for FY 25-26 for 2022 to 2023.",
+  "block": 12
+ },
+ {
+  "n": 97,
+  "q": "List the GPs that have not yet uploaded any GPDP for 2024 to 2026.",
+  "block": 13
+ },
+ {
+  "n": 98,
+  "q": "Which GPs haven't uploaded a GPDP yet for 2024 to 2026?",
+  "block": 13
+ },
+ {
+  "n": 99,
+  "q": "Show me the Gram Panchayats with pending GPDP uploads for 2024 to 2026.",
+  "block": 13
+ },
+ {
+  "n": 100,
+  "q": "Provide the names of GPs missing GPDP uploads for 2024 to 2025.",
+  "block": 13
+ },
+ {
+  "n": 101,
+  "q": "Which GPs failed to upload any GPDP so far for 2024 to 2025?",
+  "block": 13
+ },
+ {
+  "n": 102,
+  "q": "List all Gram Panchayats that have not submitted GPDPs for 2025 to 2026.",
+  "block": 13
+ },
+ {
+  "n": 103,
+  "q": "List the GPs that have not yet uploaded any GPDP for 2020 to 2021.",
+  "block": 13
+ },
+ {
+  "n": 104,
+  "q": "Which GPs haven't uploaded a GPDP yet for 2021 to 2022?",
+  "block": 13
+ },
+ {
+  "n": 105,
+  "q": "Show me the Gram Panchayats with pending GPDP uploads for 2022 to 2023.",
+  "block": 13
+ },
+ {
+  "n": 106,
+  "q": "Provide the names of GPs missing GPDP uploads for 2020 to 2021.",
+  "block": 13
+ },
+ {
+  "n": 107,
+  "q": "Which GPs failed to upload any GPDP so far for 2021 to 2022?",
+  "block": 13
+ },
+ {
+  "n": 108,
+  "q": "List all Gram Panchayats that have not submitted GPDPs for 2022 to 2023.",
+  "block": 13
+ },
+ {
+  "n": 111,
+  "q": "What is the total number of supplementary plans approved state-wide for 2025 to 2026?",
+  "block": 14
+ },
+ {
+  "n": 112,
+  "q": "How many supplementary plans are approved across the state for 2024 to 2026?",
+  "block": 14
+ },
+ {
+  "n": 113,
+  "q": "State-wide count of approved supplementary plans for 2024 to 2026.",
+  "block": 14
+ },
+ {
+  "n": 114,
+  "q": "What is the total volume of approved supplementary plans in the state for 2024 to 2026?",
+  "block": 14
+ },
+ {
+  "n": 115,
+  "q": "Count all state-wide approved supplementary plans for 2025 to 2026.",
+  "block": 14
+ },
+ {
+  "n": 116,
+  "q": "Provide the total number of approved supplementary plans at the state level for 2024 to 2025.",
+  "block": 14
+ },
+ {
+  "n": 118,
+  "q": "What is the total number of supplementary plans approved state-wide for 2020 to 2021?",
+  "block": 15
+ },
+ {
+  "n": 119,
+  "q": "How many supplementary plans are approved across the state for 2021 to 2022?",
+  "block": 15
+ },
+ {
+  "n": 120,
+  "q": "State-wide count of approved supplementary plans for 2022 to 2023.",
+  "block": 15
+ },
+ {
+  "n": 121,
+  "q": "What is the total volume of approved supplementary plans in the state for 2020 to 2021?",
+  "block": 15
+ },
+ {
+  "n": 122,
+  "q": "Count all state-wide approved supplementary plans for 2021 to 2022.",
+  "block": 15
+ },
+ {
+  "n": 123,
+  "q": "Provide the total number of approved supplementary plans at the state level for 2022 to 2023.",
+  "block": 15
+ },
+ {
+  "n": 126,
+  "q": "How many GPs have submitted at least one supplementary plan in Ganjam district for 2024 to 2025?",
+  "block": 16
+ },
+ {
+  "n": 127,
+  "q": "Number of GPs in Ganjam with 1 or more supplementary plans for 2024 to 2026.",
+  "block": 16
+ },
+ {
+  "n": 128,
+  "q": "How many Gram Panchayats in Ganjam district submitted supplementary plans for 2025 to 2026?",
+  "block": 16
+ },
+ {
+  "n": 129,
+  "q": "Count the GPs from Ganjam that have at least one supplementary plan for 2025 to 2026.",
+  "block": 16
+ },
+ {
+  "n": 130,
+  "q": "In Ganjam district, how many GPs provided a supplementary plan for 2024 to 2025?",
+  "block": 16
+ },
+ {
+  "n": 131,
+  "q": "Total GPs in Ganjam district with submitted supplementary plans for 2025 to 2026.",
+  "block": 16
+ },
+ {
+  "n": 132,
+  "q": "How many GPs have submitted at least one supplementary plan in Ganjam district for 2020 to 2021?",
+  "block": 16
+ },
+ {
+  "n": 133,
+  "q": "Number of GPs in Ganjam with 1 or more supplementary plans for 2021 to 2022.",
+  "block": 16
+ },
+ {
+  "n": 134,
+  "q": "How many Gram Panchayats in Ganjam district submitted supplementary plans for 2022 to 2023?",
+  "block": 16
+ },
+ {
+  "n": 135,
+  "q": "Count the GPs from Ganjam that have at least one supplementary plan for 2020 to 2021.",
+  "block": 16
+ },
+ {
+  "n": 136,
+  "q": "In Ganjam district, how many GPs provided a supplementary plan for 2021 to 2022?",
+  "block": 16
+ },
+ {
+  "n": 137,
+  "q": "Total GPs in Ganjam district with submitted supplementary plans for 2022 to 2023.",
+  "block": 16
+ },
+ {
+  "n": 140,
+  "q": "What is the total number of activities planned in the main GPDPs for 2025 to 2026?",
+  "block": 17
+ },
+ {
+  "n": 141,
+  "q": "How many activities are scheduled in the main GPDPs overall for 2024 to 2025?",
+  "block": 17
+ },
+ {
+  "n": 142,
+  "q": "Total count of planned activities within the main GPDPs for 2024 to 2025.",
+  "block": 17
+ },
+ {
+  "n": 143,
+  "q": "What is the overall number of activities proposed in main GPDPs for 2025 to 2026?",
+  "block": 17
+ },
+ {
+  "n": 144,
+  "q": "Count of all planned activities inside main GPDPs for 2024 to 2025.",
+  "block": 17
+ },
+ {
+  "n": 145,
+  "q": "Provide the aggregate number of activities planned across main GPDPs for 2024 to 2026.",
+  "block": 17
+ },
+ {
+  "n": 147,
+  "q": "What is the total number of activities planned in the main GPDPs for 2020 to 2021?",
+  "block": 18
+ },
+ {
+  "n": 148,
+  "q": "How many activities are scheduled in the main GPDPs overall for 2021 to 2022?",
+  "block": 18
+ },
+ {
+  "n": 149,
+  "q": "Total count of planned activities within the main GPDPs for 2022 to 2023.",
+  "block": 18
+ },
+ {
+  "n": 150,
+  "q": "What is the overall number of activities proposed in main GPDPs for 2020 to 2021?",
+  "block": 18
+ },
+ {
+  "n": 151,
+  "q": "Count of all planned activities inside main GPDPs for 2021 to 2022.",
+  "block": 18
+ },
+ {
+  "n": 152,
+  "q": "Provide the aggregate number of activities planned across main GPDPs for 2022 to 2023.",
+  "block": 18
+ },
+ {
+  "n": 155,
+  "q": "Which GP has the highest number of planned activities for 2024 to 2025?",
+  "block": 19
+ },
+ {
+  "n": 156,
+  "q": "Show me the Gram Panchayat with the most planned activities for 2024 to 2025.",
+  "block": 19
+ },
+ {
+  "n": 157,
+  "q": "Which GP planned the maximum number of activities for 2024 to 2026?",
+  "block": 19
+ },
+ {
+  "n": 158,
+  "q": "Identify the GP with the highest activity count for 2024 to 2025.",
+  "block": 19
+ },
+ {
+  "n": 159,
+  "q": "What GP tops the list for the most planned activities for 2024 to 2026?",
+  "block": 19
+ },
+ {
+  "n": 160,
+  "q": "Find the Gram Panchayat that proposed the highest number of activities for 2024 to 2025.",
+  "block": 19
+ },
+ {
+  "n": 162,
+  "q": "Which GP has the highest number of planned activities for 2020 to 2021?",
+  "block": 20
+ },
+ {
+  "n": 163,
+  "q": "Show me the Gram Panchayat with the most planned activities for 2021 to 2022.",
+  "block": 20
+ },
+ {
+  "n": 164,
+  "q": "Which GP planned the maximum number of activities for 2022 to 2023?",
+  "block": 20
+ },
+ {
+  "n": 165,
+  "q": "Identify the GP with the highest activity count for 2020 to 2021.",
+  "block": 20
+ },
+ {
+  "n": 166,
+  "q": "What GP tops the list for the most planned activities for 2021 to 2022?",
+  "block": 20
+ },
+ {
+  "n": 167,
+  "q": "Find the Gram Panchayat that proposed the highest number of activities for 2022 to 2023.",
+  "block": 20
+ },
+ {
+  "n": 170,
+  "q": "What is the total estimated cost of all planned activities state-wide for 2024 to 2026?",
+  "block": 21
+ },
+ {
+  "n": 171,
+  "q": "How much will all planned activities cost across the state for 2024 to 2025?",
+  "block": 21
+ },
+ {
+  "n": 172,
+  "q": "Total state-wide estimated cost for planned activities for 2025 to 2026.",
+  "block": 21
+ },
+ {
+  "n": 173,
+  "q": "What is the aggregate financial estimate for state-wide planned activities for 2024 to 2025?",
+  "block": 21
+ },
+ {
+  "n": 174,
+  "q": "Provide the overall expected cost of planned activities in the state for 2024 to 2026.",
+  "block": 21
+ },
+ {
+  "n": 175,
+  "q": "State-wide total of estimated costs for all activities for 2025 to 2026.",
+  "block": 21
+ },
+ {
+  "n": 177,
+  "q": "What is the total estimated cost of all planned activities state-wide for 2020 to 2021?",
+  "block": 22
+ },
+ {
+  "n": 178,
+  "q": "How much will all planned activities cost across the state for 2021 to 2022?",
+  "block": 22
+ },
+ {
+  "n": 179,
+  "q": "Total state-wide estimated cost for planned activities for 2022 to 2023.",
+  "block": 22
+ },
+ {
+  "n": 180,
+  "q": "What is the aggregate financial estimate for state-wide planned activities for 2020 to 2021?",
+  "block": 22
+ },
+ {
+  "n": 181,
+  "q": "Provide the overall expected cost of planned activities in the state for 2021 to 2022.",
+  "block": 22
+ },
+ {
+  "n": 182,
+  "q": "State-wide total of estimated costs for all activities for 2022 to 2023.",
+  "block": 22
+ },
+ {
+  "n": 185,
+  "q": "Which GPs have planned zero-cost activities for 2024 to 2025?",
+  "block": 23
+ },
+ {
+  "n": 186,
+  "q": "List the Gram Panchayats that planned activities with no cost for 2025 to 2026.",
+  "block": 23
+ },
+ {
+  "n": 187,
+  "q": "Show me the GPs whose planned activities have an estimated cost of zero for 2024 to 2026.",
+  "block": 23
+ },
+ {
+  "n": 188,
+  "q": "Which GPs proposed activities costing zero rupees for 2024 to 2026?",
+  "block": 23
+ },
+ {
+  "n": 189,
+  "q": "Find GPs containing zero-cost planned activities for 2024 to 2026.",
+  "block": 23
+ },
+ {
+  "n": 190,
+  "q": "Identify Gram Panchayats with cost-free planned activities for 2024 to 2025.",
+  "block": 23
+ },
+ {
+  "n": 192,
+  "q": "Which GPs have planned zero-cost activities for 2020 to 2021?",
+  "block": 24
+ },
+ {
+  "n": 193,
+  "q": "List the Gram Panchayats that planned activities with no cost for 2021 to 2022.",
+  "block": 24
+ },
+ {
+  "n": 194,
+  "q": "Show me the GPs whose planned activities have an estimated cost of zero for 2022 to 2023.",
+  "block": 24
+ },
+ {
+  "n": 195,
+  "q": "Which GPs proposed activities costing zero rupees for 2020 to 2021?",
+  "block": 24
+ },
+ {
+  "n": 196,
+  "q": "Find GPs containing zero-cost planned activities for 2021 to 2022.",
+  "block": 24
+ },
+ {
+  "n": 197,
+  "q": "Identify Gram Panchayats with cost-free planned activities for 2022 to 2023.",
+  "block": 24
+ },
+ {
+  "n": 200,
+  "q": "Show the breakdown of planned activities by theme for 2024 to 2025.",
+  "block": 25
+ },
+ {
+  "n": 201,
+  "q": "How are planned activities distributed across different themes for 2024 to 2025?",
+  "block": 25
+ },
+ {
+  "n": 202,
+  "q": "Theme-wise breakdown of all planned activities for 2025 to 2026.",
+  "block": 25
+ },
+ {
+  "n": 203,
+  "q": "Categorize the planned activities by their respective themes for 2024 to 2025.",
+  "block": 25
+ },
+ {
+  "n": 204,
+  "q": "What is the thematic distribution of planned activities for 2024 to 2025?",
+  "block": 25
+ },
+ {
+  "n": 205,
+  "q": "Provide a breakdown showing planned activities for each theme for 2025 to 2026.",
+  "block": 25
+ },
+ {
+  "n": 207,
+  "q": "Show the breakdown of planned activities by theme for 2020 to 2021.",
+  "block": 26
+ },
+ {
+  "n": 208,
+  "q": "How are planned activities distributed across different themes for 2021 to 2022?",
+  "block": 26
+ },
+ {
+  "n": 209,
+  "q": "Theme-wise breakdown of all planned activities for 2022 to 2023.",
+  "block": 26
+ },
+ {
+  "n": 210,
+  "q": "Categorize the planned activities by their respective themes for 2020 to 2021.",
+  "block": 26
+ },
+ {
+  "n": 211,
+  "q": "What is the thematic distribution of planned activities for 2021 to 2022?",
+  "block": 26
+ },
+ {
+  "n": 212,
+  "q": "Provide a breakdown showing planned activities for each theme for 2022 to 2023.",
+  "block": 26
+ },
+ {
+  "n": 215,
+  "q": "How many activities are planned under the sanitation sector for 2024 to 2025?",
+  "block": 27
+ },
+ {
+  "n": 216,
+  "q": "What is the total number of planned sanitation activities for 2024 to 2025?",
+  "block": 27
+ },
+ {
+  "n": 217,
+  "q": "Count the activities scheduled for the sanitation sector for 2024 to 2026.",
+  "block": 27
+ },
+ {
+  "n": 218,
+  "q": "How many planned activities fall under sanitation for 2024 to 2026?",
+  "block": 27
+ },
+ {
+  "n": 219,
+  "q": "Number of activities proposed within the sanitation category for 2024 to 2025.",
+  "block": 27
+ },
+ {
+  "n": 220,
+  "q": "Provide the total count of sanitation sector planned activities for 2024 to 2026.",
+  "block": 27
+ },
+ {
+  "n": 222,
+  "q": "How many activities are planned under the sanitation sector for 2020 to 2021?",
+  "block": 28
+ },
+ {
+  "n": 223,
+  "q": "What is the total number of planned sanitation activities for 2021 to 2022?",
+  "block": 28
+ },
+ {
+  "n": 224,
+  "q": "Count the activities scheduled for the sanitation sector for 2022 to 2023.",
+  "block": 28
+ },
+ {
+  "n": 225,
+  "q": "How many planned activities fall under sanitation for 2020 to 2021?",
+  "block": 28
+ },
+ {
+  "n": 226,
+  "q": "Number of activities proposed within the sanitation category for 2021 to 2022.",
+  "block": 28
+ },
+ {
+  "n": 227,
+  "q": "Provide the total count of sanitation sector planned activities for 2022 to 2023.",
+  "block": 28
+ },
+ {
+  "n": 230,
+  "q": "Which GP has planned the most activities under piped water supply for 2024 to 2025?",
+  "block": 29
+ },
+ {
+  "n": 231,
+  "q": "Identify the GP with the highest number of piped water supply activities for 2025 to 2026.",
+  "block": 29
+ },
+ {
+  "n": 232,
+  "q": "Which Gram Panchayat proposed the most activities for piped water for 2025 to 2026?",
+  "block": 29
+ },
+ {
+  "n": 233,
+  "q": "Show the GP leading in planned piped water supply activities for 2024 to 2025.",
+  "block": 29
+ },
+ {
+  "n": 234,
+  "q": "What GP planned the maximum activities related to piped water supply for 2024 to 2025?",
+  "block": 29
+ },
+ {
+  "n": 235,
+  "q": "Find the GP with the greatest count of piped water supply plans for 2024 to 2026.",
+  "block": 29
+ },
+ {
+  "n": 237,
+  "q": "Which GP has planned the most activities under piped water supply for 2020 to 2021?",
+  "block": 30
+ },
+ {
+  "n": 238,
+  "q": "Identify the GP with the highest number of piped water supply activities for 2021 to 2022.",
+  "block": 30
+ },
+ {
+  "n": 239,
+  "q": "Which Gram Panchayat proposed the most activities for piped water for 2022 to 2023?",
+  "block": 30
+ },
+ {
+  "n": 240,
+  "q": "Show the GP leading in planned piped water supply activities for 2020 to 2021.",
+  "block": 30
+ },
+ {
+  "n": 241,
+  "q": "What GP planned the maximum activities related to piped water supply for 2021 to 2022?",
+  "block": 30
+ },
+ {
+  "n": 242,
+  "q": "Find the GP with the greatest count of piped water supply plans for 2022 to 2023.",
+  "block": 30
+ },
+ {
+  "n": 246,
+  "q": "How many GPs have their GPDPs still pending approval for 2024 to 2026?",
+  "block": 31
+ },
+ {
+  "n": 247,
+  "q": "What is the count of GPs waiting for GPDP approval for 2024 to 2025?",
+  "block": 31
+ },
+ {
+  "n": 248,
+  "q": "Number of Gram Panchayats whose GPDPs are pending for 2024 to 2025.",
+  "block": 31
+ },
+ {
+  "n": 249,
+  "q": "How many GPs currently have unapproved GPDPs for 2024 to 2025?",
+  "block": 31
+ },
+ {
+  "n": 250,
+  "q": "Count of GPs with GPDPs in pending approval status for 2024 to 2025.",
+  "block": 31
+ },
+ {
+  "n": 251,
+  "q": "How many GPs have their GPDPs still pending approval for 2020-2021?",
+  "block": 31
+ },
+ {
+  "n": 252,
+  "q": "What is the count of GPs waiting for GPDP approval for 2021-2022?",
+  "block": 31
+ },
+ {
+  "n": 253,
+  "q": "Number of Gram Panchayats whose GPDPs are pending for 2022-2023.",
+  "block": 31
+ },
+ {
+  "n": 254,
+  "q": "How many GPs currently have unapproved GPDPs for 2020-2021?",
+  "block": 31
+ },
+ {
+  "n": 255,
+  "q": "Count of GPs with GPDPs in pending approval status for 2021-2022?",
+  "block": 31
+ },
+ {
+  "n": 256,
+  "q": "Find out how many GPs still need their GPDPs approved for 2022-2023.",
+  "block": 31
+ },
+ {
+  "n": 257,
+  "q": "Find out how many GPs still need their GPDPs approved for 2024 to 2026.",
+  "block": 31
+ },
+ {
+  "n": 258,
+  "q": "How many activities have been completed across the state for 2025 to 2026?",
+  "block": 31
+ },
+ {
+  "n": 259,
+  "q": "Give me the state-wide count of completed activities for 2025 to 2026?",
+  "block": 31
+ },
+ {
+  "n": 260,
+  "q": "What is the total completed activity count for all districts in 2025 to 2026?",
+  "block": 31
+ },
+ {
+  "n": 261,
+  "q": "How many GPDP activities are marked completed across Odisha for 2025 to 2026?",
+  "block": 31
+ },
+ {
+  "n": 262,
+  "q": "Provide the overall number of completed activities state-wide for 2025 to 2026.",
+  "block": 31
+ },
+ {
+  "n": 263,
+  "q": "What is the total number of completed activities state-wide for 2020-2021?",
+  "block": 31
+ },
+ {
+  "n": 264,
+  "q": "How many activities have been completed across the state for 2021-2022?",
+  "block": 31
+ },
+ {
+  "n": 265,
+  "q": "Give me the state-wide count of completed activities for 2022-2023?",
+  "block": 31
+ },
+ {
+  "n": 266,
+  "q": "What is the total completed activity count for all districts in 2020-2021?",
+  "block": 31
+ },
+ {
+  "n": 267,
+  "q": "How many GPDP activities are marked completed across Odisha for 2021-2022?",
+  "block": 31
+ },
+ {
+  "n": 268,
+  "q": "Provide the overall number of completed activities state-wide for 2022-2023.",
+  "block": 31
+ },
+ {
+  "n": 269,
+  "q": "How many activities are in progress during 2024 to 2025?",
+  "block": 31
+ },
+ {
+  "n": 270,
+  "q": "Give the total count of activities currently in progress for 2024 to 2025.",
+  "block": 31
+ },
+ {
+  "n": 271,
+  "q": "What is the number of ongoing activities recorded for 2024 to 2025?",
+  "block": 31
+ },
+ {
+  "n": 272,
+  "q": "How many GPDP activities have an in-progress status for 2024 to 2025?",
+  "block": 31
+ },
+ {
+  "n": 273,
+  "q": "Provide the count of activities that are currently underway for 2024 to 2025.",
+  "block": 31
+ },
+ {
+  "n": 274,
+  "q": "How many activities are currently marked as 'in progress' for 2020-2021?",
+  "block": 31
+ },
+ {
+  "n": 275,
+  "q": "How many activities are in progress during 2021-2022?",
+  "block": 31
+ },
+ {
+  "n": 276,
+  "q": "Give the total count of activities currently in progress for 2022-2023.",
+  "block": 31
+ },
+ {
+  "n": 277,
+  "q": "What is the number of ongoing activities recorded for 2020-2021?",
+  "block": 31
+ },
+ {
+  "n": 278,
+  "q": "How many GPDP activities have an in-progress status for 2021-2022?",
+  "block": 31
+ },
+ {
+  "n": 279,
+  "q": "Provide the count of activities that are currently underway for 2022-2023.",
+  "block": 31
+ },
+ {
+  "n": 280,
+  "q": "Which sector has the best activity completion rate for 2024 to 2026?",
+  "block": 31
+ },
+ {
+  "n": 281,
+  "q": "Identify the sector with the highest percentage of completed activities for 2024 to 2026.",
+  "block": 31
+ },
+ {
+  "n": 282,
+  "q": "Which sector leads in activity completion for 2024 to 2026?",
+  "block": 31
+ },
+ {
+  "n": 283,
+  "q": "Show the sector with the highest completion rate of activities for 2024 to 2026.",
+  "block": 31
+ },
+ {
+  "n": 284,
+  "q": "What sector has the greatest activity completion percentage for 2024 to 2026?",
+  "block": 31
+ },
+ {
+  "n": 285,
+  "q": "Which sector has the highest activity completion rate for 2020-2021?",
+  "block": 31
+ },
+ {
+  "n": 286,
+  "q": "Which sector has the best activity completion rate for 2021-2022?",
+  "block": 31
+ },
+ {
+  "n": 287,
+  "q": "Identify the sector with the highest percentage of completed activities for 2022-2023.",
+  "block": 31
+ },
+ {
+  "n": 288,
+  "q": "Which sector leads in activity completion for 2020-2021?",
+  "block": 31
+ },
+ {
+  "n": 289,
+  "q": "Show the sector with the highest completion rate of activities for 2021-2022.",
+  "block": 31
+ },
+ {
+  "n": 290,
+  "q": "What sector has the greatest activity completion percentage for 2022-2023?",
+  "block": 31
+ },
+ {
+  "n": 291,
+  "q": "How many sanitation activities have been completed under Swachh Bharat for 2025 to 2026?",
+  "block": 31
+ },
+ {
+  "n": 292,
+  "q": "How many Swachh Bharat sanitation activities were completed for 2025 to 2026?",
+  "block": 31
+ },
+ {
+  "n": 293,
+  "q": "Give the total completed sanitation activities under Swachh Bharat for 2025 to 2026.",
+  "block": 31
+ },
+ {
+  "n": 294,
+  "q": "What is the count of completed sanitation works under Swachh Bharat for 2025 to 2026?",
+  "block": 31
+ },
+ {
+  "n": 295,
+  "q": "How many sanitation projects under Swachh Bharat are marked complete for 2025 to 2026?",
+  "block": 31
+ },
+ {
+  "n": 296,
+  "q": "Provide the number of finished Swachh Bharat sanitation activities for 2025 to 2026.",
+  "block": 31
+ },
+ {
+  "n": 297,
+  "q": "How many sanitation activities have been completed under Swachh Bharat for 2020-2021?",
+  "block": 31
+ },
+ {
+  "n": 298,
+  "q": "How many Swachh Bharat sanitation activities were completed for 2021-2022?",
+  "block": 31
+ },
+ {
+  "n": 299,
+  "q": "Give the total completed sanitation activities under Swachh Bharat for 2022-2023.",
+  "block": 31
+ },
+ {
+  "n": 300,
+  "q": "What is the count of completed sanitation works under Swachh Bharat for 2020-2021?",
+  "block": 31
+ },
+ {
+  "n": 301,
+  "q": "How many sanitation projects under Swachh Bharat are marked complete for 2021-2022?",
+  "block": 31
+ },
+ {
+  "n": 302,
+  "q": "Provide the number of finished Swachh Bharat sanitation activities for 2022-2023.",
+  "block": 31
+ },
+ {
+  "n": 303,
+  "q": "How many road construction activities are in progress for 2024 to 2026?",
+  "block": 31
+ },
+ {
+  "n": 304,
+  "q": "Give the count of ongoing road construction activities for 2024 to 2026.",
+  "block": 31
+ },
+ {
+  "n": 305,
+  "q": "What is the number of road works currently in progress for 2024 to 2026?",
+  "block": 31
+ },
+ {
+  "n": 306,
+  "q": "How many GPDP road construction activities have an in-progress status for 2024 to 2026?",
+  "block": 31
+ },
+ {
+  "n": 307,
+  "q": "Provide the total number of road construction activities currently underway for 2024 to 2026.",
+  "block": 31
+ },
+ {
+  "n": 308,
+  "q": "How many road construction activities are currently in progress for 2020-2021?",
+  "block": 31
+ },
+ {
+  "n": 309,
+  "q": "How many road construction activities are in progress for 2021-2022?",
+  "block": 31
+ },
+ {
+  "n": 310,
+  "q": "Give the count of ongoing road construction activities for 2022-2023.",
+  "block": 31
+ },
+ {
+  "n": 311,
+  "q": "What is the number of road works currently in progress for 2020-2021?",
+  "block": 31
+ },
+ {
+  "n": 312,
+  "q": "How many GPDP road construction activities have an in-progress status for 2021-2022?",
+  "block": 31
+ },
+ {
+  "n": 313,
+  "q": "Provide the total number of road construction activities currently underway for 2022-2023.",
+  "block": 31
+ },
+ {
+  "n": 314,
+  "q": "Which districts are behind on GPDP submission for 2024 to 2026?",
+  "block": 31
+ },
+ {
+  "n": 315,
+  "q": "Identify districts with delayed GPDP submissions for 2024 to 2026.",
+  "block": 31
+ },
+ {
+  "n": 316,
+  "q": "Which districts have the lowest GPDP submission performance for 2024 to 2026?",
+  "block": 31
+ },
+ {
+  "n": 317,
+  "q": "Show the districts lagging in GPDP submission during 2024 to 2026.",
+  "block": 31
+ },
+ {
+  "n": 318,
+  "q": "List the districts that are behind schedule in GPDP submission for 2024 to 2026.",
+  "block": 31
+ },
+ {
+  "n": 319,
+  "q": "Which districts are lagging behind in GPDP submission for 2020-2021?",
+  "block": 31
+ },
+ {
+  "n": 320,
+  "q": "Which districts are behind on GPDP submission for 2021-2022?",
+  "block": 31
+ },
+ {
+  "n": 321,
+  "q": "Identify districts with delayed GPDP submissions for 2022-2023.",
+  "block": 31
+ },
+ {
+  "n": 322,
+  "q": "Which districts have the lowest GPDP submission performance for 2020-2021?",
+  "block": 31
+ },
+ {
+  "n": 323,
+  "q": "Show the districts lagging in GPDP submission during 2021-2022.",
+  "block": 31
+ },
+ {
+  "n": 324,
+  "q": "List the districts that are behind schedule in GPDP submission for 2022-2023.",
+  "block": 31
+ },
+ {
+  "n": 325,
+  "q": "Which GPs have expenditure recorded but zero physical progress for 2024 to 2025?",
+  "block": 31
+ },
+ {
+  "n": 326,
+  "q": "List Gram Panchayats where spending is recorded despite no physical progress in 2024 to 2025.",
+  "block": 31
+ },
+ {
+  "n": 327,
+  "q": "Find GPs with non-zero expenditure and zero physical progress for 2024 to 2025.",
+  "block": 31
+ },
+ {
+  "n": 328,
+  "q": "Which GPs show expenditure but no physical progress for 2024 to 2025?",
+  "block": 31
+ },
+ {
+  "n": 329,
+  "q": "Identify Gram Panchayats with recorded expenditure and zero physical achievement for 2024 to 2025.",
+  "block": 31
+ },
+ {
+  "n": 330,
+  "q": "List the GPs where expenditure is recorded but physical progress is zero for 2020-2021.",
+  "block": 31
+ },
+ {
+  "n": 331,
+  "q": "Which GPs have expenditure recorded but zero physical progress for 2021-2022?",
+  "block": 31
+ },
+ {
+  "n": 332,
+  "q": "List Gram Panchayats where spending is recorded despite no physical progress in 2022-2023.",
+  "block": 31
+ },
+ {
+  "n": 333,
+  "q": "Find GPs with non-zero expenditure and zero physical progress for 2020-2021.",
+  "block": 31
+ },
+ {
+  "n": 334,
+  "q": "Which GPs show expenditure but no physical progress for 2021-2022?",
+  "block": 31
+ },
+ {
+  "n": 335,
+  "q": "Identify Gram Panchayats with recorded expenditure and zero physical achievement for 2022-2023.",
+  "block": 31
+ },
+ {
+  "n": 336,
+  "q": "Give a district-wise summary of asset creation for 2024 to 2025.",
+  "block": 31
+ },
+ {
+  "n": 337,
+  "q": "Show asset creation totals across all districts for 2024 to 2025.",
+  "block": 31
+ },
+ {
+  "n": 338,
+  "q": "What is the district-level summary of assets created in 2024 to 2025?",
+  "block": 31
+ },
+ {
+  "n": 339,
+  "q": "Provide the overall asset creation summary for every district for 2024 to 2025.",
+  "block": 31
+ },
+ {
+  "n": 340,
+  "q": "List the asset creation figures by district for 2024 to 2025.",
+  "block": 31
+ },
+ {
+  "n": 341,
+  "q": "Show the summary of asset creation across all districts for 2020-2021.",
+  "block": 31
+ },
+ {
+  "n": 342,
+  "q": "Give a district-wise summary of asset creation for 2021-2022.",
+  "block": 31
+ },
+ {
+  "n": 343,
+  "q": "Show asset creation totals across all districts for 2022-2023.",
+  "block": 31
+ },
+ {
+  "n": 344,
+  "q": "What is the district-level summary of assets created in 2020-2021?",
+  "block": 31
+ },
+ {
+  "n": 345,
+  "q": "Provide the overall asset creation summary for every district for 2021-2022.",
+  "block": 31
+ },
+ {
+  "n": 346,
+  "q": "List the asset creation figures by district for 2022-2023.",
+  "block": 31
+ },
+ {
+  "n": 347,
+  "q": "Show a five-year time series of fund utilization for 2025 to 2026.",
+  "block": 31
+ },
+ {
+  "n": 348,
+  "q": "Provide a five-year trend analysis of fund utilization for 2025 to 2026.",
+  "block": 31
+ },
+ {
+  "n": 349,
+  "q": "How has fund utilization changed over the last five years for 2025 to 2026?",
+  "block": 31
+ },
+ {
+  "n": 350,
+  "q": "Give a time-series view of fund utilization covering the previous five years for 2025 to 2026.",
+  "block": 31
+ },
+ {
+  "n": 351,
+  "q": "Analyze fund utilization trends across the last five years for 2025 to 2026.",
+  "block": 31
+ },
+ {
+  "n": 352,
+  "q": "Generate a time-series analysis of fund utilization for the last 5 years for 2020-2021.",
+  "block": 31
+ },
+ {
+  "n": 353,
+  "q": "Show a five-year time series of fund utilization for 2021-2022.",
+  "block": 31
+ },
+ {
+  "n": 354,
+  "q": "Provide a five-year trend analysis of fund utilization for 2022-2023.",
+  "block": 31
+ },
+ {
+  "n": 355,
+  "q": "How has fund utilization changed over the last five years for 2020-2021?",
+  "block": 31
+ },
+ {
+  "n": 356,
+  "q": "Give a time-series view of fund utilization covering the previous five years for 2021-2022.",
+  "block": 31
+ },
+ {
+  "n": 357,
+  "q": "Analyze fund utilization trends across the last five years for 2022-2023.",
+  "block": 31
+ },
+ {
+  "n": 370,
+  "q": "Generate a time-series analysis of fund utilization for the last 5 years for 2024 to 2026.",
+  "block": 32
+ },
+ {
+  "n": 371,
+  "q": "Generate a time-series analysis of fund utilization for the last 5 years for 2025 to 2026.",
+  "block": 32
+ }
+]

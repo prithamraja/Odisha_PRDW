@@ -465,5 +465,38 @@ class T5DisambiguationTests(unittest.TestCase):
                 self.assertTrue(qid.startswith("SBM-"), qid)
 
 
+# ── T6 ────────────────────────────────────────────────────────────────────────
+
+_BASELINE = _REPO / "handoffs" / "WP6_eval1_replay"
+
+
+@unittest.skipIf(not _BASELINE.with_suffix(".jsonl").exists(),
+                 f"no Eval_1 baseline at {_BASELINE} (set PRDW_REPO from a mirror)")
+class T6GraderTests(unittest.TestCase):
+
+    def test_it_reproduces_the_pm_grading_of_the_baseline(self):
+        """Every one of the 314 rows gets the PM's outcome (201 correct / 58
+        clarify / 15 clarify-incorrect / 28 incorrect / 12 defective).
+
+        The chip NOTES are not compared: the PM named a family member by its
+        own id on some rows (BUD-013, rows 2 and 26) and by the family's lead on
+        others (PLN-025 for PLN-027/029, rows 166-167), so no one rule
+        reproduces them. What decides the outcome — whether an accepted
+        template is among the chips — is compared on every row."""
+        import grade_eval1
+        from collections import Counter
+        mine = {r["eval_row"]: r for r in
+                grade_eval1.grade_file(_BASELINE.with_suffix(".jsonl"))}
+        theirs = grade_eval1.read_graded(_BASELINE.with_suffix(".csv"))
+        self.assertEqual(len(mine), len(theirs))
+        for row in theirs:
+            n = int(row["eval_row"])
+            with self.subTest(row=n):
+                self.assertEqual(mine[n]["outcome"], row["outcome"])
+        self.assertEqual(Counter(r["outcome"] for r in mine.values()),
+                         Counter({"correct": 201, "clarify": 58, "incorrect": 28,
+                                  "clarify-incorrect": 15, "defective row": 12}))
+
+
 if __name__ == "__main__":
     unittest.main()

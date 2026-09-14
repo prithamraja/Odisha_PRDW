@@ -76,7 +76,8 @@ COMPLETION_BUDGET_REMINDER = (
 # The three harnesses that spend, and the guard every one of them must go
 # through. `pmkisan_gates.py` is deliberately absent: it is deleted by this
 # package (it was AP's).
-PAID_HARNESSES = ("run_full_eval.py", "recall_eval.py", "rerank_eval.py")
+PAID_HARNESSES = ("run_full_eval.py", "recall_eval.py", "rerank_eval.py",
+                  "run_custom_eval.py")   # WP-6b: the Eval_1 standing regression
 
 results: list[tuple[str, bool, str]] = []
 
@@ -477,7 +478,8 @@ CHECKS = [
     Check(5, "Model identity (config + live model list)", check_model_identity),
     Check(6, "Served-refusal invariant (result is None, never [])", check_served_refusal),
     Check(7, "Paired-year direction pins (executed)", check_direction_pins),
-    Check(8, "Refusal recall (documented refusals retrieve)", check_refusal_recall),
+    Check(8, "Refusal recall (documented refusals retrieve; crowding reported)",
+          check_refusal_recall),
     Check(9, "Static invariants", check_static_invariants),
 ]
 
