@@ -87,6 +87,7 @@ from query_router.echo              import (
     echo_answer,
     operation_answer,
     operation_description,
+    rows_to_render,
 )
 from query_router.unanswerable_catalog import UNANSWERABLE_CATALOG
 from query_router.date_phrase       import extract_date_window
@@ -1136,6 +1137,15 @@ def query_endpoint(req: QueryRequest):
             )
     else:
         result.context_frame = _context_store.get(session_id)
+
+    # A COUNT over no rows shows as one row of zeros, not "No records matched"
+    # (WP-6b T4). Only AFTER the frame is stored: the frame keeps the rows the
+    # statement returned — none — so this row is what the officer sees and never
+    # what a follow-up computes on.
+    if result.query_id in _template_map:
+        result.result = rows_to_render(
+            result, _template_map[result.query_id].get("question_type"),
+            _catalog_column_metadata.get(result.query_id))
 
     # Build human-readable answer + next-question chips
     suggestions: list[Chip] | None = None

@@ -12,7 +12,8 @@ question above an empty table leaves the user to guess whether nothing was
 found or something broke, and that guess is exactly where a reader starts
 inventing rows.
 """
-from .models import ContextFrame, OperationMode, OperationResult, RouteResult
+from .models import (ColumnMetadata, ColumnType, ContextFrame, OperationMode,
+                     OperationResult, RouteResult, RouteTier)
 
 # The blank line between the echoed question and what follows it — the same
 # separator `append_caveat` puts above a caveat.
@@ -68,6 +69,45 @@ def echo_answer_without_caveat(result: RouteResult) -> str:
 
 def echo_answer(result: RouteResult) -> str:
     return append_caveat(echo_answer_without_caveat(result), result.caveat)
+
+
+# ── A count of nothing is 0 (WP-6b T4, decision D33.15) ───────────────────────
+#
+# "How many completed sanitation activities in 2025-26?" matched no activity,
+# and the officer was told "No records matched — nothing was found". For a
+# COUNT that sentence is wrong: something was found, and it was zero. WP-6's
+# GROUPING SETS change keeps the single row for the 112 plain-total statements,
+# but it cannot reach a count that groups by the very column it filters
+# (STS-003 groups by status, so a status that matches nothing yields no group)
+# or one broken down by year over no rows at all (PLN-014).
+#
+# So it is handled where the answer is RENDERED, for the 105 Count templates
+# only: an empty frame shows as one row with 0 in each count column, the columns
+# named from the statement's own SELECT list. Listing, Ranking and Lookup keep
+# the sentence — "which GPs have not uploaded?" with no rows is answered by
+# saying so. The frame and the context store keep the rows that actually ran,
+# none, so the synthesised row is a render artefact: the Test Report oracle,
+# which counts frame rows, and every follow-up operation see exactly what the
+# statement returned.
+
+def zero_count_row(declared: list[ColumnMetadata] | None) -> dict | None:
+    """{count column: 0, …}, or None when the statement declares no count."""
+    counts = [c.name for c in declared or []
+              if c.column_type == ColumnType.ADDITIVE_COUNT]
+    return {name: 0 for name in counts} or None
+
+
+def rows_to_render(
+    result: RouteResult, question_type: str | None,
+    declared: list[ColumnMetadata] | None,
+) -> list[dict] | None:
+    """The rows an answer shows: the frame's own, or a Count's zero row."""
+    if (result.tier == RouteTier.TIER2_TEMPLATE and question_type == "Count"
+            and result.result is not None and len(result.result) == 0):
+        row = zero_count_row(declared)
+        if row is not None:
+            return [row]
+    return result.result
 
 
 # ── The echo an operations answer never had (WP-4c §5.2, decision D31.2) ──────

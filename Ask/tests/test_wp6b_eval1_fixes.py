@@ -380,5 +380,66 @@ class T3TwoListsTests(unittest.TestCase):
             T["PLN-001"], [_entity("date_range", self.YEARS)]), "fiscal_year")
 
 
+# ── T4 ────────────────────────────────────────────────────────────────────────
+
+@unittest.skipIf(_adapter() is None, f"no sample database at {_DB_PATH}")
+class T4ZeroCountTests(unittest.TestCase):
+    """Rows 19, 246, 257 — and a listing, which still says nothing matched."""
+
+    def _render(self, qid, result):
+        from query_router.column_metadata import build_catalog_column_metadata
+        from query_router.echo import rows_to_render
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        declared = build_catalog_column_metadata({}, T)[qid]
+        return rows_to_render(result, T[qid]["question_type"], declared)
+
+    def test_a_status_count_that_matches_nothing_is_zero(self):
+        """Row 19: completed sanitation activities, 2025-26."""
+        from query_router.echo import echo_answer
+        result = _serve("STS-003", [_entity("date_range", "2025-2026"),
+                                    _entity("status", "WORK COMPLETED"),
+                                    _entity("focus_area", "Swachh Bharat")])
+        self.assertEqual(result.result, [], "the frame keeps the rows that ran")
+        shown = self._render("STS-003", result)
+        self.assertEqual(shown, [{"activities": 0}])
+        self.assertEqual(result.result, [], "rendering must not touch the frame rows")
+        answer = echo_answer(result.model_copy(update={"result": shown}))
+        self.assertNotIn("No records matched", answer)
+        self.assertIn("do not record SBM as a scheme", answer, "the caveats still append")
+
+    def test_a_year_breakdown_over_nothing_is_zero(self):
+        """Rows 246 / 257: GPs pending approval, 2024 to 2026, by year."""
+        result = _serve("PLN-014", [_entity("date_range", ["2024-2025", "2025-2026"]),
+                                    _entity("group_by", "fiscal_year")])
+        self.assertEqual(result.result, [])
+        self.assertEqual(self._render("PLN-014", result), [{"gps_awaiting_approval": 0}])
+
+    def test_a_listing_of_nothing_still_says_so(self):
+        from query_router.echo import echo_answer
+        result = _serve("PLN-005", [_entity("date_range", "2024-2025")])
+        self.assertEqual(result.result, [])
+        self.assertEqual(self._render("PLN-005", result), [])
+        self.assertIn("No records matched", echo_answer(result))
+
+    def test_the_test_report_zero_rows_are_untouched(self):
+        """The 21 statements the oracle records at zero rows still count zero
+        FRAME rows: the zero row is drawn at render time, never executed."""
+        oracle = json.loads((_BACKEND / "tests" / "data" / "workbook_test_report.json")
+                            .read_text(encoding="utf-8"))
+        zero = sorted(q for q, e in oracle.items() if e.get("rows") == 0)
+        self.assertEqual(len(zero), 21)
+        from query_router.template_catalog import bind
+        for qid in zero:
+            with self.subTest(template=qid):
+                sql, params = bind(qid, {k: v for k, v in oracle[qid]["params"].items()
+                                         if v is not None})
+                self.assertEqual(len(_adapter().execute(sql, params).fetchall()), 0)
+
+    def test_main_draws_it_after_the_frame_is_stored(self):
+        source = (_BACKEND / "main.py").read_text(encoding="utf-8")
+        self.assertLess(source.index("_context_store.set_frame("),
+                        source.index("rows_to_render("))
+
+
 if __name__ == "__main__":
     unittest.main()
