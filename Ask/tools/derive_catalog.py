@@ -1035,7 +1035,65 @@ _DISAMBIGUATION: dict[str, str] = {
                "NULL, approval is proxied by an approval date, and every loaded "
                "plan has one, so this currently returns the same figure as the "
                "'uploaded' question — say so rather than presenting them as two "
-               "different findings.",
+               "different findings. 'Supplementary plans approved' is THIS with "
+               "plan_type = Supplementary (approved = has approval_date); PLU-004 "
+               "counts GPs that UPLOADED one.",
+    # WP-6b T5. The Eval_1 replay's reranker losses: the right template was in
+    # the window every time, and it was passed over for a sibling or declined.
+    "PLU-004": "Counts GPs that UPLOADED a supplementary plan. 'Supplementary "
+               "plans APPROVED' is PLN-002 with plan_type = Supplementary "
+               "(approved = has approval_date).",
+    "PLU-003": "A per-GP YES/NO lookup: does this GP have a supplementary plan. A "
+               "COUNT of supplementary plans approved state-wide is PLN-002.",
+    "PLN-031": "$theme is OPTIONAL since WP-6: 'which GP has the most planned "
+               "activities' with no theme ANSWERS across all themes. Do not ask. A "
+               "named focus area ('piped water') is a filter on this entry too.",
+    "PLN-025": "Ranks THEMES within one place. 'Which GP has the most planned "
+               "activities' ranks GRAM PANCHAYATS and is PLN-031.",
+    "PLN-032": "'GPs with no allocation / no funds / nothing planned under the "
+               "Sankalp themes' is THIS: the Sankalp themes are the LSDG themes, "
+               "and with no theme named it answers across all of them. Do not ask.",
+    "AST-001": "'District-wise / summary of asset creation' is THIS with the "
+               "district breakdown, not AST-002 (category split in a block) or "
+               "AST-003 (one sub-category).",
+    "AST-002": "Splits assets by CATEGORY. A district-wise or overall summary of "
+               "asset creation is AST-001.",
+    "AST-003": "Counts ONE named asset sub-category. A district-wise summary of "
+               "all asset creation is AST-001.",
+    "TRD-003": "'Five-year time series / trend of fund utilisation' is THIS "
+               "(expenditure against plan per year). EXP-003 and EXP-023 are ONE "
+               "year's percentage.",
+    "EXP-002": "'Five-year time series / trend of fund utilisation' is THIS or "
+               "TRD-003 (expenditure against plan per year). EXP-003 and EXP-023 "
+               "are ONE year's percentage.",
+    "EXP-003": "ONE year's utilisation percentage. A multi-year TREND or time "
+               "series of fund utilisation is TRD-003.",
+    "EXP-023": "ONE year's utilisation percentage. A multi-year TREND or time "
+               "series of fund utilisation is TRD-003.",
+    "PLN-072": "A judgement of whether the spread across themes is BALANCED. A "
+               "plain 'breakdown / distribution of planned activities by theme' "
+               "is PLN-024.",
+    "SCH-003": "The estimated cost under a NAMED SCHEME. A plain state-wide total "
+               "estimated cost with no scheme named is BUD-006 with the total "
+               "breakdown.",
+    "BUD-001": "Funding RECORDED against each GP, one row per GP. The total "
+               "estimated (planned) cost of planned activities is BUD-006.",
+    "TRD-002": "Compares TWO DIFFERENT named years side by side. Tied-fund "
+               "spending on water vs sanitation within one period is EXP-009.",
+    "TRD-008": "Approved cost AND expenditure per focus area. 'Tied-fund "
+               "expenditure, water vs sanitation' is EXP-009, which reports tied "
+               "spend per focus area.",
+    "IMP-002": "'How many activities have been completed' — state-wide, across "
+               "the state or 'for all districts' — is THIS (or STS-003 with status "
+               "= WORK COMPLETED). STS-013 is a per-district table of EVERY status; "
+               "STS-001 splits activities across all statuses.",
+    "STS-013": "A per-DISTRICT table of every status. A single count of completed "
+               "activities, state-wide or 'for all districts', is IMP-002.",
+    "STS-001": "Splits activities across ALL statuses. A count of ONE status "
+               "(completed, ongoing) is STS-003 or IMP-002.",
+    "PLU-008": "'Which GPs planned zero-cost / no-cost / cost-free activities' is "
+               "THIS with the GP breakdown; DQY-007 lists the individual "
+               "activities.",
     "PLN-005": "The GPs that filed NOTHING — an absence, listed from the roster by "
                "LEFT JOIN, so a GP with no plan still appears. That is the finding "
                "a review meeting wants and the opposite of the counting questions.",
@@ -1055,14 +1113,20 @@ _DISAMBIGUATION: dict[str, str] = {
     # what the filters are FOR.
     "PLN-024": "PLAN TYPE is a filter on ACTIVITIES, not on plans: 'activities in "
                "the main GPDP' is this entry with plan_type bound, not a plan-count "
-               "question.",
+               "question. 'The total number of activities planned (in the main "
+               "GPDPs)' is THIS with the total breakdown, and a 'breakdown / "
+               "distribution of planned activities by theme' is THIS as it stands.",
     "BUD-006": "PLAN TYPE is a filter on ACTIVITIES, not on plans: 'planned cost of "
-               "the main GPDPs' is this entry with plan_type bound.",
-    "STS-003": "Filters by STATUS and, since WP-6, by FOCUS AREA too — so "
-               "\"completed sanitation activities\", \"road works in progress\" and "
-               "\"ongoing activities in this block\" are all this entry with both "
-               "bound. The SBM entries answer a different question: they identify "
-               "their subject by a keyword search on the activity text.",
+               "the main GPDPs' is this entry with plan_type bound. 'The total "
+               "estimated cost / budget outlay of all planned activities, "
+               "state-wide' is THIS with the total breakdown: planned_cost IS the "
+               "estimated cost.",
+    "STS-003": "A COUNT of activities by status, filterable by FOCUS AREA. 'How "
+               "many completed sanitation activities' / 'Swachh Bharat' with a "
+               "status word is THIS with focus_area = Sanitation — not an SBM item "
+               "entry, which counts one keyword-defined item type (soak pits, "
+               "toilets). \"Road works in progress\" and \"ongoing activities in "
+               "this block\" are this entry too.",
     "PLN-052": "A RANKING ACROSS focus areas — which one has the most. A COUNT for "
                "one named focus area (\"how many activities under sanitation\") is "
                "PLN-049, not this.",
@@ -1195,6 +1259,11 @@ def describe_family(entry: dict, member_ids: list[str]) -> str:
             f"it both misses differently-worded activities and picks up "
             f"unrelated ones."
         )
+        if any(qid.startswith("SBM-") for qid in member_ids):
+            # WP-6b T5: seven Swachh Bharat questions lost STS-003 to these.
+            parts.append("Counts ONE item type by keyword. A question about "
+                         "sanitation activities in general, or a status count, "
+                         "is STS-003.")
 
     for pattern, clause in STATUS_CLAUSES:
         if re.search(pattern, masked, re.IGNORECASE):

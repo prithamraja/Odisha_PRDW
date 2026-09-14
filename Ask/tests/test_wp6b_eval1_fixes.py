@@ -441,5 +441,29 @@ class T4ZeroCountTests(unittest.TestCase):
                         source.index("rows_to_render("))
 
 
+# ── T5 ────────────────────────────────────────────────────────────────────────
+
+class T5DisambiguationTests(unittest.TestCase):
+    """What the reranker is now told. It never sees paraphrases (WP-6 §8.1)."""
+
+    def test_the_notes_the_brief_asks_for(self):
+        from query_router.rerank_context import DESC_BY_QID as D
+        self.assertIn("not an SBM item entry", D["STS-003"])
+        self.assertIn("focus_area = Sanitation", D["STS-003"])
+        self.assertIn("is STS-003", D["SBM-SI-009"])
+        self.assertIn("OPTIONAL", D["PLN-031"])
+        self.assertIn("Do not ask", D["PLN-031"])
+        self.assertIn("plan_type = Supplementary", D["PLN-002"])
+        self.assertIn("UPLOADED", D["PLU-004"])
+        self.assertIn("district breakdown", D["AST-001"])
+        self.assertIn("EXP-003 and EXP-023", D["TRD-003"])
+
+    def test_only_sbm_families_carry_the_sbm_line(self):
+        from query_router.rerank_context import DESC_BY_QID as D
+        for qid, desc in D.items():
+            if "Counts ONE item type by keyword" in desc:
+                self.assertTrue(qid.startswith("SBM-"), qid)
+
+
 if __name__ == "__main__":
     unittest.main()
