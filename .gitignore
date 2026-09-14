@@ -70,6 +70,13 @@ decompose_corpus.json
 Insights/metainsights/retrieval_corpus.npy
 Insights/metainsights/decompose_corpus.npy
 
+# Run logs (console output and model-call logs) stay local, removed from the
+# repo 2026-09-14. The reports carry the numbers. Logs tracked before that
+# date are unaffected: an ignore line does not untrack a file.
+*.log
+DiscoverChat/experiments/logs/
+Insights/reports_prdw/*_run/**/calls_*.jsonl
+
 # The resumable partial embedding cache phase5f writes while it runs, and
 # removes when the build completes. Present only after a killed build.
 Insights/metainsights/decompose_corpus.partial.npz

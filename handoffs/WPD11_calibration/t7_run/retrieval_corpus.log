@@ -1,1 +1,0 @@
-STOP: Ask's entity registry could not be opened (ModuleNotFoundError: No module named 'db_factory'). Geography resolution is load-bearing for D5.1; building without it would produce a corpus that looks complete and answers no own-GP question.
