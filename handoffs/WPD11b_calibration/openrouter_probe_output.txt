@@ -1,0 +1,158 @@
+{
+  "findings": {
+    "novita native, first 1024": {
+      "host": null,
+      "native_dims": 4096,
+      "cos_vs_stored": [
+        0.999861,
+        0.999957
+      ],
+      "cos_call_vs_call": [
+        1.0,
+        1.0
+      ]
+    },
+    "or_deepinfra native, first 1024": {
+      "host": "DeepInfra",
+      "native_dims": 4096,
+      "cos_vs_stored": [
+        0.999838,
+        0.999939
+      ],
+      "cos_call_vs_call": [
+        1.0,
+        1.0
+      ]
+    },
+    "or_deepinfra server dimensions=1024": {
+      "host": "DeepInfra",
+      "dims": 1024,
+      "cos_vs_stored": [
+        0.999838,
+        0.999939
+      ],
+      "cos_call_vs_call": [
+        1.0,
+        1.0
+      ],
+      "cos_vs_own_native_prefix": [
+        1.0,
+        1.0
+      ]
+    },
+    "or_nebius native, first 1024": {
+      "host": "Nebius",
+      "native_dims": 4096,
+      "cos_vs_stored": [
+        0.999907,
+        0.999931
+      ],
+      "cos_call_vs_call": [
+        1.0,
+        1.0
+      ]
+    },
+    "or_nebius server dimensions=1024": {
+      "host": "Nebius",
+      "dims": 1024,
+      "cos_vs_stored": [
+        0.999907,
+        0.999931
+      ],
+      "cos_call_vs_call": [
+        0.999928,
+        0.999945
+      ],
+      "cos_vs_own_native_prefix": [
+        1.0,
+        1.0
+      ]
+    },
+    "novita vs or_deepinfra, full 4096, same text": [
+      0.999939,
+      0.999958
+    ],
+    "novita vs or_nebius, full 4096, same text": [
+      0.999845,
+      0.999957
+    ]
+  },
+  "decompose": {
+    "novita native, first 1024": {
+      "host": null,
+      "native_dims": 4096,
+      "cos_vs_stored": [
+        0.999871,
+        0.999961
+      ],
+      "cos_call_vs_call": [
+        1.0,
+        1.0
+      ]
+    },
+    "or_deepinfra native, first 1024": {
+      "host": "DeepInfra",
+      "native_dims": 4096,
+      "cos_vs_stored": [
+        0.999893,
+        0.999943
+      ],
+      "cos_call_vs_call": [
+        0.999939,
+        0.99995
+      ]
+    },
+    "or_deepinfra server dimensions=1024": {
+      "host": "DeepInfra",
+      "dims": 1024,
+      "cos_vs_stored": [
+        0.999884,
+        0.999942
+      ],
+      "cos_call_vs_call": [
+        1.0,
+        1.0
+      ],
+      "cos_vs_own_native_prefix": [
+        0.999939,
+        0.99995
+      ]
+    },
+    "or_nebius native, first 1024": {
+      "host": "Nebius",
+      "native_dims": 4096,
+      "cos_vs_stored": [
+        0.999833,
+        0.999942
+      ],
+      "cos_call_vs_call": [
+        0.999922,
+        0.999951
+      ]
+    },
+    "or_nebius server dimensions=1024": {
+      "host": "Nebius",
+      "dims": 1024,
+      "cos_vs_stored": [
+        0.999844,
+        0.999945
+      ],
+      "cos_call_vs_call": [
+        0.9999,
+        1.0
+      ],
+      "cos_vs_own_native_prefix": [
+        0.999922,
+        0.999952
+      ]
+    },
+    "novita vs or_deepinfra, full 4096, same text": [
+      0.999923,
+      0.999954
+    ],
+    "novita vs or_nebius, full 4096, same text": [
+      0.999897,
+      0.999958
+    ]
+  }
+}

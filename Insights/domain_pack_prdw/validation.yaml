@@ -48,6 +48,24 @@
 #       tec_approval_required, is_costless_activity) or by this pack's own CASE
 #       construction (stg is_costless, tied_untied).
 #
+#   CATEGORICAL on any RAW gp_profile column
+#       The seven derived bands ARE declared (below); their raw sources are not.
+#       basic_amenities_panchayat_bhawan and friends are free-form 'Yes'/'No'
+#       text in a self-reported form, and asserting the raw domain would fail
+#       statewide on a spelling rather than on a fact. The derivation is where
+#       the closure is real, so that is where the check sits.
+#
+#   Any check that would trip on a §12.6 gp_profile defect
+#       Every one of the eight was tested against the checks declared here and
+#       none of them trips (WP-D11 report §2). Explicitly: household_toilets >
+#       households (5 GPs) and households_tap_water > households (2) are
+#       cross-column comparisons the runner has no check type for; children = 0
+#       (9 GPs), ST = 0 (5) and transgender = 0 (all 20) are values inside a
+#       count column, not domain or key violations; panchayat_area_total_area's
+#       mixed units and the destitute-homes column's mixed semantics are
+#       meaning, not form. NONE of them is repaired and none is declared away —
+#       they are measured in the report, which is what §12.6 asks for.
+#
 # A violation found later that is NOT on this list is a finding: log it, report
 # it, do not quietly stop declaring the constraint.
 # =============================================================================
@@ -76,6 +94,16 @@ primary_keys:
   activity_training: activity_code
   activity_community_service: activity_code
   activity_delegation: activity_code
+  # WP-D11 (Amendment B §12). BOTH forms are declared on purpose. The raw key
+  # is the guard that matters: `stg_gp_profile` is LEFT JOINed onto views 1, 2
+  # and 3, so a single duplicate profile row would fan view1 out from 12,704
+  # rows and the post-view grain check would be the first thing to notice —
+  # after the whole build had run. Declaring it here fails at CHECK 2 instead,
+  # which is where a duplicated source row belongs. The staged form is declared
+  # as well because the cast to VARCHAR is where two distinct integer keys
+  # could in principle collapse into one string.
+  gp_profile: basic_info_lgd
+  stg_gp_profile: gp_lgd_code
   dim_lsdg_theme: focus_area_name
   dim_welfare_scheme: scheme_code
   # activity_voucher has no single-column key: an expenditure may be paid by
@@ -94,6 +122,11 @@ foreign_keys:
   - {child: activity_voucher,     child_col: gp_lgd_code, parent: gram_panchayat, parent_col: gp_lgd_code}
   - {child: admin_approval,       child_col: gp_lgd_code, parent: gram_panchayat, parent_col: gp_lgd_code}
   - {child: technical_approval,   child_col: gp_lgd_code, parent: gram_panchayat, parent_col: gp_lgd_code}
+  # WP-D11: the GP profile against the master. 20 of 20 match, zero orphans in
+  # EITHER direction (the reverse is not expressible as a check here, so it is
+  # measured in the report instead). This is the join every profile dimension
+  # travels through, on all four views.
+  - {child: gp_profile,           child_col: basic_info_lgd, parent: gram_panchayat, parent_col: gp_lgd_code}
 
   # planning spine
   - {child: planned_activity,     child_col: plan_code,     parent: plan,             parent_col: plan_code}
@@ -139,6 +172,27 @@ categorical:
     is_costless: [Costed, Costless]
   stg_approval:
     tied_untied: [Tied, Untied, Other]
+  # WP-D11 (Amendment B §12.3). Seven derived domains, every one closed by
+  # this pack's own CASE construction in derived_columns.sql — the same
+  # justification as stg_planned_activity.is_costless above, and the same
+  # reason these are safe to assert where `district_name` is not: no value can
+  # arrive from the data that the CASE ladder does not already name, at any
+  # scale. 'Not reported' is IN every domain: it is the null branch, and a
+  # statewide GP with no profile row must land on it rather than fail CHECK 5.
+  # On this drop it is produced zero times (no dimension source column is null).
+  #
+  # The three yes/no bands take the source's own 'Yes' / 'No', so a third
+  # spelling arriving statewide ('Y', 'yes', 'Not Available') SHOULD fail this
+  # check — that is a real change in the drop, not a scale artefact, and it
+  # would otherwise pass silently into a band.
+  stg_gp_profile:
+    social_composition:   [ST-majority, SC-majority, Mixed, 'Not reported']
+    gp_size:              ['Under 2,500', '2,500 to 5,000', '5,000 to 10,000', '10,000 and above', 'Not reported']
+    remoteness:           [Near, Far, 'Not reported']
+    digital_readiness:    [Ready, 'Not ready', 'Not reported']
+    has_panchayat_bhawan: ['Yes', 'No', 'Not reported']
+    has_csc:              ['Yes', 'No', 'Not reported']
+    plc_available:        ['Yes', 'No', 'Not reported']
 
 # ── CHECK 6: date ranges ────────────────────────────────────────────────────
 # Read against the `_ts` twins in the staging layer, not the source columns. The
@@ -191,3 +245,15 @@ post_view:
     expected_rows: 120
     tolerance_pct: 1
     unique_grain: [gp_lgd_code, fiscal_year]
+  #
+  #   view4  20 = one row per Gram Panchayat, straight off the master with no
+  #          cross join at all. The grain check is the guard against the profile
+  #          LEFT JOIN fanning out — which is the same failure the gp_profile
+  #          primary key above catches one step earlier, deliberately checked at
+  #          both ends. 20 rows and 20 distinct gp_lgd_codes is also the
+  #          statement that no GP was lost: a GP with a profile and no activity,
+  #          or activity and no profile, is a row here either way.
+  view4_gp_profile:
+    expected_rows: 20
+    tolerance_pct: 1
+    unique_grain: [gp_lgd_code]

@@ -1,0 +1,80 @@
+======================================================================
+METAINSIGHT ENGINE DIAGNOSTICS -- ALL VIEWS
+======================================================================
+
+--- view2 ---
+  Time:             33.4s   (215.0 scopes/s, 5 worker(s))
+  Queue drained:    True
+  Scopes evaluated: 7,191
+  Patterns found:   3,526
+  HDPs evaluated:   4,030
+  HDPs skipped:     6,140  (60.4% dedup rate)
+  Candidates:       322  (store bound K=5000, 0 dropped, 0 duplicates)
+  Data-quality (A7):0
+  Query cache HR:   89.7%   (0 evictions)
+  Pattern cache HR: 28.9%   (0 evictions)
+  Peak worker RSS:  0.18 GB
+  Candidate hash:   e79d83500a05c3c571d1cf5f2d4a52280d3ba0219d0387214de6a9d702664ec8
+  Candidates by pattern type:
+    SEASONALITY         : 104
+    TREND               : 85
+    OUTSTANDING_1       : 36
+    ATTRIBUTION         : 23
+    TOP_TWO             : 23
+    LAST_TWO            : 21
+    OUTLIER             : 16
+    UNIMODALITY         : 6
+    CHANGE_POINT        : 5
+    OUTSTANDING_LAST    : 3
+  Zero-candidate types: ['EVENNESS']
+
+--- view3 ---
+  Time:             19.3s   (513.4 scopes/s, 5 worker(s))
+  Queue drained:    True
+  Scopes evaluated: 9,900
+  Patterns found:   2,063
+  HDPs evaluated:   1,459
+  HDPs skipped:     2,064  (58.6% dedup rate)
+  Candidates:       45  (store bound K=5000, 0 dropped, 0 duplicates)
+  Data-quality (A7):0
+  Query cache HR:   87.4%   (0 evictions)
+  Pattern cache HR: 12.2%   (0 evictions)
+  Peak worker RSS:  0.18 GB
+  Candidate hash:   09461e833e10ef38d18377ee48719fd16df4cfd1545b2a3e2dd118640dc357a3
+  Candidates by pattern type:
+    OUTSTANDING_1       : 12
+    ATTRIBUTION         : 9
+    EVENNESS            : 7
+    TOP_TWO             : 6
+    TREND               : 4
+    LAST_TWO            : 4
+    UNIMODALITY         : 3
+  Zero-candidate types: ['OUTSTANDING_LAST', 'OUTLIER', 'SEASONALITY', 'CHANGE_POINT']
+
+--- view4 ---
+  Time:             48.1s   (610.5 scopes/s, 5 worker(s))
+  Queue drained:    True
+  Scopes evaluated: 29,340
+  Patterns found:   5,536
+  HDPs evaluated:   3,246
+  HDPs skipped:     5,691  (63.7% dedup rate)
+  Candidates:       32  (store bound K=5000, 0 dropped, 0 duplicates)
+  Data-quality (A7):0
+  Query cache HR:   86.9%   (0 evictions)
+  Pattern cache HR: 9.4%   (0 evictions)
+  Peak worker RSS:  0.23 GB
+  Candidate hash:   8e67ba1498f36022f336cc33d34aa95b3fa9df386947e74a33d951f31ebcca37
+  Candidates by pattern type:
+    OUTSTANDING_1       : 10
+    ATTRIBUTION         : 9
+    EVENNESS            : 6
+    TOP_TWO             : 4
+    LAST_TWO            : 3
+  Zero-candidate types: ['OUTSTANDING_LAST', 'TREND', 'OUTLIER', 'SEASONALITY', 'CHANGE_POINT', 'UNIMODALITY']
+
+--- TOTALS ---
+  Total candidates: 399
+  Total scopes:     46,431
+  Total patterns:   11,125
+  Total HDPs eval:  8,735
+  Total HDPs skip:  13,895  (61.4% overall dedup rate)

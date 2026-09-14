@@ -45,10 +45,21 @@ from phase5d_retrieval_corpus import display_name, _DISPLAY   # noqa: E402
 from phase5f_decompose import (                        # noqa: E402
     measure_phrase, dimension_plural, _MEASURE_PHRASE,
 )
-from phase2_engine import VIEW1_CONFIG                 # noqa: E402
+from phase2_engine import VIEW1_CONFIG, VIEW4_CONFIG   # noqa: E402
 from phase4a_engine import VIEW2_CONFIG, VIEW3_CONFIG  # noqa: E402
+# WP-D11b. Two display rules owned by the report layer and READ here, so the
+# chat and the reports cannot say a thing two ways: the size-band unit (T3, D61
+# ruling 3 -- "2,500 to 5,000 people", never the bare label the pack stores),
+# and the grain an averaged twin is averaged over (T4).
+from phase5b_report import BAND_DISPLAY, AVERAGED_GRAIN  # noqa: E402
 
-_CONFIGS = {"view1": VIEW1_CONFIG, "view2": VIEW2_CONFIG, "view3": VIEW3_CONFIG}
+# WP-D11 added view4 (GP Profile). Its sixty measures are in
+# phase5f_decompose._MEASURE_PHRASE and its seven profile dimensions are in
+# phase5d_retrieval_corpus._DISPLAY, so `gaps()` should report none of them --
+# and if it ever does, that is the signal that a column reached a finding
+# sentence with nobody having written down what to call it.
+_CONFIGS = {"view1": VIEW1_CONFIG, "view2": VIEW2_CONFIG, "view3": VIEW3_CONFIG,
+            "view4": VIEW4_CONFIG}
 
 # The engine's own vocabulary for a measure-extending finding, which is not a
 # column and appears in no view config: `(varies)` is its measure field and
@@ -91,6 +102,15 @@ def _phrase(view: str, col: str) -> str | None:
     """
     if col in _MEASURE_PHRASE.get(view, {}):
         return measure_phrase(view, col)
+    # WP-D11b T4: an averaged twin on view3 / view4 is its total's phrase at the
+    # view's grain -- "average planned cost per Gram Panchayat-year". DERIVED
+    # from the total's authored entry, so it is a translation somebody wrote,
+    # not a guess. Scoped to the two views WP-D11b authored a grain for: view2's
+    # two older twins stay the declared gaps until their grain is authored too.
+    if col.endswith("_mean") and view in AVERAGED_GRAIN:
+        base = col[:-len("_mean")]
+        if base in _MEASURE_PHRASE.get(view, {}):
+            return f"average {measure_phrase(view, base)} {AVERAGED_GRAIN[view]}"
     if col in _DISPLAY:
         return display_name(col)
     return None
@@ -130,6 +150,12 @@ def render(text: str, view: str) -> str:
             table[f"{col} values"] = dimension_plural(col)
     for literal, phrase in _LITERALS.items():
         table[literal] = phrase
+    # WP-D11b T3: size-band VALUES carry their unit on screen. In the same single
+    # pass as the column names, for the reason given above; no band label
+    # contains a column name or the reverse, and the digits are untouched, so
+    # `findings-verbatim`'s numeral comparison still holds.
+    for label, shown in BAND_DISPLAY.items():
+        table[label] = shown
 
     pattern = re.compile(
         r"(?<![A-Za-z0-9_])(?:"

@@ -387,3 +387,198 @@ SELECT fiscal_year FROM (
     SELECT DISTINCT fiscal_year FROM stg_voucher
 ) d
 WHERE fiscal_year IS NOT NULL;
+
+
+-- #############################################################################
+-- 4. stg_gp_profile — the GP attribute layer (WP-D11, Amendment B §12.3/§12.4)
+-- #############################################################################
+--
+-- One row per Gram Panchayat, keyed to the master. Two jobs:
+--   * the SEVEN derived dimensions §12.3 signs off, appended to views 1-3 and
+--     carried by view4;
+--   * the profile MEASURE family, renamed to §12.4's names, for view4 only.
+--
+-- NO X-* COLUMN IS PROJECTED. Email, mobile, address and gp_attractions are
+-- X-pii on the operator's ruling and are absent from this SELECT, as are the
+-- geography duplicates (the master is authoritative), the four constants, the
+-- three comma-separated multi-value strings, the 19 PLC detail columns, the
+-- three sparse location/connection columns, and panchayat_area_total_area.
+-- build_crosswalk.py's fifth gate check asserts the X-pii half of that.
+--
+-- FIXED CUT POINTS, NOT QUANTILES (§12.3). A band means the same thing in this
+-- 20-GP sample and statewide, so a sample finding can be compared with a
+-- statewide one. The population cuts (2,500 / 5,000 / 10,000, lower bound
+-- inclusive) and the 5 km remoteness cut are operator rulings of 2026-09-07;
+-- everything else is a reported yes/no or a majority test.
+--
+-- DIMENSIONS ARE NEVER ZERO-FILLED (§4.2). A null source yields 'Not reported',
+-- which is a value in the declared categorical domain, not an absence. On this
+-- drop no dimension source column is null, so 'Not reported' appears zero times
+-- — it is statewide behaviour that is being pinned here.
+--
+-- 'NA' IS TEXT, NOT NULL. The runner reads every CSV with all_varchar=true, so
+-- the 379 'NA' cells in this file arrive as the four-character string. Every
+-- numeric column that carries one is cast HERE, behind NULLIF(col, 'NA'), and
+-- sources.yaml deliberately leaves those seven columns uncast (see its header).
+-- The rule the trap exists to enforce: 'Not reported' comes from a NULL, never
+-- from text, and no 'NA' band appears anywhere.
+--
+-- MEASURES ARE NOT COALESCED HERE. view4 zero-fills them at the grid, exactly
+-- as view3 does; a null here means the GP did not report the number, which is
+-- a different fact from a zero and must stay distinguishable until the grid.
+CREATE OR REPLACE VIEW stg_gp_profile AS
+SELECT
+    -- ── the join key, VARCHAR to match gram_panchayat.gp_lgd_code ──────────
+    CAST(p.basic_info_lgd AS VARCHAR)                       AS gp_lgd_code,
+
+    -- ── the seven derived dimensions (§12.3) ───────────────────────────────
+
+    -- ST share above half, else SC share above half, else Mixed. Mined as-is at
+    -- both scales (B2): the two-way "SC + ST together" variant was declined
+    -- because the design targets statewide data and two cuts of one fact would
+    -- have produced a definitional-pair twin. Sample split 2 / 3 / 15 — thin by
+    -- design, and thin bands producing few findings is not a gate failure.
+    -- Kalimela is the only GP near the cut (ST 50.9%, SC 49.1%).
+    CASE
+      WHEN p.demographic_details_total_gender_wise_population IS NULL
+        OR p.demographic_details_st_population IS NULL
+        OR p.demographic_details_sc_population IS NULL          THEN 'Not reported'
+      WHEN p.demographic_details_total_gender_wise_population > 0
+       AND p.demographic_details_st_population * 1.0
+           / p.demographic_details_total_gender_wise_population > 0.5 THEN 'ST-majority'
+      WHEN p.demographic_details_total_gender_wise_population > 0
+       AND p.demographic_details_sc_population * 1.0
+           / p.demographic_details_total_gender_wise_population > 0.5 THEN 'SC-majority'
+      ELSE 'Mixed'
+    END                                                     AS social_composition,
+
+    -- Total population, banded at 2,500 / 5,000 / 10,000. Each band includes
+    -- its lower bound and excludes its upper. Population, not households, on
+    -- the operator's ruling — which also keeps Karuabahal's 12 households
+    -- (§12.6.11) out of the banding. Sample split 2 / 9 / 7 / 2; no GP sits on
+    -- a boundary (nearest are 4,924 and 5,741 around the 5,000 cut).
+    CASE
+      WHEN p.demographic_details_total_gender_wise_population IS NULL THEN 'Not reported'
+      WHEN p.demographic_details_total_gender_wise_population <  2500 THEN 'Under 2,500'
+      WHEN p.demographic_details_total_gender_wise_population <  5000 THEN '2,500 to 5,000'
+      WHEN p.demographic_details_total_gender_wise_population < 10000 THEN '5,000 to 10,000'
+      ELSE '10,000 and above'
+    END                                                     AS gp_size,
+
+    -- Distance to the nearest bus stop, cut at 5 km. Sample split 14 / 6. The
+    -- cut is boundary-sensitive in this sample: Itipur and Hirlipali both
+    -- report exactly 5 km and are therefore Far; reading the cut as "5 km or
+    -- less is Near" would make the split 16 / 4.
+    CASE
+      WHEN p.basic_info_distance_from_nearest_bus_stop IS NULL THEN 'Not reported'
+      WHEN p.basic_info_distance_from_nearest_bus_stop < 5      THEN 'Near'
+      ELSE 'Far'
+    END                                                     AS remoteness,
+
+    -- Internet AND a computer at the panchayat bhawan, both reported Yes.
+    -- Sample split 10 / 10. Boipariguda is the only GP with internet and no
+    -- computer; the AND is what puts it in 'Not ready'.
+    CASE
+      WHEN p.basic_amenities_internet_service_available_in_panchayat_bhawan IS NULL
+        OR p.basic_amenities_computer_laptop_printers_scanner_etc_availability_in_panchayat_bhawan IS NULL
+                                                                 THEN 'Not reported'
+      WHEN p.basic_amenities_internet_service_available_in_panchayat_bhawan = 'Yes'
+       AND p.basic_amenities_computer_laptop_printers_scanner_etc_availability_in_panchayat_bhawan = 'Yes'
+                                                                 THEN 'Ready'
+      ELSE 'Not ready'
+    END                                                     AS digital_readiness,
+
+    -- The three reported yes/no attributes, taken as reported. No cut needed.
+    -- Sample splits 14 / 6, 12 / 8 and 18 No / 2 Yes respectively.
+    COALESCE(p.basic_amenities_panchayat_bhawan, 'Not reported')
+                                                            AS has_panchayat_bhawan,
+    COALESCE(p.basic_amenities_is_common_service_centre_available_in_panchayat, 'Not reported')
+                                                            AS has_csc,
+    -- Materialised on every view, mined STATEWIDE ONLY (§12.3): 2 Yes in 20
+    -- rows is the §9.7 sparse-dimension shape. The sample configs omit it; the
+    -- statewide branch carries it, so the switch stays a config edit.
+    COALESCE(p.panchayat_learning_centre_details_panchayat_learning_centre_available, 'Not reported')
+                                                            AS plc_available,
+
+    -- ── profile measures, §12.4 names (view4 only) ─────────────────────────
+    -- No profile measure reaches views 1-3: population is a GP constant and
+    -- would be summed once per activity, once per month or once per fiscal
+    -- year — a wrong denominator in every case (§12.4).
+
+    -- population
+    p.demographic_details_total_gender_wise_population       AS population_total,
+    p.demographic_details_male_population                    AS population_male,
+    p.demographic_details_female_population                  AS population_female,
+    -- 0 in 9 of 20 GPs — plausible for some, unlikely for all (§12.6.13)
+    p.demographic_details_children_population                AS population_children,
+    p.demographic_details_sc_population                      AS population_sc,
+    -- 0 in 3 GPs (Biswamathpur, Mendarajpur in Ganjam; Itipur in Khordha).
+    -- §12.6.13 names FIVE; measured in WP-D11, the other two it lists report
+    -- 16 (Sharagada) and 1 (Barimunda), which is near-zero and not zero. The
+    -- column is carried as reported either way; the count is corrected here
+    -- and a §12.6 amendment is proposed in WPD11_REPORT §9.
+    p.demographic_details_st_population                      AS population_st,
+    p.demographic_details_obc_population                     AS population_obc,
+    p.demographic_details_general_population                 AS population_general,
+
+    -- households and organisation. Karuabahal reports 12 households against
+    -- 3,208 population, 1,256 toilets and 1,658 job-card holders (§12.6.11) —
+    -- logged, never fixed, and never a denominator in this pack.
+    p.general_no_of_households                               AS households,
+    p.general_no_of_job_card_holders                         AS job_card_holders,
+    p.general_no_of_shg                                      AS shgs,
+    p.panchayat_area_no_of_wards_sansads_of_the_panchayat    AS wards,
+    p.panchayat_area_no_of_revenue_villages                  AS revenue_villages,
+    p.panchayat_area_no_of_villages_mapped_with_lgd          AS villages_mapped_lgd,
+
+    -- education and childcare
+    p.general_no_of_anganwadi_centers                        AS anganwadi_centres,
+    p.education_total_pre_primary_schools                    AS schools_pre_primary,
+    p.education_total_primary_schools                        AS schools_primary,
+    p.education_total_secondary_schools                      AS schools_secondary,
+    p.education_total_higher_secondary_schools               AS schools_higher_secondary,
+
+    -- health
+    p.health_no_of_health_sub_centers                        AS health_sub_centres,
+    p.health_no_of_primary_health_centers                    AS primary_health_centres,
+    p.health_no_of_well_being_centers                        AS wellbeing_centres,
+    p.health_no_of_dispensary                                AS dispensaries,
+    p.health_no_of_ayurvedic_clinics                         AS ayurvedic_clinics,
+
+    -- water and sanitation. household_toilets exceeds households in 5 GPs and
+    -- households_tap_water exceeds it in 2 (Chikilli, Haldikudar) — §12.6.12.
+    -- Both ship as counts; no coverage ratio is materialised (§3).
+    p.infrastructure_no_of_drinking_water_sources            AS drinking_water_sources,
+    p.infrastructure_no_of_households_connected_to_tap_water AS households_tap_water,
+    p.infrastructure_no_of_household_toilets                 AS household_toilets,
+    p.infrastructure_no_of_community_sanitary_complexes      AS community_sanitary_complexes,
+    p.infrastructure_no_of_solid_waste_managements_centers   AS solid_waste_centres,
+
+    -- services and civic infrastructure
+    p.infrastructure_no_of_common_service_centers            AS common_service_centres,
+    p.infrastructure_no_of_banks_cooperative_banks           AS banks,
+    p.infrastructure_no_of_atms                              AS atms,
+    p.infrastructure_no_of_rural_library                     AS rural_libraries,
+    p.infrastructure_no_of_children_parks                    AS children_parks,
+    p.infrastructure_no_of_disaster_rescue_centers           AS disaster_rescue_centres,
+    p.infrastructure_no_of_bus_stands_with_drinking_water_facility AS bus_stands_with_water,
+    p.infrastructure_no_of_cooperative_seed_centers          AS seed_centres,
+
+    -- own-source revenue collected to date, rupees
+    p.basic_amenities_osr_collected_so_far                   AS osr_collected,
+
+    -- office equipment. These three are the 'NA' columns: 2 rows each, cast
+    -- here behind NULLIF so the string never becomes a band or a zero.
+    -- no_of_computer is NOT here — it is 1 on all 18 non-null rows, a form
+    -- default (§12.6.15), and X-const in the crosswalk.
+    CAST(NULLIF(p.basic_amenities_no_of_laptop,  'NA') AS BIGINT) AS laptops,
+    CAST(NULLIF(p.basic_amenities_no_of_printer, 'NA') AS BIGINT) AS printers,
+    CAST(NULLIF(p.basic_amenities_no_of_scanner, 'NA') AS BIGINT) AS scanners,
+
+    -- sports courts, the three disciplines summed into one count (§12.4). A
+    -- plain + is correct: all three columns are non-null on every row.
+    p.sports_no_of_badminton_court
+  + p.sports_no_of_football_court
+  + p.sports_no_of_volleyball_court                          AS sports_courts
+
+FROM gp_profile p;

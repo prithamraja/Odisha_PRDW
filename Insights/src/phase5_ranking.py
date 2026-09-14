@@ -663,7 +663,7 @@ if __name__ == "__main__":
     # authorised by D-12 / D25 (WP-D2b), and retires
     # handoffs/WPD2_calibration/run_phase5_prdw.py, the driver that existed only
     # to work around it. Ranking behaviour is unchanged.
-    views = ["view1", "view2", "view3"]
+    views = ["view1", "view2", "view3", "view4"]   # WP-D11
     k = 15
 
     all_candidates: dict = {}

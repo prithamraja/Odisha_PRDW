@@ -1,0 +1,15 @@
+wrote Insights/domain_pack_prdw/crosswalk.csv: 281 column rows across 20 tables
+
+--- GATE: crosswalk vs the built Parquet views
+  X-* roles naming an output column: 0 []
+  output_columns not found in their claimed view: 0 []
+  view1_activity_lifecycle: 77 columns, unclaimed (non-derived): []
+  view2_geo_month_cube: 24 columns, unclaimed (non-derived): []
+  view3_gp_performance: 33 columns, unclaimed (non-derived): []
+  view4_gp_profile: 73 columns, unclaimed (non-derived): []
+  X-pii column names found in a view schema: 0 []
+    (checked 4 X-pii columns against 4 views: ['basic_info_address', 'basic_info_email_address', 'basic_info_gp_attractions', 'basic_info_mobile'])
+
+--- SPEC integrity
+  every CSV column has exactly one crosswalk row; no phantom rows
+  total staged columns: 281

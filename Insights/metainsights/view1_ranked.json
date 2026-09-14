@@ -645,6 +645,36 @@
   {
     "extending_strategy": "subspace",
     "extending_dimension": "fiscal_year",
+    "pattern_type": "LAST_TWO",
+    "breakdown": "gp_size",
+    "measure": "fund_sanctioned_total",
+    "base_subspace": [],
+    "hdp_size": 6,
+    "commonness_sets": [
+      {
+        "highlight": "('10,000 and above', 'Under 2,500')",
+        "pattern_type": "LAST_TWO",
+        "members": [
+          "2023-2024",
+          "2024-2025",
+          "2025-2026",
+          "2021-2022",
+          "2020-2021",
+          "2022-2023"
+        ],
+        "count": 6,
+        "proportion": 1.0
+      }
+    ],
+    "exceptions": [],
+    "conciseness": 0.721057,
+    "impact": 1.0,
+    "score": 0.721057,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "fiscal_year",
     "pattern_type": "OUTSTANDING_LAST",
     "breakdown": "gp_name",
     "measure": "fund_sanctioned_total",
@@ -684,36 +714,6 @@
       {
         "highlight": "('Other',)",
         "pattern_type": "OUTSTANDING_LAST",
-        "members": [
-          "2023-2024",
-          "2024-2025",
-          "2025-2026",
-          "2021-2022",
-          "2020-2021",
-          "2022-2023"
-        ],
-        "count": 6,
-        "proportion": 1.0
-      }
-    ],
-    "exceptions": [],
-    "conciseness": 0.721057,
-    "impact": 1.0,
-    "score": 0.721057,
-    "impact_measure_used": "n_activities"
-  },
-  {
-    "extending_strategy": "subspace",
-    "extending_dimension": "fiscal_year",
-    "pattern_type": "TOP_TWO",
-    "breakdown": "status_label",
-    "measure": "n_activities",
-    "base_subspace": [],
-    "hdp_size": 6,
-    "commonness_sets": [
-      {
-        "highlight": "('Activity Approved', 'WORK ONGOING')",
-        "pattern_type": "TOP_TWO",
         "members": [
           "2023-2024",
           "2024-2025",

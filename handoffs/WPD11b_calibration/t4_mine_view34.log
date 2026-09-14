@@ -1,0 +1,94 @@
+DISCOVER_SCALE=sample
+
+======================================================================
+VIEW: GP Performance
+======================================================================
+Loading C:\dev\odisha-d11b\Insights\views_prdw\view3_gp_performance.parquet ...
+  120 rows x 33 cols  (canonical row order, fingerprint 51cef85322a91f94)
+
+Pattern types: 6 categorical, 5 temporal  (11 total)
+
+Generating subspaces ...
+  depth-0: 1  depth-1: 60  depth-2: 0  total: 61
+Building priority queue ...
+  61 subspaces retained after impact pruning (min=0.01); 15,400 data scopes behind them
+
+Mining (budget: 120s, workers: 6, top-K: 5000) ...
+  queue sharded 6 ways: [20, 16, 9, 6, 5, 5] subspaces per worker
+  5,000 scopes | 287 patterns | 0 MetaInsights | 51.4s elapsed
+
+Mining complete in 60.0s
+  Queue drained:         True
+  Scopes evaluated:      15,400
+  Throughput:            256.7 scopes/s
+  Patterns found:        3,122
+  HDPs evaluated:        2,060
+  HDPs skipped (dedup):  3,284
+  HDP dedup hit rate:    61.5%
+  MetaInsights found:    45
+  Data-quality (A7):     0
+  Query cache hit rate:  87.3%
+  Pattern cache rate:    11.9%
+  Cache evictions:       0 query / 0 pattern
+  Store dropped / dup:   0 / 0
+  Peak worker memory:    0.19 GB
+  Top score:             0.5474
+  Candidate hash:        a82f672c6ab64699757936eac05a3fc1
+
+  Candidates by pattern type:
+    EVENNESS            : 13
+    OUTSTANDING_1       : 9
+    TREND               : 8
+    ATTRIBUTION         : 7
+    TOP_TWO             : 4
+    UNIMODALITY         : 4
+Saved 45 candidates -> C:\dev\odisha-d11b\Insights\metainsights\view3_candidates.json
+Saved 0 displaced findings and 3 sub-support measures -> C:\dev\odisha-d11b\Insights\metainsights\view3_data_quality.json
+
+======================================================================
+VIEW: GP Profile
+======================================================================
+Loading C:\dev\odisha-d11b\Insights\views_prdw\view4_gp_profile.parquet ...
+  20 rows x 73 cols  (canonical row order, fingerprint 06c4602af99482ac)
+
+Pattern types: 6 categorical, 5 temporal  (11 total)
+
+Generating subspaces ...
+  depth-0: 1  depth-1: 60  depth-2: 0  total: 61
+Building priority queue ...
+  61 subspaces retained after impact pruning (min=0.01); 36,186 data scopes behind them
+
+Mining (budget: 120s, workers: 6, top-K: 5000) ...
+  queue sharded 6 ways: [20, 16, 9, 6, 5, 5] subspaces per worker
+  5,000 scopes | 0 patterns | 0 MetaInsights | 41.9s elapsed
+  5,000 scopes | 72 patterns | 0 MetaInsights | 43.0s elapsed
+  5,000 scopes | 596 patterns | 0 MetaInsights | 45.9s elapsed
+  10,000 scopes | 0 patterns | 0 MetaInsights | 67.5s elapsed
+
+Mining complete in 79.1s
+  Queue drained:         True
+  Scopes evaluated:      36,186
+  Throughput:            457.6 scopes/s
+  Patterns found:        6,612
+  HDPs evaluated:        4,062
+  HDPs skipped (dedup):  6,587
+  HDP dedup hit rate:    61.9%
+  MetaInsights found:    31
+  Data-quality (A7):     0
+  Query cache hit rate:  86.8%
+  Pattern cache rate:    9.2%
+  Cache evictions:       0 query / 11,040 pattern
+  Store dropped / dup:   0 / 0
+  Peak worker memory:    0.23 GB
+  Top score:             0.4877
+  Candidate hash:        afba11514b42bc0c4358d0984cb5e6e5
+
+  Candidates by pattern type:
+    EVENNESS            : 12
+    OUTSTANDING_1       : 8
+    ATTRIBUTION         : 7
+    TOP_TWO             : 4
+Saved 31 candidates -> C:\dev\odisha-d11b\Insights\metainsights\view4_candidates.json
+Saved 0 displaced findings and 0 sub-support measures -> C:\dev\odisha-d11b\Insights\metainsights\view4_data_quality.json
+
+Combined diagnostics -> C:\dev\odisha-d11b\Insights\reports\engine_diagnostics_all_views.txt

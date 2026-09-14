@@ -43,12 +43,18 @@ from phase5d_retrieval_corpus import (            # noqa: E402
     # -- a file in the old format cannot be served by the new loader, or the
     # other way round, without saying so.
     read_corpus_json, load_vectors, members_expand,
+    # WP-D11b T1: the vectors are split into stamped parts; the loader reads
+    # the parts the stamp names and raises this if any is missing or altered.
+    VectorPartsError,
 )
 from discover_config import (                     # noqa: E402
     DISCOVER_PROSE_MODEL, DISCOVER_MAX_COMPLETION_TOKENS,
 )
 
 CORPUS_PATH = METAINSIGHTS / "retrieval_corpus.json.gz"
+# The name the vector PARTS derive from (`retrieval_corpus.part0.npy`, ...),
+# WP-D11b. No file of exactly this name is written any more; the parts and their
+# hashes are listed in the stamp, and the gate fails if this spelling reappears.
 VECTORS_PATH = METAINSIGHTS / "retrieval_corpus.npy"
 STAMP_PATH = METAINSIGHTS / "retrieval_corpus_stamp.json"
 

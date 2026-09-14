@@ -116,18 +116,32 @@ def members_of(data: dict) -> list:
 _CACHE: Corpus | None = None
 
 
-def _read(corpus_path, vectors_path, what: str) -> tuple:
+def _read(corpus_path, vectors_path, what: str, stamp: dict) -> tuple:
     """One corpus file and its vectors, checked for the mismatches that matter.
 
     Both are read through the builder's own format functions (WP-D10): the
-    records out of a gzipped, compact JSON, the vectors out of an fp16 .npy and
-    UPCAST TO FP32 here. Everything past this line -- the matrix, the cosines,
-    the boosts, the floor -- is fp32 exactly as it was before the file got
-    narrower, so the storage width is a fact about the disk and about nothing
-    else.
+    records out of a gzipped, compact JSON, the vectors out of fp16 .npy files
+    and UPCAST TO FP32 here. Everything past this line -- the matrix, the
+    cosines, the boosts, the floor -- is fp32 exactly as it was before the file
+    got narrower, so the storage width is a fact about the disk and about
+    nothing else.
+
+    WP-D11b: the vectors are PARTS, named with their SHA-256 in `stamp`. They
+    are read in order and concatenated; a part that is missing, altered, or does
+    not add up to the recorded shape is a STOP, never a partial matrix. The
+    concatenation is byte-identical to the single file it replaced, so the split
+    is a fact about git's file-size limit and about nothing else either.
     """
     payload = config.read_corpus_json(str(corpus_path))
-    vectors = config.load_vectors(str(vectors_path))
+    manifest = stamp.get("vector_storage")
+    if not manifest:
+        raise SystemExit(
+            f"STOP: the {what} stamp names no vector parts, so there is nothing "
+            f"to verify the vectors against. Rebuild it (WP-D11b layout).")
+    try:
+        vectors = config.load_vectors(str(vectors_path), manifest)
+    except config.VectorPartsError as exc:
+        raise SystemExit(f"STOP: the {what} vectors were refused -- {exc}.")
     records = payload["records"]
     if len(records) != len(vectors):
         raise SystemExit(
@@ -162,7 +176,7 @@ def load(force: bool = False) -> Corpus:
 
     stamp = config.assert_pin_matches_corpus()
     payload, records, vectors = _read(
-        config.CORPUS_PATH, config.VECTORS_PATH, "corpus")
+        config.CORPUS_PATH, config.VECTORS_PATH, "corpus", stamp)
 
     meta = {k: v for k, v in payload.items() if k != "records"}
     meta["findings"] = len(records)
@@ -172,7 +186,7 @@ def load(force: bool = False) -> Corpus:
     if d_stamp is not None and config.DECOMPOSE_CORPUS_PATH.exists():
         d_payload, d_records, d_vectors = _read(
             config.DECOMPOSE_CORPUS_PATH, config.DECOMPOSE_VECTORS_PATH,
-            "decomposition sidecar")
+            "decomposition sidecar", d_stamp)
         if d_payload.get("candidate_set_id") != payload.get("candidate_set_id"):
             raise SystemExit(
                 "STOP: the decomposition sidecar was built from a different "

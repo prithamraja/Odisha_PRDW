@@ -354,3 +354,268 @@ above is unedited; where this log and §§2–8 disagree, this log wins.
    normalisation — the `v_asset` double-cast idiom; FK declared on it);
    view1 carries `sanction_scheme_rows` and the five statewide-staged sparse
    dimension columns; view2 additionally carries `work_proposed_amount`.
+
+---
+
+## 12. Amendment B — `gp_profile` (2026-09-07; operator sign-off requested)
+
+A new source, `Data/gp_profile.csv`, arrived 2026-09-07: one row per Gram
+Panchayat, 99 columns, 20 rows. Operator decisions taken in the 2026-09-07
+PM session, before this text was written:
+
+- **Leadership comparisons are dropped for now.** The profile carries no
+  elected-representative field (no sarpanch gender, no seat reservation);
+  the only "sarpanch" in the drop is an approving authority. Revisit if the
+  department supplies a representative or seat-reservation table.
+- **Shape approved:** profile attributes join the three existing views as
+  dimensions, AND a fourth GP-grain view is added (§12.4).
+- **Cut points are fixed, declared in the pack**, not quantiles (§12.3).
+- **GP size is banded on population at 2,500 / 5,000 / 10,000** (operator
+  ruling, replacing the PM's household proposal).
+- **Email, mobile and address are excluded from every view** — not needed
+  for anything (operator ruling; §12.2 `X-pii`).
+- **Design for statewide scale, not for the 20-GP sample.** Social
+  composition stays a three-way ST / SC / Mixed split at every scale; the
+  PM's proposed two-way sample workaround is dropped (operator ruling on B2).
+  Thin sample bands are accepted as a sample property, not designed around.
+
+The signed text of §§1–11 is unedited. Where this section and §4.4 disagree
+("no equity view in v1"), this section wins: the beneficiary-grain conclusion
+stands, but a **GP-composition equity lens** is now supportable.
+
+### 12.1 Source audit
+
+| Property | Measured |
+|---|---|
+| Rows / columns | 20 / 99 |
+| Join key | `basic_info_lgd` = `gram_panchayat.gp_lgd_code` — 1:1, all 20 match, zero orphans either side |
+| Column families | `param__*` (8, keys the master already carries), `basic_info_*` (11), `basic_amenities_*` (17), `demographic_details_*` (9), `general_*` (5), `education_*` (4), `health_*` (5), `infrastructure_*` (13), `panchayat_area_*` (4), `panchayat_learning_centre_details_*` (20), `sports_*` (3) |
+| Internal consistency | male+female = total and general+obc+sc+st = total on all 20 rows |
+| Sparse block | the 19 PLC detail columns are populated on the 2 GPs that have a learning centre; `plc_available` itself is complete (18 No / 2 Yes) |
+
+This is **self-reported** GP data. It is staged as-is; defects are logged
+(§12.6), never fixed.
+
+### 12.2 Crosswalk roles (extends §7)
+
+New role **`X-pii`**: personal or contact data — registered by the runner
+(the CSV loads whole) but projected by no `stg_*` view and reaching no
+Parquet file, on the operator's ruling that email, mobile and address are
+needed for nothing. Same mechanics as the raw authority text of §9.6; the
+WP's crosswalk gate check asserts that no `X-pii` column name appears in any
+view's output columns.
+
+| Columns | Role |
+|---|---|
+| `basic_info_lgd` | **join** (the spine) |
+| `param__label1/label11/label111`, `param__bp_name/zp_name/gp_name`, `basic_info_block/district/state/village` | **X-derived** — the master is authoritative for geography; never re-projected |
+| `param__localbodytypecode`, `param__stateid`, `demographic_details_transgender_population` (all 0), `basic_amenities_no_of_computer` (constant 1 where present) | **X-const** |
+| `basic_info_email_address`, `basic_info_mobile`, `basic_info_address`, `basic_info_gp_attractions` | **X-pii** |
+| `basic_amenities_common_service_centre_situated_in` (free text, 9 rows), `basic_amenities_location_of_common_service_centre` (12 rows), `basic_amenities_types_of_connection` (11 rows), the 19 PLC detail columns (2 rows) | **X-sparse** — staged, unused in v1; statewide candidates |
+| `basic_amenities_alternate_source_of_water_*`, `basic_amenities_sources_of_internet_*`, `basic_amenities_sources_of_power_supply_*` | **X-multi** — comma-separated multi-value strings; not a dimension without an unnest, deferred |
+| `panchayat_area_total_area` | **X-unreliable** — values 1.11 to 3,000 with no consistent unit (§12.6); no band is built on it |
+| `basic_info_distance_from_nearest_bus_stop`, `demographic_details_{sc,st,total_gender_wise}_population`, `basic_amenities_{internet_service_available…, computer_laptop…, panchayat_bhawan, is_common_service_centre_available…}`, `panchayat_learning_centre_details_panchayat_learning_centre_available` | **dim** (source of a derived band, §12.3) |
+| every remaining count: population by gender / social category / children, households, job-card holders, SHGs, schools ×4, health facilities ×5, infrastructure ×13, wards, revenue villages, villages mapped to LGD, OSR collected so far, laptops / printers / scanners, sports courts ×3 | **meas** — view4 only (§12.4) |
+
+### 12.3 Derived GP dimensions (`stg_gp_profile`)
+
+Six categorical dimensions, computed once in `derived_columns.sql` with
+**fixed cut points**. A GP's band means the same thing in the sample and
+statewide; quantile bands were declined because a GP that is "large" among
+20 would be re-labelled among 6,800 and sample findings could not be
+compared with statewide ones. Any null source yields `'Not reported'` —
+dimensions are never zero-filled (§4.2 rule). Yes/no attributes need no cut.
+
+| Dimension | Values | Definition | Sample split |
+|---|---|---|---|
+| `social_composition` | ST-majority / SC-majority / Mixed | ST share of population > 50%; else SC share > 50%; else Mixed | 2 / 3 / 15 — thin in the sample, by design (statewide is the target) |
+| `gp_size` | Under 2,500 / 2,500 to 5,000 / 5,000 to 10,000 / 10,000 and above | total population; each band includes its lower bound and excludes its upper (2,500 is the second band, 5,000 the third, 10,000 the fourth) | 2 / 9 / 7 / 2 — the two outer bands are thin in the sample |
+| `remoteness` | Near / Far | nearest bus stop under 5 km / 5 km or more | 14 / 6 |
+| `digital_readiness` | Ready / Not ready | internet **and** computer both available at the panchayat bhawan | 10 / 10 |
+| `has_panchayat_bhawan` | Yes / No | as reported | 14 / 6 |
+| `has_csc` | Yes / No | common service centre available in the panchayat | 12 / 8 |
+
+`social_composition` is mined as-is at both scales. A two-way "SC + ST
+together more than half" variant was proposed for the sample (7 / 13) and
+**declined by the operator**: the design targets statewide data, and two
+cuts of one fact would in any case have produced definitional-pair twins
+(WP-D2c exclusion class). The sample will find little on this dimension;
+that is expected, and is not a calibration failure. `plc_available` (2 of 20
+Yes) is materialised on every view but mined only statewide, like the §9.7
+sparse dimensions.
+
+The population cuts (2,500 / 5,000 / 10,000) and the 5 km remoteness cut
+are both operator rulings of 2026-09-07. Everything else is a reported
+yes/no or a majority test.
+
+### 12.4 View changes
+
+**Views 1–3 (`view1_activity_lifecycle`, `view2_geo_month_cube`,
+`view3_gp_performance`).** Each gains the seven `stg_gp_profile` dimension
+columns (§12.3's six plus `plc_available`) by LEFT JOIN on `gp_lgd_code`
+through the geography spine every view already carries. No measure is added
+to these views: population and household counts are GP constants and would
+be summed once per activity (view1), once per month (view2) or once per
+fiscal year (view3) — a wrong denominator in every case. Grain pins are
+unchanged: 12,704 / 1,440 / 120. Statewide GPs with no profile row read
+`'Not reported'` on every band.
+
+**New `view4_gp_profile` — one row per Gram Panchayat** (20 sample; ~6,800
+statewide). Materialised from the `gram_panchayat` master, LEFT JOIN
+`stg_gp_profile`, LEFT JOIN the lifetime aggregates — the same discipline as
+view3, so a GP with a profile and no activity survives as a row.
+
+- **Grain:** GP. Post-view pin: 20 rows, `gp_lgd_code` unique.
+- **Dimensions:** district / block / gp (names + codes, the §6 switch
+  applies) + the seven profile dimensions.
+- **Temporal dimensions:** none.
+- **Measures, profile family (all SUM):** `population_total`,
+  `population_male`, `population_female`, `population_children`,
+  `population_sc`, `population_st`, `population_obc`, `population_general`,
+  `households`, `job_card_holders`, `shgs`, `wards`, `revenue_villages`,
+  `villages_mapped_lgd`, `anganwadi_centres`, `schools_pre_primary`,
+  `schools_primary`, `schools_secondary`, `schools_higher_secondary`,
+  `health_sub_centres`, `primary_health_centres`, `wellbeing_centres`,
+  `dispensaries`, `ayurvedic_clinics`, `drinking_water_sources`,
+  `households_tap_water`, `household_toilets`, `community_sanitary_complexes`,
+  `solid_waste_centres`, `common_service_centres`, `banks`, `atms`,
+  `rural_libraries`, `children_parks`, `disaster_rescue_centres`,
+  `bus_stands_with_water`, `seed_centres`, `osr_collected`, `laptops`,
+  `printers`, `scanners`, `sports_courts` (badminton + football + volleyball).
+- **Measures, lifetime performance (all SUM, view3's expressions summed over
+  the fiscal-year domain, so each equals the matching view3 column total):**
+  `n_activities`, `n_costed`, `n_costless`, `planned_cost`,
+  `sanctioned_total`, `expenditure_total`, `overspend_vs_plan`,
+  `overspend_vs_sanction`, `n_admin_approvals`, `n_tech_approvals`,
+  `n_completed`, `n_ongoing`, `n_abandoned`, `n_with_evidence`,
+  `evidence_uploads`, `payment_amount`, `receipt_amount`, `n_plans`.
+- **Impact measures:** `population_total`, `n_activities`.
+- **No rate is materialised** (§3). Because the grain is GP, a SUM over any
+  scope gives a correct numerator and a correct denominator at once —
+  spend per household or approvals per activity are honest at block and
+  district roll-up here and nowhere else. **The engine cannot form that
+  ratio itself**: its measures are SUM or AVG of one column (WP-D2c's
+  intensity measures are AVG-of-a-column, not a quotient). So v1 of view4
+  ships numerators and denominators only; per-capita *mining* needs an
+  engine ratio-measure extension, which is a separate engine WP and not
+  part of Amendment B. The prose and decomposition layers can still state
+  a per-household figure from the two columns.
+- **Depth:** 1 at sample scale, 2 statewide (as view3).
+- **Sample-scale expectation, stated in advance:** 20 rows, 9 districts.
+  The engine will produce few rankable findings. The view is built,
+  validated and mined now so the machinery and the glossary exist; it
+  becomes a live signal statewide. Do not tune toward a sample gate on this
+  view (handoff §4, "measure wrong or target unreachable").
+
+### 12.5 Engine and calibration consequences
+
+- Seven more dimensions on view1 at depth 2 enlarge the subspace
+  enumeration. WP-D2c measured the current 17-dimension run at ~92 minutes
+  on five workers; the WP re-measures before and after and reports the
+  cost. If the re-mine exceeds the available budget, the fallback is to
+  mine the profile dimensions on view1 as **subspace filters only** — the
+  operator decides, not the agent.
+- Every profile dimension is a new **extending dimension**, so findings of
+  the form "holds in every ST-majority GP except X" become possible.
+  That is the point of the amendment, and it is also where new spurious
+  classes will appear. The WP-D2c labelled sheet remains the regression
+  gate (no labelled-spurious class re-enters a top-15) and a calibration
+  session on the new findings is required before any edition is published.
+- **Regenerate all editions together** (handoff §4): feed, gamma editions,
+  insight prose, retrieval and decomposition corpora all derive from one
+  candidate set. A profile re-mine is a new candidate set.
+- Column glossary entries for the seven dimensions and the ~60 view4
+  measures are WP content; the prose layer must be able to say "GPs where
+  Scheduled Tribes are more than half the population" rather than
+  `social_composition = ST-majority`.
+- **Correlation only, stated for the record.** A profile dimension makes a
+  finding *about* a kind of GP; it never makes it *because of* that kind.
+  Rule 4b of the report prompt and D41 apply unchanged.
+
+### 12.6 Data oddities in `gp_profile` (log, never fix — extends §8)
+
+10. `panchayat_area_total_area`: 1.11 to 3,000 across 20 GPs; three values
+    (1,450 / 1,400 / 3,000) are two orders of magnitude off the rest —
+    mixed units (hectares vs acres vs km²?). Excluded from every band.
+11. Karuabahal reports **12 households** against 3,208 population, 1,256
+    toilets and 1,658 job-card holders. Size banding uses population, so
+    the band is unaffected; the WP-D2c degenerate guard should flag any
+    per-household figure it produces.
+12. `household_toilets > households` in 5 GPs; `households_tap_water >
+    households` in 2 (Chikilli, Haldikudar). Coverage ratios from these
+    columns are candidates, not headline measures, until statewide data
+    shows whether this is systematic.
+13. `children_population` = 0 in 9 of 20 GPs; ST population = 0 in 5
+    (Biswamathpur, Sharagada, Mendarajpur in Ganjam; Barimunda, Itipur in
+    Khordha): plausible for some, unlikely for all.
+14. `general_no_of_destitue_homes_old_age_homes` = 110 in one GP; the
+    column mixes a count of homes with a count of residents.
+15. `basic_amenities_no_of_computer` is 1 on all 18 non-null rows; the
+    laptop/printer/scanner counts vary. Likely a form default.
+16. Email, mobile (already masked `977XXX7120`) and address are present in
+    the source — X-pii, excluded from every view by operator ruling.
+
+### 12.7 Ask parity
+
+The §1 principle — views are the single source of numbers — means Ask needs
+the same derived bands if it is ever to answer "how do ST-majority GPs
+compare". That is an Ask-workstream item (a `v_gp_profile` serving view over
+the same `stg_gp_profile` definitions), **not part of this WP**; logged here
+so the two products do not drift.
+
+### 12.8 Decisions for sign-off
+
+| # | Decision | Recommendation |
+|---|---|---|
+| B1 | The six dimensions and their definitions (§12.3), incl. population cuts 2,500 / 5,000 / 10,000 and the 5 km remoteness cut | **APPROVED 2026-09-07** |
+| B2 | Social composition: one three-way ST / SC / Mixed dimension at every scale; the two-way sample workaround is dropped | **RULED 2026-09-07** — design for statewide, not for the sample |
+| B3 | view4 measure list (§12.4) — profile counts + lifetime performance, impact = population + activities | **APPROVED 2026-09-07** |
+| B4 | view1 re-mine cost: full seven-dimension depth-2 run, with the subspace-filter-only fallback decided on measurement | **APPROVED 2026-09-07** — agent reports the measurement, operator picks |
+| B5 | Decision numbering: Discover's D50–D59 block is exhausted at D59; this amendment needs a new block claimed in the PROJECT_PLAN governance row | **APPROVED 2026-09-07** — D60–D69 claimed in the D30 row |
+
+**All five signed 2026-09-07 — Amendment B is the spec.** The work is one
+WP (brief to follow): stage the
+source, extend the crosswalk, write `stg_gp_profile` and `view4_gp_profile`,
+append the dimension columns to views 1–3, extend `validation.yaml`, build
+under `--strict`, write the configs and glossary, re-mine, re-rank,
+calibration session, then regenerate every edition from the new candidate
+set.
+
+### 12.9 Post-signature corrections and rulings (WP-D11 / WP-D11b, 2026-09-11)
+
+Measured by WP-D11 (`handoffs/WPD11_REPORT.md` §§8–9) and ruled by the
+operator on 2026-09-11. The signed text of §12 is unedited; where this log
+and §§12.1–12.8 disagree, this log wins.
+
+1. §12.6.13: ST population is 0 in **three** GPs (Biswamathpur, Mendarajpur,
+   Itipur), not five. Sharagada reports 16 and Barimunda 1 — the PM's table
+   rounded both to zero. The entry's point stands.
+2. §12.6: add — the **household count is unreliable across the column**, not
+   in one GP: implied household size runs 0.51 to 267 across the twenty;
+   Kalyansinghpur reports more households than people. A per-household
+   figure on view4 is arithmetically honest and substantively unreliable
+   at GP level until statewide data shows otherwise.
+3. §12.4: the SUM-equality guarantee reads *exact on every count measure;
+   equal to the paise and within 2 ULP on every money measure*. Bit
+   equality is unachievable under IEEE-754 summation order.
+4. §12.2: four columns had no role (`general_no_of_destitue_homes_old_age_homes`,
+   `basic_amenities_panchayat_library`, the renewable-energy and
+   rainwater-harvesting flags). Roled **`X-deferred`** — held out of every
+   view, statewide candidates. §12.1's `basic_amenities` count is 18, not 17.
+5. §12.3: `remoteness` is boundary-sensitive — two GPs report exactly 5 km
+   and the signed "5 km or more is Far" gives 14/6; the other reading gives
+   16/4. `has_csc` contradicts the CSC *count* in fifteen of twenty rows; the
+   band is built from the flag as signed, and the glossary warns the two do
+   not corroborate each other.
+6. **Ruling (D61, 2026-09-11): size-band labels stay bare in the pack and are
+   given their unit ("people") at prose time only.** No pack change; no
+   view1 re-mine.
+7. **Ruling (D61): views 3 and 4 gain averaged twins** (`_mean`, per GP /
+   per GP-year) of the main measures, so bands of unequal membership are
+   compared by the typical GP rather than by headcount. This is the
+   WP-D2c intensity mechanism, not a ratio measure; §12.4's deferral of
+   per-capita mining stands.
+8. **Ruling (D61): causal wording is governed by one general sentence in
+   every writer prompt, with no banned-word list**, outcome to be measured
+   against the editions' word-scan gate (WP-D11b).
+9. Open, not yet ruled: whether `work_proposed_cost` joins view4 (§9.G).

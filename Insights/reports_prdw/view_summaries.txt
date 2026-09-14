@@ -1,7 +1,7 @@
 
 ======================================================================
 SUMMARY: view1_activity_lifecycle
-Rows: 12,704 | Columns: 70
+Rows: 12,704 | Columns: 77
 ======================================================================
   activity_code [VARCHAR]  null=0.0%  distinct=12,704  min='100006786'  max='99990211'
   gp_lgd_code [VARCHAR]  null=0.0%  distinct=20  min='116350'  max='275075'
@@ -10,6 +10,13 @@ Rows: 12,704 | Columns: 70
   block_name [VARCHAR]  null=0.0%  distinct=16  min='Attabira'  max='Tangi Choudwar'
   district_code [VARCHAR]  null=0.0%  distinct=9  min='306'  max='332'
   district_name [VARCHAR]  null=0.0%  distinct=9  min='Bargarh'  max='Sundargarh'
+  social_composition [VARCHAR]  null=0.0%  distinct=3  min='Mixed'  max='ST-majority'
+  gp_size [VARCHAR]  null=0.0%  distinct=4  min='10,000 and above'  max='Under 2,500'
+  remoteness [VARCHAR]  null=0.0%  distinct=2  min='Far'  max='Near'
+  digital_readiness [VARCHAR]  null=0.0%  distinct=2  min='Not ready'  max='Ready'
+  has_panchayat_bhawan [VARCHAR]  null=0.0%  distinct=2  min='No'  max='Yes'
+  has_csc [VARCHAR]  null=0.0%  distinct=2  min='No'  max='Yes'
+  plc_available [VARCHAR]  null=0.0%  distinct=2  min='No'  max='Yes'
   fiscal_year [VARCHAR]  null=0.0%  distinct=6  min='2020-2021'  max='2025-2026'
   theme [VARCHAR]  null=0.0%  distinct=7  min='Theme 1 - Poverty Free and Enhanced Livelihoods Village'  max='Unmapped theme'
   focus_area_name [VARCHAR]  null=0.0%  distinct=30  min='Administrative & Technical Support'  max='Women and child development'
@@ -76,7 +83,7 @@ Rows: 12,704 | Columns: 70
 
 ======================================================================
 SUMMARY: view2_geo_month_cube
-Rows: 1,440 | Columns: 17
+Rows: 1,440 | Columns: 24
 ======================================================================
   gp_lgd_code [VARCHAR]  null=0.0%  distinct=20  min='116350'  max='275075'
   gp_name [VARCHAR]  null=0.0%  distinct=20  min='Andhrua'  max='Sharagada'
@@ -84,6 +91,13 @@ Rows: 1,440 | Columns: 17
   block_name [VARCHAR]  null=0.0%  distinct=16  min='Attabira'  max='Tangi Choudwar'
   district_code [VARCHAR]  null=0.0%  distinct=9  min='306'  max='332'
   district_name [VARCHAR]  null=0.0%  distinct=9  min='Bargarh'  max='Sundargarh'
+  social_composition [VARCHAR]  null=0.0%  distinct=3  min='Mixed'  max='ST-majority'
+  gp_size [VARCHAR]  null=0.0%  distinct=4  min='10,000 and above'  max='Under 2,500'
+  remoteness [VARCHAR]  null=0.0%  distinct=2  min='Far'  max='Near'
+  digital_readiness [VARCHAR]  null=0.0%  distinct=2  min='Not ready'  max='Ready'
+  has_panchayat_bhawan [VARCHAR]  null=0.0%  distinct=2  min='No'  max='Yes'
+  has_csc [VARCHAR]  null=0.0%  distinct=2  min='No'  max='Yes'
+  plc_available [VARCHAR]  null=0.0%  distinct=2  min='No'  max='Yes'
   month [VARCHAR]  null=0.0%  distinct=72  min='2020-04'  max='2026-03'
   quarter [VARCHAR]  null=0.0%  distinct=24  min='2020-Q2'  max='2026-Q1'
   fiscal_year [VARCHAR]  null=0.0%  distinct=6  min='2020-2021'  max='2025-2026'
@@ -98,7 +112,7 @@ Rows: 1,440 | Columns: 17
 
 ======================================================================
 SUMMARY: view3_gp_performance
-Rows: 120 | Columns: 26
+Rows: 120 | Columns: 33
 ======================================================================
   gp_lgd_code [VARCHAR]  null=0.0%  distinct=20  min='116350'  max='275075'
   gp_name [VARCHAR]  null=0.0%  distinct=20  min='Andhrua'  max='Sharagada'
@@ -106,6 +120,13 @@ Rows: 120 | Columns: 26
   block_name [VARCHAR]  null=0.0%  distinct=16  min='Attabira'  max='Tangi Choudwar'
   district_code [VARCHAR]  null=0.0%  distinct=9  min='306'  max='332'
   district_name [VARCHAR]  null=0.0%  distinct=9  min='Bargarh'  max='Sundargarh'
+  social_composition [VARCHAR]  null=0.0%  distinct=3  min='Mixed'  max='ST-majority'
+  gp_size [VARCHAR]  null=0.0%  distinct=4  min='10,000 and above'  max='Under 2,500'
+  remoteness [VARCHAR]  null=0.0%  distinct=2  min='Far'  max='Near'
+  digital_readiness [VARCHAR]  null=0.0%  distinct=2  min='Not ready'  max='Ready'
+  has_panchayat_bhawan [VARCHAR]  null=0.0%  distinct=2  min='No'  max='Yes'
+  has_csc [VARCHAR]  null=0.0%  distinct=2  min='No'  max='Yes'
+  plc_available [VARCHAR]  null=0.0%  distinct=2  min='No'  max='Yes'
   fiscal_year [VARCHAR]  null=0.0%  distinct=6  min='2020-2021'  max='2025-2026'
   n_plans [DOUBLE]  null=0.0%  distinct=5  min='1.0'  max='5.0'
   n_activities [DOUBLE]  null=0.0%  distinct=83  min='12.0'  max='433.0'
@@ -126,3 +147,81 @@ Rows: 120 | Columns: 26
   n_abandoned [DOUBLE]  null=0.0%  distinct=17  min='0.0'  max='95.0'
   n_with_evidence [DOUBLE]  null=0.0%  distinct=31  min='0.0'  max='53.0'
   evidence_uploads [DOUBLE]  null=0.0%  distinct=61  min='0.0'  max='1955.0'
+
+======================================================================
+SUMMARY: view4_gp_profile
+Rows: 20 | Columns: 73
+======================================================================
+  gp_lgd_code [VARCHAR]  null=0.0%  distinct=20  min='116350'  max='275075'
+  gp_name [VARCHAR]  null=0.0%  distinct=20  min='Andhrua'  max='Sharagada'
+  block_code [VARCHAR]  null=0.0%  distinct=16  min='3674'  max='3945'
+  block_name [VARCHAR]  null=0.0%  distinct=16  min='Attabira'  max='Tangi Choudwar'
+  district_code [VARCHAR]  null=0.0%  distinct=9  min='306'  max='332'
+  district_name [VARCHAR]  null=0.0%  distinct=9  min='Bargarh'  max='Sundargarh'
+  social_composition [VARCHAR]  null=0.0%  distinct=3  min='Mixed'  max='ST-majority'
+  gp_size [VARCHAR]  null=0.0%  distinct=4  min='10,000 and above'  max='Under 2,500'
+  remoteness [VARCHAR]  null=0.0%  distinct=2  min='Far'  max='Near'
+  digital_readiness [VARCHAR]  null=0.0%  distinct=2  min='Not ready'  max='Ready'
+  has_panchayat_bhawan [VARCHAR]  null=0.0%  distinct=2  min='No'  max='Yes'
+  has_csc [VARCHAR]  null=0.0%  distinct=2  min='No'  max='Yes'
+  plc_available [VARCHAR]  null=0.0%  distinct=2  min='No'  max='Yes'
+  population_total [DOUBLE]  null=0.0%  distinct=20  min='1734.0'  max='11767.0'
+  population_male [DOUBLE]  null=0.0%  distinct=20  min='871.0'  max='5965.0'
+  population_female [DOUBLE]  null=0.0%  distinct=20  min='863.0'  max='5802.0'
+  population_children [DOUBLE]  null=0.0%  distinct=12  min='0.0'  max='1098.0'
+  population_sc [DOUBLE]  null=0.0%  distinct=20  min='15.0'  max='5246.0'
+  population_st [DOUBLE]  null=0.0%  distinct=18  min='0.0'  max='5435.0'
+  population_obc [DOUBLE]  null=0.0%  distinct=11  min='0.0'  max='4175.0'
+  population_general [DOUBLE]  null=0.0%  distinct=18  min='0.0'  max='9434.0'
+  households [DOUBLE]  null=0.0%  distinct=19  min='12.0'  max='4051.0'
+  job_card_holders [DOUBLE]  null=0.0%  distinct=18  min='0.0'  max='2559.0'
+  shgs [DOUBLE]  null=0.0%  distinct=18  min='10.0'  max='123.0'
+  wards [DOUBLE]  null=0.0%  distinct=9  min='11.0'  max='23.0'
+  revenue_villages [DOUBLE]  null=0.0%  distinct=11  min='0.0'  max='13.0'
+  villages_mapped_lgd [DOUBLE]  null=0.0%  distinct=10  min='1.0'  max='22.0'
+  anganwadi_centres [DOUBLE]  null=0.0%  distinct=12  min='4.0'  max='24.0'
+  schools_pre_primary [DOUBLE]  null=0.0%  distinct=9  min='0.0'  max='24.0'
+  schools_primary [DOUBLE]  null=0.0%  distinct=8  min='0.0'  max='10.0'
+  schools_secondary [DOUBLE]  null=0.0%  distinct=5  min='0.0'  max='5.0'
+  schools_higher_secondary [DOUBLE]  null=0.0%  distinct=2  min='0.0'  max='1.0'
+  health_sub_centres [DOUBLE]  null=0.0%  distinct=3  min='0.0'  max='4.0'
+  primary_health_centres [DOUBLE]  null=0.0%  distinct=3  min='0.0'  max='2.0'
+  wellbeing_centres [DOUBLE]  null=0.0%  distinct=4  min='0.0'  max='3.0'
+  dispensaries [DOUBLE]  null=0.0%  distinct=2  min='0.0'  max='1.0'
+  ayurvedic_clinics [DOUBLE]  null=0.0%  distinct=2  min='0.0'  max='1.0'
+  drinking_water_sources [DOUBLE]  null=0.0%  distinct=15  min='0.0'  max='98.0'
+  households_tap_water [DOUBLE]  null=0.0%  distinct=18  min='0.0'  max='2420.0'
+  household_toilets [DOUBLE]  null=0.0%  distinct=17  min='0.0'  max='3200.0'
+  community_sanitary_complexes [DOUBLE]  null=0.0%  distinct=8  min='0.0'  max='7.0'
+  solid_waste_centres [DOUBLE]  null=0.0%  distinct=7  min='0.0'  max='8.0'
+  common_service_centres [DOUBLE]  null=0.0%  distinct=8  min='0.0'  max='7.0'
+  banks [DOUBLE]  null=0.0%  distinct=5  min='0.0'  max='4.0'
+  atms [DOUBLE]  null=0.0%  distinct=5  min='0.0'  max='5.0'
+  rural_libraries [DOUBLE]  null=0.0%  distinct=3  min='0.0'  max='2.0'
+  children_parks [DOUBLE]  null=0.0%  distinct=4  min='0.0'  max='4.0'
+  disaster_rescue_centres [DOUBLE]  null=0.0%  distinct=3  min='0.0'  max='2.0'
+  bus_stands_with_water [DOUBLE]  null=0.0%  distinct=4  min='0.0'  max='3.0'
+  seed_centres [DOUBLE]  null=0.0%  distinct=3  min='0.0'  max='2.0'
+  osr_collected [DOUBLE]  null=0.0%  distinct=14  min='0.0'  max='285000.0'
+  laptops [DOUBLE]  null=0.0%  distinct=3  min='0.0'  max='2.0'
+  printers [DOUBLE]  null=0.0%  distinct=3  min='0.0'  max='2.0'
+  scanners [DOUBLE]  null=0.0%  distinct=2  min='0.0'  max='1.0'
+  sports_courts [DOUBLE]  null=0.0%  distinct=9  min='0.0'  max='14.0'
+  n_plans [DOUBLE]  null=0.0%  distinct=9  min='6.0'  max='17.0'
+  n_activities [DOUBLE]  null=0.0%  distinct=20  min='394.0'  max='920.0'
+  n_costed [DOUBLE]  null=0.0%  distinct=18  min='190.0'  max='460.0'
+  n_costless [DOUBLE]  null=0.0%  distinct=19  min='147.0'  max='722.0'
+  planned_cost [DOUBLE]  null=0.0%  distinct=20  min='16573096.0'  max='86470063.0'
+  sanctioned_total [DOUBLE]  null=0.0%  distinct=20  min='0.0'  max='27391626.0'
+  n_admin_approvals [DOUBLE]  null=0.0%  distinct=19  min='0.0'  max='168.0'
+  n_tech_approvals [DOUBLE]  null=0.0%  distinct=18  min='0.0'  max='168.0'
+  expenditure_total [DOUBLE]  null=0.0%  distinct=20  min='5817097.0'  max='18814607.0'
+  overspend_vs_plan [DOUBLE]  null=0.0%  distinct=20  min='-72291027.0'  max='-6945281.0'
+  overspend_vs_sanction [DOUBLE]  null=0.0%  distinct=20  min='-8577019.0'  max='0.0'
+  payment_amount [DOUBLE]  null=0.0%  distinct=20  min='10193834.0'  max='68867662.27000004'
+  receipt_amount [DOUBLE]  null=0.0%  distinct=20  min='12765688.0'  max='67945854.18'
+  n_completed [DOUBLE]  null=0.0%  distinct=4  min='0.0'  max='13.0'
+  n_ongoing [DOUBLE]  null=0.0%  distinct=20  min='65.0'  max='167.0'
+  n_abandoned [DOUBLE]  null=0.0%  distinct=16  min='0.0'  max='110.0'
+  n_with_evidence [DOUBLE]  null=0.0%  distinct=20  min='0.0'  max='158.0'
+  evidence_uploads [DOUBLE]  null=0.0%  distinct=19  min='0.0'  max='3596.0'

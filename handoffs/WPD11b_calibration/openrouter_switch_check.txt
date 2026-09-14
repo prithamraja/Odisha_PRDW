@@ -1,0 +1,6 @@
+semantic_pin: {"dims": 1024, "document_instruction": null, "model": "qwen/qwen3-embedding-8b", "normalisation": "L2, client-side", "query_instruction": "Instruct: Given a question from a government official about v
+fingerprint: c2f9779ab6cf29d6 | base_url: https://openrouter.ai/api/v1 | route: {'order': ['DeepInfra'], 'allow_fallbacks': True}
+cache reusable against the Novita-built findings corpus: True
+vectors the cache would reuse: 4397
+production Embedder.documents: (3, 1024) calls 1 | cos vs stored: [0.999963, 0.999917, 0.999935]
+production Embedder.query: (1024,) norm 1.0

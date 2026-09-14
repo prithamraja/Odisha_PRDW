@@ -356,7 +356,7 @@ Write findings for ALL {len(ranked_candidates)} findings provided. Follow this e
    - Keep each bullet to one line where possible
    - The last bullet of each group is the OPERATIONAL bullet: what the officer should do about it or ask at the next district review. Write it as an action or a question, never as an explanation of the cause
 
-5. NEVER INVENT A CAUSE. This is the hardest rule here and the easiest to break by accident. The findings tell you WHAT is happening, WHERE, and HOW MUCH. They contain no information whatever about WHY. You must not supply one.
+5. NEVER INVENT A CAUSE. It is very important that you do not make causal claims - none of our data can be used to determine causality. This is the hardest rule here and the easiest to break by accident. The findings tell you WHAT is happening, WHERE, and HOW MUCH. They contain no information whatever about WHY. You must not supply one.
    - Do not write that something happened "because", "due to", "driven by", "as a result of", "reflecting", or "explained by" anything. Those are claims about causation that the analysis did not make
    - Do not reach for a plausible mechanism to tidy up a finding. Do not attribute a pattern to administrative capacity, staffing, awareness, monsoon or terrain, contractor availability, election years, or any other unstated factor
    - Where a cause matters -- and it usually does -- write it as a QUESTION FOR THE OFFICER, not as a statement. "Chikilli has 640 activities and no administrative approvals on record; is nothing being sanctioned, or is nothing being entered?" is correct. "Chikilli is not sanctioning because the block office is understaffed" is not, and neither is "likely reflecting staffing pressure"

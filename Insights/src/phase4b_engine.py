@@ -21,6 +21,7 @@
 #   metainsights/view1_candidates.json
 #   metainsights/view2_candidates.json
 #   metainsights/view3_candidates.json
+#   metainsights/view4_candidates.json   (WP-D11)
 #   metainsights/view{1,2,3}_data_quality.json
 #   reports/engine_diagnostics_all_views.txt
 #
@@ -53,6 +54,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from phase4a_engine import (
     # Config
     MeasureConfig, ViewConfig, VIEW1_CONFIG, VIEW2_CONFIG, VIEW3_CONFIG,
+    VIEW4_CONFIG,   # WP-D11
     DISCOVER_SCALE,
     # Data structures
     Subspace, DataScope, MetaInsightCandidate,
@@ -713,7 +715,11 @@ if __name__ == "__main__":
     # not a config edit because DISCOVER_SCALE owns the sample/statewide split
     # (D15) and this is neither: it is one deliberate deep run of the sample.
     ap = argparse.ArgumentParser()
-    ap.add_argument("--views", default="view2,view3,view1")
+    # view4 runs with the two other cheap views, BEFORE view1. It is 20 rows at
+    # depth 1: it drains in seconds, and having it finish early means the
+    # ranking, the glossary and the report's prompt path are all proved on a
+    # brand-new view before view1's hours are committed.
+    ap.add_argument("--views", default="view2,view3,view4,view1")
     ap.add_argument("--workers", type=int, default=1,
                     help="processes to shard the priority queue across (T3)")
     ap.add_argument("--top-k", type=int, default=RANKING_PREFILTER_CAP,
@@ -732,8 +738,14 @@ if __name__ == "__main__":
                     help="write to view{N}{suffix}_candidates.json")
     args = ap.parse_args()
 
-    BUDGETS = {"view1": 36000, "view2": 300, "view3": 120}
-    CONFIGS = {"view1": VIEW1_CONFIG, "view2": VIEW2_CONFIG, "view3": VIEW3_CONFIG}
+    # view4's budget starts at view3's 120 s (WP-D11 brief) and is raised only
+    # on a measured need. 20 rows x 60 measures x 9 dimensions at depth 1 is a
+    # smaller queue than view3's 120 rows at depth 1, so 120 s is generous by
+    # the standard this block sets: the proof is the ACTUAL drain time in the
+    # diagnostics, which must be strictly under the budget.
+    BUDGETS = {"view1": 36000, "view2": 300, "view3": 120, "view4": 120}
+    CONFIGS = {"view1": VIEW1_CONFIG, "view2": VIEW2_CONFIG, "view3": VIEW3_CONFIG,
+               "view4": VIEW4_CONFIG}
 
     if args.depth2:
         VIEW1_CONFIG.max_subspace_depth = 2

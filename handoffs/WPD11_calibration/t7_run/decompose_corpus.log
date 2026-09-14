@@ -1,0 +1,57 @@
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+  Ask registry: 20 GPs, 16 blocks, 9 districts
+  66,779 decompositions view1=50,908, view2=2,837, view3=3,832, view4=9,202
+    view1: 142 subspaces x 23 dimensions x 24 measures; skipped 4,426 definitional, 8,865 all-zero, 10,801 single-member
+    view2: 67 subspaces x 12 dimensions x 7 measures; skipped 0 definitional, 12 all-zero, 2,317 single-member
+    view3: 61 subspaces x 10 dimensions x 18 measures; skipped 0 definitional, 110 all-zero, 5,958 single-member
+    view4: 61 subspaces x 9 dimensions x 60 measures; skipped 0 definitional, 278 all-zero, 19,860 single-member
+  shapes: concentrated=32,562, even=381, offsetting=281, spread=33,555
+  reconciliation: 66,779 of 66,779 exact, 0 failed
+  distinct enriched texts: 66,779 of 66,779
+  geography: 10,068 records name a registry-confirmed Gram Panchayat; 0 candidate names rejected
+  vectors: 40,698 reused from cache, 26,081 to embed
+    embedded 640/26,081 (17 texts/s, 24.8 min left, 0 rate-limit waits)
+    embedded 1,280/26,081 (18 texts/s, 22.4 min left, 0 rate-limit waits)
+    embedded 1,920/26,081 (19 texts/s, 21.2 min left, 0 rate-limit waits)
+    embedded 2,560/26,081 (19 texts/s, 20.4 min left, 0 rate-limit waits)
+    embedded 3,200/26,081 (19 texts/s, 19.8 min left, 0 rate-limit waits)
+    embedded 3,840/26,081 (20 texts/s, 18.8 min left, 0 rate-limit waits)
+    embedded 4,480/26,081 (20 texts/s, 17.9 min left, 0 rate-limit waits)
+    embedded 5,120/26,081 (20 texts/s, 17.3 min left, 0 rate-limit waits)
+    embedded 5,760/26,081 (20 texts/s, 16.8 min left, 0 rate-limit waits)
+    embedded 6,400/26,081 (20 texts/s, 16.3 min left, 0 rate-limit waits)
+    embedded 7,040/26,081 (20 texts/s, 15.8 min left, 0 rate-limit waits)
+    embedded 7,680/26,081 (20 texts/s, 15.4 min left, 0 rate-limit waits)
+    embedded 8,320/26,081 (20 texts/s, 15.0 min left, 0 rate-limit waits)
+    embedded 8,960/26,081 (19 texts/s, 15.0 min left, 0 rate-limit waits)
+    embedded 9,600/26,081 (19 texts/s, 14.3 min left, 0 rate-limit waits)
+    embedded 10,240/26,081 (19 texts/s, 13.8 min left, 0 rate-limit waits)
+    embedded 10,880/26,081 (19 texts/s, 13.2 min left, 0 rate-limit waits)
+    embedded 11,520/26,081 (19 texts/s, 12.7 min left, 0 rate-limit waits)
+    embedded 12,160/26,081 (19 texts/s, 12.0 min left, 0 rate-limit waits)
+    embedded 12,800/26,081 (18 texts/s, 12.4 min left, 0 rate-limit waits)
+    embedded 13,440/26,081 (18 texts/s, 11.8 min left, 0 rate-limit waits)
+    embedded 14,080/26,081 (18 texts/s, 11.1 min left, 0 rate-limit waits)
+    embedded 14,720/26,081 (18 texts/s, 10.5 min left, 0 rate-limit waits)
+    embedded 15,360/26,081 (18 texts/s, 9.8 min left, 0 rate-limit waits)
+    embedded 16,000/26,081 (18 texts/s, 9.1 min left, 0 rate-limit waits)
+    embedded 16,640/26,081 (18 texts/s, 8.6 min left, 0 rate-limit waits)
+    embedded 17,280/26,081 (18 texts/s, 8.0 min left, 0 rate-limit waits)
+    embedded 17,920/26,081 (18 texts/s, 7.4 min left, 0 rate-limit waits)
+    embedded 18,560/26,081 (18 texts/s, 6.8 min left, 0 rate-limit waits)
+    embedded 19,200/26,081 (18 texts/s, 6.2 min left, 0 rate-limit waits)
+    embedded 19,840/26,081 (18 texts/s, 5.7 min left, 0 rate-limit waits)
+    embedded 20,480/26,081 (19 texts/s, 5.0 min left, 0 rate-limit waits)
+    embedded 21,120/26,081 (19 texts/s, 4.4 min left, 0 rate-limit waits)
+    embedded 21,760/26,081 (19 texts/s, 3.9 min left, 0 rate-limit waits)
+    embedded 22,400/26,081 (19 texts/s, 3.3 min left, 0 rate-limit waits)
+    embedded 23,040/26,081 (19 texts/s, 2.7 min left, 0 rate-limit waits)
+    embedded 23,680/26,081 (19 texts/s, 2.2 min left, 0 rate-limit waits)
+    embedded 24,320/26,081 (19 texts/s, 1.6 min left, 0 rate-limit waits)
+    embedded 24,960/26,081 (19 texts/s, 1.0 min left, 0 rate-limit waits)
+    embedded 25,600/26,081 (19 texts/s, 0.4 min left, 0 rate-limit waits)
+    embedded 26,081/26,081 (19 texts/s, 0.0 min left, 0 rate-limit waits)
+  wrote C:\dev\odisha-d11\Insights\metainsights\decompose_corpus.json.gz (12.0 MB)
+  wrote C:\dev\odisha-d11\Insights\metainsights\decompose_corpus.npy  shape=(66779, 1024) (136.8 MB)
+  wrote C:\dev\odisha-d11\Insights\metainsights\decompose_corpus_stamp.json

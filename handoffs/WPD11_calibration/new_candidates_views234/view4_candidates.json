@@ -1,0 +1,4405 @@
+[
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_children",
+          "population_sc",
+          "population_st",
+          "population_obc",
+          "population_general",
+          "households",
+          "shgs",
+          "wards",
+          "revenue_villages",
+          "villages_mapped_lgd",
+          "anganwadi_centres",
+          "schools_pre_primary",
+          "schools_primary",
+          "schools_secondary",
+          "schools_higher_secondary",
+          "health_sub_centres",
+          "primary_health_centres",
+          "wellbeing_centres",
+          "dispensaries",
+          "ayurvedic_clinics",
+          "drinking_water_sources",
+          "households_tap_water",
+          "household_toilets",
+          "community_sanitary_complexes",
+          "solid_waste_centres",
+          "common_service_centres",
+          "banks",
+          "atms",
+          "rural_libraries",
+          "children_parks",
+          "disaster_rescue_centres",
+          "bus_stands_with_water",
+          "seed_centres",
+          "osr_collected",
+          "laptops",
+          "printers",
+          "scanners",
+          "sports_courts",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 56,
+        "proportion": 0.9333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "job_card_holders",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.772667,
+    "impact": 1.0,
+    "score": 0.772667,
+    "impact_measure_used": "population_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "ATTRIBUTION",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "ATTRIBUTION",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_children",
+          "population_sc",
+          "population_obc",
+          "population_general",
+          "households",
+          "shgs",
+          "wards",
+          "revenue_villages",
+          "anganwadi_centres",
+          "schools_pre_primary",
+          "schools_primary",
+          "schools_secondary",
+          "schools_higher_secondary",
+          "health_sub_centres",
+          "primary_health_centres",
+          "wellbeing_centres",
+          "dispensaries",
+          "ayurvedic_clinics",
+          "drinking_water_sources",
+          "households_tap_water",
+          "household_toilets",
+          "community_sanitary_complexes",
+          "common_service_centres",
+          "banks",
+          "atms",
+          "rural_libraries",
+          "children_parks",
+          "disaster_rescue_centres",
+          "bus_stands_with_water",
+          "seed_centres",
+          "osr_collected",
+          "laptops",
+          "printers",
+          "scanners",
+          "sports_courts",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 53,
+        "proportion": 0.8833
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "ATTRIBUTION"
+      },
+      {
+        "member_label": "population_st",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "job_card_holders",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "villages_mapped_lgd",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "solid_waste_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.671532,
+    "impact": 1.0,
+    "score": 0.671532,
+    "impact_measure_used": "population_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_panchayat_bhawan",
+        "Yes"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_children",
+          "population_sc",
+          "population_st",
+          "population_obc",
+          "population_general",
+          "households",
+          "job_card_holders",
+          "shgs",
+          "wards",
+          "revenue_villages",
+          "villages_mapped_lgd",
+          "anganwadi_centres",
+          "schools_pre_primary",
+          "schools_primary",
+          "schools_secondary",
+          "schools_higher_secondary",
+          "health_sub_centres",
+          "primary_health_centres",
+          "wellbeing_centres",
+          "dispensaries",
+          "ayurvedic_clinics",
+          "households_tap_water",
+          "household_toilets",
+          "community_sanitary_complexes",
+          "solid_waste_centres",
+          "common_service_centres",
+          "banks",
+          "atms",
+          "rural_libraries",
+          "children_parks",
+          "disaster_rescue_centres",
+          "bus_stands_with_water",
+          "seed_centres",
+          "osr_collected",
+          "laptops",
+          "printers",
+          "scanners",
+          "sports_courts",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 56,
+        "proportion": 0.9333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('SC-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "drinking_water_sources",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.772667,
+    "impact": 0.7071,
+    "score": 0.546353,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "ATTRIBUTION",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_panchayat_bhawan",
+        "Yes"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "ATTRIBUTION",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_children",
+          "population_sc",
+          "population_st",
+          "population_obc",
+          "population_general",
+          "households",
+          "shgs",
+          "wards",
+          "revenue_villages",
+          "villages_mapped_lgd",
+          "anganwadi_centres",
+          "schools_pre_primary",
+          "schools_primary",
+          "schools_secondary",
+          "schools_higher_secondary",
+          "health_sub_centres",
+          "primary_health_centres",
+          "wellbeing_centres",
+          "dispensaries",
+          "ayurvedic_clinics",
+          "households_tap_water",
+          "household_toilets",
+          "community_sanitary_complexes",
+          "solid_waste_centres",
+          "common_service_centres",
+          "banks",
+          "atms",
+          "rural_libraries",
+          "children_parks",
+          "disaster_rescue_centres",
+          "bus_stands_with_water",
+          "seed_centres",
+          "osr_collected",
+          "laptops",
+          "printers",
+          "scanners",
+          "sports_courts",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 55,
+        "proportion": 0.9167
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('SC-majority',)",
+        "pattern_type": "ATTRIBUTION"
+      },
+      {
+        "member_label": "job_card_holders",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "drinking_water_sources",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.735599,
+    "impact": 0.7071,
+    "score": 0.520142,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_csc",
+        "Yes"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_children",
+          "population_sc",
+          "population_st",
+          "population_obc",
+          "population_general",
+          "households",
+          "job_card_holders",
+          "shgs",
+          "wards",
+          "revenue_villages",
+          "villages_mapped_lgd",
+          "anganwadi_centres",
+          "schools_pre_primary",
+          "schools_primary",
+          "schools_secondary",
+          "schools_higher_secondary",
+          "health_sub_centres",
+          "primary_health_centres",
+          "wellbeing_centres",
+          "dispensaries",
+          "ayurvedic_clinics",
+          "drinking_water_sources",
+          "households_tap_water",
+          "household_toilets",
+          "community_sanitary_complexes",
+          "solid_waste_centres",
+          "common_service_centres",
+          "banks",
+          "atms",
+          "rural_libraries",
+          "children_parks",
+          "disaster_rescue_centres",
+          "bus_stands_with_water",
+          "seed_centres",
+          "osr_collected",
+          "laptops",
+          "printers",
+          "scanners",
+          "sports_courts",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 57,
+        "proportion": 0.95
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.814608,
+    "impact": 0.638224,
+    "score": 0.519903,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "ATTRIBUTION",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_csc",
+        "Yes"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "ATTRIBUTION",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_children",
+          "population_sc",
+          "population_st",
+          "population_obc",
+          "population_general",
+          "households",
+          "job_card_holders",
+          "shgs",
+          "wards",
+          "revenue_villages",
+          "villages_mapped_lgd",
+          "anganwadi_centres",
+          "schools_pre_primary",
+          "schools_primary",
+          "schools_secondary",
+          "schools_higher_secondary",
+          "health_sub_centres",
+          "primary_health_centres",
+          "wellbeing_centres",
+          "dispensaries",
+          "ayurvedic_clinics",
+          "households_tap_water",
+          "household_toilets",
+          "community_sanitary_complexes",
+          "solid_waste_centres",
+          "common_service_centres",
+          "banks",
+          "atms",
+          "rural_libraries",
+          "children_parks",
+          "disaster_rescue_centres",
+          "bus_stands_with_water",
+          "seed_centres",
+          "osr_collected",
+          "laptops",
+          "printers",
+          "scanners",
+          "sports_courts",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 56,
+        "proportion": 0.9333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "drinking_water_sources",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.772667,
+    "impact": 0.638224,
+    "score": 0.493135,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "social_composition",
+    "pattern_type": "EVENNESS",
+    "breakdown": "block_name",
+    "measure": "overspend_vs_plan",
+    "base_subspace": [],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('EVEN',)",
+        "pattern_type": "EVENNESS",
+        "members": [
+          "Mixed",
+          "SC-majority"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "ST-majority",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 1.0,
+    "score": 0.487712,
+    "impact_measure_used": "population_total"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "social_composition",
+    "pattern_type": "EVENNESS",
+    "breakdown": "block_name",
+    "measure": "overspend_vs_sanction",
+    "base_subspace": [],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('EVEN',)",
+        "pattern_type": "EVENNESS",
+        "members": [
+          "Mixed",
+          "SC-majority"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "ST-majority",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 1.0,
+    "score": 0.487712,
+    "impact_measure_used": "population_total"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "social_composition",
+    "pattern_type": "EVENNESS",
+    "breakdown": "district_name",
+    "measure": "overspend_vs_plan",
+    "base_subspace": [],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('EVEN',)",
+        "pattern_type": "EVENNESS",
+        "members": [
+          "Mixed",
+          "SC-majority"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "ST-majority",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 1.0,
+    "score": 0.487712,
+    "impact_measure_used": "population_total"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "social_composition",
+    "pattern_type": "EVENNESS",
+    "breakdown": "district_name",
+    "measure": "overspend_vs_sanction",
+    "base_subspace": [],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('EVEN',)",
+        "pattern_type": "EVENNESS",
+        "members": [
+          "Mixed",
+          "SC-majority"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "ST-majority",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 1.0,
+    "score": 0.487712,
+    "impact_measure_used": "population_total"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "social_composition",
+    "pattern_type": "EVENNESS",
+    "breakdown": "gp_name",
+    "measure": "overspend_vs_plan",
+    "base_subspace": [],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('EVEN',)",
+        "pattern_type": "EVENNESS",
+        "members": [
+          "Mixed",
+          "SC-majority"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "ST-majority",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 1.0,
+    "score": 0.487712,
+    "impact_measure_used": "population_total"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "social_composition",
+    "pattern_type": "EVENNESS",
+    "breakdown": "gp_name",
+    "measure": "overspend_vs_sanction",
+    "base_subspace": [],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('EVEN',)",
+        "pattern_type": "EVENNESS",
+        "members": [
+          "Mixed",
+          "SC-majority"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "ST-majority",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 1.0,
+    "score": 0.487712,
+    "impact_measure_used": "population_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "remoteness",
+        "Near"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_children",
+          "population_sc",
+          "population_obc",
+          "population_general",
+          "households",
+          "shgs",
+          "wards",
+          "revenue_villages",
+          "anganwadi_centres",
+          "schools_pre_primary",
+          "schools_primary",
+          "schools_secondary",
+          "schools_higher_secondary",
+          "health_sub_centres",
+          "primary_health_centres",
+          "wellbeing_centres",
+          "dispensaries",
+          "ayurvedic_clinics",
+          "drinking_water_sources",
+          "households_tap_water",
+          "household_toilets",
+          "community_sanitary_complexes",
+          "common_service_centres",
+          "banks",
+          "atms",
+          "rural_libraries",
+          "children_parks",
+          "bus_stands_with_water",
+          "seed_centres",
+          "osr_collected",
+          "laptops",
+          "printers",
+          "scanners",
+          "sports_courts",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 52,
+        "proportion": 0.8667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "population_st",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "job_card_holders",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "villages_mapped_lgd",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "solid_waste_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "disaster_rescue_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.643542,
+    "impact": 0.754126,
+    "score": 0.485312,
+    "impact_measure_used": "population_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "ATTRIBUTION",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "remoteness",
+        "Near"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "ATTRIBUTION",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_children",
+          "population_sc",
+          "population_obc",
+          "population_general",
+          "households",
+          "shgs",
+          "wards",
+          "revenue_villages",
+          "anganwadi_centres",
+          "schools_pre_primary",
+          "schools_primary",
+          "schools_higher_secondary",
+          "health_sub_centres",
+          "primary_health_centres",
+          "wellbeing_centres",
+          "ayurvedic_clinics",
+          "drinking_water_sources",
+          "households_tap_water",
+          "household_toilets",
+          "community_sanitary_complexes",
+          "common_service_centres",
+          "banks",
+          "atms",
+          "rural_libraries",
+          "children_parks",
+          "bus_stands_with_water",
+          "seed_centres",
+          "osr_collected",
+          "laptops",
+          "printers",
+          "scanners",
+          "sports_courts",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 50,
+        "proportion": 0.8333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "ATTRIBUTION"
+      },
+      {
+        "member_label": "population_st",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "job_card_holders",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "villages_mapped_lgd",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "dispensaries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "solid_waste_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "disaster_rescue_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.593732,
+    "impact": 0.754126,
+    "score": 0.447749,
+    "impact_measure_used": "population_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "LAST_TWO",
+    "breakdown": "gp_size",
+    "measure": "(varies)",
+    "base_subspace": [],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('10,000 and above', 'Under 2,500')",
+        "pattern_type": "LAST_TWO",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_st",
+          "population_obc",
+          "households",
+          "shgs",
+          "wards",
+          "revenue_villages",
+          "villages_mapped_lgd",
+          "anganwadi_centres",
+          "health_sub_centres",
+          "ayurvedic_clinics",
+          "drinking_water_sources",
+          "household_toilets",
+          "solid_waste_centres",
+          "banks",
+          "bus_stands_with_water",
+          "osr_collected",
+          "laptops",
+          "printers",
+          "scanners",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence"
+        ],
+        "count": 35,
+        "proportion": 0.5833
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "atms",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('2,500 to 5,000', 'Under 2,500')",
+        "pattern_type": "LAST_TWO"
+      },
+      {
+        "member_label": "population_children",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_sc",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_general",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "job_card_holders",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_pre_primary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_primary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_higher_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "primary_health_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "wellbeing_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "dispensaries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "households_tap_water",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "community_sanitary_complexes",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "common_service_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "rural_libraries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "children_parks",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "disaster_rescue_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "seed_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "sports_courts",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "planned_cost",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "evidence_uploads",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.397011,
+    "impact": 1.0,
+    "score": 0.397011,
+    "impact_measure_used": "population_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "TOP_TWO",
+    "breakdown": "gp_size",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_panchayat_bhawan",
+        "Yes"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('2,500 to 5,000', '5,000 to 10,000')",
+        "pattern_type": "TOP_TWO",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_children",
+          "population_sc",
+          "population_st",
+          "population_obc",
+          "households",
+          "job_card_holders",
+          "shgs",
+          "wards",
+          "revenue_villages",
+          "villages_mapped_lgd",
+          "anganwadi_centres",
+          "schools_pre_primary",
+          "schools_primary",
+          "schools_higher_secondary",
+          "health_sub_centres",
+          "ayurvedic_clinics",
+          "drinking_water_sources",
+          "households_tap_water",
+          "household_toilets",
+          "community_sanitary_complexes",
+          "solid_waste_centres",
+          "common_service_centres",
+          "banks",
+          "rural_libraries",
+          "bus_stands_with_water",
+          "osr_collected",
+          "laptops",
+          "printers",
+          "scanners",
+          "sports_courts",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_completed",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 49,
+        "proportion": 0.8167
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "population_general",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('10,000 and above', '5,000 to 10,000')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "atms",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('10,000 and above', '5,000 to 10,000')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "wellbeing_centres",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('10,000 and above', '2,500 to 5,000')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('10,000 and above', 'Under 2,500')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "schools_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "primary_health_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "dispensaries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "children_parks",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "disaster_rescue_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "seed_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.519857,
+    "impact": 0.7071,
+    "score": 0.367591,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "TOP_TWO",
+    "breakdown": "gp_size",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "social_composition",
+        "Mixed"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('2,500 to 5,000', '5,000 to 10,000')",
+        "pattern_type": "TOP_TWO",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_children",
+          "population_sc",
+          "population_st",
+          "population_obc",
+          "households",
+          "job_card_holders",
+          "shgs",
+          "wards",
+          "revenue_villages",
+          "villages_mapped_lgd",
+          "anganwadi_centres",
+          "health_sub_centres",
+          "primary_health_centres",
+          "dispensaries",
+          "ayurvedic_clinics",
+          "drinking_water_sources",
+          "community_sanitary_complexes",
+          "solid_waste_centres",
+          "common_service_centres",
+          "banks",
+          "bus_stands_with_water",
+          "seed_centres",
+          "osr_collected",
+          "laptops",
+          "printers",
+          "scanners",
+          "sports_courts",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 45,
+        "proportion": 0.75
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "schools_pre_primary",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('10,000 and above', '5,000 to 10,000')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "households_tap_water",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('10,000 and above', '5,000 to 10,000')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('10,000 and above', 'Under 2,500')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "population_general",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_primary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_higher_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "wellbeing_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "household_toilets",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "atms",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "rural_libraries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "children_parks",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "disaster_rescue_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.446711,
+    "impact": 0.79818,
+    "score": 0.356556,
+    "impact_measure_used": "population_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "TOP_TWO",
+    "breakdown": "gp_size",
+    "measure": "(varies)",
+    "base_subspace": [],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('2,500 to 5,000', '5,000 to 10,000')",
+        "pattern_type": "TOP_TWO",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_st",
+          "population_obc",
+          "households",
+          "shgs",
+          "wards",
+          "revenue_villages",
+          "villages_mapped_lgd",
+          "anganwadi_centres",
+          "schools_primary",
+          "health_sub_centres",
+          "ayurvedic_clinics",
+          "drinking_water_sources",
+          "households_tap_water",
+          "household_toilets",
+          "community_sanitary_complexes",
+          "common_service_centres",
+          "banks",
+          "bus_stands_with_water",
+          "osr_collected",
+          "laptops",
+          "printers",
+          "scanners",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 40,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "schools_secondary",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('5,000 to 10,000', 'Under 2,500')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "atms",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('10,000 and above', '5,000 to 10,000')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "disaster_rescue_centres",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('10,000 and above', '2,500 to 5,000')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('10,000 and above', '2,500 to 5,000')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "population_children",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_sc",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_general",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "job_card_holders",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_pre_primary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_higher_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "primary_health_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "wellbeing_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "dispensaries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "solid_waste_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "rural_libraries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "children_parks",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "seed_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "sports_courts",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.35346,
+    "impact": 1.0,
+    "score": 0.35346,
+    "impact_measure_used": "population_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "digital_readiness",
+        "Not ready"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_sc",
+          "population_obc",
+          "population_general",
+          "households",
+          "shgs",
+          "wards",
+          "revenue_villages",
+          "villages_mapped_lgd",
+          "anganwadi_centres",
+          "schools_pre_primary",
+          "schools_primary",
+          "schools_secondary",
+          "schools_higher_secondary",
+          "health_sub_centres",
+          "primary_health_centres",
+          "wellbeing_centres",
+          "dispensaries",
+          "ayurvedic_clinics",
+          "drinking_water_sources",
+          "households_tap_water",
+          "household_toilets",
+          "community_sanitary_complexes",
+          "common_service_centres",
+          "banks",
+          "atms",
+          "rural_libraries",
+          "children_parks",
+          "disaster_rescue_centres",
+          "bus_stands_with_water",
+          "seed_centres",
+          "laptops",
+          "printers",
+          "scanners",
+          "sports_courts",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 52,
+        "proportion": 0.8667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "population_children",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_st",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "job_card_holders",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "solid_waste_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "osr_collected",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.643542,
+    "impact": 0.539116,
+    "score": 0.346944,
+    "impact_measure_used": "population_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "ATTRIBUTION",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "digital_readiness",
+        "Ready"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "ATTRIBUTION",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_children",
+          "population_st",
+          "population_obc",
+          "population_general",
+          "households",
+          "shgs",
+          "wards",
+          "revenue_villages",
+          "anganwadi_centres",
+          "schools_pre_primary",
+          "schools_primary",
+          "schools_secondary",
+          "schools_higher_secondary",
+          "health_sub_centres",
+          "primary_health_centres",
+          "wellbeing_centres",
+          "ayurvedic_clinics",
+          "households_tap_water",
+          "household_toilets",
+          "community_sanitary_complexes",
+          "solid_waste_centres",
+          "common_service_centres",
+          "banks",
+          "atms",
+          "rural_libraries",
+          "children_parks",
+          "disaster_rescue_centres",
+          "bus_stands_with_water",
+          "seed_centres",
+          "osr_collected",
+          "laptops",
+          "printers",
+          "scanners",
+          "sports_courts",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 52,
+        "proportion": 0.8667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('SC-majority',)",
+        "pattern_type": "ATTRIBUTION"
+      },
+      {
+        "member_label": "population_sc",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "job_card_holders",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "villages_mapped_lgd",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "dispensaries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "drinking_water_sources",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.643542,
+    "impact": 0.496851,
+    "score": 0.319745,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "digital_readiness",
+        "Ready"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_children",
+          "population_st",
+          "population_obc",
+          "population_general",
+          "households",
+          "shgs",
+          "wards",
+          "revenue_villages",
+          "anganwadi_centres",
+          "schools_pre_primary",
+          "schools_primary",
+          "schools_secondary",
+          "schools_higher_secondary",
+          "health_sub_centres",
+          "primary_health_centres",
+          "wellbeing_centres",
+          "ayurvedic_clinics",
+          "households_tap_water",
+          "household_toilets",
+          "community_sanitary_complexes",
+          "solid_waste_centres",
+          "common_service_centres",
+          "banks",
+          "atms",
+          "rural_libraries",
+          "children_parks",
+          "disaster_rescue_centres",
+          "bus_stands_with_water",
+          "seed_centres",
+          "osr_collected",
+          "laptops",
+          "printers",
+          "scanners",
+          "sports_courts",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 52,
+        "proportion": 0.8667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('SC-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "population_sc",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "job_card_holders",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "villages_mapped_lgd",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "dispensaries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "drinking_water_sources",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.643542,
+    "impact": 0.496851,
+    "score": 0.319745,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "ATTRIBUTION",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "digital_readiness",
+        "Not ready"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "ATTRIBUTION",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_obc",
+          "population_general",
+          "households",
+          "shgs",
+          "wards",
+          "revenue_villages",
+          "villages_mapped_lgd",
+          "anganwadi_centres",
+          "schools_pre_primary",
+          "schools_primary",
+          "schools_higher_secondary",
+          "health_sub_centres",
+          "primary_health_centres",
+          "wellbeing_centres",
+          "dispensaries",
+          "ayurvedic_clinics",
+          "drinking_water_sources",
+          "households_tap_water",
+          "household_toilets",
+          "community_sanitary_complexes",
+          "common_service_centres",
+          "banks",
+          "atms",
+          "children_parks",
+          "bus_stands_with_water",
+          "seed_centres",
+          "laptops",
+          "printers",
+          "scanners",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 47,
+        "proportion": 0.7833
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "ATTRIBUTION"
+      },
+      {
+        "member_label": "population_children",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_sc",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_st",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "job_card_holders",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "solid_waste_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "rural_libraries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "disaster_rescue_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "osr_collected",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "sports_courts",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.532023,
+    "impact": 0.539116,
+    "score": 0.286822,
+    "impact_measure_used": "population_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "TOP_TWO",
+    "breakdown": "gp_size",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_csc",
+        "Yes"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('2,500 to 5,000', '5,000 to 10,000')",
+        "pattern_type": "TOP_TWO",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_children",
+          "population_sc",
+          "population_st",
+          "population_obc",
+          "households",
+          "job_card_holders",
+          "shgs",
+          "wards",
+          "revenue_villages",
+          "villages_mapped_lgd",
+          "anganwadi_centres",
+          "schools_pre_primary",
+          "schools_primary",
+          "schools_higher_secondary",
+          "health_sub_centres",
+          "ayurvedic_clinics",
+          "drinking_water_sources",
+          "households_tap_water",
+          "household_toilets",
+          "community_sanitary_complexes",
+          "solid_waste_centres",
+          "common_service_centres",
+          "banks",
+          "bus_stands_with_water",
+          "osr_collected",
+          "laptops",
+          "printers",
+          "scanners",
+          "sports_courts",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 47,
+        "proportion": 0.7833
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "population_general",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('10,000 and above', '5,000 to 10,000')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "atms",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('10,000 and above', '5,000 to 10,000')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('10,000 and above', 'Under 2,500')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "schools_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "primary_health_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "wellbeing_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "dispensaries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "rural_libraries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "children_parks",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "disaster_rescue_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "seed_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.441503,
+    "impact": 0.638224,
+    "score": 0.281778,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "gp_size",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "social_composition",
+        "Mixed"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('5,000 to 10,000',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_children",
+          "population_sc",
+          "population_st",
+          "population_obc",
+          "households",
+          "shgs",
+          "revenue_villages",
+          "villages_mapped_lgd",
+          "anganwadi_centres",
+          "schools_pre_primary",
+          "schools_primary",
+          "schools_secondary",
+          "schools_higher_secondary",
+          "health_sub_centres",
+          "households_tap_water",
+          "household_toilets",
+          "community_sanitary_complexes",
+          "solid_waste_centres",
+          "common_service_centres",
+          "atms",
+          "rural_libraries",
+          "bus_stands_with_water",
+          "seed_centres",
+          "laptops",
+          "sports_courts",
+          "n_costed",
+          "planned_cost",
+          "expenditure_total",
+          "receipt_amount",
+          "n_completed"
+        ],
+        "count": 33,
+        "proportion": 0.55
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "disaster_rescue_centres",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('2,500 to 5,000',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "evidence_uploads",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('2,500 to 5,000',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('Under 2,500',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "population_general",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "job_card_holders",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "wards",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "primary_health_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "wellbeing_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "dispensaries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "ayurvedic_clinics",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "drinking_water_sources",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "banks",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "children_parks",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "osr_collected",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "printers",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "scanners",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_plans",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_activities",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_costless",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "sanctioned_total",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "payment_amount",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_admin_approvals",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_tech_approvals",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_ongoing",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_abandoned",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_with_evidence",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.319803,
+    "impact": 0.79818,
+    "score": 0.25526,
+    "impact_measure_used": "population_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "LAST_TWO",
+    "breakdown": "gp_size",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_panchayat_bhawan",
+        "Yes"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('10,000 and above', 'Under 2,500')",
+        "pattern_type": "LAST_TWO",
+        "members": [
+          "population_sc",
+          "population_st",
+          "population_obc",
+          "households",
+          "job_card_holders",
+          "shgs",
+          "wards",
+          "villages_mapped_lgd",
+          "anganwadi_centres",
+          "health_sub_centres",
+          "ayurvedic_clinics",
+          "drinking_water_sources",
+          "households_tap_water",
+          "household_toilets",
+          "solid_waste_centres",
+          "rural_libraries",
+          "bus_stands_with_water",
+          "osr_collected",
+          "laptops",
+          "printers",
+          "scanners",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 35,
+        "proportion": 0.5833
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "wellbeing_centres",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('5,000 to 10,000', 'Under 2,500')",
+        "pattern_type": "LAST_TWO"
+      },
+      {
+        "member_label": "children_parks",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('5,000 to 10,000', 'Under 2,500')",
+        "pattern_type": "LAST_TWO"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('2,500 to 5,000', '5,000 to 10,000')",
+        "pattern_type": "LAST_TWO"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('2,500 to 5,000', '5,000 to 10,000')",
+        "pattern_type": "LAST_TWO"
+      },
+      {
+        "member_label": "population_total",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_male",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_female",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_children",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_general",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "revenue_villages",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_pre_primary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_primary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_higher_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "primary_health_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "dispensaries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "community_sanitary_complexes",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "common_service_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "banks",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "atms",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "disaster_rescue_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "seed_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "sports_courts",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_abandoned",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.305886,
+    "impact": 0.7071,
+    "score": 0.216292,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "ATTRIBUTION",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "gp_size",
+        "2,500 to 5,000"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "ATTRIBUTION",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_children",
+          "population_obc",
+          "population_general",
+          "households",
+          "shgs",
+          "wards",
+          "revenue_villages",
+          "anganwadi_centres",
+          "schools_primary",
+          "schools_secondary",
+          "health_sub_centres",
+          "primary_health_centres",
+          "wellbeing_centres",
+          "dispensaries",
+          "ayurvedic_clinics",
+          "drinking_water_sources",
+          "community_sanitary_complexes",
+          "common_service_centres",
+          "banks",
+          "atms",
+          "children_parks",
+          "disaster_rescue_centres",
+          "bus_stands_with_water",
+          "seed_centres",
+          "osr_collected",
+          "laptops",
+          "printers",
+          "scanners",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 46,
+        "proportion": 0.7667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "schools_pre_primary",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('SC-majority',)",
+        "pattern_type": "ATTRIBUTION"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('SC-majority',)",
+        "pattern_type": "ATTRIBUTION"
+      },
+      {
+        "member_label": "household_toilets",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "population_sc",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_st",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "job_card_holders",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "villages_mapped_lgd",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_higher_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "households_tap_water",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "solid_waste_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "rural_libraries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "sports_courts",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.439569,
+    "impact": 0.407903,
+    "score": 0.179302,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "LAST_TWO",
+    "breakdown": "gp_size",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_csc",
+        "Yes"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('10,000 and above', 'Under 2,500')",
+        "pattern_type": "LAST_TWO",
+        "members": [
+          "population_st",
+          "population_obc",
+          "job_card_holders",
+          "wards",
+          "revenue_villages",
+          "villages_mapped_lgd",
+          "anganwadi_centres",
+          "schools_primary",
+          "health_sub_centres",
+          "ayurvedic_clinics",
+          "drinking_water_sources",
+          "households_tap_water",
+          "household_toilets",
+          "solid_waste_centres",
+          "banks",
+          "bus_stands_with_water",
+          "osr_collected",
+          "laptops",
+          "printers",
+          "scanners",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 34,
+        "proportion": 0.5667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "population_general",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('2,500 to 5,000', 'Under 2,500')",
+        "pattern_type": "LAST_TWO"
+      },
+      {
+        "member_label": "wellbeing_centres",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('5,000 to 10,000', 'Under 2,500')",
+        "pattern_type": "LAST_TWO"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('2,500 to 5,000', '5,000 to 10,000')",
+        "pattern_type": "LAST_TWO"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "population_total",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_male",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_female",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_children",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_sc",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "households",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "shgs",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_pre_primary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_higher_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "primary_health_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "dispensaries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "community_sanitary_complexes",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "common_service_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "atms",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "rural_libraries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "children_parks",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "disaster_rescue_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "seed_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "sports_courts",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "planned_cost",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.269392,
+    "impact": 0.638224,
+    "score": 0.171932,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "gp_size",
+        "2,500 to 5,000"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_children",
+          "population_obc",
+          "population_general",
+          "households",
+          "shgs",
+          "wards",
+          "revenue_villages",
+          "anganwadi_centres",
+          "schools_primary",
+          "schools_secondary",
+          "health_sub_centres",
+          "primary_health_centres",
+          "wellbeing_centres",
+          "dispensaries",
+          "ayurvedic_clinics",
+          "drinking_water_sources",
+          "community_sanitary_complexes",
+          "common_service_centres",
+          "banks",
+          "atms",
+          "children_parks",
+          "disaster_rescue_centres",
+          "bus_stands_with_water",
+          "seed_centres",
+          "osr_collected",
+          "laptops",
+          "printers",
+          "scanners",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 46,
+        "proportion": 0.7667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "schools_pre_primary",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('SC-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('SC-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "household_toilets",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "population_sc",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_st",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "job_card_holders",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "villages_mapped_lgd",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_higher_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "households_tap_water",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "solid_waste_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "rural_libraries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "sports_courts",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.406799,
+    "impact": 0.407903,
+    "score": 0.165934,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "ATTRIBUTION",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_csc",
+        "No"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "ATTRIBUTION",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_obc",
+          "population_general",
+          "wards",
+          "revenue_villages",
+          "anganwadi_centres",
+          "schools_pre_primary",
+          "schools_primary",
+          "health_sub_centres",
+          "primary_health_centres",
+          "drinking_water_sources",
+          "community_sanitary_complexes",
+          "common_service_centres",
+          "banks",
+          "printers",
+          "scanners",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 31,
+        "proportion": 0.5167
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "solid_waste_centres",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('SC-majority',)",
+        "pattern_type": "ATTRIBUTION"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "ATTRIBUTION"
+      },
+      {
+        "member_label": "atms",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "population_children",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_sc",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_st",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "households",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "job_card_holders",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "shgs",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "villages_mapped_lgd",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_higher_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "wellbeing_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "dispensaries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "ayurvedic_clinics",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "households_tap_water",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "household_toilets",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "rural_libraries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "children_parks",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "disaster_rescue_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "bus_stands_with_water",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "seed_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "osr_collected",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "laptops",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "sports_courts",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "planned_cost",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_abandoned",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.287571,
+    "impact": 0.414236,
+    "score": 0.119122,
+    "impact_measure_used": "population_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_csc",
+        "No"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_obc",
+          "population_general",
+          "shgs",
+          "wards",
+          "revenue_villages",
+          "anganwadi_centres",
+          "schools_pre_primary",
+          "schools_primary",
+          "health_sub_centres",
+          "primary_health_centres",
+          "dispensaries",
+          "ayurvedic_clinics",
+          "drinking_water_sources",
+          "community_sanitary_complexes",
+          "common_service_centres",
+          "banks",
+          "children_parks",
+          "bus_stands_with_water",
+          "printers",
+          "scanners",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 37,
+        "proportion": 0.6167
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "wellbeing_centres",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "solid_waste_centres",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('SC-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "rural_libraries",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('SC-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "atms",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "population_children",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_sc",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_st",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "households",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "job_card_holders",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "villages_mapped_lgd",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_higher_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "households_tap_water",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "household_toilets",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "disaster_rescue_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "seed_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "osr_collected",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "laptops",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "sports_courts",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_abandoned",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.250893,
+    "impact": 0.414236,
+    "score": 0.103929,
+    "impact_measure_used": "population_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "ATTRIBUTION",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_panchayat_bhawan",
+        "No"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "ATTRIBUTION",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_obc",
+          "population_general",
+          "shgs",
+          "wards",
+          "anganwadi_centres",
+          "schools_pre_primary",
+          "health_sub_centres",
+          "primary_health_centres",
+          "dispensaries",
+          "drinking_water_sources",
+          "community_sanitary_complexes",
+          "common_service_centres",
+          "children_parks",
+          "printers",
+          "scanners",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 31,
+        "proportion": 0.5167
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "household_toilets",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('SC-majority',)",
+        "pattern_type": "ATTRIBUTION"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "ATTRIBUTION"
+      },
+      {
+        "member_label": "atms",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "population_female",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_children",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_sc",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_st",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "households",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "job_card_holders",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "revenue_villages",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "villages_mapped_lgd",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_primary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_higher_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "wellbeing_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "ayurvedic_clinics",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "households_tap_water",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "solid_waste_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "banks",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "rural_libraries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "disaster_rescue_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "bus_stands_with_water",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "seed_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "osr_collected",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "laptops",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "sports_courts",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "planned_cost",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.287571,
+    "impact": 0.29903,
+    "score": 0.085992,
+    "impact_measure_used": "population_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_panchayat_bhawan",
+        "No"
+      ]
+    ],
+    "hdp_size": 60,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "population_total",
+          "population_male",
+          "population_female",
+          "population_obc",
+          "population_general",
+          "shgs",
+          "wards",
+          "revenue_villages",
+          "anganwadi_centres",
+          "schools_pre_primary",
+          "health_sub_centres",
+          "primary_health_centres",
+          "dispensaries",
+          "ayurvedic_clinics",
+          "drinking_water_sources",
+          "community_sanitary_complexes",
+          "common_service_centres",
+          "banks",
+          "children_parks",
+          "printers",
+          "scanners",
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 36,
+        "proportion": 0.6
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "wellbeing_centres",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "household_toilets",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('SC-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('SC-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "atms",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "population_children",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_sc",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "population_st",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "households",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "job_card_holders",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "villages_mapped_lgd",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_primary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "schools_higher_secondary",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "households_tap_water",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "solid_waste_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "rural_libraries",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "disaster_rescue_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "bus_stands_with_water",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "seed_centres",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "osr_collected",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "laptops",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "sports_courts",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.260006,
+    "impact": 0.29903,
+    "score": 0.07775,
+    "impact_measure_used": "population_total"
+  }
+]

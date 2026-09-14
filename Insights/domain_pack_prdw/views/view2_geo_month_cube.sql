@@ -41,6 +41,12 @@
 -- a substitute for the other and a reader must never have to guess which is which.
 --
 -- Measures only are zero-filled; dimensions never are.
+--
+-- WP-D11 (Amendment B §12.4): this view also carries the seven derived
+-- gp_profile dimensions — social_composition, gp_size, remoteness,
+-- digital_readiness, has_panchayat_bhawan, has_csc, plc_available. They are
+-- dimensions only; no profile measure is added here, and the grain, the row
+-- count and every pre-existing column are unchanged.
 -- =============================================================================
 WITH cash AS (
     SELECT v.gp_lgd_code,
@@ -91,6 +97,28 @@ SELECT
     CAST(grid.district_code AS VARCHAR) AS district_code,
     CAST(grid.district_name AS VARCHAR) AS district_name,
 
+    -- ── GP profile dimensions (Amendment B §12.3, WP-D11) ──────────────────
+    -- The seven derived GP attributes, LEFT JOINed from stg_gp_profile on the
+    -- geography spine this view already carries. Dimensions only: NO profile
+    -- measure belongs on this view, because population and household counts are
+    -- GP constants and would be summed once per row of this grain — a wrong
+    -- denominator every time (§12.4). view4_gp_profile is where they live.
+    --
+    -- COALESCE to 'Not reported' is the statewide guard: a GP with no profile
+    -- row still carries a band rather than a null, because dimensions are never
+    -- zero-filled and never absent (§4.2). Every sample GP has a profile row,
+    -- so the coalesce fires zero times here.
+    --
+    -- Cut points and sample splits are documented once, at the CASE ladders in
+    -- derived_columns.sql; they are not restated per view.
+    COALESCE(gpp.social_composition,   'Not reported') AS social_composition,
+    COALESCE(gpp.gp_size,              'Not reported') AS gp_size,
+    COALESCE(gpp.remoteness,           'Not reported') AS remoteness,
+    COALESCE(gpp.digital_readiness,    'Not reported') AS digital_readiness,
+    COALESCE(gpp.has_panchayat_bhawan, 'Not reported') AS has_panchayat_bhawan,
+    COALESCE(gpp.has_csc,              'Not reported') AS has_csc,
+    COALESCE(gpp.plc_available,        'Not reported') AS plc_available,
+
     -- ── temporal dimensions ────────────────────────────────────────────────
     -- 'YYYY-MM' sorts lexicographically in calendar order, so the engine can
     -- treat it as an ordered axis without parsing it.
@@ -127,3 +155,6 @@ LEFT JOIN linked   ON linked.gp_lgd_code   = grid.gp_lgd_code
                   AND linked.month_start   = grid.month_start
 LEFT JOIN sanction ON sanction.gp_lgd_code = grid.gp_lgd_code
                   AND sanction.month_start = grid.month_start
+-- WP-D11: the GP profile, LEFT JOIN so a GP without a profile row keeps
+-- every one of its grid rows and reads 'Not reported' on each band.
+LEFT JOIN stg_gp_profile gpp ON gpp.gp_lgd_code = grid.gp_lgd_code

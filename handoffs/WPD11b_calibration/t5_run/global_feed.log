@@ -1,0 +1,43 @@
+======================================================================
+PHASE 5c — CROSS-VIEW GLOBAL FEED
+======================================================================
+
+Candidate set 610cb3d26dff7bf3, stamped 2026-09-11T09:31:44Z (from DISCOVER_RUN_STAMP):
+  view1_candidates.json  1335f43736f2e2eb
+  view1_ranked.json  7dcdb22d1be0d9ee
+  view2_candidates.json  602ff52ec6789ca8
+  view2_ranked.json  5bdf95d1a4a483bc
+  view3_candidates.json  ab532743dcc67e21
+  view3_ranked.json  fb6b61e669269303
+  view4_candidates.json  158fe6f298c645f7
+  view4_ranked.json  8f7d748d41ce24dc
+
+Coverage weights — EQUAL (D24); coverage measured, not assumed:
+  view1:    20 Gram Panchayats  ->  weight 0.2500
+  view2:    20 Gram Panchayats  ->  weight 0.2500
+  view3:    20 Gram Panchayats  ->  weight 0.2500
+  view4:    20 Gram Panchayats  ->  weight 0.2500
+
+Pooling candidates:
+  view1: 15 ranked findings, weight 0.2500
+  view2: 15 ranked findings, weight 0.2500
+  view3: 15 ranked findings, weight 0.2500
+  view4: 13 ranked findings, weight 0.2500
+
+  5,398 raw -> 58 ranked-eligible -> 46 distinct lineages (12 merged)
+
+Knobs (fixed by spec): rank decay 0.85, seeds per view 1
+  redundancy: content-gated r; fill charges the single WORST overlap, not the sum
+  4 seeds + 42 filled = 46 of a top-50
+
+Global feed JSON -> C:\dev\odisha-d11b\Insights\metainsights\global_feed.json
+Source-set sidecar -> C:\dev\odisha-d11b\Insights\metainsights\global_feed_source_set.json
+Global feed markdown -> C:\dev\odisha-d11b\Insights\reports_prdw\global_feed.md
+
+Feed composition by view:
+  view1: 15  (seeded)
+  view2: 14  (seeded)
+  view3:  5  (seeded)
+  view4: 12  (seeded)
+
+  seed check: 4/4 views seeded (all present)

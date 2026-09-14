@@ -1,0 +1,205 @@
+# WP-D11b — top-15 diff, `d619a72e4fe98d5f` against `d619a72e4fe98d5f`
+
+A finding is *the same finding* when its pattern type, measure, breakdown, slice, extending dimension and strategy all match; the score is not part of it. **averaged twin** = the finding rests on a `_mean` measure (its own measure, or one of the measures it compares). **band-headcount** = it breaks down or varies along a GP profile band while measuring a TOTAL.
+
+
+## view1
+
+15 ranked before, 15 now: **15 unchanged, 0 dropped, 0 new.** **0 of the 15 rest on an averaged twin.** Band-headcount findings: 1 before, 1 now; 0 of the earlier ones were displaced.
+
+
+### The current top-15
+
+- **#1** `EVENNESS` overspend_vs_plan by `block_name`, varied along `asset_category_label`
+  - Across nearly all asset_category_label values (27/28), overspend_vs_plan is spread evenly across block_name values -- it belongs to all of them and no single block_name accounts for it. Uneven only in: Banking Facilities (not evenly spread)
+- **#2** `EVENNESS` overspend_vs_sanction by `district_name`, varied along `asset_category_label`
+  - Across nearly all asset_category_label values (27/28), overspend_vs_sanction is spread evenly across district_name values -- it belongs to all of them and no single district_name accounts for it. Uneven only in: Banking Facilities (not even
+- **#3** `TOP_TWO` fund_untied_total by `output_type_label`, varied along `gp_name`
+  - Across nearly all gp_name values (19/20), Code 101 and Code 105 lead in fund_untied_total among output_type_label values. Exception: Haldikudar (different pattern)
+- **#4** `OUTSTANDING_1` n_activities by `asset_category_label`, varied along `gp_name`
+  - Across nearly all gp_name values (19/20), Uncategorised has the highest n_activities among asset_category_label values. Exception: Govindapur (different pattern)
+- **#5** `OUTSTANDING_LAST` overspend_vs_plan by `status_label`, varied along `gp_name`
+  - Across nearly all gp_name values (18/20), Activity Approved has the lowest overspend_vs_plan among status_label values. Exception: Boipariguda (no clear pattern); Laxmipur (no clear pattern)
+- **#6** `ATTRIBUTION` gen_amount by `status_label`, varied along `gp_name`
+  - Across nearly all gp_name values (18/20), WORK ONGOING accounts for the majority of gen_amount among status_label values. Exception: Boipariguda (no clear pattern); Laxmipur (no clear pattern)
+- **#7** `OUTSTANDING_1` beneficiaries_expected by `status_label`, varied along `gp_name`
+  - Across nearly all gp_name values (18/20), Activity Approved has the highest beneficiaries_expected among status_label values. Exception: Boipariguda (no clear pattern); Laxmipur (no clear pattern)
+- **#8** `OUTSTANDING_1` fund_untied_total by `theme`, varied along `gp_name`
+  - Across nearly all gp_name values (18/20), Theme 6 - Self-sufficient Infrastructure in Village has the highest fund_untied_total among theme values. Exception: Boipariguda (Unmapped theme has the highest fund_untied_total among theme values)
+- **#9** `OUTSTANDING_LAST` overspend_vs_sanction by `output_type_label`, varied along `gp_name`
+  - Across nearly all gp_name values (19/20), Code 101 has the lowest overspend_vs_sanction among output_type_label values. Exception: Chikilli (no clear pattern)
+- **#10** `ATTRIBUTION` evidence_uploads by `output_type_label`, varied along `gp_name`
+  - Across nearly all gp_name values (19/20), Code 101 accounts for the majority of evidence_uploads among output_type_label values. Exception: Chikilli (no clear pattern)
+- **#11** `LAST_TWO` overspend_vs_plan by `output_type_label`, varied along `activity_for_label`
+  - Across all activity_for_label values, Code 101 and Code 105 are lowest in overspend_vs_plan among output_type_label values
+- **#12** `TOP_TWO` fund_tied_total by `focus_area_name`, varied along `activity_for_label`
+  - Across all activity_for_label values, Drinking water and Sanitation lead in fund_tied_total among focus_area_name values
+- **#13** `LAST_TWO` fund_sanctioned_total by `gp_size`, varied along `fiscal_year` — band-headcount; profile: gp_size
+  - Across all fiscal_year values, 10,000 and above and Under 2,500 are lowest in fund_sanctioned_total among gp_size values
+- **#14** `OUTSTANDING_LAST` fund_sanctioned_total by `gp_name`, varied along `fiscal_year`
+  - Across all fiscal_year values, Chikilli has the lowest fund_sanctioned_total among gp_name values
+- **#15** `OUTSTANDING_LAST` gen_amount by `tied_untied`, varied along `fiscal_year`
+  - Across all fiscal_year values, Other has the lowest gen_amount among tied_untied values
+
+## view2
+
+15 ranked before, 15 now: **15 unchanged, 0 dropped, 0 new.** **5 of the 15 rest on an averaged twin.** Band-headcount findings: 7 before, 7 now; 0 of the earlier ones were displaced.
+
+
+### The current top-15
+
+- **#1** `TREND` activity_linked_expenditure by `(varies)`, varied along `temporal_grain`
+  - Across all temporal_grain values, activity_linked_expenditure is increasing over (varies)
+- **#2** `LAST_TWO` payment_amount by `gp_size`, varied along `fiscal_year` — band-headcount; profile: gp_size
+  - Across all fiscal_year values, 10,000 and above and Under 2,500 are lowest in payment_amount among gp_size values
+- **#3** `TOP_TWO` activity_linked_expenditure by `gp_size`, varied along `fiscal_year` — band-headcount; profile: gp_size
+  - Across all fiscal_year values, 2,500 to 5,000 and 5,000 to 10,000 lead in activity_linked_expenditure among gp_size values
+- **#4** `TREND` activity_linked_expenditure by `month`, varied along `gp_size` — band-headcount; profile: gp_size
+  - Across all gp_size values, activity_linked_expenditure is increasing over month
+- **#5** `SEASONALITY` receipt_count by `quarter`, varied along `social_composition` — band-headcount; profile: social_composition
+  - Across all social_composition values, receipt_count shows seasonal pattern (PERIOD_12) over quarter
+- **#6** `ATTRIBUTION` activity_linked_expenditure by `social_composition`, varied along `fiscal_year` — band-headcount; profile: social_composition
+  - Across all fiscal_year values, Mixed accounts for the majority of activity_linked_expenditure among social_composition values
+- **#7** `OUTSTANDING_LAST` payment_amount_mean by `social_composition`, varied along `fiscal_year` — **averaged twin**; profile: social_composition
+  - Across most fiscal_year values (5/6), SC-majority has the lowest payment_amount_mean among social_composition values. Exception: 2025-2026 (different pattern)
+- **#8** `OUTSTANDING_1` payment_count by `block_name`, varied along `fiscal_year`
+  - Across most fiscal_year values (5/6), Bhubaneswar has the highest payment_count among block_name values. Exception: 2024-2025 (no clear pattern)
+- **#9** `ATTRIBUTION` (varies) by `social_composition`, varied along `measure` — **averaged twin**; profile: social_composition
+  - Across most measure values (7/9), Mixed accounts for the majority of (varies) among social_composition values. Exception: payment_amount_mean (different pattern); receipt_amount_mean (different pattern)
+- **#10** `CHANGE_POINT` sanctions_count by `month`, varied along `gp_size` — band-headcount; profile: gp_size
+  - Across most gp_size values (3/4), sanctions_count has a significant shift at 2020-10 in month. Exception: 10,000 and above (sanctions_count has a significant shift at 2021-01 in month)
+- **#11** `SEASONALITY` payment_amount_mean by `month`, varied along `gp_size` — **averaged twin**; profile: gp_size
+  - Across most gp_size values (3/4), payment_amount_mean shows seasonal pattern (PERIOD_12) over month. Exception: 10,000 and above (different pattern)
+- **#12** `SEASONALITY` payment_count by `(varies)`, varied along `temporal_grain`
+  - Across most temporal_grain values (2/3), payment_count shows seasonal pattern (PERIOD_12) over (varies). Exception: fiscal_year (no clear pattern)
+- **#13** `TREND` sanctions_count by `fiscal_year`, varied along `social_composition` — band-headcount; profile: social_composition
+  - Across most social_composition values (2/3), sanctions_count is increasing over fiscal_year. Exception: ST-majority (no clear pattern)
+- **#14** `LAST_TWO` (varies) by `gp_size`, varied along `measure` — **averaged twin**; profile: gp_size, social_composition
+  - Across most measure values (7/9), 10,000 and above and Under 2,500 are lowest in (varies) among gp_size values. Exception: payment_amount_mean (no clear pattern); receipt_amount_mean (no clear pattern)
+- **#15** `TOP_TWO` (varies) by `gp_size`, varied along `measure` — **averaged twin**; profile: gp_size, social_composition
+  - Across most measure values (7/9), 2,500 to 5,000 and 5,000 to 10,000 lead in (varies) among gp_size values. Exception: payment_amount_mean (no clear pattern); receipt_amount_mean (no clear pattern)
+
+## view3
+
+15 ranked before, 15 now: **3 unchanged, 12 dropped, 12 new.** **11 of the 15 rest on an averaged twin.** Band-headcount findings: 14 before, 4 now; 11 of the earlier ones were displaced.
+
+
+### The current top-15
+
+- **#1** `TREND` expenditure_total_mean by `fiscal_year`, varied along `gp_size` — **averaged twin**; profile: gp_size
+  - Across most gp_size values (3/4), expenditure_total_mean is decreasing over fiscal_year. Exception: 10,000 and above (no clear pattern)
+- **#2** `EVENNESS` overspend_vs_plan_mean by `block_name`, varied along `social_composition` — **averaged twin**; profile: social_composition
+  - Across most social_composition values (2/3), overspend_vs_plan_mean is evenly distributed across block_name values. Uneven only in: ST-majority (not evenly spread) -- this is about how the total is spread, not about how much any one of them
+- **#3** `EVENNESS` overspend_vs_plan by `district_name`, varied along `social_composition` — band-headcount; profile: social_composition
+  - Across most social_composition values (2/3), overspend_vs_plan is spread evenly across district_name values -- it belongs to all of them and no single district_name accounts for it. Uneven only in: ST-majority (not evenly spread) -- this is
+- **#4** `EVENNESS` overspend_vs_sanction_mean by `gp_name`, varied along `social_composition` — **averaged twin**; profile: social_composition
+  - Across most social_composition values (2/3), overspend_vs_sanction_mean is evenly distributed across gp_name values. Uneven only in: ST-majority (not evenly spread) -- this is about how the total is spread, not about how much any one of the
+- **#5** `UNIMODALITY` n_admin_approvals_mean by `fiscal_year`, varied along `social_composition` — **averaged twin**; profile: social_composition
+  - Across most social_composition values (2/3), n_admin_approvals_mean forms a peak at 2024-2025 over fiscal_year. Exception: Mixed (no clear pattern)
+- **#6** `TREND` expenditure_total by `fiscal_year`, varied along `social_composition` — band-headcount; profile: social_composition
+  - Across most social_composition values (2/3), expenditure_total is decreasing over fiscal_year. Exception: SC-majority (different pattern)
+- **#7** `ATTRIBUTION` (varies) by `social_composition`, varied along `measure` — **averaged twin**; profile: has_panchayat_bhawan, social_composition
+  - Across most measure values (17/28), Mixed accounts for the majority of (varies) among social_composition values. Exceptions: n_completed (SC-majority accounts for the majority of (varies) among social_composition values); sanctioned_total_m
+- **#8** `OUTSTANDING_1` (varies) by `social_composition`, varied along `measure` — **averaged twin**; profile: has_panchayat_bhawan, social_composition
+  - Across most measure values (19/28), Mixed has the highest (varies) among social_composition values. Exceptions: n_completed (SC-majority has the highest (varies) among social_composition values); overspend_vs_plan_mean (ST-majority has the 
+- **#9** `ATTRIBUTION` (varies) by `social_composition`, varied along `measure` — **averaged twin**; profile: social_composition
+  - Across most measure values (15/18), Mixed accounts for the majority of (varies) among social_composition values. Exception: n_completed (ST-majority accounts for the majority of (varies) among social_composition values); overspend_vs_plan (
+- **#10** `OUTSTANDING_1` (varies) by `social_composition`, varied along `measure` — **averaged twin**; profile: has_csc, social_composition
+  - Across most measure values (19/28), Mixed has the highest (varies) among social_composition values. Exceptions: overspend_vs_sanction_mean (SC-majority has the highest (varies) among social_composition values); evidence_uploads_mean (ST-maj
+- **#11** `EVENNESS` overspend_vs_sanction by `block_name`, varied along `social_composition` — band-headcount; profile: social_composition
+  - Across most social_composition values (2/3), overspend_vs_sanction is spread evenly across block_name values -- it belongs to all of them and no single block_name accounts for it. Uneven only in: ST-majority (not evenly spread) -- this is a
+- **#12** `UNIMODALITY` n_admin_approvals by `fiscal_year`, varied along `social_composition` — band-headcount; profile: social_composition
+  - Across most social_composition values (2/3), n_admin_approvals forms a peak at 2024-2025 over fiscal_year. Exception: Mixed (no clear pattern)
+- **#13** `EVENNESS` (varies) by `gp_name`, varied along `measure` — **averaged twin**
+  - Across most measure values (16/28), (varies) is evenly distributed across gp_name values. Uneven only in: n_plans (not evenly spread); sanctioned_total (not evenly spread); n_completed (not evenly spread) and 9 others -- this is about how t
+- **#14** `TOP_TWO` (varies) by `gp_size`, varied along `measure` — **averaged twin**; profile: gp_size, has_panchayat_bhawan
+  - Across most measure values (16/18), 2,500 to 5,000 and 5,000 to 10,000 lead in (varies) among gp_size values. Exception: overspend_vs_sanction (10,000 and above and Under 2,500 lead in (varies) among gp_size values); overspend_vs_plan (diff
+- **#15** `ATTRIBUTION` (varies) by `social_composition`, varied along `measure` — **averaged twin**; profile: has_csc, social_composition
+  - Across most measure values (18/28), Mixed accounts for the majority of (varies) among social_composition values. Exceptions: evidence_uploads_mean (ST-majority accounts for the majority of (varies) among social_composition values); n_comple
+
+### Dropped out (earlier rank shown)
+
+- **#1** `TOP_TWO` (varies) by `gp_size`, varied along `measure` — band-headcount; profile: gp_size
+  - Across most measure values (15/18), 2,500 to 5,000 and 5,000 to 10,000 lead in (varies) among gp_size values. Exception: n_completed (10,000 and above and 2,500 to 5,000 lead in (varies) among gp_size values); overspend_vs_plan (different p
+- **#3** `TREND` expenditure_total by `fiscal_year`, varied along `gp_size` — band-headcount; profile: gp_size
+  - Across most gp_size values (3/4), expenditure_total is decreasing over fiscal_year. Exception: 10,000 and above (no clear pattern)
+- **#4** `LAST_TWO` (varies) by `gp_size`, varied along `measure` — band-headcount; profile: gp_size
+  - Across most measure values (13/18), 10,000 and above and Under 2,500 are lowest in (varies) among gp_size values. Exceptions: planned_cost (different pattern); overspend_vs_plan (different pattern); overspend_vs_sanction (different pattern)
+- **#5** `EVENNESS` overspend_vs_plan by `block_name`, varied along `social_composition` — band-headcount; profile: social_composition
+  - Across most social_composition values (2/3), overspend_vs_plan is spread evenly across block_name values -- it belongs to all of them and no single block_name accounts for it. Uneven only in: ST-majority (not evenly spread) -- this is about
+- **#6** `EVENNESS` overspend_vs_sanction by `district_name`, varied along `social_composition` — band-headcount; profile: social_composition
+  - Across most social_composition values (2/3), overspend_vs_sanction is spread evenly across district_name values -- it belongs to all of them and no single district_name accounts for it. Uneven only in: ST-majority (not evenly spread) -- thi
+- **#9** `OUTSTANDING_1` (varies) by `social_composition`, varied along `measure` — band-headcount; profile: gp_size, social_composition
+  - Across most measure values (15/18), Mixed has the highest (varies) among social_composition values. Exception: overspend_vs_plan (ST-majority has the highest (varies) among social_composition values); overspend_vs_sanction (ST-majority has 
+- **#10** `ATTRIBUTION` (varies) by `social_composition`, varied along `measure` — band-headcount; profile: remoteness, social_composition
+  - Across most measure values (15/18), Mixed accounts for the majority of (varies) among social_composition values. Exception: n_completed (ST-majority accounts for the majority of (varies) among social_composition values); overspend_vs_plan (
+- **#11** `TREND` sanctioned_total by `fiscal_year`, varied along `social_composition` — band-headcount; profile: social_composition
+  - Across most social_composition values (2/3), sanctioned_total is decreasing over fiscal_year. Exception: SC-majority (different pattern)
+- **#12** `LAST_TWO` (varies) by `gp_size`, varied along `measure` — band-headcount; profile: gp_size, social_composition
+  - Across most measure values (13/18), 10,000 and above and Under 2,500 are lowest in (varies) among gp_size values. Exceptions: overspend_vs_plan (2,500 to 5,000 and 5,000 to 10,000 are lowest in (varies) among gp_size values); planned_cost (
+- **#13** `OUTSTANDING_1` (varies) by `block_name`, varied along `measure` — profile: has_csc
+  - Across most measure values (12/18), Bhubaneswar has the highest (varies) among block_name values. Exceptions: n_completed (Kalimela has the highest (varies) among block_name values); n_costless (different pattern); planned_cost (different p
+- **#14** `OUTSTANDING_1` (varies) by `social_composition`, varied along `measure` — band-headcount; profile: has_panchayat_bhawan, social_composition
+  - Across most measure values (15/18), Mixed has the highest (varies) among social_composition values. Exception: overspend_vs_plan (SC-majority has the highest (varies) among social_composition values); n_completed (ST-majority has the highes
+- **#15** `TOP_TWO` (varies) by `gp_size`, varied along `measure` — band-headcount; profile: gp_size, social_composition
+  - Across most measure values (15/18), 2,500 to 5,000 and 5,000 to 10,000 lead in (varies) among gp_size values. Exception: overspend_vs_sanction (10,000 and above and Under 2,500 lead in (varies) among gp_size values); overspend_vs_plan (diff
+
+## view4
+
+15 ranked before, 13 now: **8 unchanged, 7 dropped, 5 new.** **11 of the 13 rest on an averaged twin.** Band-headcount findings: 15 before, 2 now; 7 of the earlier ones were displaced.
+
+
+### The current top-15
+
+- **#1** `EVENNESS` overspend_vs_plan_mean by `block_name`, varied along `social_composition` — **averaged twin**; profile: social_composition
+  - Across most social_composition values (2/3), overspend_vs_plan_mean is evenly distributed across block_name values. Uneven only in: ST-majority (not evenly spread) -- this is about how the total is spread, not about how much any one of them
+- **#2** `EVENNESS` overspend_vs_plan by `district_name`, varied along `social_composition` — band-headcount; profile: social_composition
+  - Across most social_composition values (2/3), overspend_vs_plan is spread evenly across district_name values -- it belongs to all of them and no single district_name accounts for it. Uneven only in: ST-majority (not evenly spread) -- this is
+- **#3** `EVENNESS` overspend_vs_sanction_mean by `gp_name`, varied along `social_composition` — **averaged twin**; profile: social_composition
+  - Across most social_composition values (2/3), overspend_vs_sanction_mean is evenly distributed across gp_name values. Uneven only in: ST-majority (not evenly spread) -- this is about how the total is spread, not about how much any one of the
+- **#4** `OUTSTANDING_1` (varies) by `social_composition`, varied along `measure` — **averaged twin**; profile: social_composition
+  - Across nearly all measure values (56/60), Mixed has the highest (varies) among social_composition values. Exceptions: n_completed (ST-majority has the highest (varies) among social_composition values); job_card_holders (different pattern); 
+- **#5** `ATTRIBUTION` (varies) by `social_composition`, varied along `measure` — **averaged twin**; profile: social_composition
+  - Across most measure values (53/60), Mixed accounts for the majority of (varies) among social_composition values. Exceptions: n_completed (ST-majority accounts for the majority of (varies) among social_composition values); population_st (dif
+- **#6** `OUTSTANDING_1` (varies) by `social_composition`, varied along `measure` — **averaged twin**; profile: has_panchayat_bhawan, social_composition
+  - Across nearly all measure values (56/60), Mixed has the highest (varies) among social_composition values. Exceptions: n_completed (SC-majority has the highest (varies) among social_composition values); drinking_water_sources (different patt
+- **#7** `ATTRIBUTION` (varies) by `social_composition`, varied along `measure` — **averaged twin**; profile: has_panchayat_bhawan, social_composition
+  - Across nearly all measure values (55/60), Mixed accounts for the majority of (varies) among social_composition values. Exceptions: n_completed (SC-majority accounts for the majority of (varies) among social_composition values); job_card_hol
+- **#8** `TOP_TWO` (varies) by `gp_size`, varied along `measure` — **averaged twin**; profile: gp_size, has_panchayat_bhawan
+  - Across most measure values (49/60), 2,500 to 5,000 and 5,000 to 10,000 lead in (varies) among gp_size values. Exceptions: population_general (10,000 and above and 5,000 to 10,000 lead in (varies) among gp_size values); atms (10,000 and abov
+- **#9** `TOP_TWO` (varies) by `gp_size`, varied along `measure` — **averaged twin**; profile: gp_size, social_composition
+  - Across most measure values (45/60), 2,500 to 5,000 and 5,000 to 10,000 lead in (varies) among gp_size values. Exceptions: schools_pre_primary (10,000 and above and 5,000 to 10,000 lead in (varies) among gp_size values); households_tap_water
+- **#10** `EVENNESS` overspend_vs_sanction by `block_name`, varied along `social_composition` — band-headcount; profile: social_composition
+  - Across most social_composition values (2/3), overspend_vs_sanction is spread evenly across block_name values -- it belongs to all of them and no single block_name accounts for it. Uneven only in: ST-majority (not evenly spread) -- this is a
+- **#11** `OUTSTANDING_1` (varies) by `social_composition`, varied along `measure` — **averaged twin**; profile: has_csc, social_composition
+  - Across nearly all measure values (57/60), Mixed has the highest (varies) among social_composition values. Exception: n_completed (no clear pattern); overspend_vs_plan (different pattern); overspend_vs_sanction (different pattern)
+- **#12** `ATTRIBUTION` (varies) by `social_composition`, varied along `measure` — **averaged twin**; profile: has_csc, social_composition
+  - Across nearly all measure values (56/60), Mixed accounts for the majority of (varies) among social_composition values. Exceptions: n_completed (no clear pattern); drinking_water_sources (different pattern); overspend_vs_plan (different patt
+- **#13** `TOP_TWO` (varies) by `gp_size`, varied along `measure` — **averaged twin**; profile: gp_size, has_csc
+  - Across most measure values (48/74), 2,500 to 5,000 and 5,000 to 10,000 lead in (varies) among gp_size values. Exceptions: population_general (10,000 and above and 5,000 to 10,000 lead in (varies) among gp_size values); atms (10,000 and abov
+
+### Dropped out (earlier rank shown)
+
+- **#3** `EVENNESS` overspend_vs_plan by `block_name`, varied along `social_composition` — band-headcount; profile: social_composition
+  - Across most social_composition values (2/3), overspend_vs_plan is spread evenly across block_name values -- it belongs to all of them and no single block_name accounts for it. Uneven only in: ST-majority (not evenly spread) -- this is about
+- **#4** `EVENNESS` overspend_vs_sanction by `district_name`, varied along `social_composition` — band-headcount; profile: social_composition
+  - Across most social_composition values (2/3), overspend_vs_sanction is spread evenly across district_name values -- it belongs to all of them and no single district_name accounts for it. Uneven only in: ST-majority (not evenly spread) -- thi
+- **#5** `LAST_TWO` (varies) by `gp_size`, varied along `measure` — band-headcount; profile: gp_size
+  - Across most measure values (35/60), 10,000 and above and Under 2,500 are lowest in (varies) among gp_size values. Exceptions: atms (2,500 to 5,000 and Under 2,500 are lowest in (varies) among gp_size values); population_children (different 
+- **#9** `OUTSTANDING_1` (varies) by `gp_size`, varied along `measure` — band-headcount; profile: gp_size, social_composition
+  - Across most measure values (33/60), 5,000 to 10,000 has the highest (varies) among gp_size values. Exceptions: disaster_rescue_centres (2,500 to 5,000 has the highest (varies) among gp_size values); evidence_uploads (2,500 to 5,000 has the 
+- **#11** `LAST_TWO` (varies) by `gp_size`, varied along `measure` — band-headcount; profile: gp_size, has_panchayat_bhawan
+  - Across most measure values (35/60), 10,000 and above and Under 2,500 are lowest in (varies) among gp_size values. Exceptions: wellbeing_centres (5,000 to 10,000 and Under 2,500 are lowest in (varies) among gp_size values); children_parks (5
+- **#14** `EVENNESS` overspend_vs_plan by `gp_name`, varied along `social_composition` — band-headcount; profile: social_composition
+  - Across most social_composition values (2/3), overspend_vs_plan is spread evenly across gp_name values -- it belongs to all of them and no single gp_name accounts for it. Uneven only in: ST-majority (not evenly spread) -- this is about how t
+- **#15** `TOP_TWO` (varies) by `gp_size`, varied along `measure` — band-headcount; profile: gp_size
+  - Across most measure values (40/60), 2,500 to 5,000 and 5,000 to 10,000 lead in (varies) among gp_size values. Exceptions: schools_secondary (5,000 to 10,000 and Under 2,500 lead in (varies) among gp_size values); atms (10,000 and above and 
+
+## Summary
+
+| view | before | now | unchanged | new | dropped | now resting on a twin | band-headcount before | band-headcount now | band-headcount displaced |
+|---|---|---|---|---|---|---|---|---|---|
+| view1 | 15 | 15 | 15 | 0 | 0 | 0 | 1 | 1 | 0 |
+| view2 | 15 | 15 | 15 | 0 | 0 | 5 | 7 | 7 | 0 |
+| view3 | 15 | 15 | 3 | 12 | 12 | 11 | 14 | 4 | 11 |
+| view4 | 15 | 13 | 8 | 5 | 7 | 11 | 15 | 2 | 7 |

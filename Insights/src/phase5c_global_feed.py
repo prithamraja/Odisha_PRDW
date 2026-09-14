@@ -124,10 +124,13 @@ from phase5_ranking import (  # noqa: E402
 # makes, so a parquet path is written down in exactly one place. Deliberately NOT
 # imported from phase5b_report: that module loads `.env` and the OpenAI client at
 # import time, and this file makes no API call and needs no key.
-from phase4a_engine import VIEW1_CONFIG, VIEW2_CONFIG, VIEW3_CONFIG  # noqa: E402
+from phase4a_engine import (  # noqa: E402
+    VIEW1_CONFIG, VIEW2_CONFIG, VIEW3_CONFIG, VIEW4_CONFIG,
+)
 
 VIEW_CONFIGS = {
     "view1": VIEW1_CONFIG, "view2": VIEW2_CONFIG, "view3": VIEW3_CONFIG,
+    "view4": VIEW4_CONFIG,      # WP-D11
 }
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -164,12 +167,18 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # is emitted here, with the same nesting and the same types; only the values and
 # the descriptive strings inside them are PR&DW's. The frontend is the AP
 # frontend ported, so its parser is the contract and no key may move.
-VIEWS = ["view1", "view2", "view3"]
+# WP-D11 added view4. The coverage weights below are 1/n over this list (D24),
+# so adding a view moves every view's weight -- from a third each to a quarter
+# each. That is the intended behaviour of an EQUAL weighting and not a tuning
+# decision: the feed's editorial claim is that the four views are equally worth
+# reading, and it stays true by construction as views are added.
+VIEWS = ["view1", "view2", "view3", "view4"]
 
 VIEW_TITLES = {
     "view1": "Activity Lifecycle",
     "view2": "Geo-Month Cash Cube",
     "view3": "GP Performance",
+    "view4": "GP Profile",
 }
 
 # Where each view's rows live, read off the engine's own configs rather than

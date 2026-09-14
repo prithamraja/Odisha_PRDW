@@ -77,7 +77,7 @@ from phase5b_report import VIEW_DESCRIPTIONS                   # noqa: E402
 from phase5c_global_feed import VIEW_TITLES                    # noqa: E402
 
 MI_DIR = os.path.join(BASE_DIR, "metainsights")
-VIEWS = ("view1", "view2", "view3")
+VIEWS = ("view1", "view2", "view3", "view4")   # WP-D11
 
 CORPUS_PATH  = os.path.join(MI_DIR, "retrieval_corpus.json.gz")
 VECTORS_PATH = os.path.join(MI_DIR, "retrieval_corpus.npy")
@@ -157,17 +157,192 @@ def read_corpus_json(path: str) -> dict:
         return json.load(fh)
 
 
-def save_vectors(path: str, vectors: np.ndarray) -> None:
-    """Store fp16. Rounding fp32 -> fp16 is deterministic, and re-storing an
-    already-fp16 vector is the identity, so a rebuild from the cache reproduces
-    the file byte for byte."""
-    np.save(path, np.asarray(vectors, dtype=VECTOR_DTYPE))
+# =============================================================================
+# THE VECTOR PARTS  (WP-D11b T1, D61 ruling 1)
+# =============================================================================
+# WP-D11 grew the decomposition matrix to 66,779 x 1,024 fp16 = 136.8 MB, over
+# GitHub's 100 MB per-file limit, and the deployed `discover-api` reads its
+# corpus straight from git. The operator's ruling: SPLIT the file, do not shrink
+# it -- no dimension truncation (declined 2026-09-04), no re-embedding, no record
+# dropped. So a vector matrix is now written as `<name>.part0.npy`,
+# `<name>.part1.npy`, ... in row order, each at most PART_MAX_BYTES, and the
+# stamp carries the list with a SHA-256 per part.
+#
+# THE SPLIT IS INVISIBLE TO RETRIEVAL. The parts are consecutive row slices of
+# one C-contiguous fp16 array, so concatenating them in order gives back the
+# identical bytes (`matrix_sha256` in the manifest is the hash of exactly those
+# bytes, and the T1 proof compares it against the unsplit file). Nothing about
+# what a vector means changes, so `semantic_pin()` is untouched and the cache
+# reuses every vector; `storage_layout` joins `storage_dtype` in the full pin,
+# for the same loader-guard reason.
+#
+# ONE PART EVEN WHEN ONE WOULD DO. The findings matrix is 9 MB and fits in one
+# file, and it is still written as `.part0.npy`, so there is one layout and one
+# loader rather than a size-dependent fork -- and the unsplit spelling, which is
+# the thing git must never be handed again, is never written by anything.
+#
+# The parts are sized EVENLY (ceil(rows / n) each) rather than filled to the
+# limit, so the decompose matrix is two ~68 MB files, not a 95 MB one and a
+# 42 MB one: the headroom is shared, and the next mining run that adds records
+# does not push the first part over the limit before it adds a third.
+STORAGE_LAYOUT = "npy-parts"
+# 95 MB of decimal bytes: 5 MB under the limit git enforces, and the limit the
+# brief sets. The gate (`vector-parts-under-limit`) checks 100 MB separately, so
+# the two numbers are not the same check twice.
+PART_MAX_BYTES = 95_000_000
+_NPY_HEADER_ALLOWANCE = 4096          # np.save writes a 128-byte header; generous
 
 
-def load_vectors(path: str) -> np.ndarray:
-    """Read fp16 OR fp32 from disk and hand back fp32. Every consumer of a
-    vector in this system works in fp32; the storage dtype stops at this line."""
-    return np.asarray(np.load(path), dtype=np.float32)
+class VectorPartsError(Exception):
+    """A vector part named by the stamp is missing, altered, or mis-shaped.
+
+    An Exception, not a SystemExit, on purpose: the builders' cache readers
+    catch Exception and fall back to "no cache", and the service's loader turns
+    it into a STOP. Each caller decides what a bad file costs it.
+    """
+
+
+def part_path(vectors_path: str, index: int) -> str:
+    """`.../decompose_corpus.npy` -> `.../decompose_corpus.part<index>.npy`."""
+    stem = vectors_path[:-len(".npy")] if vectors_path.endswith(".npy") else vectors_path
+    return f"{stem}.part{index}.npy"
+
+
+def _existing_parts(vectors_path: str) -> list:
+    stem = os.path.basename(part_path(vectors_path, 0))[:-len("0.npy")]
+    folder = os.path.dirname(vectors_path)
+    return sorted(os.path.join(folder, n) for n in os.listdir(folder)
+                  if n.startswith(stem) and n.endswith(".npy")
+                  and n[len(stem):-len(".npy")].isdigit())
+
+
+def save_vectors(path: str, vectors: np.ndarray) -> dict:
+    """Store fp16, as evenly sized row-slice parts; return the stamp manifest.
+
+    Rounding fp32 -> fp16 is deterministic, re-storing an already-fp16 vector is
+    the identity, and the part boundaries depend only on the row count, so a
+    rebuild from the cache reproduces every part byte for byte.
+
+    New parts are written under temporary names first and swapped in only when
+    all of them exist, and stale parts from a larger previous build are removed
+    after that -- so a kill mid-write leaves the previous build readable. The
+    unsplit legacy file is NOT removed here: the caller removes it after the
+    stamp that supersedes it has been written (see `retire_unsplit`).
+    """
+    arr = np.ascontiguousarray(np.asarray(vectors, dtype=VECTOR_DTYPE))
+    n_rows = int(arr.shape[0])
+    row_bytes = int(arr.shape[1]) * arr.itemsize if arr.ndim == 2 else arr.itemsize
+    n_parts = max(1, -(-(n_rows * row_bytes) // PART_MAX_BYTES))
+    rows_per = max(1, -(-n_rows // n_parts))
+    while rows_per * row_bytes + _NPY_HEADER_ALLOWANCE > PART_MAX_BYTES:
+        n_parts += 1
+        rows_per = -(-n_rows // n_parts)
+
+    written = []
+    for i in range(n_parts):
+        final = part_path(path, i)
+        tmp = final[:-len(".npy")] + ".tmp.npy"     # np.save appends .npy otherwise
+        np.save(tmp, arr[i * rows_per:(i + 1) * rows_per])
+        written.append((tmp, final))
+    keep = set()
+    for tmp, final in written:
+        os.replace(tmp, final)
+        keep.add(os.path.normcase(os.path.abspath(final)))
+    for stale in _existing_parts(path):
+        if os.path.normcase(os.path.abspath(stale)) not in keep:
+            os.remove(stale)
+
+    parts = []
+    for _tmp, final in written:
+        parts.append({"file": os.path.basename(final),
+                      "rows": int(np.load(final, mmap_mode="r").shape[0]),
+                      "bytes": os.path.getsize(final),
+                      "sha256": sha256_of(final)})
+    return {
+        "layout": STORAGE_LAYOUT,
+        "dtype": STORAGE_DTYPE,
+        "shape": [n_rows] + [int(d) for d in arr.shape[1:]],
+        "part_max_bytes": PART_MAX_BYTES,
+        # The hash of the whole fp16 matrix's bytes, C order -- the same bytes
+        # whether they sit in one file or in several. This is what the T1 proof
+        # compares against the unsplit array, and what an auditor can recompute.
+        "matrix_sha256": hashlib.sha256(arr.tobytes()).hexdigest(),
+        "parts": parts,
+    }
+
+
+def retire_unsplit(path: str) -> bool:
+    """Remove the pre-WP-D11b single `.npy`, once a split build has replaced it."""
+    if os.path.exists(path):
+        os.remove(path)
+        return True
+    return False
+
+
+def load_vectors(path: str, manifest: dict | None = None) -> np.ndarray:
+    """The vector matrix as fp32, from the parts a stamp's manifest names.
+
+    With a manifest: read every part IN ORDER, refuse if one is missing, if its
+    SHA-256 is not the one the stamp recorded, or if the concatenation is not
+    the recorded shape, and hand back the concatenation upcast to fp32.
+
+    Without one: read a single pre-WP-D11b `.npy`. Only the builders' cache
+    readers take this path, so the first split build can reuse the unsplit
+    build's vectors by hash and make no embedding call; the service always
+    passes a manifest.
+
+    Every consumer of a vector in this system works in fp32; the storage dtype
+    and the storage layout both stop at this function.
+    """
+    if manifest is None:
+        return np.asarray(np.load(path), dtype=np.float32)
+    if manifest.get("layout") != STORAGE_LAYOUT or not manifest.get("parts"):
+        raise VectorPartsError(
+            f"the stamp's vector manifest is not a {STORAGE_LAYOUT!r} manifest "
+            f"with parts: {json.dumps(manifest)[:200]}")
+    folder = os.path.dirname(path)
+    blocks = []
+    for part in manifest["parts"]:
+        file = os.path.join(folder, part["file"])
+        if not os.path.exists(file):
+            raise VectorPartsError(f"vector part {part['file']} is missing from {folder}")
+        actual = sha256_of(file)
+        if actual != part["sha256"]:
+            raise VectorPartsError(
+                f"vector part {part['file']} has sha256 {actual[:16]}, the stamp "
+                f"recorded {part['sha256'][:16]} -- it is not the file this build wrote")
+        blocks.append(np.load(file))
+    matrix = blocks[0] if len(blocks) == 1 else np.concatenate(blocks, axis=0)
+    if list(matrix.shape) != list(manifest["shape"]):
+        raise VectorPartsError(
+            f"the parts concatenate to {list(matrix.shape)}, the stamp says "
+            f"{manifest['shape']}")
+    return np.asarray(matrix, dtype=np.float32)
+
+
+def load_previous_vectors(vectors_path: str, stamp_path: str):
+    """The previous build's vectors, in whichever layout it wrote, or None.
+
+    A split build is found through its stamp's manifest; a pre-split build
+    through the single `.npy` it left. Anything unreadable is None -- for a
+    cache, "no cache" is always a safe answer, and the byte-identity gate is what
+    would notice if it happened when it should not have.
+    """
+    manifest = None
+    if os.path.exists(stamp_path):
+        try:
+            with open(stamp_path, encoding="utf-8") as fh:
+                manifest = json.load(fh).get("vector_storage")
+        except (OSError, ValueError):
+            manifest = None
+    try:
+        if manifest:
+            return load_vectors(vectors_path, manifest)
+        if os.path.exists(vectors_path):
+            return load_vectors(vectors_path)
+    except Exception:
+        return None
+    return None
 
 
 # ── The decomposition member list, columnar (D10 ruling 3) ───────────────────
@@ -234,12 +409,33 @@ def members_expand(members) -> list:
 # byte-identical -- therefore rests on the VECTOR CACHE below, not on the
 # endpoint: a rebuild re-embeds only texts whose SHA-256 is new. This is also
 # why nothing downstream may re-embed a document.
+#
+# THE PROVIDER IS OPENROUTER FROM WP-D11b (operator ruling, 2026-09-11). Between
+# 2026-09-08 (WP-D11 embedded ~28,000 texts with exactly this request) and
+# 2026-09-11, Novita began refusing `dimensions=1024` ("not supported") and the
+# OpenAI client's default base64 encoding, and returned only native 4,096-dim
+# vectors -- which also broke every query embedding in the deployed chat. The
+# same model on OpenRouter honours `dimensions=1024`, and was MEASURED against
+# the stored corpus before the switch (handoffs/WPD11b_calibration/
+# openrouter_probe_output.txt): cosine >= 0.99983 against stored vectors on
+# 32 records, Novita and OpenRouter agreeing at >= 0.99985 on the same text,
+# and OpenRouter's server-side 1,024 equal to the first 1,024 of its native
+# vector -- the Matryoshka prefix the stored vectors were made with.
+#
+# ONE HOST PREFERRED. OpenRouter routes a model to several hosts; DeepInfra and
+# Nebius both measured inside the noise above. DeepInfra is preferred for
+# repeatability, with fallback allowed so an outage there does not take query
+# embedding down with it. Set DISCOVER_EMBED_PROVIDER to change the preference.
 EMBED_MODEL       = os.getenv("DISCOVER_EMBED_MODEL", "qwen/qwen3-embedding-8b")
 EMBED_DIMS        = int(os.getenv("DISCOVER_EMBED_DIMS", "1024"))
-EMBED_BASE_URL    = os.getenv("DISCOVER_EMBED_BASE_URL", "https://api.novita.ai/openai")
-EMBED_API_KEY_VAR = "NOVITA_API_KEY"
+EMBED_BASE_URL    = os.getenv("DISCOVER_EMBED_BASE_URL", "https://openrouter.ai/api/v1")
+EMBED_API_KEY_VAR = "OPENROUTER_API_KEY"
+EMBED_PROVIDER_ROUTE = {
+    "order": [os.getenv("DISCOVER_EMBED_PROVIDER", "DeepInfra")],
+    "allow_fallbacks": True,
+}
 EMBED_BATCH       = 64
-# The endpoint publishes 50 requests/minute; a 429 is waited out, not reported.
+# A 429 is waited out, not reported.
 EMBED_MAX_RETRIES = int(os.getenv("DISCOVER_EMBED_MAX_RETRIES", "8"))
 
 # The ONE query-side instruction. Documents never receive it.
@@ -259,10 +455,18 @@ def semantic_pin() -> dict:
     non-deterministic endpoint: the vectors mean the same thing, they are simply
     about to be written narrower.
     """
+    # WP-D11b: `base_url` LEFT this dict when the provider moved from Novita to
+    # OpenRouter (operator ruling, 2026-09-11). It had stood for "which weights
+    # produce the vector", and the switch MEASURED that it no longer does: the
+    # same text through Novita and through OpenRouter (DeepInfra and Nebius
+    # hosts) agrees at cosine >= 0.99985 on the full 4,096 dimensions, and every
+    # source agrees with the stored vectors at >= 0.99983 -- run-to-run noise.
+    # Keeping it here would have re-embedded all ~71,000 texts for a change of
+    # address. It is still in the FULL pin and every stamp (SERVICE_PIN_FIELDS).
+    # Evidence: handoffs/WPD11b_calibration/openrouter_probe_output.txt.
     return {
         "model": EMBED_MODEL,
         "dims": EMBED_DIMS,
-        "base_url": EMBED_BASE_URL,
         "query_instruction": QUERY_INSTRUCTION,
         "document_instruction": None,          # documents are embedded plain
         "normalisation": "L2, client-side",
@@ -277,7 +481,24 @@ def embedding_pin() -> dict:
     a loader must never be able to open the wrong one quietly. The cache reader
     is the one place that compares `semantic_pin()` instead, and it says why.
     """
-    return dict(semantic_pin(), storage_dtype=STORAGE_DTYPE)
+    # WP-D11b: `storage_layout` joins `storage_dtype`, for the same reason. A
+    # split corpus and an unsplit one are read by different code paths, so the
+    # service's pin check refuses a stamp from the other layout outright.
+    return dict(semantic_pin(), storage_dtype=STORAGE_DTYPE,
+                storage_layout=STORAGE_LAYOUT,
+                # WP-D11b: WHERE the vector was fetched, not what it means.
+                base_url=EMBED_BASE_URL,
+                provider_route=EMBED_PROVIDER_ROUTE)
+
+
+# The fields of the full pin that say how a vector is STORED, not what it means.
+STORAGE_PIN_FIELDS = ("storage_dtype", "storage_layout")
+# ... and the ones that say which SERVICE fetched it (WP-D11b). A pre-switch pin
+# carries `base_url` inside its meaning half; stripping it from both sides is
+# what lets the Novita-built cache be reused, on the measurement above.
+SERVICE_PIN_FIELDS = ("base_url", "provider_route")
+# The cache reader strips exactly these, and nothing else.
+NON_SEMANTIC_PIN_FIELDS = STORAGE_PIN_FIELDS + SERVICE_PIN_FIELDS
 
 
 def pin_fingerprint() -> str:
@@ -291,12 +512,13 @@ def cache_is_reusable(old_payload: dict) -> bool:
     """May the vectors in a previous build be reused as they stand?
 
     Yes when the previous build MEANS the same thing by a vector, whatever
-    dtype it wrote. An old file that predates the pin carrying `storage_dtype`
-    at all compares equal here too, because the field is stripped from both
-    sides rather than defaulted on one.
+    dtype or file layout it wrote. An old file that predates the pin carrying
+    a storage field at all compares equal here too, because the storage fields
+    are stripped from both sides rather than defaulted on one.
     """
     old_pin = dict(old_payload.get("embedding_pin") or {})
-    old_pin.pop("storage_dtype", None)
+    for name in NON_SEMANTIC_PIN_FIELDS:
+        old_pin.pop(name, None)
     return old_pin == semantic_pin()
 
 
@@ -343,7 +565,17 @@ class Embedder:
             resp = self._with_retry(chunk)
             self.calls += 1
             self.texts_embedded += len(chunk)
-            out.extend(d.embedding for d in resp.data)
+            rows = sorted(resp.data, key=lambda d: d.index)
+            # A vector of the wrong length is a STOP, never a silent pad or cut:
+            # Novita's quiet change of 2026-09 (it began refusing `dimensions`)
+            # is the reminder that the endpoint's behaviour is not ours.
+            bad = [len(d.embedding) for d in rows if len(d.embedding) != EMBED_DIMS]
+            if bad or len(rows) != len(chunk):
+                raise SystemExit(
+                    f"STOP: the embedding endpoint returned {len(rows)} vectors of "
+                    f"lengths {sorted(set(bad)) or [EMBED_DIMS]} for {len(chunk)} "
+                    f"texts; the pin says {EMBED_DIMS}.")
+            out.extend(d.embedding for d in rows)
         return np.asarray(out, dtype=np.float32)
 
     def _with_retry(self, chunk: list):
@@ -360,8 +592,14 @@ class Embedder:
         delay = 5.0
         for attempt in range(EMBED_MAX_RETRIES):
             try:
+                # `encoding_format="float"` explicitly: the OpenAI client
+                # otherwise asks for base64, which Novita began refusing in
+                # 2026-09 and which is one more thing to depend on.
+                # `provider` is OpenRouter's routing field (WP-D11b).
                 return self._client.embeddings.create(
                     model=EMBED_MODEL, input=chunk, dimensions=EMBED_DIMS,
+                    encoding_format="float",
+                    extra_body={"provider": EMBED_PROVIDER_ROUTE},
                 )
             except openai.RateLimitError:
                 if attempt == EMBED_MAX_RETRIES - 1:
@@ -417,6 +655,18 @@ _DISPLAY = {
     "fund_component_name":    "fund component",
     "measure":                "measure",
     "(varies)":               "several measures",
+    # WP-D11: the seven GP profile bands (§12.3). These are DIMENSION display
+    # names -- the short phrase a sentence uses in place of the column name --
+    # so they name the attribute, not its cut. The cut itself lives in the
+    # report's column glossary, which is where a reader who needs "more than
+    # half the population" rather than "social composition" will find it.
+    "social_composition":     "social composition",
+    "gp_size":                "population size band",
+    "remoteness":             "distance to a bus stop",
+    "digital_readiness":      "office internet and computer",
+    "has_panchayat_bhawan":   "panchayat bhawan",
+    "has_csc":                "common service centre",
+    "plc_available":          "panchayat learning centre",
 }
 
 # The ALL-CAPS scaffolding in the glossary is a machine convention, not officer
@@ -881,12 +1131,17 @@ def load_vector_cache() -> dict:
     """
     corpus_path = next((c for c in (CORPUS_PATH, LEGACY_CORPUS_PATH)
                         if os.path.exists(c)), None)
-    if corpus_path is None or not os.path.exists(VECTORS_PATH):
+    if corpus_path is None:
         return {}
     try:
         old = read_corpus_json(corpus_path)
-        vectors = load_vectors(VECTORS_PATH)
     except Exception:
+        return {}
+    # WP-D11b: the previous build's vectors in whichever layout it wrote -- the
+    # parts its stamp names, or the single pre-split .npy. This is what lets the
+    # first split build reuse every vector and make no embedding call.
+    vectors = load_previous_vectors(VECTORS_PATH, STAMP_PATH)
+    if vectors is None:
         return {}
     old_records = old.get("records", [])
     if len(old_records) != len(vectors):
@@ -900,6 +1155,14 @@ def load_vector_cache() -> dict:
     return {r["embed_text_sha256"]: vectors[i] for i, r in enumerate(old_records)}
 
 
+def vector_artefacts(manifest: dict | None) -> list:
+    """The stamp's `artefacts` entries for the vectors: one per part, or none
+    when the build wrote no vectors (`--no-embed`)."""
+    if not manifest:
+        return []
+    return ["metainsights/" + p["file"] for p in manifest["parts"]]
+
+
 def write_outputs(records, counts, stamp, vectors, embedder, elapsed):
     payload = {
         "what_this_is": (
@@ -908,8 +1171,10 @@ def write_outputs(records, counts, stamp, vectors, embedder, elapsed):
             "and the 32-finding feed are marked, not selected for. Every "
             "sentence is phase5_ranking.generate_nl_summary -- nothing here "
             "computes, re-reads or rewrites a figure. Vectors live beside this "
-            "file in retrieval_corpus.npy, float16 on disk and read as float32, "
-            "row-aligned with `records`. The embedded text is not stored: "
+            "file as retrieval_corpus.part<N>.npy -- consecutive row slices, "
+            "listed with their SHA-256 in the stamp (WP-D11b) -- float16 on disk "
+            "and read as float32, row-aligned with `records`. The embedded text "
+            "is not stored: "
             "`embed_text_sha256` pins it, and `python "
             "Insights/src/phase5d_retrieval_corpus.py --embed-text <id>` "
             "regenerates it from the record and verifies it (WP-D10)."
@@ -923,8 +1188,7 @@ def write_outputs(records, counts, stamp, vectors, embedder, elapsed):
     }
     write_corpus_json(CORPUS_PATH, payload)
 
-    if vectors is not None:
-        save_vectors(VECTORS_PATH, vectors)
+    manifest = save_vectors(VECTORS_PATH, vectors) if vectors is not None else None
 
     # The INPUTS this build read, hashed. Both sidecars are excluded BY NAME:
     # `decompose_corpus.*` is a sibling OUTPUT of phase5f, not a source of this
@@ -946,13 +1210,15 @@ def write_outputs(records, counts, stamp, vectors, embedder, elapsed):
     with open(STAMP_PATH, "w", encoding="utf-8") as fh:
         json.dump({
             "what_this_is": (
-                "Provenance for retrieval_corpus.json/.npy. The `generated_at` "
-                "line is the ONLY field expected to differ between two "
-                "consecutive builds (D5.0 gate); everything else, vectors "
-                "included, is reproduced from the cache."
+                "Provenance for retrieval_corpus.json.gz and its vector parts. "
+                "The `generated_at` line is the ONLY field expected to differ "
+                "between two consecutive builds (D5.0 gate); everything else, "
+                "vectors included, is reproduced from the cache. "
+                "`vector_storage` lists the parts in row order with a SHA-256 "
+                "each; the loader refuses a missing or altered part (WP-D11b)."
             ),
-            "artefacts": ["metainsights/retrieval_corpus.json.gz",
-                          "metainsights/retrieval_corpus.npy"],
+            "artefacts": (["metainsights/retrieval_corpus.json.gz"]
+                          + vector_artefacts(manifest)),
             "candidate_set_id": stamp["candidate_set_id"],
             "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "build_seconds": round(elapsed, 1),
@@ -964,8 +1230,16 @@ def write_outputs(records, counts, stamp, vectors, embedder, elapsed):
             "counts": counts,
             "ranking_prefilter_cap": RANKING_PREFILTER_CAP,
             "source_files": source_files,
+            "vector_storage": manifest,
         }, fh, indent=2, ensure_ascii=False)
         fh.write("\n")
+
+    # Only now, with a stamp on disk that names the parts, is the unsplit file
+    # retired. Retiring it first would leave a window in which neither layout
+    # is readable and the next build would re-embed everything.
+    if manifest:
+        retire_unsplit(VECTORS_PATH)
+    return manifest
 
 
 # =============================================================================
@@ -1116,11 +1390,16 @@ def main(argv=None) -> int:
         vectors = np.stack([np.asarray(cache[r["embed_text_sha256"]],
                                        dtype=np.float32) for r in records])
 
-    write_outputs(records, counts, stamp, vectors, embedder, time.time() - t0)
+    manifest = write_outputs(records, counts, stamp, vectors, embedder,
+                             time.time() - t0)
     print(f"  wrote {CORPUS_PATH}")
-    if vectors is not None:
-        print(f"  wrote {VECTORS_PATH}  shape={vectors.shape} "
-              f"({os.path.getsize(VECTORS_PATH) / 1e6:.1f} MB)")
+    if manifest:
+        print(f"  wrote vectors shape={tuple(manifest['shape'])} as "
+              f"{len(manifest['parts'])} part(s), matrix sha256 "
+              f"{manifest['matrix_sha256'][:16]}")
+        for part in manifest["parts"]:
+            print(f"    {part['file']}  {part['rows']:,} rows  "
+                  f"{part['bytes'] / 1e6:.1f} MB  sha256 {part['sha256'][:16]}")
     print(f"  wrote {STAMP_PATH}")
     return 0
 

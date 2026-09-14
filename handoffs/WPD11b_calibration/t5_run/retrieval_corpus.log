@@ -1,0 +1,11 @@
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+  Ask registry: 20 GPs, 16 blocks, 9 districts
+  4,404 corpus records view1=4,028, view2=301, view3=44, view4=31
+  geography: 278 records name a registry-confirmed GP; 0 candidate names rejected as non-geographic
+  distinct texts: bare sentence 1,525, enriched 4,404 (of 4,404)
+  vectors: 4,348 reused from cache, 56 to embed
+  wrote C:\dev\odisha-d11b\Insights\metainsights\retrieval_corpus.json.gz
+  wrote vectors shape=(4404, 1024) as 1 part(s), matrix sha256 c50d2319a6421725
+    retrieval_corpus.part0.npy  4,404 rows  9.0 MB  sha256 a01ce848be1442ef
+  wrote C:\dev\odisha-d11b\Insights\metainsights\retrieval_corpus_stamp.json

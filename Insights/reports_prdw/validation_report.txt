@@ -20,6 +20,7 @@ STEP 1: Register sources
   registered dim_code: 717 rows x 5 cols
   registered dim_lsdg_theme: 17 rows x 4 cols
   registered dim_welfare_scheme: 12 rows x 2 cols
+  registered gp_profile: 20 rows x 99 cols
 
 ======================================================================
 STEP 2: Apply derived columns
@@ -29,7 +30,7 @@ STEP 2: Apply derived columns
 ======================================================================
 STEP 3: Pre-view validation
 ======================================================================
-Generated: 2026-08-14 11:12:35
+Generated: 2026-09-07 19:15:31
 
 --- CHECK 1: Row counts ---
   gram_panchayat: actual=20 expected~20 (0.0% diff) [OK]
@@ -50,6 +51,7 @@ Generated: 2026-08-14 11:12:35
   dim_code: actual=717 expected~717 (0.0% diff) [OK]
   dim_lsdg_theme: actual=17 expected~17 (0.0% diff) [OK]
   dim_welfare_scheme: actual=12 expected~12 (0.0% diff) [OK]
+  gp_profile: actual=20 expected~20 (0.0% diff) [OK]
 [PASSED] CHECK 1: Row counts
 
 --- CHECK 2: Primary-key uniqueness ---
@@ -67,6 +69,8 @@ Generated: 2026-08-14 11:12:35
   [OK]   activity_training.activity_code: unique
   [OK]   activity_community_service.activity_code: unique
   [OK]   activity_delegation.activity_code: unique
+  [OK]   gp_profile.basic_info_lgd: unique
+  [OK]   stg_gp_profile.gp_lgd_code: unique
   [OK]   dim_lsdg_theme.focus_area_name: unique
   [OK]   dim_welfare_scheme.scheme_code: unique
 [PASSED] CHECK 2: Primary-key uniqueness
@@ -79,6 +83,7 @@ Generated: 2026-08-14 11:12:35
   activity_voucher.gp_lgd_code -> gram_panchayat.gp_lgd_code: 0/5,976 orphans (0.0%)
   admin_approval.gp_lgd_code -> gram_panchayat.gp_lgd_code: 0/2,101 orphans (0.0%)
   technical_approval.gp_lgd_code -> gram_panchayat.gp_lgd_code: 0/2,134 orphans (0.0%)
+  gp_profile.basic_info_lgd -> gram_panchayat.gp_lgd_code: 0/20 orphans (0.0%)
   planned_activity.plan_code -> plan.plan_code: 0/12,704 orphans (0.0%)
   activity_asset.activity_code -> planned_activity.activity_code: 0/12,704 orphans (0.0%)
   activity_fund.activity_code -> planned_activity.activity_code: 0/12,704 orphans (0.0%)
@@ -170,6 +175,13 @@ Generated: 2026-08-14 11:12:35
   planned_activity.is_costless_activity: ['0', '1']
   stg_planned_activity.is_costless: ['Costed', 'Costless']
   stg_approval.tied_untied: ['Other', 'Tied', 'Untied']
+  stg_gp_profile.social_composition: ['Mixed', 'SC-majority', 'ST-majority']
+  stg_gp_profile.gp_size: ['10,000 and above', '2,500 to 5,000', '5,000 to 10,000', 'Under 2,500']
+  stg_gp_profile.remoteness: ['Far', 'Near']
+  stg_gp_profile.digital_readiness: ['Not ready', 'Ready']
+  stg_gp_profile.has_panchayat_bhawan: ['No', 'Yes']
+  stg_gp_profile.has_csc: ['No', 'Yes']
+  stg_gp_profile.plc_available: ['No', 'Yes']
 [PASSED] CHECK 5: Categorical value domains
 
 --- CHECK 6: Date ranges (span 1-10 yrs) ---
@@ -183,14 +195,15 @@ Generated: 2026-08-14 11:12:35
 ======================================================================
 STEP 4: Build views
 ======================================================================
-  built view1_activity_lifecycle: 12,704 rows -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\af8add88-3cac-461b-8d13-59fde0aaead7\scratchpad\wpd1\Insights\views_prdw\view1_activity_lifecycle.parquet
-  built view2_geo_month_cube: 1,440 rows -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\af8add88-3cac-461b-8d13-59fde0aaead7\scratchpad\wpd1\Insights\views_prdw\view2_geo_month_cube.parquet
-  built view3_gp_performance: 120 rows -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\af8add88-3cac-461b-8d13-59fde0aaead7\scratchpad\wpd1\Insights\views_prdw\view3_gp_performance.parquet
+  built view1_activity_lifecycle: 12,704 rows -> Insights/views_prdw\view1_activity_lifecycle.parquet
+  built view2_geo_month_cube: 1,440 rows -> Insights/views_prdw\view2_geo_month_cube.parquet
+  built view3_gp_performance: 120 rows -> Insights/views_prdw\view3_gp_performance.parquet
+  built view4_gp_profile: 20 rows -> Insights/views_prdw\view4_gp_profile.parquet
 
 ======================================================================
 STEP 5: Profile views
 ======================================================================
-  view summaries -> C:\Users\prith\AppData\Local\Temp\claude\i--My-Drive-ASC-Lab-LMIC-AI-Code-repo-Odisha-PRDW\af8add88-3cac-461b-8d13-59fde0aaead7\scratchpad\wpd1\Insights\reports_prdw\view_summaries.txt
+  view summaries -> Insights/reports_prdw\view_summaries.txt
 
 ======================================================================
 STEP 6: Post-view checks
@@ -204,3 +217,6 @@ STEP 6: Post-view checks
   view3_gp_performance: 120 rows (expected ~120, 0.0% diff)
   view3_gp_performance: grain ['gp_lgd_code', 'fiscal_year'] unique
 [PASSED] POST-VIEW: view3_gp_performance
+  view4_gp_profile: 20 rows (expected ~20, 0.0% diff)
+  view4_gp_profile: grain ['gp_lgd_code'] unique
+[PASSED] POST-VIEW: view4_gp_profile

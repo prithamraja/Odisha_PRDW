@@ -293,8 +293,79 @@ def check_sidecar(sidecar_path, feed_path, source_set_path, rebuild_roster_base=
     # WP-D4d. The rendering the Discover page actually serves.
     if feed_md_path:
         check_feed_md(R, sidecar_path, feed_md_path, feed_path, base)
+        # WP-D11b T2. The same surface, judged by the editions' D41 rule.
+        check_causal_feed(R, feed_md_path, records)
 
     return R.done("check_insight_prose")
+
+
+# =============================================================================
+# WP-D11b T2 -- the D41 causal-wording scan, over the shipped feed
+# =============================================================================
+# The gamma editions have been judged by prose_gate's causal scan since WP-D6.
+# The feed never was, and WP-D11's PM review found causal connectives in the
+# shipped feed as a result. D61 ruling 2 fixes the WRITER'S wording the
+# operator's way -- one general sentence, no banned-word list -- and asks that
+# the outcome be MEASURED, by one rule for both surfaces. So this IMPORTS
+# prose_gate's scan (the same compiled patterns, the same denial window, the
+# same request-for-an-explanation exemption) instead of carrying a second list
+# that would drift from the first.
+#
+# It GATES and it REPORTS; it never fixes. A hit is the measurement ruling 2
+# asks for, and is never a reason to regenerate -- the build does not reroll.
+
+def causal_hits_in_markdown(md):
+    """prose_gate's line-by-line D41 scan over one markdown document."""
+    import prose_gate
+    return prose_gate.check_causal_lines(list(enumerate(md.split("\n"), start=1)))
+
+
+def attribute_causal_hits(records):
+    """The same scan per sidecar record, so a hit can be charged to model prose
+    or to the deterministic fallback text -- they have different owners."""
+    import prose_gate
+    out = []
+    for r in records:
+        for field in ("lead", "detail"):
+            for p in prose_gate.scan_causal(r.get(field) or ""):
+                out.append({"rank": r["rank"], "status": r["status"],
+                            "field": field, "surface": p["surface"],
+                            "asserts": p["asserts"]})
+    return out
+
+
+def check_causal_feed(R, feed_md_path, records):
+    print("\nD41 -- causal wording in the shipped feed (prose_gate's scan, WP-D11b)")
+    if not os.path.exists(feed_md_path):
+        R.add(False, "D41 scan: the feed markdown exists", feed_md_path)
+        return
+    md = open(feed_md_path, encoding="utf-8").read()
+    hits = causal_hits_in_markdown(md)
+    for h in hits:
+        print("    " + h.replace("\n", "\n    "))
+    by_record = attribute_causal_hits(records)
+    in_model = [h for h in by_record if h["status"] != "fell-back"]
+    in_fallback = [h for h in by_record if h["status"] == "fell-back"]
+    for h in by_record:
+        print("    rank %d (%s, %s): %r %s" % (h["rank"], h["status"], h["field"],
+                                           h["surface"], h["asserts"]))
+    R.add(not hits, "D41: no causal wording anywhere in the shipped feed",
+          "%d line hit(s); by record %d in model prose, %d in fallback text"
+          % (len(hits), len(in_model), len(in_fallback)))
+
+
+def scan_causal_files(paths):
+    """--scan-causal: the D41 scan alone over any markdown files, for a baseline
+    (e.g. a previous WP's insight_feed.md). No sidecar needed."""
+    total = 0
+    for path in paths:
+        md = open(path, encoding="utf-8").read()
+        hits = causal_hits_in_markdown(md)
+        total += len(hits)
+        print("%s: %d D41 hit(s)" % (path, len(hits)))
+        for h in hits:
+            print("    " + h.replace("\n", "\n    "))
+    return 1 if total else 0
 
 
 # =============================================================================
@@ -720,6 +791,12 @@ def self_test(feed_path):
 
 
 def main(argv=None):
+    # The scans print report lines verbatim, and they carry the rupee sign; a
+    # Windows console on cp1252 would crash on the first one (WP-D11b).
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--base", default=None,
                     help="the Insights directory (default: the one holding this script)")
@@ -738,10 +815,17 @@ def main(argv=None):
                     help="WP-D4c: run the cleaned renderer over all 32 feed "
                          "sentences and unit-test the three ratified fixes. "
                          "No API call, no sidecar required")
+    ap.add_argument("--scan-causal", nargs="+", metavar="MD",
+                    help="WP-D11b: run only the D41 causal-wording scan (the "
+                         "editions' prose_gate rule) over these markdown files "
+                         "and exit non-zero on any hit. No sidecar needed")
     args = ap.parse_args(argv)
 
     base = os.path.abspath(args.base) if args.base else os.path.dirname(_HERE)
     P = CFG.paths(base)
+
+    if args.scan_causal:
+        return scan_causal_files(args.scan_causal)
 
     if args.self_test:
         return self_test(P["feed"])

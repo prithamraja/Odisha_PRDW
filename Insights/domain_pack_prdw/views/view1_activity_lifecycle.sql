@@ -37,6 +37,12 @@
 -- plan_code, source_file, operation_*, the raw decode codes, expenditure_id,
 -- v_exp.scheme_name (82% null), and every free-text authority or document
 -- number. `days_since_sanction` is dropped as non-reproducible (§3).
+--
+-- WP-D11 (Amendment B §12.4): this view also carries the seven derived
+-- gp_profile dimensions — social_composition, gp_size, remoteness,
+-- digital_readiness, has_panchayat_bhawan, has_csc, plc_available. They are
+-- dimensions only; no profile measure is added here, and the grain, the row
+-- count and every pre-existing column are unchanged.
 -- =============================================================================
 SELECT
     -- ── grain ──────────────────────────────────────────────────────────────
@@ -49,6 +55,28 @@ SELECT
     CAST(g.block_name    AS VARCHAR)          AS block_name,
     CAST(g.district_code AS VARCHAR)          AS district_code,
     CAST(g.district_name AS VARCHAR)          AS district_name,
+
+    -- ── GP profile dimensions (Amendment B §12.3, WP-D11) ──────────────────
+    -- The seven derived GP attributes, LEFT JOINed from stg_gp_profile on the
+    -- geography spine this view already carries. Dimensions only: NO profile
+    -- measure belongs on this view, because population and household counts are
+    -- GP constants and would be summed once per row of this grain — a wrong
+    -- denominator every time (§12.4). view4_gp_profile is where they live.
+    --
+    -- COALESCE to 'Not reported' is the statewide guard: a GP with no profile
+    -- row still carries a band rather than a null, because dimensions are never
+    -- zero-filled and never absent (§4.2). Every sample GP has a profile row,
+    -- so the coalesce fires zero times here.
+    --
+    -- Cut points and sample splits are documented once, at the CASE ladders in
+    -- derived_columns.sql; they are not restated per view.
+    COALESCE(gpp.social_composition,   'Not reported') AS social_composition,
+    COALESCE(gpp.gp_size,              'Not reported') AS gp_size,
+    COALESCE(gpp.remoteness,           'Not reported') AS remoteness,
+    COALESCE(gpp.digital_readiness,    'Not reported') AS digital_readiness,
+    COALESCE(gpp.has_panchayat_bhawan, 'Not reported') AS has_panchayat_bhawan,
+    COALESCE(gpp.has_csc,              'Not reported') AS has_csc,
+    COALESCE(gpp.plc_available,        'Not reported') AS plc_available,
 
     -- ── dimensions ─────────────────────────────────────────────────────────
     CAST(a.fiscal_year          AS VARCHAR)   AS fiscal_year,
@@ -155,6 +183,7 @@ FROM stg_planned_activity a
 -- (verified, zero orphans). Zero-activity GPs are view3's job, not this view's.
 JOIN      stg_gram_panchayat          g   ON g.gp_lgd_code   = a.gp_lgd_code
 LEFT JOIN stg_exp_rollup              e   ON e.activity_code = a.activity_code
+LEFT JOIN stg_gp_profile               gpp ON gpp.gp_lgd_code = g.gp_lgd_code
 LEFT JOIN stg_approval                ap  ON ap.activity_code = a.activity_code
 LEFT JOIN stg_progress_rollup         pp  ON pp.activity_code = a.activity_code
 LEFT JOIN stg_activity_asset          ast ON ast.activity_code = a.activity_code

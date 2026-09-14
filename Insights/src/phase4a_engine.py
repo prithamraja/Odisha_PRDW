@@ -45,6 +45,18 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from phase2_engine import (
     # Config & data structures
     MeasureConfig, ViewConfig, VIEW1_CONFIG,
+    # WP-D11: view4's config is authored in phase2_engine, next to the scale
+    # switch and _PROFILE_DIMS that it reads. It is re-exported HERE because
+    # this module is the one every downstream registry imports its configs from
+    # -- and because phase5c_gamma_reports.discover_views() enumerates the
+    # reportable views by scanning THIS module for VIEW<n>_CONFIG. An import is
+    # what makes view4 visible to that scan; without it the view would mine and
+    # rank and then silently vanish from the gamma editions.
+    VIEW4_CONFIG,
+    # The seven derived GP profile dimensions, written down once (§12.3) and
+    # shared by all four configs, so that a band means the same thing on every
+    # view.
+    _PROFILE_DIMS,
     # The one scale switch, defined next to VIEW1_CONFIG and imported here so
     # all three views read the same flag (D15 / mapping doc §6)
     DISCOVER_SCALE, _STATEWIDE,
@@ -80,15 +92,25 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # ADDITIONAL VIEW CONFIGS (Views 2, 3)
 # =============================================================================
 # Domain: Odisha Panchayati Raj & Drinking Water. Built by
-# domain_pack_prdw/views/. Three views ship in v1 and there is no view 4-9:
-# mapping doc §4.4 rules out an equity or journey view on this drop (no
-# beneficiary-grain data exists anywhere in it, `activity_nsap` has zero rows,
-# and the SC/ST components are near-empty), and the asset dimensions fold into
-# view1 because activity_asset is 1:1 with activities. If statewide NSAP or
-# beneficiary tables arrive, a fourth view is a pack addition, not a redesign.
+# domain_pack_prdw/views/.
+#
+# THERE ARE FOUR VIEWS AS OF WP-D11, and the fourth arrived exactly the way the
+# paragraph that used to stand here said it would. That paragraph read: "Three
+# views ship in v1 and there is no view 4-9 -- mapping doc §4.4 rules out an
+# equity or journey view on this drop ... If statewide NSAP or beneficiary
+# tables arrive, a fourth view is a pack addition, not a redesign." §4.4's
+# conclusion still holds on its own terms: there is still no beneficiary-grain
+# data, activity_nsap still has zero rows, and no journey view is supportable.
+# What arrived instead was `Data/gp_profile.csv` -- GP-grain attributes -- and
+# Amendment B §12 makes a GP-COMPOSITION equity lens supportable where a
+# beneficiary-grain one is not. It was a pack addition and not a redesign: one
+# new source, one new view SQL, seven derived dimensions, and this config block.
+#
+# VIEW4_CONFIG itself is authored in phase2_engine (next to _PROFILE_DIMS and
+# the scale switch it reads) and re-exported above.
 #
 # The scale switch is imported from phase2_engine, next to VIEW1_CONFIG, so all
-# three views read one flag. See the comment there.
+# four views read one flag. See the comment there.
 
 # view2 is the only view with a temporal axis, and that is the point of §5. The
 # activity tables carry a reporting artifact at FY 2023-24 (costless activities
@@ -114,7 +136,7 @@ VIEW2_CONFIG = ViewConfig(
 
     dimensions=_VIEW2_GEO_DIMS + [
         "fiscal_year",   # 6 values — categorical here, temporal below
-    ],
+    ] + _PROFILE_DIMS,   # WP-D11: +6 sample / +7 statewide (§12.3)
 
     temporal_dimensions=[
         "month",         # 72 values — '2020-04' .. '2026-03', the full cashbook window
@@ -185,7 +207,7 @@ VIEW3_CONFIG = ViewConfig(
     name="GP Performance",
     parquet_path=os.path.join(BASE_DIR, "views_prdw", "view3_gp_performance.parquet"),
 
-    dimensions=_VIEW3_GEO_DIMS,
+    dimensions=_VIEW3_GEO_DIMS + _PROFILE_DIMS,  # WP-D11: +6 sample / +7 statewide
 
     temporal_dimensions=[
         "fiscal_year",   # 6 values — 2020-2021 .. 2025-2026
@@ -215,6 +237,27 @@ VIEW3_CONFIG = ViewConfig(
         MeasureConfig("n_abandoned",           "sum"),
         MeasureConfig("n_with_evidence",       "sum"),
         MeasureConfig("evidence_uploads",      "sum"),  # geotagged photo uploads
+
+        # WP-D11b (D61 ruling 4): AVERAGED TWINS, the WP-D2c A4 intensity
+        # mechanism at this view's grain. WP-D11's top-15 here was band
+        # membership: "Mixed leads" on measure after measure because 15 of the
+        # 20 Gram Panchayats are Mixed, so a band's TOTAL is mostly its
+        # headcount. The view's own row is one Gram Panchayat per fiscal year,
+        # so the MEAN of the same column over a group is the typical Gram
+        # Panchayat-year -- a band of 15 and a band of 2 are compared by their
+        # typical member. Aliases (`column=`), not new columns: the pack and the
+        # view SQL are untouched and no number is recomputed. The totals stay
+        # minable; the report pairs each with its twin (phase5b, rule 2c).
+        MeasureConfig("n_activities_mean",          "avg", column="n_activities"),
+        MeasureConfig("planned_cost_mean",          "avg", column="planned_cost"),
+        MeasureConfig("sanctioned_total_mean",      "avg", column="sanctioned_total"),
+        MeasureConfig("expenditure_total_mean",     "avg", column="expenditure_total"),
+        MeasureConfig("overspend_vs_plan_mean",     "avg", column="overspend_vs_plan"),
+        MeasureConfig("overspend_vs_sanction_mean", "avg", column="overspend_vs_sanction"),
+        MeasureConfig("n_admin_approvals_mean",     "avg", column="n_admin_approvals"),
+        MeasureConfig("evidence_uploads_mean",      "avg", column="evidence_uploads"),
+        MeasureConfig("payment_amount_mean",        "avg", column="payment_amount"),
+        MeasureConfig("receipt_amount_mean",        "avg", column="receipt_amount"),
     ],
 
     impact_measures=[

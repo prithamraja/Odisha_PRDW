@@ -33,8 +33,13 @@ load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file_
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from phase4a_engine import (
-    VIEW1_CONFIG, VIEW2_CONFIG, VIEW3_CONFIG,
+    VIEW1_CONFIG, VIEW2_CONFIG, VIEW3_CONFIG, VIEW4_CONFIG,
     ViewConfig,
+    # WP-D11. The glossary must carry exactly the columns the configs mine --
+    # no more, no less -- and `plc_available` is in the config statewide only.
+    # Reading the same list the configs read is what keeps that true without a
+    # second place to remember to edit.
+    _PROFILE_DIMS, _STATEWIDE,
     # WP-D2c A3: the one list of signed money measures, shared with the ranker
     SIGNED_MONEY_MEASURES,
 )
@@ -48,6 +53,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # all read it, so a view cannot be half-added.
 VIEW_CONFIGS = {
     "view1": VIEW1_CONFIG, "view2": VIEW2_CONFIG, "view3": VIEW3_CONFIG,
+    "view4": VIEW4_CONFIG,      # WP-D11, Amendment B §12.4
 }
 
 
@@ -113,6 +119,24 @@ _FORMATTERS = {
     "approvals":  lambda x: f"{_num(x, 0)} approval records",
     "uploads":    lambda x: f"{_num(x, 0)} photo uploads",
     "people":     lambda x: f"{_num(x, 0)} people",
+    # WP-D11: view4's profile family. Each is its own unit for the reason the
+    # note below gives -- a count of schools and a count of activities are not
+    # the same kind of number, and "activities" in particular must keep meaning
+    # an activity count and nothing else, because the FY 2023-24 caveat is
+    # scoped off it.
+    "households":        lambda x: f"{_num(x, 0)} households",
+    "job-card holders":  lambda x: f"{_num(x, 0)} job-card holders",
+    "self-help groups":  lambda x: f"{_num(x, 0)} self-help groups",
+    "wards":             lambda x: f"{_num(x, 0)} wards",
+    "villages":          lambda x: f"{_num(x, 0)} villages",
+    "centres":           lambda x: f"{_num(x, 0)} centres",
+    "schools":           lambda x: f"{_num(x, 0)} schools",
+    "health facilities": lambda x: f"{_num(x, 0)} health facilities",
+    "water sources":     lambda x: f"{_num(x, 0)} water sources",
+    "toilets":           lambda x: f"{_num(x, 0)} toilets",
+    "facilities":        lambda x: f"{_num(x, 0)} facilities",
+    "devices":           lambda x: f"{_num(x, 0)} devices",
+    "courts":            lambda x: f"{_num(x, 0)} courts",
 }
 
 # Every measure of every view has a unit here, so no measure can reach the
@@ -161,7 +185,104 @@ _UNITS = {
         "n_abandoned": "activities", "n_with_evidence": "activities",
         "evidence_uploads": "uploads",
     },
+    # WP-D11. Two families. The LIFETIME half repeats view3's units exactly --
+    # they are the same columns summed over the whole window, so a unit that
+    # differed between the two would be a bug. The PROFILE half is
+    # self-reported GP attributes and none of it is "activities": a school and
+    # an activity are not interchangeable, and activity_count_measures() reads
+    # this table to decide which measures the FY 2023-24 caveat applies to.
+    "view4": {
+        # profile: population
+        "population_total": "people", "population_male": "people",
+        "population_female": "people", "population_children": "people",
+        "population_sc": "people", "population_st": "people",
+        "population_obc": "people", "population_general": "people",
+        # profile: households and organisation
+        "households": "households", "job_card_holders": "job-card holders",
+        "shgs": "self-help groups", "wards": "wards",
+        "revenue_villages": "villages", "villages_mapped_lgd": "villages",
+        # profile: education and childcare
+        "anganwadi_centres": "centres",
+        "schools_pre_primary": "schools", "schools_primary": "schools",
+        "schools_secondary": "schools", "schools_higher_secondary": "schools",
+        # profile: health
+        "health_sub_centres": "health facilities",
+        "primary_health_centres": "health facilities",
+        "wellbeing_centres": "health facilities",
+        "dispensaries": "health facilities",
+        "ayurvedic_clinics": "health facilities",
+        # profile: water and sanitation
+        "drinking_water_sources": "water sources",
+        "households_tap_water": "households",
+        "household_toilets": "toilets",
+        "community_sanitary_complexes": "facilities",
+        "solid_waste_centres": "facilities",
+        # profile: services and civic infrastructure
+        "common_service_centres": "facilities", "banks": "facilities",
+        "atms": "facilities", "rural_libraries": "facilities",
+        "children_parks": "facilities", "disaster_rescue_centres": "facilities",
+        "bus_stands_with_water": "facilities", "seed_centres": "facilities",
+        # profile: revenue and equipment
+        "osr_collected": "rupees",
+        "laptops": "devices", "printers": "devices", "scanners": "devices",
+        "sports_courts": "courts",
+        # lifetime performance -- view3's units, verbatim
+        "n_plans": "plans",
+        "n_activities": "activities", "n_costed": "activities",
+        "n_costless": "activities",
+        "planned_cost": "rupees", "sanctioned_total": "rupees",
+        "expenditure_total": "rupees",
+        "overspend_vs_plan": "rupees", "overspend_vs_sanction": "rupees",
+        "payment_amount": "rupees", "receipt_amount": "rupees",
+        "n_admin_approvals": "approvals", "n_tech_approvals": "approvals",
+        "n_completed": "activities", "n_ongoing": "activities",
+        "n_abandoned": "activities", "n_with_evidence": "activities",
+        "evidence_uploads": "uploads",
+    },
 }
+
+
+# ── WP-D11b T4 (D61 ruling 4): the averaged twins on views 3 and 4 ───────────
+# `<m>_mean` is `<m>` averaged over the view's rows instead of totalled -- the
+# WP-D2c A4 mechanism, which view2 has carried since calibration session 1. The
+# unit is derived from the total's, never restated, and it says the averaging
+# in words ("rupees, averaged per Gram Panchayat-year"), because this string is
+# `stats.measure_unit` and the writer reads it. view2's two keep the bare
+# "rupees" they shipped with; `how_aggregated` already tells that writer.
+#
+# THE FORMATTERS ARE NEW, NOT BORROWED, because the count formatters round to a
+# whole number: 0.35 approval records per Gram Panchayat-year would print as
+# "0 approval records" -- a false zero, which rule 4b says is the sharpest error
+# in this report. Averaged counts keep one decimal; averaged rupees use the
+# rupee renderer. Both carry the grain, so a copied figure cannot lose it.
+AVERAGED_GRAIN = {"view3": "per Gram Panchayat-year", "view4": "per Gram Panchayat"}
+_AVERAGED_COUNT_NOUN = {
+    "activities": "activities", "approvals": "approval records",
+    "uploads": "photo uploads", "households": "households",
+    "toilets": "toilets", "self-help groups": "self-help groups",
+}
+
+
+def averaged_unit(base_unit: str, view_name: str) -> str:
+    return f"{base_unit}, averaged {AVERAGED_GRAIN[view_name]}"
+
+
+def _avg_count(x: float) -> str:
+    """One decimal, or two below 1 -- so 0.04 prints as 0.04, never as 0.0."""
+    return _num(x, 2 if 0 < abs(x) < 1 else 1)
+
+
+for _grain in AVERAGED_GRAIN.values():
+    _FORMATTERS[f"rupees, averaged {_grain}"] = (
+        lambda g: lambda x: f"{_rupees(x)} {g}")(_grain)
+    for _unit, _noun in _AVERAGED_COUNT_NOUN.items():
+        _FORMATTERS[f"{_unit}, averaged {_grain}"] = (
+            lambda n, g: lambda x: f"{_avg_count(x)} {n} {g}")(_noun, _grain)
+
+for _view in AVERAGED_GRAIN:
+    for _m in VIEW_CONFIGS[_view].measures:
+        if _m.agg == "avg" and _m.column:
+            _UNITS[_view][_m.name] = averaged_unit(_UNITS[_view][_m.column], _view)
 
 
 def format_measure(view_name: str, measure: str, value: float) -> str:
@@ -195,6 +316,150 @@ _FISCAL_YEAR = (
     "2023-24 boundary reflect the reporting change described above, not real "
     "workload change."
 )
+
+# The seven derived GP profile dimensions (WP-D11 / Amendment B §12.3). Written
+# once and merged into all four view glossaries, because they are the same seven
+# columns on every view -- a band must not be able to mean one thing in the
+# activity section and another in the report card.
+#
+# EVERY ENTRY STATES THE CUT, NOT JUST THE NAME. The prose layer's whole reason
+# for having a glossary is that the writer must be able to say "Gram Panchayats
+# where Scheduled Tribes are more than half the population" instead of
+# `social_composition = ST-majority` (§12.5), and it can only do that if the
+# definition is here. The sample split is included for the same reason the other
+# entries carry their coverage caveats: a two-Gram-Panchayat band is a fact the
+# writer needs before it writes a sentence about it.
+#
+# CORRELATION ONLY, AND IT IS SAID IN THE TEXT (§12.5, rule 4b, D41). A profile
+# dimension makes a finding ABOUT a kind of Gram Panchayat; it never makes it
+# BECAUSE OF that kind. Every entry below ends on that, so the constraint sits
+# in the writer's context next to the column it applies to rather than only in a
+# numbered rule further up the prompt.
+_CORRELATION_ONLY = (
+    " This is a description of which Gram Panchayats a pattern covers, never an "
+    "explanation of why it happens."
+)
+
+# ── WP-D11b T3 (D61 ruling 3): size bands carry their unit at PROSE time ─────
+# `gp_size`'s values are bare numbers -- 'Under 2,500', '2,500 to 5,000' -- and
+# on the operator's ruling they STAY bare in the pack, the Parquet views, the
+# categorical domain and every mined candidate. What a writer, a verifier or an
+# officer READS carries the unit. WP-D11 measured the cost of the bare label: a
+# 57% prose fallback rate on gp_size findings against 0% on social_composition,
+# the verifier rejecting "populations of 10,000 and above" each time because its
+# Source Material named no unit.
+#
+# THIS IS THE ONE MAP. The report prompts (this module), the feed's packets and
+# fallback sentences (phase5e) and the chat's render-time glossary
+# (DiscoverChat/glossary.py) all import it, so the three surfaces cannot call a
+# band two different things. Digits are never touched, so every numeral check
+# binds exactly as before; "people" is a word, not a numeral.
+#
+# "Under" keeps its capital, as the stored label has it: the displayed form is
+# the label plus its unit, and it stands in lists beside 'Mixed' and
+# 'ST-majority' as a category name. (Decide-and-document; WPD11b_REPORT §6.)
+BAND_DISPLAY = {
+    "Under 2,500":      "Under 2,500 people",
+    "2,500 to 5,000":   "2,500 to 5,000 people",
+    "5,000 to 10,000":  "5,000 to 10,000 people",
+    "10,000 and above": "10,000 people and above",
+}
+# Longest first, and never when "people" already follows -- so applying it twice
+# is applying it once, and a figure such as "12,500" can never match inside.
+_BAND_RE = re.compile(
+    r"(?<![\w,.])("
+    + "|".join(re.escape(k) for k in sorted(BAND_DISPLAY, key=len, reverse=True))
+    + r")(?![\w,]|\s+people\b)")
+
+
+def display_band_labels(text):
+    """`text` with every bare size-band label shown with its unit. Idempotent;
+    anything that is not a non-empty string is returned unchanged."""
+    if not isinstance(text, str) or not text:
+        return text
+    return _BAND_RE.sub(lambda m: BAND_DISPLAY[m.group(1)], text)
+
+
+def display_band_labels_deep(obj):
+    """A copy of a JSON-shaped structure with every string -- dict keys
+    included -- passed through `display_band_labels`."""
+    if isinstance(obj, dict):
+        return {display_band_labels_deep(k): display_band_labels_deep(v)
+                for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [display_band_labels_deep(v) for v in obj]
+    if isinstance(obj, tuple):
+        return tuple(display_band_labels_deep(v) for v in obj)
+    return display_band_labels(obj)
+
+
+_PROFILE_GLOSSARY_ALL = {
+    "social_composition": (
+        "Which community is the majority in the Gram Panchayat, from its own "
+        "reported population figures: 'ST-majority' where Scheduled Tribes are "
+        "more than half the population, 'SC-majority' where Scheduled Castes "
+        "are more than half and Scheduled Tribes are not, 'Mixed' otherwise. "
+        "The sample splits 2 / 3 / 15, so the two majority bands cover two and "
+        "three Gram Panchayats - say so rather than generalising from them."
+        + _CORRELATION_ONLY
+    ),
+    # WP-D11b T3: this entry stays BYTE-IDENTICAL to WP-D11, bare labels and
+    # all, and that is measured, not cautious. The glossary is not only prose:
+    # `phase5d_retrieval_corpus.glossary_snippet` and phase5f quote it into the
+    # EMBEDDED text of every record that touches gp_size, and a first draft that
+    # passed it through `display_band_labels` changed the embed text of 917
+    # findings and 3,623 decompositions -- 4,540 re-embeddings, which the brief
+    # forbids, for a surface ruling 3 keeps bare. The unit reaches the writers
+    # at the prompt boundary instead (`build_view_prompt`,
+    # `build_global_feed_prompt`, the enrichment and the feed packets).
+    "gp_size": (
+        "Total reported population, in four fixed bands: 'Under 2,500', "
+        "'2,500 to 5,000', '5,000 to 10,000' and '10,000 and above'. Each band "
+        "includes its lower figure and excludes its upper. The cuts are fixed, "
+        "not quantiles, so a band means the same thing here as it will "
+        "statewide. The sample splits 2 / 9 / 7 / 2."
+        + _CORRELATION_ONLY
+    ),
+    "remoteness": (
+        "Distance to the nearest bus stop, as reported: 'Near' under 5 km, "
+        "'Far' 5 km or more. A crude proxy for access to a road head and "
+        "nothing more - it says nothing about roads inside the Gram Panchayat. "
+        "The sample splits 14 Near / 6 Far."
+        + _CORRELATION_ONLY
+    ),
+    "digital_readiness": (
+        "'Ready' where the panchayat bhawan reports BOTH an internet "
+        "connection AND a computer; 'Not ready' otherwise. It describes the "
+        "office's equipment, not the Gram Panchayat's connectivity and not its "
+        "residents'. The sample splits 10 / 10."
+        + _CORRELATION_ONLY
+    ),
+    "has_panchayat_bhawan": (
+        "Whether the Gram Panchayat reports having a panchayat bhawan - its own "
+        "office building. 'Yes' / 'No', as reported. The sample splits 14 / 6."
+        + _CORRELATION_ONLY
+    ),
+    "has_csc": (
+        "Whether the Gram Panchayat reports a Common Service Centre in the "
+        "panchayat. 'Yes' / 'No', as reported. The sample splits 12 / 8. Note "
+        "that this reported flag and the separate COUNT of common service "
+        "centres disagree in this drop - eight Gram Panchayats answer 'No' and "
+        "still report 25 centres between them - so never present the two as "
+        "confirming each other."
+        + _CORRELATION_ONLY
+    ),
+    "plc_available": (
+        "Whether the Gram Panchayat reports a Panchayat Learning Centre. "
+        "'Yes' / 'No', as reported; 2 of the 20 sample Gram Panchayats say Yes, "
+        "which is why this band is mined at statewide scale only."
+        + _CORRELATION_ONLY
+    ),
+}
+
+# Exactly the bands the configs mine, at this scale. `_PROFILE_DIMS` is the
+# engine's own list, so the glossary cannot carry an entry for a column no
+# config mines, nor miss one a config does.
+_PROFILE_GLOSSARY = {d: _PROFILE_GLOSSARY_ALL[d] for d in _PROFILE_DIMS}
 
 # The counted-flag family in view1: eight columns, one definition.
 _ACTIVITY_FLAG = (
@@ -284,6 +549,31 @@ READING_NOTES = {
         "administrative one. The Ask chatbot reports the same 2,095, so the two "
         "systems agree."
     ),
+    # WP-D11. Three properties of this view are data, not results, and the
+    # third is the one that matters most: 20 rows is not a sample anybody can
+    # generalise from, and the bands make it smaller still.
+    "view4": (
+        "this view has **one row per Gram Panchayat - 20 in all** - and no time "
+        "axis: every programme figure in it is the whole six-year total, and "
+        "every attribute is what the Gram Panchayat reports about itself. Three "
+        "things follow. First, the attribute half is **self-reported and "
+        "carries visible defects**: toilets outnumber households in 5 Gram "
+        "Panchayats, tap connections outnumber them in 2, and the children's "
+        "population is recorded as zero in 9. The **household count in "
+        "particular is unreliable** - implied household size runs from 0.51 "
+        "people to 267 across the twenty - so a per-household figure for any "
+        "one Gram Panchayat has to be checked against its own household count "
+        "before it is quoted. Second, **no rate is stored** - a "
+        "figure per household or per thousand people has to be read off the two "
+        "columns, and it is honest here only because there is exactly one row "
+        "per Gram Panchayat. Third, and most important, **the comparison groups "
+        "are tiny**: the social-composition bands hold 2, 3 and 15 Gram "
+        "Panchayats and the outer size bands hold 2 each. A difference between "
+        "two Gram Panchayats and fifteen is a description of those seventeen "
+        "places, not evidence about a kind of Gram Panchayat, and this view is "
+        "built now so that it can become that evidence when statewide data "
+        "arrives."
+    ),
 }
 
 
@@ -325,6 +615,11 @@ _FY_PRE_2023 = frozenset({"2020-2021", "2021-2022", "2022-2023"})
 _FY_FROM_2023 = frozenset({"2023-2024", "2024-2025", "2025-2026"})
 
 # Views whose counted measures are activity counts, and therefore carry it.
+# view4 counts activities too, but it has NO fiscal_year dimension at all --
+# every figure on it is the whole-window total -- so no finding on it can
+# compare counts across the 2023-24 boundary, and part 3 of the test could
+# never fire. It is left out because the comparison is impossible there, not
+# because the artifact stops applying to its numbers (WP-D11).
 _COUNT_CAVEAT_VIEWS = ("view1", "view3")
 
 COUNT_CAVEAT_SENTENCE = (
@@ -411,8 +706,14 @@ LINKAGE_FOR_PROMPT = (
 
 
 def activity_count_measures(view_name: str) -> set:
-    """The view's measures whose UNIT is activities, read off _UNITS."""
-    return {m for m, unit in _UNITS.get(view_name, {}).items() if unit == "activities"}
+    """The view's measures whose UNIT is activities, read off _UNITS.
+
+    WP-D11b: an averaged activity count ("activities, averaged per Gram
+    Panchayat-year") is still an activity count, and the FY 2023-24 recording
+    jump moves its average exactly as it moves its total -- so the unit's first
+    clause is what is compared, not the whole string."""
+    return {m for m, unit in _UNITS.get(view_name, {}).items()
+            if unit.split(",")[0] == "activities"}
 
 
 def _member_labels(finding: dict) -> set:
@@ -717,6 +1018,28 @@ VIEW_VOCABULARY = {
             (r"\bseasonal(?:ity)?\b",     "view2's month axis"),
         ],
     },
+    # WP-D11. view4 has no time axis of any kind, so every temporal word
+    # belongs to another section -- and it is the section most likely to tempt
+    # one, because "over the whole window" invites "over time". The last three
+    # entries are the causal words: this view puts an attribute of a place next
+    # to its spending, which is exactly the shape a reader mistakes for a cause,
+    # and rule 4b / D41 forbid the model from supplying one.
+    "view4": {
+        "pipeline": ("the Gram Panchayat profile -- one row per Gram Panchayat, "
+                     "its own reported attributes beside its whole-window "
+                     "planning, sanctioning, spending and evidence"),
+        "deny": [
+            (r"\bmonthly\b",              "view2's month axis"),
+            (r"\bmonth-on-month\b",       "view2's month axis"),
+            (r"\bmonth by month\b",       "view2's month axis"),
+            (r"\bseasonal(?:ity)?\b",     "view2's month axis"),
+            (r"\byear-on-year\b",         "view3's fiscal-year axis"),
+            (r"\btrend\w*\b",            "this view has no time axis"),
+            (r"\bbecause of\b",           "a cause this data cannot establish"),
+            (r"\bdriven by\b",            "a cause this data cannot establish"),
+            (r"\bleads? to\b",            "a cause this data cannot establish"),
+        ],
+    },
 }
 
 # The prose forms of the denied patterns, for the prompt. A regex is the right
@@ -728,6 +1051,8 @@ _DENIED_PHRASES = {
               "geotagged", "photo evidence", "overspend", "action plan",
               "planned cost", "costless"],
     "view3": ["monthly", "month-on-month", "month by month", "seasonality"],
+    "view4": ["monthly", "month-on-month", "month by month", "seasonality",
+              "year-on-year", "trend", "because of", "driven by", "leads to"],
 }
 
 
@@ -958,6 +1283,7 @@ VIEW_DESCRIPTIONS = {
                 "UNIT: people, TOTALLED - for the small subset recording "
                 "community-service detail (763 activities)."
             ),
+            **_PROFILE_GLOSSARY,   # WP-D11: the seven GP profile bands
         },
     },
     "view2": {
@@ -1027,6 +1353,7 @@ VIEW_DESCRIPTIONS = {
                 "UNIT: rupees, AVERAGED per GP-month. As payment_amount_mean, "
                 "for inflows."
             ),
+            **_PROFILE_GLOSSARY,   # WP-D11: the seven GP profile bands
         },
     },
     "view3": {
@@ -1104,9 +1431,299 @@ VIEW_DESCRIPTIONS = {
                 "UNIT: geotagged photo uploads, TOTALLED (8,267 uploads across "
                 "1,675 activities)."
             ),
+            **_PROFILE_GLOSSARY,   # WP-D11: the seven GP profile bands
+        },
+    },
+    # ── view4 (WP-D11, Amendment B §12.4) ─────────────────────────────────
+    # Written from §12.4 and from the built view. Nothing here is invented:
+    # every figure quoted below is one this WP measured (WPD11_REPORT §2, §3).
+    "view4": {
+        "title": "Gram Panchayat Profile - Who Lives There and What They Have",
+        "description": (
+            "One row per Gram Panchayat - 20 rows, one for each GP in the "
+            "sample, with no time axis at all. It joins what each Gram "
+            "Panchayat reports about itself (population by gender and social "
+            "category, households, schools, health facilities, water and "
+            "sanitation, banks, offices and equipment) to what it has planned, "
+            "sanctioned, spent and evidenced over the whole six-year window. "
+            "Two things follow from the grain. Because there is exactly one row "
+            "per Gram Panchayat, a total over any group of them carries a "
+            "correct numerator AND a correct denominator at the same time, so a "
+            "figure per household or per thousand people is honest here at "
+            "block and district level in a way it is nowhere else in this "
+            "report - but it must be stated from the two columns, because no "
+            "ratio is stored. And because the profile is SELF-REPORTED and this "
+            "is a 20-Gram-Panchayat sample, its counts carry the reporting "
+            "defects listed against the individual columns below - toilets "
+            "exceeding households in five Gram Panchayats, a children's "
+            "population of zero in nine, one Gram Panchayat reporting 12 "
+            "households against 3,208 people - and none of those is a finding."
+        ),
+        "audience_context": (
+            "Key questions: Does a Gram Panchayat's own size, social "
+            "composition, remoteness or office equipment go together with how "
+            "much it plans, gets sanctioned, spends and evidences? Where does "
+            "reported infrastructure - water, toilets, schools, health "
+            "facilities - sit thinnest against the population it serves? Which "
+            "Gram Panchayats look alike on paper and unlike in delivery? "
+            "IMPORTANT: with 20 Gram Panchayats and bands as small as two, this "
+            "view is built to become a signal at statewide scale; treat what it "
+            "shows now as a description of these twenty places, never as a "
+            "pattern about a kind of Gram Panchayat."
+        ),
+        "column_glossary": {
+            "gp_name": _GP,
+            "block_name": _BLOCK,
+            "district_name": _DISTRICT,
+            **_PROFILE_GLOSSARY,
+
+            # ── profile: population ────────────────────────────────────────
+            "population_total": (
+                "UNIT: people, TOTALLED - the Gram Panchayat's own reported "
+                "total population. 115,246 across the 20 sample Gram "
+                "Panchayats. Male plus female equals this total on all 20 rows, "
+                "and so does general plus OBC plus SC plus ST."
+            ),
+            "population_male": "UNIT: people, TOTALLED, as reported.",
+            "population_female": "UNIT: people, TOTALLED, as reported.",
+            "population_children": (
+                "UNIT: people, TOTALLED, as reported. Reported as ZERO by 9 of "
+                "the 20 Gram Panchayats, which is a reporting gap rather than a "
+                "fact about children - never rank Gram Panchayats on this "
+                "column and never use it as a denominator."
+            ),
+            "population_sc": (
+                "UNIT: people, TOTALLED - reported Scheduled Caste population. "
+                "This is the count; the majority test built from it is the "
+                "social_composition band."
+            ),
+            "population_st": (
+                "UNIT: people, TOTALLED - reported Scheduled Tribe population. "
+                "Reported as ZERO by 3 of the 20 Gram Panchayats, and as 1 "
+                "and 16 by two more - plausible for some, unlikely for all."
+            ),
+            "population_obc": "UNIT: people, TOTALLED, as reported.",
+            "population_general": "UNIT: people, TOTALLED, as reported.",
+
+            # ── profile: households and organisation ───────────────────────
+            "households": (
+                "UNIT: households, TOTALLED - as reported. 26,132 across the 20 "
+                "Gram Panchayats. TREAT THIS COLUMN AS UNRELIABLE AT GRAM "
+                "PANCHAYAT LEVEL: implied household size runs from 0.51 people "
+                "to 267 across the 20. Four are visibly wrong - one reports 12 "
+                "households against 3,208 people, one reports 200 against "
+                "10,681, one reports 541 against 5,741, and one reports 4,051 "
+                "households and 2,559 job-card holders against a population of "
+                "2,049. Never quote a per-household figure for a single Gram "
+                "Panchayat without checking its household count first; the "
+                "column is safest as a total across many."
+            ),
+            "job_card_holders": (
+                "UNIT: job-card holders, COUNTED - as reported by the Gram "
+                "Panchayat."
+            ),
+            "shgs": "UNIT: self-help groups, COUNTED, as reported.",
+            "wards": (
+                "UNIT: wards, COUNTED - the wards (sansads) the Gram Panchayat "
+                "is divided into."
+            ),
+            "revenue_villages": "UNIT: villages, COUNTED, as reported.",
+            "villages_mapped_lgd": (
+                "UNIT: villages, COUNTED - villages mapped to an LGD code. Not "
+                "necessarily equal to the revenue village count."
+            ),
+
+            # ── profile: education and childcare ───────────────────────────
+            "anganwadi_centres": "UNIT: centres, COUNTED, as reported.",
+            "schools_pre_primary": "UNIT: schools, COUNTED, as reported.",
+            "schools_primary": "UNIT: schools, COUNTED, as reported.",
+            "schools_secondary": "UNIT: schools, COUNTED, as reported.",
+            "schools_higher_secondary": "UNIT: schools, COUNTED, as reported.",
+
+            # ── profile: health ────────────────────────────────────────────
+            "health_sub_centres": "UNIT: health facilities, COUNTED, as reported.",
+            "primary_health_centres": "UNIT: health facilities, COUNTED, as reported.",
+            "wellbeing_centres": "UNIT: health facilities, COUNTED, as reported.",
+            "dispensaries": "UNIT: health facilities, COUNTED, as reported.",
+            "ayurvedic_clinics": "UNIT: health facilities, COUNTED, as reported.",
+
+            # ── profile: water and sanitation ──────────────────────────────
+            "drinking_water_sources": "UNIT: water sources, COUNTED, as reported.",
+            "households_tap_water": (
+                "UNIT: households, COUNTED - households connected to tap water, "
+                "as reported. EXCEEDS the reported household count in 2 Gram "
+                "Panchayats, so a coverage percentage from these two columns "
+                "can exceed 100% - report both counts rather than the ratio."
+            ),
+            "household_toilets": (
+                "UNIT: toilets, COUNTED - as reported. EXCEEDS the reported "
+                "household count in 5 of the 20 Gram Panchayats. Whether that "
+                "is a household undercount or a toilet overcount is not known "
+                "from this data, so it is a candidate for follow-up, not a "
+                "headline."
+            ),
+            "community_sanitary_complexes": "UNIT: facilities, COUNTED, as reported.",
+            "solid_waste_centres": "UNIT: facilities, COUNTED, as reported.",
+
+            # ── profile: services and civic infrastructure ─────────────────
+            "common_service_centres": (
+                "UNIT: facilities, COUNTED - the reported number of Common "
+                "Service Centres. It disagrees with the has_csc band in this "
+                "drop: eight Gram Panchayats answer 'No' to having one and "
+                "report 25 between them. Use one or the other in a sentence, "
+                "never both as corroboration."
+            ),
+            "banks": (
+                "UNIT: facilities, COUNTED - banks and cooperative banks, as "
+                "reported."
+            ),
+            "atms": "UNIT: facilities, COUNTED, as reported.",
+            "rural_libraries": "UNIT: facilities, COUNTED, as reported.",
+            "children_parks": "UNIT: facilities, COUNTED, as reported.",
+            "disaster_rescue_centres": "UNIT: facilities, COUNTED, as reported.",
+            "bus_stands_with_water": (
+                "UNIT: facilities, COUNTED - bus stands with a drinking water "
+                "facility, as reported. Unrelated to the remoteness band, which "
+                "is built from distance to the nearest bus stop."
+            ),
+            "seed_centres": (
+                "UNIT: facilities, COUNTED - cooperative seed centres, as "
+                "reported."
+            ),
+
+            # ── profile: revenue and equipment ─────────────────────────────
+            "osr_collected": (
+                "UNIT: rupees, TOTALLED - own-source revenue the Gram Panchayat "
+                "reports collecting to date. This is NOT one of the report's "
+                "four money bases (planned, sanctioned, spent, cashbook): it is "
+                "money the Gram Panchayat raised itself, over an unstated "
+                "period, and it must never be added to or compared against "
+                "them."
+            ),
+            "laptops": (
+                "UNIT: devices, COUNTED - as reported. 2 Gram Panchayats "
+                "reported no figure at all and read as 0 here, so 'none' and "
+                "'not reported' cannot be told apart on this column."
+            ),
+            "printers": (
+                "UNIT: devices, COUNTED - as reported; the same 2 Gram "
+                "Panchayats read as 0 without having reported a figure."
+            ),
+            "scanners": (
+                "UNIT: devices, COUNTED - as reported; the same 2 Gram "
+                "Panchayats read as 0 without having reported a figure."
+            ),
+            "sports_courts": (
+                "UNIT: courts, COUNTED - badminton, football and volleyball "
+                "courts added together."
+            ),
+
+            # ── lifetime performance: the whole window, not a year ─────────
+            # Each of these equals the matching view3 column summed over all six
+            # fiscal years, so the two sections can never disagree on a total.
+            "n_plans": (
+                "UNIT: plans, COUNTED (Main + Supplementary) - all six years "
+                "together, not one year."
+            ),
+            "n_activities": (
+                "UNIT: activities, COUNTED - every activity the Gram Panchayat "
+                "planned across the whole window. Equals the yearly report "
+                "card's total for the same Gram Panchayat."
+            ),
+            "n_costed": "UNIT: activities, COUNTED - those planned with a cost.",
+            "n_costless": (
+                "UNIT: activities, COUNTED - those planned without one, "
+                "recorded only from 2023-24 onward, which is why they are 7,074 "
+                "of the 12,704."
+            ),
+            "planned_cost": "UNIT: rupees, TOTALLED, PLANNED basis, whole window.",
+            "sanctioned_total": (
+                "UNIT: rupees, TOTALLED, SANCTIONED basis, whole window "
+                "(the one-in-six coverage caveat applies)."
+            ),
+            "expenditure_total": "UNIT: rupees, TOTALLED, SPENT basis, whole window.",
+            "overspend_vs_plan": (
+                "UNIT: rupees, TOTALLED, SIGNED (SPENT minus PLANNED) over the "
+                "whole window. Positive = spending above plan; negative = "
+                "unspent plan."
+            ),
+            "overspend_vs_sanction": (
+                "UNIT: rupees, TOTALLED, SIGNED (SPENT minus SANCTIONED) over "
+                "the whole window; meaningful only for the sanctioned sixth. A "
+                "zero means nothing was sanctioned, not that spending matched "
+                "sanction - read it against n_admin_approvals."
+            ),
+            "payment_amount": "UNIT: rupees, TOTALLED, CASHBOOK basis, whole window.",
+            "receipt_amount": "UNIT: rupees, TOTALLED, CASHBOOK basis, whole window.",
+            "n_admin_approvals": (
+                "UNIT: sanction records, COUNTED, whole window. Zero can mean "
+                "nothing was sanctioned OR nothing was recorded. One sample "
+                "Gram Panchayat has 640 activities and zero of these."
+            ),
+            "n_tech_approvals": (
+                "UNIT: sanction records, COUNTED, whole window. Totals 2,095 "
+                "across the sample, not the 2,134 technical-approval records: "
+                "39 sit on activities with no administrative approval and are "
+                "invisible here, deliberately, so the Ask chatbot and this "
+                "report give the same number."
+            ),
+            "n_completed": (
+                "UNIT: activities, COUNTED - only 17 activities are marked "
+                "complete in the whole sample, so this column measures "
+                "recording practice and cannot rank Gram Panchayats."
+            ),
+            "n_ongoing": "UNIT: activities, COUNTED, whole window.",
+            "n_abandoned": "UNIT: activities, COUNTED, whole window.",
+            "n_with_evidence": (
+                "UNIT: activities, COUNTED - those with at least one geotagged "
+                "photo upload, whole window."
+            ),
+            "evidence_uploads": (
+                "UNIT: geotagged photo uploads, TOTALLED, whole window."
+            ),
         },
     },
 }
+
+
+# ── WP-D11b T4: the glossary entries for the averaged twins ──────────────────
+# One per `_mean` alias on views 3 and 4, in the WP-D2c appendix form (the
+# `payment_amount_mean` entry above is the template: unit, AVERAGED per what,
+# "the same column as", what it is independent of, "use this, not the total").
+# Generated from the configs and from each TOTAL's own entry rather than typed
+# out 24 times, so an average can never describe its column differently from
+# the column's own entry -- and the basis, sign and coverage caveats are
+# inherited by reference instead of being copied and left to drift.
+_AVERAGED_GLOSSARY_WORDS = {
+    "view3": ("GP-year", "Gram Panchayat-years",
+              "the typical Gram Panchayat-year in the group",
+              "how many Gram Panchayats or years"),
+    "view4": ("Gram Panchayat", "Gram Panchayats",
+              "the typical Gram Panchayat in the group, over the whole "
+              "six-year window",
+              "how many Gram Panchayats"),
+}
+
+
+def _averaged_glossary_entry(view_name: str, total: str, total_entry: str) -> str:
+    unit = total_entry.split("UNIT: ", 1)[-1].split(",", 1)[0].split(" - ", 1)[0].strip()
+    per, rows, typical, count = _AVERAGED_GLOSSARY_WORDS[view_name]
+    return (
+        f"UNIT: {unit}, AVERAGED per {per}. The same column as {total}, "
+        f"normalised by {rows}: {typical}, independent of {count} the group "
+        f"contains. Everything the entry for {total} says about its basis, sign "
+        f"and coverage applies to this average too. Use this, not the total, to "
+        f"compare groups of different size - a band of 15 Gram Panchayats and a "
+        f"band of 2 are compared by their typical member, not by their headcount."
+    )
+
+
+for _view in AVERAGED_GRAIN:
+    _gloss = VIEW_DESCRIPTIONS[_view]["column_glossary"]
+    for _m in VIEW_CONFIGS[_view].measures:
+        if _m.agg == "avg" and _m.column:
+            _gloss[_m.name] = _averaged_glossary_entry(_view, _m.column,
+                                                        _gloss[_m.column])
 
 
 # =============================================================================
@@ -1137,6 +1754,26 @@ _VOLUME_MEASURE = {
     "view1": "n_activities",
     "view2": "payment_count",
     "view3": "n_activities",
+    # WP-D11. view4 takes `n_activities` for the same reason views 1 and 3 do,
+    # and the failing findings that made this omission visible are the argument:
+    # the WP-D2c regression gate caught `overspend_vs_plan by block_name`,
+    # `overspend_vs_sanction by district_name` and `overspend_vs_plan by
+    # gp_name` reaching view4's top-15 with no volume context, which is exactly
+    # the size-is-not-performance confound rule 2b exists to expose. The volume
+    # behind an overspend total is the ACTIVITY COUNT -- a block with more
+    # activities carries more of any activity-driven rupee total, almost by
+    # definition -- so the base has to be the same one view3 quotes for the same
+    # two measures, or the two sections would explain the same confound with
+    # different denominators.
+    #
+    # `population_total` is the other candidate and is deliberately NOT used.
+    # It is the right base for a question about REACH ("how many people sit
+    # behind this total") and the wrong one for a question about size confound
+    # in a programme measure: a large Gram Panchayat with no activities would
+    # read as a big volume share while contributing nothing to the total the
+    # share is supposed to explain. It stays available to the prose layer as a
+    # measure, which is where a per-capita statement belongs (§12.4).
+    "view4": "n_activities",
 }
 
 # Which BREAKDOWNS get the comparison. It was the geography spine only, on the
@@ -1167,9 +1804,9 @@ POPULATION_SHARE_RULE = """2b. SIZE IS NOT PERFORMANCE. Where a finding carries 
    - Only call a divergence a gap when the two shares actually diverge, and say by how much using the figures given. That IS the finding when it happens, and it is the one to lead with
    - Copy the percentages verbatim like every other figure. 'scope' tells you which slice the share describes and 'volume_in_scope' how much volume is behind it. If 'base_not_narrowed_by' is present, the share covers a WIDER slice than the finding does -- name the slice you are describing so the reader is not misled
 
-2c. PREFER THE PER-UNIT FIGURE WHERE ONE IS OFFERED. Where a finding carries 'stats.intensity_companion', the same rupees are also available as an average per Gram Panchayat per month, which does not grow with the number of Gram Panchayats a place contains.
-   - Quote the companion figure alongside the total whenever you rank places, and prefer it when you say which place stands out. A district leading on total outflow because it holds four of the sample's twenty Gram Panchayats is not a finding; a district whose typical Gram Panchayat moves more money each month than its neighbours' is
-   - Copy those figures verbatim too, and keep the words that come with them: one is a total, the other is a typical month for one Gram Panchayat. Never add them together and never present one as the other"""
+2c. PREFER THE PER-UNIT FIGURE WHERE ONE IS OFFERED. Where a finding carries 'stats.intensity_companion', the same figures are also available as an average per Gram Panchayat -- per month, per year or over the whole window, as its 'what_this_is' says -- which does not grow with the number of Gram Panchayats a group contains.
+   - Quote the companion figure alongside the total whenever you rank places or groups, and prefer it when you say which one stands out. A district leading on total outflow because it holds four of the sample's twenty Gram Panchayats is not a finding; a district whose typical Gram Panchayat moves more money than its neighbours' is
+   - Copy those figures verbatim too, and keep the words that come with them: one is a total, the other is the typical Gram Panchayat's figure over the period its 'what_this_is' names. Never add them together and never present one as the other"""
 
 
 _view_df_cache: dict = {}
@@ -1265,6 +1902,34 @@ _INTENSITY_COMPANION = {
     "view2": {"payment_amount": "payment_amount_mean",
               "receipt_amount": "receipt_amount_mean"},
 }
+# WP-D11b T4: views 3 and 4 carry averaged twins too (D61 ruling 4), and the
+# companion is how rule 2c pairs a total with its twin -- so the registry is
+# DERIVED from the configs rather than extended by hand: every AVG alias of a
+# SUM measure on those two views is that measure's companion. A twin is never
+# a candidate for the A2 twin MERGE: `_twin_key` includes the measure name, and
+# `payment_amount` and `payment_amount_mean` are different names.
+for _view in AVERAGED_GRAIN:
+    _INTENSITY_COMPANION[_view] = {
+        _m.column: _m.name for _m in VIEW_CONFIGS[_view].measures
+        if _m.agg == "avg" and _m.column}
+
+# What each view's average IS, in the words the companion block carries, and
+# the key its row counts go under. view2's are the strings it has always
+# shipped, kept byte-for-byte; the other two say their own grain.
+_COMPANION_WORDS = {
+    "view2": ("averaged per Gram Panchayat per month instead of totalled - a "
+              "typical month for one Gram Panchayat, which does not grow with "
+              "how many of them a group holds",
+              "gp_months_behind_each_average"),
+    "view3": ("averaged per Gram Panchayat per fiscal year instead of totalled "
+              "- a typical year for one Gram Panchayat, which does not grow "
+              "with how many Gram Panchayats or years a group holds",
+              "gp_years_behind_each_average"),
+    "view4": ("averaged per Gram Panchayat instead of totalled - the typical "
+              "Gram Panchayat over the whole six-year window, which does not "
+              "grow with how many Gram Panchayats a group holds",
+              "gps_behind_each_average"),
+}
 
 
 def intensity_companion(view_name: str, breakdown: str, measure: str,
@@ -1291,19 +1956,19 @@ def intensity_companion(view_name: str, breakdown: str, measure: str,
 
     means = df.groupby(breakdown)[column].mean().sort_values(ascending=False)
     rows  = df.groupby(breakdown)[column].size()
+    words, rows_key = _COMPANION_WORDS[view_name]
+    # view2's companions are all rupee columns and it has always said "the same
+    # rupees"; views 3 and 4 also average counts, so they say "figures".
+    same = "rupees" if view_name == "view2" else "figures"
     return {
         "measure": companion,
-        "what_this_is": (
-            f"the same rupees as {measure}, averaged per Gram Panchayat per "
-            "month instead of totalled - a typical month for one Gram "
-            "Panchayat, which does not grow with how many of them a group holds"
-        ),
+        "what_this_is": f"the same {same} as {measure}, {words}",
         "how_aggregated": "averaged across rows - a per-unit figure, not a total",
         "values": {
             str(k): format_measure(view_name, companion, v)
             for k, v in means.head(5).items()
         },
-        "gp_months_behind_each_average": {
+        rows_key: {
             str(k): _num(int(rows[k]), 0) for k in means.head(5).index
         },
     }
@@ -1936,7 +2601,21 @@ def enrich_candidates_with_stats(
         _mark_framing_rules(view_name, c, config)
         enriched.append(c)
 
-    return enriched
+    # WP-D11b T3: every consumer of this function writes prose from what it
+    # returns -- the gamma editions, the executive report, the feed's packets --
+    # so the size bands leave here with their unit. Done LAST, after every
+    # figure has been computed against the view's own (bare) labels, and on
+    # copies, so the caller's candidates are not altered. Only the fields a
+    # writer reads are mapped; nothing downstream filters the view by them.
+    return [_display_candidate(c) for c in enriched]
+
+
+def _display_candidate(c: dict) -> dict:
+    out = dict(c)
+    for key in ("stats", "commonness_sets", "exceptions", "base_subspace"):
+        if key in out:
+            out[key] = display_band_labels_deep(out[key])
+    return out
 
 
 # =============================================================================
@@ -1970,7 +2649,9 @@ def build_view_prompt(view_name: str, ranked_candidates: list) -> str:
 
     findings_json = json.dumps(findings, indent=2, default=str)
 
-    return f"""You are writing the findings section of an analytical report on Gram Panchayat development planning and spending in Odisha, India, for the Department of Panchayati Raj & Drinking Water. The data covers the Gram Panchayat Development Plan (GPDP): the works and services a Gram Panchayat plans each year, the administrative and technical sanctions that approve them, the money actually paid out of the Gram Panchayat cashbook, and the geotagged photographs recorded as evidence.
+    # WP-D11b T3: the whole prompt passes through the band map (idempotent), so
+    # no path into it can carry a bare size-band label.
+    return display_band_labels(f"""You are writing the findings section of an analytical report on Gram Panchayat development planning and spending in Odisha, India, for the Department of Panchayati Raj & Drinking Water. The data covers the Gram Panchayat Development Plan (GPDP): the works and services a Gram Panchayat plans each year, the administrative and technical sanctions that approve them, the money actually paid out of the Gram Panchayat cashbook, and the geotagged photographs recorded as evidence.
 
 ## Your Audience
 An officer of the Department of Panchayati Raj & Drinking Water who takes these findings into the departmental review meeting, where district and block officials are held to account for how their Gram Panchayats plan, sanction and spend. They are non-technical -- they understand the GPDP cycle, sanctioning authority and grant components, but not data science terminology. They want to know: what did the data reveal, why does it matter for delivery, and what should they put to the district and block officials in front of them.
@@ -2063,7 +2744,7 @@ Write a clear, readable summary of these findings for the programme officer. Fol
    - Use inline bold sparingly — only for specific Gram Panchayat, block or district names that are exceptions or outliers
    - No bold for general phrases or conclusions
    - Plain prose for everything else
-"""
+""")
 
 
 # =============================================================================
@@ -2107,7 +2788,9 @@ def build_global_feed_prompt(feed: dict) -> str:
                 f["size_share"] = size_share
         findings.append(f)
 
-    return f"""You are writing the OPENING section of an analytical report on Gram Panchayat development planning and spending in Odisha, India, for the Department of Panchayati Raj & Drinking Water. Everything after this section goes area by area; this section is the one place the whole picture is looked at together.
+    # WP-D11b T3: the feed rows' engine sentences carry bare size-band labels;
+    # the whole prompt passes through the band map on its way out.
+    return display_band_labels(f"""You are writing the OPENING section of an analytical report on Gram Panchayat development planning and spending in Odisha, India, for the Department of Panchayati Raj & Drinking Water. Everything after this section goes area by area; this section is the one place the whole picture is looked at together.
 
 ## Your Audience
 An officer of the Department of Panchayati Raj & Drinking Water who takes these findings into the departmental review meeting, where district and block officials answer for how their Gram Panchayats plan, sanction and spend. Non-technical: they understand the GPDP cycle and sanctioning authority, not data science.
@@ -2152,7 +2835,7 @@ Write 350-550 words. Rules:
 7. End with the three questions you would put on the agenda of the next departmental review.
 
 8. FORMATTING: ### for any sub-headers. No bold except for a Gram Panchayat, block or district name that is an exception. Plain prose otherwise.
-"""
+""")
 
 
 def _feed_weighting_sentence(weighting: dict) -> str:

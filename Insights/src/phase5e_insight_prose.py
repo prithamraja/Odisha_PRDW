@@ -462,6 +462,19 @@ def _drop_degenerate_bottom(stats):
     return out
 
 
+def _display(text):
+    """A size-band label with its unit, from the ONE map (WP-D11b T3).
+
+    `phase5b_report.BAND_DISPLAY` is the definition; the packets, the fallback
+    sentence, the report prompts and DiscoverChat's glossary all read it, so the
+    three prose surfaces cannot disagree about what a band is called. Imported
+    lazily: `--emit-feed-md` renders from the sidecar alone and must not pull in
+    the enrichment stack. Non-strings pass through untouched.
+    """
+    from phase5b_report import display_band_labels
+    return display_band_labels(text)
+
+
 def build_packets(p5b, feed):
     """One packet per feed row, all 32, in feed order."""
     by_view = {}
@@ -534,6 +547,24 @@ def build_packets(p5b, feed):
             "thin": thin,
             "thin_reason": thin_reason,
         }
+        # WP-D11b T3 (D61 ruling 3). What the writer AND the verifier read
+        # carries the size band's unit -- "2,500 to 5,000 people", never the bare
+        # '2,500 to 5,000' the pack stores. WP-D11's verifier rejected
+        # "population" on 8 of 14 gp_size findings because the label named no
+        # unit; this packet IS its Source Material, so the unit goes in here.
+        # The stats figures arrive already mapped from phase5b's enrichment;
+        # they are mapped again because the function is idempotent and a figure
+        # from any other path should not be the one that slips through.
+        for key in ("feed_sentence", "scope", "shared_pattern_in_words"):
+            packet[key] = _display(packet[key])
+        packet["members_following_the_pattern"] = [
+            _display(m) for m in packet["members_following_the_pattern"]]
+        for exc in packet["exceptions"]:
+            exc["name"] = _display(exc["name"])
+            exc["in_words"] = _display(exc["in_words"])
+        for fig in packet["reference_figures"] + packet["grain_figures"]:
+            fig["label"] = _display(fig["label"])
+            fig["display"] = _display(fig["display"])
         packet["year_forms"] = year_forms(json.dumps(packet, ensure_ascii=False))
         # D45. NOT rendered into the writer's prompt -- render_packet never
         # reads this key. It is the fallback text, and showing a writer the
@@ -583,8 +614,23 @@ def _measure_subject(view, measure):
     plain = CFG.MEASURE_PLAIN.get((view, measure))
     if plain:
         return plain
+    # WP-D11b T4: an averaged twin reads as its total's phrase, averaged at the
+    # view's grain -- DERIVED from the total's entry, so no second table exists
+    # to drift from MEASURE_PLAIN. view2's two predate this and have entries.
+    if measure.endswith("_mean") and view in _AVERAGED_GRAIN_PLAIN:
+        base = CFG.MEASURE_PLAIN.get((view, measure[:-len("_mean")]))
+        if base:
+            base = base[4:] if base.startswith("the ") else base
+            return "the average %s %s" % (base, _AVERAGED_GRAIN_PLAIN[view])
+        return "the average %s %s" % (measure[:-len("_mean")].replace("_", " "),
+                                      _AVERAGED_GRAIN_PLAIN[view])
     # Never a raw column name, even for a measure the table has not met.
     return measure.replace("_", " ")
+
+
+# The grain an averaged twin is averaged over, as a fallback sentence says it.
+_AVERAGED_GRAIN_PLAIN = {"view3": "per Gram Panchayat per year",
+                         "view4": "per Gram Panchayat"}
 
 
 def _measure_bare(view, measure):
@@ -839,7 +885,10 @@ def cleaned_sentence(row):
     if is_even:
         sentence += (" This is about how totals are spread, not about how much "
                      "any one of them spends.")
-    return re.sub(r"\s+", " ", sentence).strip()
+    # WP-D11b T3: the fallback is prose an officer reads, so a size band carries
+    # its unit here too. Deterministic, so the checker's byte-exact replay of
+    # this function still holds.
+    return _display(re.sub(r"\s+", " ", sentence).strip())
 
 
 

@@ -1,0 +1,5 @@
+1 chat.completions max_tokens=1024: 500 -> {"code": 500, "reason": "MODEL_NOT_AVAILABLE", "message": "model not available", "metadata": {"reason": "model: qwen/qwen3-embedding-8b is not an chat model"}}
+2 embeddings max_tokens=1024: 200 -> embedding of 4096 numbers
+3 embeddings dimension=1024: 200 -> embedding of 4096 numbers
+4 embeddings output_dimension=1024: 200 -> embedding of 4096 numbers
+5 embeddings dimensions=1024 (the pinned request): 400 -> {"message": "dimensions 1024 is not supported trace_id: 8a0ea01d5fa02d56b1b2d01506c9a3ad", "type": "invalid_request_error"}

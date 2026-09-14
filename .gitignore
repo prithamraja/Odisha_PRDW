@@ -46,18 +46,29 @@ deploy/.railway-token
 # and reads Insights/metainsights/ straight from git, and since WP-D10 the
 # decompose half (74 MB .npy + 7 MB .json.gz) fits under GitHub's 100 MB
 # per-file limit — committing it is what turns question decomposition ON in
-# production. The committed files are the WP-D10 spellings:
-#   retrieval_corpus.json.gz / .npy / _stamp.json
-#   decompose_corpus.json.gz / .npy / _stamp.json
-# Each mining rebuild re-commits ~80 MB; if mining becomes frequent, move the
+# production. WP-D11 then grew the decompose matrix to 136.8 MB, over that
+# limit, and WP-D11b (D61 ruling 1) SPLIT every vector matrix into stamped parts
+# under 95 MB rather than shrink it. The committed files are now:
+#   retrieval_corpus.json.gz / .part<N>.npy / _stamp.json
+#   decompose_corpus.json.gz / .part<N>.npy / _stamp.json
+# The stamps list every part with its SHA-256, and DiscoverChat's gate
+# `vector-parts-under-limit` fails on a part over 100 MB or a stale file.
+# Each mining rebuild re-commits ~150 MB; if mining becomes frequent, move the
 # sidecars to a fetched artifact instead.
 #
-# Only the superseded pre-D10 plain-JSON spellings stay ignored, so a stale
-# fp32-era record file left in a mirror cannot be committed by accident.
+# The superseded spellings stay ignored, so a stale file left in a mirror
+# cannot be committed by accident: the pre-D10 plain JSON, and the pre-D11b
+# unsplit .npy (at decompose size it is over GitHub's limit and a push would be
+# refused). NOTE: the two unsplit .npy files were TRACKED before WP-D11b, and an
+# ignore line does not untrack a file -- the commit that adopts the split must
+# record their deletion (`git rm --cached` is not needed: the files are gone
+# from the working tree, so `git add -A` / `git rm` records it).
 Insights/metainsights/retrieval_corpus.json
 Insights/metainsights/decompose_corpus.json
 retrieval_corpus.json
 decompose_corpus.json
+Insights/metainsights/retrieval_corpus.npy
+Insights/metainsights/decompose_corpus.npy
 
 # The resumable partial embedding cache phase5f writes while it runs, and
 # removes when the build completes. Present only after a killed build.

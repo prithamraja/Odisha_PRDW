@@ -1,94 +1,137 @@
 {
-  "what_this_is": "Provenance for retrieval_corpus.json/.npy. The `generated_at` line is the ONLY field expected to differ between two consecutive builds (D5.0 gate); everything else, vectors included, is reproduced from the cache.",
+  "what_this_is": "Provenance for retrieval_corpus.json.gz and its vector parts. The `generated_at` line is the ONLY field expected to differ between two consecutive builds (D5.0 gate); everything else, vectors included, is reproduced from the cache. `vector_storage` lists the parts in row order with a SHA-256 each; the loader refuses a missing or altered part (WP-D11b).",
   "artefacts": [
     "metainsights/retrieval_corpus.json.gz",
-    "metainsights/retrieval_corpus.npy"
+    "metainsights/retrieval_corpus.part0.npy"
   ],
-  "candidate_set_id": "a7f991c1df3771f9",
-  "generated_at": "2026-09-04T12:50:18Z",
-  "build_seconds": 1.1,
+  "candidate_set_id": "610cb3d26dff7bf3",
+  "generated_at": "2026-09-11T11:57:28Z",
+  "build_seconds": 10.1,
   "embedding_pin": {
     "model": "qwen/qwen3-embedding-8b",
     "dims": 1024,
-    "base_url": "https://api.novita.ai/openai",
     "query_instruction": "Instruct: Given a question from a government official about village-level planning and spending, retrieve analysis findings that answer it\nQuery: ",
     "document_instruction": null,
     "normalisation": "L2, client-side",
-    "storage_dtype": "float16"
+    "storage_dtype": "float16",
+    "storage_layout": "npy-parts",
+    "base_url": "https://openrouter.ai/api/v1",
+    "provider_route": {
+      "order": [
+        "DeepInfra"
+      ],
+      "allow_fallbacks": true
+    }
   },
-  "embedding_pin_fingerprint": "808928d2275aa54b",
-  "embedding_calls": 0,
-  "texts_embedded": 0,
-  "records": 4239,
+  "embedding_pin_fingerprint": "c2f9779ab6cf29d6",
+  "embedding_calls": 1,
+  "texts_embedded": 56,
+  "records": 4404,
   "counts": {
     "view1": {
       "raw": 5000,
-      "twin_merged": 884,
-      "corpus": 4116,
+      "twin_merged": 972,
+      "corpus": 4028,
       "ranked": 15
     },
     "view2": {
-      "raw": 122,
-      "twin_merged": 1,
-      "corpus": 121,
+      "raw": 322,
+      "twin_merged": 21,
+      "corpus": 301,
       "ranked": 15
     },
     "view3": {
-      "raw": 2,
+      "raw": 45,
+      "twin_merged": 1,
+      "corpus": 44,
+      "ranked": 15
+    },
+    "view4": {
+      "raw": 31,
       "twin_merged": 0,
-      "corpus": 2,
-      "ranked": 2
+      "corpus": 31,
+      "ranked": 13
     }
   },
   "ranking_prefilter_cap": 5000,
   "source_files": {
     "global_feed.json": {
-      "sha256": "3da40edae324f917ce8fd5118df54b8c24fad92716e27550b18ff238c46a1cce",
-      "bytes": 53709
+      "sha256": "c591db2199c8680c59e9706902753722c8eb5f465f4923aafb9728515294b88b",
+      "bytes": 108050
     },
     "global_feed_source_set.json": {
-      "sha256": "6c7b62e62f728849530b2078dd30b72c53fc019bacacf3b65e42a27e272e11a4",
-      "bytes": 1474
+      "sha256": "a42f9498027522b1d2a67918076e5d8553cd6f02d29344c1932d38cc3f4101ea",
+      "bytes": 1767
     },
     "insight_prose.json": {
-      "sha256": "333b24e5214fec8ce4056d5bdd38506ad8059061ddd7d9022417496182354f10",
-      "bytes": 939932
+      "sha256": "5d53cff1888fa6b744226f5600dd9bbf3e9f240e826672c41f72b0e9ea00966b",
+      "bytes": 1390989
     },
     "view1_candidates.json": {
-      "sha256": "890767085988a6c7b61b1694a51e544d977932b1f567c89cae0e017b3643359b",
-      "bytes": 5868996
+      "sha256": "1335f43736f2e2eb710a64c178ef77cf8b5b2b613e6d69c27b572e28c71f96b7",
+      "bytes": 4642540
     },
     "view1_data_quality.json": {
       "sha256": "08d69cde4f870759273983a9c7c570d4d0851c63cf5592f7bb83cb51a3bc71f9",
       "bytes": 63
     },
     "view1_ranked.json": {
-      "sha256": "182ff833849488cad3a15c0cec614f903a9ee68bff3175ffe824f8e3262476e1",
-      "bytes": 18430
+      "sha256": "7dcdb22d1be0d9eefbb9eefee74fb7ac6115117560b5eb0f2cca42fc0f73f9d4",
+      "bytes": 18434
     },
     "view2_candidates.json": {
-      "sha256": "5796d3c8029c5f06efe71fa59ce84c3e9c847335b52b89c0078eb82f0ad2358c",
-      "bytes": 143100
+      "sha256": "602ff52ec6789ca84a7e06ee291682463b265d703a3ddcd27240875aa31997e9",
+      "bytes": 347869
     },
     "view2_data_quality.json": {
       "sha256": "08d69cde4f870759273983a9c7c570d4d0851c63cf5592f7bb83cb51a3bc71f9",
       "bytes": 63
     },
     "view2_ranked.json": {
-      "sha256": "44c9638c450d29af03e2981855757c1a603db98272763c695133047d7cf3cd62",
-      "bytes": 16544
+      "sha256": "5bdf95d1a4a483bc50e7bff3839addd5cd20b70191b6c0552da9274d280a6aa8",
+      "bytes": 13183
     },
     "view3_candidates.json": {
-      "sha256": "a5fa0a1f5f2fa659f52d89bff2f7d11dc12beb52aa97afccb92b882effd17ecb",
-      "bytes": 3613
+      "sha256": "ab532743dcc67e21f37666861d8fce4a99b55f1e34628db6d93bb7fc7c2035cb",
+      "bytes": 87574
     },
     "view3_data_quality.json": {
-      "sha256": "782b1660e4edcc21d7f4eb81df9d001774d8998850ea1a49095260cda3e72cf2",
+      "sha256": "9968c96d04cb2200cba7ba35cc8c019ea7b6a29c71e4090581d443636dce83d8",
       "bytes": 1072
     },
     "view3_ranked.json": {
-      "sha256": "a5fa0a1f5f2fa659f52d89bff2f7d11dc12beb52aa97afccb92b882effd17ecb",
-      "bytes": 3613
+      "sha256": "fb6b61e66926930352340ef77caa68dcbe62035f9a0f4955cccef5c768ed1395",
+      "bytes": 27904
+    },
+    "view4_candidates.json": {
+      "sha256": "158fe6f298c645f77a15ff8b6ea78830bb37b34f3cc976a5bcdb387acafdc48c",
+      "bytes": 125629
+    },
+    "view4_data_quality.json": {
+      "sha256": "08d69cde4f870759273983a9c7c570d4d0851c63cf5592f7bb83cb51a3bc71f9",
+      "bytes": 63
+    },
+    "view4_ranked.json": {
+      "sha256": "8f7d748d41ce24dccf77be8949ece370779889a14527b35224576ab1d2dca4b9",
+      "bytes": 54170
     }
+  },
+  "vector_storage": {
+    "layout": "npy-parts",
+    "dtype": "float16",
+    "shape": [
+      4404,
+      1024
+    ],
+    "part_max_bytes": 95000000,
+    "matrix_sha256": "c50d2319a64217253759c59735971fb61e6262a29a2ad5964cd57dc159b108b8",
+    "parts": [
+      {
+        "file": "retrieval_corpus.part0.npy",
+        "rows": 4404,
+        "bytes": 9019520,
+        "sha256": "a01ce848be1442ef79ce3a160ad928a1bc27e0b3db65f37640113a05707110b9"
+      }
+    ]
   }
 }

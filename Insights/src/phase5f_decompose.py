@@ -87,7 +87,7 @@ from phase2_engine import (                                    # noqa: E402
     Subspace, ImpactCalculator, apply_subspace,
 )
 from phase4a_engine import (                                   # noqa: E402
-    VIEW1_CONFIG, VIEW2_CONFIG, VIEW3_CONFIG,
+    VIEW1_CONFIG, VIEW2_CONFIG, VIEW3_CONFIG, VIEW4_CONFIG,
     evaluate_evenness, evaluate_attribution,
 )
 from phase5b_report import (                                   # noqa: E402
@@ -104,12 +104,16 @@ from phase5d_retrieval_corpus import (                         # noqa: E402
     # one loader for both corpora (D10 ruling 5), decided in phase5d.
     read_corpus_json, write_corpus_json, save_vectors, load_vectors,
     cache_is_reusable, members_columnar, members_expand,
+    # WP-D11b T1: the split vector layout, from the same module, so the two
+    # corpora cannot be written or read two different ways.
+    load_previous_vectors, retire_unsplit, vector_artefacts,
 )
 
 MI_DIR = os.path.join(BASE_DIR, "metainsights")
 VIEWS_DIR = os.path.join(BASE_DIR, "views_prdw")
-VIEWS = ("view1", "view2", "view3")
-CONFIGS = {"view1": VIEW1_CONFIG, "view2": VIEW2_CONFIG, "view3": VIEW3_CONFIG}
+VIEWS = ("view1", "view2", "view3", "view4")   # WP-D11
+CONFIGS = {"view1": VIEW1_CONFIG, "view2": VIEW2_CONFIG, "view3": VIEW3_CONFIG,
+           "view4": VIEW4_CONFIG}
 
 CORPUS_PATH = os.path.join(MI_DIR, "decompose_corpus.json.gz")
 VECTORS_PATH = os.path.join(MI_DIR, "decompose_corpus.npy")
@@ -204,6 +208,83 @@ _MEASURE_PHRASE = {
         "n_with_evidence":       "activities with photo evidence",
         "evidence_uploads":      "geotagged photo uploads",
     },
+    # WP-D11. Sixty measures in two families, and the phrasing keeps them
+    # apart on purpose: the PROFILE half is always "reported ..." because every
+    # one of those numbers is the Gram Panchayat's own return, while the
+    # LIFETIME half repeats view3's phrases verbatim because it is the same
+    # column summed over the whole window. A sentence that said "toilets" flat
+    # would be asserting a fact about toilets; "reported household toilets" is
+    # asserting what the form says, which is all this data supports.
+    "view4": {
+        # profile: population
+        "population_total":             "reported population",
+        "population_male":              "reported male population",
+        "population_female":            "reported female population",
+        "population_children":          "reported children's population",
+        "population_sc":                "reported Scheduled Caste population",
+        "population_st":                "reported Scheduled Tribe population",
+        "population_obc":               "reported OBC population",
+        "population_general":           "reported general-category population",
+        # profile: households and organisation
+        "households":                   "reported households",
+        "job_card_holders":             "reported job-card holders",
+        "shgs":                         "reported self-help groups",
+        "wards":                        "reported wards",
+        "revenue_villages":             "reported revenue villages",
+        "villages_mapped_lgd":          "reported villages mapped to an LGD code",
+        # profile: education and childcare
+        "anganwadi_centres":            "reported anganwadi centres",
+        "schools_pre_primary":          "reported pre-primary schools",
+        "schools_primary":              "reported primary schools",
+        "schools_secondary":            "reported secondary schools",
+        "schools_higher_secondary":     "reported higher secondary schools",
+        # profile: health
+        "health_sub_centres":           "reported health sub-centres",
+        "primary_health_centres":       "reported primary health centres",
+        "wellbeing_centres":            "reported wellbeing centres",
+        "dispensaries":                 "reported dispensaries",
+        "ayurvedic_clinics":            "reported ayurvedic clinics",
+        # profile: water and sanitation
+        "drinking_water_sources":       "reported drinking water sources",
+        "households_tap_water":         "reported households with a tap connection",
+        "household_toilets":            "reported household toilets",
+        "community_sanitary_complexes": "reported community sanitary complexes",
+        "solid_waste_centres":          "reported solid waste centres",
+        # profile: services and civic infrastructure
+        "common_service_centres":       "reported common service centres",
+        "banks":                        "reported banks and cooperative banks",
+        "atms":                         "reported ATMs",
+        "rural_libraries":              "reported rural libraries",
+        "children_parks":               "reported children's parks",
+        "disaster_rescue_centres":      "reported disaster rescue centres",
+        "bus_stands_with_water":        "reported bus stands with drinking water",
+        "seed_centres":                 "reported cooperative seed centres",
+        # profile: revenue and equipment
+        "osr_collected":                "reported own-source revenue collected",
+        "laptops":                      "reported laptops",
+        "printers":                     "reported printers",
+        "scanners":                     "reported scanners",
+        "sports_courts":                "reported sports courts",
+        # lifetime performance -- view3's phrases, over the whole window
+        "n_plans":                      "plans",
+        "n_activities":                 "activities planned",
+        "n_costed":                     "activities planned with a cost",
+        "n_costless":                   "activities planned without a cost",
+        "planned_cost":                 "planned cost",
+        "sanctioned_total":             "sanctioned amount",
+        "expenditure_total":            "spending",
+        "overspend_vs_plan":            "spending measured against plan",
+        "overspend_vs_sanction":        "spending measured against sanction",
+        "payment_amount":               "cashbook money paid out",
+        "receipt_amount":               "cashbook money received",
+        "n_admin_approvals":            "administrative approvals",
+        "n_tech_approvals":             "technical approvals",
+        "n_completed":                  "activities completed",
+        "n_ongoing":                    "activities ongoing",
+        "n_abandoned":                  "activities abandoned",
+        "n_with_evidence":              "activities with photo evidence",
+        "evidence_uploads":             "geotagged photo uploads",
+    },
 }
 
 # Caveats that belong to the MEASURE and must travel with any figure taken from
@@ -269,6 +350,19 @@ def dimension_plural(dim: str) -> str:
         "fiscal year": "fiscal years",
         "calendar month": "calendar months",
         "calendar quarter": "calendar quarters",
+        # WP-D11. The generic "<name> values" reads badly for every one of the
+        # profile bands -- "panchayat bhawan values", "distance to a bus stop
+        # values" -- so all seven take an irregular. What each becomes is the
+        # plural of the GROUPS the band makes, because that is what the
+        # engine's sentence is quantifying over: "holds across most population
+        # size bands".
+        "social composition": "social composition groups",
+        "population size band": "population size bands",
+        "distance to a bus stop": "distance bands",
+        "office internet and computer": "office equipment groups",
+        "panchayat bhawan": "answers on having a panchayat bhawan",
+        "common service centre": "answers on having a common service centre",
+        "panchayat learning centre": "answers on having a learning centre",
     }
     return irregular.get(name, f"{name} values")
 
@@ -283,6 +377,21 @@ def dimension_singular(dim: str) -> str:
     name = display_name(dim)
     bare = ("Gram Panchayat", "block", "district",
             "fiscal year", "calendar month", "calendar quarter")
+    # WP-D11. The generic "<name> value" is wrong for the profile bands in a way
+    # the plural is not: "no single panchayat bhawan value accounts for it"
+    # reads as a claim about a building. Each takes the singular of the GROUP
+    # its plural names, which is what the sentence is quantifying over.
+    irregular = {
+        "social composition": "social composition group",
+        "population size band": "population size band",
+        "distance to a bus stop": "distance band",
+        "office internet and computer": "office equipment group",
+        "panchayat bhawan": "answer on having a panchayat bhawan",
+        "common service centre": "answer on having a common service centre",
+        "panchayat learning centre": "answer on having a learning centre",
+    }
+    if name in irregular:
+        return irregular[name]
     return name if name in bare else f"{name} value"
 
 
@@ -915,7 +1024,14 @@ def load_partial_cache() -> dict:
 
 
 def save_partial_cache(cache: dict) -> None:
-    tmp = PARTIAL_CACHE_PATH + ".tmp"
+    # The tmp name MUST end in `.npz`. `np.savez` appends `.npz` to any path
+    # that does not already carry it, so a tmp of "<...>.partial.npz.tmp" is
+    # written as "<...>.partial.npz.tmp.npz" and the os.replace below then
+    # fails on a file that was never created. WP-D11 is the first run to embed
+    # more than PARTIAL_SAVE_EVERY new texts -- WP-D6 and WP-D10 both served
+    # every vector from cache -- so this crashed the first checkpoint, 3,840
+    # vectors into a 30,561-vector build, and took the whole run with it.
+    tmp = PARTIAL_CACHE_PATH + ".tmp.npz"
     np.savez(tmp, **cache)
     os.replace(tmp, PARTIAL_CACHE_PATH)
 
@@ -978,12 +1094,15 @@ def load_vector_cache() -> dict:
     """
     corpus_path = next((c for c in (CORPUS_PATH, LEGACY_CORPUS_PATH)
                         if os.path.exists(c)), None)
-    if corpus_path is None or not os.path.exists(VECTORS_PATH):
+    if corpus_path is None:
         return {}
     try:
         old = read_corpus_json(corpus_path)
-        vectors = load_vectors(VECTORS_PATH)
     except Exception:
+        return {}
+    # WP-D11b: the parts the previous stamp names, or the pre-split single file.
+    vectors = load_previous_vectors(VECTORS_PATH, STAMP_PATH)
+    if vectors is None:
         return {}
     old_records = old.get("records", [])
     if len(old_records) != len(vectors):
@@ -1027,8 +1146,10 @@ def write_outputs(records, counts, stamp, vectors, embedder, elapsed, views):
             "identity -- its members sum to its total -- and the D6.0 gate "
             "checks all of them. Nothing here correlates, infers or explains "
             "(D41); it is bookkeeping. Vectors live beside this file in "
-            "decompose_corpus.npy, float16 on disk and read as float32, "
-            "row-aligned with `records`. `members` is COLUMNAR -- parallel "
+            "decompose_corpus.part<N>.npy -- consecutive row slices, each under "
+            "git's 100 MB file limit, listed with their SHA-256 in the stamp "
+            "(WP-D11b) -- float16 on disk and read as float32, row-aligned with "
+            "`records`. `members` is COLUMNAR -- parallel "
             "lists plus `null_index` -- and the embedded text is not stored: "
             "`embed_text_sha256` pins it, and `python "
             "Insights/src/phase5f_decompose.py --embed-text <id>` regenerates "
@@ -1051,19 +1172,20 @@ def write_outputs(records, counts, stamp, vectors, embedder, elapsed, views):
     }
     write_corpus_json(CORPUS_PATH, payload)
 
-    if vectors is not None:
-        save_vectors(VECTORS_PATH, vectors)
+    manifest = save_vectors(VECTORS_PATH, vectors) if vectors is not None else None
 
     with open(STAMP_PATH, "w", encoding="utf-8") as fh:
         json.dump({
             "what_this_is": (
-                "Provenance for decompose_corpus.json/.npy. The `generated_at` "
-                "line is the ONLY field expected to differ between two "
-                "consecutive builds (D6.0 gate); everything else, vectors "
-                "included, is reproduced from the cache."
+                "Provenance for decompose_corpus.json.gz and its vector parts. "
+                "The `generated_at` line is the ONLY field expected to differ "
+                "between two consecutive builds (D6.0 gate); everything else, "
+                "vectors included, is reproduced from the cache. "
+                "`vector_storage` lists the parts in row order with a SHA-256 "
+                "each; the loader refuses a missing or altered part (WP-D11b)."
             ),
-            "artefacts": ["metainsights/decompose_corpus.json.gz",
-                          "metainsights/decompose_corpus.npy"],
+            "artefacts": (["metainsights/decompose_corpus.json.gz"]
+                          + vector_artefacts(manifest)),
             "candidate_set_id": stamp["candidate_set_id"],
             "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "build_seconds": round(elapsed, 1),
@@ -1075,8 +1197,14 @@ def write_outputs(records, counts, stamp, vectors, embedder, elapsed, views):
             "reconciled": reconciled,
             "counts": counts,
             "view_parquets": parquet_provenance(views),
+            "vector_storage": manifest,
         }, fh, indent=2, ensure_ascii=False)
         fh.write("\n")
+
+    # After the stamp that names the parts, never before -- phase5d says why.
+    if manifest:
+        retire_unsplit(VECTORS_PATH)
+    return manifest
 
 
 # =============================================================================
@@ -1235,19 +1363,23 @@ def main(argv=None) -> int:
         vectors = np.stack([np.asarray(cache[r["embed_text_sha256"]],
                                        dtype=np.float32) for r in records])
 
-    write_outputs(records, counts, stamp, vectors, embedder,
-                  time.time() - t0, views)
-    # The partial cache exists to survive a kill. Once `decompose_corpus.npy` is
-    # written it holds the same vectors and `load_vector_cache` will find them
+    manifest = write_outputs(records, counts, stamp, vectors, embedder,
+                             time.time() - t0, views)
+    # The partial cache exists to survive a kill. Once the vector parts are
+    # written they hold the same vectors and `load_vector_cache` will find them
     # there, so leaving it behind would be a second 148 MB copy of the same
     # numbers in a Drive-synced directory.
     if vectors is not None and os.path.exists(PARTIAL_CACHE_PATH):
         os.remove(PARTIAL_CACHE_PATH)
     print(f"  wrote {CORPUS_PATH} "
           f"({os.path.getsize(CORPUS_PATH) / 1e6:.1f} MB)")
-    if vectors is not None:
-        print(f"  wrote {VECTORS_PATH}  shape={vectors.shape} "
-              f"({os.path.getsize(VECTORS_PATH) / 1e6:.1f} MB)")
+    if manifest:
+        print(f"  wrote vectors shape={tuple(manifest['shape'])} as "
+              f"{len(manifest['parts'])} part(s), matrix sha256 "
+              f"{manifest['matrix_sha256'][:16]}")
+        for part in manifest["parts"]:
+            print(f"    {part['file']}  {part['rows']:,} rows  "
+                  f"{part['bytes'] / 1e6:.1f} MB  sha256 {part['sha256'][:16]}")
     print(f"  wrote {STAMP_PATH}")
     return 0
 

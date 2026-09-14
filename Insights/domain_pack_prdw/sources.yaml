@@ -189,3 +189,94 @@ tables:
   dim_welfare_scheme:
     file: dim_welfare_scheme.csv
     expected_rows: 12
+
+  # ── GP profile (WP-D11 / mapping doc Amendment B §12) ──────────────────────
+  # One row per Gram Panchayat, 99 columns, self-reported. Joins the master 1:1
+  # on basic_info_lgd = gram_panchayat.gp_lgd_code (zero orphans either side,
+  # verified WP-D11). Source of the seven derived dimensions §12.3 puts on every
+  # view, and of view4's profile measure family.
+  #
+  # THE 'NA' TRAP (WP-D11 T1). 379 cells in this CSV hold the literal string
+  # 'NA', not an empty field, and the runner reads every file with
+  # all_varchar=true — so DuckDB hands back the four characters, never a NULL.
+  # `_cast` in build_views.py emits a plain CAST, which raises on 'NA' and would
+  # fail registration outright. Seven numeric columns are affected and are
+  # therefore NOT cast here; they are cast in derived_columns.sql behind
+  # NULLIF(col, 'NA') so that a 'Not reported' band can only ever come from a
+  # NULL and the string 'NA' reaches no view:
+  #
+  #     basic_amenities_no_of_{computer,laptop,printer,scanner}   2 'NA' each
+  #     panchayat_learning_centre_details_{number_of_computers_laptops,
+  #                                        seating_capacity,
+  #                                        year_of_establishment}  18 'NA' each
+  #
+  # The remaining 43 counts carry no 'NA' on this drop and are cast here as
+  # usual. If a statewide drop puts 'NA' in any of them, registration fails
+  # loudly rather than silently — which is the right failure, and the WP-D11
+  # report proposes a `try_int` cast type for the runner as the general fix.
+  #
+  # basic_info_lgd stays VARCHAR (the join key is an LGD identifier, not a
+  # quantity — the same rule gram_panchayat.gp_lgd_code follows); it is cast to
+  # VARCHAR explicitly in stg_gp_profile so the join is VARCHAR-to-VARCHAR.
+  # panchayat_area_total_area is float even though it is X-unreliable (§12.6.10,
+  # values 1.11 to 3,000 with no consistent unit): the cast records what the
+  # column claims to be, and no band is built on it.
+  gp_profile:
+    file: gp_profile.csv
+    expected_rows: 20
+    casts:
+      # distance, in km, to the nearest bus stop — the remoteness cut point
+      basic_info_distance_from_nearest_bus_stop: int
+      # demographics: male+female = total and general+obc+sc+st = total on all
+      # 20 rows (§12.1). transgender is constant 0 (X-const) but still a count.
+      demographic_details_total_gender_wise_population: int
+      demographic_details_male_population: int
+      demographic_details_female_population: int
+      demographic_details_transgender_population: int
+      demographic_details_children_population: int
+      demographic_details_general_population: int
+      demographic_details_obc_population: int
+      demographic_details_sc_population: int
+      demographic_details_st_population: int
+      # education
+      education_total_pre_primary_schools: int
+      education_total_primary_schools: int
+      education_total_secondary_schools: int
+      education_total_higher_secondary_schools: int
+      # general
+      general_no_of_anganwadi_centers: int
+      general_no_of_destitue_homes_old_age_homes: int
+      general_no_of_households: int
+      general_no_of_job_card_holders: int
+      general_no_of_shg: int
+      # health
+      health_no_of_health_sub_centers: int
+      health_no_of_primary_health_centers: int
+      health_no_of_well_being_centers: int
+      health_no_of_dispensary: int
+      health_no_of_ayurvedic_clinics: int
+      # infrastructure
+      infrastructure_no_of_drinking_water_sources: int
+      infrastructure_no_of_households_connected_to_tap_water: int
+      infrastructure_no_of_household_toilets: int
+      infrastructure_no_of_community_sanitary_complexes: int
+      infrastructure_no_of_solid_waste_managements_centers: int
+      infrastructure_no_of_common_service_centers: int
+      infrastructure_no_of_banks_cooperative_banks: int
+      infrastructure_no_of_atms: int
+      infrastructure_no_of_rural_library: int
+      infrastructure_no_of_children_parks: int
+      infrastructure_no_of_disaster_rescue_centers: int
+      infrastructure_no_of_bus_stands_with_drinking_water_facility: int
+      infrastructure_no_of_cooperative_seed_centers: int
+      # panchayat area
+      panchayat_area_no_of_wards_sansads_of_the_panchayat: int
+      panchayat_area_no_of_revenue_villages: int
+      panchayat_area_no_of_villages_mapped_with_lgd: int
+      # sports
+      sports_no_of_badminton_court: int
+      sports_no_of_football_court: int
+      sports_no_of_volleyball_court: int
+      # money and area
+      basic_amenities_osr_collected_so_far: float
+      panchayat_area_total_area: float

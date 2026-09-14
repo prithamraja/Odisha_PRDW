@@ -1,0 +1,131 @@
+{
+  "what_this_is": "Provenance for retrieval_corpus.json.gz and its vector parts. The `generated_at` line is the ONLY field expected to differ between two consecutive builds (D5.0 gate); everything else, vectors included, is reproduced from the cache. `vector_storage` lists the parts in row order with a SHA-256 each; the loader refuses a missing or altered part (WP-D11b).",
+  "artefacts": [
+    "metainsights/retrieval_corpus.json.gz",
+    "metainsights/retrieval_corpus.part0.npy"
+  ],
+  "candidate_set_id": "d619a72e4fe98d5f",
+  "generated_at": "2026-09-11T09:16:38Z",
+  "build_seconds": 1.6,
+  "embedding_pin": {
+    "model": "qwen/qwen3-embedding-8b",
+    "dims": 1024,
+    "base_url": "https://api.novita.ai/openai",
+    "query_instruction": "Instruct: Given a question from a government official about village-level planning and spending, retrieve analysis findings that answer it\nQuery: ",
+    "document_instruction": null,
+    "normalisation": "L2, client-side",
+    "storage_dtype": "float16",
+    "storage_layout": "npy-parts"
+  },
+  "embedding_pin_fingerprint": "538190cd34f77988",
+  "embedding_calls": 0,
+  "texts_embedded": 0,
+  "records": 4397,
+  "counts": {
+    "view1": {
+      "raw": 5000,
+      "twin_merged": 972,
+      "corpus": 4028,
+      "ranked": 15
+    },
+    "view2": {
+      "raw": 322,
+      "twin_merged": 21,
+      "corpus": 301,
+      "ranked": 15
+    },
+    "view3": {
+      "raw": 45,
+      "twin_merged": 7,
+      "corpus": 38,
+      "ranked": 15
+    },
+    "view4": {
+      "raw": 32,
+      "twin_merged": 2,
+      "corpus": 30,
+      "ranked": 15
+    }
+  },
+  "ranking_prefilter_cap": 5000,
+  "source_files": {
+    "global_feed.json": {
+      "sha256": "15f3ab1c9da76a3deaf35cac56695da4362e4b9f8184be7e49dcd9fa72c947fc",
+      "bytes": 109656
+    },
+    "global_feed_source_set.json": {
+      "sha256": "5a999d45d6c8d73e7371c9a989031a80fc613c61a47f3defd52dbc2cf5f1189e",
+      "bytes": 1767
+    },
+    "insight_prose.json": {
+      "sha256": "feff136bcf2c4b8aea765ef9dff621add8f56575ed22ead7351142b392cc08d9",
+      "bytes": 1423695
+    },
+    "view1_candidates.json": {
+      "sha256": "1335f43736f2e2eb710a64c178ef77cf8b5b2b613e6d69c27b572e28c71f96b7",
+      "bytes": 4642540
+    },
+    "view1_data_quality.json": {
+      "sha256": "08d69cde4f870759273983a9c7c570d4d0851c63cf5592f7bb83cb51a3bc71f9",
+      "bytes": 63
+    },
+    "view1_ranked.json": {
+      "sha256": "7dcdb22d1be0d9eefbb9eefee74fb7ac6115117560b5eb0f2cca42fc0f73f9d4",
+      "bytes": 18434
+    },
+    "view2_candidates.json": {
+      "sha256": "602ff52ec6789ca84a7e06ee291682463b265d703a3ddcd27240875aa31997e9",
+      "bytes": 347869
+    },
+    "view2_data_quality.json": {
+      "sha256": "08d69cde4f870759273983a9c7c570d4d0851c63cf5592f7bb83cb51a3bc71f9",
+      "bytes": 63
+    },
+    "view2_ranked.json": {
+      "sha256": "5bdf95d1a4a483bc50e7bff3839addd5cd20b70191b6c0552da9274d280a6aa8",
+      "bytes": 13183
+    },
+    "view3_candidates.json": {
+      "sha256": "b5d2b8885a8279b1dfd5e267c25448852e68d9fff7e649de1605f7ecd245505f",
+      "bytes": 67530
+    },
+    "view3_data_quality.json": {
+      "sha256": "9968c96d04cb2200cba7ba35cc8c019ea7b6a29c71e4090581d443636dce83d8",
+      "bytes": 1072
+    },
+    "view3_ranked.json": {
+      "sha256": "10524628d5ed93dc9c5bac70caa3d0976198e610975b7fe011867a8be958c2e9",
+      "bytes": 21190
+    },
+    "view4_candidates.json": {
+      "sha256": "0f73a22d4b61c649af3b694fdf009701e17412163cbd161e019d20080e38c2a4",
+      "bytes": 121910
+    },
+    "view4_data_quality.json": {
+      "sha256": "08d69cde4f870759273983a9c7c570d4d0851c63cf5592f7bb83cb51a3bc71f9",
+      "bytes": 63
+    },
+    "view4_ranked.json": {
+      "sha256": "fccb7a5451b01f3b6ffc346fd62f83e2a94f70ef85f4479c9668973ddb30fcd4",
+      "bytes": 53070
+    }
+  },
+  "vector_storage": {
+    "layout": "npy-parts",
+    "dtype": "float16",
+    "shape": [
+      4397,
+      1024
+    ],
+    "part_max_bytes": 95000000,
+    "matrix_sha256": "36683d5cacf009015a0cd7a3cb733dfd597268be851b5bf9fad71473bc8a72e8",
+    "parts": [
+      {
+        "file": "retrieval_corpus.part0.npy",
+        "rows": 4397,
+        "bytes": 9005184,
+        "sha256": "4e9e99acb79705ba676d36b1fa565e5c9a8f9e592726c03a35a83f221cda6812"
+      }
+    ]
+  }
+}

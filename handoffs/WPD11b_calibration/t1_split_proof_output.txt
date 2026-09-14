@@ -1,0 +1,29 @@
+
+=== retrieval_corpus ===
+  [PASS] both are float16  -- float16 / float16
+  [PASS] same shape  -- (4397, 1024) / (4397, 1024)
+  [PASS] concatenated parts are byte-identical to the unsplit array  -- sha256 36683d5cacf00901 vs 36683d5cacf00901
+  [PASS] the stamp's matrix_sha256 is those bytes
+  [PASS] the loader returns exactly the unsplit array, upcast to fp32
+  [PASS] retrieval_corpus.part0.npy is 9.0 MB (< 100 MB, <= 95 MB budget)
+  [PASS] an altered part is refused  -- vector part retrieval_corpus.part0.npy has sha256 b790556b7fa29e85, the stamp recorded 4e9
+  [PASS] a missing part is refused  -- vector part retrieval_corpus.part0.npy is missing from C:\Users\prith\AppData\Local\Temp\w
+  [PASS] semantic_pin() is the pin WP-D11 embedded under
+  [PASS] the full pin records the part layout  -- 538190cd34f77988
+  [PASS] the split build made zero embedding calls  -- calls=0 texts=0
+
+=== decompose_corpus ===
+  [PASS] both are float16  -- float16 / float16
+  [PASS] same shape  -- (66779, 1024) / (66779, 1024)
+  [PASS] concatenated parts are byte-identical to the unsplit array  -- sha256 76eb1f2a85d6da7c vs 76eb1f2a85d6da7c
+  [PASS] the stamp's matrix_sha256 is those bytes
+  [PASS] the loader returns exactly the unsplit array, upcast to fp32
+  [PASS] decompose_corpus.part0.npy is 68.4 MB (< 100 MB, <= 95 MB budget)
+  [PASS] decompose_corpus.part1.npy is 68.4 MB (< 100 MB, <= 95 MB budget)
+  [PASS] an altered part is refused  -- vector part decompose_corpus.part0.npy has sha256 82e254d704a3ed94, the stamp recorded 6ff
+  [PASS] a missing part is refused  -- vector part decompose_corpus.part0.npy is missing from C:\Users\prith\AppData\Local\Temp\w
+  [PASS] semantic_pin() is the pin WP-D11 embedded under
+  [PASS] the full pin records the part layout  -- 538190cd34f77988
+  [PASS] the split build made zero embedding calls  -- calls=0 texts=0
+
+0 failure(s)

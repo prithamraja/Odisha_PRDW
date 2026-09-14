@@ -5,33 +5,41 @@
     "reports_prdw/global_feed.md",
     "reports_prdw/gamma_{0.1,0.3,0.5,0.7,0.9}_report.md"
   ],
-  "candidate_set_id": "a7f991c1df3771f9",
-  "generated_at": "2026-08-17T10:26:15Z",
+  "candidate_set_id": "610cb3d26dff7bf3",
+  "generated_at": "2026-09-11T09:31:44Z",
   "stamp_source": "DISCOVER_RUN_STAMP",
   "files": {
     "view1_candidates.json": {
-      "sha256": "890767085988a6c7b61b1694a51e544d977932b1f567c89cae0e017b3643359b",
-      "bytes": 5868996
+      "sha256": "1335f43736f2e2eb710a64c178ef77cf8b5b2b613e6d69c27b572e28c71f96b7",
+      "bytes": 4642540
     },
     "view1_ranked.json": {
-      "sha256": "182ff833849488cad3a15c0cec614f903a9ee68bff3175ffe824f8e3262476e1",
-      "bytes": 18430
+      "sha256": "7dcdb22d1be0d9eefbb9eefee74fb7ac6115117560b5eb0f2cca42fc0f73f9d4",
+      "bytes": 18434
     },
     "view2_candidates.json": {
-      "sha256": "5796d3c8029c5f06efe71fa59ce84c3e9c847335b52b89c0078eb82f0ad2358c",
-      "bytes": 143100
+      "sha256": "602ff52ec6789ca84a7e06ee291682463b265d703a3ddcd27240875aa31997e9",
+      "bytes": 347869
     },
     "view2_ranked.json": {
-      "sha256": "44c9638c450d29af03e2981855757c1a603db98272763c695133047d7cf3cd62",
-      "bytes": 16544
+      "sha256": "5bdf95d1a4a483bc50e7bff3839addd5cd20b70191b6c0552da9274d280a6aa8",
+      "bytes": 13183
     },
     "view3_candidates.json": {
-      "sha256": "a5fa0a1f5f2fa659f52d89bff2f7d11dc12beb52aa97afccb92b882effd17ecb",
-      "bytes": 3613
+      "sha256": "ab532743dcc67e21f37666861d8fce4a99b55f1e34628db6d93bb7fc7c2035cb",
+      "bytes": 87574
     },
     "view3_ranked.json": {
-      "sha256": "a5fa0a1f5f2fa659f52d89bff2f7d11dc12beb52aa97afccb92b882effd17ecb",
-      "bytes": 3613
+      "sha256": "fb6b61e66926930352340ef77caa68dcbe62035f9a0f4955cccef5c768ed1395",
+      "bytes": 27904
+    },
+    "view4_candidates.json": {
+      "sha256": "158fe6f298c645f77a15ff8b6ea78830bb37b34f3cc976a5bcdb387acafdc48c",
+      "bytes": 125629
+    },
+    "view4_ranked.json": {
+      "sha256": "8f7d748d41ce24dccf77be8949ece370779889a14527b35224576ab1d2dca4b9",
+      "bytes": 54170
     }
   }
 }

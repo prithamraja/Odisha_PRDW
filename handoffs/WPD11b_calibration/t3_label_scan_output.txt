@@ -1,0 +1,69 @@
+Surfaces
+  FAIL  metainsights\insight_feed.md: 1 bare, 13 with unit
+        line 121: 'under 2,500'
+  FAIL  reports_prdw\gamma_0.1_report.md: 2 bare, 33 with unit
+        line 176: 'under 2,500'
+        line 240: '2,500 to 5,000'
+  FAIL  reports_prdw\gamma_0.3_report.md: 1 bare, 47 with unit
+        line 51: 'under 2,500'
+  FAIL  reports_prdw\gamma_0.5_report.md: 17 bare, 28 with unit
+        line 90: 'under 2,500'
+        line 180: '5,000 to 10,000'
+        line 181: '2,500 to 5,000'
+        line 182: 'Under 2,500'
+        line 187: '5,000 to 10,000'
+        line 188: '2,500 to 5,000'
+        line 189: 'Under 2,500'
+        line 216: '2,500 to 5,000'
+        line 216: 'Under 2,500'
+        line 225: '2,500 to 5,000'
+  FAIL  reports_prdw\gamma_0.7_report.md: 12 bare, 45 with unit
+        line 176: '5,000 to 10,000'
+        line 176: '2,500 to 5,000'
+        line 223: '5,000 to 10,000'
+        line 223: '2,500 to 5,000'
+        line 224: '5,000 to 10,000'
+        line 225: 'Under 2,500'
+        line 225: '2,500 to 5,000'
+        line 258: '5,000 to 10,000'
+        line 258: '2,500 to 5,000'
+        line 260: '5,000 to 10,000'
+  FAIL  reports_prdw\gamma_0.9_report.md: 4 bare, 24 with unit
+        line 214: 'under 2,500'
+        line 214: '2,500 to 5,000'
+        line 335: '5,000 to 10,000'
+        line 335: '2,500 to 5,000'
+  PASS  reports_prdw\executive_metainsight_report.md: 0 bare, 18 with unit
+  FAIL  reports_prdw\global_feed.md: 29 bare, 0 with unit
+        line 42: '10,000 and above'
+        line 45: '10,000 and above'
+        line 45: 'Under 2,500'
+        line 47: '2,500 to 5,000'
+        line 47: '5,000 to 10,000'
+        line 65: '10,000 and above'
+        line 67: '10,000 and above'
+        line 75: '10,000 and above'
+        line 75: 'Under 2,500'
+        line 76: '2,500 to 5,000'
+
+  chat: 5 records naming a size band: ['1-01130', '1-01133', '1-01135', 'd1-00400', 'd1-00401']
+    stored   Across all fiscal_year values, 10,000 and above and Under 2,500 are lowest in fund_sanctioned_total among gp_size values
+    rendered Across all fiscal years, 10,000 people and above and Under 2,500 people are lowest in sanctioned amount among population size bands
+    stored   Across all fiscal_year values, 10,000 and above and Under 2,500 are lowest in fund_sanctioned_total among gp_size values
+    rendered Across all fiscal years, 10,000 people and above and Under 2,500 people are lowest in sanctioned amount among population size bands
+    stored   Across all fiscal_year values, 10,000 and above and Under 2,500 are lowest in fund_tied_total among gp_size values
+    rendered Across all fiscal years, 10,000 people and above and Under 2,500 people are lowest in tied grant planned among population size bands
+    stored   Within the whole of Activity Lifecycle - Every Planned Work and Its Money, activities planned totals 12,704 activities across 4 population size bands.
+    rendered Within the whole of Activity Lifecycle - Every Planned Work and Its Money, activities planned totals 12,704 activities across 4 population size bands.
+    stored   Within the whole of Activity Lifecycle - Every Planned Work and Its Money, planned cost totals Rs 77.31 crore across 4 population size bands. It is sp
+    rendered Within the whole of Activity Lifecycle - Every Planned Work and Its Money, planned cost totals Rs 77.31 crore across 4 population size bands. It is sp
+  chat: fell_back=False attempts=1 
+  --- answer ---
+  | Planning and expenditure totals are concentrated in the two middle population bands. Of 12,704 planned activities, GPs with 2,500 to 5,000 people account for 40.8% (5,182 activities), while those with 5,000 to 10,000 people account for 37.0% (4,695 activities); the other two bands together account for 2,827 activities. Of the Rs 77.31 crore planned cost, the 5,000-to-10,000 band holds 47.5% (Rs 36.73 crore), compared with 27.9% (Rs 21.61 crore) in the 2,500-to-5,000 band; the other two bands together hold Rs 18.97 crore. 
+  | 
+  | At the two ends of the population range, GPs with under 2,500 people and those with 10,000 people and above have the lowest sanctioned amounts across all fiscal years. These same two bands also have the lowest tied-grant amounts planned across all fiscal years.
+  ---
+  PASS  chat answer: 0 bare, 4 with unit
+  chat: citation check all_pass=True
+
+66 problem(s)

@@ -213,6 +213,48 @@ _VIEW1_GEO_DIMS = ["district_name"] if _STATEWIDE else [
     "gp_name", "block_name", "district_name",
 ]
 
+# --- The seven GP profile dimensions (WP-D11, mapping doc Amendment B §12.3) --
+# Written down ONCE and shared by all four view configs, because they are the
+# same seven columns computed once in derived_columns.sql and LEFT JOINed onto
+# every view. A GP's band means the same thing on view1 and on view4, and the
+# only way to keep that true is for the four configs to read one list.
+#
+# Each band's definition, cut point and sample split, in the order below:
+#
+#   social_composition    ST share > 50% -> ST-majority; else SC share > 50%
+#                         -> SC-majority; else Mixed.          2 / 3 / 15
+#   gp_size               total population banded at 2,500 / 5,000 / 10,000,
+#                         lower bound inclusive.               2 / 9 / 7 / 2
+#   remoteness            nearest bus stop under 5 km Near, 5 km or more Far.
+#                                                              14 / 6
+#   digital_readiness     internet AND computer at the bhawan, both Yes.
+#                                                              10 / 10
+#   has_panchayat_bhawan  as reported.                         14 / 6
+#   has_csc               common service centre in the panchayat, as reported.
+#                                                              12 / 8
+#   plc_available         panchayat learning centre, as reported.  2 Yes / 18 No
+#
+# 'Not reported' is an eighth possible value on every one of them and is
+# produced zero times on this drop; it exists for the statewide GP with no
+# profile row (§4.2 -- dimensions are never zero-filled and never absent).
+#
+# THE SAMPLE / STATEWIDE SPLIT IS ONE COLUMN. plc_available carries 2 Yes in 20
+# rows, which is the §9.7 sparse-dimension shape: at sample scale it can only
+# produce findings about two Gram Panchayats, so it is materialised on every
+# view and mined statewide only. The other six are mined at both scales --
+# including social_composition, whose 2 / 3 / 15 split is thin. That is B2, an
+# operator ruling: the design targets statewide data, the two-way "SC + ST
+# together" sample workaround was declined, and few findings on this dimension
+# in the sample is an expected property, not a calibration failure.
+_PROFILE_DIMS = [
+    "social_composition",
+    "gp_size",
+    "remoteness",
+    "digital_readiness",
+    "has_panchayat_bhawan",
+    "has_csc",
+] + (["plc_available"] if _STATEWIDE else [])
+
 VIEW1_CONFIG = ViewConfig(
     name="Activity Lifecycle",
     parquet_path=os.path.join(BASE_DIR, "views_prdw", "view1_activity_lifecycle.parquet"),
@@ -232,7 +274,7 @@ VIEW1_CONFIG = ViewConfig(
         "fund_component_name",     # 8 values, sanctioned subset only
         "asset_category_label",    # 28 values — 27 named + 'Uncategorised' (8,439 rows)
         "fiscal_year",             # 6 values  — CATEGORICAL here; see §5 above
-    ],
+    ] + _PROFILE_DIMS,             # WP-D11: +6 sample / +7 statewide, see above
 
     temporal_dimensions=[],
 
@@ -297,8 +339,14 @@ VIEW1_CONFIG = ViewConfig(
     # the "~37 rows, statistically fragile" objection applies to the 11,057
     # subspaces the prune already removes, not to the ones actually mined.
     #
-    # WHAT IT COSTS: ~92 minutes per re-mine of this view (measured, 5 workers),
-    # accepted by the operator as the price of the conditional findings.
+    # WHAT IT COSTS: ~92 minutes per re-mine of this view at 17 dimensions
+    # (measured, 5 workers), accepted by the operator as the price of the
+    # conditional findings. WP-D11 added six more dimensions at sample scale
+    # (23 in all) and re-measured on the same five workers -- see WPD11_REPORT
+    # §4 for the drain time against this baseline. B4 signed the full
+    # seven-dimension depth-2 run with a subspace-filter-only fallback the
+    # OPERATOR picks on the measurement; the agent measures and reports, and
+    # never silently lowers the depth or drops a dimension to fit a budget.
     #
     # CAUTION FOR WHOEVER RUNS IT: phase4b_engine's default view1 time budget is
     # 3,600 s, which was sized for the depth-1 drain and is now BELOW the
@@ -405,6 +453,208 @@ VIEW1_CONFIG = ViewConfig(
     # equity index at 0.75 of parity was being rejected by a bar built for
     # volumetric extremes). Every measure here is volumetric, so the loosened
     # bar would buy nothing and would lower the evidence standard.
+)
+
+
+# --- View 4 configuration (WP-D11, mapping doc Amendment B §12.4) ---
+# Built by domain_pack_prdw/views/view4_gp_profile.sql -- one row per Gram
+# Panchayat, 20 in this sample and ~6,800 statewide. The GP itself as the unit
+# of analysis: who lives there, what the panchayat has, and what it has planned,
+# sanctioned, spent and evidenced over the whole window.
+#
+# It lives here rather than in phase4a_engine beside VIEW2/VIEW3 for one reason:
+# _PROFILE_DIMS and the scale switch are defined in this module, and a config
+# that reads them belongs next to them. phase4a_engine re-exports it, so
+# phase5c_gamma_reports.discover_views() -- which scans that module for
+# VIEW\d+_CONFIG -- finds it exactly as it finds the other three.
+#
+# WHY THE SAMPLE-SCALE EXPECTATION IS LOW, STATED IN ADVANCE (§12.4). 20 rows,
+# 9 districts, depth 1. The engine will produce few rankable findings and thin
+# bands on social_composition will produce fewer. The view is built, validated
+# and mined NOW so that the machinery, the glossary and the corpus entries
+# exist; it becomes a live signal statewide. This is the handoff §4 rule --
+# "is the measure wrong or is the target unreachable" -- and here the target is
+# unreachable on 20 rows. Do not tune toward a sample gate on this view.
+#
+# NO RATIO MEASURE, DELIBERATELY (§12.4). Because the grain is GP, a SUM over
+# any scope gives a correct numerator and a correct denominator at once, so
+# spend per household is honest at block and district roll-up here and nowhere
+# else in this deployment. The ENGINE still cannot form that quotient: a
+# MeasureConfig is a SUM or an AVG of ONE column, and WP-D2c's intensity
+# measures are AVG-of-a-column, not a ratio. So v1 ships numerators and
+# denominators only. Per-capita MINING needs an engine ratio-measure extension,
+# which Amendment B defers to a separate engine WP. The prose and decomposition
+# layers can still state a per-household figure from the two columns.
+VIEW4_CONFIG = ViewConfig(
+    name="GP Profile",
+    parquet_path=os.path.join(BASE_DIR, "views_prdw", "view4_gp_profile.parquet"),
+
+    # Geography as on view3: names only, never the LGD codes -- a code is the
+    # same dimension as its name, and mining both finds every geographic
+    # pattern twice. Statewide drops gp_name for the same reason view3 does:
+    # 6,800 GP values put every subspace below the 1% impact prune.
+    dimensions=(["district_name", "block_name"] if _STATEWIDE else
+                ["gp_name", "block_name", "district_name"]) + _PROFILE_DIMS,
+
+    # NONE. This view is the lifetime total; every time-varying question belongs
+    # to view2 (cash months) or view3 (GP x fiscal year), and §5 routes all
+    # temporal mining to view2 regardless.
+    temporal_dimensions=[],
+
+    # All SUM, all sixty. Two families, and they must not be silently mixed:
+    # the PROFILE family is self-reported GP attributes, the LIFETIME family is
+    # this pack's own programme measures, each equal to its view3 column total.
+    measures=[
+        # ── profile: population ────────────────────────────────────────────
+        MeasureConfig("population_total",    "sum"),  # 115,246 sample-wide
+        MeasureConfig("population_male",     "sum"),
+        MeasureConfig("population_female",   "sum"),  # male + female = total, all 20
+        MeasureConfig("population_children", "sum"),  # 0 in 9 of 20 GPs (§12.6.13)
+        MeasureConfig("population_sc",       "sum"),
+        MeasureConfig("population_st",       "sum"),  # 0 in 3 of 20 GPs; §12.6.13
+                                                     # says 5 -- see WPD11_REPORT §9
+        MeasureConfig("population_obc",      "sum"),
+        MeasureConfig("population_general",  "sum"),  # gen+obc+sc+st = total, all 20
+
+        # ── profile: households and organisation ───────────────────────────
+        MeasureConfig("households",          "sum"),  # 26,132 sample-wide
+        MeasureConfig("job_card_holders",    "sum"),
+        MeasureConfig("shgs",                "sum"),
+        MeasureConfig("wards",               "sum"),
+        MeasureConfig("revenue_villages",    "sum"),
+        MeasureConfig("villages_mapped_lgd", "sum"),
+
+        # ── profile: education and childcare ───────────────────────────────
+        MeasureConfig("anganwadi_centres",        "sum"),
+        MeasureConfig("schools_pre_primary",      "sum"),
+        MeasureConfig("schools_primary",          "sum"),
+        MeasureConfig("schools_secondary",        "sum"),
+        MeasureConfig("schools_higher_secondary", "sum"),
+
+        # ── profile: health ────────────────────────────────────────────────
+        MeasureConfig("health_sub_centres",     "sum"),
+        MeasureConfig("primary_health_centres", "sum"),
+        MeasureConfig("wellbeing_centres",      "sum"),
+        MeasureConfig("dispensaries",           "sum"),
+        MeasureConfig("ayurvedic_clinics",      "sum"),
+
+        # ── profile: water and sanitation ──────────────────────────────────
+        # household_toilets exceeds households in 5 GPs and households_tap_water
+        # in 2 (§12.6.12). Counts only; no coverage rate is materialised (§3).
+        MeasureConfig("drinking_water_sources",       "sum"),
+        MeasureConfig("households_tap_water",         "sum"),
+        MeasureConfig("household_toilets",            "sum"),
+        MeasureConfig("community_sanitary_complexes", "sum"),
+        MeasureConfig("solid_waste_centres",          "sum"),
+
+        # ── profile: services and civic infrastructure ─────────────────────
+        MeasureConfig("common_service_centres",  "sum"),
+        MeasureConfig("banks",                   "sum"),
+        MeasureConfig("atms",                    "sum"),
+        MeasureConfig("rural_libraries",         "sum"),
+        MeasureConfig("children_parks",          "sum"),
+        MeasureConfig("disaster_rescue_centres", "sum"),
+        MeasureConfig("bus_stands_with_water",   "sum"),
+        MeasureConfig("seed_centres",            "sum"),
+
+        # ── profile: revenue and equipment ─────────────────────────────────
+        # osr_collected is own-source revenue, NOT one of §3's four money bases
+        # -- it must never be totalled alongside PLANNED / SANCTIONED / SPENT /
+        # CASHBOOK, and the glossary says so.
+        MeasureConfig("osr_collected",  "sum"),
+        MeasureConfig("laptops",        "sum"),  # 'NA' on 2 GPs, zero-filled
+        MeasureConfig("printers",       "sum"),  # 'NA' on 2 GPs, zero-filled
+        MeasureConfig("scanners",       "sum"),  # 'NA' on 2 GPs, zero-filled
+        MeasureConfig("sports_courts",  "sum"),  # badminton + football + volleyball
+
+        # ── lifetime performance: each equals its view3 column total ───────
+        MeasureConfig("n_plans",               "sum"),  # GPDP plans, 204 sample-wide
+        MeasureConfig("n_activities",          "sum"),  # 12,704 sample-wide
+        MeasureConfig("n_costed",              "sum"),
+        MeasureConfig("n_costless",            "sum"),
+        MeasureConfig("planned_cost",          "sum"),  # PLANNED rupees
+        MeasureConfig("sanctioned_total",      "sum"),  # SANCTIONED rupees
+        MeasureConfig("expenditure_total",     "sum"),  # SPENT rupees
+        MeasureConfig("overspend_vs_plan",     "sum"),  # SIGNED: spent minus planned
+        MeasureConfig("overspend_vs_sanction", "sum"),  # SIGNED: spent minus sanctioned
+        MeasureConfig("payment_amount",        "sum"),  # CASHBOOK rupees out
+        MeasureConfig("receipt_amount",        "sum"),  # CASHBOOK rupees in
+        MeasureConfig("n_admin_approvals",     "sum"),  # 2,101 sample-wide
+        MeasureConfig("n_tech_approvals",      "sum"),  # 2,095, not 2,134 -- WP-D1 §4
+        MeasureConfig("n_completed",           "sum"),  # 17 sample-wide, near-degenerate
+        MeasureConfig("n_ongoing",             "sum"),
+        MeasureConfig("n_abandoned",           "sum"),
+        MeasureConfig("n_with_evidence",       "sum"),
+        MeasureConfig("evidence_uploads",      "sum"),
+
+        # ── WP-D11b (D61 ruling 4): AVERAGED TWINS ─────────────────────────
+        # The WP-D2c A4 intensity mechanism, at this view's grain. The row is
+        # ONE Gram Panchayat, so the mean of a column over a group is the
+        # typical Gram Panchayat in it. WP-D11's top-15 here was band
+        # membership -- a band of 15 Gram Panchayats outranks a band of 2 on
+        # almost any TOTAL by headcount alone -- and these compare the bands by
+        # their typical member instead. Aliases of columns already in the view;
+        # nothing is recomputed and the pack is untouched. Fourteen, per the
+        # ruling: the ten view3 also averages, plus four profile counts.
+        MeasureConfig("n_activities_mean",          "avg", column="n_activities"),
+        MeasureConfig("planned_cost_mean",          "avg", column="planned_cost"),
+        MeasureConfig("sanctioned_total_mean",      "avg", column="sanctioned_total"),
+        MeasureConfig("expenditure_total_mean",     "avg", column="expenditure_total"),
+        MeasureConfig("overspend_vs_plan_mean",     "avg", column="overspend_vs_plan"),
+        MeasureConfig("overspend_vs_sanction_mean", "avg", column="overspend_vs_sanction"),
+        MeasureConfig("n_admin_approvals_mean",     "avg", column="n_admin_approvals"),
+        MeasureConfig("evidence_uploads_mean",      "avg", column="evidence_uploads"),
+        MeasureConfig("payment_amount_mean",        "avg", column="payment_amount"),
+        MeasureConfig("receipt_amount_mean",        "avg", column="receipt_amount"),
+        MeasureConfig("households_tap_water_mean",  "avg", column="households_tap_water"),
+        MeasureConfig("household_toilets_mean",     "avg", column="household_toilets"),
+        MeasureConfig("osr_collected_mean",         "avg", column="osr_collected"),
+        MeasureConfig("shgs_mean",                  "avg", column="shgs"),
+    ],
+
+    # §12.4, signed as B3. One from each family on purpose: how many people the
+    # slice speaks for, and how much programme activity sits in it. A profile
+    # view whose only impact signal were programme volume would rank a large
+    # empty GP below a small busy one, which is the opposite of what this view
+    # exists to show.
+    impact_measures=[
+        "population_total",  # reach: people the finding speaks about
+        "n_activities",      # volume signal, as on views 1 and 3
+    ],
+
+    # Depth 1 at sample scale on 20 rows -- a second filter would leave the
+    # engine nothing to break down. Depth 2 statewide (§12.4), where ~6,800 rows
+    # across 30 districts and 314 blocks make a two-filter subspace both
+    # populated enough to clear the impact prune and specific enough to matter.
+    max_subspace_depth=2 if _STATEWIDE else 1,
+    tau=0.5,
+    min_impact=0.01,
+    min_hdp_size=3,
+
+    # NO DEFINITIONAL PAIRS ARE EXCLUDED, AND THAT IS A MEASUREMENT, NOT AN
+    # OVERSIGHT. WP-D2c's two rules were run over the built view4 in WP-D11:
+    #   (a) no measure is non-zero on >=99% of the rows carrying one dimension
+    #       value and on <=1% of every other row -- the profile counts are
+    #       populated everywhere, so none of them is a band's indicator;
+    #   (b) no child table is confined to one dimension value here, because
+    #       there is no child table: every measure is present on every row.
+    # The pairs that LOOK circular are not, under SUM. gp_size is population_
+    # total banded, so "the 10,000-and-above band has the highest population"
+    # sounds definitional -- but the engine sums, and the 5,000-to-10,000 band
+    # totals more people (7 GPs) than the 10,000-and-above band (2). The
+    # ordering is driven by band size, not by the cut, so it is the same volume
+    # artifact §1 of WPD2c_REPORT declines to delete from the search space, and
+    # the answer to it is the volume share the report attaches to every total.
+    #
+    # WHERE THIS CHANGES: the moment a ratio measure exists (the deferred engine
+    # WP), population-per-capita broken down by gp_size IS circular and belongs
+    # in this tuple. Flagged for the calibration session rather than pre-empted
+    # -- an exclusion invented before the finding it removes has been seen is
+    # exactly what the session exists to prevent.
+    excluded_pairs=(),
+
+    # extremum_ratio at the 0.67 default -- every measure here is volumetric,
+    # as on the other three views.
 )
 
 

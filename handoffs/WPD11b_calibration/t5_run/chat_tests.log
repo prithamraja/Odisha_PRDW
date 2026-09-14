@@ -1,0 +1,156 @@
+test_it_catches_causal_claims (test_behaviour.CausalGateTests.test_it_catches_causal_claims) ... ok
+test_it_lets_an_honest_limit_through (test_behaviour.CausalGateTests.test_it_lets_an_honest_limit_through) ... ok
+test_it_offers_the_replacement_vocabulary (test_behaviour.CausalGateTests.test_it_offers_the_replacement_vocabulary) ... ok
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+test_out_of_scope_says_nothing_on_this (test_behaviour.FloorTests.test_out_of_scope_says_nothing_on_this) ... ok
+test_the_floor_is_never_relaxed (test_behaviour.FloorTests.test_the_floor_is_never_relaxed) ... ok
+test_both_instructions_stay_reachable (test_behaviour.JudgePromptBindingTests.test_both_instructions_stay_reachable)
+D9.1 reverts by configuration, so "minimal" must not be deleted. ... ok
+test_the_evidence_records_a_prompt_hash (test_behaviour.JudgePromptBindingTests.test_the_evidence_records_a_prompt_hash)
+Without it `judge-prompt-evidenced` has nothing to compare against. ... ok
+test_the_hash_is_of_the_template_not_a_rendered_prompt (test_behaviour.JudgePromptBindingTests.test_the_hash_is_of_the_template_not_a_rendered_prompt)
+A rendered prompt carries 100 candidates and could never be pinned. ... ok
+test_the_variants_differ_only_in_the_instruction (test_behaviour.JudgePromptBindingTests.test_the_variants_differ_only_in_the_instruction)
+Everything outside the changed bullets is held identical, so a ... ok
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+test_a_starved_reply_is_retried_once (test_behaviour.JudgeTests.test_a_starved_reply_is_retried_once) ... ok
+test_allow_model_false_forces_the_threshold_path (test_behaviour.JudgeTests.test_allow_model_false_forces_the_threshold_path)
+The offline gate must not silently depend on a judge. ... ok
+test_an_empty_keep_list_is_a_valid_answer (test_behaviour.JudgeTests.test_an_empty_keep_list_is_a_valid_answer) ... ok
+test_an_id_outside_the_pool_is_dropped_not_resolved (test_behaviour.JudgeTests.test_an_id_outside_the_pool_is_dropped_not_resolved)
+The judge selects; it never gets to name a finding it was not shown. ... ok
+test_an_unparseable_reply_falls_back_to_the_threshold (test_behaviour.JudgeTests.test_an_unparseable_reply_falls_back_to_the_threshold) ... ok
+test_the_pool_collapses_duplicates_before_it_truncates (test_behaviour.JudgeTests.test_the_pool_collapses_duplicates_before_it_truncates)
+Otherwise pool slots are spent on sentences the reader cannot tell ... ok
+test_the_pool_never_reaches_below_the_candidate_floor (test_behaviour.JudgeTests.test_the_pool_never_reaches_below_the_candidate_floor) ... ok
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+test_a_follow_up_walks_to_an_exception_member (test_behaviour.NavigationTests.test_a_follow_up_walks_to_an_exception_member) ... ok
+test_contextualise_is_self_contained (test_behaviour.NavigationTests.test_contextualise_is_self_contained) ... ok
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+test_every_answer_carries_the_run_stamp (test_behaviour.RenderingTests.test_every_answer_carries_the_run_stamp) ... ok
+test_finding_sentences_are_verbatim (test_behaviour.RenderingTests.test_finding_sentences_are_verbatim)
+The shown sentence is the corpus's, with only its column names ... ok
+test_no_answer_asserts_a_cause (test_behaviour.RenderingTests.test_no_answer_asserts_a_cause) ... ok
+test_unranked_findings_state_their_coverage (test_behaviour.RenderingTests.test_unranked_findings_state_their_coverage) ... ok
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+test_number_lookup_declines_and_names_ask (test_behaviour.RoutingTests.test_number_lookup_declines_and_names_ask) ... ok
+test_routing_is_logged_with_its_source (test_behaviour.RoutingTests.test_routing_is_logged_with_its_source) ... ok
+test_the_decline_carries_no_figure_of_its_own (test_behaviour.RoutingTests.test_the_decline_carries_no_figure_of_its_own) ... ok
+test_why_beats_lookup_when_a_question_looks_like_both (test_behaviour.RoutingTests.test_why_beats_lookup_when_a_question_looks_like_both)
+'Why is so much unspent' contains quantity wording. A why-question ... ok
+test_why_is_reframed_not_answered (test_behaviour.RoutingTests.test_why_is_reframed_not_answered) ... ok
+test_anchors_survive_a_turn_that_found_nothing (test_behaviour.SessionTests.test_anchors_survive_a_turn_that_found_nothing)
+A follow-up after a miss must still be able to walk from what is on ... ok
+test_the_store_is_bounded (test_behaviour.SessionTests.test_the_store_is_bounded) ... ok
+test_a_causal_claim_fails (test_citations.CitationCheckTests.test_a_causal_claim_fails) ... ok
+test_a_derived_figure_fails (test_citations.CitationCheckTests.test_a_derived_figure_fails)
+PM addition 2, enforced rather than requested: a percentage the ... ok
+test_a_dropped_finding_fails (test_citations.CitationCheckTests.test_a_dropped_finding_fails)
+The judge already picked the smallest sufficient set, so a finding ... ok
+test_a_figure_cited_to_the_wrong_finding_fails (test_citations.CitationCheckTests.test_a_figure_cited_to_the_wrong_finding_fails)
+The case check (a) cannot see. 51.96 IS in the supplied material, so ... ok
+test_a_tag_never_travels_forwards (test_citations.CitationCheckTests.test_a_tag_never_travels_forwards)
+A tag at the head of the FIRST sentence has no sentence to attach ... ok
+test_a_trailing_tag_cites_the_sentence_it_follows (test_citations.CitationCheckTests.test_a_trailing_tag_cites_the_sentence_it_follows)
+The one latitude in the check, and it is one-directional. ... ok
+test_an_invented_tag_that_is_not_an_id_fails (test_citations.CitationCheckTests.test_an_invented_tag_that_is_not_an_id_fails)
+`[Finding 3]` must fail rather than be ignored. A tag parser tight ... ok
+test_an_uncited_numeral_fails (test_citations.CitationCheckTests.test_an_uncited_numeral_fails) ... ok
+test_an_unknown_id_fails (test_citations.CitationCheckTests.test_an_unknown_id_fails) ... ok
+test_clean_prose_passes_every_step (test_citations.CitationCheckTests.test_clean_prose_passes_every_step) ... ok
+test_digits_inside_a_tag_are_not_treated_as_figures (test_citations.CitationCheckTests.test_digits_inside_a_tag_are_not_treated_as_figures)
+`[1-00235]` carries digits. Counting them would let a writer smuggle ... ok
+test_every_failure_gives_a_reason_to_feed_back (test_citations.CitationCheckTests.test_every_failure_gives_a_reason_to_feed_back) ... ok
+test_the_run_date_is_exempt_and_nothing_else_is (test_citations.CitationCheckTests.test_the_run_date_is_exempt_and_nothing_else_is)
+A date is not a finding and can be cited to none; a figure is. ... ok
+test_a_decomposition_is_marked_as_one (test_citations.CitationMapTests.test_a_decomposition_is_marked_as_one) ... ok
+test_the_map_carries_what_a_hover_needs (test_citations.CitationMapTests.test_the_map_carries_what_a_hover_needs) ... ok
+test_a_null_classification_is_named_not_swallowed (test_citations.ClassifierSignalTests.test_a_null_classification_is_named_not_swallowed)
+Ask's F1: a small model returning nulls looked exactly like a model ... ok
+test_a_rule_routed_turn_never_claims_a_model_null (test_citations.ClassifierSignalTests.test_a_rule_routed_turn_never_claims_a_model_null) ... ok
+test_rules_still_run_first (test_citations.ClassifierSignalTests.test_rules_still_run_first)
+D7.0 changed the model, not the routing. `allow_rules=False` exists ... ok
+test_a_non_numeric_claim_is_still_hoverable (test_citations.HoverRenderTests.test_a_non_numeric_claim_is_still_hoverable) ... ok
+test_every_bound_numeral_is_wrapped (test_citations.HoverRenderTests.test_every_bound_numeral_is_wrapped) ... ok
+test_every_citation_links_to_its_record (test_citations.HoverRenderTests.test_every_citation_links_to_its_record) ... ok
+test_the_hover_carries_the_stored_sentence_scope_and_stamp (test_citations.HoverRenderTests.test_the_hover_carries_the_stored_sentence_scope_and_stamp) ... ok
+test_the_rendered_output_is_ascii_safe (test_citations.HoverRenderTests.test_the_rendered_output_is_ascii_safe)
+The gate and the tests print fragments to a cp1252 console. ... ok
+test_the_renderer_uses_the_checks_binding_not_its_own (test_citations.HoverRenderTests.test_the_renderer_uses_the_checks_binding_not_its_own)
+A renderer that matched numbers its own way could show a hover the ... ok
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+test_a_decomposition_resolves_from_the_same_endpoint (test_citations.RecordEndpointTests.test_a_decomposition_resolves_from_the_same_endpoint) ... ok
+test_a_finding_resolves_with_its_stored_sentence (test_citations.RecordEndpointTests.test_a_finding_resolves_with_its_stored_sentence) ... ok
+test_an_unknown_id_404s (test_citations.RecordEndpointTests.test_an_unknown_id_404s) ... ok
+test_the_citation_url_points_at_this_endpoint (test_citations.RecordEndpointTests.test_the_citation_url_points_at_this_endpoint) ... ok
+test_the_html_view_is_readable_and_stamped (test_citations.RecordEndpointTests.test_the_html_view_is_readable_and_stamped) ... ok
+test_the_record_carries_coordinates_values_score_and_stamp (test_citations.RecordEndpointTests.test_the_record_carries_coordinates_values_score_and_stamp) ... ok
+test_no_tag_survives_into_the_display_text (test_citations.TagStrippingTests.test_no_tag_survives_into_the_display_text) ... ok
+test_punctuation_survives_the_strip (test_citations.TagStrippingTests.test_punctuation_survives_the_strip) ... ok
+test_stripping_removes_no_content (test_citations.TagStrippingTests.test_stripping_removes_no_content) ... ok
+test_inline_verification_is_off_by_default (test_citations.VerifierPlacementTests.test_inline_verification_is_off_by_default) ... ok
+test_the_audit_prompt_describes_a_consolidated_answer (test_citations.VerifierPlacementTests.test_the_audit_prompt_describes_a_consolidated_answer) ... ok
+test_the_connective_prompt_is_unchanged_for_old_prose (test_citations.VerifierPlacementTests.test_the_connective_prompt_is_unchanged_for_old_prose) ... ok
+test_the_verifier_module_is_still_here_for_the_audit (test_citations.VerifierPlacementTests.test_the_verifier_module_is_still_here_for_the_audit)
+A config default, not a deletion — the audit runs the same module. ... ok
+test_a_decomposition_carries_its_scope_note (test_citations.WriterPromptTests.test_a_decomposition_carries_its_scope_note) ... ok
+test_a_rejection_reason_is_fed_back_on_the_second_attempt (test_citations.WriterPromptTests.test_a_rejection_reason_is_fed_back_on_the_second_attempt) ... ok
+test_each_finding_arrives_as_id_then_sentence (test_citations.WriterPromptTests.test_each_finding_arrives_as_id_then_sentence) ... ok
+test_no_ranking_metadata_reaches_the_writer (test_citations.WriterPromptTests.test_no_ranking_metadata_reaches_the_writer)
+Belt is the prompt line telling the writer to ignore it; braces are ... ok
+test_the_bracket_scaffolding_is_not_in_the_prompt (test_citations.WriterPromptTests.test_the_bracket_scaffolding_is_not_in_the_prompt) ... ok
+test_the_context_brief_is_background_only (test_citations.WriterPromptTests.test_the_context_brief_is_background_only)
+WRITER_TASK is D5's connective-prose job and tells the writer not to ... ok
+test_the_prompt_is_the_operators_text (test_citations.WriterPromptTests.test_the_prompt_is_the_operators_text) ... FAIL
+test_the_run_date_is_supplied_so_the_prose_can_say_as_of (test_citations.WriterPromptTests.test_the_run_date_is_supplied_so_the_prose_can_say_as_of) ... ok
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+test_no_slots_means_no_boost (test_retrieval.BoostTests.test_no_slots_means_no_boost) ... ok
+test_the_boost_fires_only_on_findings_that_name_the_place (test_retrieval.BoostTests.test_the_boost_fires_only_on_findings_that_name_the_place) ... ok
+test_enrichment_separates_what_the_sentence_does_not (test_retrieval.CorpusTests.test_enrichment_separates_what_the_sentence_does_not)
+The reason the enriched text exists, asserted as a fact about the ... ok
+test_every_embedded_text_is_distinct (test_retrieval.CorpusTests.test_every_embedded_text_is_distinct)
+Across BOTH corpora. Two records sharing an embedded text share a ... ok
+test_every_finding_carries_the_run_stamp (test_retrieval.CorpusTests.test_every_finding_carries_the_run_stamp)
+ONE candidate set behind everything an answer can show. ... ok
+test_geography_holds_no_engine_tokens (test_retrieval.CorpusTests.test_geography_holds_no_engine_tokens)
+'EVEN' is a pattern shape, not a Gram Panchayat. ... ok
+test_pin_matches (test_retrieval.CorpusTests.test_pin_matches)
+Both corpora, and both under ONE pin (WP-D6). ... ok
+test_vectors_are_row_aligned_and_unit_length (test_retrieval.CorpusTests.test_vectors_are_row_aligned_and_unit_length) ... ok
+test_identical_sentences_collapse_to_the_best (test_retrieval.DiversityTests.test_identical_sentences_collapse_to_the_best) ... ok
+test_the_survivor_keeps_the_collapsed_ids (test_retrieval.DiversityTests.test_the_survivor_keeps_the_collapsed_ids) ... ok
+test_abbreviation_keeps_the_officers_word (test_retrieval.ExpansionTests.test_abbreviation_keeps_the_officers_word) ... ok
+test_expansion_does_not_loop (test_retrieval.ExpansionTests.test_expansion_does_not_loop)
+'GP' -> 'Gram Panchayat (GP)' must not re-expand its own output. ... ok
+test_longest_pattern_wins (test_retrieval.ExpansionTests.test_longest_pattern_wins)
+'XV FC' must not be consumed as 'FC' or left as two fragments. ... ok
+test_unknown_text_is_untouched (test_retrieval.ExpansionTests.test_unknown_text_is_untouched) ... ok
+theme registry: 1 value(s) carry stray whitespace in the SOURCE and are bound verbatim (trimming them would filter to zero rows): ["'Theme 5 - Clean and Green Village '"]
+status registry: excluded ['Buildings'] — 'Buildings' is an asset_category label appearing in the activity_status decode (dim_code code 173), so it is a decoder defect in the SOURCE. Not repaired here; reported for the data owner.
+test_a_name_that_is_both_gp_and_block_resolves_as_both (test_retrieval.SlotTests.test_a_name_that_is_both_gp_and_block_resolves_as_both)
+Kalimela is a Gram Panchayat AND a block. Picking one silently is ... ok
+test_district_alias_resolves (test_retrieval.SlotTests.test_district_alias_resolves) ... ok
+test_gp_resolves_to_an_lgd_code (test_retrieval.SlotTests.test_gp_resolves_to_an_lgd_code) ... ok
+test_measure_words_map_to_columns (test_retrieval.SlotTests.test_measure_words_map_to_columns) ... ok
+test_unknown_place_resolves_to_nothing (test_retrieval.SlotTests.test_unknown_place_resolves_to_nothing) ... ok
+
+======================================================================
+FAIL: test_the_prompt_is_the_operators_text (test_citations.WriterPromptTests.test_the_prompt_is_the_operators_text)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\dev\odisha-d11b\DiscoverChat\tests\test_citations.py", line 221, in test_the_prompt_is_the_operators_text
+    self.assertIn(line, prompt)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 'Do not make causal claims ever' not found in 'Turn the analytical findings below into clear, concise prose for a senior government official.\n\nDo not rewrite each finding separately. Identify overlapping or repeated findings, consolidate them into a small number of underlying patterns, and explain those patterns as a coherent narrative. It is very important that you do not make causal claims - none of our data can be used to determine causality. Do not fabricate or overstate data.\n\nPreserve important numbers and exceptions where useful. Ignore ranking metadata such as "not in the ranked shortlist." Avoid database-style language and do not infer causes that are not supported by the findings.\n\nAfter every figure and every claim, tag the finding it comes from with its id in square brackets, exactly as given, e.g. [1-00235]. A sentence drawing on two findings carries both tags.\n\nUse figures exactly as they appear in the findings. Do not compute new numbers — no percentages, sums, or differences that are not stated in a finding.\n\nReturn only the finished prose.'
+
+----------------------------------------------------------------------
+Ran 93 tests in 130.150s
+
+FAILED (failures=1)

@@ -1,0 +1,33 @@
+  Patterns found:        3,526
+  HDPs evaluated:        4,030
+  HDPs skipped (dedup):  6,140
+  HDP dedup hit rate:    60.4%
+  MetaInsights found:    322
+  Data-quality (A7):     0
+  Query cache hit rate:  89.7%
+  Pattern cache rate:    28.9%
+  Cache evictions:       0 query / 0 pattern
+  Store dropped / dup:   0 / 0
+  Peak worker memory:    0.16 GB
+  Top score:             0.7211
+  Candidate hash:        e79d83500a05c3c571d1cf5f2d4a5228
+
+  Candidates by pattern type:
+    SEASONALITY         : 104
+    TREND               : 85
+    OUTSTANDING_1       : 36
+    ATTRIBUTION         : 23
+    TOP_TWO             : 23
+    LAST_TWO            : 21
+    OUTLIER             : 16
+    UNIMODALITY         : 6
+    CHANGE_POINT        : 5
+    OUTSTANDING_LAST    : 3
+  [PASS] view2: parallel content hash equals the single-process one  -- e79d83500a05c3c5 vs e79d83500a05c3c5
+  [PASS] view2: same candidate count  -- 322 vs 322
+
+============================================================
+0 failure(s)
+EXIT=0
+
+[exited with code 0]

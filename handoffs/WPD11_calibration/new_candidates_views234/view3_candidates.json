@@ -1,0 +1,2619 @@
+[
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "ATTRIBUTION",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "ATTRIBUTION",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 15,
+        "proportion": 0.8333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "ATTRIBUTION"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.551956,
+    "impact": 1.0,
+    "score": 0.551956,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 15,
+        "proportion": 0.8333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.551956,
+    "impact": 1.0,
+    "score": 0.551956,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "TOP_TWO",
+    "breakdown": "gp_size",
+    "measure": "(varies)",
+    "base_subspace": [],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('2,500 to 5,000', '5,000 to 10,000')",
+        "pattern_type": "TOP_TWO",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 15,
+        "proportion": 0.8333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('10,000 and above', '2,500 to 5,000')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.551956,
+    "impact": 1.0,
+    "score": 0.551956,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "gp_size",
+    "pattern_type": "TREND",
+    "breakdown": "fiscal_year",
+    "measure": "expenditure_total",
+    "base_subspace": [],
+    "hdp_size": 4,
+    "commonness_sets": [
+      {
+        "highlight": "('DECREASING',)",
+        "pattern_type": "TREND",
+        "members": [
+          "5,000 to 10,000",
+          "2,500 to 5,000",
+          "Under 2,500"
+        ],
+        "count": 3,
+        "proportion": 0.75
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "10,000 and above",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.547399,
+    "impact": 1.0,
+    "score": 0.547399,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "LAST_TWO",
+    "breakdown": "gp_size",
+    "measure": "(varies)",
+    "base_subspace": [],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('10,000 and above', 'Under 2,500')",
+        "pattern_type": "LAST_TWO",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence"
+        ],
+        "count": 13,
+        "proportion": 0.7222
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "planned_cost",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "evidence_uploads",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.524443,
+    "impact": 1.0,
+    "score": 0.524443,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "social_composition",
+    "pattern_type": "EVENNESS",
+    "breakdown": "block_name",
+    "measure": "overspend_vs_plan",
+    "base_subspace": [],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('EVEN',)",
+        "pattern_type": "EVENNESS",
+        "members": [
+          "Mixed",
+          "SC-majority"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "ST-majority",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 1.0,
+    "score": 0.487712,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "social_composition",
+    "pattern_type": "EVENNESS",
+    "breakdown": "block_name",
+    "measure": "overspend_vs_sanction",
+    "base_subspace": [],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('EVEN',)",
+        "pattern_type": "EVENNESS",
+        "members": [
+          "Mixed",
+          "SC-majority"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "ST-majority",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 1.0,
+    "score": 0.487712,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "social_composition",
+    "pattern_type": "EVENNESS",
+    "breakdown": "district_name",
+    "measure": "overspend_vs_plan",
+    "base_subspace": [],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('EVEN',)",
+        "pattern_type": "EVENNESS",
+        "members": [
+          "Mixed",
+          "SC-majority"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "ST-majority",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 1.0,
+    "score": 0.487712,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "social_composition",
+    "pattern_type": "EVENNESS",
+    "breakdown": "district_name",
+    "measure": "overspend_vs_sanction",
+    "base_subspace": [],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('EVEN',)",
+        "pattern_type": "EVENNESS",
+        "members": [
+          "Mixed",
+          "SC-majority"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "ST-majority",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 1.0,
+    "score": 0.487712,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "social_composition",
+    "pattern_type": "EVENNESS",
+    "breakdown": "gp_name",
+    "measure": "overspend_vs_plan",
+    "base_subspace": [],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('EVEN',)",
+        "pattern_type": "EVENNESS",
+        "members": [
+          "Mixed",
+          "SC-majority"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "ST-majority",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 1.0,
+    "score": 0.487712,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "social_composition",
+    "pattern_type": "EVENNESS",
+    "breakdown": "gp_name",
+    "measure": "overspend_vs_sanction",
+    "base_subspace": [],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('EVEN',)",
+        "pattern_type": "EVENNESS",
+        "members": [
+          "Mixed",
+          "SC-majority"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "ST-majority",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 1.0,
+    "score": 0.487712,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "social_composition",
+    "pattern_type": "TREND",
+    "breakdown": "fiscal_year",
+    "measure": "expenditure_total",
+    "base_subspace": [],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('DECREASING',)",
+        "pattern_type": "TREND",
+        "members": [
+          "Mixed",
+          "ST-majority"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "SC-majority",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 1.0,
+    "score": 0.487712,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "social_composition",
+    "pattern_type": "TREND",
+    "breakdown": "fiscal_year",
+    "measure": "sanctioned_total",
+    "base_subspace": [],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('DECREASING',)",
+        "pattern_type": "TREND",
+        "members": [
+          "Mixed",
+          "ST-majority"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "SC-majority",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 1.0,
+    "score": 0.487712,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "social_composition",
+    "pattern_type": "UNIMODALITY",
+    "breakdown": "fiscal_year",
+    "measure": "n_admin_approvals",
+    "base_subspace": [],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('PEAK', '2024-2025')",
+        "pattern_type": "UNIMODALITY",
+        "members": [
+          "SC-majority",
+          "ST-majority"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "Mixed",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 1.0,
+    "score": 0.487712,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "social_composition",
+    "pattern_type": "UNIMODALITY",
+    "breakdown": "fiscal_year",
+    "measure": "n_ongoing",
+    "base_subspace": [],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('PEAK', '2024-2025')",
+        "pattern_type": "UNIMODALITY",
+        "members": [
+          "SC-majority",
+          "ST-majority"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "Mixed",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 1.0,
+    "score": 0.487712,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "social_composition",
+    "pattern_type": "UNIMODALITY",
+    "breakdown": "fiscal_year",
+    "measure": "n_tech_approvals",
+    "base_subspace": [],
+    "hdp_size": 3,
+    "commonness_sets": [
+      {
+        "highlight": "('PEAK', '2024-2025')",
+        "pattern_type": "UNIMODALITY",
+        "members": [
+          "SC-majority",
+          "ST-majority"
+        ],
+        "count": 2,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "Mixed",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.487712,
+    "impact": 1.0,
+    "score": 0.487712,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "TOP_TWO",
+    "breakdown": "gp_size",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_panchayat_bhawan",
+        "Yes"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('2,500 to 5,000', '5,000 to 10,000')",
+        "pattern_type": "TOP_TWO",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_completed",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 16,
+        "proportion": 0.8889
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('10,000 and above', 'Under 2,500')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.65726,
+    "impact": 0.7071,
+    "score": 0.464749,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "TOP_TWO",
+    "breakdown": "gp_size",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "social_composition",
+        "Mixed"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('2,500 to 5,000', '5,000 to 10,000')",
+        "pattern_type": "TOP_TWO",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 15,
+        "proportion": 0.8333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('10,000 and above', 'Under 2,500')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.551956,
+    "impact": 0.792815,
+    "score": 0.437599,
+    "impact_measure_used": "expenditure_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "ATTRIBUTION",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "remoteness",
+        "Near"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "ATTRIBUTION",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 15,
+        "proportion": 0.8333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "ATTRIBUTION"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.551956,
+    "impact": 0.711091,
+    "score": 0.392491,
+    "impact_measure_used": "expenditure_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "remoteness",
+        "Near"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 15,
+        "proportion": 0.8333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.551956,
+    "impact": 0.711091,
+    "score": 0.392491,
+    "impact_measure_used": "expenditure_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "ATTRIBUTION",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_panchayat_bhawan",
+        "Yes"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "ATTRIBUTION",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 15,
+        "proportion": 0.8333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('SC-majority',)",
+        "pattern_type": "ATTRIBUTION"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.551956,
+    "impact": 0.7071,
+    "score": 0.390288,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_panchayat_bhawan",
+        "Yes"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 15,
+        "proportion": 0.8333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('SC-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.551956,
+    "impact": 0.7071,
+    "score": 0.390288,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "ATTRIBUTION",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_csc",
+        "Yes"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "ATTRIBUTION",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 15,
+        "proportion": 0.8333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.551956,
+    "impact": 0.638224,
+    "score": 0.352271,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_csc",
+        "Yes"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 15,
+        "proportion": 0.8333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.551956,
+    "impact": 0.638224,
+    "score": 0.352271,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "LAST_TWO",
+    "breakdown": "gp_size",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "social_composition",
+        "Mixed"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('10,000 and above', 'Under 2,500')",
+        "pattern_type": "LAST_TWO",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence"
+        ],
+        "count": 13,
+        "proportion": 0.7222
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('2,500 to 5,000', '5,000 to 10,000')",
+        "pattern_type": "LAST_TWO"
+      },
+      {
+        "member_label": "planned_cost",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "evidence_uploads",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.412567,
+    "impact": 0.792815,
+    "score": 0.32709,
+    "impact_measure_used": "expenditure_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "LAST_TWO",
+    "breakdown": "gp_size",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_panchayat_bhawan",
+        "Yes"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('10,000 and above', 'Under 2,500')",
+        "pattern_type": "LAST_TWO",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 14,
+        "proportion": 0.7778
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('2,500 to 5,000', '5,000 to 10,000')",
+        "pattern_type": "LAST_TWO"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('2,500 to 5,000', '5,000 to 10,000')",
+        "pattern_type": "LAST_TWO"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_abandoned",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.4497,
+    "impact": 0.7071,
+    "score": 0.317983,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "TOP_TWO",
+    "breakdown": "gp_size",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_csc",
+        "Yes"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('2,500 to 5,000', '5,000 to 10,000')",
+        "pattern_type": "TOP_TWO",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 15,
+        "proportion": 0.8333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('10,000 and above', 'Under 2,500')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.489968,
+    "impact": 0.638224,
+    "score": 0.31271,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "ATTRIBUTION",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "digital_readiness",
+        "Not ready"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "ATTRIBUTION",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 15,
+        "proportion": 0.8333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "ATTRIBUTION"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.551956,
+    "impact": 0.518041,
+    "score": 0.285936,
+    "impact_measure_used": "expenditure_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "digital_readiness",
+        "Not ready"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 15,
+        "proportion": 0.8333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.551956,
+    "impact": 0.518041,
+    "score": 0.285936,
+    "impact_measure_used": "expenditure_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "ATTRIBUTION",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "digital_readiness",
+        "Ready"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "ATTRIBUTION",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 15,
+        "proportion": 0.8333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('SC-majority',)",
+        "pattern_type": "ATTRIBUTION"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.551956,
+    "impact": 0.496851,
+    "score": 0.27424,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "digital_readiness",
+        "Ready"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 15,
+        "proportion": 0.8333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('SC-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.551956,
+    "impact": 0.496851,
+    "score": 0.27424,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "gp_size",
+        "2,500 to 5,000"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 15,
+        "proportion": 0.8333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('SC-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      }
+    ],
+    "conciseness": 0.63734,
+    "impact": 0.407903,
+    "score": 0.259973,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "LAST_TWO",
+    "breakdown": "gp_size",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_csc",
+        "Yes"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('10,000 and above', 'Under 2,500')",
+        "pattern_type": "LAST_TWO",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 14,
+        "proportion": 0.7778
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('2,500 to 5,000', '5,000 to 10,000')",
+        "pattern_type": "LAST_TWO"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "planned_cost",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.387713,
+    "impact": 0.638224,
+    "score": 0.247448,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "subspace",
+    "extending_dimension": "district_name",
+    "pattern_type": "TREND",
+    "breakdown": "fiscal_year",
+    "measure": "sanctioned_total",
+    "base_subspace": [],
+    "hdp_size": 9,
+    "commonness_sets": [
+      {
+        "highlight": "('DECREASING',)",
+        "pattern_type": "TREND",
+        "members": [
+          "Bargarh",
+          "Koraput",
+          "Cuttack",
+          "Sundargarh",
+          "Malkangiri"
+        ],
+        "count": 5,
+        "proportion": 0.5556
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "Kandhamal",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('INCREASING',)",
+        "pattern_type": "TREND"
+      },
+      {
+        "member_label": "Khordha",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "Ganjam",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "Rayagada",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      }
+    ],
+    "conciseness": 0.245952,
+    "impact": 1.0,
+    "score": 0.245952,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "ATTRIBUTION",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "gp_size",
+        "2,500 to 5,000"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "ATTRIBUTION",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 15,
+        "proportion": 0.8333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('SC-majority',)",
+        "pattern_type": "ATTRIBUTION"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.551956,
+    "impact": 0.407903,
+    "score": 0.225144,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_csc",
+        "No"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 14,
+        "proportion": 0.7778
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_abandoned",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.4497,
+    "impact": 0.376009,
+    "score": 0.169091,
+    "impact_measure_used": "expenditure_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_panchayat_bhawan",
+        "No"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 15,
+        "proportion": 0.8333
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('SC-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.551956,
+    "impact": 0.302891,
+    "score": 0.167183,
+    "impact_measure_used": "expenditure_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "ATTRIBUTION",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_csc",
+        "No"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "ATTRIBUTION",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 13,
+        "proportion": 0.7222
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "ATTRIBUTION"
+      },
+      {
+        "member_label": "planned_cost",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_abandoned",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.412567,
+    "impact": 0.376009,
+    "score": 0.155129,
+    "impact_measure_used": "expenditure_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "ATTRIBUTION",
+    "breakdown": "social_composition",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_panchayat_bhawan",
+        "No"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('Mixed',)",
+        "pattern_type": "ATTRIBUTION",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "n_costless",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_abandoned",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 14,
+        "proportion": 0.7778
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('ST-majority',)",
+        "pattern_type": "ATTRIBUTION"
+      },
+      {
+        "member_label": "planned_cost",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.473097,
+    "impact": 0.302891,
+    "score": 0.143297,
+    "impact_measure_used": "expenditure_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "block_name",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_csc",
+        "No"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('Bhubaneswar',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 12,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('Kalimela',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "n_costless",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "planned_cost",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_abandoned",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.366832,
+    "impact": 0.376009,
+    "score": 0.137932,
+    "impact_measure_used": "expenditure_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "district_name",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_csc",
+        "No"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('Khordha',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 12,
+        "proportion": 0.6667
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('Malkangiri',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "n_costless",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "planned_cost",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_abandoned",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.366832,
+    "impact": 0.376009,
+    "score": 0.137932,
+    "impact_measure_used": "expenditure_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "TOP_TWO",
+    "breakdown": "gp_size",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_csc",
+        "No"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('2,500 to 5,000', '5,000 to 10,000')",
+        "pattern_type": "TOP_TWO",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costed",
+          "sanctioned_total",
+          "expenditure_total",
+          "payment_amount",
+          "receipt_amount",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_with_evidence"
+        ],
+        "count": 11,
+        "proportion": 0.6111
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('2,500 to 5,000', 'Under 2,500')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "n_abandoned",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('2,500 to 5,000', 'Under 2,500')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('10,000 and above', '2,500 to 5,000')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "n_costless",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "planned_cost",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "evidence_uploads",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.248399,
+    "impact": 0.376009,
+    "score": 0.0934,
+    "impact_measure_used": "expenditure_total"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "TOP_TWO",
+    "breakdown": "district_name",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_csc",
+        "Yes"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('Bargarh', 'Ganjam')",
+        "pattern_type": "TOP_TWO",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costless",
+          "planned_cost",
+          "sanctioned_total",
+          "expenditure_total",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_with_evidence"
+        ],
+        "count": 10,
+        "proportion": 0.5556
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_abandoned",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('Bargarh', 'Cuttack')",
+        "pattern_type": "TOP_TWO"
+      },
+      {
+        "member_label": "n_costed",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "payment_amount",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "receipt_amount",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "evidence_uploads",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.125072,
+    "impact": 0.638224,
+    "score": 0.079824,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "EVENNESS",
+    "breakdown": "gp_name",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "district_name",
+        "Bargarh"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('EVEN',)",
+        "pattern_type": "EVENNESS",
+        "members": [
+          "n_activities",
+          "n_costless",
+          "expenditure_total",
+          "overspend_vs_plan",
+          "overspend_vs_sanction",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 10,
+        "proportion": 0.5556
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_plans",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "sanctioned_total",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "n_completed",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "n_costed",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "planned_cost",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "payment_amount",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "receipt_amount",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "n_abandoned",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.210456,
+    "impact": 0.241026,
+    "score": 0.050726,
+    "impact_measure_used": "n_activities"
+  },
+  {
+    "extending_strategy": "measure",
+    "extending_dimension": "measure",
+    "pattern_type": "OUTSTANDING_1",
+    "breakdown": "gp_size",
+    "measure": "(varies)",
+    "base_subspace": [
+      [
+        "has_panchayat_bhawan",
+        "No"
+      ]
+    ],
+    "hdp_size": 18,
+    "commonness_sets": [
+      {
+        "highlight": "('2,500 to 5,000',)",
+        "pattern_type": "OUTSTANDING_1",
+        "members": [
+          "n_plans",
+          "n_activities",
+          "n_costless",
+          "sanctioned_total",
+          "expenditure_total",
+          "n_admin_approvals",
+          "n_tech_approvals",
+          "n_ongoing",
+          "n_with_evidence",
+          "evidence_uploads"
+        ],
+        "count": 10,
+        "proportion": 0.5556
+      }
+    ],
+    "exceptions": [
+      {
+        "member_label": "n_completed",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('10,000 and above',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "n_abandoned",
+        "category": "HIGHLIGHT_CHANGE",
+        "highlight": "('5,000 to 10,000',)",
+        "pattern_type": "OUTSTANDING_1"
+      },
+      {
+        "member_label": "n_costed",
+        "category": "NO_PATTERN",
+        "highlight": null,
+        "pattern_type": "NO_PATTERN"
+      },
+      {
+        "member_label": "planned_cost",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_plan",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "overspend_vs_sanction",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "payment_amount",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      },
+      {
+        "member_label": "receipt_amount",
+        "category": "TYPE_CHANGE",
+        "highlight": null,
+        "pattern_type": "OTHER_PATTERN"
+      }
+    ],
+    "conciseness": 0.125072,
+    "impact": 0.302891,
+    "score": 0.037883,
+    "impact_measure_used": "expenditure_total"
+  }
+]

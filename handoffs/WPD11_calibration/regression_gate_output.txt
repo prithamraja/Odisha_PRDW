@@ -1,0 +1,51 @@
+
+=== 1. definitional (measure, breakdown) pairs are absent (A1) ===
+  [PASS] view1: no top-15 finding uses an excluded pair
+  [PASS] view1: the exclusion list is populated  -- 32 pairs
+  [PASS] view2: no top-15 finding uses an excluded pair
+  [PASS] view2: the exclusion list is populated  -- 0 pairs
+  [PASS] view3: no top-15 finding uses an excluded pair
+  [PASS] view3: the exclusion list is populated  -- 0 pairs
+  [PASS] view4: no top-15 finding uses an excluded pair
+  [PASS] view4: the exclusion list is populated  -- 0 pairs
+
+=== 2. OUTSTANDING_1 / ATTRIBUTION twins are merged (A2) ===
+  [PASS] view1: no twin pair survives into the ranked list
+  [PASS] view2: no twin pair survives into the ranked list
+  [PASS] view3: no twin pair survives into the ranked list
+  [PASS] view4: no twin pair survives into the ranked list
+
+=== 3. no temporal finding rests on sub-support series (A7) ===
+  [PASS] view1: every ranked temporal finding has non-zero support
+  [PASS] view2: every ranked temporal finding has non-zero support
+  [PASS] view3: every ranked temporal finding has non-zero support
+  [PASS] view4: every ranked temporal finding has non-zero support
+
+=== 4. size-total rankings carry size shares or a per-unit companion (A4 / rule 2b) ===
+  [PASS] view1: every size-total ranking carries its volume context
+  [PASS] view2: every size-total ranking carries its volume context
+  [PASS] view3: every size-total ranking carries its volume context
+  [PASS] view4: every size-total ranking carries its volume context
+
+=== the labelled baseline, row by row (reported, not gated) ===
+
+  spurious: 1 of 11 still say the same thing; 1 still occupy the same slot
+    [same finding] view1 #11: OUTSTANDING_LAST overspend_vs_plan by status_label
+        Across nearly all gp_name values (18/20), Activity Approved has the lowest overspend_vs_plan among s
+
+  real: 2 of 15 still say the same thing; 3 still occupy the same slot
+    [SLOT ONLY -- the highlight changed] view1 #7: OUTSTANDING_1 fund_untied_total by theme
+        Across nearly all gp_name values (18/20), Theme 6 - Self-sufficient Infrastructure in Village has th
+    [same finding] view2 #1: TREND activity_linked_expenditure by (varies)
+        Across all temporal_grain values, activity_linked_expenditure is increasing over (varies)
+    [same finding] view2 #15: TREND activity_linked_expenditure by (varies)
+        Across all temporal_grain values, activity_linked_expenditure is increasing over (varies)
+
+  already-known: 2 of 7 still say the same thing; 2 still occupy the same slot
+    [same finding] view2 #2: OUTSTANDING_1 payment_count by block_name
+        Across most fiscal_year values (5/6), Bhubaneswar has the highest payment_count among block_name val
+    [same finding] view2 #3: SEASONALITY payment_count by (varies)
+        Across most temporal_grain values (2/3), payment_count shows seasonal pattern (PERIOD_12) over (vari
+
+============================================================
+0 failure(s)

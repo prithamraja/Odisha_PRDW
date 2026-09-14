@@ -35,7 +35,8 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 from phase2_engine import MetaInsightCandidate, Subspace, load_candidates
-from phase4a_engine import VIEW1_CONFIG, VIEW2_CONFIG, VIEW3_CONFIG, ViewConfig
+from phase4a_engine import (VIEW1_CONFIG, VIEW2_CONFIG, VIEW3_CONFIG,
+                            VIEW4_CONFIG, ViewConfig)
 from phase5_ranking import rank_metainsights, prefilter_candidates
 from phase5b_report import VIEW_DESCRIPTIONS, enrich_candidates_with_stats
 from discover_config import DISCOVER_PROSE_MODEL
@@ -43,12 +44,14 @@ from discover_config import DISCOVER_PROSE_MODEL
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(os.path.dirname(BASE_DIR), ".env"))
 
-# The view registry. Three views in the PR&DW deployment (WP-D2 T1); the AP and
-# UP configs it used to carry are gone from phase4a_engine.
+# The view registry. FOUR views since WP-D11 added the GP profile view
+# (Amendment B §12.4); the AP and UP configs this used to carry are gone from
+# phase4a_engine.
 ALL_CONFIGS = {
     "view1": VIEW1_CONFIG,
     "view2": VIEW2_CONFIG,
     "view3": VIEW3_CONFIG,
+    "view4": VIEW4_CONFIG,
 }
 
 # Fixed conciseness parameters

@@ -78,6 +78,50 @@ def _corpus_pin(ctx):
             f"{stamp['embedding_pin_fingerprint']}")
 
 
+GIT_FILE_LIMIT_BYTES = 100_000_000      # GitHub refuses a file over 100 MB
+
+
+@check("vector-parts-under-limit",
+       "every vector file is a stamped part under 100 MB; no unsplit .npy is left")
+def _vector_parts(ctx):
+    """WP-D11b T1 (D61 ruling 1). The deployed service reads its corpus from
+    git, and git's host refuses any file over 100 MB -- which the decomposition
+    matrix became in WP-D11 (136.8 MB). The split fixes that; this keeps it
+    fixed. Both stamps are read from disk directly, whether or not the sidecar is
+    switched on for serving, because a file that cannot be pushed is a problem
+    either way."""
+    stamps = {"findings": config.load_stamp()}
+    if config.DECOMPOSE_STAMP_PATH.exists():
+        with open(config.DECOMPOSE_STAMP_PATH, encoding="utf-8") as fh:
+            stamps["decompositions"] = json.load(fh)
+    named, lines = set(), []
+    for what, stamp in stamps.items():
+        manifest = stamp.get("vector_storage") or {}
+        parts = manifest.get("parts") or []
+        assert parts, f"the {what} stamp names no vector parts"
+        for part in parts:
+            path = config.METAINSIGHTS / part["file"]
+            assert path.exists(), f"{part['file']} is named by the {what} stamp and missing"
+            size = path.stat().st_size
+            assert size < GIT_FILE_LIMIT_BYTES, (
+                f"{part['file']} is {size:,} bytes, over git's 100 MB file limit")
+            named.add(part["file"])
+        lines.append(f"{what}: {len(parts)} part(s), largest "
+                     f"{max(p['bytes'] for p in parts) / 1e6:.1f} MB")
+    every = sorted(p.name for p in config.METAINSIGHTS.glob("*.npy"))
+    big = [n for n in every
+           if (config.METAINSIGHTS / n).stat().st_size >= GIT_FILE_LIMIT_BYTES]
+    assert not big, f".npy files over the 100 MB limit: {big}"
+    for unsplit in (config.VECTORS_PATH, config.DECOMPOSE_VECTORS_PATH):
+        assert not unsplit.exists(), (
+            f"{unsplit.name}, the unsplit spelling, is back on disk -- nothing "
+            f"writes it any more, so it is stale, and at decompose size it is "
+            f"over the limit")
+    stray = [n for n in every if n not in named]
+    assert not stray, f"vector files no stamp names (stale parts?): {stray}"
+    return "; ".join(lines) + f"; {len(every)} .npy file(s), all stamped, all under 100 MB"
+
+
 @check("corpus-deterministic-text",
        "every displayed sentence is built, not generated")
 def _sentences_are_engine(ctx):
@@ -863,7 +907,11 @@ def _prompt_is_appendix_a(ctx):
     prompt = context_brief.CONSOLIDATING_WRITER_PROMPT
     for line in ("Turn the analytical findings below into clear, concise prose",
                  "consolidate them into a small number of underlying patterns",
-                 "Do not make causal claims ever",
+                 # The operator's own sentence, 2026-09-11 (D61 ruling 2). It
+                 # replaced "Do not make causal claims ever" and its banned-word
+                 # list; the gate pins the operator's text, so it pins this.
+                 "It is very important that you do not make causal claims - "
+                 "none of our data can be used to determine causality.",
                  'Ignore ranking metadata such as "not in the ranked shortlist."',
                  "tag the finding it comes from with its id in square brackets",
                  "Do not compute new numbers",

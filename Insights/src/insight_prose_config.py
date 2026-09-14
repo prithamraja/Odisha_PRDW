@@ -48,7 +48,13 @@ def paths(base_dir=None):
         # by phase5e --emit-feed-md and copied into the frontend's drop-in
         # folder. It is a RENDERING, never a source: nothing reads it back.
         "feed_md": os.path.join(meta, "insight_feed.md"),
-        "run_log_dir": os.path.join(b, "reports_prdw", "wpd4c_run"),
+        # PER-WP (WP-D11b, the WPD11_REPORT sec.9.C fix). MAX_CALLS_TOTAL is
+        # counted across every log in this directory and is documented as
+        # guarding ONE work package; while it pointed at `wpd4c_run`, WP-D11
+        # inherited WP-D4c's 64 spent calls and hit 150/150 with 13 findings
+        # unwritten. The directory is the WP that is spending, so it is named
+        # for it. A later WP sets its own.
+        "run_log_dir": os.path.join(b, "reports_prdw", "wpd11b_run"),
         # The API key lives in Insights/.env and is loaded FROM THERE, in place
         # -- never copied into the mirror, never printed, never written. WPD3
         # section 4.4 bug 1 was exactly this path being wrong and the load
@@ -192,6 +198,13 @@ CONTEXT = (
     "they strengthen the point; use no number that is not provided. Be direct "
     "about what the data can and cannot establish — an insight that "
     "overstates certainty could send an official after the wrong problem."
+    # WP-D11b (D61 ruling 2): the operator's own sentence, verbatim from the
+    # chat writer's prompt (DiscoverChat/context_brief.py), after the WP-D11
+    # feed shipped causal connectives. ONE general sentence and no word list,
+    # on the operator's ruling; whether it clears the D41 scan is measured by
+    # check_insight_prose.py, not assumed.
+    + " It is very important that you do not make causal claims - none of our "
+    "data can be used to determine causality."
 )
 
 SLOT_VALUES = {

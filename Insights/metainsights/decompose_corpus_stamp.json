@@ -1,76 +1,124 @@
 {
-  "what_this_is": "Provenance for decompose_corpus.json/.npy. The `generated_at` line is the ONLY field expected to differ between two consecutive builds (D6.0 gate); everything else, vectors included, is reproduced from the cache.",
+  "what_this_is": "Provenance for decompose_corpus.json.gz and its vector parts. The `generated_at` line is the ONLY field expected to differ between two consecutive builds (D6.0 gate); everything else, vectors included, is reproduced from the cache. `vector_storage` lists the parts in row order with a SHA-256 each; the loader refuses a missing or altered part (WP-D11b).",
   "artefacts": [
     "metainsights/decompose_corpus.json.gz",
-    "metainsights/decompose_corpus.npy"
+    "metainsights/decompose_corpus.part0.npy",
+    "metainsights/decompose_corpus.part1.npy"
   ],
-  "candidate_set_id": "a7f991c1df3771f9",
-  "generated_at": "2026-09-04T12:52:30Z",
-  "build_seconds": 126.1,
+  "candidate_set_id": "610cb3d26dff7bf3",
+  "generated_at": "2026-09-11T12:04:35Z",
+  "build_seconds": 412.6,
   "embedding_pin": {
     "model": "qwen/qwen3-embedding-8b",
     "dims": 1024,
-    "base_url": "https://api.novita.ai/openai",
     "query_instruction": "Instruct: Given a question from a government official about village-level planning and spending, retrieve analysis findings that answer it\nQuery: ",
     "document_instruction": null,
     "normalisation": "L2, client-side",
-    "storage_dtype": "float16"
+    "storage_dtype": "float16",
+    "storage_layout": "npy-parts",
+    "base_url": "https://openrouter.ai/api/v1",
+    "provider_route": {
+      "order": [
+        "DeepInfra"
+      ],
+      "allow_fallbacks": true
+    }
   },
-  "embedding_pin_fingerprint": "808928d2275aa54b",
+  "embedding_pin_fingerprint": "c2f9779ab6cf29d6",
   "embedding_calls": 0,
   "texts_embedded": 0,
-  "records": 36218,
-  "reconciled": 36218,
+  "records": 66779,
+  "reconciled": 66779,
   "counts": {
     "view1": {
       "rows": 12704,
       "measures": 24,
-      "dimensions": 17,
-      "subspaces": 127,
-      "records": 33868,
+      "dimensions": 23,
+      "subspaces": 142,
+      "records": 50908,
       "skipped": {
-        "definitional": 3946,
-        "zero_total": 6345,
-        "single_member": 4633
+        "definitional": 4426,
+        "zero_total": 8865,
+        "single_member": 10801
       }
     },
     "view2": {
       "rows": 1440,
       "measures": 7,
-      "dimensions": 6,
-      "subspaces": 52,
-      "records": 1283,
+      "dimensions": 12,
+      "subspaces": 67,
+      "records": 2837,
       "skipped": {
         "definitional": 0,
         "zero_total": 12,
-        "single_member": 532
+        "single_member": 2317
       }
     },
     "view3": {
       "rows": 120,
       "measures": 18,
-      "dimensions": 4,
-      "subspaces": 46,
-      "records": 1067,
+      "dimensions": 10,
+      "subspaces": 61,
+      "records": 3832,
       "skipped": {
         "definitional": 0,
-        "zero_total": 67,
-        "single_member": 1368
+        "zero_total": 110,
+        "single_member": 5958
+      }
+    },
+    "view4": {
+      "rows": 20,
+      "measures": 60,
+      "dimensions": 9,
+      "subspaces": 61,
+      "records": 9202,
+      "skipped": {
+        "definitional": 0,
+        "zero_total": 278,
+        "single_member": 19860
       }
     }
   },
   "view_parquets": {
     "view1_activity_lifecycle.parquet": {
-      "sha256": "a177bc32885116fc3b3285eed2edb113baa47a618a924c3cec2e9627560b42a3",
-      "bytes": 328031
+      "sha256": "33311e2fd6d94e391789760eb18450feabde8c7620bc45be383e0c27dd449c5f",
+      "bytes": 330621
     },
     "view2_geo_month_cube.parquet": {
-      "sha256": "770c3154d1654f40e1cf587d4be7c0f8bff0e9c4b8c1b0d5ff400dbef3766aed",
-      "bytes": 36867
+      "sha256": "4b9b503daf1331abcce299586eb92028709948fb28afddc00e507f8c5dfade31",
+      "bytes": 41101
     },
     "view3_gp_performance.parquet": {
-      "sha256": "7c2382f0c8740e8ad4d0657aebf68717ed4b2decb94706c23559e9d2fffde57f",
-      "bytes": 14279
+      "sha256": "9a4bea34d33b04520647db329830516f54bffffa612dcb3c915bca4fae37d63b",
+      "bytes": 15994
+    },
+    "view4_gp_profile.parquet": {
+      "sha256": "aa9ce0ad9e96f1b7a91207b26e9d5dd04f107c4035147de31376f143edbb9e5d",
+      "bytes": 17475
     }
+  },
+  "vector_storage": {
+    "layout": "npy-parts",
+    "dtype": "float16",
+    "shape": [
+      66779,
+      1024
+    ],
+    "part_max_bytes": 95000000,
+    "matrix_sha256": "76eb1f2a85d6da7c99ec7f2bdd90f60b8d5bf565ea1118eaa55bd17f249fc453",
+    "parts": [
+      {
+        "file": "decompose_corpus.part0.npy",
+        "rows": 33390,
+        "bytes": 68382848,
+        "sha256": "6ff9e3f1bf9988cbd2a1ba71b04b4a3a44c0f2b880b43a99ec2b96d9090b9acb"
+      },
+      {
+        "file": "decompose_corpus.part1.npy",
+        "rows": 33389,
+        "bytes": 68380800,
+        "sha256": "3ddec5cbbcf91ed47e5b05bc6a673d7b73b23a5b7dd20b0c57cfe53928dbec8d"
+      }
+    ]
   }
 }
