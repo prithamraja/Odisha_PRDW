@@ -40,6 +40,7 @@ from .intent_catalog    import INTENT_LOOKUP, INTENT_SLOTS
 from .intent_classifier import classify_intent
 from .entity_extractor  import extract_entities
 from .entity_validator  import EntityValidator, lossy_caveat, mask_aadhaar
+from .                  import subject_reader
 from .reranker          import rerank
 from .fallback          import generate_fallback_message
 from .zones             import (
@@ -394,8 +395,18 @@ def _extract_slot_values(
     without it the fiscal-year prefill is skipped and the old behaviour stands.
     """
     prefilled: dict[str, str] = {}
+    # The subject an officer names — "road construction", "Swachh Bharat" — read
+    # the same way (WP-6b T2): bound here when every mention agrees on one value,
+    # left to the extractor when the question compares several.
+    named = subject_reader.named_subjects(user_query, slot_type, validator)
     for slot, etype in slot_type.items():
-        if etype in _AMOUNT_ENTITY_TYPES:
+        if slot in named and etype not in _FISCAL_YEAR_ENTITY_TYPES:
+            phrase = subject_reader.prefill_phrase(named[slot])
+            if phrase is not None:
+                prefilled[slot] = phrase
+                _log.info("subject read from the question: %s=%r query=%r",
+                          slot, phrase, user_query[:120])
+        elif etype in _AMOUNT_ENTITY_TYPES:
             found = amount_from_text(user_query)
             if found is not None:
                 prefilled[slot] = found
@@ -984,6 +995,31 @@ def _fill_slots_or_clarify(
             )
             clarify.pending = _pending(slot, e.candidates)
             return [], clarify
+
+    # A SUBJECT THE QUESTION NAMED MUST BIND, OR NOTHING IS SERVED (WP-6b T2,
+    # D33.13). "How many road construction activities are in progress?" was
+    # answered with the count of EVERY ongoing activity: the focus area it named
+    # never reached a slot. The subject reader binds most such mentions before
+    # the extractor is asked; this is for the rest — the reader stood aside for a
+    # comparison and the extractor then returned nothing. Serving would present a
+    # number about everything as a number about the subject, so it asks, with the
+    # value(s) named as chips; a tap resumes this exact question with the slot
+    # filled, through the pending state like any missing slot.
+    unbound = subject_reader.unbound_subject(
+        user_query, slot_type, {e.slot_name for e in validated}, validator)
+    if unbound is not None:
+        slot, values = unbound
+        noun = subject_reader.noun_for(slot_type[slot])
+        prompt = (f"Did you mean the {values[0]} {noun}?" if len(values) == 1 else
+                  f"Which {noun} did you mean — {', '.join(values[:-1])} or "
+                  f"{values[-1]}?")
+        clarify = _clarify(
+            "unbound_subject", prompt,
+            [Chip(label=v, send_text=v) for v in values[:MAX_CLARIFY_OPTIONS]],
+            user_query, normalized, start,
+        )
+        clarify.pending = _pending(slot)
+        return [], clarify
 
     if missing:
         # Required slot empty → pause and ask, never execute broken SQL. The
