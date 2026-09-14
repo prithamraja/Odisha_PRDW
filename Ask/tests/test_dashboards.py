@@ -87,16 +87,14 @@ class DashboardProposalTests(unittest.TestCase):
                 self.assertNotIn("$", masked)
 
     def test_the_caveat_travels_with_the_dashboard(self):
-        """Decision D3 does not stop applying because an answer was precomputed;
-        if anything a tile is where a caveat is most easily read past."""
+        """A tile carries whatever caveat its source template has — none since
+        the catalogue's caveats were removed (operator, 2026-09-14)."""
         for qid, entry in PROPOSED_DASHBOARDS.items():
             with self.subTest(qid=qid):
                 self.assertEqual(
                     entry["caveat"],
                     TEMPLATE_CATALOG[entry["source_template"]].get("caveat"),
                 )
-        caveated = sum(1 for e in PROPOSED_DASHBOARDS.values() if e["caveat"])
-        self.assertGreater(caveated, 0)
 
 
 @unittest.skipIf(_adapter() is None, f"no sample database at {_DB_PATH}")

@@ -1,18 +1,21 @@
-"""Decision D3: a caveat reaches the user on EVERY path that serves rows.
+"""Caveat plumbing: a caveat, when a template has one, reaches the user on EVERY
+path that serves rows.
 
-296 of the 346 templates carry one, because 251 of the signed-off questions are
-only partially answerable — a proxy column, a coverage gap, a denominator that
-is the 20 loaded GPs rather than the official roster. A Partial answer served
-without its caveat is the confidently-wrong failure mode the caveat layer exists
-to prevent, and "served" includes the two paths that hand back rows WITHOUT
-re-routing: a breadcrumb hop back, and an operation recomputed on the table
-already on screen. A caveat is a property of the question the rows answer, so
-neither may quietly drop it.
+Operator ruling 2026-09-14: the catalogue's caveats were removed — the "Note: …"
+under each answer confused officers and was almost never helpful — so no shipped
+template carries one today (`tools/migrations/m4_drop_caveats.py`). The plumbing
+stays, because the lossy-alias sentence (Swachh Bharat -> Sanitation) still uses
+it and a caveat may be put back on one template by hand. These tests therefore
+give PLN-002 a caveat of their own and check it travels.
+
+"Served" includes the two paths that hand back rows WITHOUT re-routing: a
+breadcrumb hop back, and an operation recomputed on the table already on screen.
+A caveat is a property of the question the rows answer, so neither may quietly
+drop it.
 
 VERBATIM, AND OUTSIDE ANY MODEL. The text is asserted to appear unchanged and to
 be appended after the answer rather than woven into it. No LLM runs on this
-path — `echo_answer` composes the answer deterministically — which is precisely
-what makes appending safe: there is no later step that could paraphrase it away.
+path — `echo_answer` composes the answer deterministically.
 
 No API key and no network: the endpoint handlers are called directly with a
 seeded context store.
@@ -23,11 +26,8 @@ from pathlib import Path
 _BACKEND = Path(__file__).resolve().parents[1]
 _DB_PATH = _BACKEND / "data" / "panchayat_1.duckdb"
 
-# PLN-002 is the sharpest example in the catalogue: it reports GPs with an
-# APPROVED plan, but plan_code_status is entirely NULL so approval is proxied by
-# a date every loaded plan has — the number is real and means something other
-# than it appears to. Without the caveat it is a wrong answer with correct rows.
 CAVEATED_ID = "PLN-002"
+TEST_CAVEAT = "Approval is proxied by a date every loaded plan has."
 
 
 def _skip_reason():
@@ -54,12 +54,14 @@ class CaveatRenderingTests(unittest.TestCase):
         from query_router.template_catalog import TEMPLATE_CATALOG
 
         cls.main = main
-        cls.caveat = TEMPLATE_CATALOG[CAVEATED_ID]["caveat"]
-        cls.assertTruthy = bool(cls.caveat)
+        cls.caveat = TEST_CAVEAT
 
         # main.startup() is never called — it builds the vector index and needs
-        # an API key. The two maps the endpoints read are populated directly.
+        # an API key. The two maps the endpoints read are populated directly,
+        # with PLN-002 given a caveat the shipped catalogue no longer has.
         main._template_map = dict(TEMPLATE_CATALOG)
+        main._template_map[CAVEATED_ID] = {
+            **TEMPLATE_CATALOG[CAVEATED_ID], "caveat": TEST_CAVEAT}
         main._dashboard_questions = {}
 
         cls.rows = [{"gps_approved": 20}]
@@ -87,6 +89,14 @@ class CaveatRenderingTests(unittest.TestCase):
         self.assertIn(self.caveat, payload.answer, f"{where}: answer text")
         self.assertTrue(payload.answer.rstrip().endswith(self.caveat),
                         f"{where}: the caveat must come last, not be woven in")
+
+    # ── The shipped catalogue: no notes ──────────────────────────────────────
+
+    def test_no_shipped_template_carries_a_caveat(self):
+        from query_router.template_catalog import TEMPLATE_CATALOG
+        carrying = sorted(qid for qid, entry in TEMPLATE_CATALOG.items()
+                          if (entry.get("caveat") or "").strip())
+        self.assertEqual(carrying, [])
 
     # ── Path 1 of 3: /query ──────────────────────────────────────────────────
 
@@ -140,8 +150,7 @@ class CaveatRenderingTests(unittest.TestCase):
 
     def test_the_operation_path_carries_the_caveat(self):
         """An operation recomputes on the same rows — a sum, a share, a top-N.
-        The caveat qualifies those rows, so it qualifies the recomputation: a
-        percentage of a 17%-covered population is as misleading as the count."""
+        The caveat qualifies those rows, so it qualifies the recomputation."""
         from main import OperationCallRequest
 
         self.main._context_store.set_frame(
@@ -165,9 +174,8 @@ class CaveatRenderingTests(unittest.TestCase):
     # ── The negative: no caveat, no note ─────────────────────────────────────
 
     def test_an_uncaveated_question_gains_no_note_on_any_path(self):
-        from query_router.template_catalog import TEMPLATE_CATALOG
         uncaveated = next(
-            qid for qid, entry in TEMPLATE_CATALOG.items()
+            qid for qid, entry in self.main._template_map.items()
             if not (entry.get("caveat") or "").strip()
         )
         self.assertIsNone(self.main._catalog_caveat(uncaveated))

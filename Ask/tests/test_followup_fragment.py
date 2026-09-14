@@ -786,18 +786,18 @@ class FragmentEndpointTests(unittest.TestCase):
         self.assertEqual(payload["tier"], "operation", payload["answer"])
         self.assertEqual(payload["operation"], "sum")
 
-    def test_a_caveated_answer_carries_its_caveat_on_the_query_path(self):
-        """T7, path 1 of 3. PLN-002's note says approval is PROXIED by a date —
-        without it the answer reads as a real approval count."""
+    def test_a_catalogue_answer_carries_no_note_on_the_query_path(self):
+        """Operator ruling 2026-09-14: the catalogue's caveats were removed, so
+        PLN-002 is answered with its echo and no "Note: …" under it."""
         session = "frag-caveat"
         payload = self.ask(
             "how many GPs had their GPDP approved in 2024-2025?", session_id=session
         )
         if payload.get("query_id") != "PLN-002":
             self.skipTest(f"routed to {payload.get('query_id')}, not PLN-002")
-        caveat = TEMPLATE_CATALOG["PLN-002"]["caveat"]
-        self.assertEqual(payload["caveat"], caveat)
-        self.assertIn(caveat, payload["answer"])
+        self.assertIsNone(TEMPLATE_CATALOG["PLN-002"]["caveat"])
+        self.assertIsNone(payload["caveat"])
+        self.assertNotIn("Note:", payload["answer"])
 
 
 if __name__ == "__main__":

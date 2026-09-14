@@ -615,7 +615,6 @@ class T5NewTemplateAndRelaxedSlotsTests(unittest.TestCase):
         self.assertIn("FROM gram_panchayat g", entry["sql_template"])
         self.assertIn("LEFT JOIN v_activity", entry["sql_template"])
         self.assertEqual(entry["answerable"], "Partial")
-        self.assertIn("photo/GPS evidence", entry["caveat"])
 
         rows = self._bind_rows("PHY-006", {"date_range": "2024-2025"})
         want = _adapter().execute(
@@ -688,12 +687,16 @@ class T5LossyAliasTests(unittest.TestCase):
         self.assertIn("Sanitation focus area", result.caveat)
         self.assertIn("do not record SBM as a scheme", result.caveat)
 
-    def test_the_templates_own_caveat_survives_beside_it(self):
+    def test_the_alias_note_is_the_whole_note(self):
+        """The catalogue's own caveats were removed (operator, 2026-09-14) and
+        the alias note was kept, so it is all an alias answer carries."""
+        from query_router.entity_validator import lossy_caveat
         from query_router.template_catalog import TEMPLATE_CATALOG as T
-        own = (T["STS-003"].get("caveat") or "").strip()
+        self.assertIsNone(T["STS-003"].get("caveat"))
+        entity = self.validator.validate("Swachh Bharat", "focus_area")
         result = self._serve("STS-003", date_range="2024-2025",
                              focus_area="Swachh Bharat")
-        self.assertTrue(own and own in result.caveat)
+        self.assertEqual(result.caveat, lossy_caveat(entity))
 
     def test_the_plain_value_owes_nothing(self):
         result = self._serve("STS-003", date_range="2024-2025",

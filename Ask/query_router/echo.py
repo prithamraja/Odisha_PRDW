@@ -21,12 +21,10 @@ _PARAGRAPH_BREAK = "\n\n"
 
 _NO_ROWS = "No records matched — nothing was found for this question."
 
-# Decision D3. 296 of the 346 PR&DW templates carry a caveat, because 251 of the
-# signed-off questions are only PARTIALLY answerable: approval tables cover ~17%
-# of activities, scheme_name is 82% null, SBM subjects are found by searching
-# free text, and every percentage divides by the GPs actually loaded rather than
-# the official roster. An answer served without its caveat is not a slightly
-# worse answer — it is the confidently-wrong failure mode.
+# Decision D3 put a caveat under 296 of the templates. Operator ruling
+# 2026-09-14 removed them from the catalogue — the notes confused officers and
+# were almost never helpful — so today this prefix carries only the lossy-alias
+# sentence (Swachh Bharat -> Sanitation) and any caveat later put back by hand.
 _CAVEAT_PREFIX = "Note: "
 
 

@@ -356,30 +356,18 @@ def check_static_invariants(args):
         problems.append(f"tagged dollar quoting in: {', '.join(quoted)}")
     notes.append("no $tag$ dollar quoting in any sql_template")
 
-    # (c) Every PARTIAL answer carries a caveat (D3). 251 of the 363 signed-off
-    # questions are only partially answerable; a partial answer served without
-    # its caveat is the confidently-wrong failure mode, not a slightly worse
-    # answer.
-    uncaveated = sorted(
-        qid for qid, t in TEMPLATE_CATALOG.items()
-        if str(t.get("answerable", "")).strip().lower() == "partial"
-        and not (t.get("caveat") or "").strip())
-    if uncaveated:
+    # (c) No template carries a caveat. Operator ruling 2026-09-14, reversing D3
+    # for the catalogue: the "Note: …" under each answer confused officers and
+    # was almost never helpful (tools/migrations/m4_drop_caveats.py). The
+    # lossy-alias sentence is built in entity_validator and is not checked here.
+    caveated = sorted(qid for qid, t in TEMPLATE_CATALOG.items()
+                      if (t.get("caveat") or "").strip())
+    if caveated:
         problems.append(
-            f"{len(uncaveated)} Partial template(s) carry no caveat: "
-            f"{', '.join(uncaveated[:8])}"
-            + (" …" if len(uncaveated) > 8 else ""))
-    partials = sum(1 for t in TEMPLATE_CATALOG.values()
-                   if str(t.get("answerable", "")).strip().lower() == "partial")
-    if not partials:
-        # The field was renamed or dropped: "all 0 Partial templates carry a
-        # caveat" is a vacuous pass, and a vacuous pass on the caveat invariant
-        # is the worst possible thing for this check to print.
-        problems.append(
-            "no template reports answerable='Partial' — the workbook says 251 "
-            "of 363 questions are partially answerable, so this invariant is "
-            "checking a field that no longer exists")
-    notes.append(f"all {partials} Partial templates carry a caveat")
+            f"{len(caveated)} template(s) carry a caveat again: "
+            f"{', '.join(caveated[:8])}"
+            + (" …" if len(caveated) > 8 else ""))
+    notes.append(f"no caveat on any of {len(TEMPLATE_CATALOG)} templates")
 
     # (d) The extraction sentinel is wired (D30.2). `except Exception: return
     # {s: None}` made a timeout, a 429 and an auth failure indistinguishable

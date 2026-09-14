@@ -150,14 +150,15 @@ class CatalogueShapeTests(unittest.TestCase):
                         "bind name validates as",
                     )
 
-    def test_every_partial_answer_carries_its_caveat(self):
-        """Decision D3. A Partial answer without its caveat is the
-        confidently-wrong failure mode the whole caveat layer exists for."""
-        missing = sorted(
+    def test_no_template_carries_a_caveat(self):
+        """Operator ruling 2026-09-14 (reverses D3 for the catalogue): the
+        "Note: …" under each answer confused officers, so the caveats were
+        removed. A template imported later must not bring one back unnoticed."""
+        carrying = sorted(
             qid for qid, entry in TEMPLATE_CATALOG.items()
-            if entry["answerable"] == "Partial" and not (entry.get("caveat") or "").strip()
+            if (entry.get("caveat") or "").strip()
         )
-        self.assertEqual(missing, [])
+        self.assertEqual(carrying, [])
 
 
 @unittest.skipIf(_open() is None, f"no sample database at {_DB_PATH}")
