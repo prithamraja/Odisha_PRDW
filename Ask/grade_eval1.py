@@ -28,6 +28,22 @@ THE GRADING, LIFTED FROM THE PM'S:
 The "sector" group is expected to ASK (operator ruling 2026-09-12): there a
 clarification of any kind is correct and an answer is not.
 
+THE PILOT ROWS (WP-6c T3), numbered from 1001 in
+`handoffs/WP6c_pilot_questions.json`, are the fourth standing group, graded on
+what each row says it expects rather than on a template table:
+
+  fund split by scheme   correct when answered per scheme (a scheme column in
+                         the rows) or, for a one-scheme question, with that
+                         scheme bound. The served and the rank-0 template are
+                         named per-source / tied-untied in the note.
+  threshold reply        two turns: the first must ASK for the threshold; the
+                         second must answer the expected template with the
+                         expected figure bound — or, where the reply
+                         contradicts the statement, ask `direction_mismatch`
+                         and serve nothing.
+
+In every row, of every run, a "Tied / Untied / Other" chip set is flagged.
+
 Chips are mapped back to template ids by their wording, the way the PM read
 them, and an id stands for its FAMILY — the templates with identical SQL and
 slots in `rerank_context` (PLN-025/027/029 are one statement at three scopes).
@@ -174,9 +190,126 @@ def _bound(record: dict) -> dict:
             for e in record.get("entities") or []}
 
 
+# ── The WP-6c pilot rows ─────────────────────────────────────────────────────
+
+PILOT_FIRST_ROW = 1001
+TIED_UNTIED_CHIPS = {"Tied", "Untied", "Other"}
+SCHEME_COLUMNS = {"funding_source", "scheme_name", "sanctioned_scheme_name"}
+PER_SOURCE = {"BUD-002", "BUD-004", "EXP-006", "EXP-007", "FND-010", "SAN-013"}
+TIED_UNTIED = {"BUD-003", "BUD-005", "EXP-008", "FND-001"}
+THRESHOLD_ASKS = ("Above what", "Below what", "More than what", "How many days",
+                  "Within how many", "At least how many", "Fewer than how many")
+
+
+def _kind(qid: str | None) -> str:
+    if not qid:
+        return "-"
+    return ("per-source" if qid in PER_SOURCE else
+            "tied-untied" if qid in TIED_UNTIED else "other")
+
+
+def tied_untied_chips(record: dict) -> bool:
+    """True when any turn of the record offered the Tied / Untied / Other set."""
+    for turn in (record, record.get("turn2") or {}):
+        labels = {o.get("label") for o in
+                  ((turn.get("clarification") or {}).get("options") or [])}
+        if labels & TIED_UNTIED_CHIPS:
+            return True
+    return False
+
+
+def _grade_answer(final: dict, expect: dict, notes: list[str]) -> str:
+    """The outcome of a served answer against what the pilot row expects."""
+    query_id = final["query_id"]
+    bound = _bound(final)
+    columns = set()
+    for sample in final.get("rows_sample") or []:
+        columns |= set(sample)
+    if "reason" in expect:
+        notes.append("answered where a direction_mismatch was expected")
+        return "incorrect"
+    if "template" in expect:
+        value = bound.get("amount_threshold") or bound.get("threshold")
+        if expect["template"] in family(query_id) and str(value) == expect["value"]:
+            return "correct"
+        notes.append(f"bound threshold {value!r}, expected {expect['value']}")
+        return "incorrect"
+    if columns & SCHEME_COLUMNS:
+        if "scheme" in expect:
+            notes.append("answered per scheme rather than filtered")
+        return "correct"
+    scheme = bound.get("scheme")
+    if "scheme" in expect and (scheme == expect["scheme"]
+                               or expect["scheme"] in (scheme or [])):
+        return "correct"
+    if not final.get("n_rows"):
+        notes.append("answered with no rows")
+    else:
+        notes.append(f"rows are not per scheme: {sorted(columns)}")
+    return "incorrect"
+
+
+def grade_pilot(record: dict) -> dict:
+    """One graded CSV row for one WP-6c pilot record."""
+    expect = record.get("expect") or {}
+    turn2 = record.get("turn2")
+    row = {"eval_row": int(record["n"]), "question_group": record.get("group", "pilot"),
+           "question": record.get("q", "") + (f"  ->  {turn2['q']}" if turn2 else ""),
+           "expected_template_ids": expect.get("template", ""),
+           "expected_template_question": json.dumps(expect, ensure_ascii=False),
+           "served_template_id": "", "served_question": "", "bound_filters": "",
+           "outcome": "incorrect", "note": ""}
+    notes: list[str] = []
+    rank0 = (record.get("retrieved") or [None])[0]
+    notes.append(f"rank 0: {rank0 or '-'} ({_kind(rank0)})")
+
+    final = turn2 if turn2 is not None else record
+    if turn2 is not None:
+        asked = record.get("clarification") or {}
+        if record.get("query_id") and record.get("tier") != "clarify":
+            notes.append(f"turn 1 ANSWERED with {record['query_id']} instead of asking")
+            final = None
+        elif not (asked.get("prompt") or "").startswith(THRESHOLD_ASKS):
+            notes.append(f"turn 1 asked something else ({asked.get('reason')}): "
+                         f"{(asked.get('prompt') or '')[:60]}")
+            final = None
+        else:
+            notes.append(f"turn 1 asked: {asked.get('prompt')}")
+
+    if final is not None:
+        clarification = final.get("clarification") or {}
+        query_id = final.get("query_id")
+        bound = _bound(final)
+        row["served_template_id"] = query_id or ""
+        row["bound_filters"] = json.dumps(bound, ensure_ascii=False) if bound else ""
+        if final.get("error"):
+            notes.append(f"error: {final['error'][:80]}")
+        elif query_id and final.get("tier") != "clarify":
+            row["served_question"] = final.get("query_description") or ""
+            notes.append(f"served {query_id} ({_kind(query_id)})")
+            row["outcome"] = _grade_answer(final, expect, notes)
+        elif clarification:
+            reason = clarification.get("reason")
+            row["served_question"] = (f"(asked {reason}: "
+                                      f"{(clarification.get('prompt') or '')[:70]})")
+            chips = [o.get("label", "") for o in clarification.get("options") or []]
+            notes.append("chips: " + " / ".join(chips))
+            row["outcome"] = ("correct" if expect.get("reason") == reason
+                              and not query_id and len(chips) == 2 else "clarify")
+        else:
+            notes.append(f"declined: {(final.get('answer') or '')[:60]}")
+
+    if tied_untied_chips(record):
+        notes.append("TIED / UNTIED / OTHER CHIPS OFFERED")
+    row["note"] = "; ".join(notes)
+    return row
+
+
 def grade(record: dict) -> dict:
     """One graded CSV row for one replay record."""
     n = int(record["n"])
+    if n >= PILOT_FIRST_ROW:
+        return grade_pilot(record)
     spec = row_spec(n)
     if spec is None:
         raise ValueError(f"Eval_1 row {n} is in no question group")
@@ -310,6 +443,9 @@ def clarification_reasons(path: Path) -> None:
     """How the run asked, and every `unbound_subject` question in full (T7.4)."""
     records = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()
                if line.strip()]
+    tied = [r["n"] for r in records if tied_untied_chips(r)]
+    print(f"\n── Tied / Untied / Other chip sets offered — {len(tied)} ──"
+          + (f"\n  rows: {tied}" if tied else ""))
     asked = [r for r in records if r.get("clarification")]
     reasons = Counter(r["clarification"].get("reason") for r in asked)
     print("\n── Clarifications by reason ──")

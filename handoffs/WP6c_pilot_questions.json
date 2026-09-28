@@ -1,0 +1,25 @@
+[
+ {"n": 1001, "group": "fund split by scheme", "q": "fund breakdown by SFC, CFC and own funds 2024-25", "expect": {"per_scheme": true}},
+ {"n": 1002, "group": "fund split by scheme", "q": "how much came from Own Funds vs SFC in Khordha in 2024-25", "expect": {"per_scheme": true}},
+ {"n": 1003, "group": "fund split by scheme", "q": "scheme-wise sanctioned amount 2024-25", "expect": {"per_scheme": true}},
+ {"n": 1004, "group": "fund split by scheme", "q": "funding source wise expenditure 2025-26", "expect": {"per_scheme": true}},
+ {"n": 1005, "group": "fund split by scheme", "q": "split the sanctioned funds into SFC and Own Funds for 2024-25", "expect": {"per_scheme": true}},
+ {"n": 1006, "group": "fund split by scheme", "q": "how much was funded from Own Funds in Andhrua 2024-25", "expect": {"scheme": "Own Funds"}},
+ {"n": 1007, "group": "fund split by scheme", "q": "What share of the sanctioned budget came from SFC and 15th Finance Commission in 2024-25?", "expect": {"per_scheme": true}},
+ {"n": 1008, "group": "fund split by scheme", "q": "Show expenditure under SFC and CFC funds for 2024-25", "expect": {"per_scheme": true}},
+ {"n": 1009, "group": "fund split by scheme", "q": "How much of the 2024-25 sanctioned amount is from the State Finance Commission?", "expect": {"scheme": "5TH STATE FINANCE COMMISSION"}},
+ {"n": 1010, "group": "fund split by scheme", "q": "Compare Own Funds and SFC spending in 2023-24", "expect": {"per_scheme": true}},
+
+ {"n": 1011, "group": "threshold reply", "q": "Which high-value activities have no expenditure in 2024-25?", "reply": "above ₹20,000", "expect": {"template": "EXP-033", "value": "20000"}},
+ {"n": 1012, "group": "threshold reply", "q": "Which high-value activities have no expenditure in 2024-25?", "reply": "activities above 20,000", "expect": {"template": "EXP-033", "value": "20000"}},
+ {"n": 1013, "group": "threshold reply", "q": "Which high-expenditure activities have not yet started in 2024-25?", "reply": "more than 20,000 rupees", "expect": {"template": "IMP-013", "value": "20000"}},
+ {"n": 1014, "group": "threshold reply", "q": "How many low-cost activities are planned theme-wise in 2024-25?", "reply": "the threshold is 50000", "expect": {"template": "PLU-006", "value": "50000"}},
+ {"n": 1015, "group": "threshold reply", "q": "Which high-expenditure activities have not yet started in 2024-25?", "reply": "20,000 and above", "expect": {"template": "IMP-013", "value": "20000"}},
+ {"n": 1016, "group": "threshold reply", "q": "Which high-value activities have no expenditure in 2024-25?", "reply": "under 2 lakhs", "expect": {"reason": "direction_mismatch"}},
+ {"n": 1017, "group": "threshold reply", "q": "How many low-cost activities are planned theme-wise in 2024-25?", "reply": "above 2 lakh", "expect": {"reason": "direction_mismatch"}},
+ {"n": 1018, "group": "threshold reply", "q": "Which high-value activities have no expenditure in 2024-25?", "reply": "twenty thousand", "expect": {"template": "EXP-033", "value": "20000"}},
+ {"n": 1019, "group": "threshold reply", "q": "How many low-cost activities are planned theme-wise in 2024-25?", "reply": "two and a half lakh", "expect": {"template": "PLU-006", "value": "250000"}},
+ {"n": 1020, "group": "threshold reply", "q": "Which high-value activities have no expenditure in 2024-25?", "reply": "1 lakh", "expect": {"template": "EXP-033", "value": "100000"}},
+ {"n": 1021, "group": "threshold reply", "q": "How many low-cost activities are planned theme-wise in 2024-25?", "reply": "₹50,000", "expect": {"template": "PLU-006", "value": "50000"}},
+ {"n": 1022, "group": "threshold reply", "q": "Which high-expenditure activities have not yet started in 2024-25?", "reply": "5 lakh", "expect": {"template": "IMP-013", "value": "500000"}}
+]

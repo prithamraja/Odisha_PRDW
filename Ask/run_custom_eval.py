@@ -9,6 +9,14 @@ session per question, and record what came back.
 The Eval_1 standing regression (WP-6b T6) runs this over the 314 officer
 phrasings in `handoffs/WP6_eval1_questions.json`; `grade_eval1.py` grades it.
 
+TWO-TURN ROWS (WP-6c T3). A question spec may carry a `reply`: it is sent in
+the SAME session straight after the first answer, the way an officer answers
+"Above what planned cost?", and recorded under `turn2`. Any other keys on the
+spec (`group`, `expect`) are copied into the record for the grader. Each turn
+also records the retriever's top three ids (`retrieved`), because whether a
+per-funding-source or a tied/untied template ranks first is something only a
+live run can show.
+
 THIS SPENDS MONEY — every question is an embed + a rerank + an extraction, and
 a clarification adds one more extraction for its chips — so it requires --yes
 (or PRDW_EVAL_CONFIRM=1) and prints its call estimate first (eval_spend.py).
@@ -61,6 +69,63 @@ def _capture_router_log(out_path: Path) -> logging.Handler:
     return handler
 
 
+def _turn(client, message: str, session_id: str, *, reset: bool, retrieved: list) -> dict:
+    """One /query call, recorded the way the graders read it."""
+    rec: dict = {}
+    retrieved.clear()
+    payload = {"message": message, "session_id": session_id, "reset_context": reset}
+    try:
+        resp = client.post("/query", json=payload, timeout=120)
+        if resp.status_code != 200:
+            rec.update(error=f"HTTP {resp.status_code}: {resp.text[:300]}")
+        else:
+            d = resp.json()
+            n_rows, sample = slim_rows(d.get("result"))
+            clar = d.get("clarification")
+            rec.update(
+                tier=d.get("tier"),
+                query_id=d.get("query_id"),
+                query_description=d.get("query_description"),
+                answer=(d.get("answer") or "")[:400],
+                entities=d.get("entities"),
+                n_rows=n_rows,
+                rows_sample=sample,
+                date_range=d.get("date_range"),
+                date_filter_applied=d.get("date_filter_applied"),
+                clarification=(
+                    {"reason": clar.get("reason"),
+                     "prompt": (clar.get("prompt") or "")[:200],
+                     "options": [
+                         {k: v for k, v in (o or {}).items()
+                          if k in ("label", "send_text", "query", "query_id", "message")}
+                         for o in (clar.get("options") or [])
+                     ]} if clar else None),
+            )
+    except Exception as ex:
+        rec.update(error=f"{type(ex).__name__}: {ex}")
+    if retrieved:
+        rec["retrieved"] = list(retrieved[0])
+    return rec
+
+
+def _trace_retrieval(main_module) -> list:
+    """Record the top three ids of every retrieval, without changing it."""
+    seen: list = []
+    retriever = getattr(main_module, "_retriever", None)
+    if retriever is None or not hasattr(retriever, "retrieve_scored"):
+        return seen
+    real = retriever.retrieve_scored
+
+    def traced(*args, **kwargs):
+        scored = real(*args, **kwargs)
+        if not seen:
+            seen.append([qid for qid, _, _ in scored[:3]])
+        return scored
+
+    retriever.retrieve_scored = traced
+    return seen
+
+
 def run(questions: list[dict], out: Path):
     # Imported here, AFTER the spend guard: importing main constructs the
     # OpenAI client, and building the retriever can embed the catalogue.
@@ -70,42 +135,17 @@ def run(questions: list[dict], out: Path):
     handler = _capture_router_log(out)
     records = []
     with TestClient(main.app) as client, out.open("w", encoding="utf-8") as sink:
+        retrieved = _trace_retrieval(main)
         for i, spec in enumerate(questions, 1):
             sid = str(uuid4())
-            payload = {"message": spec["q"], "session_id": sid, "reset_context": True}
-
             t0 = time.time()
-            rec = {"n": spec["n"], "q": spec["q"]}
-            try:
-                resp = client.post("/query", json=payload, timeout=120)
-                if resp.status_code != 200:
-                    rec.update(error=f"HTTP {resp.status_code}: {resp.text[:300]}")
-                else:
-                    d = resp.json()
-                    n_rows, sample = slim_rows(d.get("result"))
-                    clar = d.get("clarification")
-                    rec.update(
-                        tier=d.get("tier"),
-                        query_id=d.get("query_id"),
-                        query_description=d.get("query_description"),
-                        answer=(d.get("answer") or "")[:400],
-                        entities=d.get("entities"),
-                        n_rows=n_rows,
-                        rows_sample=sample,
-                        date_range=d.get("date_range"),
-                        date_filter_applied=d.get("date_filter_applied"),
-                        clarification=(
-                            {"reason": clar.get("reason"),
-                             "prompt": (clar.get("prompt") or "")[:200],
-                             "options": [
-                                 {k: v for k, v in (o or {}).items()
-                                  if k in ("label", "query", "query_id", "message")}
-                                 for o in (clar.get("options") or [])
-                             ]} if clar else None),
-                    )
-            except Exception as ex:
-                rec.update(error=f"{type(ex).__name__}: {ex}")
-
+            rec = {"n": spec["n"], "q": spec["q"],
+                   **{k: v for k, v in spec.items() if k not in ("n", "q", "reply")}}
+            rec.update(_turn(client, spec["q"], sid, reset=True, retrieved=retrieved))
+            if spec.get("reply"):
+                rec["turn2"] = {"q": spec["reply"],
+                                **_turn(client, spec["reply"], sid, reset=False,
+                                        retrieved=retrieved)}
             rec["wall_s"] = round(time.time() - t0, 2)
             records.append(rec)
             sink.write(json.dumps(rec, ensure_ascii=False, default=str) + "\n")
@@ -131,11 +171,14 @@ def main_cli() -> None:
     questions = json.loads(args.questions.read_text(encoding="utf-8"))
     from eval_spend import confirm_spend
     n = len(questions)
+    replies = sum(1 for q in questions if q.get("reply"))
     confirm_spend(
         "run_custom_eval",
         [("catalogue embedding index (cached after the first build)", 1),
          (f"per question: 1 embed + 1 rerank + 1 extraction x {n}", 3 * n),
-         (f"chip pre-fill extraction on clarifications (at most {n})", n)],
+         (f"chip pre-fill extraction on clarifications (at most {n})", n),
+         (f"second turns: a reply read, or routed, at most 3 calls x {replies}",
+          3 * replies)],
         confirmed=args.yes,
     )
     run(questions, args.out)

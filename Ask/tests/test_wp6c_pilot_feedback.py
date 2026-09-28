@@ -6,6 +6,7 @@
     T2  a scheme is never a tied/untied value: re-homed to `$scheme`, a list of
         schemes answered one row per scheme (M5), and a tied/untied value the
         question never says is dropped rather than asked about
+    T3  the pilot rows are graded as grade_eval1.py's fourth standing group
 
 No API key and no network: the extractor and the model fallback are stubbed,
 and every router path runs against the sample database.
@@ -529,6 +530,78 @@ class T2MigrationM5Tests(unittest.TestCase):
         self.assertIsNone(clarify)
         self.assertTrue(all("scheme_name" in row for row in result.result))
         self.assertIn("(broken down by scheme)", result.query_description)
+
+# ── T3 ────────────────────────────────────────────────────────────────────────
+
+def _ask(prompt, reason="missing_parameter", chips=()):
+    return {"tier": "clarify", "clarification": {
+        "reason": reason, "prompt": prompt,
+        "options": [{"label": c, "send_text": c} for c in chips]}}
+
+
+class T3PilotGradingTests(unittest.TestCase):
+    """The fourth standing group in grade_eval1.py, on synthetic records."""
+
+    def _grade(self, record):
+        import sys
+        sys.path.insert(0, str(_BACKEND))
+        import grade_eval1
+        return grade_eval1.grade(record)
+
+    def test_a_threshold_row_answers_with_the_expected_figure(self):
+        row = self._grade({
+            "n": 1011, "q": "Which high-value activities have no expenditure in 2024-25?",
+            "group": "threshold reply", "expect": {"template": "EXP-033", "value": "20000"},
+            **_ask("Above what planned cost? For example ₹50,000 or 1 lakh."),
+            "turn2": {"q": "above ₹20,000", "tier": "tier2", "query_id": "EXP-033",
+                      "entities": [{"slot": "amount_threshold", "value": "20000"}]}})
+        self.assertEqual(row["outcome"], "correct")
+        self.assertIn("->  above ₹20,000", row["question"])
+
+    def test_a_contradiction_row_must_ask_and_serve_nothing(self):
+        record = {
+            "n": 1016, "q": "q", "group": "threshold reply",
+            "expect": {"reason": "direction_mismatch"},
+            **_ask("Above what planned cost? For example ₹50,000 or 1 lakh."),
+            "turn2": {"q": "under 2 lakhs", **_ask(
+                "This question looks for results above a planned cost.", "direction_mismatch",
+                ["Above ₹2 lakhs", "Below ₹2 lakhs instead"])}}
+        self.assertEqual(self._grade(record)["outcome"], "correct")
+        record["turn2"] = {"q": "under 2 lakhs", "tier": "tier2", "query_id": "EXP-033",
+                           "entities": [{"slot": "amount_threshold", "value": "200000"}]}
+        self.assertEqual(self._grade(record)["outcome"], "incorrect")
+
+    def test_a_first_turn_that_does_not_ask_fails_the_row(self):
+        row = self._grade({
+            "n": 1020, "q": "q", "group": "threshold reply",
+            "expect": {"template": "EXP-033", "value": "100000"},
+            "tier": "tier2", "query_id": "EXP-032",
+            "turn2": {"q": "1 lakh", "tier": "tier2", "query_id": "EXP-033"}})
+        self.assertEqual(row["outcome"], "incorrect")
+        self.assertIn("instead of asking", row["note"])
+
+    def test_a_fund_split_row_needs_a_scheme_column_or_the_scheme_bound(self):
+        per_scheme = self._grade({
+            "n": 1005, "q": "split the sanctioned funds into SFC and Own Funds",
+            "group": "fund split by scheme", "expect": {"per_scheme": True},
+            "retrieved": ["BUD-003", "BUD-002", "SAN-013"], "tier": "tier2",
+            "query_id": "BUD-003", "n_rows": 1,
+            "rows_sample": [{"scheme_name": "5TH STATE FINANCE COMMISSION"}]})
+        self.assertEqual(per_scheme["outcome"], "correct")
+        self.assertIn("rank 0: BUD-003 (tied-untied)", per_scheme["note"])
+        tied_table = self._grade({
+            "n": 1005, "q": "q", "group": "fund split by scheme",
+            "expect": {"per_scheme": True}, "tier": "tier2", "query_id": "BUD-003",
+            "n_rows": 3, "rows_sample": [{"tied_untied": "Tied"}]})
+        self.assertEqual(tied_table["outcome"], "incorrect")
+
+    def test_the_tied_untied_chip_set_is_flagged_in_any_turn(self):
+        row = self._grade({
+            "n": 1006, "q": "q", "group": "fund split by scheme",
+            "expect": {"scheme": "Own Funds"},
+            **_ask("I couldn't find a tied untied called 'Own Funds'.", "unknown_entity",
+                   ["Untied", "Other", "Tied"])})
+        self.assertIn("TIED / UNTIED / OTHER CHIPS OFFERED", row["note"])
 
 if __name__ == "__main__":
     unittest.main()
