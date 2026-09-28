@@ -44,6 +44,12 @@ what each row says it expects rather than on a template table:
 
 In every row, of every run, a "Tied / Untied / Other" chip set is flagged.
 
+THE WP-6d ROWS (1023 on, groups "WP-6d …") are the fifth standing group, in the
+same question file: rankings that must answer with the bottom 10 (or the number
+written), plan-type questions that must not bind an invented plan type, places
+that are both a block and a GP (one row taps a chip), and plain counts. See
+`grade_wp6d`.
+
 Chips are mapped back to template ids by their wording, the way the PM read
 them, and an id stands for its FAMILY — the templates with identical SQL and
 slots in `rerank_context` (PLN-025/027/029 are one statement at three scopes).
@@ -313,9 +319,101 @@ def grade_pilot(record: dict) -> dict:
     return row
 
 
+# ── The WP-6d rows (the fifth standing group, 1023 on) ────────────────────────
+
+def _one(value):
+    return value[0] if isinstance(value, list) and len(value) == 1 else value
+
+
+def _chip_labels(record: dict) -> list[str]:
+    return [o.get("label", "") for o in
+            ((record.get("clarification") or {}).get("options") or [])]
+
+
+def grade_wp6d(record: dict) -> dict:
+    """One graded CSV row for one WP-6d record.
+
+      ranking          answered on the expected template with the expected number
+                       of rows (10, or the number the officer wrote), and the
+                       floor bound where the officer set one
+      plan-type guard  answered with no plan type bound
+      block and GP     the place read as expected: a chip naming it with its tier
+                       ("Kalimela block"), or an answer binding it at that tier;
+                       a chip-tap row must answer the expected template for the block
+      plain count      answered at all (what it returned is in the note)
+    """
+    expect = record.get("expect") or {}
+    turn2 = record.get("turn2")
+    row = {"eval_row": int(record["n"]), "question_group": record.get("group", "WP-6d"),
+           "question": record.get("q", "") + (f"  ->  [chip] {turn2.get('q')}" if turn2 else ""),
+           "expected_template_ids": expect.get("template", ""),
+           "expected_template_question": json.dumps(expect, ensure_ascii=False),
+           "served_template_id": "", "served_question": "", "bound_filters": "",
+           "outcome": "incorrect", "note": ""}
+    notes: list[str] = []
+    final = turn2 if turn2 is not None else record
+    if turn2 is not None:
+        notes.append("turn 1: " + (f"answered {record.get('query_id')}" if record.get(
+            "tier") != "clarify" else "chips " + " / ".join(_chip_labels(record))))
+    query_id = final.get("query_id")
+    bound = {k: _one(v) for k, v in _bound(final).items()}
+    row["served_template_id"] = query_id or ""
+    row["bound_filters"] = json.dumps(bound, ensure_ascii=False) if bound else ""
+    # A served refusal comes back as tier "fallback" with a query id: not an answer.
+    answered = bool(query_id) and str(final.get("tier") or "").startswith("tier")
+    if answered:
+        row["served_question"] = final.get("query_description") or ""
+        notes.append(f"served {query_id}, {final.get('n_rows')} rows")
+    elif final.get("clarification"):
+        clar = final["clarification"]
+        row["served_question"] = f"(asked {clar.get('reason')}: {(clar.get('prompt') or '')[:70]})"
+        notes.append("chips: " + " / ".join(_chip_labels(final)))
+    else:
+        notes.append(f"declined: {(final.get('answer') or final.get('error') or '')[:80]}")
+
+    if "rows" in expect:
+        ok = (answered and expect["template"] in family(query_id)
+              and final.get("n_rows") == expect["rows"]
+              and ("threshold" not in expect or str(bound.get("threshold")) == expect["threshold"]))
+        row["outcome"] = "correct" if ok else ("clarify" if not answered else "incorrect")
+    elif expect.get("no_plan_type"):
+        row["outcome"] = ("correct" if answered and "plan_type" not in bound else
+                          "clarify" if not answered else "incorrect")
+        if "plan_type" in bound:
+            notes.append(f"plan_type={bound['plan_type']!r} BOUND")
+    elif "place" in expect:
+        place, gp = expect["place"], expect.get("gp")
+        if answered:
+            want = ("gp_name", gp) if gp else ("block_name", place.rsplit(" ", 1)[0])
+            row["outcome"] = "correct" if bound.get(want[0]) == want[1] else "incorrect"
+        else:
+            chips = _chip_labels(final)
+            named = [c for c in chips if place in c
+                     and not (gp and f"{gp} block" in c)]
+            row["outcome"] = "correct" if chips and len(named) == len(chips) else "incorrect"
+            if any("a gram panchayat" in c for c in chips):
+                notes.append("a chip reads 'a gram panchayat'")
+    elif "block" in expect:
+        row["outcome"] = ("correct" if answered and expect["template"] in family(query_id)
+                          and bound.get("block_name") == expect["block"]
+                          and not bound.get("gp_name") else
+                          "clarify" if not answered else "incorrect")
+    elif expect.get("answers"):
+        # A plain count of planned activities: PLN-024 (per theme) or PLN-049
+        # (per focus area) — anything else answered a different question.
+        accepted = expect.get("accept", ["PLN-024", "PLN-049"])
+        row["outcome"] = ("correct" if answered and _accepted([query_id], tuple(accepted))
+                          else "clarify" if not query_id or final.get("tier") == "clarify"
+                          else "incorrect")
+    row["note"] = "; ".join(notes)
+    return row
+
+
 def grade(record: dict) -> dict:
     """One graded CSV row for one replay record."""
     n = int(record["n"])
+    if str(record.get("group", "")).startswith("WP-6d"):
+        return grade_wp6d(record)
     if n >= PILOT_FIRST_ROW:
         return grade_pilot(record)
     spec = row_spec(n)

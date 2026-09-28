@@ -17,6 +17,10 @@ also records the retriever's top three ids (`retrieved`), because whether a
 per-funding-source or a tied/untied template ranks first is something only a
 live run can show.
 
+CHIP TAPS (WP-6d T8). A spec may carry a `chip` instead: the second turn sends
+the first offered chip whose label contains that wording, with `from_chip`, the
+way an officer taps it. No such chip is recorded as an error on `turn2`.
+
 THIS SPENDS MONEY — every question is an embed + a rerank + an extraction, and
 a clarification adds one more extraction for its chips — so it requires --yes
 (or PRDW_EVAL_CONFIRM=1) and prints its call estimate first (eval_spend.py).
@@ -69,11 +73,13 @@ def _capture_router_log(out_path: Path) -> logging.Handler:
     return handler
 
 
-def _turn(client, message: str, session_id: str, *, reset: bool, retrieved: list) -> dict:
+def _turn(client, message: str, session_id: str, *, reset: bool, retrieved: list,
+          from_chip: bool = False) -> dict:
     """One /query call, recorded the way the graders read it."""
     rec: dict = {}
     retrieved.clear()
-    payload = {"message": message, "session_id": session_id, "reset_context": reset}
+    payload = {"message": message, "session_id": session_id, "reset_context": reset,
+               "from_chip": from_chip}
     try:
         resp = client.post("/query", json=payload, timeout=120)
         if resp.status_code != 200:
@@ -106,6 +112,14 @@ def _turn(client, message: str, session_id: str, *, reset: bool, retrieved: list
     if retrieved:
         rec["retrieved"] = list(retrieved[0])
     return rec
+
+
+def _pick_chip(record: dict, wording: str) -> str | None:
+    """The send_text of the first chip whose label contains `wording` (WP-6d T8)."""
+    for option in ((record.get("clarification") or {}).get("options") or []):
+        if wording.lower() in (option.get("label") or "").lower():
+            return option.get("send_text") or option.get("label")
+    return None
 
 
 def _trace_retrieval(main_module) -> list:
@@ -146,6 +160,13 @@ def run(questions: list[dict], out: Path):
                 rec["turn2"] = {"q": spec["reply"],
                                 **_turn(client, spec["reply"], sid, reset=False,
                                         retrieved=retrieved)}
+            elif spec.get("chip"):
+                chip = _pick_chip(rec, spec["chip"])
+                rec["turn2"] = ({"q": chip, "from_chip": True,
+                                 **_turn(client, chip, sid, reset=False,
+                                         retrieved=retrieved, from_chip=True)}
+                                if chip else
+                                {"q": None, "error": f"no chip containing {spec['chip']!r}"})
             rec["wall_s"] = round(time.time() - t0, 2)
             records.append(rec)
             sink.write(json.dumps(rec, ensure_ascii=False, default=str) + "\n")
@@ -171,7 +192,7 @@ def main_cli() -> None:
     questions = json.loads(args.questions.read_text(encoding="utf-8"))
     from eval_spend import confirm_spend
     n = len(questions)
-    replies = sum(1 for q in questions if q.get("reply"))
+    replies = sum(1 for q in questions if q.get("reply") or q.get("chip"))
     confirm_spend(
         "run_custom_eval",
         [("catalogue embedding index (cached after the first build)", 1),

@@ -663,5 +663,38 @@ class T7EchoTests(unittest.TestCase):
         self.assertEqual(bad, {})
 
 
+# ── T8 ────────────────────────────────────────────────────────────────────────
+
+_PILOT = _REPO / "handoffs" / "WP6d_pilot_replay"
+
+
+@unittest.skipUnless(_PILOT.with_suffix(".jsonl").exists(),
+                     f"no WP-6d pilot replay at {_PILOT} (set PRDW_REPO from a mirror)")
+class T8GraderTests(unittest.TestCase):
+
+    def test_the_fifth_group_grades_as_committed(self):
+        import sys
+        sys.path.insert(0, str(_BACKEND))
+        import grade_eval1
+        mine = {r["eval_row"]: r["outcome"]
+                for r in grade_eval1.grade_file(_PILOT.with_suffix(".jsonl"))}
+        theirs = {int(r["eval_row"]): r["outcome"]
+                  for r in grade_eval1.read_graded(_PILOT.with_suffix(".csv"))}
+        self.assertEqual(mine, theirs)
+        self.assertEqual(sum(1 for n in mine if n >= 1023), 22)
+
+    def test_a_chip_tap_row_sends_the_chip(self):
+        import sys
+        sys.path.insert(0, str(_BACKEND))
+        import run_custom_eval
+        record = {"clarification": {"options": [
+            {"label": "How many activities are planned under a focus area in X block?",
+             "send_text": "A"},
+            {"label": "How many activities are planned under each GPDP theme in X block?",
+             "send_text": "B"}]}}
+        self.assertEqual(run_custom_eval._pick_chip(record, "each GPDP theme"), "B")
+        self.assertIsNone(run_custom_eval._pick_chip(record, "nothing like this"))
+
+
 if __name__ == "__main__":
     unittest.main()

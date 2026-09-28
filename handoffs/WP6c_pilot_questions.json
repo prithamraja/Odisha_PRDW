@@ -21,5 +21,31 @@
  {"n": 1019, "group": "threshold reply", "q": "How many low-cost activities are planned theme-wise in 2024-25?", "reply": "two and a half lakh", "expect": {"template": "PLU-006", "value": "250000"}},
  {"n": 1020, "group": "threshold reply", "q": "Which high-value activities have no expenditure in 2024-25?", "reply": "1 lakh", "expect": {"template": "EXP-033", "value": "100000"}},
  {"n": 1021, "group": "threshold reply", "q": "How many low-cost activities are planned theme-wise in 2024-25?", "reply": "₹50,000", "expect": {"template": "PLU-006", "value": "50000"}},
- {"n": 1022, "group": "threshold reply", "q": "Which high-expenditure activities have not yet started in 2024-25?", "reply": "5 lakh", "expect": {"template": "IMP-013", "value": "500000"}}
+ {"n": 1022, "group": "threshold reply", "q": "Which high-expenditure activities have not yet started in 2024-25?", "reply": "5 lakh", "expect": {"template": "IMP-013", "value": "500000"}},
+
+ {"n": 1023, "group": "WP-6d ranking", "q": "Which focus area has the smallest activity completion rate in FY 2025-26?", "expect": {"template": "IMP-009", "rows": 10}},
+ {"n": 1024, "group": "WP-6d ranking", "q": "Which focus area has the lowest completion rate in FY 2025-26?", "expect": {"template": "IMP-009", "rows": 10}},
+ {"n": 1025, "group": "WP-6d ranking", "q": "Identify the focus area with the lowest completion percentage for FY 2025-26.", "expect": {"template": "IMP-009", "rows": 10}},
+ {"n": 1026, "group": "WP-6d ranking", "q": "For FY 2025-26, which focus area ranks last by completion rate?", "expect": {"template": "IMP-009", "rows": 10}},
+ {"n": 1027, "group": "WP-6d ranking", "q": "Which themes should be prioritised for implementation support in 2025-26?", "expect": {"template": "IMP-019", "rows": 7}},
+ {"n": 1028, "group": "WP-6d ranking", "q": "Which LSDG theme most needs implementation support in 2024-25?", "expect": {"template": "IMP-019", "rows": 7}},
+ {"n": 1029, "group": "WP-6d ranking", "q": "Which focus areas should be prioritised for implementation support in 2025-26?", "expect": {"template": "IMP-020", "rows": 10}},
+ {"n": 1030, "group": "WP-6d ranking", "q": "Which focus area needs the most implementation support in 2024-25?", "expect": {"template": "IMP-020", "rows": 10}},
+ {"n": 1031, "group": "WP-6d ranking", "q": "Show the bottom 3 focus areas by completion rate in 2025-26", "expect": {"template": "IMP-009", "rows": 3}},
+ {"n": 1032, "group": "WP-6d ranking", "q": "Which focus areas with at least 50 activities have the lowest completion rate in 2025-26?", "expect": {"template": "IMP-009", "rows": 10, "threshold": "50"}},
+ {"n": 1033, "group": "WP-6d ranking", "q": "What is the single lowest focus area by completion rate in 2025-26?", "expect": {"template": "IMP-009", "rows": 10}},
+ {"n": 1034, "group": "WP-6d ranking", "q": "Which GPDP theme has the highest actual expenditure in 2024-25?", "expect": {"template": "EXP-015", "rows": 1}},
+
+ {"n": 1035, "group": "WP-6d plan-type guard", "q": "Number of Gram Panchayats whose GPDPs are pending for 2022-2023.", "expect": {"no_plan_type": true}},
+ {"n": 1036, "group": "WP-6d plan-type guard", "q": "ଖୋର୍ଦ୍ଧା ଜିଲ୍ଲାରେ 2024-2025 ରେ କେତେ ଗ୍ରାମ ପଞ୍ଚାୟତ GPDP ଅପଲୋଡ କରିଛନ୍ତି?", "expect": {"no_plan_type": true}},
+ {"n": 1037, "group": "WP-6d plan-type guard", "q": "How many GPs in Bhubaneswar uploaded the GPDP after 30 June 2024 in 2024-25?", "expect": {"no_plan_type": true}},
+ {"n": 1038, "group": "WP-6d plan-type guard", "q": "How many GPs have their GPDPs still pending approval for 2024 to 2026?", "expect": {"no_plan_type": true}},
+
+ {"n": 1039, "group": "WP-6d block and GP", "q": "What is the count of planned activities in Kalimela in 2024?", "expect": {"place": "Kalimela block"}},
+ {"n": 1040, "group": "WP-6d block and GP", "q": "What is the count of planned activities in Kalimela in 2024?", "chip": "each GPDP theme", "expect": {"template": "PLN-024", "block": "Kalimela"}},
+ {"n": 1041, "group": "WP-6d block and GP", "q": "What is the count of planned activities in Bheden in 2024?", "expect": {"place": "Bheden block"}},
+ {"n": 1042, "group": "WP-6d block and GP", "q": "What is the count of planned activities in Laxmipur GP in 2024?", "expect": {"place": "Laxmipur GP", "gp": "Laxmipur"}},
+
+ {"n": 1043, "group": "WP-6d plain count", "q": "What is the count of planned activities in Barpali in 2024-25?", "expect": {"answers": true}},
+ {"n": 1044, "group": "WP-6d plain count", "q": "count of planned activities in Attabira in 2025-26", "expect": {"answers": true}}
 ]
