@@ -3783,8 +3783,8 @@
   "id": "G1613",
   "bracket": "Implementation & Progress",
   "lang": "en",
-  "case_type": "ambiguity",
-  "expected_behavior": "clarify",
+  "case_type": "standard",
+  "expected_behavior": "answer",
   "expected_entities": {
    "date_range": "2024-2025"
   },
@@ -3792,7 +3792,7 @@
   "entity_surface": [],
   "answerability": "Partial",
   "sme_review": false,
-  "notes": "RECLASSIFIED after WP-3 landed. IMP-009 carries a REQUIRED $threshold — a minimum activity count 'so focus areas with one or two activities do not dominate the ranking'. The question as an officer asks it does not supply one, so required-slot behaviour is a clarification. Worth keeping as a clarify row: the alternative is a league table topped by a focus area with two activities, which is the statistically-wrong-but-confident failure the threshold exists to prevent. SME: is there a sensible default (say 5) that would let this answer outright?"
+  "notes": "RECLASSIFIED after WP-3 landed. IMP-009 carries a REQUIRED $threshold — a minimum activity count 'so focus areas with one or two activities do not dominate the ranking'. The question as an officer asks it does not supply one, so required-slot behaviour is a clarification. Worth keeping as a clarify row: the alternative is a league table topped by a focus area with two activities, which is the statistically-wrong-but-confident failure the threshold exists to prevent. SME: is there a sensible default (say 5) that would let this answer outright? Operator ruling 2026-09-28 (WP-6d): no floor by default, bottom 10."
  },
  {
   "n": 1614,
