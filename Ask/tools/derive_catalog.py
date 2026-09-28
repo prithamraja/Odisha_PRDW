@@ -351,6 +351,26 @@ CODE_BOUND = {"gp_name", "gp_name_2"}
 # at bind time, including inside LIMIT.
 DEFAULTED_SLOTS = {"top_n": "10"}
 
+# WP-6d T1 (operator ruling 2026-09-28): THE ONE EXCEPTION to "a threshold never
+# defaults". Three rankings end `HAVING COUNT(*) >= $threshold` — a floor that only
+# keeps groups with very few activities out of the league table. Their question
+# text never mentions it, so "At least how many activities?" was a number the
+# officer could not know the meaning of (gold G1613 asked it for this reason).
+# They default to the floor's no-op value: `COUNT(*) >= 1` holds for every group,
+# so 1 is exactly "no floor". It must be a DEFAULT, not merely optional — an
+# absent optional binds NULL and `HAVING COUNT(*) >= NULL` drops every row.
+# A threshold that changes WHICH records are counted (the other twelve) still
+# never defaults. Listed by id, never matched by pattern; migration M6 wrote them.
+RANKING_FLOOR_DEFAULTS = {
+    ("IMP-009", "threshold"): "1",
+    ("IMP-019", "threshold"): "1",
+    ("IMP-020", "threshold"): "1",
+}
+# On those three, a superlative ("which focus area has the lowest …") still gets
+# the ten-row list — the bottom rate is usually shared by many groups, so a single
+# row would name the largest of the ties as though it were the one answer.
+RANKING_FLOOR_TEMPLATES = frozenset(qid for qid, _ in RANKING_FLOOR_DEFAULTS)
+
 # The other half of the D18 table: dimensions that are optional and must NEVER
 # carry a default, each with its reason. `contract_problems` already refuses a
 # default on anything outside DEFAULTED_SLOTS; this names the ones where the
@@ -1581,7 +1601,29 @@ def contract_problems(catalog: dict) -> list[str]:
                         problems.append(f"{qid} $group_by: {sorted(stray)} is outside "
                                         f"the breakdown whitelist")
                 continue
-            if name in DEFAULTED_SLOTS:
+            if "superlative_means_one" in slot and (
+                    name != "top_n" or qid not in RANKING_FLOOR_TEMPLATES
+                    or slot["superlative_means_one"] is not False):
+                problems.append(f"{qid} ${name}: `superlative_means_one: False` is "
+                                f"declared only on the ranking-floor templates' "
+                                f"$top_n (WP-6d)")
+            if name == "top_n" and qid in RANKING_FLOOR_TEMPLATES \
+                    and slot.get("superlative_means_one") is not False:
+                problems.append(f"{qid} $top_n: a ranking-floor template keeps its "
+                                f"ten rows for a superlative — declare "
+                                f"`superlative_means_one: False` (WP-6d)")
+            if (qid, name) in RANKING_FLOOR_DEFAULTS:
+                floor = re.search(rf"\bHAVING\s+COUNT\(\*\)\s*>=\s*\${re.escape(name)}\b",
+                                  mask_literals(sql), re.I)
+                if not floor:
+                    problems.append(f"{qid} ${name}: declared a ranking floor but the "
+                                    f"SQL has no `HAVING COUNT(*) >= ${name}`")
+                if (not slot.get("optional")
+                        or slot.get("default") != RANKING_FLOOR_DEFAULTS[(qid, name)]):
+                    problems.append(f"{qid} ${name}: a ranking floor must be optional "
+                                    f"with default "
+                                    f"{RANKING_FLOOR_DEFAULTS[(qid, name)]!r} (WP-6d)")
+            elif name in DEFAULTED_SLOTS:
                 if not slot.get("optional") or slot.get("default") != DEFAULTED_SLOTS[name]:
                     problems.append(f"{qid} ${name}: must be optional with default "
                                     f"{DEFAULTED_SLOTS[name]!r} (D18.P1)")

@@ -178,14 +178,22 @@ class BindParamValuesTests(unittest.TestCase):
         and `$amount_threshold` (2) change the POPULATION under study — a
         completion-rate league table topped by a focus area with two activities
         is the confidently-wrong output the threshold exists to prevent. They
-        clarify; they never default."""
+        clarify; they never default.
+
+        EXCEPT the three ranking floors the catalogue declares (WP-6d, operator
+        ruling 2026-09-28): `HAVING COUNT(*) >= $threshold` on IMP-009/019/020
+        only keeps tiny groups out of a league table, and defaults to 1 — no
+        floor. Declared in tools/derive_catalog.py, nowhere else."""
+        from tools.derive_catalog import RANKING_FLOOR_DEFAULTS
         bearing = sorted({
             qid for qid, t in TEMPLATE_CATALOG.items()
             for s in t["param_slots"]
             if s["name"] in ("threshold", "amount_threshold")
         })
         self.assertEqual(len(bearing), 15)
-        for qid in bearing:
+        floors = {qid for qid, _ in RANKING_FLOOR_DEFAULTS}
+        self.assertEqual(floors, {"IMP-009", "IMP-019", "IMP-020"})
+        for qid in sorted(set(bearing) - floors):
             for slot in TEMPLATE_CATALOG[qid]["param_slots"]:
                 if slot["name"] in ("threshold", "amount_threshold"):
                     with self.subTest(qid=qid, slot=slot["name"]):

@@ -210,8 +210,11 @@ class T1AskTests(unittest.TestCase):
             ("ALR-008", "Which activities approved long ago in Barpali are not started?",
              {"block_name": "Barpali"}, "How many days?",
              ["30 days", "60 days", "90 days"]),
-            ("IMP-009", "Which focus area has the lowest completion rate in 2024-25?",
-             {"date_range": "2024-2025"}, "At least how many activities?", ["5", "10", "20"]),
+            # IMP-009 asked "At least how many activities?" here until WP-6d gave
+            # its ranking floor a default of 1; PLN-045 is an activity-count
+            # threshold that still changes the population, so it still asks.
+            ("PLN-045", "Which GPDP themes have only a few planned activities in 2024-25?",
+             {"date_range": "2024-2025"}, "Fewer than how many activities?", ["5", "10", "20"]),
         ]
         for qid, question, raw, prompt, chips in cases:
             _, clarify = _fill(qid, question, raw)
