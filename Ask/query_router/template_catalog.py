@@ -1123,6 +1123,7 @@ ORDER BY planned_activities DESC
             'How many activities are planned under each focus area in a Gram Panchayat in a given year?',
             # folded from PLN-051 (WP-6 T3): the same measure, answered with $group_by
             'How many activities are planned under each focus area in a given block in a given year?',
+            'How many activities are planned in a given block in a given year?',
             'How many activities are planned under each focus area in Bhubaneswar in 2024-2025?',
             'How many total activities are planned under each focus area in a block in a given year?',
             'Show the breakdown of planned activities by theme in a given year.',
@@ -5615,6 +5616,9 @@ ORDER BY sanctioned_amount DESC
         "paraphrases": [
             'How much was sanctioned as tied vs untied in 2024-2025?',
             'How much funding is available under Tied and Untied Funds in a given year?',
+            'Split the sanctioned funds into SFC and Own Funds in a given year',
+            'How much of the sanctioned amount came from a given scheme in a given year?',
+            'What share of the sanctioned budget came from SFC and the 15th Finance Commission?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How much funding is sanctioned under tied and untied components in a given year?',
             'How much funding is sanctioned under tied and untied components in a given year, for a given district?',

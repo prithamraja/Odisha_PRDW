@@ -332,5 +332,24 @@ class T4PlanTypeGuardTests(unittest.TestCase):
                              "Main", n)
 
 
+# ── T4 / T5: the hand phrasings ───────────────────────────────────────────────
+
+class T5PhrasingTests(unittest.TestCase):
+
+    def test_the_hand_phrasings_are_in_the_catalogue(self):
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        wanted = {
+            "PLN-007": ("Which districts are behind on GPDP submission in a given year?",
+                        "Which districts are lagging on GPDP submission in a given year?"),
+            "BUD-003": ("Split the sanctioned funds into SFC and Own Funds in a given year",
+                        "How much of the sanctioned amount came from a given scheme in a given year?",
+                        "What share of the sanctioned budget came from SFC and the 15th Finance Commission?"),
+            "PLN-024": ("How many activities are planned in a given block in a given year?",),
+        }
+        for qid, phrasings in wanted.items():
+            for phrasing in phrasings:
+                self.assertIn(phrasing, T[qid]["paraphrases"], qid)
+
+
 if __name__ == "__main__":
     unittest.main()
