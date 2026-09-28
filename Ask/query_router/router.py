@@ -61,6 +61,7 @@ from .fragment_reroute   import drill_target, templates_share_subject
 from .sql_params         import NAMED, param_style
 from .suggestions       import elicitation_chips
 from .                  import breakdown
+from .                  import config
 from .config            import (
     CLARIFY_SCORE_MARGIN,
     MAX_CLARIFY_OPTIONS,
@@ -2452,7 +2453,15 @@ def _route_vector(
             user_query, normalized, start,
         )
 
-    scored = retriever.retrieve_scored(normalized, VECTOR_TOP_K)
+    # The phrasings that found each candidate go to the reranker (WP-6e); they
+    # never change the candidates. Read at call time, so a harness can flip it.
+    per_candidate = config.RERANK_EXAMPLES_PER_CANDIDATE
+    examples = None
+    if per_candidate > 0:
+        scored, examples = retriever.retrieve_with_examples(
+            normalized, VECTOR_TOP_K, per_candidate)
+    else:
+        scored = retriever.retrieve_scored(normalized, VECTOR_TOP_K)
 
     # Three-zone confidence handling on retrieval scores
     score_zone = zone([s for _, _, s in scored])
@@ -2479,7 +2488,8 @@ def _route_vector(
         )
 
     candidates = [(qid, q) for qid, q, _ in scored]
-    query_id, near_misses = rerank(user_query, candidates, openai_client)
+    query_id, near_misses = rerank(user_query, candidates, openai_client,
+                                   examples=examples)
 
     # The catalogue's own "this cannot be answered", when it is the closest thing
     # in the index to the question asked. Before the branch below, because that

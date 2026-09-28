@@ -15,6 +15,10 @@ one rerank call per row; catalog embeddings come from the .tmp cache.
   python rerank_eval.py --out ../eval_after.json --yes
   python rerank_eval.py --compare ../eval_baseline.json ../eval_after.json
 
+  --examples N (WP-6e) shows the reranker up to N "found by:" phrasings per
+  candidate; 0 is the WP-6d prompt. The default is the production setting,
+  config.RERANK_EXAMPLES_PER_CANDIDATE, so both arms of a comparison are one flag.
+
 THE GOLD SET IS THE REPO'S, NOT AP'S (WP-4 T4d). This harness previously carried
 79 hand-labelled AP questions in a `GOLD_RAW` docstring block -- PM-KISAN
 farmers, eKYC status, MARKFED procurement -- scored against query_ids
@@ -55,7 +59,7 @@ if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
 
 from openai import OpenAI
 
-from query_router.config import VECTOR_TOP_K
+from query_router.config import RERANK_EXAMPLES_PER_CANDIDATE, VECTOR_TOP_K
 from query_router.dashboard_catalog import DASHBOARD_CATALOG
 from query_router.preprocessor import normalize
 from query_router.reranker import rerank
@@ -115,7 +119,8 @@ def score_row(row: dict, picked: str, near_misses: list[str]) -> str:
     return "miss"
 
 
-def run(out_path: Path | None, limit: int | None) -> dict:
+def run(out_path: Path | None, limit: int | None,
+        examples_per_candidate: int = RERANK_EXAMPLES_PER_CANDIDATE) -> dict:
     meter().reset()                     # D28.8 — per-run totals, not cumulative
     client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
     # The unanswerables are indexed here for the same reason main.py indexes
@@ -130,10 +135,16 @@ def run(out_path: Path | None, limit: int | None) -> dict:
     results = []
     for i, row in enumerate(gold, 1):
         normalized = normalize(row["question"])
-        scored = retriever.retrieve_scored(normalized, VECTOR_TOP_K)
+        examples = None
+        if examples_per_candidate > 0:
+            scored, examples = retriever.retrieve_with_examples(
+                normalized, VECTOR_TOP_K, examples_per_candidate)
+        else:
+            scored = retriever.retrieve_scored(normalized, VECTOR_TOP_K)
         score_zone = zone([s for _, _, s in scored])
         candidates = [(qid, q) for qid, q, _ in scored]
-        picked, near_misses = rerank(row["question"], candidates, client)
+        picked, near_misses = rerank(row["question"], candidates, client,
+                                     examples=examples)
 
         ranked_ids = [qid for qid, _, _ in scored]
         gold_rank = ranked_ids.index(row["gold"]) if row["gold"] in ranked_ids else None
@@ -153,6 +164,8 @@ def run(out_path: Path | None, limit: int | None) -> dict:
             "top_score": round(scored[0][2], 4) if scored else None,
             "gold_retrieval_rank": gold_rank,
             "verdict": verdict,
+            "examples_shown": {qid: examples[qid] for qid in (row["gold"], picked)
+                               if examples and qid in examples},
         })
         print(f"[{i:>2}/{len(gold)}] {verdict:<8} gold={row['gold']:<6} "
               f"picked={picked:<9} zone={score_zone:<9} {row['question'][:62]}")
@@ -182,7 +195,8 @@ def run(out_path: Path | None, limit: int | None) -> dict:
     # well as score them — which is the whole question in T5's transliteration
     # vs paraphrase-index choice.
     print(meter().report("rerank_eval: token spend"))
-    payload = {"summary": summary, "usage": meter().snapshot(), "results": results}
+    payload = {"summary": summary, "examples_per_candidate": examples_per_candidate,
+               "usage": meter().snapshot(), "results": results}
     if out_path:
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(json.dumps(payload, indent=1), encoding="utf-8")
@@ -226,6 +240,9 @@ def main() -> None:
     ap.add_argument("--out", type=Path, help="write per-row results JSON here")
     ap.add_argument("--limit", type=int, help="only run the first N questions")
     ap.add_argument("--compare", nargs=2, type=Path, metavar=("BEFORE", "AFTER"))
+    ap.add_argument("--examples", type=int, default=RERANK_EXAMPLES_PER_CANDIDATE,
+                    metavar="N", help="found-by phrasings per candidate; 0 = the "
+                    f"WP-6d prompt (default {RERANK_EXAMPLES_PER_CANDIDATE})")
     ap.add_argument("--yes", action="store_true",
                     help="confirm the paid run (or set PRDW_EVAL_CONFIRM=1)")
     args = ap.parse_args()
@@ -241,7 +258,7 @@ def main() -> None:
          (f"per row: 1 embed + 1 rerank x {n}", 2 * n)],
         confirmed=args.yes,
     )
-    run(args.out, args.limit)
+    run(args.out, args.limit, args.examples)
 
 
 if __name__ == "__main__":

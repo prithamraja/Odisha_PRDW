@@ -53,6 +53,21 @@ Disambiguation — the distinctions this database punishes most:
 
 Return ONLY a JSON object: {"query_id": "<id or no_match>", "candidates": ["<id>", ...]}."""
 
+# WP-6e. Only when "found by:" lines are shown — with the switch at 0 the prompt
+# is byte-for-byte the one above.
+_EXAMPLES_RULE = (
+    '"found by:" lines are the example phrasings that brought a candidate into '
+    'this list — they show how officers word that question. The "↳" line says '
+    'what it measures. When the two point different ways, decide by what the '
+    'candidate measures.'
+)
+_ANCHOR = (
+    'and you choose between them with "accepts filters:".'
+)
+assert _ANCHOR in _RERANK_SYS
+_RERANK_SYS_WITH_EXAMPLES = _RERANK_SYS.replace(
+    _ANCHOR, f"{_ANCHOR}\n\n{_EXAMPLES_RULE}", 1)
+
 
 def _accepted_filters(qid: str) -> str:
     """The filters a query_id can actually apply — ground truth from its param_slots.
@@ -145,15 +160,21 @@ def rerank_call_count() -> int:
     return _CALL_COUNT
 
 
-def rerank(query: str, candidates: list[tuple[str, str]], client: OpenAI) -> tuple[str, list[str]]:
-    """candidates: list of (query_id, question).
-    Returns (query_id | 'no_match', llm_picked_near_miss_ids)."""
-    global _CALL_COUNT
-    if not candidates:
-        return "no_match", []
-    _CALL_COUNT += 1
+def _found_by(phrasings: list[str]) -> str:
+    """The "found by:" block under a candidate, one quoted phrasing per line."""
+    pad = " " * len("    found by: ")
+    quoted = [f'"{text}"' for text in phrasings]
+    return "\n    found by: " + f"\n{pad}".join(quoted)
 
-    valid_ids = {qid for qid, _ in candidates}
+
+def build_messages(query: str, candidates: list[tuple[str, str]],
+                   examples: dict[str, list[str]] | None = None) -> list[dict]:
+    """The system and user messages the reranker is sent.
+
+    `examples` (WP-6e): query_id -> the phrasings search walked through to find
+    that candidate, best first. None — the switch at 0 — sends exactly the
+    WP-6d prompt; a dict adds the "found by:" lines and the rule that reads them.
+    """
     lines = []
     for qid, question in candidates:
         ctx = _QID_TO_CONTEXT.get(qid)
@@ -162,20 +183,37 @@ def rerank(query: str, candidates: list[tuple[str, str]], client: OpenAI) -> tup
             line = f"{qid}: {question}"
             if desc:
                 line += f"\n    ↳ {desc}"
-            lines.append(f"{line}\n    accepts filters: {filters}")
+            line = f"{line}\n    accepts filters: {filters}"
         else:
-            lines.append(f"{qid}: {question}")
+            line = f"{qid}: {question}"
+        if examples and examples.get(qid):
+            line += _found_by(examples[qid])
+        lines.append(line)
     listing = "\n".join(lines)
     user_msg = f'Candidates:\n{listing}\n\nUser question: "{query}"\nJSON:'
+    system = _RERANK_SYS if examples is None else _RERANK_SYS_WITH_EXAMPLES
+    return [
+        {"role": "system", "content": system},
+        {"role": "user", "content": user_msg},
+    ]
+
+
+def rerank(query: str, candidates: list[tuple[str, str]], client: OpenAI,
+           examples: dict[str, list[str]] | None = None) -> tuple[str, list[str]]:
+    """candidates: list of (query_id, question); examples: see build_messages.
+    Returns (query_id | 'no_match', llm_picked_near_miss_ids)."""
+    global _CALL_COUNT
+    if not candidates:
+        return "no_match", []
+    _CALL_COUNT += 1
+
+    valid_ids = {qid for qid, _ in candidates}
 
     try:
         kwargs = dict(
             model=RERANK_MODEL,
             timeout=LLM_TIMEOUT_SECONDS,
-            messages=[
-                {"role": "system", "content": _RERANK_SYS},
-                {"role": "user", "content": user_msg},
-            ],
+            messages=build_messages(query, candidates, examples),
             response_format={"type": "json_object"},
         )
         if RERANK_MODEL in REASONING_MODELS:

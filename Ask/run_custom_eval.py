@@ -137,6 +137,17 @@ def _trace_retrieval(main_module) -> list:
         return scored
 
     retriever.retrieve_scored = traced
+
+    # With the WP-6e switch above 0 the router retrieves through this one.
+    real_with_examples = getattr(retriever, "retrieve_with_examples", None)
+    if real_with_examples is not None:
+        def traced_with_examples(*args, **kwargs):
+            scored, examples = real_with_examples(*args, **kwargs)
+            if not seen:
+                seen.append([qid for qid, _, _ in scored[:3]])
+            return scored, examples
+
+        retriever.retrieve_with_examples = traced_with_examples
     return seen
 
 

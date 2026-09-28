@@ -13,6 +13,11 @@ EMBEDDING_DIMENSIONS = 3072
 USE_VECTOR_RETRIEVAL = True
 VECTOR_TOP_K         = 30    # validated at k=30 (English & Hinglish recall@30 = 97%)
 
+# WP-6e: under each candidate the reranker is shown up to this many of the
+# example phrasings search walked through to find it ("found by:" lines), best
+# first. 0 sends exactly the WP-6d prompt — adoption or rollback is this line.
+RERANK_EXAMPLES_PER_CANDIDATE = 4
+
 # ── LLM parameters ───────────────────────────────────────────────────────────
 LLM_TEMPERATURE           = 0.0
 LLM_MAX_TOKENS_CLASSIFY   = 60     # JSON: {"domain":"...","intent":"..."}

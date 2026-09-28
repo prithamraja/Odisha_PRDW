@@ -236,6 +236,9 @@ class _StubRetriever:
     def retrieve_scored(self, query, k):
         return list(self._scored)
 
+    def retrieve_with_examples(self, query, k, per_candidate):
+        return list(self._scored), {}
+
 
 class RouteVectorRefusalTests(unittest.TestCase):
     """The rule where it lives: through `_route_vector`, with the two LLM calls
@@ -248,8 +251,8 @@ class RouteVectorRefusalTests(unittest.TestCase):
         router.rerank = self._real_rerank
 
     def _route(self, scored, rerank_verdict, near_misses=()):
-        router.rerank = lambda query, candidates, client: (rerank_verdict,
-                                                          list(near_misses))
+        router.rerank = lambda query, candidates, client, examples=None: (
+            rerank_verdict, list(near_misses))
         return router._route_vector(
             "How many beneficiaries received benefits under Swachh Bharat "
             "Mission in Andhrua during 2024-25?",

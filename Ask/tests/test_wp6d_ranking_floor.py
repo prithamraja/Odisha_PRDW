@@ -368,6 +368,9 @@ class _Retriever:
     def retrieve_scored(self, text, k):
         return self.scored[:k]
 
+    def retrieve_with_examples(self, text, k, per_candidate):
+        return self.scored[:k], {}
+
 
 def _chips_for(question, extractor_says, near_misses):
     """The reranker no-match chips for `question`, extractor and reranker stubbed."""
@@ -376,7 +379,8 @@ def _chips_for(question, extractor_says, near_misses):
     stub, _ = _stubbed(extractor_says)
     real_extract, real_rerank = router.extract_entities, router.rerank
     router.extract_entities = stub
-    router.rerank = lambda query, candidates, client: ("no_match", list(near_misses))
+    router.rerank = lambda query, candidates, client, examples=None: (
+        "no_match", list(near_misses))
     try:
         result = router._route_vector(
             question, question, time.monotonic(), validator=_validator(),
