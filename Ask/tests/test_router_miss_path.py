@@ -177,8 +177,10 @@ class AmbiguousNameFillTests(unittest.TestCase):
             template_map=GP_TEMPLATE_MAP,
         )
         labels = [chip.label for chip in result.clarification.options]
+        # WP-6d T6: a place on a chip carries its tier, since a tap sends only
+        # the text ("Naugaon GP" still lands in the GP disambiguation).
         self.assertIn(
-            "What is the GPDP status for Naugaon in a year?", labels
+            "What is the GPDP status for Naugaon GP in a year?", labels
         )
         for label in labels:
             self.assertNotIn("a gram panchayat", label)

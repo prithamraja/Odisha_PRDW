@@ -1292,6 +1292,13 @@ def _extract_fill_values(
     except Exception:
         return {}
     _block_first(raw, slot_type, validator, user_query)
+    # A list length the officer did not write is not put on a chip (WP-6d): the
+    # chip's own wording carries the superlative, and on the ranking-floor
+    # templates the answer keeps ten rows, so "(the lowest)" would misdescribe it.
+    for slot, etype in slot_type.items():
+        if etype == "top_n" and raw.get(slot) is not None \
+                and not number_in_question(raw[slot], user_query):
+            raw[slot] = None
     fill: dict[str, str] = {}
     for slot, value in raw.items():
         if value is None:

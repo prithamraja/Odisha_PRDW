@@ -436,10 +436,33 @@ def _borrowed_geography(question: str, fill: dict) -> tuple[dict[str, str], set]
     return borrowed, used
 
 
+_GEO_PAIR_RE = re.compile(r"\{(district_name|block_name|gp_name)\}/\{(district_name|block_name|gp_name)\}")
+
+
+def _one_tier(question: str, fill: dict) -> str:
+    """'in {gp_name}/{block_name}' with only the block known -> 'in {block_name}'.
+
+    Six questions offer two tiers side by side (PLN-001 "in {district_name}/
+    {block_name}", PLN-044 "in {gp_name}/{block_name}"). On a chip, the tier the
+    officer did not name read "in a gram panchayat/Bheden" — a stand-in beside the
+    place. The named tier alone is what the chip means (WP-6d pilot row 1041).
+    """
+    def _sub(match: re.Match) -> str:
+        first, second = match.group(1), match.group(2)
+        if first in fill and second not in fill:
+            return "{" + first + "}"
+        if second in fill and first not in fill:
+            return "{" + second + "}"
+        return match.group(0)
+    return _GEO_PAIR_RE.sub(_sub, question)
+
+
 def _readable(
     question: str,
     fill: dict[str, str] | None = None,
     phrases: dict[str, str] | None = None,
+    *,
+    tier_nouns: bool = False,
 ) -> str:
     """'GPDP status for {gp_name}?' -> 'GPDP status for Andhrua?' when the value
     is known from the user's own utterance, else 'GPDP status for a gram
@@ -460,7 +483,13 @@ def _readable(
             # A known value keeps the unit — "in Khordha district" reads better
             # than "in Khordha" and is what the user said. A database label reads
             # by its display name (WP-6d T7); several values are named.
-            return join_values(display_label(v) for v in _values(fill[name])) + following
+            values = _values(fill[name])
+            if tier_nouns and name in _APPEND_NOUNS and not swallowed:
+                # On a CHIP a place carries its tier: Kalimela and Laxmipur are
+                # both a block and a GP, and a tap sends only the text, so "in
+                # Laxmipur" would lose the "GP" the officer wrote (WP-6d T6).
+                return _geo_phrase(name, values) + following
+            return join_values(display_label(v) for v in values) + following
         stand_in = (phrases or {}).get(name) or _slot_phrase(name)
         return stand_in + ("" if swallowed else following)
 
@@ -481,9 +510,10 @@ def readable_question(question: str, fill: dict[str, str] | None = None,
     """
     fill = fill or {}
     template = template or _template_for(question)
-    borrowed, used = _borrowed_geography(question, fill)
-    rendered = _readable(question, fill, borrowed)
-    return _with_appended(rendered, _appended(question, rendered, fill, template, used,
+    shown = _one_tier(question, fill)
+    borrowed, used = _borrowed_geography(shown, fill)
+    rendered = _readable(shown, fill, borrowed, tier_nouns=True)
+    return _with_appended(rendered, _appended(shown, rendered, fill, template, used,
                                               chip=True))
 
 

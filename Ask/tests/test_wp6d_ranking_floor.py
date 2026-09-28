@@ -402,6 +402,34 @@ class T6ChipTests(unittest.TestCase):
                          "How many activities are planned under a focus area in "
                          "Kalimela block in 2024-2025?")
 
+    def test_two_tiers_side_by_side_show_the_one_named_and_a_place_keeps_its_tier(self):
+        """Pilot rows 1041 / 1042: "in a gram panchayat/Bheden", and "in Laxmipur"
+        on a chip for a question that said "Laxmipur GP"."""
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        from query_router.zones import readable_question, resolved_question
+        q44 = T["PLN-044"]["abstract_question"]
+        self.assertEqual(readable_question(q44, {"block_name": "Bheden", "date_range": "2024-2025"}),
+                         "Are the planned activities balanced across themes in Bheden block "
+                         "in 2024-2025?")
+        self.assertEqual(readable_question(T["PLN-024"]["abstract_question"],
+                                           {"gp_name": "Laxmipur", "date_range": "2024-2025"}),
+                         "How many activities are planned under each GPDP theme in Laxmipur GP "
+                         "in 2024-2025?")
+        self.assertEqual(readable_question(T["PLN-001"]["abstract_question"],
+                                           {"district_name": "Ganjam", "date_range": "2024-2025"}),
+                         "How many Gram Panchayats in Ganjam district have uploaded the GPDP "
+                         "in 2024-2025?")
+        # A unit noun the question already writes is not doubled; the answer echo
+        # is unchanged by the chip-only rules.
+        self.assertIn("Laxmipur block", readable_question(
+            "Which GPs in {block_name} block spent most in {date_range}?",
+            {"block_name": "Laxmipur", "date_range": "2024-2025"}))
+        self.assertNotIn("block block", readable_question(
+            "Which GPs in {block_name} block spent most in {date_range}?",
+            {"block_name": "Laxmipur", "date_range": "2024-2025"}))
+        self.assertIn("in Laxmipur in", resolved_question(
+            T["PLN-024"]["abstract_question"], {"gp_name": "Laxmipur", "date_range": "2024-2025"}))
+
     def test_block_first_unless_the_question_says_gp(self):
         from query_router import router
         from query_router.template_catalog import TEMPLATE_CATALOG as T
@@ -445,6 +473,20 @@ class T6ChipTests(unittest.TestCase):
         bound = {e.slot_name: e.resolved_value for e in entities}
         self.assertEqual(bound.get("block_name"), "Kalimela")
         self.assertNotIn("gp_name", bound)
+
+    def test_a_chip_shows_no_list_length_the_officer_did_not_write(self):
+        """Pilot row 1032: chips read "(the lowest, …)" from the extractor's
+        superlative top_n = 1, on a ranking that answers ten rows."""
+        question = "Which focus areas with at least 50 activities have the lowest completion rate in 2025-26?"
+        result = _chips_for(question, {"top_n": "1", "threshold": "50"}, ["IMP-009", "IMP-020"])
+        labels = [c.label for c in result.clarification.options]
+        self.assertTrue(labels)
+        for label in labels:
+            self.assertNotIn("the lowest,", label)
+            self.assertIn("(bottom 10, focus areas with at least 50 activities)", label)
+        result = _chips_for("bottom 3 focus areas by completion rate in 2025-26",
+                            {"top_n": "3"}, ["IMP-009"])
+        self.assertIn("(bottom 3)", result.clarification.options[0].label)
 
     def test_a_scheme_list_survives_into_the_chip_and_is_read_back(self):
         from query_router import subject_reader
