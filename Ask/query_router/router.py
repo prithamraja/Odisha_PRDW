@@ -301,6 +301,14 @@ _CONSTANT_ENTITY_TYPES: dict[str, str] = {}
 # — the Parameter Registry is explicit that its unit varies by question between
 # percent, rupees, days and a minimum activity count.
 #
+# ONE EXCEPTION, DECLARED BY THE CATALOGUE (WP-6d, operator ruling 2026-09-28): a
+# threshold that only guards small denominators in a ranking may default to its
+# no-op value where the catalogue declares it — IMP-009, IMP-019 and IMP-020,
+# `HAVING COUNT(*) >= $threshold`, default 1 (see
+# tools/derive_catalog.py::RANKING_FLOOR_DEFAULTS). A threshold that changes the
+# population may not. The declaration arrives through slot_defaults(), not this
+# table, so nothing here changes.
+#
 # KEYED BY ENTITY TYPE, and now the FALLBACK rather than the authority: since
 # D18.P1 the PR&DW catalogue declares the default on the slot itself
 # (`{"optional": True, "default": "10"}`, emitted by tools/derive_catalog.py), and
@@ -371,6 +379,40 @@ def amount_from_text(text: str) -> str | None:
     return f"{number} {unit.lower()}" if unit else number
 
 
+_NUMBER_WORDS = {
+    "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7,
+    "eight": 8, "nine": 9, "ten": 10, "eleven": 11, "twelve": 12, "thirteen": 13,
+    "fourteen": 14, "fifteen": 15, "sixteen": 16, "seventeen": 17, "eighteen": 18,
+    "nineteen": 19, "twenty": 20,
+}
+# A year is not a list length: "FY 2025-26", "2024 to 2026", "2023-2025".
+_YEARISH_RE = re.compile(r"\b(?:19|20)\d{2}(?:\s*[-–/]\s*\d{2,4})?\b")
+# "which one", "the one with", "one of the" — a pronoun, not a count.
+_ONE_AS_PRONOUN_RE = re.compile(r"\b(?:which|the|any|that|this)\s+one\b|\bone\s+of\b",
+                                re.IGNORECASE)
+
+
+def superlative_list_slots(param_slots: list[dict]) -> frozenset:
+    """`$top_n` slots declaring `superlative_means_one: False` (WP-6d T1): a
+    ranking whose bottom is usually shared by many groups keeps its list."""
+    return frozenset(s["name"] for s in param_slots
+                     if s.get("superlative_means_one") is False)
+
+
+def number_in_question(value, text: str) -> bool:
+    """True when the question states this list length itself — as digits, or as
+    a number word from one to twenty. Years are not read as lengths."""
+    try:
+        n = int(str(value).strip())
+    except (TypeError, ValueError):
+        return False
+    masked = _YEARISH_RE.sub(" ", text or "")
+    if n in {int(d) for d in re.findall(r"(?<![\d.,])\d+(?![\d.,]*\d)", masked)}:
+        return True
+    words = _ONE_AS_PRONOUN_RE.sub(" ", masked).lower()
+    return any(_NUMBER_WORDS.get(w) == n for w in re.findall(r"[a-z]+", words))
+
+
 def _extract_slot_values(
     user_query: str,
     slot_type: dict[str, str],
@@ -379,6 +421,7 @@ def _extract_slot_values(
     validator: EntityValidator | None = None,
     intent: str | None = None,
     list_slots: set[str] | frozenset[str] = frozenset(),
+    superlative_lists: set[str] | frozenset[str] = frozenset(),
 ) -> dict[str, str | None]:
     """extract_entities() over the genuinely user-supplied slots, with the
     catalog's constant slots filled in afterwards, and the two things a
@@ -464,6 +507,16 @@ def _extract_slot_values(
                       slot, value)
             raw[slot] = (kept if len(kept) > 1 else kept[0]) if kept else None
     raw.update(prefilled)
+    # WP-6d T2. The extractor reads a bare superlative as `top_n = 1`, which is
+    # right for "which GP spent the most?". On a ranking that declares otherwise
+    # its value stands only when the officer wrote the number ("bottom 3"); else
+    # the declared default (10) applies and the lowest is row one.
+    for slot in superlative_lists:
+        value = raw.get(slot)
+        if value is not None and not number_in_question(value, user_query):
+            _log.info("top_n: superlative read as list (declared): dropped %s=%r "
+                      "query=%r", slot, value, user_query[:120])
+            raw[slot] = None
     if validator is not None:
         _rehome_and_guard(raw, slot_type, askable, validator, user_query)
     for slot, etype in slot_type.items():
@@ -1050,6 +1103,7 @@ def _fill_slots_or_clarify(
                 # resolve.
                 raw_val = bad if bad is not None else supplied[0]
 
+        from_default = raw_val is None
         if raw_val is None:
             # A slot the question implies is filled from its declared default
             # rather than clarified for. Applied here, in the one place every
@@ -1064,7 +1118,9 @@ def _fill_slots_or_clarify(
                 missing.append(slot)
             continue
         direction = numeric.get(slot, {}).get("direction")
-        if check_direction and direction and against is None:
+        # A default (WP-6d's ranking floor of 1) is not a figure the officer wrote,
+        # so there is no direction in the question to check it against.
+        if check_direction and direction and against is None and not from_default:
             stated = threshold_reply.direction_of_value(user_query, raw_val)
             if stated is not None and stated.direction != direction:
                 # Not bound: the officer asked the other way round from what this
@@ -2405,6 +2461,8 @@ def _route_vector(
             raw_entities = _extract_slot_values(
                 user_query, slot_type, openai_client,
                 validator=validator, intent=intent, list_slots=list_slots,
+                superlative_lists=superlative_list_slots(
+                    template_map[query_id]["param_slots"]),
             )
             validated_entities, clarify_result = _fill_slots_or_clarify(
                 query_id, slot_type, raw_entities, validator,
