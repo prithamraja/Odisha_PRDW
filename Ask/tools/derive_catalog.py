@@ -368,6 +368,75 @@ UNDEFAULTED_SLOTS = {
     "plan_type": "absent means both plan types (Main and Supplementary)",
 }
 
+
+# ── Threshold slots: which way they compare, and in what (WP-6c T1) ───────────
+#
+# The 15 threshold slots are asked for with one sentence ("Above what planned
+# cost?"), and an officer's reply is checked against the statement's own
+# direction ("under 2 lakhs" on an "above" question is not an answer to it). Both
+# facts are IN THE SQL — the comparison operator and what it compares — so they
+# are derived and written onto the slot declaration, never typed by hand, and
+# `--check` pins them. The SQL text is not touched: this reads it.
+#
+#   direction   `x >= $t` / `x > $t` -> above;  `x < $t` / `x <= $t` -> below
+#   unit        `100.0 * … /` -> percent; CURRENT_DATE arithmetic -> days;
+#               COUNT(*) -> activities; a cost or spend column -> rupees
+THRESHOLD_ENTITY_TYPES = {"threshold", "amount_threshold"}
+THRESHOLD_DIRECTIONS = ("above", "below")
+THRESHOLD_UNITS = ("rupees", "percent", "days", "activities")
+
+# Read by hand where the slot sits inside an expression rather than beside the
+# operator. ALR-003: `v.total_expenditure > v.total_cost * (1 + $threshold / 100.0)`
+# — spend more than N percent ABOVE the estimate.
+HAND_THRESHOLD_META = {
+    ("ALR-003", "threshold"): ("above", "percent"),
+}
+
+_OPERATOR_DIRECTION = {">": "above", ">=": "above", "<": "below", "<=": "below"}
+_OPERATOR_FLIP = {">": "<", ">=": "<=", "<": ">", "<=": ">="}
+
+
+def _threshold_unit(expression: str) -> str | None:
+    """What the other side of the comparison measures. Percent is tested first:
+    `100.0 * spend / NULLIF(cost, 0)` names a cost column and a COUNT(*) too."""
+    if re.search(r"\b100(?:\.0+)?\s*\*", expression):
+        return "percent"
+    if re.search(r"\bCURRENT_DATE\b|\bDATE_DIFF\b", expression, re.I):
+        return "days"
+    if re.search(r"\bCOUNT\s*\(\s*\*\s*\)", expression, re.I):
+        return "activities"
+    if re.search(r"cost|expenditure|amount|fund", expression, re.I):
+        return "rupees"
+    return None
+
+
+def threshold_meta(qid: str, sql: str, name: str) -> tuple[str, str] | None:
+    """(direction, unit) for one threshold slot, or None when the SQL does not
+    say it plainly (every occurrence must agree). A hand pin wins."""
+    if (qid, name) in HAND_THRESHOLD_META:
+        return HAND_THRESHOLD_META[(qid, name)]
+    masked = mask_literals(sql)
+    readings: set[tuple[str, str]] = set()
+    for m in re.finditer(rf"\${re.escape(name)}\b", masked):
+        line_start = masked.rfind("\n", 0, m.start()) + 1
+        line_end = masked.find("\n", m.end())
+        before = masked[line_start:m.start()]
+        after = masked[m.end():len(masked) if line_end < 0 else line_end]
+        op = re.search(r"(>=|<=|<|>)\s*$", before)
+        if op:
+            direction, other = _OPERATOR_DIRECTION[op.group(1)], before[:op.start()]
+        else:
+            op = re.match(r"\s*(>=|<=|<|>)", after)
+            if not op:
+                return None
+            direction = _OPERATOR_DIRECTION[_OPERATOR_FLIP[op.group(1)]]
+            other = after[op.end():]
+        unit = _threshold_unit(other)
+        if unit is None:
+            return None
+        readings.add((direction, unit))
+    return readings.pop() if len(readings) == 1 else None
+
 # {Token} in the question text -> the slot it stands for. `.format()` is called
 # on abstract_question by suggestions._chip_for, so every placeholder must be a
 # real slot name or a pre-filled chip raises KeyError.
@@ -863,6 +932,29 @@ def _rewrite_grouped_geo(lines, start, end, qid, entry) -> int:
     return len(new)
 
 
+def _rewrite_threshold_slots(lines, start, end, qid, entry) -> None:
+    """Write the derived `unit` and `direction` onto each threshold slot line.
+
+    A slot the SQL does not state plainly is left as it is; `contract_problems`
+    names it, so the build stops rather than asking with the wrong sentence.
+    """
+    opened, closed = _find_block(lines, start, end, SLOTS_OPEN, SLOTS_CLOSE, qid)
+    for k in range(opened + 1, closed):
+        stripped = lines[k].strip()
+        try:
+            slot = ast.literal_eval(stripped[:-1] if stripped.endswith(",") else stripped)
+        except (ValueError, SyntaxError):
+            continue
+        if not isinstance(slot, dict) or slot.get("entity_type") not in THRESHOLD_ENTITY_TYPES:
+            continue
+        meta = threshold_meta(qid, entry["sql_template"], slot["name"])
+        if meta is None:
+            continue
+        slot = {key: value for key, value in slot.items() if key not in ("unit", "direction")}
+        slot["unit"], slot["direction"] = meta[1], meta[0]
+        lines[k] = f"{_ITEM_PAD}{py(slot)},"
+
+
 def rewrite_source(source: str, catalog: dict, derive, *, grouped_geo: bool) -> str:
     """The file with every entry's derived regions brought up to date."""
     lines = source.split("\n")
@@ -871,6 +963,7 @@ def rewrite_source(source: str, catalog: dict, derive, *, grouped_geo: bool) -> 
         entry = catalog[qid]
         if grouped_geo:
             end += _rewrite_grouped_geo(lines, start, end, qid, entry)
+            _rewrite_threshold_slots(lines, start, end, qid, entry)
         opened, closed = _find_block(lines, start, end,
                                      PARAPHRASES_OPEN, PARAPHRASES_CLOSE, qid)
         hand_lines, hand = _split_paraphrase_body(lines[opened + 1:closed], qid)
@@ -1513,6 +1606,17 @@ def contract_problems(catalog: dict) -> list[str]:
                                 f"no list flag")
             if name in CODE_BOUND and slot.get("bind") != "code":
                 problems.append(f"{qid} ${name}: a GP slot must bind a code (D4/D10)")
+            # WP-6c T1: every threshold slot is asked for, and a reply checked,
+            # by its direction and unit — so the SQL must say both, or a hand pin
+            # must. Nothing else carries them.
+            if slot.get("entity_type") in THRESHOLD_ENTITY_TYPES:
+                if threshold_meta(qid, sql, name) is None:
+                    problems.append(
+                        f"{qid} ${name}: cannot read its direction and unit off the "
+                        f"SQL — pin them in HAND_THRESHOLD_META")
+            elif "unit" in slot or "direction" in slot:
+                problems.append(f"{qid} ${name}: only a threshold slot carries "
+                                f"`unit`/`direction`")
     return problems
 
 

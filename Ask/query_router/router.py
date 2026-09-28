@@ -41,6 +41,7 @@ from .intent_classifier import classify_intent
 from .entity_extractor  import extract_entities
 from .entity_validator  import EntityValidator, lossy_caveat, mask_aadhaar
 from .                  import subject_reader
+from .                  import threshold_reply
 from .reranker          import rerank
 from .fallback          import generate_fallback_message
 from .zones             import (
@@ -847,6 +848,8 @@ def _fill_slots_or_clarify(
     defaults: dict[str, str] | None = None,
     list_slots: set[str] | frozenset[str] = frozenset(),
     splits: set[str] | frozenset[str] = frozenset(),
+    numeric: dict[str, dict] | None = None,
+    check_direction: bool = False,
 ) -> tuple[list[ExtractedEntity], RouteResult | None]:
     """Validate every slot value, or return a clarify carrying pending state so
     the user's next message can resume this exact question.
@@ -868,9 +871,18 @@ def _fill_slots_or_clarify(
     left unstated but which must not bind NULL — `$top_n`, whose NULL means
     "no limit". A defaulted value is validated like any other, so the 1,000
     ceiling still applies to it.
+
+    `numeric` (slot -> the unit and direction the catalogue derives for a
+    threshold, WP-6c T1) words the question for a missing threshold. With
+    `check_direction`, a figure the QUESTION states the other way round from its
+    statement ("under 2 lakhs" on an "above" template) is asked about rather
+    than bound — only on the first turn: a resumed reply was checked by the
+    pending resolver, against the reply rather than the question.
     """
     validated: list[ExtractedEntity] = []
     missing: list[str] = []
+    numeric = numeric or {}
+    against: tuple[str, threshold_reply.Reading] | None = None
 
     def _pending(
         missing_slot: str, candidates: list[EntityCandidate] | None = None
@@ -975,6 +987,17 @@ def _fill_slots_or_clarify(
             if slot not in optional:
                 missing.append(slot)
             continue
+        direction = numeric.get(slot, {}).get("direction")
+        if check_direction and direction and against is None:
+            stated = threshold_reply.direction_of_value(user_query, raw_val)
+            if stated is not None and stated.direction != direction:
+                # Not bound: the officer asked the other way round from what this
+                # statement answers, and its operator is never flipped.
+                _log.info("direction_mismatch on %s: the question reads %s %r, the "
+                          "statement compares %s", query_id, stated.direction,
+                          stated.written, direction)
+                against = (slot, stated)
+                continue
         try:
             entity = validator.validate(raw_val, slot_type[slot])
             entity.slot_name = slot
@@ -1012,6 +1035,15 @@ def _fill_slots_or_clarify(
             clarify.pending = _pending(slot, e.candidates)
             return [], clarify
 
+    if against is not None:
+        slot, stated = against
+        prompt, options = threshold_reply.mismatch(numeric[slot], stated, user_query,
+                                                   first_turn=True)
+        clarify = _clarify("direction_mismatch", prompt, options,
+                           user_query, normalized, start)
+        clarify.pending = _pending(slot)
+        return [], clarify
+
     # A SUBJECT THE QUESTION NAMED MUST BIND, OR NOTHING IS SERVED (WP-6b T2,
     # D33.13). "How many road construction activities are in progress?" was
     # answered with the count of EVERY ongoing activity: the focus area it named
@@ -1042,10 +1074,14 @@ def _fill_slots_or_clarify(
         # pending state carries everything already resolved, so answering this
         # one question resumes the original query rather than restarting it.
         slot = missing[0]
+        # A threshold is asked for in its own unit and direction, with example
+        # figures to tap (WP-6c T1): "For which threshold?" named no unit, and
+        # the rankings' activity floor was unanswerable in those words.
+        prompt, options = threshold_reply.ask(numeric.get(slot, {}))
         clarify = _clarify(
             "missing_parameter",
-            f"For which {slot.replace('_', ' ')}?",
-            [],
+            prompt or f"For which {slot.replace('_', ' ')}?",
+            options,
             user_query, normalized, start,
         )
         clarify.pending = _pending(slot)
@@ -1776,6 +1812,7 @@ def serve_pending_answer(
         defaults=slot_defaults(template["param_slots"]),
         list_slots=_list_slots(template["param_slots"]),
         splits=breakdown.slots_the_statement_splits(template),
+        numeric=threshold_reply.numeric_meta(template["param_slots"]),
     )
     if clarify_result is not None:
         return clarify_result
@@ -2300,6 +2337,9 @@ def _route_vector(
                 defaults=slot_defaults(template_map[query_id]["param_slots"]),
                 list_slots=list_slots,
                 splits=breakdown.slots_the_statement_splits(template_map[query_id]),
+                numeric=threshold_reply.numeric_meta(
+                    template_map[query_id]["param_slots"]),
+                check_direction=True,
             )
             if clarify_result is not None:
                 return clarify_result

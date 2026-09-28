@@ -394,3 +394,65 @@ def extract_entities(
     result = {s: parsed.get(s) for s in slots}
     record_extraction(slots, result, reasoning_tokens=reasoning, query=user_query)
     return result
+
+
+# ── A figure written in words (WP-6c T1, step 2) ──────────────────────────────
+#
+# Called only when the deterministic reader found NO figure in a reply to "Above
+# what planned cost?" but the reply has a number word in it ("twenty thousand",
+# "two and a half lakh", Odia number words). One job, one call: copy the figure
+# into digits, keeping the officer's own unit word, and say which way they meant
+# it. Never multiply out the unit — `entity_validator.parse_amount` does that
+# conversion for every reading, so a bad copy fails loudly instead of binding.
+
+_FIGURE_PROMPT = """An officer was asked for a number (an amount, a percentage, a number of days or a count) and replied:
+
+"{reply}"
+
+Return JSON: {{"amount": "<the number in digits, followed by the unit word the officer used, if any>", "direction": "above" | "below" | null}}
+
+Rules:
+- Write the number in digits but KEEP the unit word as written: "twenty thousand" -> "20 thousand"; "two and a half lakh" -> "2.5 lakh"; "half a crore" -> "0.5 crore"; "fifty percent" -> "50 percent"; "ninety days" -> "90 days".
+- Never multiply the unit out: "2.5 lakh", never "250000".
+- "direction" is "above" for words like above, over, more than, at least; "below" for under, below, less than, up to, at most, within; null when the reply says neither.
+- If the reply gives no number, a range, or several numbers, return {{"amount": null, "direction": null}}.
+- Copy; never invent a number the reply does not state."""
+
+
+def read_figure(reply: str, client: OpenAI) -> dict | None:
+    """{"amount": "2.5 lakh", "direction": "above" | "below" | None}, or None.
+
+    None on any failure or when the model finds no single figure — the caller
+    then asks again. The model's output is never trusted as a number: it goes
+    through the same validation a typed figure does.
+    """
+    kwargs = dict(
+        model=EXTRACTION_MODEL,
+        timeout=LLM_TIMEOUT_SECONDS,
+        messages=[{"role": "user", "content": _FIGURE_PROMPT.format(reply=reply)}],
+        response_format={"type": "json_object"},
+    )
+    if EXTRACTION_MODEL in REASONING_MODELS:
+        kwargs["max_completion_tokens"] = 2000
+        kwargs["extra_body"] = {"reasoning_effort": "low"}
+    else:
+        kwargs["temperature"] = LLM_TEMPERATURE
+        kwargs["max_tokens"] = LLM_MAX_TOKENS_EXTRACT
+    try:
+        resp = client.chat.completions.create(**kwargs)
+        choice = resp.choices[0]
+        record_call("threshold_reply", EXTRACTION_MODEL, resp,
+                    finish_reason=getattr(choice, "finish_reason", None))
+        parsed = json.loads(choice.message.content or "")
+    except Exception as exc:
+        _log.warning("threshold reply: the model read failed (%s: %s) | reply=%r",
+                     type(exc).__name__, exc, (reply or "")[:120])
+        return None
+    if not isinstance(parsed, dict) or not parsed.get("amount"):
+        _log.info("threshold reply read by the model: %r -> no figure", (reply or "")[:120])
+        return None
+    direction = parsed.get("direction")
+    result = {"amount": str(parsed["amount"]).strip(),
+              "direction": direction if direction in ("above", "below") else None}
+    _log.info("threshold reply read by the model: %r -> %r", (reply or "")[:120], result)
+    return result

@@ -19,6 +19,7 @@ in this module executes SQL or talks to a model.
 """
 from __future__ import annotations
 
+import logging
 import re
 from dataclasses import dataclass, field
 
@@ -28,6 +29,9 @@ from .config import MAX_CLARIFY_OPTIONS
 from .entity_validator import _STATE_LEVEL_TERMS, _GEO_TYPES
 from .models import Chip, EntityCandidate, PendingClarification
 from .zones import candidate_chips, candidate_label, candidate_replies
+from . import threshold_reply
+
+_log = logging.getLogger(__name__)
 
 # "Venkateswarlu Devi of Chittoor" — a reply that names a person by where they
 # are. The roster, not this module, decides which one it is.
@@ -277,11 +281,14 @@ def resolve_pending_reply(
     validator,
     *,
     template_map: dict[str, dict] | None = None,
+    openai_client=None,
 ) -> Resolution:
     """Decide what a reply to a paused question means, in this order:
 
       1. it picks one of the candidates we listed (by name, or by the district
          we used to tell them apart);
+         — a NUMERIC pause (a threshold) is read by `_resolve_numeric` instead
+           of steps 2-4 (WP-6c T1);
       2. it widens the scope ("all crops") — serve the broader question if the
          catalog declares one, else re-ask and keep the pause;
       3. it validates as the slot we asked for;
@@ -292,6 +299,10 @@ def resolve_pending_reply(
         resolved = _resolve_candidates(reply, pending, validator)
         if resolved is not None:
             return resolved
+
+    if is_numeric_pending(pending):
+        return _resolve_numeric(reply, pending, validator, template_map or {},
+                                openai_client)
 
     if is_scope_widening_reply(reply, pending.missing_slot):
         return _resolve_scope_widening(pending, template_map or {}, validator)
@@ -339,3 +350,102 @@ def _unusable_reply(reply: str, pending: PendingClarification) -> Resolution:
         options=candidate_chips(pending.candidates) + [escape],
         pending=pending.model_copy(update={"retried": True}, deep=True),
     )
+
+
+# ── A threshold reply (WP-6c T1) ──────────────────────────────────────────────
+#
+# "Above what planned cost?" → "above ₹20,000" is an answer, not a new question,
+# and so is "more than 20,000 rupees" — the strict validation below, and the
+# three-word fall-through after it, turned both into the loop the pilot hit. Here
+# a reply with a figure in it always resumes (or asks about its direction); a
+# reply with none is asked again in the slot's own words; only a long reply with
+# no number in it at all is taken as a change of subject.
+
+# Replies at least this long with no digit and no number word are a new message.
+_NUMERIC_FALLTHROUGH_WORDS = 6
+
+
+def is_numeric_pending(pending: PendingClarification) -> bool:
+    return pending.slot_type in threshold_reply.NUMERIC_SLOT_TYPES
+
+
+def admits_reply(message: str, pending: PendingClarification, *,
+                 from_chip: bool) -> bool:
+    """Whether /query should read this message against the paused question.
+
+    A chip tap is a complete question by construction — except a disambiguation
+    chip, whose text IS the slot value, and a threshold chip, which sends a bare
+    figure ("1 lakh"); the "other way round" chip sends a full question and
+    routes as one. A typed reply is read when it is short, or — for a threshold
+    — whenever it has a number in it, however many words surround it.
+    """
+    numeric = is_numeric_pending(pending)
+    if from_chip:
+        return bool(pending.candidates) or (numeric and threshold_reply.is_bare_figure(message))
+    if numeric and threshold_reply.mentions_number(message):
+        return True
+    return len(str(message).strip().strip("?.!").split()) <= 6
+
+
+def _numeric_reask(pending: PendingClarification, meta: dict, reply: str,
+                   *, retried: bool) -> Resolution:
+    """Ask again in the slot's own words, with the example chips and a way out."""
+    prompt, chips = threshold_reply.ask(meta)
+    slot_words = pending.missing_slot.replace("_", " ")
+    if prompt is None:
+        prompt = f"Which {slot_words}? Please give a number."
+    escape = Chip(label=f'Ask "{reply}" instead', send_text=reply)
+    return Resolution(
+        kind=REASK,
+        reason="missing_parameter",
+        prompt=f'I still need a number to answer "{pending.original_query}". {prompt}',
+        options=chips + ([escape] if reply else []),
+        pending=pending.model_copy(update={"retried": retried}, deep=True),
+    )
+
+
+def _resolve_numeric(reply: str, pending: PendingClarification, validator,
+                     template_map: dict[str, dict], openai_client) -> Resolution:
+    meta = threshold_reply.slot_meta(template_map.get(pending.query_id),
+                                     pending.missing_slot)
+    answer = str(reply).strip().strip(_TRAILING_JUNK)
+
+    # 1. Deterministic: one figure, and the direction written beside it.
+    reading = threshold_reply.read_reply(answer)
+
+    # 2. The model, only when there is no figure but there is a number word.
+    if reading is None and not threshold_reply.has_digit(answer) \
+            and threshold_reply.has_number_word(answer) and openai_client is not None:
+        from .entity_extractor import read_figure
+        read = read_figure(answer, openai_client)
+        if read is not None:
+            figure = threshold_reply.clean_figure(read["amount"])
+            reading = threshold_reply.Reading(figure, read["direction"], figure, "model")
+
+    if reading is None:
+        if not threshold_reply.mentions_number(answer) and (
+                pending.retried or len(answer.split()) >= _NUMERIC_FALLTHROUGH_WORDS):
+            return Resolution(kind=FALLTHROUGH)
+        return _numeric_reask(pending, meta, answer,
+                              retried=not threshold_reply.mentions_number(answer))
+
+    figure = threshold_reply.clean_figure(reading.figure)
+    try:
+        validator.validate(figure, pending.slot_type)
+    except Exception:
+        return _numeric_reask(pending, meta, answer, retried=pending.retried)
+
+    # 3. The reply's direction against the statement's. Never bound the other
+    # way round, and the SQL operator is never flipped.
+    slot_direction = meta.get("direction")
+    if reading.direction and slot_direction and reading.direction != slot_direction:
+        _log.info("direction_mismatch on %s: reply %r reads %s, the statement "
+                  "compares %s", pending.query_id, answer, reading.direction,
+                  slot_direction)
+        prompt, chips = threshold_reply.mismatch(meta, reading, pending.original_query)
+        return Resolution(kind=REASK, reason="direction_mismatch", prompt=prompt,
+                          options=chips, pending=pending)
+    if reading.source == "model":
+        _log.info("threshold reply bound from the model's reading: %s=%r (%r)",
+                  pending.missing_slot, figure, answer)
+    return Resolution(kind=RESUME, value=figure)

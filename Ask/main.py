@@ -51,6 +51,7 @@ from query_router.pending_resolver  import (
     REASK,
     RESUME,
     SERVE_ALTERNATIVE,
+    admits_reply,
     resolve_pending_reply,
 )
 from query_router.interpretation   import (
@@ -282,12 +283,6 @@ class QueryResponse(BaseModel):
     # field, because a frame edit returns an ordinary successful answer that no
     # client can tell apart from a fresh question.
     interpretation:     Interpretation = Interpretation()
-
-
-def _looks_like_slot_answer(message: str) -> bool:
-    """A bare answer to a pending clarification ('Krishna', 'Ramesh Naidu'),
-    not a fresh question. Long messages route normally."""
-    return len(message.strip().strip("?.!").split()) <= 6
 
 
 def _catalog_question(query_id: Optional[str]) -> Optional[str]:
@@ -820,14 +815,16 @@ def query_endpoint(req: QueryRequest):
     # routes normally.
     # A chip tap sends text we generated from the catalog — it is a complete
     # question by construction, never a slot answer or a follow-up fragment.
-    # The exception is a disambiguation chip, whose send_text IS the slot value:
-    # skipping the resume there would route a bare name to nowhere.
+    # The exceptions are a disambiguation chip, whose send_text IS the slot
+    # value, and a threshold chip, which sends a bare figure: skipping the resume
+    # there would route "Anantapur" or "1 lakh" to nowhere. A typed reply to a
+    # threshold is read whenever it has a number in it, however wordy (WP-6c T1).
     pending = _context_store.take_pending(session_id)
-    if pending is not None and _looks_like_slot_answer(req.message) and (
-        not req.from_chip or bool(pending.candidates)
-    ):
+    if pending is not None and admits_reply(req.message, pending,
+                                            from_chip=req.from_chip):
         resolution = resolve_pending_reply(
             req.message, pending, _validator, template_map=_template_map,
+            openai_client=_openai_client,
         )
 
         if resolution.kind == RESUME:

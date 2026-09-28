@@ -455,6 +455,24 @@ def check_static_invariants(args):
     except Exception as exc:                                 # noqa: BLE001
         problems.append(f"plan_type check could not run: {type(exc).__name__}: {exc}")
 
+    # (j) WP-6c T1: every threshold slot says which way it compares and in what.
+    # The officer is asked "Above what planned cost?" from these, and a reply
+    # the other way round is caught by them; tools/derive_catalog.py writes them
+    # from the SQL operator, and check 3 keeps them in step.
+    thresholds, unstated = 0, []
+    for qid, entry in TEMPLATE_CATALOG.items():
+        for slot in entry["param_slots"]:
+            if slot.get("entity_type") not in ("threshold", "amount_threshold"):
+                continue
+            thresholds += 1
+            if slot.get("direction") not in ("above", "below") or slot.get("unit") not in (
+                    "rupees", "percent", "days", "activities"):
+                unstated.append(f"{qid}.${slot['name']}")
+    if unstated:
+        problems.append("threshold slot(s) without a unit and direction: "
+                        + ", ".join(unstated))
+    notes.append(f"unit and direction on all {thresholds} threshold slots")
+
     return not problems, "\n".join(problems or notes)
 
 
