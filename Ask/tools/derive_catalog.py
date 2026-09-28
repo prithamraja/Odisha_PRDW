@@ -1322,9 +1322,15 @@ def describe_family(entry: dict, member_ids: list[str]) -> str:
         default = re.search(r"--\s*absent:\s*(\w+)", sql)
         finer = re.findall(r"\$group_by\s+IS\s+NULL\s+THEN\s+\S+\s+END\s+AS\s+(\w+)",
                            sql)
+        offered = re.findall(r"WHEN\s+'(\w+)'", re.search(
+            r"CASE\s+\$group_by\b(.*?)\bEND\s+AS\s+group_label", sql, re.S).group(1))
+        # WP-6c M5: a statement offering ONE breakdown says which, rather than
+        # promising the reranker breakdowns it will not give.
+        on_request = (f"one row per {offered[0].replace('_', ' ')} on request"
+                      if len(offered) == 1 else "other breakdowns on request")
         if default:
             parts.append("One row per " + " × ".join([default.group(1), *finer])
-                         + " by default; other breakdowns on request.")
+                         + f" by default; {on_request}.")
         else:
             parts.append("A single summary row by default; breakdowns on request.")
     elif grain and group_cols:

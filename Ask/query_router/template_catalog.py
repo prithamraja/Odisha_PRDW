@@ -5171,7 +5171,10 @@ ORDER BY expenditure DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.tied_untied, v.fund_component_name,
+SELECT CASE $group_by
+                WHEN 'scheme'       THEN v.scheme_name
+                ELSE v.tied_untied  -- absent: tied_untied
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.fund_component_name END AS fund_component_name,
        COUNT(*) AS sanctioned_activities,
        SUM(COALESCE(v.fund_sanctioned_total,0)) AS sanctioned_amount,
        ROUND(100.0 * SUM(COALESCE(v.fund_sanctioned_total,0))
@@ -5202,6 +5205,7 @@ ORDER BY sanctioned_amount DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": None,
@@ -5562,7 +5566,10 @@ ORDER BY amount DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.tied_untied,
+SELECT CASE $group_by
+                WHEN 'scheme'       THEN v.scheme_name
+                ELSE v.tied_untied  -- absent: tied_untied
+              END AS group_label,
        COUNT(*) AS activities,
        SUM(COALESCE(v.fund_sanctioned_general,0)) AS general_amount,
        SUM(COALESCE(v.fund_sanctioned_sc,0))      AS sc_amount,
@@ -5594,6 +5601,7 @@ ORDER BY sanctioned_amount DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": None,
@@ -5685,7 +5693,10 @@ ORDER BY pct_of_total DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.tied_untied,
+SELECT CASE $group_by
+                WHEN 'scheme'       THEN v.scheme_name
+                ELSE v.tied_untied  -- absent: tied_untied
+              END AS group_label,
        SUM(COALESCE(v.fund_sanctioned_total,0)) AS sanctioned_amount,
        ROUND(100.0 * SUM(COALESCE(v.fund_sanctioned_total,0))
              / NULLIF(SUM(SUM(COALESCE(v.fund_sanctioned_total,0))) OVER (),0), 2) AS pct_of_sanctioned
@@ -5715,6 +5726,7 @@ ORDER BY pct_of_sanctioned DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": None,
@@ -8104,7 +8116,10 @@ ORDER BY expenditure DESC
         "date_filter": None,
         "date_kind": None,
         "sql_template": """
-SELECT v.tied_untied,
+SELECT CASE $group_by
+                WHEN 'scheme'       THEN v.scheme_name
+                ELSE v.tied_untied  -- absent: tied_untied
+              END AS group_label,
        COUNT(*) AS activities,
        SUM(COALESCE(v.fund_sanctioned_total,0)) AS sanctioned_amount,
        SUM(v.total_expenditure) AS actual_expenditure,
@@ -8136,6 +8151,7 @@ ORDER BY actual_expenditure DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": None,

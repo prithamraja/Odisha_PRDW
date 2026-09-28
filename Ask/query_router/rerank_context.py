@@ -167,7 +167,7 @@ FAMILY_DESCRIPTIONS: dict[str, dict] = {
     },
 
     'bud_003__budgeting': {
-        "desc": 'TOTALS: How much funding is sanctioned under tied and untied components in a given year. Returns tied_untied, activities, general_amount, sc_amount, st_amount, sanctioned_amount. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "desc": 'TOTALS: How much funding is sanctioned under tied and untied components in a given year. Returns activities, general_amount, sc_amount, st_amount, sanctioned_amount. One row per tied_untied by default; one row per scheme on request. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
         "members": ['BUD-003'],
     },
 
@@ -177,7 +177,7 @@ FAMILY_DESCRIPTIONS: dict[str, dict] = {
     },
 
     'bud_005__budgeting': {
-        "desc": 'The PERCENTAGE for: What percentage of the sanctioned budget is tied and untied in a given year. Returns tied_untied, sanctioned_amount, pct_of_sanctioned. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "desc": 'The PERCENTAGE for: What percentage of the sanctioned budget is tied and untied in a given year. Returns sanctioned_amount, pct_of_sanctioned. One row per tied_untied by default; one row per scheme on request. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
         "members": ['BUD-005'],
     },
 
@@ -372,7 +372,7 @@ FAMILY_DESCRIPTIONS: dict[str, dict] = {
     },
 
     'exp_008__expenditure': {
-        "desc": 'TOTALS: How much actual expenditure has been incurred under tied and untied funds in a given year. Returns tied_untied, activities, sanctioned_amount, actual_expenditure, pct_utilised. Restricted to activities that have an administrative approval (17% of them). actual_expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "desc": 'TOTALS: How much actual expenditure has been incurred under tied and untied funds in a given year. Returns activities, sanctioned_amount, actual_expenditure, pct_utilised. One row per tied_untied by default; one row per scheme on request. Restricted to activities that have an administrative approval (17% of them). actual_expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
         "members": ['EXP-008'],
     },
 
@@ -497,7 +497,7 @@ FAMILY_DESCRIPTIONS: dict[str, dict] = {
     },
 
     'fnd_001__tied_untied_funds': {
-        "desc": 'TOTALS: What is the split of tied and untied funds sanctioned to activities of a given gram panchayat in a given year. Returns tied_untied, fund_component_name, sanctioned_activities, sanctioned_amount, pct_of_sanctioned. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "desc": 'TOTALS: What is the split of tied and untied funds sanctioned to activities of a given gram panchayat in a given year. Returns fund_component_name, sanctioned_activities, sanctioned_amount, pct_of_sanctioned. One row per tied_untied × fund_component_name by default; one row per scheme on request. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
         "members": ['FND-001'],
     },
 

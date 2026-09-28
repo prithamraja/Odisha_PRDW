@@ -39,7 +39,9 @@ from .date_phrase       import resolve_fiscal_years
 from .intent_catalog    import INTENT_LOOKUP, INTENT_SLOTS
 from .intent_classifier import classify_intent
 from .entity_extractor  import extract_entities
-from .entity_validator  import EntityValidator, lossy_caveat, mask_aadhaar
+from .entity_validator  import (
+    EntityValidator, _resolve_config, lossy_caveat, mask_aadhaar,
+)
 from .                  import subject_reader
 from .                  import threshold_reply
 from .reranker          import rerank
@@ -462,10 +464,84 @@ def _extract_slot_values(
                       slot, value)
             raw[slot] = (kept if len(kept) > 1 else kept[0]) if kept else None
     raw.update(prefilled)
+    if validator is not None:
+        _rehome_and_guard(raw, slot_type, askable, validator, user_query)
     for slot, etype in slot_type.items():
         if etype in _CONSTANT_ENTITY_TYPES:
             raw[slot] = _CONSTANT_ENTITY_TYPES[etype]
     return raw
+
+
+def _resolves(validator: EntityValidator, value, entity_type: str) -> str | None:
+    """The value's resolved form for this type, or None when it does not resolve."""
+    try:
+        return validator.validate(value, entity_type).resolved_value
+    except (EntityNotFound, ClarificationNeeded):
+        return None
+
+
+def _rehome_and_guard(
+    raw: dict, slot_type: dict[str, str], extracted: list[str],
+    validator: EntityValidator, user_query: str,
+) -> None:
+    """A scheme is never a tied/untied value (WP-6c T2), in two steps, both
+    before anything is validated or asked:
+
+      1. RE-HOME. An extractor `$tied_untied` value that is not a tied/untied
+         value but IS a scheme ("SFC", "Own Funds", "15th FC") moves to the
+         template's `$scheme`, merging with anything already there. Two schemes
+         then make a list, which the WP-6 T4 rule answers one row per scheme.
+      2. THE VOCABULARY GUARD. What is left of an extractor value for a type in
+         `subject_reader.VOCABULARY_GUARDED` stands only if the question says it
+         in that type's own words; otherwise it is dropped and logged, never
+         asked about. A value that fails validation is kept only when the
+         officer did write a tied/untied word — that is the one case the
+         "Tied / Untied / Other" question is for.
+    """
+    scheme_slots = [s for s, e in slot_type.items()
+                    if _resolve_config(e)[0] == "scheme"]
+    scheme_slot = scheme_slots[0] if len(scheme_slots) == 1 else None
+    for slot in extracted:
+        etype = slot_type[slot]
+        base = _resolve_config(etype)[0]
+        if base not in subject_reader.VOCABULARY_GUARDED or raw.get(slot) is None:
+            continue
+        value = raw[slot]
+        values = [v for v in (value if isinstance(value, (list, tuple)) else [value])
+                  if v is not None and str(v).strip()]
+
+        kept, rehomed = [], []
+        for v in values:
+            if (base == "tied_untied" and scheme_slot is not None
+                    and _resolves(validator, v, etype) is None
+                    and _resolves(validator, v, slot_type[scheme_slot]) is not None):
+                rehomed.append(v)
+            else:
+                kept.append(v)
+        if rehomed:
+            current = raw.get(scheme_slot)
+            merged = [v for v in (current if isinstance(current, (list, tuple))
+                                  else [current]) if v is not None]
+            have = {_resolves(validator, v, slot_type[scheme_slot]) for v in merged}
+            for v in rehomed:
+                resolved = _resolves(validator, v, slot_type[scheme_slot])
+                if resolved not in have:
+                    merged.append(v)
+                    have.add(resolved)
+            raw[scheme_slot] = merged if len(merged) > 1 else merged[0]
+            _log.info("rehomed tied_untied→scheme: %r -> %s=%r query=%r",
+                      rehomed, scheme_slot, raw[scheme_slot], user_query[:120])
+
+        written = subject_reader.written_values(user_query, etype, validator)
+        standing, dropped = [], []
+        for v in kept:
+            resolved = _resolves(validator, v, etype)
+            ok = (" ".join(resolved.lower().split()) in written) if resolved is not None                 else bool(written)
+            (standing if ok else dropped).append(v)
+        if dropped:
+            _log.info("dropped %s=%r: the question does not say it in %s words "
+                      "query=%r", slot, dropped, base.replace("_", "/"), user_query[:120])
+        raw[slot] = (standing if len(standing) > 1 else standing[0]) if standing else None
 
 
 def _fiscal_years_from_text(user_query: str, validator: EntityValidator) -> list[str]:

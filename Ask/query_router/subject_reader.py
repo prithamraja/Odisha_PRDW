@@ -185,3 +185,23 @@ def unbound_subject(
         if slot not in bound:
             return slot, _distinct_values(mentions)
     return None
+
+
+# ── Values the extractor must find WRITTEN in the question (WP-6c T2) ─────────
+#
+# The extractor has been seen to fill `$tied_untied` from words that are not a
+# tied/untied word at all — "funded under Own Funds" came back as
+# tied_untied='Own Funds', and "fund split by SFC and Own Funds" as both — and
+# validation then asked the officer which of Tied / Untied / Other they meant, on
+# a question that never mentioned either. For the types listed here, an
+# extractor value stands only when the question says it in the type's own
+# vocabulary (a registry value or an alias key). Table-driven so the plan-type
+# guard D34.4 asks for can join it; only tied/untied is wired today.
+VOCABULARY_GUARDED = frozenset({"tied_untied"})
+
+
+def written_values(text: str, entity_type: str, validator) -> set[str]:
+    """The values of this type the question names in its own words, collapsed."""
+    base, cfg = _resolve_config(entity_type)
+    vocab, pattern = _vocabulary(base, cfg, validator.registry_values(base))
+    return {_collapse_ws(vocab[_key(m.group(0))][1]) for m in pattern.finditer(text or "")}

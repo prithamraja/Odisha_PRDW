@@ -3,7 +3,9 @@
     T1  a threshold reply is read — the figure, the direction beside it, a
         number written in words through one model call — and asked for in the
         slot's own unit; a reply the other way round is asked about, never bound
-    T2  a scheme is never a tied/untied value (added with T2)
+    T2  a scheme is never a tied/untied value: re-homed to `$scheme`, a list of
+        schemes answered one row per scheme (M5), and a tied/untied value the
+        question never says is dropped rather than asked about
 
 No API key and no network: the extractor and the model fallback are stubbed,
 and every router path runs against the sample database.
@@ -365,6 +367,168 @@ class T1FirstTurnTests(unittest.TestCase):
                                   first_turn=False)
         self.assertIsNone(clarify)
 
+
+# ── T2 ────────────────────────────────────────────────────────────────────────
+
+def _extract(qid: str, question: str, extractor_says: dict):
+    """`_extract_slot_values` with the extractor stubbed."""
+    from query_router import router
+    from query_router.template_catalog import TEMPLATE_CATALOG as T
+
+    def stub(query, slots, client, intent=None):
+        return {s: extractor_says.get(s) for s in slots}
+
+    real, router.extract_entities = router.extract_entities, stub
+    try:
+        return router._extract_slot_values(
+            question, router._template_slot_types(T[qid]), object(),
+            validator=_validator(), list_slots=router._list_slots(T[qid]["param_slots"]))
+    finally:
+        router.extract_entities = real
+
+
+def _answer(qid: str, question: str, extractor_says: dict):
+    """(entities, clarify, served result or None), the vector path from extraction on."""
+    from query_router import router
+    from query_router.template_catalog import TEMPLATE_CATALOG as T
+    raw = _extract(qid, question, extractor_says)
+    entities, clarify = _fill(qid, question, raw)
+    if clarify is not None:
+        return entities, clarify, None
+    result = router._serve_query_id(
+        qid, entities, None, user_query=question, normalized=question,
+        start=time.monotonic(), cache_conn=_adapter(), dashboard_results={},
+        template_map=T, dashboard_questions={}, start_date=None, end_date=None)
+    return entities, None, result
+
+
+SPLIT_INTO_TWO = "Split the sanctioned funds into SFC and Own Funds for 2024-25"
+Y = {"date_range": "2024-2025"}
+
+
+@_needs_db
+class T2SchemeIsNeverTiedUntiedTests(unittest.TestCase):
+
+    def test_a_scheme_in_tied_untied_moves_to_scheme_and_answers(self):
+        question = ("What share of sanctioned funding came from the panchayat's "
+                    "own-source income in 2024-25?")
+        with self.assertLogs("query_router.router", "INFO") as logs:
+            entities, clarify, result = _answer("BUD-005", question,
+                                                {**Y, "tied_untied": "Own Funds"})
+        self.assertIsNone(clarify)
+        bound = {e.slot_name: e.resolved_value for e in result.entities}
+        self.assertEqual(bound.get("scheme"), "Own Funds")
+        self.assertNotIn("tied_untied", bound)
+        self.assertTrue(any("rehomed tied_untied→scheme" in line for line in logs.output))
+
+    def test_two_schemes_answer_one_row_per_scheme(self):
+        for qid in ("BUD-005", "BUD-003", "EXP-008", "FND-001"):
+            entities, clarify, result = _answer(qid, SPLIT_INTO_TWO,
+                                                {**Y, "tied_untied": ["SFC", "Own Funds"]})
+            self.assertIsNone(clarify, qid)
+            bound = {e.slot_name: e.resolved_value for e in result.entities}
+            self.assertEqual(bound.get("group_by"), "scheme", qid)
+            self.assertIn("(broken down by scheme)", result.query_description, qid)
+            self.assertTrue(result.result, qid)
+            for row in result.result:
+                self.assertIn("scheme_name", row, qid)
+                self.assertNotIn("tied_untied", row, qid)
+                self.assertNotIn("fund_component_name", row, qid)
+            names = {row["scheme_name"] for row in result.result}
+            self.assertLessEqual(names, {"5TH STATE FINANCE COMMISSION", "Own Funds"}, qid)
+
+    def test_schemes_already_in_scheme_on_bud_002_are_unchanged(self):
+        entities, clarify, result = _answer(
+            "BUD-002", "How much funding came from SFC and Own Funds in 2024-25?",
+            {**Y, "scheme": ["SFC", "Own Funds"]})
+        self.assertIsNone(clarify)
+        bound = {e.slot_name: e.resolved_value for e in result.entities}
+        self.assertNotIn("group_by", bound)   # BUD-002 already reports per source
+        self.assertEqual({row["funding_source"] for row in result.result},
+                         {"5TH STATE FINANCE COMMISSION"})
+
+    def test_a_tied_word_in_the_question_still_binds(self):
+        entities, clarify, result = _answer(
+            "BUD-005", "What percentage of the sanctioned budget is tied in 2024-25?",
+            {**Y, "tied_untied": "Tied"})
+        self.assertIsNone(clarify)
+        bound = {e.slot_name: e.resolved_value for e in result.entities}
+        self.assertEqual(bound.get("tied_untied"), "Tied")
+
+    def test_tied_untied_with_no_such_word_in_the_question_is_dropped_and_logged(self):
+        question = "What percentage of the sanctioned budget is from XV FC in 2024-25?"
+        with self.assertLogs("query_router.router", "INFO") as logs:
+            raw = _extract("BUD-005", question, {**Y, "tied_untied": "Tied"})
+        self.assertIsNone(raw["tied_untied"])
+        self.assertTrue(any("dropped tied_untied" in line for line in logs.output))
+
+    def test_the_tied_untied_chips_are_never_offered_for_a_scheme(self):
+        for says in ({"tied_untied": "Own Funds"}, {"tied_untied": ["SFC", "Own Funds"]},
+                     {"tied_untied": "15th FC"}):
+            _, clarify, _ = _answer("BUD-005", SPLIT_INTO_TWO, {**Y, **says})
+            if clarify is not None:
+                labels = {c.label for c in clarify.clarification.options}
+                self.assertFalse(labels & {"Tied", "Untied", "Other"}, says)
+
+    def test_gold_1423_still_answers(self):
+        question = "Which activities of Andhrua are funded under Own Funds in 2024-25?"
+        for qid in ("SCH-002", "BUD-005"):
+            entities, clarify, result = _answer(qid, question,
+                                                {**Y, "tied_untied": "Own Funds",
+                                                 "gp_name": "Andhrua"})
+            self.assertIsNone(clarify, qid)
+            bound = {e.slot_name: e.resolved_value for e in result.entities}
+            self.assertEqual(bound.get("scheme"), "Own Funds", qid)
+
+    def test_gold_1402_and_1522_answer_the_split_with_no_scheme_breakdown(self):
+        for qid, question in [
+                ("BUD-005", "What percentage of the sanctioned budget is tied and untied "
+                            "in 2024-2025?"),
+                ("EXP-008", "Tied aur untied fund se 2024-25 me kitna kharcha hua?")]:
+            entities, clarify, result = _answer(qid, question,
+                                                {**Y, "tied_untied": ["Tied", "Untied"]})
+            self.assertIsNone(clarify, qid)
+            bound = {e.slot_name: e.resolved_value for e in result.entities}
+            self.assertNotIn("group_by", bound, qid)
+            self.assertNotIn("tied_untied", bound, qid)
+            self.assertEqual({row["tied_untied"] for row in result.result},
+                             {"Tied", "Untied", "Other"}, qid)
+
+
+@_needs_db
+class T2MigrationM5Tests(unittest.TestCase):
+
+    def test_scheme_is_the_only_breakdown_the_four_offer(self):
+        from query_router import breakdown
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        for qid in ("BUD-003", "BUD-005", "EXP-008", "FND-001"):
+            self.assertEqual(breakdown.template_group_values(T[qid]), frozenset({"scheme"}))
+            self.assertIn("tied_untied", breakdown.slots_the_statement_splits(T[qid]))
+
+    def test_absent_is_the_signed_off_statement(self):
+        oracle = json.loads((_BACKEND / "tests" / "data" / "workbook_test_report.json")
+                            .read_text(encoding="utf-8"))
+        from query_router import router
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        for qid in ("BUD-003", "BUD-005", "EXP-008", "FND-001"):
+            self.assertIsNone(oracle[qid]["params"]["group_by"])
+            params = router.bind_for_template(T[qid], {"date_range": ["2024-2025"]})
+            rows = _adapter().execute(T[qid]["sql_template"], params).fetchall()
+            self.assertEqual(len(rows), oracle[qid]["rows"], qid)
+
+    def test_any_other_breakdown_keeps_the_tied_untied_table(self):
+        entities, clarify, result = _answer(
+            "EXP-008", "district-wise tied and untied expenditure 2024-25",
+            {**Y, "tied_untied": ["tied", "untied"]})
+        self.assertIsNone(clarify)
+        self.assertTrue(all("tied_untied" in row for row in result.result))
+        self.assertNotIn("broken down", result.query_description)
+
+    def test_scheme_wise_is_read_off_the_question(self):
+        entities, clarify, result = _answer("BUD-003", "scheme-wise sanctioned amount 2024-25", Y)
+        self.assertIsNone(clarify)
+        self.assertTrue(all("scheme_name" in row for row in result.result))
+        self.assertIn("(broken down by scheme)", result.query_description)
 
 if __name__ == "__main__":
     unittest.main()
