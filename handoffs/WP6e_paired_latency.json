@@ -1,0 +1,1843 @@
+{
+ "rows": [
+  {
+   "n": 1,
+   "q": "What is the total budget outlay planned across all main GPDPs for 2024 to 2025?",
+   "first": "off",
+   "off": {
+    "picked": "BUD-006",
+    "near": [],
+    "latency_s": 1.903,
+    "prompt_tokens": 5920,
+    "completion_tokens": 140,
+    "reasoning_tokens": 110,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "BUD-006",
+    "near": [],
+    "latency_s": 1.148,
+    "prompt_tokens": 7165,
+    "completion_tokens": 79,
+    "reasoning_tokens": 49,
+    "cached_tokens": 6912
+   }
+  },
+  {
+   "n": 6,
+   "q": "What's the aggregate budget outlay for all primary GPDPs for 2025 to 2026?",
+   "first": "on",
+   "on": {
+    "picked": "BUD-006",
+    "near": [
+     "BUD-013",
+     "SCH-003"
+    ],
+    "latency_s": 1.247,
+    "prompt_tokens": 6954,
+    "completion_tokens": 127,
+    "reasoning_tokens": 88,
+    "cached_tokens": 6400
+   },
+   "off": {
+    "picked": "BUD-006",
+    "near": [
+     "BUD-013",
+     "EXP-038"
+    ],
+    "latency_s": 1.861,
+    "prompt_tokens": 5912,
+    "completion_tokens": 268,
+    "reasoning_tokens": 229,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 12,
+   "q": "Show me the GPs whose planned activities have an estimated cost of zero for 2024 to 2026.",
+   "first": "off",
+   "off": {
+    "picked": "no_match",
+    "near": [
+     "PLU-008",
+     "DQY-007",
+     "BUD-021"
+    ],
+    "latency_s": 1.816,
+    "prompt_tokens": 5892,
+    "completion_tokens": 235,
+    "reasoning_tokens": 196,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "PLU-008",
+    "near": [
+     "DQY-007",
+     "BUD-021"
+    ],
+    "latency_s": 2.561,
+    "prompt_tokens": 7189,
+    "completion_tokens": 334,
+    "reasoning_tokens": 294,
+    "cached_tokens": 6912
+   }
+  },
+  {
+   "n": 18,
+   "q": "Total number of completed Swachh Bharat sanitation activities for 2024 to 2025.",
+   "first": "on",
+   "on": {
+    "picked": "STS-003",
+    "near": [
+     "PLN-049",
+     "SBM-SI-009"
+    ],
+    "latency_s": 1.197,
+    "prompt_tokens": 8172,
+    "completion_tokens": 111,
+    "reasoning_tokens": 71,
+    "cached_tokens": 7936
+   },
+   "off": {
+    "picked": "STS-003",
+    "near": [
+     "SBM-SI-009",
+     "SBM-SI-008"
+    ],
+    "latency_s": 1.461,
+    "prompt_tokens": 7425,
+    "completion_tokens": 112,
+    "reasoning_tokens": 70,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 25,
+   "q": "What is the total budget outlay planned across all main GPDPs for 2020 to 2021?",
+   "first": "off",
+   "off": {
+    "picked": "BUD-006",
+    "near": [
+     "BUD-013",
+     "BUD-007"
+    ],
+    "latency_s": 1.529,
+    "prompt_tokens": 5900,
+    "completion_tokens": 168,
+    "reasoning_tokens": 128,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "BUD-006",
+    "near": [
+     "BUD-013",
+     "SCH-003"
+    ],
+    "latency_s": 1.731,
+    "prompt_tokens": 7497,
+    "completion_tokens": 238,
+    "reasoning_tokens": 199,
+    "cached_tokens": 6912
+   }
+  },
+  {
+   "n": 30,
+   "q": "Provide the sum of the planned budget outlay across main GPDPs for 2022 to 2023.",
+   "first": "on",
+   "on": {
+    "picked": "BUD-006",
+    "near": [
+     "BUD-013"
+    ],
+    "latency_s": 1.1,
+    "prompt_tokens": 7315,
+    "completion_tokens": 94,
+    "reasoning_tokens": 59,
+    "cached_tokens": 6912
+   },
+   "off": {
+    "picked": "BUD-006",
+    "near": [
+     "BUD-013",
+     "SCH-003"
+    ],
+    "latency_s": 1.61,
+    "prompt_tokens": 5847,
+    "completion_tokens": 190,
+    "reasoning_tokens": 151,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 36,
+   "q": "Can you show the total remaining funds across all GPs for 2021 to 2022?",
+   "first": "off",
+   "off": {
+    "picked": "EXP-004",
+    "near": [
+     "EXP-013",
+     "EXP-003"
+    ],
+    "latency_s": 1.03,
+    "prompt_tokens": 6002,
+    "completion_tokens": 75,
+    "reasoning_tokens": 39,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "EXP-004",
+    "near": [
+     "BUD-001",
+     "EXP-001"
+    ],
+    "latency_s": 1.251,
+    "prompt_tokens": 7476,
+    "completion_tokens": 99,
+    "reasoning_tokens": 62,
+    "cached_tokens": 6912
+   }
+  },
+  {
+   "n": 43,
+   "q": "Tied fund expenditure breakdown: water vs. sanitation for 2024 to 2025.",
+   "first": "on",
+   "on": {
+    "picked": "EXP-009",
+    "near": [
+     "EXP-011",
+     "EXP-008"
+    ],
+    "latency_s": 1.263,
+    "prompt_tokens": 7630,
+    "completion_tokens": 101,
+    "reasoning_tokens": 65,
+    "cached_tokens": 7424
+   },
+   "off": {
+    "picked": "EXP-009",
+    "near": [
+     "EXP-011",
+     "EXP-008",
+     "BUD-003"
+    ],
+    "latency_s": 1.34,
+    "prompt_tokens": 6520,
+    "completion_tokens": 92,
+    "reasoning_tokens": 55,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 49,
+   "q": "Compare tied fund spending between water and sanitation for 2022 to 2023.",
+   "first": "off",
+   "off": {
+    "picked": "TRD-002",
+    "near": [
+     "EXP-009",
+     "BUD-005"
+    ],
+    "latency_s": 1.655,
+    "prompt_tokens": 6561,
+    "completion_tokens": 213,
+    "reasoning_tokens": 174,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "TRD-002",
+    "near": [
+     "EXP-009",
+     "EXP-008"
+    ],
+    "latency_s": 1.493,
+    "prompt_tokens": 7634,
+    "completion_tokens": 128,
+    "reasoning_tokens": 90,
+    "cached_tokens": 7424
+   }
+  },
+  {
+   "n": 55,
+   "q": "How much money is allocated to the 9 Sankalp themes across the state for 2024 to 2026?",
+   "first": "on",
+   "on": {
+    "picked": "BUD-006",
+    "near": [
+     "BUD-024",
+     "EXP-014"
+    ],
+    "latency_s": 1.333,
+    "prompt_tokens": 7105,
+    "completion_tokens": 66,
+    "reasoning_tokens": 27,
+    "cached_tokens": 0
+   },
+   "off": {
+    "picked": "BUD-006",
+    "near": [
+     "BUD-013",
+     "BUD-024"
+    ],
+    "latency_s": 1.517,
+    "prompt_tokens": 6076,
+    "completion_tokens": 144,
+    "reasoning_tokens": 104,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 61,
+   "q": "What is the total allocation for the 9 Sankalp themes state-wide for 2020 to 2021?",
+   "first": "off",
+   "off": {
+    "picked": "BUD-006",
+    "near": [
+     "BUD-013",
+     "BUD-009"
+    ],
+    "latency_s": 1.626,
+    "prompt_tokens": 5907,
+    "completion_tokens": 162,
+    "reasoning_tokens": 122,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "BUD-006",
+    "near": [
+     "BUD-013",
+     "BUD-009"
+    ],
+    "latency_s": 1.128,
+    "prompt_tokens": 7645,
+    "completion_tokens": 80,
+    "reasoning_tokens": 40,
+    "cached_tokens": 7424
+   }
+  },
+  {
+   "n": 66,
+   "q": "Provide the total funds set aside for the 9 Sankalp themes statewide for 2022 to 2023.",
+   "first": "on",
+   "on": {
+    "picked": "BUD-006",
+    "near": [
+     "BUD-013",
+     "BUD-009"
+    ],
+    "latency_s": 1.089,
+    "prompt_tokens": 7272,
+    "completion_tokens": 64,
+    "reasoning_tokens": 24,
+    "cached_tokens": 0
+   },
+   "off": {
+    "picked": "BUD-006",
+    "near": [
+     "BUD-013",
+     "BUD-009"
+    ],
+    "latency_s": 1.289,
+    "prompt_tokens": 6069,
+    "completion_tokens": 147,
+    "reasoning_tokens": 107,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 72,
+   "q": "Which GPs didn't allocate money to any Sankalp theme for 2024 to 2026?",
+   "first": "off",
+   "off": {
+    "picked": "PLN-032",
+    "near": [
+     "PLN-059",
+     "PLN-005"
+    ],
+    "latency_s": 1.352,
+    "prompt_tokens": 5996,
+    "completion_tokens": 134,
+    "reasoning_tokens": 94,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "PLN-032",
+    "near": [
+     "BUD-012",
+     "PLN-043"
+    ],
+    "latency_s": 1.476,
+    "prompt_tokens": 7301,
+    "completion_tokens": 146,
+    "reasoning_tokens": 106,
+    "cached_tokens": 6912
+   }
+  },
+  {
+   "n": 78,
+   "q": "Provide a list of GPs lacking funding for Sankalp themes for 2020 to 2021.",
+   "first": "on",
+   "on": {
+    "picked": "PLN-032",
+    "near": [
+     "PLN-059",
+     "PLN-043"
+    ],
+    "latency_s": 1.208,
+    "prompt_tokens": 7362,
+    "completion_tokens": 100,
+    "reasoning_tokens": 60,
+    "cached_tokens": 6912
+   },
+   "off": {
+    "picked": "PLN-032",
+    "near": [
+     "BUD-012",
+     "PLN-043"
+    ],
+    "latency_s": 1.766,
+    "prompt_tokens": 5938,
+    "completion_tokens": 185,
+    "reasoning_tokens": 145,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 85,
+   "q": "Number of GPs with uploaded main GPDPs for FY 2025-26 for 2025 to 2026.",
+   "first": "off",
+   "off": {
+    "picked": "PLN-001",
+    "near": [
+     "PLN-002",
+     "PLN-013"
+    ],
+    "latency_s": 1.4,
+    "prompt_tokens": 5500,
+    "completion_tokens": 139,
+    "reasoning_tokens": 99,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "PLN-001",
+    "near": [
+     "PLN-002",
+     "PLN-019"
+    ],
+    "latency_s": 1.304,
+    "prompt_tokens": 7216,
+    "completion_tokens": 129,
+    "reasoning_tokens": 89,
+    "cached_tokens": 6912
+   }
+  },
+  {
+   "n": 90,
+   "q": "What is the count of GPs that uploaded their main GPDP for 2025-26 for 2021 to 2022?",
+   "first": "on",
+   "on": {
+    "picked": "PLN-001",
+    "near": [
+     "PLN-013",
+     "PLN-002"
+    ],
+    "latency_s": 1.364,
+    "prompt_tokens": 7393,
+    "completion_tokens": 129,
+    "reasoning_tokens": 89,
+    "cached_tokens": 2816
+   },
+   "off": {
+    "picked": "PLN-001",
+    "near": [
+     "PLN-002",
+     "PLU-004"
+    ],
+    "latency_s": 1.983,
+    "prompt_tokens": 5576,
+    "completion_tokens": 227,
+    "reasoning_tokens": 187,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 97,
+   "q": "List the GPs that have not yet uploaded any GPDP for 2024 to 2026.",
+   "first": "off",
+   "off": {
+    "picked": "PLN-005",
+    "near": [
+     "PLN-001",
+     "PLN-004"
+    ],
+    "latency_s": 1.202,
+    "prompt_tokens": 5414,
+    "completion_tokens": 69,
+    "reasoning_tokens": 29,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "PLN-005",
+    "near": [
+     "PLN-001",
+     "PLN-004"
+    ],
+    "latency_s": 1.044,
+    "prompt_tokens": 7062,
+    "completion_tokens": 60,
+    "reasoning_tokens": 20,
+    "cached_tokens": 6912
+   }
+  },
+  {
+   "n": 102,
+   "q": "List all Gram Panchayats that have not submitted GPDPs for 2025 to 2026.",
+   "first": "on",
+   "on": {
+    "picked": "PLN-005",
+    "near": [],
+    "latency_s": 1.158,
+    "prompt_tokens": 7221,
+    "completion_tokens": 50,
+    "reasoning_tokens": 20,
+    "cached_tokens": 6912
+   },
+   "off": {
+    "picked": "PLN-005",
+    "near": [
+     "PLN-019",
+     "PLN-014"
+    ],
+    "latency_s": 1.171,
+    "prompt_tokens": 5421,
+    "completion_tokens": 70,
+    "reasoning_tokens": 30,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 107,
+   "q": "Which GPs failed to upload any GPDP so far for 2021 to 2022?",
+   "first": "off",
+   "off": {
+    "picked": "PLN-005",
+    "near": [
+     "PLN-001",
+     "PLN-004"
+    ],
+    "latency_s": 1.42,
+    "prompt_tokens": 5366,
+    "completion_tokens": 54,
+    "reasoning_tokens": 14,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "PLN-005",
+    "near": [
+     "PLN-001",
+     "PLN-004"
+    ],
+    "latency_s": 1.878,
+    "prompt_tokens": 7224,
+    "completion_tokens": 58,
+    "reasoning_tokens": 18,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 114,
+   "q": "What is the total volume of approved supplementary plans in the state for 2024 to 2026?",
+   "first": "on",
+   "on": {
+    "picked": "PLN-002",
+    "near": [
+     "PLU-004",
+     "PLU-003"
+    ],
+    "latency_s": 1.393,
+    "prompt_tokens": 7890,
+    "completion_tokens": 102,
+    "reasoning_tokens": 62,
+    "cached_tokens": 0
+   },
+   "off": {
+    "picked": "PLN-002",
+    "near": [
+     "PLU-004",
+     "PLU-003"
+    ],
+    "latency_s": 1.167,
+    "prompt_tokens": 6986,
+    "completion_tokens": 106,
+    "reasoning_tokens": 66,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 120,
+   "q": "State-wide count of approved supplementary plans for 2022 to 2023.",
+   "first": "off",
+   "off": {
+    "picked": "PLN-002",
+    "near": [
+     "PLU-004",
+     "PLU-003"
+    ],
+    "latency_s": 1.103,
+    "prompt_tokens": 6696,
+    "completion_tokens": 85,
+    "reasoning_tokens": 45,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "PLN-002",
+    "near": [
+     "PLU-004",
+     "PLU-003"
+    ],
+    "latency_s": 1.321,
+    "prompt_tokens": 7690,
+    "completion_tokens": 49,
+    "reasoning_tokens": 9,
+    "cached_tokens": 7424
+   }
+  },
+  {
+   "n": 127,
+   "q": "Number of GPs in Ganjam with 1 or more supplementary plans for 2024 to 2026.",
+   "first": "on",
+   "on": {
+    "picked": "PLU-004",
+    "near": [
+     "PLN-002",
+     "PLU-003"
+    ],
+    "latency_s": 1.362,
+    "prompt_tokens": 7137,
+    "completion_tokens": 135,
+    "reasoning_tokens": 95,
+    "cached_tokens": 6912
+   },
+   "off": {
+    "picked": "PLU-004",
+    "near": [
+     "PLU-003",
+     "PLN-002"
+    ],
+    "latency_s": 1.226,
+    "prompt_tokens": 5923,
+    "completion_tokens": 99,
+    "reasoning_tokens": 59,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 132,
+   "q": "How many GPs have submitted at least one supplementary plan in Ganjam district for 2020 to 2021?",
+   "first": "off",
+   "off": {
+    "picked": "PLU-004",
+    "near": [
+     "PLN-002",
+     "PLU-003"
+    ],
+    "latency_s": 1.257,
+    "prompt_tokens": 5581,
+    "completion_tokens": 98,
+    "reasoning_tokens": 58,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "PLU-004",
+    "near": [
+     "PLN-002",
+     "PLU-003"
+    ],
+    "latency_s": 1.294,
+    "prompt_tokens": 7183,
+    "completion_tokens": 72,
+    "reasoning_tokens": 32,
+    "cached_tokens": 2304
+   }
+  },
+  {
+   "n": 137,
+   "q": "Total GPs in Ganjam district with submitted supplementary plans for 2022 to 2023.",
+   "first": "on",
+   "on": {
+    "picked": "PLU-004",
+    "near": [
+     "PLN-013",
+     "PLN-001"
+    ],
+    "latency_s": 1.605,
+    "prompt_tokens": 7364,
+    "completion_tokens": 119,
+    "reasoning_tokens": 79,
+    "cached_tokens": 6912
+   },
+   "off": {
+    "picked": "PLU-004",
+    "near": [
+     "PLN-002",
+     "PLN-001"
+    ],
+    "latency_s": 1.547,
+    "prompt_tokens": 5799,
+    "completion_tokens": 123,
+    "reasoning_tokens": 83,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 144,
+   "q": "Count of all planned activities inside main GPDPs for 2024 to 2025.",
+   "first": "off",
+   "off": {
+    "picked": "no_match",
+    "near": [
+     "PLN-024",
+     "PLN-072",
+     "BUD-006"
+    ],
+    "latency_s": 1.74,
+    "prompt_tokens": 6120,
+    "completion_tokens": 212,
+    "reasoning_tokens": 174,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "PLN-024",
+    "near": [
+     "STS-003",
+     "EXP-005"
+    ],
+    "latency_s": 2.128,
+    "prompt_tokens": 7344,
+    "completion_tokens": 230,
+    "reasoning_tokens": 192,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 150,
+   "q": "What is the overall number of activities proposed in main GPDPs for 2020 to 2021?",
+   "first": "on",
+   "on": {
+    "picked": "no_match",
+    "near": [
+     "PLN-024",
+     "PLN-045",
+     "PLN-033"
+    ],
+    "latency_s": 1.772,
+    "prompt_tokens": 7465,
+    "completion_tokens": 202,
+    "reasoning_tokens": 164,
+    "cached_tokens": 0
+   },
+   "off": {
+    "picked": "PLN-024",
+    "near": [
+     "PLN-045",
+     "PLN-058"
+    ],
+    "latency_s": 1.509,
+    "prompt_tokens": 6042,
+    "completion_tokens": 180,
+    "reasoning_tokens": 140,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 157,
+   "q": "Which GP planned the maximum number of activities for 2024 to 2026?",
+   "first": "off",
+   "off": {
+    "picked": "PLN-031",
+    "near": [
+     "PLN-024",
+     "PLN-025"
+    ],
+    "latency_s": 1.09,
+    "prompt_tokens": 6332,
+    "completion_tokens": 59,
+    "reasoning_tokens": 19,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "PLN-031",
+    "near": [
+     "PLN-025",
+     "PLN-029"
+    ],
+    "latency_s": 0.948,
+    "prompt_tokens": 7810,
+    "completion_tokens": 62,
+    "reasoning_tokens": 22,
+    "cached_tokens": 7424
+   }
+  },
+  {
+   "n": 163,
+   "q": "Show me the Gram Panchayat with the most planned activities for 2021 to 2022.",
+   "first": "on",
+   "on": {
+    "picked": "PLN-031",
+    "near": [
+     "PLN-024",
+     "PLN-052"
+    ],
+    "latency_s": 0.951,
+    "prompt_tokens": 7482,
+    "completion_tokens": 60,
+    "reasoning_tokens": 20,
+    "cached_tokens": 6912
+   },
+   "off": {
+    "picked": "PLN-031",
+    "near": [
+     "PLN-025",
+     "PLN-029"
+    ],
+    "latency_s": 0.919,
+    "prompt_tokens": 6281,
+    "completion_tokens": 59,
+    "reasoning_tokens": 19,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 170,
+   "q": "What is the total estimated cost of all planned activities state-wide for 2024 to 2026?",
+   "first": "off",
+   "off": {
+    "picked": "BUD-006",
+    "near": [
+     "SCH-003",
+     "FND-010"
+    ],
+    "latency_s": 1.554,
+    "prompt_tokens": 6057,
+    "completion_tokens": 123,
+    "reasoning_tokens": 83,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "BUD-006",
+    "near": [
+     "SCH-003",
+     "FND-010"
+    ],
+    "latency_s": 1.33,
+    "prompt_tokens": 6856,
+    "completion_tokens": 66,
+    "reasoning_tokens": 27,
+    "cached_tokens": 6400
+   }
+  },
+  {
+   "n": 175,
+   "q": "State-wide total of estimated costs for all activities for 2025 to 2026.",
+   "first": "on",
+   "on": {
+    "picked": "BUD-006",
+    "near": [],
+    "latency_s": 1.562,
+    "prompt_tokens": 6662,
+    "completion_tokens": 94,
+    "reasoning_tokens": 64,
+    "cached_tokens": 6400
+   },
+   "off": {
+    "picked": "BUD-006",
+    "near": [
+     "FND-010",
+     "EXP-004"
+    ],
+    "latency_s": 1.38,
+    "prompt_tokens": 5879,
+    "completion_tokens": 128,
+    "reasoning_tokens": 89,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 181,
+   "q": "Provide the overall expected cost of planned activities in the state for 2021 to 2022.",
+   "first": "off",
+   "off": {
+    "picked": "BUD-006",
+    "near": [
+     "BUD-024",
+     "EXP-014"
+    ],
+    "latency_s": 1.283,
+    "prompt_tokens": 5784,
+    "completion_tokens": 144,
+    "reasoning_tokens": 105,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "BUD-006",
+    "near": [],
+    "latency_s": 1.401,
+    "prompt_tokens": 6708,
+    "completion_tokens": 143,
+    "reasoning_tokens": 113,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 188,
+   "q": "Which GPs proposed activities costing zero rupees for 2024 to 2026?",
+   "first": "on",
+   "on": {
+    "picked": "PLU-008",
+    "near": [
+     "DQY-007",
+     "BUD-021"
+    ],
+    "latency_s": 1.558,
+    "prompt_tokens": 7181,
+    "completion_tokens": 199,
+    "reasoning_tokens": 159,
+    "cached_tokens": 6912
+   },
+   "off": {
+    "picked": "PLU-008",
+    "near": [
+     "DQY-007",
+     "BUD-021",
+     "PLU-006"
+    ],
+    "latency_s": 1.77,
+    "prompt_tokens": 6028,
+    "completion_tokens": 235,
+    "reasoning_tokens": 195,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 194,
+   "q": "Show me the GPs whose planned activities have an estimated cost of zero for 2022 to 2023.",
+   "first": "off",
+   "off": {
+    "picked": "PLU-008",
+    "near": [
+     "DQY-007",
+     "BUD-021"
+    ],
+    "latency_s": 2.404,
+    "prompt_tokens": 5934,
+    "completion_tokens": 357,
+    "reasoning_tokens": 317,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "PLU-008",
+    "near": [
+     "DQY-007",
+     "BUD-021"
+    ],
+    "latency_s": 1.786,
+    "prompt_tokens": 7250,
+    "completion_tokens": 234,
+    "reasoning_tokens": 194,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 201,
+   "q": "How are planned activities distributed across different themes for 2024 to 2025?",
+   "first": "on",
+   "on": {
+    "picked": "PLN-024",
+    "near": [
+     "PLN-072",
+     "PLN-044"
+    ],
+    "latency_s": 1.025,
+    "prompt_tokens": 6622,
+    "completion_tokens": 72,
+    "reasoning_tokens": 32,
+    "cached_tokens": 0
+   },
+   "off": {
+    "picked": "PLN-024",
+    "near": [
+     "PLN-072",
+     "PLN-044",
+     "BUD-006"
+    ],
+    "latency_s": 1.356,
+    "prompt_tokens": 5754,
+    "completion_tokens": 76,
+    "reasoning_tokens": 36,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 207,
+   "q": "Show the breakdown of planned activities by theme for 2020 to 2021.",
+   "first": "off",
+   "off": {
+    "picked": "PLN-024",
+    "near": [
+     "PLN-072",
+     "PLN-038"
+    ],
+    "latency_s": 1.038,
+    "prompt_tokens": 5666,
+    "completion_tokens": 64,
+    "reasoning_tokens": 24,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "PLN-024",
+    "near": [
+     "PLN-072",
+     "PLN-045"
+    ],
+    "latency_s": 0.907,
+    "prompt_tokens": 6966,
+    "completion_tokens": 54,
+    "reasoning_tokens": 14,
+    "cached_tokens": 6400
+   }
+  },
+  {
+   "n": 212,
+   "q": "Provide a breakdown showing planned activities for each theme for 2022 to 2023.",
+   "first": "on",
+   "on": {
+    "picked": "PLN-024",
+    "near": [],
+    "latency_s": 1.195,
+    "prompt_tokens": 6997,
+    "completion_tokens": 54,
+    "reasoning_tokens": 24,
+    "cached_tokens": 0
+   },
+   "off": {
+    "picked": "PLN-024",
+    "near": [
+     "PLN-072",
+     "PLN-044"
+    ],
+    "latency_s": 1.015,
+    "prompt_tokens": 5527,
+    "completion_tokens": 64,
+    "reasoning_tokens": 24,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 219,
+   "q": "Number of activities proposed within the sanitation category for 2024 to 2025.",
+   "first": "off",
+   "off": {
+    "picked": "PLN-049",
+    "near": [
+     "PLN-024",
+     "PLN-052"
+    ],
+    "latency_s": 1.329,
+    "prompt_tokens": 6509,
+    "completion_tokens": 139,
+    "reasoning_tokens": 99,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "PLN-049",
+    "near": [
+     "PLN-058",
+     "STS-003"
+    ],
+    "latency_s": 0.98,
+    "prompt_tokens": 7246,
+    "completion_tokens": 55,
+    "reasoning_tokens": 16,
+    "cached_tokens": 6912
+   }
+  },
+  {
+   "n": 225,
+   "q": "How many planned activities fall under sanitation for 2020 to 2021?",
+   "first": "on",
+   "on": {
+    "picked": "PLN-049",
+    "near": [
+     "PLN-058",
+     "PLN-052"
+    ],
+    "latency_s": 0.951,
+    "prompt_tokens": 7843,
+    "completion_tokens": 59,
+    "reasoning_tokens": 19,
+    "cached_tokens": 0
+   },
+   "off": {
+    "picked": "PLN-049",
+    "near": [
+     "STS-003",
+     "SBM-SWM-001"
+    ],
+    "latency_s": 1.026,
+    "prompt_tokens": 6531,
+    "completion_tokens": 67,
+    "reasoning_tokens": 26,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 232,
+   "q": "Which Gram Panchayat proposed the most activities for piped water for 2025 to 2026?",
+   "first": "off",
+   "off": {
+    "picked": "PLN-031",
+    "near": [
+     "PLN-049"
+    ],
+    "latency_s": 1.24,
+    "prompt_tokens": 6411,
+    "completion_tokens": 118,
+    "reasoning_tokens": 83,
+    "cached_tokens": 2304
+   },
+   "on": {
+    "picked": "PLN-031",
+    "near": [
+     "PLN-049",
+     "PLN-056"
+    ],
+    "latency_s": 1.203,
+    "prompt_tokens": 7801,
+    "completion_tokens": 104,
+    "reasoning_tokens": 64,
+    "cached_tokens": 7424
+   }
+  },
+  {
+   "n": 238,
+   "q": "Identify the GP with the highest number of piped water supply activities for 2021 to 2022.",
+   "first": "on",
+   "on": {
+    "picked": "PLN-031",
+    "near": [
+     "PLN-029",
+     "PLN-025"
+    ],
+    "latency_s": 1.326,
+    "prompt_tokens": 7518,
+    "completion_tokens": 122,
+    "reasoning_tokens": 82,
+    "cached_tokens": 0
+   },
+   "off": {
+    "picked": "PLN-031",
+    "near": [
+     "PLN-056",
+     "PLN-054"
+    ],
+    "latency_s": 1.352,
+    "prompt_tokens": 6387,
+    "completion_tokens": 163,
+    "reasoning_tokens": 122,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 246,
+   "q": "How many GPs have their GPDPs still pending approval for 2024 to 2026?",
+   "first": "off",
+   "off": {
+    "picked": "PLN-014",
+    "near": [
+     "PLN-019",
+     "PLN-021"
+    ],
+    "latency_s": 1.103,
+    "prompt_tokens": 5560,
+    "completion_tokens": 95,
+    "reasoning_tokens": 55,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "PLN-014",
+    "near": [
+     "PLN-019",
+     "PLN-021"
+    ],
+    "latency_s": 1.136,
+    "prompt_tokens": 7143,
+    "completion_tokens": 94,
+    "reasoning_tokens": 54,
+    "cached_tokens": 6912
+   }
+  },
+  {
+   "n": 251,
+   "q": "How many GPs have their GPDPs still pending approval for 2020-2021?",
+   "first": "on",
+   "on": {
+    "picked": "PLN-014",
+    "near": [
+     "PLN-019",
+     "PLN-021"
+    ],
+    "latency_s": 0.908,
+    "prompt_tokens": 7089,
+    "completion_tokens": 56,
+    "reasoning_tokens": 16,
+    "cached_tokens": 6912
+   },
+   "off": {
+    "picked": "PLN-014",
+    "near": [
+     "PLN-019",
+     "PLN-021"
+    ],
+    "latency_s": 1.138,
+    "prompt_tokens": 5522,
+    "completion_tokens": 60,
+    "reasoning_tokens": 20,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 256,
+   "q": "Find out how many GPs still need their GPDPs approved for 2022-2023.",
+   "first": "off",
+   "off": {
+    "picked": "PLN-014",
+    "near": [
+     "PLN-019",
+     "PLN-002"
+    ],
+    "latency_s": 1.076,
+    "prompt_tokens": 5588,
+    "completion_tokens": 49,
+    "reasoning_tokens": 9,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "PLN-014",
+    "near": [
+     "PLN-019",
+     "PLN-013"
+    ],
+    "latency_s": 0.973,
+    "prompt_tokens": 7307,
+    "completion_tokens": 59,
+    "reasoning_tokens": 19,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 261,
+   "q": "How many GPDP activities are marked completed across Odisha for 2025 to 2026?",
+   "first": "on",
+   "on": {
+    "picked": "STS-003",
+    "near": [
+     "IMP-002",
+     "STS-001",
+     "STS-006"
+    ],
+    "latency_s": 1.421,
+    "prompt_tokens": 7216,
+    "completion_tokens": 113,
+    "reasoning_tokens": 77,
+    "cached_tokens": 0
+   },
+   "off": {
+    "picked": "STS-003",
+    "near": [
+     "IMP-002",
+     "STS-001",
+     "STS-008"
+    ],
+    "latency_s": 2.015,
+    "prompt_tokens": 5970,
+    "completion_tokens": 153,
+    "reasoning_tokens": 117,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 266,
+   "q": "What is the total completed activity count for all districts in 2020-2021?",
+   "first": "off",
+   "off": {
+    "picked": "IMP-002",
+    "near": [],
+    "latency_s": 0.921,
+    "prompt_tokens": 5485,
+    "completion_tokens": 49,
+    "reasoning_tokens": 21,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "IMP-002",
+    "near": [
+     "STS-013",
+     "STS-003"
+    ],
+    "latency_s": 1.137,
+    "prompt_tokens": 6677,
+    "completion_tokens": 121,
+    "reasoning_tokens": 85,
+    "cached_tokens": 6400
+   }
+  },
+  {
+   "n": 271,
+   "q": "What is the number of ongoing activities recorded for 2024 to 2025?",
+   "first": "on",
+   "on": {
+    "picked": "STS-003",
+    "near": [
+     "STS-001",
+     "IMP-002"
+    ],
+    "latency_s": 1.268,
+    "prompt_tokens": 6807,
+    "completion_tokens": 85,
+    "reasoning_tokens": 49,
+    "cached_tokens": 0
+   },
+   "off": {
+    "picked": "STS-003",
+    "near": [
+     "STS-001",
+     "IMP-002"
+    ],
+    "latency_s": 1.203,
+    "prompt_tokens": 6097,
+    "completion_tokens": 93,
+    "reasoning_tokens": 57,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 276,
+   "q": "Give the total count of activities currently in progress for 2022-2023.",
+   "first": "off",
+   "off": {
+    "picked": "STS-003",
+    "near": [
+     "STS-013",
+     "STS-001"
+    ],
+    "latency_s": 1.317,
+    "prompt_tokens": 5827,
+    "completion_tokens": 125,
+    "reasoning_tokens": 89,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "STS-003",
+    "near": [
+     "STS-013",
+     "STS-001"
+    ],
+    "latency_s": 1.324,
+    "prompt_tokens": 7481,
+    "completion_tokens": 92,
+    "reasoning_tokens": 56,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 281,
+   "q": "Identify the sector with the highest percentage of completed activities for 2024 to 2026.",
+   "first": "on",
+   "on": {
+    "picked": "no_match",
+    "near": [
+     "IMP-005",
+     "IMP-006",
+     "IMP-009"
+    ],
+    "latency_s": 1.794,
+    "prompt_tokens": 6823,
+    "completion_tokens": 217,
+    "reasoning_tokens": 182,
+    "cached_tokens": 6400
+   },
+   "off": {
+    "picked": "no_match",
+    "near": [
+     "IMP-006",
+     "IMP-009",
+     "IMP-005"
+    ],
+    "latency_s": 2.113,
+    "prompt_tokens": 5931,
+    "completion_tokens": 251,
+    "reasoning_tokens": 216,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 286,
+   "q": "Which sector has the best activity completion rate for 2021-2022?",
+   "first": "off",
+   "off": {
+    "picked": "no_match",
+    "near": [
+     "IMP-005",
+     "IMP-008",
+     "IMP-009"
+    ],
+    "latency_s": 2.006,
+    "prompt_tokens": 5989,
+    "completion_tokens": 239,
+    "reasoning_tokens": 204,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "no_match",
+    "near": [
+     "IMP-005",
+     "IMP-008",
+     "IMP-009"
+    ],
+    "latency_s": 3.185,
+    "prompt_tokens": 7528,
+    "completion_tokens": 212,
+    "reasoning_tokens": 177,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 291,
+   "q": "How many sanitation activities have been completed under Swachh Bharat for 2025 to 2026?",
+   "first": "on",
+   "on": {
+    "picked": "STS-003",
+    "near": [
+     "IMP-002",
+     "SBM-SWM-001"
+    ],
+    "latency_s": 1.29,
+    "prompt_tokens": 8132,
+    "completion_tokens": 93,
+    "reasoning_tokens": 54,
+    "cached_tokens": 7936
+   },
+   "off": {
+    "picked": "STS-003",
+    "near": [
+     "IMP-002",
+     "SBM-SWM-001"
+    ],
+    "latency_s": 1.28,
+    "prompt_tokens": 7308,
+    "completion_tokens": 113,
+    "reasoning_tokens": 74,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 296,
+   "q": "Provide the number of finished Swachh Bharat sanitation activities for 2025 to 2026.",
+   "first": "off",
+   "off": {
+    "picked": "STS-003",
+    "near": [
+     "IMP-002",
+     "SBM-SI-008"
+    ],
+    "latency_s": 1.21,
+    "prompt_tokens": 7481,
+    "completion_tokens": 92,
+    "reasoning_tokens": 53,
+    "cached_tokens": 1792
+   },
+   "on": {
+    "picked": "STS-003",
+    "near": [
+     "IMP-002",
+     "PLN-049"
+    ],
+    "latency_s": 1.297,
+    "prompt_tokens": 8247,
+    "completion_tokens": 91,
+    "reasoning_tokens": 53,
+    "cached_tokens": 1792
+   }
+  },
+  {
+   "n": 301,
+   "q": "How many sanitation projects under Swachh Bharat are marked complete for 2021-2022?",
+   "first": "on",
+   "on": {
+    "picked": "STS-003",
+    "near": [
+     "PLN-049",
+     "SBM-SI-004"
+    ],
+    "latency_s": 1.899,
+    "prompt_tokens": 8441,
+    "completion_tokens": 100,
+    "reasoning_tokens": 60,
+    "cached_tokens": 7936
+   },
+   "off": {
+    "picked": "STS-003",
+    "near": [
+     "SBM-SI-014",
+     "PLN-049"
+    ],
+    "latency_s": 2.034,
+    "prompt_tokens": 7583,
+    "completion_tokens": 140,
+    "reasoning_tokens": 100,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 306,
+   "q": "How many GPDP road construction activities have an in-progress status for 2024 to 2026?",
+   "first": "off",
+   "off": {
+    "picked": "STS-003",
+    "near": [
+     "PLN-024",
+     "IMP-001"
+    ],
+    "latency_s": 2.24,
+    "prompt_tokens": 5915,
+    "completion_tokens": 116,
+    "reasoning_tokens": 79,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "STS-003",
+    "near": [
+     "PLN-024",
+     "STS-001"
+    ],
+    "latency_s": 1.226,
+    "prompt_tokens": 7282,
+    "completion_tokens": 115,
+    "reasoning_tokens": 78,
+    "cached_tokens": 6912
+   }
+  },
+  {
+   "n": 311,
+   "q": "What is the number of road works currently in progress for 2020-2021?",
+   "first": "on",
+   "on": {
+    "picked": "STS-003",
+    "near": [
+     "IMP-002",
+     "EXP-005"
+    ],
+    "latency_s": 1.135,
+    "prompt_tokens": 8474,
+    "completion_tokens": 72,
+    "reasoning_tokens": 36,
+    "cached_tokens": 0
+   },
+   "off": {
+    "picked": "STS-003",
+    "near": [],
+    "latency_s": 1.121,
+    "prompt_tokens": 7749,
+    "completion_tokens": 43,
+    "reasoning_tokens": 15,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 316,
+   "q": "Which districts have the lowest GPDP submission performance for 2024 to 2026?",
+   "first": "off",
+   "off": {
+    "picked": "PLN-007",
+    "near": [],
+    "latency_s": 1.32,
+    "prompt_tokens": 5793,
+    "completion_tokens": 49,
+    "reasoning_tokens": 19,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "PLN-007",
+    "near": [],
+    "latency_s": 0.992,
+    "prompt_tokens": 7371,
+    "completion_tokens": 56,
+    "reasoning_tokens": 26,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 321,
+   "q": "Identify districts with delayed GPDP submissions for 2022-2023.",
+   "first": "on",
+   "on": {
+    "picked": "PLN-007",
+    "near": [],
+    "latency_s": 0.919,
+    "prompt_tokens": 7165,
+    "completion_tokens": 52,
+    "reasoning_tokens": 22,
+    "cached_tokens": 6912
+   },
+   "off": {
+    "picked": "no_match",
+    "near": [
+     "PLN-007",
+     "PLN-023",
+     "PLN-009"
+    ],
+    "latency_s": 1.611,
+    "prompt_tokens": 5371,
+    "completion_tokens": 144,
+    "reasoning_tokens": 106,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 326,
+   "q": "List Gram Panchayats where spending is recorded despite no physical progress in 2024 to 2025.",
+   "first": "off",
+   "off": {
+    "picked": "PHY-006",
+    "near": [
+     "DQY-006",
+     "EXP-005"
+    ],
+    "latency_s": 0.902,
+    "prompt_tokens": 6078,
+    "completion_tokens": 44,
+    "reasoning_tokens": 7,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "PHY-006",
+    "near": [
+     "DQY-006",
+     "DQY-011"
+    ],
+    "latency_s": 0.916,
+    "prompt_tokens": 7450,
+    "completion_tokens": 45,
+    "reasoning_tokens": 7,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 331,
+   "q": "Which GPs have expenditure recorded but zero physical progress for 2021-2022?",
+   "first": "on",
+   "on": {
+    "picked": "PHY-006",
+    "near": [
+     "DQY-006",
+     "EXP-005"
+    ],
+    "latency_s": 1.12,
+    "prompt_tokens": 7420,
+    "completion_tokens": 99,
+    "reasoning_tokens": 62,
+    "cached_tokens": 6912
+   },
+   "off": {
+    "picked": "PHY-006",
+    "near": [
+     "DQY-011",
+     "EXP-001"
+    ],
+    "latency_s": 1.327,
+    "prompt_tokens": 6045,
+    "completion_tokens": 44,
+    "reasoning_tokens": 7,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 336,
+   "q": "Give a district-wise summary of asset creation for 2024 to 2025.",
+   "first": "off",
+   "off": {
+    "picked": "AST-001",
+    "near": [],
+    "latency_s": 0.854,
+    "prompt_tokens": 5432,
+    "completion_tokens": 58,
+    "reasoning_tokens": 30,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "AST-001",
+    "near": [
+     "AST-002",
+     "AST-006"
+    ],
+    "latency_s": 0.94,
+    "prompt_tokens": 6992,
+    "completion_tokens": 58,
+    "reasoning_tokens": 22,
+    "cached_tokens": 6400
+   }
+  },
+  {
+   "n": 341,
+   "q": "Show the summary of asset creation across all districts for 2020-2021.",
+   "first": "on",
+   "on": {
+    "picked": "AST-001",
+    "near": [
+     "AST-012",
+     "AST-002"
+    ],
+    "latency_s": 1.352,
+    "prompt_tokens": 7037,
+    "completion_tokens": 87,
+    "reasoning_tokens": 51,
+    "cached_tokens": 0
+   },
+   "off": {
+    "picked": "AST-001",
+    "near": [],
+    "latency_s": 0.981,
+    "prompt_tokens": 5394,
+    "completion_tokens": 75,
+    "reasoning_tokens": 47,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 346,
+   "q": "List the asset creation figures by district for 2022-2023.",
+   "first": "off",
+   "off": {
+    "picked": "AST-001",
+    "near": [
+     "AST-002",
+     "AST-012"
+    ],
+    "latency_s": 0.934,
+    "prompt_tokens": 5393,
+    "completion_tokens": 51,
+    "reasoning_tokens": 15,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "AST-001",
+    "near": [
+     "AST-012",
+     "AST-002"
+    ],
+    "latency_s": 1.083,
+    "prompt_tokens": 6755,
+    "completion_tokens": 66,
+    "reasoning_tokens": 30,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 351,
+   "q": "Analyze fund utilization trends across the last five years for 2025 to 2026.",
+   "first": "on",
+   "on": {
+    "picked": "TRD-003",
+    "near": [
+     "EXP-002",
+     "EXP-003"
+    ],
+    "latency_s": 1.3,
+    "prompt_tokens": 6618,
+    "completion_tokens": 113,
+    "reasoning_tokens": 75,
+    "cached_tokens": 0
+   },
+   "off": {
+    "picked": "TRD-003",
+    "near": [
+     "EXP-002",
+     "EXP-003"
+    ],
+    "latency_s": 1.312,
+    "prompt_tokens": 5869,
+    "completion_tokens": 122,
+    "reasoning_tokens": 84,
+    "cached_tokens": 0
+   }
+  },
+  {
+   "n": 356,
+   "q": "Give a time-series view of fund utilization covering the previous five years for 2021-2022.",
+   "first": "off",
+   "off": {
+    "picked": "TRD-003",
+    "near": [
+     "EXP-002",
+     "EXP-003"
+    ],
+    "latency_s": 1.228,
+    "prompt_tokens": 5887,
+    "completion_tokens": 96,
+    "reasoning_tokens": 58,
+    "cached_tokens": 0
+   },
+   "on": {
+    "picked": "TRD-003",
+    "near": [
+     "EXP-003",
+     "EXP-023"
+    ],
+    "latency_s": 1.356,
+    "prompt_tokens": 7176,
+    "completion_tokens": 93,
+    "reasoning_tokens": 55,
+    "cached_tokens": 0
+   }
+  }
+ ],
+ "usage": {
+  "totals": {
+   "calls": 189,
+   "prompt_tokens": 843523,
+   "completion_tokens": 14493,
+   "reasoning_tokens": 9730,
+   "cached_prompt_tokens": 262400,
+   "total_tokens": 858016
+  },
+  "by_site": {
+   "embed_query": {
+    "calls": 63,
+    "model": "text-embedding-3-large",
+    "prompt_tokens": 1308,
+    "completion_tokens": 0,
+    "reasoning_tokens": 0,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 1308
+   },
+   "rerank": {
+    "calls": 126,
+    "model": "gpt-5.4-mini",
+    "prompt_tokens": 842215,
+    "completion_tokens": 14493,
+    "reasoning_tokens": 9730,
+    "cached_prompt_tokens": 262400,
+    "total_tokens": 856708
+   }
+  },
+  "extraction": {
+   "extraction_calls": 0,
+   "unavailable_calls": 0,
+   "unavailable_causes": {},
+   "all_none_answered": 0,
+   "all_none_rate_answered": 0.0,
+   "by_slot_family": {},
+   "reasoning_tokens_when_all_none": null,
+   "reasoning_tokens_when_read": null
+  }
+ }
+}
