@@ -9,6 +9,7 @@ No API key and no network: the extractor is stubbed, and every router path runs
 against the sample database.
 """
 import json
+import os
 import time
 import unittest
 from pathlib import Path
@@ -254,6 +255,81 @@ class T3GoldRowTests(unittest.TestCase):
         for other in ("G2041", "G2042"):
             r = next(r for r in rows if r["id"] == other)
             self.assertIn("IMP-009", r["acc"], other)
+
+
+# ── T4 ────────────────────────────────────────────────────────────────────────
+
+_REPO = Path(os.environ.get("PRDW_REPO") or _BACKEND.parent)
+_EVAL1 = _REPO / "handoffs" / "WP6_eval1_questions.json"
+
+# D34.4: the extractor invented `plan_type = Main` on these, none of which says "main".
+INVENTED_MAIN = (
+    ("PLN-014", "Number of Gram Panchayats whose GPDPs are pending for 2022-2023."),   # Eval_1 #253
+    ("PLN-001", "ଖୋର୍ଦ୍ଧା ଜିଲ୍ଲାରେ 2024-2025 ରେ କେତେ ଗ୍ରାମ ପଞ୍ଚାୟତ GPDP ଅପଲୋଡ କରିଛନ୍ତି?"),  # gold #1006
+    ("PLN-008", "How many GPs in Bhubaneswar uploaded the GPDP after 30 June 2024 in 2024-25?"),  # #1014
+    ("PLN-014", "How many GPs have their GPDPs still pending approval for 2024 to 2026?"),  # #2035
+)
+
+
+@_needs_db
+class T4PlanTypeGuardTests(unittest.TestCase):
+
+    def test_the_guard_list_is_the_prefill_list_plus_the_words_it_leaves_out(self):
+        from query_router import subject_reader as sr
+        from query_router.entity_validator import _resolve_config
+        _, cfg = _resolve_config("plan_type")
+        registry = _validator().registry_values("plan_type")
+        prefill = set(sr._vocabulary("plan_type", cfg, registry)[0])
+        guard = set(sr.guard_vocabulary("plan_type", _validator()))
+        self.assertEqual(guard - prefill, set(sr._NOT_READ["plan_type"]))
+        self.assertEqual(prefill - guard, set())
+        self.assertIn("plan_type", sr.VOCABULARY_GUARDED)
+
+    def test_an_invented_main_is_dropped_and_logged(self):
+        for qid, question in INVENTED_MAIN:
+            with self.subTest(qid=qid), self.assertLogs("query_router.router", "INFO") as logs:
+                raw = _extract(qid, question, {"plan_type": "Main"})
+            self.assertIsNone(raw.get("plan_type"), question)
+            self.assertTrue(any("dropped plan_type=['Main']" in m and "plan type words" in m
+                                for m in logs.output), logs.output)
+
+    @unittest.skipUnless(_EVAL1.exists(), f"no Eval_1 at {_EVAL1} (set PRDW_REPO from a mirror)")
+    def test_every_eval1_row_that_says_main_or_supplementary_still_binds_it(self):
+        import re
+        import sys
+        sys.path.insert(0, str(_BACKEND))
+        import grade_eval1
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        rows = json.loads(_EVAL1.read_text(encoding="utf-8"))
+        checked = 0
+        for row in rows:
+            text = row["q"]
+            says_main = re.search(r"\bmain\b", text, re.I)
+            says_supp = re.search(r"\bsupplementary\b", text, re.I)
+            spec = grade_eval1.row_spec(row["n"])
+            if not (says_main or says_supp) or spec is None:
+                continue
+            qid = next((q for q in spec[1]
+                        if any(s["name"] == "plan_type" for s in T[q]["param_slots"])), None)
+            if qid is None:
+                continue
+            value = ["Main", "Supplementary"] if says_main and says_supp else \
+                ("Main" if says_main else "Supplementary")
+            raw = _extract(qid, text, {"plan_type": value})
+            with self.subTest(n=row["n"], q=text):
+                bound = raw.get("plan_type")
+                self.assertIsNotNone(bound)
+                got = {_validator().validate(v, "plan_type").resolved_value
+                       for v in (bound if isinstance(bound, list) else [bound])}
+                self.assertEqual(got, set(value if isinstance(value, list) else [value]))
+            checked += 1
+        self.assertGreaterEqual(checked, 20)
+        # Rows 1-2 are the brief's named pair.
+        for n in (1, 2):
+            row = next(r for r in rows if r["n"] == n)
+            raw = _extract("BUD-006", row["q"], {"plan_type": "Main"})
+            self.assertEqual(_validator().validate(raw["plan_type"], "plan_type").resolved_value,
+                             "Main", n)
 
 
 if __name__ == "__main__":

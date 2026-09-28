@@ -549,7 +549,9 @@ def _rehome_and_guard(
          in that type's own words; otherwise it is dropped and logged, never
          asked about. A value that fails validation is kept only when the
          officer did write a tied/untied word — that is the one case the
-         "Tied / Untied / Other" question is for.
+         "Tied / Untied / Other" question is for. Since WP-6d (D34.4) plan type
+         is guarded the same way: an invented `plan_type = Main` is dropped, and
+         "main GPDPs" still binds it.
     """
     scheme_slots = [s for s, e in slot_type.items()
                     if _resolve_config(e)[0] == "scheme"]
@@ -592,8 +594,9 @@ def _rehome_and_guard(
             ok = (" ".join(resolved.lower().split()) in written) if resolved is not None                 else bool(written)
             (standing if ok else dropped).append(v)
         if dropped:
+            words = "tied/untied" if base == "tied_untied" else base.replace("_", " ")
             _log.info("dropped %s=%r: the question does not say it in %s words "
-                      "query=%r", slot, dropped, base.replace("_", "/"), user_query[:120])
+                      "query=%r", slot, dropped, words, user_query[:120])
         raw[slot] = (standing if len(standing) > 1 else standing[0]) if standing else None
 
 

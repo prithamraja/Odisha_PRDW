@@ -91,9 +91,14 @@ def _key(text: str) -> str:
 _PATTERNS: dict[tuple, tuple[dict[str, tuple[str, str]], re.Pattern]] = {}
 
 
-def _vocabulary(base_type: str, cfg: dict, registry: list[str]):
-    """({key: (table phrase, value)}, one pattern matching any key)."""
-    cache_key = (base_type, tuple(registry))
+def _vocabulary(base_type: str, cfg: dict, registry: list[str], *, full: bool = False):
+    """({key: (table phrase, value)}, one pattern matching any key).
+
+    `full` keeps the `_NOT_READ` words. The prefill must not read "main" (it is
+    also "the main reasons"); the vocabulary GUARD must, or it would drop
+    `plan_type = Main` from "main GPDPs" — the one place the officer did say it.
+    """
+    cache_key = (base_type, tuple(registry), full)
     cached = _PATTERNS.get(cache_key)
     if cached is not None:
         return cached
@@ -103,8 +108,9 @@ def _vocabulary(base_type: str, cfg: dict, registry: list[str]):
     for value in registry:
         # A value named outright wins over an alias spelt the same way.
         vocab[_key(value)] = (value, value)
-    for word in _NOT_READ.get(base_type, ()):
-        vocab.pop(word, None)
+    if not full:
+        for word in _NOT_READ.get(base_type, ()):
+            vocab.pop(word, None)
     vocab.pop("", None)
     alternatives = sorted(vocab, key=len, reverse=True)
     body = "|".join(r"[\s\-–]+".join(map(re.escape, key.split(" ")))
@@ -195,13 +201,27 @@ def unbound_subject(
 # validation then asked the officer which of Tied / Untied / Other they meant, on
 # a question that never mentioned either. For the types listed here, an
 # extractor value stands only when the question says it in the type's own
-# vocabulary (a registry value or an alias key). Table-driven so the plan-type
-# guard D34.4 asks for can join it; only tied/untied is wired today.
-VOCABULARY_GUARDED = frozenset({"tied_untied"})
+# vocabulary (a registry value or an alias key).
+#
+# PLAN TYPE JOINED IN WP-6d (D34.4). The extractor filled `plan_type = Main` on
+# questions that never say "main" (#253 "GPDPs pending for 2022-2023", gold
+# #1006, #1014, #2035), which silently drops the 481 supplementary activities from
+# the answer. Its word list is the FULL alias table plus the registry values —
+# "main" included, although the prefill leaves "main" to the extractor — so
+# "main GPDPs" still binds Main while an invented Main is dropped.
+VOCABULARY_GUARDED = frozenset({"tied_untied", "plan_type"})
+
+
+def guard_vocabulary(entity_type: str, validator) -> dict[str, tuple[str, str]]:
+    """The words the vocabulary guard accepts for this type: every alias key and
+    registry value, with nothing removed (the prefill's list minus `_NOT_READ`)."""
+    base, cfg = _resolve_config(entity_type)
+    return _vocabulary(base, cfg, validator.registry_values(base), full=True)[0]
 
 
 def written_values(text: str, entity_type: str, validator) -> set[str]:
-    """The values of this type the question names in its own words, collapsed."""
+    """The values of this type the question names in its own words, collapsed —
+    read with the guard's full word list, not the prefill's."""
     base, cfg = _resolve_config(entity_type)
-    vocab, pattern = _vocabulary(base, cfg, validator.registry_values(base))
+    vocab, pattern = _vocabulary(base, cfg, validator.registry_values(base), full=True)
     return {_collapse_ws(vocab[_key(m.group(0))][1]) for m in pattern.finditer(text or "")}

@@ -397,6 +397,8 @@ LIMIT $top_n
         "answerable": 'Partial',
         "paraphrases": [
             'Which Districts have the lowest GPDP submission rate in 2024-2025?',
+            'Which districts are behind on GPDP submission in a given year?',
+            'Which districts are lagging on GPDP submission in a given year?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which Districts have the lowest GPDP submission rate in a given year?',
             # ── end derived ──
