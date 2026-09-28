@@ -170,6 +170,14 @@ def chip_ids(label: str) -> list[str]:
     hits = [(literal, qid) for qid, pattern, literal in _PATTERNS
             if pattern.fullmatch(text)]
     if not hits:
+        # WP-6d T6b: a chip now appends what the officer named and the question
+        # has no gap for — "…in 2024-2025 (Sanitation focus area)?". The bracket
+        # is not catalogue wording; read the chip without it.
+        bare = re.sub(r"\s*\((?:[^()]|\([^()]*\))*\)\s*\?\s*$", "?", text)
+        hits = [(literal, qid) for qid, pattern, literal in _PATTERNS
+                if pattern.fullmatch(bare)]
+        text = bare if hits else text
+    if not hits:
         return []
     best = max(literal for literal, _ in hits)
     tied = sorted({qid for literal, qid in hits if literal == best})

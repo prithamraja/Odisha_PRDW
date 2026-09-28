@@ -194,6 +194,248 @@ def unfilled_phrases(
     return phrases
 
 
+# ── How a bound value READS (WP-6d T7) — display only ─────────────────────────
+#
+# ONE renderer serves the answer echo (`resolved_question`) and the chips
+# (`readable_question`). Nothing here reaches SQL: the bound values stay the
+# database's own labels, and only the sentence printed above the answer, or on a
+# chip, says them in English. Measured on WP-6c's replays: ~100 raw breakdown
+# values ("(fiscal_year)"), 25 bare list lengths ("(10)"), ~60 plan-type and
+# tied/untied values with no noun ("(Main)"), ~40 focus areas the reader could not
+# tell were filters, and the database's scheme labels in capitals.
+
+# Database label -> what an officer calls it. Any label not here shows as stored.
+DISPLAY_NAMES: dict[str, str] = {
+    "5TH STATE FINANCE COMMISSION": "5th State Finance Commission (SFC)",
+    "XV Finance Commission":        "15th Finance Commission (CFC)",
+    "4TH STATE FINANCE SCHEME":     "4th State Finance Commission",
+    "WORK COMPLETED":               "completed",
+    "WORK ONGOING":                 "ongoing",
+    "WORK ABANDONED":               "abandoned",
+    "UNDER APPROVAL":               "awaiting approval",
+}
+
+# An appended filter carries its noun, so the reader can tell it is a filter.
+_PLAN_TYPE_WORDS = {"Main": "main GPDP", "Supplementary": "supplementary plan"}
+_STATUS_WORK = {"completed": "completed work", "ongoing": "ongoing work",
+                "abandoned": "abandoned work", "awaiting approval": "work awaiting approval"}
+
+# What a ranking ranks, for "(bottom 10, focus areas with at least 50 activities)".
+_RANKED_NOUNS = {
+    "focus_area_name": "focus areas", "theme": "themes", "district_name": "districts",
+    "block_name": "blocks", "gp_name": "GPs", "status_label": "work statuses",
+    "scheme_name": "schemes", "plan_type": "plan types", "fiscal_year": "years",
+}
+
+_GEO_FINEST_FIRST = ("gp_name", "block_name", "district_name")
+_THRESHOLD_TYPES = ("threshold", "amount_threshold")
+# "1 lakh (₹100000)": an amount the officer gave in lakhs, echoed with its figure.
+_CONVERTED_RE = re.compile(r"^(?P<written>.+?)\s+\(₹[\d.]+\)$")
+
+
+def display_label(value) -> str:
+    """A database label as an officer reads it; anything else unchanged."""
+    text = str(value).strip()
+    return DISPLAY_NAMES.get(text, text)
+
+
+def _values(value) -> list[str]:
+    """A bound value as its list of values (a list slot may name several)."""
+    items = value if isinstance(value, (list, tuple)) else [value]
+    return [str(v).strip() for v in items if v is not None and str(v).strip()]
+
+
+def join_values(values) -> str:
+    """'A', 'A and B', 'A, B and C' — several values NAMED, never summed away."""
+    values = list(values)
+    if len(values) <= 1:
+        return "".join(values)
+    return ", ".join(values[:-1]) + f" and {values[-1]}"
+
+
+def _geo_phrase(slot: str, values: list[str]) -> str:
+    """'Kalimela block', 'Khordha and Ganjam districts' — a place with its tier."""
+    noun = _APPEND_NOUNS.get(slot, "")
+    joined = join_values(values)
+    if not noun:
+        return joined
+    if len(values) > 1:
+        return f"{joined} {noun}s"
+    # main.py's tier chips already pass "Laxmipur block".
+    return joined if joined.lower().endswith(" " + noun.lower()) else f"{joined} {noun}"
+
+
+def _filter_phrase(slot: str, values: list[str]) -> str:
+    """How one appended filter reads, with its noun."""
+    base = re.sub(r"_2$", "", slot)
+    if slot in _APPEND_NOUNS:
+        return _geo_phrase(slot, values)
+    if base == "plan_type":
+        return join_values(_PLAN_TYPE_WORDS.get(v, f"{v} plan") for v in values)
+    if base == "tied_untied":
+        return f"{join_values(v.lower() for v in values)} funds"
+    if base == "focus_area":
+        return f"{join_values(values)} focus area{'s' if len(values) > 1 else ''}"
+    if base == "status":
+        shown = [display_label(v) for v in values]
+        return join_values(_STATUS_WORK.get(s, f"{s} status") for s in shown)
+    return join_values(display_label(v) for v in values)
+
+
+def list_direction(sql: str | None) -> str | None:
+    """'top' or 'bottom' for a `LIMIT $top_n` list — the first key of the ORDER BY
+    it limits (ASC, or no keyword, is bottom). None when there is no such list."""
+    sql = sql or ""
+    limit = re.search(r"\bLIMIT\s+\$top_n\b", sql)
+    if not limit:
+        return None
+    orders = list(re.finditer(r"\bORDER\s+BY\b", sql[:limit.start()], re.IGNORECASE))
+    if not orders:
+        return None
+    depth, key = 0, []
+    for ch in sql[orders[-1].end():limit.start()]:
+        depth += (ch == "(") - (ch == ")")
+        if ch == "," and depth == 0:
+            break
+        key.append(ch)
+    return "top" if re.search(r"\bDESC\b", "".join(key), re.IGNORECASE) else "bottom"
+
+
+def _ranked_noun(template: dict, group_by: str | None) -> str:
+    from .breakdown import DIMENSIONS, _parse
+    column = DIMENSIONS[group_by][0] if group_by in DIMENSIONS else \
+        _parse(template.get("sql_template") or "")[1]
+    return _RANKED_NOUNS.get(column or "", "groups")
+
+
+def _length_phrase(length, floor, template: dict, group_by) -> str:
+    """'top 10' / 'bottom 10' / 'the lowest', and a floor the officer set."""
+    direction = list_direction(template.get("sql_template"))
+    if length is None:
+        length = next((s.get("default") for s in template.get("param_slots", [])
+                       if s["name"] == "top_n"), None)
+    if length is None:
+        text = ""
+    elif str(length) == "1":
+        text = "the lowest" if direction == "bottom" else "the highest"
+    else:
+        text = f"{direction or 'first'} {length}"
+    if floor is not None:
+        noun = _ranked_noun(template, group_by)
+        text = f"{text}, {noun} with at least {floor} activities" if text else \
+            f"{noun} with at least {floor} activities"
+    return text
+
+
+def _threshold_phrase(value: str, slot: dict) -> str:
+    """'above ₹20,000', 'below 50%', 'fewer than 5 activities' — never a bare number."""
+    from .threshold_reply import _comparison_word, figure_label
+    converted = _CONVERTED_RE.match(value)
+    written = converted.group("written") if converted else value
+    unit, direction = slot.get("unit"), slot.get("direction")
+    if not direction:
+        return f"threshold {written}"
+    label = figure_label(written, unit)
+    if unit == "activities":
+        label = f"{label} activities"
+    return f"{_comparison_word(direction, unit)} {label}"
+
+
+_TEMPLATE_BY_QUESTION: dict[str, dict] | None = None
+
+
+def _template_for(question: str) -> dict | None:
+    """The catalogue entry a question text belongs to, when the caller had none."""
+    global _TEMPLATE_BY_QUESTION
+    if _TEMPLATE_BY_QUESTION is None:
+        from .template_catalog import TEMPLATE_CATALOG
+        _TEMPLATE_BY_QUESTION = {}
+        for entry in TEMPLATE_CATALOG.values():
+            _TEMPLATE_BY_QUESTION.setdefault(entry["abstract_question"], entry)
+    return _TEMPLATE_BY_QUESTION.get(question)
+
+
+def _appended(question: str, rendered: str, fill: dict, template: dict | None,
+              used: set, *, chip: bool) -> list[str]:
+    """The phrases for every filled slot the question has no gap for, in order.
+
+    The list length and a floor the officer set share one phrase, first. A
+    breakdown is said by `breakdown.describe` on an answer; on a chip, where
+    nothing else would say it, it reads "broken down by district" so a tap
+    re-reads it. The default floor (1) is never shown.
+    """
+    slots = {s["name"]: s for s in (template or {}).get("param_slots", [])}
+    parts: list[str] = []
+    length = floor = None
+    group_by = None
+    for slot, value in fill.items():
+        values = _values(value)
+        if slot == "group_by":
+            group_by = values[0] if values else None
+            continue
+        if not values or slot in used or f"{{{slot}}}" in question:
+            continue
+        if slots and slot not in slots:
+            continue            # a chip's template cannot apply it
+        decl = slots.get(slot, {})
+        etype = decl.get("entity_type", slot)
+        if etype == "top_n":
+            length = values[0]
+            continue
+        if etype in _THRESHOLD_TYPES:
+            if "default" in decl:                  # a declared ranking floor (WP-6d)
+                if values[0] != str(decl["default"]):
+                    floor = values[0]
+                continue
+            parts.append(_threshold_phrase(values[0], decl))
+            continue
+        if join_values(values) in rendered:
+            continue
+        parts.append(_filter_phrase(slot, values))
+    if template and (length is not None or floor is not None):
+        phrase = _length_phrase(length, floor, template, group_by)
+        if phrase:
+            parts.insert(0, phrase)
+    elif length is not None:
+        parts.insert(0, f"first {length}" if str(length) != "1" else "the first")
+    if chip and group_by:
+        from .breakdown import DIMENSIONS, _parse
+        absent = _parse((template or {}).get("sql_template") or "")[1]
+        if group_by == "total":
+            parts.append("as one total")
+        elif group_by in DIMENSIONS and DIMENSIONS[group_by][0] != absent:
+            parts.append(f"broken down by {DIMENSIONS[group_by][1]}")
+    return parts
+
+
+def _with_appended(rendered: str, parts: list[str]) -> str:
+    if not parts:
+        return rendered
+    return f"{rendered.rstrip('?. ')} ({'; '.join(parts)})?"
+
+
+def _borrowed_geography(question: str, fill: dict) -> tuple[dict[str, str], set]:
+    """({gap: 'Kalimela block'}, the slots used) — a chip's unfilled geography gap
+    takes the place the officer named at another tier (WP-6d T6b).
+
+    PLN-024 reads "…each GPDP theme in {gp_name} in {date_range}?". With
+    `block_name = Kalimela` it rendered "in a gram panchayat" and lost Kalimela;
+    appending "(Kalimela block)" after "in a gram panchayat" would name two
+    scopes, so the place takes the gap, with its noun.
+    """
+    gaps = [s for s in _GEO_FINEST_FIRST if f"{{{s}}}" in question and s not in fill]
+    spare = [s for s in _GEO_FINEST_FIRST
+             if s in fill and f"{{{s}}}" not in question and _values(fill[s])]
+    borrowed, used = {}, set()
+    for gap in gaps:
+        if not spare:
+            break
+        slot = spare.pop(0)
+        borrowed[gap] = _geo_phrase(slot, _values(fill[slot]))
+        used.add(slot)
+    return borrowed, used
+
+
 def _readable(
     question: str,
     fill: dict[str, str] | None = None,
@@ -216,25 +458,40 @@ def _readable(
         swallowed = word in _unit_nouns(name)
         if fill and name in fill:
             # A known value keeps the unit — "in Khordha district" reads better
-            # than "in Khordha" and is what the user said.
-            return str(fill[name]) + following
+            # than "in Khordha" and is what the user said. A database label reads
+            # by its display name (WP-6d T7); several values are named.
+            return join_values(display_label(v) for v in _values(fill[name])) + following
         stand_in = (phrases or {}).get(name) or _slot_phrase(name)
         return stand_in + ("" if swallowed else following)
 
     return re.sub(r"\{(\w+?)\}(\s+(\w+)\b)?", _sub, question)
 
 
-def readable_question(question: str, fill: dict[str, str] | None = None) -> str:
-    """Public form of _readable: a catalog question rendered for a chip, with
-    the slots the caller knows filled in and the rest turned into readable
-    stand-ins. Always routable."""
-    return _readable(question, fill)
+def readable_question(question: str, fill: dict[str, str] | None = None,
+                      template: dict | None = None) -> str:
+    """A catalog question rendered for a CHIP, with the slots the caller knows
+    filled in and the rest turned into readable stand-ins. Always routable.
+
+    NOTHING THE FILL KNOWS IS DROPPED (WP-6d T6b), the rule `resolved_question`
+    and `suggestions._chip_for` already follow. A chip tap sends only its text,
+    so a value the text leaves out is gone for good: "…in a gram panchayat in
+    2024-2025?" lost Kalimela, and the BUD-003 chip lost the schemes. A place
+    named at another tier takes an unfilled geography gap ("in Kalimela
+    block"); every other filled slot with no gap is appended in the echo's words.
+    """
+    fill = fill or {}
+    template = template or _template_for(question)
+    borrowed, used = _borrowed_geography(question, fill)
+    rendered = _readable(question, fill, borrowed)
+    return _with_appended(rendered, _appended(question, rendered, fill, template, used,
+                                              chip=True))
 
 
 def resolved_question(
     question: str,
     fill: dict[str, str] | None = None,
     phrases: dict[str, str] | None = None,
+    template: dict | None = None,
 ) -> str:
     """The question as ANSWERED — every placeholder substituted, none left.
 
@@ -259,15 +516,17 @@ def resolved_question(
     question printed above it, which is the SAME defect the operator reported
     wearing different clothes. `suggestions._chip_for` already appends for this
     reason; the answer echo has to as well.
+
+    IN ENGLISH SINCE WP-6d T7: every appended filter carries its noun and they
+    share one bracket ("(Sanitation focus area; main GPDP)"); a list length reads
+    "(bottom 10)"; the breakdown is left to `breakdown.describe`'s suffix and
+    never appended as a raw value.
     """
+    fill = fill or {}
+    template = template or _template_for(question)
     rendered = _readable(question, fill, phrases)
-    for slot, value in (fill or {}).items():
-        text = str(value)
-        if not text or f"{{{slot}}}" in question or text in rendered:
-            continue
-        scope = f"{text} {_APPEND_NOUNS.get(slot, '')}".strip()
-        rendered = f"{rendered.rstrip('?. ')} ({scope})?"
-    return rendered
+    return _with_appended(rendered, _appended(question, rendered, fill, template, set(),
+                                              chip=False))
 
 
 def question_chips(
@@ -280,7 +539,7 @@ def question_chips(
     chips: list[Chip] = []
     seen: set[str] = set()
     for _, question, _ in candidates:
-        text = _readable(question, fill)
+        text = readable_question(question, fill)
         if text in seen:
             continue
         seen.add(text)

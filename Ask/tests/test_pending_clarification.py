@@ -227,8 +227,11 @@ class FilledChipTests(unittest.TestCase):
             fill={"district": "Krishna"},
         )
         # 'a mandal mandal' would be the naive substitution — the duplicated
-        # unit word is dropped when the slot is unfilled.
-        self.assertEqual(chips[0].send_text, "Beneficiaries in each village of a mandal?")
+        # unit word is dropped when the slot is unfilled. Since WP-6d T6b the
+        # district the fill knows is appended rather than dropped: a chip tap
+        # sends only its text, so a value left out of it is gone.
+        self.assertEqual(chips[0].send_text,
+                         "Beneficiaries in each village of a mandal (Krishna)?")
 
 
 if __name__ == "__main__":

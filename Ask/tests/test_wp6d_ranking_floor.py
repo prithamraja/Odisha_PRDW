@@ -10,6 +10,7 @@ against the sample database.
 """
 import json
 import os
+import re
 import time
 import unittest
 from pathlib import Path
@@ -349,6 +350,275 @@ class T5PhrasingTests(unittest.TestCase):
         for qid, phrasings in wanted.items():
             for phrasing in phrasings:
                 self.assertIn(phrasing, T[qid]["paraphrases"], qid)
+
+
+# ── T6 ────────────────────────────────────────────────────────────────────────
+
+KALIMELA_Q = "What is the count of planned activities in Kalimela in 2024?"
+
+
+class _Retriever:
+    """A retriever that returns a fixed list — the chips come from the reranker."""
+
+    def __init__(self, qids):
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        self.scored = [(q, T[q]["abstract_question"], 0.9 - 0.01 * i)
+                       for i, q in enumerate(qids)]
+
+    def retrieve_scored(self, text, k):
+        return self.scored[:k]
+
+
+def _chips_for(question, extractor_says, near_misses):
+    """The reranker no-match chips for `question`, extractor and reranker stubbed."""
+    from query_router import router
+    from query_router.template_catalog import TEMPLATE_CATALOG as T
+    stub, _ = _stubbed(extractor_says)
+    real_extract, real_rerank = router.extract_entities, router.rerank
+    router.extract_entities = stub
+    router.rerank = lambda query, candidates, client: ("no_match", list(near_misses))
+    try:
+        result = router._route_vector(
+            question, question, time.monotonic(), validator=_validator(),
+            openai_client=object(), retriever=_Retriever(near_misses), cache_conn=_adapter(),
+            dashboard_results={}, template_map=T, dashboard_questions={},
+            start_date=None, end_date=None)
+    finally:
+        router.extract_entities, router.rerank = real_extract, real_rerank
+    return result
+
+
+@_needs_db
+class T6ChipTests(unittest.TestCase):
+
+    def test_a_block_fill_takes_the_gp_gap_with_its_noun(self):
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        from query_router.zones import readable_question
+        fill = {"block_name": "Kalimela", "date_range": "2024-2025"}
+        self.assertEqual(readable_question(T["PLN-024"]["abstract_question"], fill),
+                         "How many activities are planned under each GPDP theme in "
+                         "Kalimela block in 2024-2025?")
+        self.assertEqual(readable_question(T["PLN-049"]["abstract_question"], fill),
+                         "How many activities are planned under a focus area in "
+                         "Kalimela block in 2024-2025?")
+
+    def test_block_first_unless_the_question_says_gp(self):
+        from query_router import router
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        slot_type = router._template_slot_types(T["PLN-024"])
+        self.assertEqual(_validator().validate("Kalimela", "block").confidence, "exact")
+        self.assertEqual(_validator().validate("Kalimela", "gp").confidence, "exact")
+        cases = (
+            (KALIMELA_Q, {"gp_name": "Kalimela"}, {"block_name": "Kalimela", "gp_name": None}),
+            (KALIMELA_Q, {"gp_name": "Kalimela", "block_name": "Kalimela"},
+             {"block_name": "Kalimela", "gp_name": None}),
+            ("planned activities in Kalimela GP in 2024", {"gp_name": "Kalimela"},
+             {"gp_name": "Kalimela"}),
+            ("planned activities in Kalimela gram panchayat in 2024", {"gp_name": "Kalimela"},
+             {"gp_name": "Kalimela"}),
+            ("planned activities in Andhrua in 2024", {"gp_name": "Andhrua"},
+             {"gp_name": "Andhrua"}),
+        )
+        for question, raw, want in cases:
+            raw = dict(raw)
+            router._block_first(raw, slot_type, _validator(), question)
+            for slot, value in want.items():
+                self.assertEqual(raw.get(slot), value, (question, slot))
+
+    def test_the_operators_question_chips_name_kalimela_block_and_the_tap_binds_it(self):
+        with self.assertLogs("query_router.router", "INFO") as logs:
+            result = _chips_for(KALIMELA_Q, {"gp_name": "Kalimela"},
+                                ["PLN-024", "PLN-049", "PLN-025"])
+        self.assertTrue(any("chip fill: Kalimela read as block (also a GP)" in m
+                            for m in logs.output), logs.output)
+        chips = [c.send_text for c in result.clarification.options]
+        self.assertTrue(chips)
+        for chip in chips:
+            self.assertIn("Kalimela block", chip)
+            self.assertNotIn("a gram panchayat", chip)
+            self.assertEqual(chip, next(c.label for c in result.clarification.options
+                                        if c.send_text == chip))
+        per_theme = next(c for c in chips if "each GPDP theme" in c)
+        raw = _extract("PLN-024", per_theme, {"block_name": "Kalimela block"})
+        entities, clarify = _fill("PLN-024", per_theme, raw)
+        self.assertIsNone(clarify)
+        bound = {e.slot_name: e.resolved_value for e in entities}
+        self.assertEqual(bound.get("block_name"), "Kalimela")
+        self.assertNotIn("gp_name", bound)
+
+    def test_a_scheme_list_survives_into_the_chip_and_is_read_back(self):
+        from query_router import subject_reader
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        result = _chips_for("split the sanctioned funds into SFC and Own Funds for 2024-25",
+                            {"scheme": ["SFC", "Own Funds"]}, ["BUD-003", "BUD-004"])
+        chip = next(c.send_text for c in result.clarification.options
+                    if "tied and untied components" in c.send_text)
+        self.assertIn("5th State Finance Commission (SFC) and Own Funds", chip)
+        named = subject_reader.named_subjects(
+            chip, router_slot_types("BUD-003"), _validator())
+        self.assertEqual({m.value for m in named["scheme"]},
+                         {"5TH STATE FINANCE COMMISSION", "Own Funds"})
+
+    def test_display_names_read_back_as_the_same_values(self):
+        from query_router import subject_reader
+        from query_router.zones import DISPLAY_NAMES
+        slot_type = router_slot_types("BUD-002")
+        for label, shown in DISPLAY_NAMES.items():
+            if label.startswith("WORK") or label == "UNDER APPROVAL":
+                continue
+            named = subject_reader.named_subjects(f"funds from {shown} in 2024-25",
+                                                  slot_type, _validator())
+            self.assertEqual({m.value for m in named["scheme"]}, {label}, shown)
+
+
+def router_slot_types(qid):
+    from query_router import router
+    from query_router.template_catalog import TEMPLATE_CATALOG as T
+    return router._template_slot_types(T[qid])
+
+
+# ── T7 ────────────────────────────────────────────────────────────────────────
+
+_REPLAY = _REPO / "handoffs" / "WP6c_eval1_replay.jsonl"
+_RAW_GROUP = re.compile(r"\((?:total|fiscal_year|district|block|gp|theme|focus_area|status|"
+                        r"scheme|plan_type)\)")
+_BARE_NUMBER = re.compile(r"\(\d+\)")
+_RAW_SCHEMES = ("5TH STATE FINANCE COMMISSION", "XV Finance Commission", "4TH STATE FINANCE SCHEME")
+_NOUNLESS = {"Main", "Supplementary", "Tied", "Untied", "Other"}
+
+
+def rerender(record: dict):
+    """(entities, the echo) for a recorded served row, re-served offline from its
+    template and bound values — the path `_serve_query_id` takes today."""
+    from query_router import breakdown, router, threshold_reply
+    from query_router.template_catalog import TEMPLATE_CATALOG as T
+    qid = record["query_id"]
+    template = T[qid]
+    raw = {e["slot"]: (e.get("values") or e.get("value")) for e in record.get("entities") or []}
+    entities, clarify = router._fill_slots_or_clarify(
+        qid, router._template_slot_types(template), raw, _validator(),
+        record["q"], "n", time.monotonic(),
+        optional=router.optional_slots(template["param_slots"]),
+        defaults=router.slot_defaults(template["param_slots"]),
+        list_slots=router._list_slots(template["param_slots"]),
+        splits=breakdown.slots_the_statement_splits(template),
+        numeric=threshold_reply.numeric_meta(template["param_slots"]),
+        check_direction=False)
+    if clarify is not None:
+        return None, None
+    result = router._serve_query_id(
+        qid, entities, None, user_query=record["q"], normalized=record["q"],
+        start=time.monotonic(), cache_conn=_adapter(), dashboard_results={},
+        template_map=T, dashboard_questions={}, start_date=None, end_date=None)
+    return entities, result.query_description
+
+
+def echo_problems(echo: str, entities) -> list[str]:
+    """Everything T7 says an echo must not do, for one echo."""
+    from query_router.zones import _PLAN_TYPE_WORDS, display_label
+    problems = []
+    if _RAW_GROUP.search(echo):
+        problems.append("raw breakdown value")
+    if _BARE_NUMBER.search(echo):
+        problems.append("bare number")
+    if any(label in echo for label in _RAW_SCHEMES):
+        problems.append("raw scheme label")
+    for bracket in re.findall(r"\(([^()]*(?:\([^()]*\)[^()]*)*)\)", echo):
+        if any(part.strip() in _NOUNLESS for part in bracket.split(";")):
+            problems.append(f"noun-less value ({bracket})")
+    lowered = echo.lower()
+    for e in entities:
+        if e.slot_name in ("group_by", "top_n", "threshold", "date_range", "gp_name"):
+            continue
+        for value in (e.values or [e.resolved_value]):
+            shown = _PLAN_TYPE_WORDS.get(value) if e.slot_name == "plan_type" else \
+                display_label(value)
+            if str(shown).lower().strip() not in lowered:
+                problems.append(f"{e.slot_name}={value!r} not named")
+    return problems
+
+
+@_needs_db
+class T7EchoTests(unittest.TestCase):
+
+    def test_the_worst_case_reads_as_english(self):
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        from query_router.zones import resolved_question
+        echo = resolved_question(
+            T["STS-003"]["abstract_question"],
+            {"date_range": ["2024-2025", "2025-2026"], "status": "WORK ONGOING",
+             "focus_area": "Roads", "group_by": "fiscal_year"},
+            {"block_name": "all blocks"})
+        self.assertEqual(echo, "How many activities in all blocks are in ongoing status for "
+                               "2024-2025 and 2025-2026 (Roads focus area)?")
+
+    def test_filters_share_one_bracket_with_their_nouns(self):
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        from query_router.zones import resolved_question
+        echo = resolved_question(
+            T["BUD-006"]["abstract_question"],
+            {"date_range": "2024-2025", "focus_area": "Sanitation", "plan_type": "Main",
+             "tied_untied": ["Tied", "Untied"], "status": "UNDER APPROVAL",
+             "scheme": ["5TH STATE FINANCE COMMISSION", "XV Finance Commission"],
+             "district_name": "Ganjam"}, {})
+        self.assertTrue(echo.endswith(
+            "in 2024-2025 (Sanitation focus area; main GPDP; tied and untied funds; "
+            "work awaiting approval; 5th State Finance Commission (SFC) and 15th Finance "
+            "Commission (CFC); Ganjam district)?"), echo)
+
+    def test_the_list_length_reads_as_a_length(self):
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        from query_router.zones import resolved_question
+        q9 = T["IMP-009"]["abstract_question"]
+        cases = (
+            ("IMP-009", {"top_n": "10", "threshold": "1"}, "(bottom 10)?"),
+            ("IMP-009", {"top_n": "10", "threshold": "50"},
+             "(bottom 10, focus areas with at least 50 activities)?"),
+            ("IMP-009", {"top_n": "3", "threshold": "1"}, "(bottom 3)?"),
+            ("EXP-015", {"top_n": "10"}, "(top 10)?"),
+            ("EXP-015", {"top_n": "1"}, "(the highest)?"),
+            ("EXP-016", {"top_n": "1"}, "(the lowest)?"),
+        )
+        for qid, fill, tail in cases:
+            echo = resolved_question(T[qid]["abstract_question"],
+                                     {"date_range": "2025-2026", **fill}, {})
+            self.assertTrue(echo.endswith(tail), (qid, echo))
+            self.assertNotIn("(1)", echo)
+        self.assertIn("{date_range}", q9)
+
+    def test_the_served_echo_and_its_bound_values(self):
+        """Display is not binding: the SQL parameters are byte-identical to what
+        the values bind, whatever the echo says."""
+        from query_router import router
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        question = "Budget for sanitation in main GPDPs of Ganjam under SFC and Own Funds 2024-25"
+        entities, clarify, result = _answer("BUD-006", question, {
+            "scheme": ["SFC", "Own Funds"], "district_name": "Ganjam", **{"date_range": "2024-2025"}})
+        self.assertIsNone(clarify)
+        self.assertEqual(echo_problems(result.query_description, entities), [])
+        params = {e.slot_name: (e.values if e.values else e.resolved_value) for e in entities}
+        self.assertEqual(sorted(params["scheme"]), ["5TH STATE FINANCE COMMISSION", "Own Funds"])
+        self.assertEqual(params["plan_type"], "Main")
+        self.assertEqual(params["focus_area"], "Sanitation")
+        bound = router.bind_for_template(T["BUD-006"], params, context="x", person_ids={
+            e.slot_name: e.resolved_code for e in entities if e.resolved_code})
+        self.assertEqual(sorted(bound["scheme"]), ["5TH STATE FINANCE COMMISSION", "Own Funds"])
+
+    @unittest.skipUnless(_REPLAY.exists(), f"no WP-6c replay at {_REPLAY}")
+    def test_every_served_eval1_echo_re_renders_clean(self):
+        records = [json.loads(line) for line in _REPLAY.read_text(encoding="utf-8").splitlines()]
+        served = [r for r in records if r.get("query_id") and r.get("tier") == "tier2"]
+        self.assertGreater(len(served), 280)
+        bad = {}
+        for record in served:
+            entities, echo = rerender(record)
+            if echo is None:
+                bad[record["n"]] = ["asked on re-render"]
+                continue
+            problems = echo_problems(echo, entities)
+            if problems:
+                bad[record["n"]] = problems + [echo]
+        self.assertEqual(bad, {})
 
 
 if __name__ == "__main__":

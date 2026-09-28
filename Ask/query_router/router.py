@@ -1225,6 +1225,49 @@ def _fill_slots_or_clarify(
     return validated, None
 
 
+# "Kalimela GP", "GP Kalimela", "Kalimela gram panchayat", "panchayat of Kalimela".
+_GP_CUE = r"(?:g\.?\s?p\.?|gram\s+panchayats?|panchayats?)"
+
+
+def _block_first(raw: dict, slot_type: dict[str, str], validator: EntityValidator,
+                 user_query: str) -> None:
+    """A place that is both a block and a GP is read as the BLOCK, on a chip
+    (WP-6d T6a, operator ruling 2026-09-28).
+
+    "What is the count of planned activities in Kalimela in 2024?" — Kalimela is
+    a block and a GP, both exact. The chips offered were GP-worded; read as a GP
+    or dropped, the tap answered for the wrong place or none. Here, before any
+    chip is rendered: an extracted `gp_name` that is ALSO an exact block name,
+    with no GP cue written beside it, moves to `block_name`; the same name in
+    both keeps the block only. "Kalimela GP" stays a GP. The answer path does not
+    come through here and is unchanged.
+    """
+    gp = raw.get("gp_name")
+    if not gp or isinstance(gp, (list, tuple)) or "block_name" not in slot_type:
+        return
+    name = str(gp).strip()
+    try:
+        block = validator.validate(name, slot_type["block_name"])
+    except (EntityNotFound, ClarificationNeeded):
+        return
+    if block.confidence != "exact":
+        return
+    cue = re.compile(rf"\b{re.escape(name)}\s+{_GP_CUE}(?!\w)"
+                     rf"|\b{_GP_CUE}\s+(?:of\s+)?{re.escape(name)}\b", re.IGNORECASE)
+    if cue.search(user_query or ""):
+        return
+    current = raw.get("block_name")
+    if current:
+        named = [v for v in (current if isinstance(current, (list, tuple)) else [current])
+                 if v is not None]
+        if [_resolves(validator, v, slot_type["block_name"]) for v in named] \
+                != [block.resolved_value]:
+            return          # a different block is named too: leave both as read
+    raw["block_name"] = block.resolved_value
+    raw["gp_name"] = None
+    _log.info("chip fill: %s read as block (also a GP) query=%r", name, user_query[:120])
+
+
 def _extract_fill_values(
     user_query: str,
     picked_ids: list[str],
@@ -1248,9 +1291,25 @@ def _extract_fill_values(
         )
     except Exception:
         return {}
+    _block_first(raw, slot_type, validator, user_query)
     fill: dict[str, str] = {}
     for slot, value in raw.items():
         if value is None:
+            continue
+        if isinstance(value, (list, tuple)):
+            # "SFC and Own Funds": each value validated, all of them kept (WP-6d
+            # T6b) — a list handed to validate() whole failed and was dropped.
+            resolved = []
+            for item in value:
+                try:
+                    resolved.append(validator.validate(item, slot_type[slot]).resolved_value)
+                except ClarificationNeeded:
+                    resolved.append(str(item))
+                except Exception as ex:
+                    _log.debug("chip pre-fill dropped %s value %r: %s", slot, item,
+                               type(ex).__name__)
+            if resolved:
+                fill[slot] = resolved if len(resolved) > 1 else resolved[0]
             continue
         try:
             fill[slot] = validator.validate(value, slot_type[slot]).resolved_value
@@ -2149,7 +2208,10 @@ def _serve_query_id(
             # can check the conversion rather than take it on trust.
             entity_values[e.slot_name] = f"{e.raw_value} (₹{e.resolved_value})"
         else:
-            entity_values[e.slot_name] = _readable_values(e)
+            # Several values go as a list: the echo names each one in its own
+            # words ("SFC and Own Funds"), not the database's joined labels.
+            entity_values[e.slot_name] = (list(e.values) if e.values and len(e.values) > 1
+                                          else str(e.resolved_value))
     # PER-PLACEHOLDER, never all-or-nothing. `.format(**entity_values)` raises
     # KeyError on the first unbound slot and the old fallback echoed the RAW
     # abstract question, throwing away the substitutions that HAD resolved: the
@@ -2162,6 +2224,7 @@ def _serve_query_id(
         entity_values,
         unfilled_phrases(param_slots, set(entity_values),
                          breakdown.effective_grouped_geo(template, group_by)),
+        template=template,
     )
     # A GP whose name is shared resolves to "Naugaon of Barpali" so the
     # panchayat survives a round trip — which renders "…of Barpali of Barpali"
