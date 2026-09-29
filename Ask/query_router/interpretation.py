@@ -134,8 +134,11 @@ def against_pending(
 
 def readable_slot(slot: str | None) -> str:
     """`district_name` → "district". The bind name is the workbook's, not a
-    word an officer uses."""
+    word an officer uses — and `date_range` is a fiscal year, so it reads as
+    "year" (WP-6g T1c)."""
     text = str(slot or "").strip()
+    if text in ("date_range", "date_range_2"):
+        return "year"
     if text.endswith("_name"):
         text = text[: -len("_name")]
     return text.replace("_", " ") or "value"

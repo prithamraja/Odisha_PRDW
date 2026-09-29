@@ -135,7 +135,7 @@ class InterpretationContractTests(unittest.TestCase):
         self.assertEqual(slot_detail("district_name", "Khordha"),
                          "district → Khordha")
         self.assertEqual(readable_slot("gp_name"), "gp")
-        self.assertEqual(readable_slot("date_range"), "date range")
+        self.assertEqual(readable_slot("date_range"), "year")   # WP-6g T1c
         self.assertIsNone(slot_detail("district_name", None))
         self.assertIsNone(slot_detail(None, "Khordha"))
         self.assertEqual(period_detail("2024-04-01", "2025-03-31"),

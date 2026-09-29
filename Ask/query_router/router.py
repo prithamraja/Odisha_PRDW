@@ -61,6 +61,7 @@ from .fragment_reroute   import drill_target, templates_share_subject
 from .sql_params         import NAMED, param_style
 from .suggestions       import elicitation_chips
 from .                  import breakdown
+from .                  import year_ask
 from .                  import config
 from .config            import (
     MAX_CLARIFY_OPTIONS,
@@ -155,7 +156,7 @@ def _date_predicate(
         # contract is real dates) — if one reappears, fail loudly.
         raise DateFilterUnsupported(
             f"date filtering on '{column}' is not supported yet: the column holds "
-            "Excel day serials, not dates. Ask the question without a date range."
+            "Excel day serials, not dates. Ask the question without a year."
         )
 
     raise DateFilterUnsupported(f"unknown date_kind '{date_kind}' for column '{column}'")
@@ -1081,7 +1082,7 @@ def _fill_slots_or_clarify(
             elif slot not in list_slots:
                 clarify = _clarify(
                     "missing_parameter",
-                    f"I can answer that for one {slot.replace('_', ' ')} at a "
+                    f"I can answer that for one {year_ask.slot_words(slot)} at a "
                     f"time. Which did you mean?",
                     [Chip(label=str(v), send_text=str(v))
                      for v in supplied[:MAX_CLARIFY_OPTIONS]],
@@ -1144,7 +1145,7 @@ def _fill_slots_or_clarify(
             if e.suggestions:
                 clarify = _clarify(
                     "unknown_entity",
-                    f"I couldn't find a {slot.replace('_', ' ')} called "
+                    f"I couldn't find a {year_ask.slot_words(slot)} called "
                     f"'{e.raw_value}'. Did you mean one of these?",
                     corrected_query_chips(
                         user_query, e.raw_value, e.suggestions, MAX_CLARIFY_OPTIONS
@@ -1154,8 +1155,8 @@ def _fill_slots_or_clarify(
             else:
                 clarify = _clarify(
                     "unknown_entity",
-                    f"I couldn't find a {slot.replace('_', ' ')} called '{e.raw_value}'. "
-                    f"Which {slot.replace('_', ' ')} did you mean?",
+                    f"I couldn't find a {year_ask.slot_words(slot)} called '{e.raw_value}'. "
+                    f"Which {year_ask.slot_words(slot)} did you mean?",
                     [],
                     user_query, normalized, start,
                 )
@@ -1221,6 +1222,15 @@ def _fill_slots_or_clarify(
         # asked for in those words rather than "For which deadline?".
         if prompt is None and slot_type.get(slot) == "deadline":
             prompt = _DEADLINE_ASK
+        # WP-6g T1c: a year is asked for as one, with the latest years in the
+        # data to tap — "For which date range?" named the slot, offered nothing,
+        # and read to the tester as no answer at all.
+        if prompt is None and slot_type.get(slot) in _FISCAL_YEAR_ENTITY_TYPES:
+            prompt, options = year_ask.ask(
+                slot_type[slot], year_ask.known_years(validator),
+                bound=year_ask.bound_years(
+                    e.values or [e.resolved_value] for e in validated
+                    if slot_type.get(e.slot_name) in _FISCAL_YEAR_ENTITY_TYPES))
         clarify = _clarify(
             "missing_parameter",
             prompt or f"For which {slot.replace('_', ' ')}?",
@@ -2007,6 +2017,14 @@ def serve_pending_answer(
         raise ValueError(f"'{pending.query_id}' is not a resumable template")
 
     slot_type = _template_slot_types(template)
+    # A reply naming several years ("from 2022-23 to 2024-25") binds them all
+    # where the statement filters on a list (WP-6g T1c), as the same words would
+    # in the question itself; one string would bind only its latest year.
+    if (slot_type.get(pending.missing_slot) in _FISCAL_YEAR_ENTITY_TYPES
+            and pending.missing_slot in _list_slots(template["param_slots"])):
+        years = _fiscal_years_from_text(str(answer_value), validator)
+        if len(years) > 1:
+            answer_value = years
     raw_entities = {
         slot: (answer_value if slot == pending.missing_slot else pending.filled.get(slot))
         for slot in slot_type

@@ -30,6 +30,7 @@ from .entity_validator import _STATE_LEVEL_TERMS, _GEO_TYPES
 from .models import Chip, EntityCandidate, PendingClarification
 from .zones import candidate_chips, candidate_label, candidate_replies
 from . import threshold_reply
+from . import year_ask
 
 _log = logging.getLogger(__name__)
 
@@ -249,7 +250,7 @@ def _resolve_scope_widening(
     pending: PendingClarification, template_map: dict[str, dict], validator
 ) -> Resolution:
     template = template_map.get(pending.query_id)
-    slot_words = pending.missing_slot.replace("_", " ")
+    slot_words = year_ask.slot_words(pending.missing_slot)
 
     # A template may declare the broader question its slot narrows. Serve that
     # when every parameter it needs is already resolved — its own
@@ -311,7 +312,7 @@ def resolve_pending_reply(
     try:
         validator.validate(answer, pending.slot_type)
     except Exception:
-        return _unusable_reply(answer, pending)
+        return _unusable_reply(answer, pending, validator)
     return Resolution(kind=RESUME, value=answer)
 
 
@@ -322,7 +323,12 @@ def resolve_pending_reply(
 _RETRY_MAX_WORDS = 3
 
 
-def _unusable_reply(reply: str, pending: PendingClarification) -> Resolution:
+def is_year_pending(pending: PendingClarification) -> bool:
+    return pending.slot_type in year_ask.FISCAL_YEAR_TYPES
+
+
+def _unusable_reply(reply: str, pending: PendingClarification,
+                    validator=None) -> Resolution:
     """The reply answers neither the slot nor anything else we recognise.
 
     Serving whatever a confident matcher makes of a two-word fragment is the
@@ -336,18 +342,23 @@ def _unusable_reply(reply: str, pending: PendingClarification) -> Resolution:
     if pending.retried or not 0 < words <= _RETRY_MAX_WORDS:
         return Resolution(kind=FALLTHROUGH)
 
-    slot_words = pending.missing_slot.replace("_", " ")
+    slot_words = year_ask.slot_words(pending.missing_slot)
     escape = Chip(label=f'Ask "{reply}" instead', send_text=reply)
+    ask, options = f"Which {slot_words}?", candidate_chips(pending.candidates)
+    if is_year_pending(pending):
+        # The same question and year chips as the first ask (WP-6g T1c).
+        ask, options = year_ask.ask(
+            pending.slot_type, year_ask.known_years(validator),
+            bound=year_ask.bound_years(
+                v for k, v in pending.filled.items()
+                if k in ("date_range", "date_range_2") and k != pending.missing_slot))
     return Resolution(
         kind=REASK,
         reason="missing_parameter",
-        prompt=(
-            f'I still need a {slot_words} to answer "{pending.original_query}". '
-            f"Which {slot_words}?"
-        ),
+        prompt=f'I still need a {slot_words} to answer "{pending.original_query}". {ask}',
         # A disambiguation pause still knows who the choices are — re-offering
         # them beats asking an open question the user already failed to answer.
-        options=candidate_chips(pending.candidates) + [escape],
+        options=options + [escape],
         pending=pending.model_copy(update={"retried": True}, deep=True),
     )
 
@@ -374,14 +385,17 @@ def admits_reply(message: str, pending: PendingClarification, *,
     """Whether /query should read this message against the paused question.
 
     A chip tap is a complete question by construction — except a disambiguation
-    chip, whose text IS the slot value, and a threshold chip, which sends a bare
-    figure ("1 lakh"); the "other way round" chip sends a full question and
-    routes as one. A typed reply is read when it is short, or — for a threshold
-    — whenever it has a number in it, however many words surround it.
+    chip, whose text IS the slot value, a threshold chip, which sends a bare
+    figure ("1 lakh"), and a year chip, which sends a bare year ("2024-25",
+    WP-6g T1c); the "other way round" chip sends a full question and routes as
+    one. A typed reply is read when it is short, or — for a threshold —
+    whenever it has a number in it, however many words surround it.
     """
     numeric = is_numeric_pending(pending)
     if from_chip:
-        return bool(pending.candidates) or (numeric and threshold_reply.is_bare_figure(message))
+        return (bool(pending.candidates)
+                or (numeric and threshold_reply.is_bare_figure(message))
+                or (is_year_pending(pending) and year_ask.is_year_chip(message)))
     if numeric and threshold_reply.mentions_number(message):
         return True
     return len(str(message).strip().strip("?.!").split()) <= 6
