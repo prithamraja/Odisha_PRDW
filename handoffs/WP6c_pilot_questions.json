@@ -63,5 +63,14 @@
  {"n": 1056, "group": "WP-6f former refusal", "q": "Which blocks in Bargarh consistently experience delays in GPDP approvals after 30 June 2024 in 2024-25?", "expect": {"template": "PLN-022", "answers": true}},
  {"n": 1057, "group": "WP-6f former refusal", "q": "Which districts consistently experience delays in GPDP approvals after 30 June 2025 from 2023-24 to 2025-26?", "expect": {"template": "PLN-023", "answers": true}},
  {"n": 1058, "group": "WP-6f former refusal", "q": "Which themes have remained consistently among the top priorities over the last five years in Bargarh?", "expect": {"template": "PLN-041", "answers": true}},
- {"n": 1059, "group": "WP-6f former refusal", "q": "Which themes have remained consistently among the lowest priorities over the last five years in Bargarh?", "expect": {"template": "PLN-042", "answers": true}}
+ {"n": 1059, "group": "WP-6f former refusal", "q": "Which themes have remained consistently among the lowest priorities over the last five years in Bargarh?", "expect": {"template": "PLN-042", "answers": true}},
+
+ {"n": 1060, "group": "WP-6g year span", "q": "How many activities were planned from 2022-23 to 2024-25?", "expect": {"years": ["2022-2023", "2023-2024", "2024-2025"], "answers": true}},
+ {"n": 1061, "group": "WP-6g year span", "q": "Total expenditure from FY 2021-22 to FY 2023-24 in Khordha", "expect": {"years": ["2021-2022", "2022-2023", "2023-2024"], "answers": true}},
+ {"n": 1062, "group": "WP-6g year span", "q": "Blocks consistently delayed in GPDP approvals from 2023-24 to 2025-26", "reply": "30 June 2025", "expect": {"template": "PLN-022", "years": ["2023-2024", "2024-2025", "2025-2026"], "answers": true}},
+ {"n": 1063, "group": "WP-6g year span", "q": "Beneficiary trend in Barpali from 2022-23 till 2024-25", "expect": {"years": ["2022-2023", "2023-2024", "2024-2025"], "answers": true}},
+ {"n": 1064, "group": "WP-6g year span", "q": "Activities planned 2022-23 – 2024-25", "expect": {"years": ["2022-2023", "2023-2024", "2024-2025"], "answers": true}},
+ {"n": 1065, "group": "WP-6g year span", "q": "Compare expenditure in 2022-23 and 2024-25", "expect": {"years": ["2022-2023", "2024-2025"], "answers": true, "control": "still two years"}},
+ {"n": 1066, "group": "WP-6g year span", "q": "Planned cost between 2022-23 and 2024-25", "expect": {"years": ["2022-2023", "2024-2025"], "answers": true, "control": "still two years"}},
+ {"n": 1067, "group": "WP-6g year span", "q": "Planned activities in 2023-2025", "expect": {"years": ["2023-2024", "2024-2025"], "answers": true, "control": "D33.7, unchanged"}}
 ]

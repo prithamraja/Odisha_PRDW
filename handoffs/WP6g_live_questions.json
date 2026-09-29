@@ -1,0 +1,281 @@
+[
+ {
+  "n": 2001,
+  "group": "WP-6g T1c chip",
+  "q": "Andhrua untied-fund expenditure",
+  "chip": "2024-25",
+  "expect": {
+   "template": "EXP-008",
+   "years": [
+    "2024-2025"
+   ],
+   "note": "12 activities, Rs 19.06 lakh spent"
+  }
+ },
+ {
+  "n": 2002,
+  "group": "WP-6g T1c chip",
+  "q": "Barimunda planned activities count",
+  "chip": "2025-26",
+  "expect": {
+   "template": "PLN-024",
+   "years": [
+    "2025-2026"
+   ]
+  }
+ },
+ {
+  "n": 2003,
+  "group": "WP-6g T1c typed",
+  "q": "Andhrua untied-fund expenditure",
+  "reply": "FY 2024-25",
+  "expect": {
+   "template": "EXP-008",
+   "years": [
+    "2024-2025"
+   ]
+  }
+ },
+ {
+  "n": 2011,
+  "group": "WP-6g T1b tester",
+  "q": "Barimunda planned activities 2025-2026 — count?",
+  "expect": {
+   "template": "PLN-024",
+   "years": [
+    "2025-2026"
+   ]
+  }
+ },
+ {
+  "n": 2012,
+  "group": "WP-6g T1b tester",
+  "q": "Barimunda planned activities 2025-26 count",
+  "expect": {
+   "template": "PLN-024",
+   "years": [
+    "2025-2026"
+   ]
+  }
+ },
+ {
+  "n": 315,
+  "group": "WP-6g T1b Eval_1",
+  "q": "Identify districts with delayed GPDP submissions for 2024 to 2026.",
+  "expect": {
+   "template": "PLN-007"
+  }
+ },
+ {
+  "n": 1055,
+  "group": "WP-6g T3 changed row",
+  "q": "How has the beneficiary count under XV Finance Commission in Andhrua changed from 2022-23 to 2024-25?",
+  "expect": {
+   "template": "BEN-012",
+   "answers": true
+  }
+ },
+ {
+  "n": 1057,
+  "group": "WP-6g T3 changed row",
+  "q": "Which districts consistently experience delays in GPDP approvals after 30 June 2025 from 2023-24 to 2025-26?",
+  "expect": {
+   "template": "PLN-023",
+   "answers": true
+  }
+ },
+ {
+  "n": 1233,
+  "group": "WP-6g T1b gold refusal",
+  "q": "How many waste collection vehicles were repaired in 2024-25?",
+  "expect": {
+   "refusal": "SBM-SWM-033"
+  }
+ },
+ {
+  "n": 1421,
+  "group": "WP-6g T1b gold refusal",
+  "q": "What is the fund allocated under XV Finance Commission at ZP, Block and GP tiers in Khordha for 2025-26?",
+  "expect": {
+   "refusal": "SCH-004"
+  }
+ },
+ {
+  "n": 1621,
+  "group": "WP-6g T1b gold refusal",
+  "q": "What are the stage-wise completion dates for asset 509018477?",
+  "expect": {
+   "refusal": "PHY-002"
+  }
+ },
+ {
+  "n": 1622,
+  "group": "WP-6g T1b gold refusal",
+  "q": "Which assets in Attabira have not advanced a stage in the last 90 days?",
+  "expect": {
+   "refusal": "PHY-005"
+  }
+ },
+ {
+  "n": 1712,
+  "group": "WP-6g T1b gold refusal",
+  "q": "Which suspended activities in Attabira have payment vouchers dated after suspension in 2025-26?",
+  "expect": {
+   "refusal": "ALR-006"
+  }
+ },
+ {
+  "n": 1713,
+  "group": "WP-6g T1b gold refusal",
+  "q": "Which GPs in Khordha have a resource envelope allocation but no uploaded plan for 2025-26?",
+  "expect": {
+   "refusal": "ALR-010"
+  }
+ },
+ {
+  "n": 1714,
+  "group": "WP-6g T1b gold refusal",
+  "q": "Which activities in Begunia have been ongoing longer than their planned duration in 2025-26?",
+  "expect": {
+   "refusal": "ALR-007"
+  }
+ },
+ {
+  "n": 1715,
+  "group": "WP-6g T1b gold refusal",
+  "q": "How many beneficiary records in Andhrua are missing the village field for 2024-25?",
+  "expect": {
+   "refusal": "DQY-005"
+  }
+ },
+ {
+  "n": 1956,
+  "group": "WP-6g T1b gold refusal",
+  "q": "Which GPs in Attabira could reach the next PAI grade with the smallest score improvement, and on which themes are they weakest?",
+  "expect": {
+   "refusal": "DSS-004"
+  }
+ },
+ {
+  "n": 1973,
+  "group": "WP-6g T1b gold refusal",
+  "q": "What is the village-wise count of beneficiaries in Andhrua under NSAP for 2024-2025?",
+  "expect": {
+   "refusal": "BEN-002"
+  }
+ },
+ {
+  "n": 1974,
+  "group": "WP-6g T1b gold refusal",
+  "q": "2024-2025 ରେ ଆନ୍ଧ୍ରୁଆରେ କେତେ ହିତାଧିକାରୀ ପେନସନ ପାଇଛନ୍ତି?",
+  "expect": {
+   "refusal": "BEN-010"
+  }
+ },
+ {
+  "n": 1060,
+  "group": "WP-6g year span",
+  "q": "How many activities were planned from 2022-23 to 2024-25?",
+  "expect": {
+   "years": [
+    "2022-2023",
+    "2023-2024",
+    "2024-2025"
+   ],
+   "answers": true
+  }
+ },
+ {
+  "n": 1061,
+  "group": "WP-6g year span",
+  "q": "Total expenditure from FY 2021-22 to FY 2023-24 in Khordha",
+  "expect": {
+   "years": [
+    "2021-2022",
+    "2022-2023",
+    "2023-2024"
+   ],
+   "answers": true
+  }
+ },
+ {
+  "n": 1062,
+  "group": "WP-6g year span",
+  "q": "Blocks consistently delayed in GPDP approvals from 2023-24 to 2025-26",
+  "reply": "30 June 2025",
+  "expect": {
+   "template": "PLN-022",
+   "years": [
+    "2023-2024",
+    "2024-2025",
+    "2025-2026"
+   ],
+   "answers": true
+  }
+ },
+ {
+  "n": 1063,
+  "group": "WP-6g year span",
+  "q": "Beneficiary trend in Barpali from 2022-23 till 2024-25",
+  "expect": {
+   "years": [
+    "2022-2023",
+    "2023-2024",
+    "2024-2025"
+   ],
+   "answers": true
+  }
+ },
+ {
+  "n": 1064,
+  "group": "WP-6g year span",
+  "q": "Activities planned 2022-23 – 2024-25",
+  "expect": {
+   "years": [
+    "2022-2023",
+    "2023-2024",
+    "2024-2025"
+   ],
+   "answers": true
+  }
+ },
+ {
+  "n": 1065,
+  "group": "WP-6g year span",
+  "q": "Compare expenditure in 2022-23 and 2024-25",
+  "expect": {
+   "years": [
+    "2022-2023",
+    "2024-2025"
+   ],
+   "answers": true,
+   "control": "still two years"
+  }
+ },
+ {
+  "n": 1066,
+  "group": "WP-6g year span",
+  "q": "Planned cost between 2022-23 and 2024-25",
+  "expect": {
+   "years": [
+    "2022-2023",
+    "2024-2025"
+   ],
+   "answers": true,
+   "control": "still two years"
+  }
+ },
+ {
+  "n": 1067,
+  "group": "WP-6g year span",
+  "q": "Planned activities in 2023-2025",
+  "expect": {
+   "years": [
+    "2023-2024",
+    "2024-2025"
+   ],
+   "answers": true,
+   "control": "D33.7, unchanged"
+  }
+ }
+]

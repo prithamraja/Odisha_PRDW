@@ -1,0 +1,1055 @@
+[
+ {
+  "n": 2001,
+  "group": "WP-6g T1c chip",
+  "q": "Andhrua untied-fund expenditure",
+  "expect": {
+   "template": "EXP-008",
+   "years": [
+    "2024-2025"
+   ],
+   "note": "12 activities, Rs 19.06 lakh spent"
+  },
+  "t1": {
+   "q": "Andhrua untied-fund expenditure",
+   "tier": "clarify",
+   "query_id": null,
+   "years": [],
+   "entities": {},
+   "echo": null,
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": "Which year? For example 2024-25.",
+   "chips": [
+    "2025-26",
+    "2024-25",
+    "2023-24"
+   ],
+   "refusal_served": false,
+   "reranker_picks": [
+    "EXP-008",
+    "EXP-008"
+   ],
+   "error": null
+  },
+  "t2": {
+   "q": "2024-25",
+   "tier": "tier2",
+   "query_id": "EXP-008",
+   "years": [
+    "2024-2025"
+   ],
+   "entities": {
+    "date_range": "2024-2025",
+    "gp_name": "Andhrua",
+    "tied_untied": "Untied"
+   },
+   "echo": "How much actual expenditure has been incurred under tied and untied funds in 2024-2025 (Andhrua GP; untied funds)?",
+   "n_rows": 1,
+   "rows_sample": [
+    {
+     "tied_untied": "Untied",
+     "activities": 12,
+     "sanctioned_amount": "1936848.00",
+     "actual_expenditure": "1905636.00",
+     "pct_utilised": 98.39
+    }
+   ],
+   "ask": null,
+   "chips": [],
+   "refusal_served": false,
+   "reranker_picks": [],
+   "error": null
+  }
+ },
+ {
+  "n": 2002,
+  "group": "WP-6g T1c chip",
+  "q": "Barimunda planned activities count",
+  "expect": {
+   "template": "PLN-024",
+   "years": [
+    "2025-2026"
+   ]
+  },
+  "t1": {
+   "q": "Barimunda planned activities count",
+   "tier": "clarify",
+   "query_id": null,
+   "years": [],
+   "entities": {},
+   "echo": null,
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": "Which year? For example 2024-25.",
+   "chips": [
+    "2025-26",
+    "2024-25",
+    "2023-24"
+   ],
+   "refusal_served": false,
+   "reranker_picks": [
+    "PLN-024"
+   ],
+   "error": null
+  },
+  "t2": {
+   "q": "2025-26",
+   "tier": "tier2",
+   "query_id": "PLN-024",
+   "years": [
+    "2025-2026"
+   ],
+   "entities": {
+    "date_range": "2025-2026",
+    "gp_name": "Barimunda"
+   },
+   "echo": "How many activities are planned under each GPDP theme in Barimunda in 2025-2026?",
+   "n_rows": 7,
+   "rows_sample": [
+    {
+     "theme": "Theme 6 - Self-sufficient Infrastructure in Village",
+     "planned_activities": 53,
+     "planned_cost": 959608.0
+    },
+    {
+     "theme": "Theme 5 - Clean and Green Village ",
+     "planned_activities": 27,
+     "planned_cost": 640487.0
+    },
+    {
+     "theme": "Theme 3 - Child Friendly Village",
+     "planned_activities": 14,
+     "planned_cost": 280000.0
+    }
+   ],
+   "ask": null,
+   "chips": [],
+   "refusal_served": false,
+   "reranker_picks": [],
+   "error": null
+  }
+ },
+ {
+  "n": 2003,
+  "group": "WP-6g T1c typed",
+  "q": "Andhrua untied-fund expenditure",
+  "expect": {
+   "template": "EXP-008",
+   "years": [
+    "2024-2025"
+   ]
+  },
+  "t1": {
+   "q": "Andhrua untied-fund expenditure",
+   "tier": "clarify",
+   "query_id": null,
+   "years": [],
+   "entities": {},
+   "echo": null,
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": "Which year? For example 2024-25.",
+   "chips": [
+    "2025-26",
+    "2024-25",
+    "2023-24"
+   ],
+   "refusal_served": false,
+   "reranker_picks": [
+    "EXP-008",
+    "EXP-008"
+   ],
+   "error": null
+  },
+  "t2": {
+   "q": "FY 2024-25",
+   "tier": "tier2",
+   "query_id": "EXP-008",
+   "years": [
+    "2024-2025"
+   ],
+   "entities": {
+    "date_range": "2024-2025",
+    "gp_name": "Andhrua",
+    "tied_untied": "Untied"
+   },
+   "echo": "How much actual expenditure has been incurred under tied and untied funds in 2024-2025 (Andhrua GP; untied funds)?",
+   "n_rows": 1,
+   "rows_sample": [
+    {
+     "tied_untied": "Untied",
+     "activities": 12,
+     "sanctioned_amount": "1936848.00",
+     "actual_expenditure": "1905636.00",
+     "pct_utilised": 98.39
+    }
+   ],
+   "ask": null,
+   "chips": [],
+   "refusal_served": false,
+   "reranker_picks": [
+    "no_match"
+   ],
+   "error": null
+  }
+ },
+ {
+  "n": 2011,
+  "group": "WP-6g T1b tester",
+  "q": "Barimunda planned activities 2025-2026 — count?",
+  "expect": {
+   "template": "PLN-024",
+   "years": [
+    "2025-2026"
+   ]
+  },
+  "t1": {
+   "q": "Barimunda planned activities 2025-2026 — count?",
+   "tier": "tier2",
+   "query_id": "PLN-024",
+   "years": [
+    "2025-2026"
+   ],
+   "entities": {
+    "date_range": "2025-2026",
+    "gp_name": "Barimunda"
+   },
+   "echo": "How many activities are planned under each GPDP theme in Barimunda in 2025-2026?",
+   "n_rows": 7,
+   "rows_sample": [
+    {
+     "theme": "Theme 6 - Self-sufficient Infrastructure in Village",
+     "planned_activities": 53,
+     "planned_cost": 959608.0
+    },
+    {
+     "theme": "Theme 5 - Clean and Green Village ",
+     "planned_activities": 27,
+     "planned_cost": 640487.0
+    },
+    {
+     "theme": "Theme 4 - Water Sufficient Village",
+     "planned_activities": 14,
+     "planned_cost": 881734.0
+    }
+   ],
+   "ask": null,
+   "chips": [],
+   "refusal_served": false,
+   "reranker_picks": [
+    "PLN-024"
+   ],
+   "error": null
+  }
+ },
+ {
+  "n": 2012,
+  "group": "WP-6g T1b tester",
+  "q": "Barimunda planned activities 2025-26 count",
+  "expect": {
+   "template": "PLN-024",
+   "years": [
+    "2025-2026"
+   ]
+  },
+  "t1": {
+   "q": "Barimunda planned activities 2025-26 count",
+   "tier": "tier2",
+   "query_id": "PLN-024",
+   "years": [
+    "2025-2026"
+   ],
+   "entities": {
+    "date_range": "2025-2026",
+    "gp_name": "Barimunda"
+   },
+   "echo": "How many activities are planned under each GPDP theme in Barimunda in 2025-2026?",
+   "n_rows": 7,
+   "rows_sample": [
+    {
+     "theme": "Theme 6 - Self-sufficient Infrastructure in Village",
+     "planned_activities": 53,
+     "planned_cost": 959608.0
+    },
+    {
+     "theme": "Theme 5 - Clean and Green Village ",
+     "planned_activities": 27,
+     "planned_cost": 640487.0
+    },
+    {
+     "theme": "Theme 3 - Child Friendly Village",
+     "planned_activities": 14,
+     "planned_cost": 280000.0
+    }
+   ],
+   "ask": null,
+   "chips": [],
+   "refusal_served": false,
+   "reranker_picks": [
+    "PLN-024"
+   ],
+   "error": null
+  }
+ },
+ {
+  "n": 315,
+  "group": "WP-6g T1b Eval_1",
+  "q": "Identify districts with delayed GPDP submissions for 2024 to 2026.",
+  "expect": {
+   "template": "PLN-007"
+  },
+  "t1": {
+   "q": "Identify districts with delayed GPDP submissions for 2024 to 2026.",
+   "tier": "tier2",
+   "query_id": "PLN-007",
+   "years": [
+    "2024-2025",
+    "2025-2026"
+   ],
+   "entities": {
+    "date_range": [
+     "2024-2025",
+     "2025-2026"
+    ],
+    "top_n": "10"
+   },
+   "echo": "Which Districts have the lowest GPDP submission rate in 2024-2025 and 2025-2026 (bottom 10)? (2024-2025 and 2025-2026 combined)",
+   "n_rows": 9,
+   "rows_sample": [
+    {
+     "district_name": "Ganjam",
+     "total_gps": 4,
+     "gps_uploaded": 4,
+     "pct_uploaded": 100.0
+    },
+    {
+     "district_name": "Bargarh",
+     "total_gps": 4,
+     "gps_uploaded": 4,
+     "pct_uploaded": 100.0
+    },
+    {
+     "district_name": "Khordha",
+     "total_gps": 3,
+     "gps_uploaded": 3,
+     "pct_uploaded": 100.0
+    }
+   ],
+   "ask": null,
+   "chips": [],
+   "refusal_served": false,
+   "reranker_picks": [
+    "PLN-007"
+   ],
+   "error": null
+  }
+ },
+ {
+  "n": 1055,
+  "group": "WP-6g T3 changed row",
+  "q": "How has the beneficiary count under XV Finance Commission in Andhrua changed from 2022-23 to 2024-25?",
+  "expect": {
+   "template": "BEN-012",
+   "answers": true
+  },
+  "t1": {
+   "q": "How has the beneficiary count under XV Finance Commission in Andhrua changed from 2022-23 to 2024-25?",
+   "tier": "tier2",
+   "query_id": "BEN-012",
+   "years": [
+    "2022-2023",
+    "2023-2024",
+    "2024-2025"
+   ],
+   "entities": {
+    "date_range": [
+     "2022-2023",
+     "2023-2024",
+     "2024-2025"
+    ],
+    "gp_name": "Andhrua",
+    "scheme": "XV Finance Commission"
+   },
+   "echo": "How has the beneficiary count under 15th Finance Commission (CFC) in Andhrua changed over 2022-2023, 2023-2024 and 2024-2025?",
+   "n_rows": 0,
+   "rows_sample": [],
+   "ask": null,
+   "chips": [],
+   "refusal_served": false,
+   "reranker_picks": [
+    "BEN-012"
+   ],
+   "error": null
+  }
+ },
+ {
+  "n": 1057,
+  "group": "WP-6g T3 changed row",
+  "q": "Which districts consistently experience delays in GPDP approvals after 30 June 2025 from 2023-24 to 2025-26?",
+  "expect": {
+   "template": "PLN-023",
+   "answers": true
+  },
+  "t1": {
+   "q": "Which districts consistently experience delays in GPDP approvals after 30 June 2025 from 2023-24 to 2025-26?",
+   "tier": "tier2",
+   "query_id": "PLN-023",
+   "years": [
+    "2023-2024",
+    "2024-2025",
+    "2025-2026"
+   ],
+   "entities": {
+    "date_range": [
+     "2023-2024",
+     "2024-2025",
+     "2025-2026"
+    ],
+    "deadline": "2025-06-30",
+    "top_n": "10"
+   },
+   "echo": "Which Districts consistently experience delays in GPDP approvals after the deadline 2025-06-30 in 2023-2024, 2024-2025 and 2025-2026 (top 10)?",
+   "n_rows": 9,
+   "rows_sample": [
+    {
+     "district_name": "Kandhamal",
+     "gps": 3,
+     "gps_late": 1,
+     "pct_late": 33.33,
+     "years_counted": 3,
+     "years_mostly_late": 1
+    },
+    {
+     "district_name": "Cuttack",
+     "gps": 6,
+     "gps_late": 1,
+     "pct_late": 16.67,
+     "years_counted": 3,
+     "years_mostly_late": 0
+    },
+    {
+     "district_name": "Bargarh",
+     "gps": 12,
+     "gps_late": 0,
+     "pct_late": 0.0,
+     "years_counted": 3,
+     "years_mostly_late": 0
+    }
+   ],
+   "ask": null,
+   "chips": [],
+   "refusal_served": false,
+   "reranker_picks": [
+    "PLN-023"
+   ],
+   "error": null
+  }
+ },
+ {
+  "n": 1233,
+  "group": "WP-6g T1b gold refusal",
+  "q": "How many waste collection vehicles were repaired in 2024-25?",
+  "expect": {
+   "refusal": "SBM-SWM-033"
+  },
+  "t1": {
+   "q": "How many waste collection vehicles were repaired in 2024-25?",
+   "tier": "fallback",
+   "query_id": "SBM-SWM-033",
+   "years": [],
+   "entities": {},
+   "echo": "How many such vehicles have been repaired in a given year?",
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": null,
+   "chips": [],
+   "refusal_served": true,
+   "reranker_picks": [
+    "SBM-SWM-033"
+   ],
+   "error": null
+  }
+ },
+ {
+  "n": 1421,
+  "group": "WP-6g T1b gold refusal",
+  "q": "What is the fund allocated under XV Finance Commission at ZP, Block and GP tiers in Khordha for 2025-26?",
+  "expect": {
+   "refusal": "SCH-004"
+  },
+  "t1": {
+   "q": "What is the fund allocated under XV Finance Commission at ZP, Block and GP tiers in Khordha for 2025-26?",
+   "tier": "fallback",
+   "query_id": "SCH-004",
+   "years": [],
+   "entities": {},
+   "echo": "What is the fund allocated under a given Scheme at ZP, Block, and GP tiers in a given District for a given Plan Year?",
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": null,
+   "chips": [],
+   "refusal_served": true,
+   "reranker_picks": [
+    "SCH-004"
+   ],
+   "error": null
+  }
+ },
+ {
+  "n": 1621,
+  "group": "WP-6g T1b gold refusal",
+  "q": "What are the stage-wise completion dates for asset 509018477?",
+  "expect": {
+   "refusal": "PHY-002"
+  },
+  "t1": {
+   "q": "What are the stage-wise completion dates for asset 509018477?",
+   "tier": "fallback",
+   "query_id": "PHY-002",
+   "years": [],
+   "entities": {},
+   "echo": "What are the stage-wise completion dates for asset a given Asset Code?",
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": null,
+   "chips": [],
+   "refusal_served": true,
+   "reranker_picks": [
+    "PHY-002"
+   ],
+   "error": null
+  }
+ },
+ {
+  "n": 1622,
+  "group": "WP-6g T1b gold refusal",
+  "q": "Which assets in Attabira have not advanced a stage in the last 90 days?",
+  "expect": {
+   "refusal": "PHY-005"
+  },
+  "t1": {
+   "q": "Which assets in Attabira have not advanced a stage in the last 90 days?",
+   "tier": "fallback",
+   "query_id": "PHY-005",
+   "years": [],
+   "entities": {},
+   "echo": "Which assets in a given Block have not advanced a stage in the last a given Threshold days?",
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": null,
+   "chips": [],
+   "refusal_served": true,
+   "reranker_picks": [
+    "PHY-005"
+   ],
+   "error": null
+  }
+ },
+ {
+  "n": 1712,
+  "group": "WP-6g T1b gold refusal",
+  "q": "Which suspended activities in Attabira have payment vouchers dated after suspension in 2025-26?",
+  "expect": {
+   "refusal": "ALR-006"
+  },
+  "t1": {
+   "q": "Which suspended activities in Attabira have payment vouchers dated after suspension in 2025-26?",
+   "tier": "fallback",
+   "query_id": "ALR-006",
+   "years": [],
+   "entities": {},
+   "echo": "Which suspended activities in a given Block have payment vouchers dated after suspension in a given year?",
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": null,
+   "chips": [],
+   "refusal_served": true,
+   "reranker_picks": [
+    "ALR-006"
+   ],
+   "error": null
+  }
+ },
+ {
+  "n": 1713,
+  "group": "WP-6g T1b gold refusal",
+  "q": "Which GPs in Khordha have a resource envelope allocation but no uploaded plan for 2025-26?",
+  "expect": {
+   "refusal": "ALR-010"
+  },
+  "t1": {
+   "q": "Which GPs in Khordha have a resource envelope allocation but no uploaded plan for 2025-26?",
+   "tier": "fallback",
+   "query_id": "ALR-010",
+   "years": [],
+   "entities": {},
+   "echo": "Which GPs in a given District have a resource envelope allocation but no uploaded plan for a given Plan Year?",
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": null,
+   "chips": [],
+   "refusal_served": true,
+   "reranker_picks": [
+    "ALR-010"
+   ],
+   "error": null
+  }
+ },
+ {
+  "n": 1714,
+  "group": "WP-6g T1b gold refusal",
+  "q": "Which activities in Begunia have been ongoing longer than their planned duration in 2025-26?",
+  "expect": {
+   "refusal": "ALR-007"
+  },
+  "t1": {
+   "q": "Which activities in Begunia have been ongoing longer than their planned duration in 2025-26?",
+   "tier": "fallback",
+   "query_id": "ALR-007",
+   "years": [],
+   "entities": {},
+   "echo": "Which activities in a given Block have been ongoing longer than their planned duration in a given year?",
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": null,
+   "chips": [],
+   "refusal_served": true,
+   "reranker_picks": [
+    "ALR-007"
+   ],
+   "error": null
+  }
+ },
+ {
+  "n": 1715,
+  "group": "WP-6g T1b gold refusal",
+  "q": "How many beneficiary records in Andhrua are missing the village field for 2024-25?",
+  "expect": {
+   "refusal": "DQY-005"
+  },
+  "t1": {
+   "q": "How many beneficiary records in Andhrua are missing the village field for 2024-25?",
+   "tier": "fallback",
+   "query_id": "DQY-005",
+   "years": [],
+   "entities": {},
+   "echo": "How many beneficiary records in a given GP Name are missing the village field for a given Plan Year?",
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": null,
+   "chips": [],
+   "refusal_served": true,
+   "reranker_picks": [
+    "DQY-005"
+   ],
+   "error": null
+  }
+ },
+ {
+  "n": 1956,
+  "group": "WP-6g T1b gold refusal",
+  "q": "Which GPs in Attabira could reach the next PAI grade with the smallest score improvement, and on which themes are they weakest?",
+  "expect": {
+   "refusal": "DSS-004"
+  },
+  "t1": {
+   "q": "Which GPs in Attabira could reach the next PAI grade with the smallest score improvement, and on which themes are they weakest?",
+   "tier": "fallback",
+   "query_id": "DSS-004",
+   "years": [],
+   "entities": {},
+   "echo": "Which GPs in a given Block could reach the next PAI grade with the smallest score improvement, and on which themes are they weakest in a given year?",
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": null,
+   "chips": [],
+   "refusal_served": true,
+   "reranker_picks": [
+    "DSS-004"
+   ],
+   "error": null
+  }
+ },
+ {
+  "n": 1973,
+  "group": "WP-6g T1b gold refusal",
+  "q": "What is the village-wise count of beneficiaries in Andhrua under NSAP for 2024-2025?",
+  "expect": {
+   "refusal": "BEN-002"
+  },
+  "t1": {
+   "q": "What is the village-wise count of beneficiaries in Andhrua under NSAP for 2024-2025?",
+   "tier": "fallback",
+   "query_id": "BEN-002",
+   "years": [],
+   "entities": {},
+   "echo": "What is the village-wise count of beneficiaries in a given GP Name under a given Scheme for a given Plan Year?",
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": null,
+   "chips": [],
+   "refusal_served": true,
+   "reranker_picks": [
+    "BEN-002"
+   ],
+   "error": null
+  }
+ },
+ {
+  "n": 1974,
+  "group": "WP-6g T1b gold refusal",
+  "q": "2024-2025 ରେ ଆନ୍ଧ୍ରୁଆରେ କେତେ ହିତାଧିକାରୀ ପେନସନ ପାଇଛନ୍ତି?",
+  "expect": {
+   "refusal": "BEN-010"
+  },
+  "t1": {
+   "q": "2024-2025 ରେ ଆନ୍ଧ୍ରୁଆରେ କେତେ ହିତାଧିକାରୀ ପେନସନ ପାଇଛନ୍ତି?",
+   "tier": "clarify",
+   "query_id": null,
+   "years": [],
+   "entities": {},
+   "echo": null,
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": "What would you like to know about Andhrua?",
+   "chips": [
+    "What is the status of the GPDP for Andhrua in 2025-2026?",
+    "What is the total actual expenditure incurred by Andhrua in 2025-2026?",
+    "How has the total actual expenditure of Andhrua changed over the years?",
+    "How many activities in Andhrua are in each progress status for 2025-2026?"
+   ],
+   "refusal_served": false,
+   "reranker_picks": [
+    "no_match"
+   ],
+   "error": null
+  }
+ },
+ {
+  "n": 1060,
+  "group": "WP-6g year span",
+  "q": "How many activities were planned from 2022-23 to 2024-25?",
+  "expect": {
+   "years": [
+    "2022-2023",
+    "2023-2024",
+    "2024-2025"
+   ],
+   "answers": true
+  },
+  "t1": {
+   "q": "How many activities were planned from 2022-23 to 2024-25?",
+   "tier": "clarify",
+   "query_id": null,
+   "years": [],
+   "entities": {},
+   "echo": null,
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": "I couldn't match that exactly. Did you mean one of these?",
+   "chips": [
+    "How many activities are planned under each GPDP theme in a gram panchayat in 2024-2025?",
+    "How many activities in a gram panchayat are in each progress status for 2024-2025?",
+    "Are the planned activities balanced across themes in 2024-2025?"
+   ],
+   "refusal_served": false,
+   "reranker_picks": [
+    "no_match"
+   ],
+   "error": null
+  },
+  "graded": "clarify"
+ },
+ {
+  "n": 1061,
+  "group": "WP-6g year span",
+  "q": "Total expenditure from FY 2021-22 to FY 2023-24 in Khordha",
+  "expect": {
+   "years": [
+    "2021-2022",
+    "2022-2023",
+    "2023-2024"
+   ],
+   "answers": true
+  },
+  "t1": {
+   "q": "Total expenditure from FY 2021-22 to FY 2023-24 in Khordha",
+   "tier": "clarify",
+   "query_id": null,
+   "years": [],
+   "entities": {},
+   "echo": null,
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": "I couldn't match that exactly. Did you mean one of these?",
+   "chips": [
+    "How did the total expenditure of Khordha district change between 2021-2022 and 2023-2024 (as one total)?",
+    "How does Khordha district compare with the state average on expenditure per GP and completion rate for 2023-2024 (as one total)?",
+    "What is the total amount recorded per scheme across Khordha district in 2023-2024 (as one total)?"
+   ],
+   "refusal_served": false,
+   "reranker_picks": [
+    "no_match"
+   ],
+   "error": null
+  },
+  "graded": "clarify"
+ },
+ {
+  "n": 1062,
+  "group": "WP-6g year span",
+  "q": "Blocks consistently delayed in GPDP approvals from 2023-24 to 2025-26",
+  "expect": {
+   "template": "PLN-022",
+   "years": [
+    "2023-2024",
+    "2024-2025",
+    "2025-2026"
+   ],
+   "answers": true
+  },
+  "t1": {
+   "q": "Blocks consistently delayed in GPDP approvals from 2023-24 to 2025-26",
+   "tier": "clarify",
+   "query_id": null,
+   "years": [],
+   "entities": {},
+   "echo": null,
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": "I couldn't match that exactly. Did you mean one of these?",
+   "chips": [
+    "Which Blocks consistently experience delays in GPDP approvals after the deadline a deadline in 2025-2026?",
+    "Which Blocks have the highest number of pending GPDP approvals in 2025-2026?",
+    "Which Districts consistently experience delays in GPDP approvals after the deadline a deadline in 2025-2026?"
+   ],
+   "refusal_served": false,
+   "reranker_picks": [
+    "no_match"
+   ],
+   "error": null
+  },
+  "t2": {
+   "q": "30 June 2025",
+   "tier": "clarify",
+   "query_id": null,
+   "years": [],
+   "entities": {},
+   "echo": null,
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": "I couldn't match that exactly. Did you mean one of these?",
+   "chips": [
+    "How many GPs uploaded the GPDP before and how many after the deadline 2025-06-30 in 2025-2026?",
+    "Which administratively approved activities in a block have a missing sanction order date or authority in 2025-2026?",
+    "What is the total unspent amount (planned minus actual) in 2025-2026?"
+   ],
+   "refusal_served": false,
+   "reranker_picks": [
+    "no_match"
+   ],
+   "error": null
+  },
+  "graded": "clarify"
+ },
+ {
+  "n": 1063,
+  "group": "WP-6g year span",
+  "q": "Beneficiary trend in Barpali from 2022-23 till 2024-25",
+  "expect": {
+   "years": [
+    "2022-2023",
+    "2023-2024",
+    "2024-2025"
+   ],
+   "answers": true
+  },
+  "t1": {
+   "q": "Beneficiary trend in Barpali from 2022-23 till 2024-25",
+   "tier": "clarify",
+   "query_id": null,
+   "years": [],
+   "entities": {},
+   "echo": null,
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": "I couldn't match that exactly. Did you mean one of these?",
+   "chips": [
+    "How many beneficiaries are recorded across GPs of Barpali block under a scheme for 2024-2025?",
+    "How has the beneficiary count under a scheme in Barpali block changed over 2024-2025?",
+    "How many beneficiaries received benefits under a scheme in Barpali block during 2024-2025?"
+   ],
+   "refusal_served": false,
+   "reranker_picks": [
+    "no_match"
+   ],
+   "error": null
+  },
+  "graded": "clarify"
+ },
+ {
+  "n": 1064,
+  "group": "WP-6g year span",
+  "q": "Activities planned 2022-23 – 2024-25",
+  "expect": {
+   "years": [
+    "2022-2023",
+    "2023-2024",
+    "2024-2025"
+   ],
+   "answers": true
+  },
+  "t1": {
+   "q": "Activities planned 2022-23 – 2024-25",
+   "tier": "clarify",
+   "query_id": null,
+   "years": [],
+   "entities": {},
+   "echo": null,
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": "I couldn't match that exactly. Did you mean one of these?",
+   "chips": [
+    "What activities are planned under a focus area in 2024-2025?",
+    "Are the planned activities balanced across themes in 2024-2025?",
+    "Compare the activities planned and started theme-wise between 2022-2023 and 2024-2025."
+   ],
+   "refusal_served": false,
+   "reranker_picks": [
+    "no_match"
+   ],
+   "error": null
+  },
+  "graded": "clarify"
+ },
+ {
+  "n": 1065,
+  "group": "WP-6g year span",
+  "q": "Compare expenditure in 2022-23 and 2024-25",
+  "expect": {
+   "years": [
+    "2022-2023",
+    "2024-2025"
+   ],
+   "answers": true,
+   "control": "still two years"
+  },
+  "t1": {
+   "q": "Compare expenditure in 2022-23 and 2024-25",
+   "tier": "tier2",
+   "query_id": "TRD-002",
+   "years": [
+    "2022-2023",
+    "2024-2025"
+   ],
+   "entities": {
+    "date_range": "2024-2025",
+    "date_range_2": "2022-2023"
+   },
+   "echo": "Compare the approved cost and expenditure theme-wise between 2022-2023 and 2024-2025.",
+   "n_rows": 7,
+   "rows_sample": [
+    {
+     "theme": "Theme 6 - Self-sufficient Infrastructure in Village",
+     "approved_cost_year1": "24438395.00",
+     "approved_cost_year2": "35803908.00",
+     "expenditure_year1": "16130157.00",
+     "expenditure_year2": "15207331.60"
+    },
+    {
+     "theme": "Theme 4 - Water Sufficient Village",
+     "approved_cost_year1": "18265019.00",
+     "approved_cost_year2": "43521476.00",
+     "expenditure_year1": "11531190.00",
+     "expenditure_year2": "13577107.00"
+    },
+    {
+     "theme": "Theme 5 - Clean and Green Village ",
+     "approved_cost_year1": "20166356.00",
+     "approved_cost_year2": "18246099.00",
+     "expenditure_year1": "8650466.00",
+     "expenditure_year2": "9663306.00"
+    }
+   ],
+   "ask": null,
+   "chips": [],
+   "refusal_served": false,
+   "reranker_picks": [
+    "TRD-002"
+   ],
+   "error": null
+  },
+  "graded": "correct"
+ },
+ {
+  "n": 1066,
+  "group": "WP-6g year span",
+  "q": "Planned cost between 2022-23 and 2024-25",
+  "expect": {
+   "years": [
+    "2022-2023",
+    "2024-2025"
+   ],
+   "answers": true,
+   "control": "still two years"
+  },
+  "t1": {
+   "q": "Planned cost between 2022-23 and 2024-25",
+   "tier": "clarify",
+   "query_id": null,
+   "years": [],
+   "entities": {},
+   "echo": null,
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": "I couldn't match that exactly. Did you mean one of these?",
+   "chips": [
+    "How much planned expenditure is allocated to each GPDP theme in 2024-2025?",
+    "Compare the approved cost and expenditure theme-wise between 2022-2023 and 2024-2025.",
+    "Compare the activities planned and started theme-wise between 2022-2023 and 2024-2025."
+   ],
+   "refusal_served": false,
+   "reranker_picks": [
+    "no_match"
+   ],
+   "error": null
+  },
+  "graded": "clarify"
+ },
+ {
+  "n": 1067,
+  "group": "WP-6g year span",
+  "q": "Planned activities in 2023-2025",
+  "expect": {
+   "years": [
+    "2023-2024",
+    "2024-2025"
+   ],
+   "answers": true,
+   "control": "D33.7, unchanged"
+  },
+  "t1": {
+   "q": "Planned activities in 2023-2025",
+   "tier": "clarify",
+   "query_id": null,
+   "years": [],
+   "entities": {},
+   "echo": null,
+   "n_rows": null,
+   "rows_sample": [],
+   "ask": "I couldn't match that exactly. Did you mean one of these?",
+   "chips": [
+    "How many activities are planned under each GPDP theme in a gram panchayat in 2024-2025?",
+    "Which focus area has the highest number of planned activities in 2024-2025?",
+    "Are the planned activities balanced across themes in 2024-2025?"
+   ],
+   "refusal_served": false,
+   "reranker_picks": [
+    "no_match"
+   ],
+   "error": null
+  },
+  "graded": "clarify"
+ }
+]

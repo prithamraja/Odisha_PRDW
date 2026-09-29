@@ -58,6 +58,13 @@ THE WP-6f ROWS (1045 on, group "WP-6f former refusal") are the sixth: one
 question per template migration M7 made out of a refusal, each of which must be
 ANSWERED by that template. See `grade_wp6f`.
 
+THE WP-6g ROWS (1060 on, group "WP-6g year span") are the seventh: "from X to
+Y" between fiscal years must bind every year from X to Y, and the three controls
+("compare … and …", "between … and …", "in 2023-2025") exactly the years they
+bound before. Graded on the YEARS bound, across `$date_range` and
+`$date_range_2`, on the final turn; a template is checked only where the row
+names one. See `grade_wp6g`.
+
 Chips are mapped back to template ids by their wording, the way the PM read
 them, and an id stands for its FAMILY — the templates with identical SQL and
 slots in `rerank_context` (PLN-025/027/029 are one statement at three scopes).
@@ -482,9 +489,62 @@ def grade_wp6f(record: dict) -> dict:
     return row
 
 
+# ── The WP-6g rows (the seventh standing group, 1060 on) ──────────────────────
+
+def _years_bound(record: dict) -> list[str]:
+    years: set[str] = set()
+    for slot, value in _bound(record).items():
+        if slot in ("date_range", "date_range_2") and value:
+            values = value if isinstance(value, list) else str(value).split(",")
+            years.update(str(v).strip() for v in values)
+    return sorted(years)
+
+
+def grade_wp6g(record: dict) -> dict:
+    """One graded CSV row for one WP-6g year-span record: answered, with exactly
+    the expected years bound (and the named template, where there is one)."""
+    expect = record.get("expect") or {}
+    turn2 = record.get("turn2")
+    final = turn2 if turn2 is not None else record
+    row = {"eval_row": int(record["n"]), "question_group": record.get("group", "WP-6g"),
+           "question": record.get("q", "") + (f"  ->  {turn2.get('q')}" if turn2 else ""),
+           "expected_template_ids": expect.get("template") or "",
+           "expected_template_question":
+               TEMPLATE_CATALOG.get(expect.get("template"), {}).get("abstract_question", ""),
+           "served_template_id": final.get("query_id") or "", "served_question": "",
+           "bound_filters": "", "outcome": "incorrect", "note": ""}
+    notes: list[str] = [f"expects {', '.join(expect.get('years') or [])}"]
+    bound = _bound(final)
+    row["bound_filters"] = json.dumps(bound, ensure_ascii=False) if bound else ""
+    query_id = final.get("query_id")
+    if final.get("error") or record.get("error"):
+        notes.append(f"error: {(final.get('error') or record.get('error'))[:80]}")
+    elif query_id and str(final.get("tier") or "").startswith("tier"):
+        row["served_question"] = final.get("query_description") or ""
+        years = _years_bound(final)
+        right_years = years == sorted(expect.get("years") or [])
+        right_template = (not expect.get("template")
+                          or expect["template"] in family(query_id))
+        row["outcome"] = "correct" if right_years and right_template else "incorrect"
+        notes.append(f"served {query_id}, {final.get('n_rows')} rows, years "
+                     f"{', '.join(years) or 'none'}")
+    elif query_id in UNANSWERABLE_CATALOG:
+        notes.append(f"SERVED A REFUSAL: {query_id}")
+    elif final.get("clarification"):
+        clar = final["clarification"]
+        row["served_question"] = f"(asked {clar.get('reason')}: {(clar.get('prompt') or '')[:70]})"
+        row["outcome"] = "clarify"
+    else:
+        notes.append(f"declined: {(final.get('answer') or '')[:60]}")
+    row["note"] = "; ".join(notes)
+    return row
+
+
 def grade(record: dict) -> dict:
     """One graded CSV row for one replay record."""
     n = int(record["n"])
+    if str(record.get("group", "")).startswith("WP-6g"):
+        return grade_wp6g(record)
     if str(record.get("group", "")).startswith("WP-6f"):
         return grade_wp6f(record)
     if str(record.get("group", "")).startswith("WP-6d"):
