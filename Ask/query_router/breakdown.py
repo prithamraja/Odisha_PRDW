@@ -140,6 +140,42 @@ def group_by_from_text(text: str) -> str | None:
     return None
 
 
+# ── A plain count of planned activities is ONE figure (WP-6f T3) ──────────────
+#
+# "What is the count of planned activities in Barpali in 2024-25?" served by
+# PLN-024 answered one row per theme — its own breakdown — though the officer
+# asked for a number. The fix is NOT a global cue: "count of / number of / how
+# many activities" is also the wording of every "which GP has the highest NUMBER
+# of planned activities" ranking and every status count, and the PM measured a
+# global rule changing the breakdown of 42 of 633 replayed questions. So it is
+# declared per template (`"plain_count_total": True` on the `$group_by` slot,
+# listed by id in tools/derive_catalog.py::PLAIN_COUNT_TOTAL) and applies only
+# when the phrase reader found nothing and no ranking word is present.
+
+_PLAIN_COUNT = re.compile(
+    r"\b(?:count|number|no\.?)\s+of\s+(?:(?:all|the)\s+)*(?:planned\s+)?activities\b"
+    r"|\bhow\s+many\s+(?:planned\s+)?activities\b",
+    re.IGNORECASE)
+_RANKING = re.compile(
+    r"\b(?:which|highest|most|lowest|least|fewest|top|bottom|rank(?:s|ed|ing)?|"
+    r"largest|smallest|maximum|minimum)\b",
+    re.IGNORECASE)
+
+
+def plain_count_total(text: str) -> bool:
+    """True when the question asks for a count of (planned) activities with no
+    breakdown cue and no ranking word — the reading that is ONE total."""
+    text = text or ""
+    return (group_by_from_text(text) is None and bool(_PLAIN_COUNT.search(text))
+            and not _RANKING.search(text))
+
+
+def declares_plain_count_total(template: dict) -> bool:
+    """The template opts in on its `$group_by` slot (PLN-024 only)."""
+    return any(s.get("name") == "group_by" and s.get("plain_count_total") is True
+               for s in template.get("param_slots") or [])
+
+
 # ── What a migrated statement says about itself ──────────────────────────────
 
 _CASE_RE = re.compile(r"CASE\s+\$group_by\b(.*?)\bEND\s+AS\s+group_label", re.S | re.I)

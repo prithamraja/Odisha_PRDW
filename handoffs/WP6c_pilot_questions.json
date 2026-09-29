@@ -41,11 +41,11 @@
  {"n": 1037, "group": "WP-6d plan-type guard", "q": "How many GPs in Bhubaneswar uploaded the GPDP after 30 June 2024 in 2024-25?", "expect": {"no_plan_type": true}},
  {"n": 1038, "group": "WP-6d plan-type guard", "q": "How many GPs have their GPDPs still pending approval for 2024 to 2026?", "expect": {"no_plan_type": true}},
 
- {"n": 1039, "group": "WP-6d block and GP", "q": "What is the count of planned activities in Kalimela in 2024?", "expect": {"place": "Kalimela block"}},
- {"n": 1040, "group": "WP-6d block and GP", "q": "What is the count of planned activities in Kalimela in 2024?", "chip": "each GPDP theme", "expect": {"template": "PLN-024", "block": "Kalimela"}},
- {"n": 1041, "group": "WP-6d block and GP", "q": "What is the count of planned activities in Bheden in 2024?", "expect": {"place": "Bheden block"}},
- {"n": 1042, "group": "WP-6d block and GP", "q": "What is the count of planned activities in Laxmipur GP in 2024?", "expect": {"place": "Laxmipur GP", "gp": "Laxmipur"}},
+ {"n": 1039, "group": "WP-6d block and GP", "q": "What is the count of planned activities in Kalimela in 2024?", "expect": {"place": "Kalimela block", "one_figure": true}},
+ {"n": 1040, "group": "WP-6d block and GP", "q": "What is the count of planned activities in Kalimela in 2024?", "chip": "each GPDP theme", "expect": {"template": "PLN-024", "block": "Kalimela", "one_figure": true}},
+ {"n": 1041, "group": "WP-6d block and GP", "q": "What is the count of planned activities in Bheden in 2024?", "expect": {"place": "Bheden block", "one_figure": true}},
+ {"n": 1042, "group": "WP-6d block and GP", "q": "What is the count of planned activities in Laxmipur GP in 2024?", "expect": {"place": "Laxmipur GP", "gp": "Laxmipur", "one_figure": true}},
 
- {"n": 1043, "group": "WP-6d plain count", "q": "What is the count of planned activities in Barpali in 2024-25?", "expect": {"answers": true}},
- {"n": 1044, "group": "WP-6d plain count", "q": "count of planned activities in Attabira in 2025-26", "expect": {"answers": true}}
+ {"n": 1043, "group": "WP-6d plain count", "q": "What is the count of planned activities in Barpali in 2024-25?", "expect": {"answers": true, "one_figure": true, "accept": ["PLN-024"]}},
+ {"n": 1044, "group": "WP-6d plain count", "q": "count of planned activities in Attabira in 2025-26", "expect": {"answers": true, "one_figure": true, "accept": ["PLN-024"]}}
 ]

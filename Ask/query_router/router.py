@@ -2198,6 +2198,18 @@ def _serve_query_id(
                 slot_name="group_by", raw_value="(comparison)",
                 resolved_value=group_by, entity_type="group_by",
                 confidence="constant")]
+        elif (breakdown.declares_plain_count_total(template)
+              and breakdown.plain_count_total(user_query)):
+            # WP-6f T3: "count of planned activities in Barpali" is one figure,
+            # not PLN-024's own per-theme table. Declared on the template only;
+            # after the comparison step, so two named places still get a row each.
+            group_by = "total"
+            _log.info("group_by='total': a plain count of activities (declared) "
+                      "query=%r", user_query[:120])
+            validated_entities = [*validated_entities, ExtractedEntity(
+                slot_name="group_by", raw_value="(plain count)",
+                resolved_value=group_by, entity_type="group_by",
+                confidence="constant")]
 
     # Build query description with resolved entity values. An Aadhaar is masked
     # to its last four digits — query_description is echoed back to the user and

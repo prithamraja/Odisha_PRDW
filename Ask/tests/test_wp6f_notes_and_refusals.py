@@ -5,10 +5,83 @@ whose data or definition exists turned into templates.
         cashbook contrast; pilot 1005 / 1007 / 1009 grade on the measure asked.
     T2  EXP-009 (and its twin EXP-011) own "compare / sector-wise tied spending
         across focus areas"; TRD-008 hands a TIED-funds question to EXP-009.
+    T3  a plain count of planned activities served by PLN-024 is ONE figure —
+        declared on PLN-024 only, never a global cue.
+
+No API key and no network: the extractor is stubbed, and every router path runs
+against the sample database.
 """
+import time
 import unittest
+from pathlib import Path
 
 from query_router.rerank_context import DESC_BY_QID
+
+_BACKEND = Path(__file__).resolve().parents[1]
+_DB_PATH = _BACKEND / "data" / "panchayat_1.duckdb"
+_STATE: dict = {}
+
+
+def _adapter():
+    if "adapter" not in _STATE:
+        from db_factory import open_analytical_db
+        _STATE["adapter"] = open_analytical_db(_DB_PATH)
+    return _STATE["adapter"]
+
+
+def _validator():
+    if "validator" not in _STATE:
+        from query_router.entity_validator import EntityValidator
+        _STATE["validator"] = EntityValidator(_adapter())
+    return _STATE["validator"]
+
+
+def tearDownModule():
+    adapter = _STATE.get("adapter")
+    if adapter is not None:
+        try:
+            adapter.close()
+        except Exception:                                    # pragma: no cover
+            pass
+
+
+def _needs_db(test):
+    return unittest.skipUnless(_DB_PATH.exists(), "no sample database")(test)
+
+
+def _answer(qid: str, question: str, extractor_says: dict):
+    """(entities, clarify, served result or None): the vector path from extraction
+    on, with the extractor stubbed to `extractor_says`."""
+    from query_router import breakdown, router, threshold_reply
+    from query_router.template_catalog import TEMPLATE_CATALOG as T
+    template = T[qid]
+    slots = template["param_slots"]
+    real = router.extract_entities
+    router.extract_entities = lambda q, asked, c, intent=None: {
+        s: extractor_says.get(s) for s in asked}
+    try:
+        raw = router._extract_slot_values(
+            question, router._template_slot_types(template), object(),
+            validator=_validator(), list_slots=router._list_slots(slots),
+            superlative_lists=router.superlative_list_slots(slots))
+    finally:
+        router.extract_entities = real
+    entities, clarify = router._fill_slots_or_clarify(
+        qid, router._template_slot_types(template), raw, _validator(),
+        question, "n", time.monotonic(),
+        optional=router.optional_slots(slots),
+        defaults=router.slot_defaults(slots),
+        list_slots=router._list_slots(slots),
+        splits=breakdown.slots_the_statement_splits(template),
+        numeric=threshold_reply.numeric_meta(slots),
+        check_direction=True)
+    if clarify is not None:
+        return entities, clarify, None
+    result = router._serve_query_id(
+        qid, entities, None, user_query=question, normalized=question,
+        start=time.monotonic(), cache_conn=_adapter(), dashboard_results={},
+        template_map=T, dashboard_questions={}, start_date=None, end_date=None)
+    return entities, None, result
 
 
 class T1SanctionedBySchemeNotes(unittest.TestCase):
@@ -87,6 +160,84 @@ class T2TiedSpendAcrossFocusAreas(unittest.TestCase):
     def test_trd002_is_unchanged(self):
         self.assertTrue(DESC_BY_QID["TRD-002"].endswith(
             "tied-fund spending on water vs sanitation for a year is EXP-009."))
+
+
+class T3PlainCountIsOneFigure(unittest.TestCase):
+
+    def test_the_phrase_reading(self):
+        from query_router.breakdown import plain_count_total
+        for text in ("What is the count of planned activities in Barpali in 2024-25?",
+                     "count of planned activities in Attabira in 2025-26",
+                     "How many activities are planned in Kalimela in 2024-25?",
+                     "Count of all planned activities inside main GPDPs for 2021 to 2022."):
+            with self.subTest(text=text):
+                self.assertTrue(plain_count_total(text))
+        for text in ("Which GP has the highest number of planned activities in 2024-25?",
+                     "How many activities are planned under each GPDP theme in Barpali?",
+                     "Theme-wise count of planned activities in 2024-25",
+                     "What is the total number of activities planned in 2024-25?",
+                     "Top 5 blocks by number of planned activities",
+                     "What is the planned cost in Barpali in 2024-25?"):
+            with self.subTest(text=text):
+                self.assertFalse(plain_count_total(text))
+
+    def test_declared_on_pln024_only(self):
+        from query_router.breakdown import declares_plain_count_total
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        self.assertEqual(sorted(q for q, t in T.items() if declares_plain_count_total(t)),
+                         ["PLN-024"])
+
+    def test_the_contract_refuses_it_elsewhere(self):
+        import copy
+        from tools import derive_catalog as dc
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        other = copy.deepcopy(T["BUD-006"])
+        for slot in other["param_slots"]:
+            if slot["name"] == "group_by":
+                slot["plain_count_total"] = True
+        problems = dc.contract_problems({"BUD-006": other})
+        self.assertTrue(any("plain_count_total" in p for p in problems), problems)
+
+    @_needs_db
+    def test_barpali_answers_one_figure_with_the_echo(self):
+        entities, clarify, result = _answer(
+            "PLN-024", "What is the count of planned activities in Barpali in 2024-25?",
+            {"block_name": "Barpali"})
+        self.assertIsNone(clarify)
+        self.assertEqual(len(result.result), 1)
+        self.assertIn("(as one total)", result.query_description)
+        bound = {e.slot_name: e.resolved_value for e in result.entities}
+        self.assertEqual(bound.get("group_by"), "total")
+        total = _adapter().execute(
+            "SELECT COUNT(*) FROM v_activity WHERE block_name = 'Barpali' "
+            "AND fiscal_year = '2024-2025'").fetchone()[0]
+        self.assertEqual(result.result[0]["planned_activities"], total)
+
+    @_needs_db
+    def test_a_ranking_or_a_breakdown_keeps_its_rows(self):
+        _, _, result = _answer(
+            "PLN-024", "How many activities are planned under each GPDP theme in "
+                       "Barpali in 2024-25?", {"block_name": "Barpali"})
+        self.assertGreater(len(result.result), 1)
+        bound = {e.slot_name: e.resolved_value for e in result.entities}
+        self.assertEqual(bound.get("group_by"), "theme")
+
+    @_needs_db
+    def test_two_named_places_still_get_a_row_each(self):
+        _, _, result = _answer(
+            "PLN-024", "What is the count of planned activities in Barpali and "
+                       "Attabira in 2024-25?", {"block_name": ["Barpali", "Attabira"]})
+        bound = {e.slot_name: e.resolved_value for e in result.entities}
+        self.assertEqual(bound.get("group_by"), "block")
+        self.assertEqual(len(result.result), 2)
+
+    @_needs_db
+    def test_another_template_is_untouched(self):
+        _, _, result = _answer(
+            "BUD-006", "What is the count of planned activities in Barpali in 2024-25?",
+            {"block_name": "Barpali"})
+        bound = {e.slot_name: e.resolved_value for e in result.entities}
+        self.assertNotIn("group_by", bound)
 
 
 if __name__ == "__main__":

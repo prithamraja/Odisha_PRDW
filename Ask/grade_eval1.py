@@ -352,6 +352,8 @@ def grade_wp6d(record: dict) -> dict:
                        ("Kalimela block"), or an answer binding it at that tier;
                        a chip-tap row must answer the expected template for the block
       plain count      answered at all (what it returned is in the note)
+      one figure       WP-6f T3, on 1039–1044: an answer must also be PLN-024 with
+                       `group_by = total` and one row
     """
     expect = record.get("expect") or {}
     turn2 = record.get("turn2")
@@ -366,6 +368,12 @@ def grade_wp6d(record: dict) -> dict:
     if turn2 is not None:
         notes.append("turn 1: " + (f"answered {record.get('query_id')}" if record.get(
             "tier") != "clarify" else "chips " + " / ".join(_chip_labels(record))))
+        # WP-6f T3: once the question answers on turn 1 there is no chip to tap;
+        # the answer it gave is what the officer got.
+        if (turn2.get("q") is None and record.get("query_id")
+                and str(record.get("tier") or "").startswith("tier")):
+            notes.append("no chip to tap: graded on turn 1")
+            final = record
     query_id = final.get("query_id")
     bound = {k: _one(v) for k, v in _bound(final).items()}
     row["served_template_id"] = query_id or ""
@@ -416,6 +424,14 @@ def grade_wp6d(record: dict) -> dict:
         row["outcome"] = ("correct" if answered and _accepted([query_id], tuple(accepted))
                           else "clarify" if not query_id or final.get("tier") == "clarify"
                           else "incorrect")
+    # WP-6f T3: the plain counts (1039–1044 and the chip tap) must answer PLN-024
+    # as ONE figure — `group_by = total`, one row — not merely answer.
+    if expect.get("one_figure") and answered and row["outcome"] == "correct":
+        if not ("PLN-024" in family(query_id) and bound.get("group_by") == "total"
+                and final.get("n_rows") == 1):
+            row["outcome"] = "incorrect"
+            notes.append(f"not one figure: group_by={bound.get('group_by')!r}, "
+                         f"{final.get('n_rows')} rows")
     row["note"] = "; ".join(notes)
     return row
 

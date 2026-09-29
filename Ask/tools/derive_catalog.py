@@ -371,6 +371,15 @@ RANKING_FLOOR_DEFAULTS = {
 # row would name the largest of the ties as though it were the one answer.
 RANKING_FLOOR_TEMPLATES = frozenset(qid for qid, _ in RANKING_FLOOR_DEFAULTS)
 
+# WP-6f T3 (operator ruling 2026-09-28): "count of planned activities in Barpali"
+# served by PLN-024 is ONE figure, not PLN-024's own per-theme table. Declared by
+# id and written onto the `$group_by` slot as `"plain_count_total": True`; the
+# router then binds `'total'` when the phrase reader found no breakdown, the
+# question asks for a count of activities, and no ranking word is present
+# (query_router/breakdown.py::plain_count_total). NOT a global cue: the same
+# wording is every "which GP has the highest number of activities" ranking.
+PLAIN_COUNT_TOTAL = frozenset({"PLN-024"})
+
 # The other half of the D18 table: dimensions that are optional and must NEVER
 # carry a default, each with its reason. `contract_problems` already refuses a
 # default on anything outside DEFAULTED_SLOTS; this names the ones where the
@@ -975,6 +984,28 @@ def _rewrite_threshold_slots(lines, start, end, qid, entry) -> None:
         lines[k] = f"{_ITEM_PAD}{py(slot)},"
 
 
+def _rewrite_plain_count_slot(lines, start, end, qid) -> None:
+    """Write `plain_count_total` onto the `$group_by` slot of the ids that declare
+    it (PLAIN_COUNT_TOTAL), and off every other one."""
+    found = _find_block(lines, start, end, SLOTS_OPEN, SLOTS_CLOSE, qid, required=False)
+    if not found:
+        return
+    opened, closed = found
+    for k in range(opened + 1, closed):
+        stripped = lines[k].strip()
+        try:
+            slot = ast.literal_eval(stripped[:-1] if stripped.endswith(",") else stripped)
+        except (ValueError, SyntaxError):
+            continue
+        if not isinstance(slot, dict) or slot.get("name") != "group_by":
+            continue
+        new = {key: value for key, value in slot.items() if key != "plain_count_total"}
+        if qid in PLAIN_COUNT_TOTAL:
+            new["plain_count_total"] = True
+        if new != slot or list(new) != list(slot):
+            lines[k] = f"{_ITEM_PAD}{py(new)},"
+
+
 def rewrite_source(source: str, catalog: dict, derive, *, grouped_geo: bool) -> str:
     """The file with every entry's derived regions brought up to date."""
     lines = source.split("\n")
@@ -984,6 +1015,7 @@ def rewrite_source(source: str, catalog: dict, derive, *, grouped_geo: bool) -> 
         if grouped_geo:
             end += _rewrite_grouped_geo(lines, start, end, qid, entry)
             _rewrite_threshold_slots(lines, start, end, qid, entry)
+            _rewrite_plain_count_slot(lines, start, end, qid)
         opened, closed = _find_block(lines, start, end,
                                      PARAPHRASES_OPEN, PARAPHRASES_CLOSE, qid)
         hand_lines, hand = _split_paraphrase_body(lines[opened + 1:closed], qid)
@@ -1257,7 +1289,12 @@ _DISAMBIGUATION: dict[str, str] = {
                "the main GPDP' is this entry with plan_type bound, not a plan-count "
                "question. 'The total number of activities planned (in the main "
                "GPDPs)' is THIS with the total breakdown, and a 'breakdown / "
-               "distribution of planned activities by theme' is THIS as it stands.",
+               "distribution of planned activities by theme' is THIS as it stands. "
+               # WP-6f T3: pilot 1043 / 1044, "count of planned activities in X".
+               "Also the PLAIN COUNT of planned activities in a place — 'count of / "
+               "number of planned activities in Barpali', 'how many activities are "
+               "planned in <block / GP / district> in <year>' — answered as ONE "
+               "total (the 'total' breakdown).",
     "BUD-006": "PLAN TYPE is a filter on ACTIVITIES, not on plans: 'planned cost of "
                "the main GPDPs' is this entry with plan_type bound. 'The total "
                "estimated cost / budget outlay of all planned activities, "
@@ -1626,6 +1663,18 @@ def contract_problems(catalog: dict) -> list[str]:
                     if stray:
                         problems.append(f"{qid} $group_by: {sorted(stray)} is outside "
                                         f"the breakdown whitelist")
+                # WP-6f T3: the one-figure reading of a plain count is declared by
+                # id, never inferred, and needs the statement to offer 'total'.
+                # (A declared id still missing the flag is drift, which --check
+                # reports; this build writes it.)
+                if "plain_count_total" in slot and (
+                        qid not in PLAIN_COUNT_TOTAL or slot["plain_count_total"] is not True):
+                    problems.append(f"{qid} $group_by: `plain_count_total: True` is "
+                                    f"declared exactly on {sorted(PLAIN_COUNT_TOTAL)} "
+                                    f"(WP-6f)")
+                if qid in PLAIN_COUNT_TOTAL and case and "'total'" not in case.group(1):
+                    problems.append(f"{qid} $group_by: a plain count answers as one "
+                                    f"total, so the CASE must offer 'total'")
                 continue
             if "superlative_means_one" in slot and (
                     name != "top_n" or qid not in RANKING_FLOOR_TEMPLATES

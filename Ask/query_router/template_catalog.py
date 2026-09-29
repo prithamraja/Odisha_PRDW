@@ -1105,7 +1105,7 @@ ORDER BY planned_activities DESC
             {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
             {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
             {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
-            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True, 'plain_count_total': True},
         ],
         "result_ttl_seconds": 600,
         "caveat": None,
