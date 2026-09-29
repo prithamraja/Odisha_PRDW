@@ -2017,16 +2017,25 @@ def serve_pending_answer(
         raise ValueError(f"'{pending.query_id}' is not a resumable template")
 
     slot_type = _template_slot_types(template)
-    # A reply naming several years ("from 2022-23 to 2024-25") binds them all
-    # where the statement filters on a list (WP-6g T1c), as the same words would
-    # in the question itself; one string would bind only its latest year.
-    if (slot_type.get(pending.missing_slot) in _FISCAL_YEAR_ENTITY_TYPES
-            and pending.missing_slot in _list_slots(template["param_slots"])):
-        years = _fiscal_years_from_text(str(answer_value), validator)
-        if len(years) > 1:
-            answer_value = years
+    list_slots = _list_slots(template["param_slots"])
+
+    def _years_as_list(slot: str, value):
+        # SEVERAL YEARS STAY SEVERAL (WP-6g T1c). A reply naming a span ("from
+        # 2022-23 to 2024-25") binds every year where the statement filters on
+        # a list, as the same words would in the question; and a year list the
+        # first turn bound is carried in `filled` joined ("2023-2024, 2024-2025,
+        # 2025-2026"). Either, read back as ONE string, bound only its latest
+        # year — "delayed from 2023-24 to 2025-26", asked for its deadline,
+        # answered about 2025-26 alone.
+        if (value is None or slot not in list_slots
+                or slot_type.get(slot) not in _FISCAL_YEAR_ENTITY_TYPES):
+            return value
+        years = _fiscal_years_from_text(str(value), validator)
+        return years if len(years) > 1 else value
+
     raw_entities = {
-        slot: (answer_value if slot == pending.missing_slot else pending.filled.get(slot))
+        slot: _years_as_list(slot, answer_value if slot == pending.missing_slot
+                             else pending.filled.get(slot))
         for slot in slot_type
     }
 

@@ -235,6 +235,20 @@ class ResumeTests(unittest.TestCase):
             with self.subTest(reply=reply):
                 self._answers(reply, self.exp_008, from_chip=False, expected=expected)
 
+    def test_a_span_on_the_first_turn_survives_another_ask(self):
+        """The pending state carries a year list joined into one string; read
+        back as one it bound only its latest year (found in WP-6g)."""
+        q = "Blocks consistently delayed in GPDP approvals from 2023-24 to 2025-26"
+        three = ["2023-2024", "2024-2025", "2025-2026"]
+        _, clarify = _fill("PLN-022", q, {"date_range": three})
+        self.assertEqual(clarify.pending.missing_slot, "deadline")
+        resolution = _resolve("30 June 2025", clarify.pending)
+        result = _resume(clarify.pending, resolution.value)
+        self.assertEqual(result.query_id, "PLN-022")
+        entity = next(e for e in result.entities if e.slot_name == "date_range")
+        self.assertEqual(entity.values, three)
+        self.assertIn("2023-2024, 2024-2025 and 2025-2026", result.query_description)
+
     def test_the_re_ask_says_year_with_the_same_chips(self):
         from query_router.pending_resolver import REASK
         resolution = _resolve("no idea", self.exp_008.pending)
