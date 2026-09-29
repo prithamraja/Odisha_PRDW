@@ -47,5 +47,21 @@
  {"n": 1042, "group": "WP-6d block and GP", "q": "What is the count of planned activities in Laxmipur GP in 2024?", "expect": {"place": "Laxmipur GP", "gp": "Laxmipur", "one_figure": true}},
 
  {"n": 1043, "group": "WP-6d plain count", "q": "What is the count of planned activities in Barpali in 2024-25?", "expect": {"answers": true, "one_figure": true, "accept": ["PLN-024"]}},
- {"n": 1044, "group": "WP-6d plain count", "q": "count of planned activities in Attabira in 2025-26", "expect": {"answers": true, "one_figure": true, "accept": ["PLN-024"]}}
+ {"n": 1044, "group": "WP-6d plain count", "q": "count of planned activities in Attabira in 2025-26", "expect": {"answers": true, "one_figure": true, "accept": ["PLN-024"]}},
+
+ {"n": 1045, "group": "WP-6f former refusal", "q": "How many activities in Attabira are delegated to another panchayat tier for execution in 2025-26?", "expect": {"template": "PLU-005", "answers": true}},
+ {"n": 1046, "group": "WP-6f former refusal", "q": "Where are the assets under activity 50378563 located, and how many units at each location?", "expect": {"template": "AST-004", "answers": true}},
+ {"n": 1047, "group": "WP-6f former refusal", "q": "What are the unit count and unit cost of assets created under activity 50378563?", "expect": {"template": "AST-005", "answers": true}},
+ {"n": 1048, "group": "WP-6f former refusal", "q": "What is the average unit cost of Road CC assets across Bargarh for 2021-22?", "expect": {"template": "AST-010", "answers": true}},
+ {"n": 1049, "group": "WP-6f former refusal", "q": "Which Road CC assets in Bargarh have a unit cost more than 50 percent above the district average in 2021-22?", "expect": {"template": "AST-011", "answers": true}},
+ {"n": 1050, "group": "WP-6f former refusal", "q": "How many beneficiaries received benefits under XV Finance Commission in Andhrua during 2024-25?", "expect": {"template": "BEN-001", "answers": true}},
+ {"n": 1051, "group": "WP-6f former refusal", "q": "How many beneficiaries are recorded across GPs of Barpali under the State Finance Commission for 2024-25?", "expect": {"template": "BEN-003", "answers": true}},
+ {"n": 1052, "group": "WP-6f former refusal", "q": "Which scheme has the most recorded beneficiaries in Barpali for 2024-25?", "expect": {"template": "BEN-007", "answers": true}},
+ {"n": 1053, "group": "WP-6f former refusal", "q": "Which GPs in Barpali have no recorded beneficiaries under XV Finance Commission for 2024-25?", "expect": {"template": "BEN-008", "answers": true}},
+ {"n": 1054, "group": "WP-6f former refusal", "q": "Compare beneficiary counts under XV Finance Commission between Barpali and Attabira for 2024-25.", "expect": {"template": "BEN-011", "answers": true}},
+ {"n": 1055, "group": "WP-6f former refusal", "q": "How has the beneficiary count under XV Finance Commission in Andhrua changed from 2022-23 to 2024-25?", "expect": {"template": "BEN-012", "answers": true}},
+ {"n": 1056, "group": "WP-6f former refusal", "q": "Which blocks in Bargarh consistently experience delays in GPDP approvals after 30 June 2024 in 2024-25?", "expect": {"template": "PLN-022", "answers": true}},
+ {"n": 1057, "group": "WP-6f former refusal", "q": "Which districts consistently experience delays in GPDP approvals after 30 June 2025 from 2023-24 to 2025-26?", "expect": {"template": "PLN-023", "answers": true}},
+ {"n": 1058, "group": "WP-6f former refusal", "q": "Which themes have remained consistently among the top priorities over the last five years in Bargarh?", "expect": {"template": "PLN-041", "answers": true}},
+ {"n": 1059, "group": "WP-6f former refusal", "q": "Which themes have remained consistently among the lowest priorities over the last five years in Bargarh?", "expect": {"template": "PLN-042", "answers": true}}
 ]

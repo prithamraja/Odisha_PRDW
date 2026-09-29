@@ -54,6 +54,10 @@ written), plan-type questions that must not bind an invented plan type, places
 that are both a block and a GP (one row taps a chip), and plain counts. See
 `grade_wp6d`.
 
+THE WP-6f ROWS (1045 on, group "WP-6f former refusal") are the sixth: one
+question per template migration M7 made out of a refusal, each of which must be
+ANSWERED by that template. See `grade_wp6f`.
+
 Chips are mapped back to template ids by their wording, the way the PM read
 them, and an id stands for its FAMILY — the templates with identical SQL and
 slots in `rerank_context` (PLN-025/027/029 are one statement at three scopes).
@@ -436,9 +440,53 @@ def grade_wp6d(record: dict) -> dict:
     return row
 
 
+# ── The WP-6f rows (the sixth standing group, 1045 on) ────────────────────────
+
+def grade_wp6f(record: dict) -> dict:
+    """One graded CSV row for one WP-6f former-refusal record: the entry's own
+    question, with a place and a year, must be ANSWERED by that template — the
+    one outcome it could never have before M7. A served refusal is wrong."""
+    expect = record.get("expect") or {}
+    row = {"eval_row": int(record["n"]), "question_group": record.get("group", "WP-6f"),
+           "question": record.get("q", ""),
+           "expected_template_ids": expect.get("template", ""),
+           "expected_template_question":
+               TEMPLATE_CATALOG.get(expect.get("template"), {}).get("abstract_question", ""),
+           "served_template_id": record.get("query_id") or "", "served_question": "",
+           "bound_filters": "", "outcome": "incorrect", "note": ""}
+    notes: list[str] = []
+    query_id = record.get("query_id")
+    bound = {k: _one(v) for k, v in _bound(record).items()}
+    row["bound_filters"] = json.dumps(bound, ensure_ascii=False) if bound else ""
+    answered = bool(query_id) and str(record.get("tier") or "").startswith("tier")
+    if record.get("error"):
+        notes.append(f"error: {record['error'][:80]}")
+    elif answered:
+        row["served_question"] = record.get("query_description") or ""
+        notes.append(f"served {query_id}, {record.get('n_rows')} rows")
+        row["outcome"] = ("correct" if expect.get("template") in family(query_id)
+                          else "incorrect")
+    elif query_id in UNANSWERABLE_CATALOG:
+        notes.append(f"SERVED A REFUSAL: {query_id}")
+    elif record.get("clarification"):
+        clar = record["clarification"]
+        chips = [chip_ids(o.get("label", "")) for o in clar.get("options") or []]
+        row["served_question"] = f"(asked {clar.get('reason')}: {(clar.get('prompt') or '')[:70]})"
+        offered = _accepted(chips and [c for ids in chips for c in ids],
+                            (expect.get("template"),))
+        row["outcome"] = "clarify" if offered else "clarify-incorrect"
+        notes.append("chips: " + ", ".join(ids[0] if ids else "?" for ids in chips))
+    else:
+        notes.append(f"declined: {(record.get('answer') or '')[:60]}")
+    row["note"] = "; ".join(notes)
+    return row
+
+
 def grade(record: dict) -> dict:
     """One graded CSV row for one replay record."""
     n = int(record["n"])
+    if str(record.get("group", "")).startswith("WP-6f"):
+        return grade_wp6f(record)
     if str(record.get("group", "")).startswith("WP-6d"):
         return grade_wp6d(record)
     if n >= PILOT_FIRST_ROW:

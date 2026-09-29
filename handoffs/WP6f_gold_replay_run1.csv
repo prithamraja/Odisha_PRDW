@@ -1,0 +1,276 @@
+﻿n,id,lang,case_type,question,gold,acc,served_wp6f,verdict_wp6f,served_wp6e,verdict_wp6e_on_new_gold
+1001,G1001,en,standard,How many Gram Panchayats in Khordha have uploaded the GPDP in 2024-25?,PLN-001,,PLN-001,hit,PLN-001,hit
+1002,G1002,en,standard,"GPDP upload status Bhubaneswar block, 24-25?",PLN-001,PLN-003,PLN-001,hit,PLN-001,hit
+1003,G1003,en,followup,and Khajuripada?,PLN-001,PLN-003,PLN-001,hit,PLN-001,hit
+1004,G1004,en,standard,Which Gram Panchayats have not yet uploaded their GPDP in 2024-2025?,PLN-005,,PLN-005,hit,PLN-005,hit
+1005,G1005,code_mixed,standard,24-25 me kaun se GP ne abhi tak GPDP upload nahi kiya?,PLN-005,,PLN-005,hit,PLN-005,hit
+1006,G1006,odia,standard,ଖୋର୍ଦ୍ଧା ଜିଲ୍ଲାରେ 2024-2025 ରେ କେତେ ଗ୍ରାମ ପଞ୍ଚାୟତ GPDP ଅପଲୋଡ କରିଛନ୍ତି?,PLN-001,,PLN-001,hit,PLN-001,hit
+1007,G1007,odia_translit,standard,Khordha jillare 2024-2025 re kete GP GPDP upload karichanti?,PLN-001,,PLN-001,hit,PLN-001,hit
+1008,G1008,odia,standard,ଆର୍ଥିକ ବର୍ଷ ୨୦୨୪-୨୫ରେ ଖୋର୍ଦ୍ଧାରେ କେତେ GP GPDP ଅପଲୋଡ କରିଛନ୍ତି?,PLN-001,,PLN-001,hit,PLN-001,hit
+1009,G1009,en,standard,How many GPs in Kordha uploaded GPDP in FY 24-25?,PLN-001,,PLN-001,hit,PLN-001,hit
+1010,G1010,code_mixed,standard,Khurda district ka GPDP approval rate kya hai 2024-25 me?,PLN-016,PLN-002;PLN-013,PLN-016,hit,PLN-016,hit
+1011,G1011,en,standard,What percentage of Gram Panchayats in Bhubaneshwar block have uploaded their GPDP in 2024-2025?,PLN-003,,PLN-003,hit,PLN-003,hit
+1012,G1012,en,standard,Which blocks achieved 100% GPDP submission in 2024-2025?,PLN-006,,PLN-006,hit,PLN-006,hit
+1013,G1013,en,standard,Which districts had the lowest GPDP submission rate last year?,PLN-007,,PLN-007,hit,PLN-007,hit
+1014,G1014,en,standard,How many GPs in Bhubaneswar uploaded the GPDP after 30 June 2024 in 2024-25?,PLN-008,,PLN-008,hit,PLN-008,hit
+1015,G1015,en,standard,"Sir, kindly let me know the GPDP status of Andhrua Gram Panchayat for the financial year 2024-2025.",PLN-012,PLU-001,PLN-012,hit,PLN-012,hit
+1016,G1016,en,followup,what about last year?,PLN-012,PLU-001,PLN-012,wrong_entities,PLN-012,wrong_entities
+1017,G1017,code_mixed,standard,Khordha me kitne GP ka GPDP approval abhi tak pending hai 2024-25 me?,PLN-014,,PLN-014,hit,PLN-014,hit
+1018,G1018,code_mixed,standard,Bhubaneswar block me GPDP approval rate kitna hai 2024-25 ka?,PLN-015,PLN-013,PLN-015,hit,PLN-015,hit
+1019,G1019,en,standard,Which blocks have the most pending GPDP approvals in 2024-2025?,PLN-020,,PLN-020,hit,PLN-020,hit
+1020,G1020,odia,standard,2024-2025 ରେ କେଉଁ ବ୍ଲକରେ ସବୁଠାରୁ ଅଧିକ GPDP ଅନୁମୋଦନ ବାକି ଅଛି?,PLN-020,,PLN-014,wrong_template,,clarify
+1021,G1021,en,standard,How many activities are planned under each GPDP theme in Andhrua in 2024-25?,PLN-024,,PLN-024,hit,PLN-024,hit
+1022,G1022,en,standard,Which GPDP theme has the highest number of planned activities in Khordha in 2024-2025?,PLN-029,PLN-035,PLN-029,hit,PLN-029,hit
+1023,G1023,en,standard,Which GPs planned the most activities under Clean and Green Village in 2024-25?,PLN-031,,PLN-031,hit,PLN-031,hit
+1024,G1024,en,standard,How has the number of planned activities per theme changed year on year?,PLN-038,,PLN-038,hit,PLN-038,hit
+1025,G1025,en,standard,Which themes showed the greatest increase in planned activities between 2023-24 and 2024-25?,PLN-039,,PLN-039,hit,PLN-039,hit
+1026,G1026,code_mixed,standard,Sanitation ke under 2024-25 me Andhrua me kitni activities plan hui?,PLN-049,,PLN-049,hit,PLN-049,hit
+1027,G1027,en,standard,Which focus area has the highest number of planned activities in 2024-2025?,PLN-052,,PLN-052,hit,PLN-052,hit
+1042,G1042,code_mixed,followup,aur sabse kam?,PLN-053,PLN-052,PLN-052,hit,PLN-052,hit
+1028,G1028,odia,standard,2024-2025 ରେ କେଉଁ ଫୋକସ ଏରିଆରେ କୌଣସି ଯୋଜନାବଦ୍ଧ କାର୍ଯ୍ୟ ନାହିଁ?,PLN-068,,,clarify,,clarify
+1029,G1029,en,standard,How many activities below Rs 1000 are planned theme-wise in 2024-2025?,PLU-006,,PLU-006,hit,PLU-006,hit
+1030,G1030,code_mixed,standard,Andhrua ke kitne percent activities 1 lakh se kam ki hain 2024-25 me?,PLU-009,,PLU-009,hit,PLU-009,hit
+1031,G1031,en,standard,What is the cost-band split of activities in Khordha for 2024-2025?,PLU-007,,PLU-007,hit,PLU-007,hit
+1032,G1032,code_mixed,standard,Andhrua ka supplementary plan hai kya 2024-25 ke liye?,PLU-003,,PLU-003,hit,PLU-003,hit
+1033,G1033,en,standard,How many fresh and how many maintenance activities does Andhrua have in 2024-25?,WRK-001,,WRK-001,hit,WRK-001,hit
+1034,G1034,en,standard,What share of Khordha's expenditure went to maintenance in 2024-2025?,WRK-003,,WRK-003,hit,WRK-003,hit
+1035,G1035,code_mixed,standard,Bhubaneswar ke kaun se GP maintenance par fresh asset se zyada kharch karte hain 2024-25 me?,WRK-005,,WRK-005,hit,WRK-005,hit
+1036,G1036,en,ambiguity,GPDP status?,PLN-001,PLN-005;PLN-012,,clarify,,clarify
+1037,G1037,en,ambiguity,How many GPs in Laxmipur uploaded the GPDP in 2024-25?,PLN-001,,PLN-001,hit,PLN-001,hit
+1038,G1038,code_mixed,ambiguity,Bheden ka plan status 2024-25?,PLU-001,PLN-012,PLU-001,hit,PLU-001,hit
+1039,G1039,odia_translit,standard,2025-26 re kaun kaun blockre GPDP anumodan re barambar bilamba huachi?,PLN-022,,PLN-020,wrong_template,PLN-020,wrong_template
+1040,G1040,en,standard,Which themes have remained consistently among the top priorities over the last five years?,PLN-041,,PLN-041,hit,PLN-041,clarify
+1041,G1041,code_mixed,standard,Attabira me kitni activities dusre panchayat tier ko delegate hui 2025-26 me?,PLU-005,,PLU-005,hit,PLU-005,fallback
+1043,G1043,en,standard,What percentage of Gram Panchayats in each block uploaded their GPDP in 2024-2025?,PLN-003,,PLN-003,hit,PLN-003,hit
+1044,G1044,en,followup,and Laxmipur?,PLN-003,,PLN-003,hit,PLN-003,hit
+1045,G1045,en,standard,Which themes showed the greatest decline in planned activities between 2023-24 and 2024-25?,PLN-040,,PLN-040,hit,PLN-040,hit
+1046,G1046,en,standard,Which GPs planned the most activities under the Water Sufficient Village theme in 2024-25?,PLN-031,,PLN-031,hit,PLN-031,hit
+1047,G1047,en,standard,Which Gram Panchayats have not planned any activities under Theme 8 in 2024-25?,PLN-032,,PLN-032,hit,PLN-032,hit
+1048,G1048,code_mixed,standard,Child Friendly Village theme ke under 2024-25 me kaunse GP ne koi activity plan nahi ki?,PLN-032,,PLN-032,hit,PLN-032,hit
+1049,G1049,code_mixed,standard,2024-25 me Poverty Free and Enhanced Livelihoods Village theme ke under sabse zyada activities kis GP ne plan ki?,PLN-031,,PLN-031,hit,PLN-031,hit
+1201,G1201,en,standard,How many community soak pits have been planned in 2024-25?,SBM-GWM-003,,SBM-GWM-003,hit,SBM-GWM-003,hit
+1202,G1202,en,followup,and household ones?,SBM-GWM-008,,,clarify,,clarify
+1203,G1203,en,ambiguity,How many soak pits were completed in 2024-2025?,SBM-GWM-006,SBM-GWM-011,,partial,,partial
+1204,G1204,en,standard,What is the expenditure on Grey Water Management activities in 2024-25?,SBM-GWM-002,,SBM-GWM-002,hit,SBM-GWM-002,hit
+1205,G1205,code_mixed,standard,2024-25 me kitne household soak pit complete hue?,SBM-GWM-011,,SBM-GWM-011,hit,SBM-GWM-011,hit
+1206,G1206,odia,standard,2024-2025 ରେ କେତେ ସାମୁଦାୟିକ ସୋକ୍‌ପିଟ୍ ଯୋଜନା କରାଯାଇଛି?,SBM-GWM-003,,,clarify_gold_offered,,clarify_gold_offered
+1207,G1207,en,standard,How many community soak pits have been approved in 2024-2025?,SBM-GWM-004,,SBM-GWM-004,hit,SBM-GWM-004,hit
+1208,G1208,en,standard,What is the expenditure on household soak pits in 2024-25?,SBM-GWM-012,,SBM-GWM-012,hit,SBM-GWM-012,hit
+1209,G1209,en,standard,How many single-pit to twin-pit toilet retrofits have been planned in 2024-2025?,SBM-SI-016,,SBM-SI-016,hit,SBM-SI-016,hit
+1210,G1210,code_mixed,standard,2024-25 me kitne IHHL complete hue?,SBM-SI-009,,SBM-SI-009,hit,SBM-SI-009,hit
+1211,G1211,code_mixed,standard,Public institutions me kitne toilet ban gaye 2024-25 me?,SBM-SI-004,,SBM-SI-004,hit,SBM-SI-004,hit
+1212,G1212,en,standard,What is the expenditure on toilets in public institutions in 2024-2025?,SBM-SI-005,,SBM-SI-005,hit,SBM-SI-005,hit
+1213,G1213,en,standard,How many toilets and handwash units in AWCs and schools are ongoing in 2024-25?,SBM-SI-013,,SBM-SI-013,hit,SBM-SI-013,hit
+1214,G1214,odia_translit,standard,2024-2025 re kete anganwadi o school re toilet sarichi?,SBM-SI-014,,SBM-SI-014,hit,SBM-SI-013,wrong_template
+1215,G1215,en,standard,How many septic-tank-with-soak-pit retrofits have been approved in 2024-2025?,SBM-SI-022,,SBM-SI-022,hit,SBM-SI-022,hit
+1216,G1216,odia,standard,2024-2025 ରେ କେତେ ବ୍ୟକ୍ତିଗତ ଘରୋଇ ଶୌଚାଳୟ ଯୋଜନା କରାଯାଇଛି?,SBM-SI-006,,SBM-SI-006,hit,SBM-SI-006,hit
+1217,G1217,en,standard,How many community compost pits are ongoing in 2024-25?,SBM-SWM-004,,SBM-SWM-004,hit,SBM-SWM-004,hit
+1218,G1218,code_mixed,standard,Household compost pit par kitna kharcha hua 2024-25 me?,SBM-SWM-011,,SBM-SWM-011,hit,SBM-SWM-011,hit
+1219,G1219,code_mixed,standard,2024-25 me kitne segregation shed ban kar taiyar ho gaye?,SBM-SWM-015,,SBM-SWM-015,hit,SBM-SWM-015,hit
+1220,G1220,en,standard,Segregation bins planned 24-25?,SBM-SWM-017,SBM-SWM-021;SBM-SWM-022,SBM-SWM-017,hit,SBM-SWM-017,hit
+1221,G1221,odia_translit,standard,2024-2025 re kete Gobardhan unit sampurna heichi?,SBM-SWM-027,,SBM-SWM-027,hit,SBM-SWM-027,hit
+1222,G1222,en,standard,What is the expenditure on Gobardhan units in 2024-2025?,SBM-SWM-028,,SBM-SWM-028,hit,SBM-SWM-028,hit
+1223,G1223,code_mixed,standard,Door-to-door kachra gaadi kitni chal rahi hain 2024-25 me?,SBM-SWM-031,,SBM-SWM-031,hit,SBM-SWM-031,hit
+1224,G1224,en,standard,How many weighing machines have been planned in 2024-2025?,SBM-SWM-035,,SBM-SWM-035,hit,SBM-SWM-035,hit
+1225,G1225,en,standard,How many Solid Waste Management activities have been planned in 2024-25?,SBM-SWM-001,,SBM-SWM-001,hit,SBM-SWM-001,hit
+1226,G1226,en,standard,What is the O&M expenditure on community sanitary complexes in 2024-2025?,SBM-OM-001,,SBM-OM-001,hit,SBM-OM-001,hit
+1227,G1227,en,standard,What is the Operation & Maintenance expenditure on segregation sheds in 2024-25?,SBM-OM-003,,SBM-OM-003,hit,SBM-OM-003,hit
+1228,G1228,code_mixed,standard,PPE kit aur safety equipment kitne plan hue 2024-25 me?,SBM-OM-008,,SBM-OM-008,hit,SBM-OM-008,hit
+1229,G1229,en,standard,What is the total Operation & Maintenance expenditure in Andhrua in 2024-2025?,SBM-OM-010,,SBM-OM-010,hit,SBM-OM-010,hit
+1230,G1230,odia,standard,2024-2025 ରେ ପ୍ଲାଷ୍ଟିକ ବର୍ଜ୍ୟବସ୍ତୁ ପରିଚାଳନା ୟୁନିଟ ପାଇଁ କେତେ ଖର୍ଚ୍ଚ ହୋଇଛି?,SBM-OM-004,,,clarify,,clarify
+1231,G1231,code_mixed,standard,Faecal sludge management plant par kitna kharcha hua 2024-25 me?,SBM-OM-007,,SBM-OM-007,hit,SBM-OM-007,hit
+1232,G1232,code_mixed,ambiguity,2024-25 me kitne compost pit complete hue?,SBM-SWM-005,SBM-SWM-010,SBM-SWM-005,hit,SBM-SWM-005,hit
+1233,G1233,en,unanswerable,How many waste collection vehicles were repaired in 2024-25?,SBM-SWM-033,,SBM-SWM-033,hit,SBM-SWM-033,hit
+1234,G1234,en,standard,How many toilets in public institutions are ongoing in 2024-2025?,SBM-SI-003,,SBM-SI-003,hit,SBM-SI-003,hit
+1401,G1401,en,standard,How much funding is recorded from each funding source in 2024-25?,BUD-002,,BUD-002,hit,BUD-002,hit
+1402,G1402,en,standard,What percentage of the sanctioned budget is tied and untied in 2024-2025?,BUD-005,BUD-003,BUD-005,hit,BUD-005,hit
+1403,G1403,en,standard,Which focus area has the highest planned expenditure in 2024-25?,BUD-022,,BUD-022,hit,BUD-022,hit
+1404,G1404,en,followup,and the lowest?,BUD-023,BUD-022,BUD-022,hit,BUD-022,hit
+1405,G1405,en,standard,Which GPDP theme has the highest planned expenditure in 2024-2025?,BUD-007,,BUD-007,hit,BUD-007,hit
+1406,G1406,code_mixed,standard,2024-25 me har theme ko kitna planned expenditure mila?,BUD-006,,BUD-006,hit,BUD-006,hit
+1407,G1407,odia,standard,2024-2025 ରେ କେଉଁ ଫୋକସ ଏରିଆକୁ କୌଣସି ଯୋଜନାବଦ୍ଧ ଖର୍ଚ୍ଚ ମିଳିନାହିଁ?,BUD-027,,,clarify,,clarify
+1408,G1408,code_mixed,standard,Andhrua ko 2024-25 me total kitna fund mila?,BUD-001,,BUD-001,hit,BUD-001,hit
+1409,G1409,en,standard,How many activities are recorded under CFC in Khordha for 2024-25?,SCH-001,,SCH-001,hit,SCH-001,hit
+1410,G1410,en,standard,Which scheme has the highest expenditure in Bhubaneswar for 2024-2025?,SCH-005,,SCH-005,hit,SCH-005,hit
+1411,G1411,en,ambiguity,SFC vs CFC comparison,SCH-008,,,clarify,,clarify
+1412,G1412,en,standard,Compare the activity counts and expenditure of the 15th Finance Commission and the 5th State Finance Commission in Khordha for 2024-25.,SCH-008,,SCH-008,hit,SCH-008,hit
+1413,G1413,code_mixed,standard,SFC ke under Bhubaneswar me General/SC/ST funding split kya hai 2024-25 me?,SCH-010,,SCH-010,hit,SCH-010,hit
+1414,G1414,en,standard,What is the district-wise activity count under the XV Finance Commission for 2024-2025?,SCH-011,,SCH-011,hit,SCH-011,hit
+1415,G1415,odia_translit,standard,2024-2025 re Andhrua ra kama pain tied o untied panthi kete bhaga heichi?,FND-001,,BUD-005,wrong_template,BUD-005,wrong_template
+1416,G1416,code_mixed,standard,Khordha me 2024-25 me kitne percent sanctioned fund tied hai?,FND-004,,FND-004,hit,FND-004,hit
+1417,G1417,code_mixed,standard,Bhubaneswar me SC aur ST ke liye kitna fund earmark hua 2024-25 me?,FND-005,,FND-005,hit,FND-005,hit
+1418,G1418,en,standard,Which GPs in Bhubaneswar have sanctioned activities but no SC/ST earmark in 2024-25?,FND-007,,FND-007,hit,FND-007,hit
+1419,G1419,odia,standard,2024-2025 ରେ ପ୍ରତ୍ୟେକ ପାଣ୍ଠି ଉତ୍ସରୁ କେତେ ଅର୍ଥ ମିଳିଛି?,BUD-002,,,clarify,,clarify
+1420,G1420,en,standard,Which scheme funds the largest number of activities in Bhubaneswar in 2024-2025?,FND-009,,FND-009,hit,FND-009,hit
+1421,G1421,en,unanswerable,"What is the fund allocated under XV Finance Commission at ZP, Block and GP tiers in Khordha for 2025-26?",SCH-004,,SCH-004,hit,SCH-004,hit
+1422,G1422,odia_translit,standard,2024-2025 re kaun scheme re sabuthara adhika kharcha heichi Bhubaneswar block re?,SCH-005,,SCH-005,hit,SCH-005,hit
+1423,G1423,en,standard,Which activities of Andhrua are funded under Own Funds in 2024-25?,SCH-002,,SCH-002,hit,SCH-002,hit
+1424,G1424,en,standard,What is the total estimated cost of activities under the 14th Finance Commission in Bhubaneswar for 2023-24?,SCH-003,,SCH-003,hit,SCH-003,hit
+1425,G1425,en,standard,Which GPs in Bhubaneswar have no activities under the 4th State Finance Scheme in 2024-25?,SCH-006,,SCH-006,hit,SCH-006,hit
+1426,G1426,code_mixed,standard,Khordha me XV Finance Commission ke under activities ka status breakdown kya hai 2024-25 me?,SCH-009,,SCH-009,hit,SCH-009,hit
+1427,G1427,en,standard,What is the district-wise activity count under the 5th State Finance Commission for 2024-25?,SCH-011,SCH-001,SCH-011,hit,SCH-011,hit
+1501,G1501,en,standard,What is the total actual expenditure incurred by each GP in 2024-25?,EXP-001,,EXP-001,hit,EXP-001,hit
+1502,G1502,en,standard,What percentage of the planned expenditure has been utilised in 2024-2025?,EXP-003,,EXP-003,hit,EXP-003,hit
+1503,G1503,en,followup,and the unspent amount?,EXP-004,,,clarify,,clarify
+1504,G1504,code_mixed,standard,2024-25 me total kitna paisa unspent reh gaya?,EXP-004,,EXP-004,hit,EXP-004,hit
+1505,G1505,odia,standard,2024-2025 ରେ କେଉଁ ଫୋକସ ଏରିଆରେ ସର୍ବାଧିକ ପ୍ରକୃତ ଖର୍ଚ୍ଚ ହୋଇଛି?,EXP-028,,,clarify,,clarify
+1506,G1506,en,standard,Which GPDP theme has the highest actual expenditure in 2024-2025?,EXP-015,,EXP-015,hit,EXP-015,hit
+1507,G1507,en,standard,How much actual expenditure has been incurred under each funding source in 2024-25?,EXP-006,,EXP-006,hit,EXP-006,hit
+1508,G1508,code_mixed,standard,Kaun se funding source me sabse zyada paisa bacha hua hai 2024-25 me?,EXP-013,,EXP-013,hit,EXP-013,hit
+1509,G1509,en,standard,"Which high-value activities above Rs 1,00,000 have no expenditure in 2024-25?",EXP-033,,EXP-033,hit,EXP-033,hit
+1510,G1510,code_mixed,standard,5 lakh se upar ki kaun si activity par abhi tak kharcha nahi hua 2024-25 me?,EXP-033,,EXP-033,hit,EXP-033,hit
+1511,G1511,odia_translit,standard,"Andhrua ra 2024-2025 ra receipt, payment o closing balance kete?",EXP-024,,EXP-024,hit,EXP-024,hit
+1512,G1512,en,standard,How has the total actual expenditure of Andhrua changed over the years?,EXP-002,TRD-006,EXP-002,hit,EXP-002,hit
+1513,G1513,code_mixed,standard,Andhrua me marammat aur rakhrakhav par kitna kharcha hua 2024-25 me?,EXP-037,,EXP-037,hit,EXP-037,hit
+1514,G1514,odia_translit,standard,2024-2025 re Andhrua re nua sampati tiari pain kete kharcha heichi?,EXP-036,,EXP-036,hit,EXP-036,hit
+1515,G1515,en,standard,Which activities have actual expenditure exceeding the planned expenditure in Andhrua in 2024-2025?,EXP-035,,EXP-035,hit,EXP-035,hit
+1516,G1516,en,standard,Which theme has the highest utilisation of 15th CFC funds at district level in 2024-25?,EXP-021,EXP-020,EXP-021,hit,EXP-021,hit
+1517,G1517,en,standard,How many activities have expenditure under Sanitation in 2024-2025?,EXP-010,EXP-026;EXP-030,EXP-026,hit,EXP-026,hit
+1518,G1518,en,standard,Which activities have the highest expenditure in 2024-25?,EXP-031,EXP-032,EXP-031,hit,EXP-031,hit
+1519,G1519,odia,standard,2024-2025 ରେ ମୋଟ କେତେ ଟଙ୍କା ଖର୍ଚ୍ଚ ହୋଇନାହିଁ?,EXP-004,,,clarify,,clarify
+1520,G1520,en,standard,What percentage of sanctioned funds was utilised in 2024-2025?,EXP-023,EXP-003,EXP-023,hit,EXP-023,hit
+1521,G1521,en,ambiguity,expenditure Andhrua?,EXP-001,EXP-024,,clarify,,partial
+1522,G1522,code_mixed,standard,Tied aur untied fund se 2024-25 me kitna kharcha hua?,EXP-008,,EXP-008,hit,EXP-008,hit
+1523,G1523,en,standard,What is the total actual expenditure incurred by each GP in 2024-2025?,EXP-001,,EXP-001,hit,EXP-001,hit
+1524,G1524,en,ambiguity,what about Laxmipur?,EXP-001,,,clarify_as_ratified,,clarify_as_ratified
+1601,G1601,en,standard,How many activities in Andhrua are in each progress status for 2024-25?,STS-001,,STS-001,hit,STS-001,hit
+1602,G1602,en,standard,What is the district-wise activity status summary for 2024-2025?,STS-013,,STS-013,hit,STS-013,hit
+1624,G1624,en,followup,and for 2023-24?,STS-013,,STS-013,wrong_entities,STS-013,hit
+1603,G1603,en,standard,How many activities in Bhubaneswar are ongoing in 2024-25?,STS-003,,STS-003,hit,STS-003,hit
+1604,G1604,en,followup,and completed ones?,STS-003,,STS-003,hit,STS-003,hit
+1605,G1605,code_mixed,standard,Bhubaneswar me kitne kaam abandoned hain 2024-25 me?,STS-003,STS-005,,clarify_gold_offered,STS-003,hit
+1606,G1606,en,standard,Which GPs in Khordha have the highest number of abandoned activities in 2024-2025?,STS-004,,STS-004,hit,STS-004,hit
+1607,G1607,code_mixed,standard,Bhubaneswar me kitne percent taken-up kaam complete hue 2024-25 me?,STS-006,,STS-006,hit,STS-006,hit
+1608,G1608,en,standard,Which blocks in Khordha have the highest activity completion rate for 2024-2025?,STS-007,,STS-007,hit,STS-007,hit
+1609,G1609,code_mixed,standard,Bhubaneswar ke kaun se GP me ek bhi kaam complete nahi hua 2024-25 me?,STS-009,,STS-009,hit,STS-009,hit
+1610,G1610,code_mixed,standard,Bhubaneswar me kitne kaam Under Approval me atke hue hain 2024-25 me?,STS-010,,STS-010,hit,STS-010,hit
+1611,G1611,odia,standard,2024-2025 ରେ ଆରମ୍ଭ ହୋଇଥିବା କେତେ କାର୍ଯ୍ୟ ସମ୍ପୂର୍ଣ୍ଣ ହୋଇଛି?,IMP-002,,,clarify,,clarify
+1612,G1612,en,standard,What is the completion rate under each theme and focus area in 2024-2025?,IMP-005,,IMP-005,hit,IMP-005,hit
+1613,G1613,en,standard,Which focus area has the lowest completion rate in 2024-25?,IMP-009,,IMP-009,hit,IMP-009,hit
+1614,G1614,en,ambiguity,Which high-expenditure activities have not yet started in 2024-2025?,IMP-013,,,clarify,,clarify
+1615,G1615,code_mixed,standard,Kaun si activities Work Ongoing dikha rahi hain lekin poora approved paisa kharch ho gaya 2024-25 me?,IMP-018,,IMP-018,hit,IMP-018,hit
+1616,G1616,odia,standard,2024-2025 ରେ କେଉଁ ଫୋକସ ଏରିଆରେ ସବୁଠାରୁ ଅଧିକ ଚାଲୁଥିବା କାର୍ଯ୍ୟ ଅଛି?,IMP-011,,,clarify,STS-003,wrong_template
+1617,G1617,code_mixed,standard,Andhrua me kitne planned kaam abhi tak shuru hi nahi hue 2024-25 me?,IMP-003,,IMP-003,hit,IMP-003,hit
+1618,G1618,en,standard,Which themes have the largest implementation gap between planned and initiated in 2024-2025?,IMP-007,,IMP-007,hit,IMP-007,hit
+1619,G1619,en,standard,What physical-progress evidence has been recorded for activity 125711758?,PHY-001,,PHY-001,hit,PHY-001,hit
+1620,G1620,odia_translit,standard,2024-2025 re Bhubaneswar block re kete kama ra physical progress evidence achi?,PHY-004,,PHY-004,hit,PHY-004,hit
+1621,G1621,en,unanswerable,What are the stage-wise completion dates for asset 509018477?,PHY-002,,PHY-002,hit,PHY-002,hit
+1622,G1622,en,unanswerable,Which assets in Attabira have not advanced a stage in the last 90 days?,PHY-005,,PHY-005,hit,PHY-005,hit
+1623,G1623,odia_translit,standard,2024-2025 re Bhubaneswar block re kete kama sarichi?,STS-003,STS-006,STS-003,hit,STS-003,hit
+1625,G1625,en,standard,How many activities in Bhubaneswar are under approval for 2024-25?,STS-003,STS-010,STS-010,hit,STS-010,hit
+1626,G1626,code_mixed,standard,2023-24 me Bhubaneswar me kitni activities approved status me hain?,STS-003,,STS-003,hit,STS-003,hit
+1701,G1701,en,standard,Which administratively approved activities in Bhubaneswar still have zero expenditure 90 days after sanction?,ALR-001,,ALR-001,hit,ALR-001,hit
+1702,G1702,code_mixed,standard,Khordha me kaun si activities ka kharcha admin approved cost se zyada ho gaya 2024-25 me?,ALR-002,,ALR-002,hit,ALR-002,hit
+1703,G1703,en,standard,Which activities in Khordha have a technically approved cost higher than the administratively approved cost in 2024-2025?,ALR-004,,ALR-004,hit,ALR-004,hit
+1704,G1704,odia,standard,2024-2025 ରେ ଭୁବନେଶ୍ୱର ବ୍ଲକର କେଉଁ ଗ୍ରାମ ପଞ୍ଚାୟତରେ କୌଣସି କାର୍ଯ୍ୟ ହୋଇନାହିଁ?,ALR-012,ALR-013,,clarify,,clarify
+1705,G1705,code_mixed,standard,Khordha me kaun se GP ka 2024-25 me kisi bhi module me data entry nahi hua?,ALR-013,,ALR-013,hit,ALR-013,hit
+1706,G1706,en,standard,Which activities approved more than 180 days ago in Bhubaneswar are still not started?,ALR-008,,ALR-008,hit,ALR-008,hit
+1707,G1707,en,standard,Which blocks in Khordha are below 50 percent activity completion in 2024-2025?,ALR-011,,ALR-011,hit,ALR-011,hit
+1708,G1708,code_mixed,standard,Khordha me kitni activities ka focus area record nahi hua 2024-25 me?,DQY-001,,DQY-001,hit,DQY-001,hit
+1709,G1709,en,standard,Which activities in Bhubaneswar are marked completed or ongoing but have no progress evidence in 2024-2025?,DQY-006,,DQY-006,hit,DQY-006,hit
+1710,G1710,en,standard,Which activities in Bhubaneswar report expenditure but have no payment vouchers in 2024-25?,DQY-011,,DQY-011,hit,DQY-011,hit
+1711,G1711,odia_translit,standard,2024-2025 re Khordha re kete activity re funding scheme record hoini?,DQY-004,,DQY-004,hit,DQY-004,hit
+1712,G1712,en,unanswerable,Which suspended activities in Attabira have payment vouchers dated after suspension in 2025-26?,ALR-006,,ALR-006,hit,ALR-006,hit
+1713,G1713,en,unanswerable,Which GPs in Khordha have a resource envelope allocation but no uploaded plan for 2025-26?,ALR-010,,ALR-010,hit,ALR-010,hit
+1714,G1714,en,unanswerable,Which activities in Begunia have been ongoing longer than their planned duration in 2025-26?,ALR-007,,ALR-007,hit,ALR-007,hit
+1715,G1715,en,unanswerable,How many beneficiary records in Andhrua are missing the village field for 2024-25?,DQY-005,,DQY-005,hit,DQY-005,hit
+1801,G1801,en,standard,What is the total administratively sanctioned amount for each GP in 2024-25?,SAN-003,,SAN-003,hit,SAN-003,hit
+1811,G1811,en,followup,only Khordha please,SAN-003,,SAN-003,hit,SAN-003,hit
+1802,G1802,en,standard,How many activities in Andhrua received administrative approval in 2024-2025?,SAN-001,,SAN-001,hit,SAN-001,hit
+1803,G1803,en,followup,and in Ganjam?,SAN-001,,SAN-001,hit,SAN-001,hit
+1804,G1804,odia_translit,standard,2024-2025 re Khordha jillare block anusare prashasanika manjuri rashi kete?,SAN-004,,SAN-004,hit,SAN-004,hit
+1805,G1805,en,standard,How many activities in Bhubaneswar are still awaiting administrative approval in 2024-2025?,SAN-002,,SAN-002,hit,SAN-002,hit
+1806,G1806,code_mixed,standard,Bhubaneswar me kitne percent planned activities ko admin approval mila 2024-25 me?,SAN-007,,SAN-007,hit,SAN-007,hit
+1807,G1807,code_mixed,standard,Khordha me kaun si activities ko sabse zyada admin sanction amount mila 2024-25 me?,SAN-011,,SAN-011,hit,SAN-011,hit
+1808,G1808,en,standard,"What are the administrative approval order number, date and issuing authority for activity 125711758?",SAN-005,,SAN-005,hit,SAN-005,hit
+1809,G1809,odia,standard,2024-2025 ରେ ଆନ୍ଧ୍ରୁଆ ପାଇଁ ମୋଟ ପ୍ରଶାସନିକ ମଞ୍ଜୁରୀ ରାଶି କେତେ?,SAN-003,,,clarify,,clarify
+1810,G1810,en,standard,How many administrative approvals in Khordha were issued in each quarter of 2024-25?,SAN-010,,SAN-010,hit,SAN-010,hit
+1851,G1851,en,standard,How many assets were created in each GP during 2024-2025?,AST-001,,AST-001,hit,AST-001,hit
+1860,G1860,odia_translit,followup,Bhubaneswar block ru?,AST-001,,,clarify,,clarify
+1852,G1852,odia,standard,2024-2025 ରେ ଭୁବନେଶ୍ୱର ବ୍ଲକରେ ସମ୍ପତ୍ତି ଶ୍ରେଣୀ ଅନୁସାରେ କେତେ ସମ୍ପତ୍ତି ସୃଷ୍ଟି ହୋଇଛି?,AST-002,,AST-006,wrong_template,AST-006,wrong_template
+1853,G1853,code_mixed,standard,Bhubaneswar me 2024-25 me kitne immovable asset bane?,AST-006,,AST-006,hit,AST-006,hit
+1854,G1854,en,standard,Which asset category received the highest expenditure in Khordha for 2024-25?,AST-007,,AST-007,hit,AST-007,hit
+1855,G1855,code_mixed,standard,Bhubaneswar ke kaun se GP ne 2024-25 me koi asset nahi banaya?,AST-009,,AST-009,hit,AST-009,hit
+1856,G1856,en,standard,How has the number of assets created per year in Bhubaneswar changed?,AST-012,,AST-012,hit,AST-012,hit
+1857,G1857,en,standard,What is the average unit cost of tap connections across Khordha for 2025-26?,AST-010,,AST-010,hit,AST-010,fallback
+1858,G1858,en,standard,What are the unit count and unit cost of assets created under activity 125711758?,AST-005,,AST-005,hit,AST-005,fallback
+1859,G1859,en,standard,"Where are the assets under activity 125711758 located, and how many units at each location?",AST-004,,AST-004,hit,AST-004,fallback
+1861,G1861,en,standard,How many assets were created under the Self-sufficient Infrastructure in Village theme in Bhubaneswar for 2024-25?,AST-008,,AST-008,hit,AST-008,hit
+1901,G1901,en,standard,"Compare activity counts, expenditure and completion rates between Bhubaneswar and Barpali for 2024-25.",TRD-011,,TRD-011,hit,TRD-011,hit
+1902,G1902,en,standard,"Compare planned expenditure, actual expenditure and completion rate between Andhrua and Barimunda for 2024-2025.",TRD-010,,TRD-010,hit,TRD-010,hit
+1903,G1903,en,standard,How does Khordha compare with the state average on expenditure per GP and completion rate for 2024-25?,TRD-012,,TRD-012,hit,TRD-012,hit
+1904,G1904,code_mixed,standard,Bhubaneswar ka total kharcha 2023-24 se 2024-25 me kitna badla?,TRD-004,,TRD-004,hit,TRD-004,hit
+1905,G1905,odia,standard,ଆନ୍ଧ୍ରୁଆର ବର୍ଷ ଅନୁସାରେ ମୋଟ ଖର୍ଚ୍ଚ କେତେ?,TRD-006,TRD-003;EXP-002,,clarify_gold_offered,,clarify_gold_offered
+1906,G1906,en,standard,Compare the approved cost and expenditure theme-wise between 2023-24 and 2024-25.,TRD-002,,TRD-002,hit,TRD-002,hit
+1907,G1907,code_mixed,standard,Khordha ka activity completion rate saalon me kaise badla?,TRD-005,,TRD-005,hit,TRD-005,hit
+1908,G1908,odia_translit,standard,Andhrua ra barsa bhittire mota kharcha kete?,TRD-006,TRD-003,TRD-006,hit,TRD-006,hit
+1909,G1909,en,ambiguity,Compare Laxmipur and Kalimela for 2024-25.,TRD-011,TRD-010,TRD-011,hit,TRD-011,hit
+1910,G1910,en,standard,Compare the activities planned and started theme-wise between 2023-24 and 2024-25.,TRD-001,,TRD-001,hit,TRD-001,hit
+1951,G1951,code_mixed,standard,Bhubaneswar ke kaun se GP me sabse zyada paisa bacha hua hai 2024-25 me?,DSS-006,,DSS-006,hit,DSS-006,hit
+1952,G1952,odia_translit,standard,2024-2025 re Bhubaneswar re kaun chalu kama manjuri rashira 25 percent tharu kama kharcha karichi?,DSS-005,,DSS-005,hit,DSS-005,hit
+1953,G1953,en,standard,Which blocks in Khordha combine high pending sanctions with low expenditure in 2024-25?,DSS-002,,DSS-002,hit,DSS-002,hit
+1954,G1954,code_mixed,standard,Andhrua me kaun se focus area ka approved cost zyada hai lekin completion 50 percent se kam hai 2024-25 me?,DSS-001,,DSS-001,hit,DSS-001,hit
+1955,G1955,en,standard,Which asset sub-categories in Bhubaneswar show the highest repeat-maintenance frequency in 2024-2025?,DSS-003,,DSS-003,hit,DSS-003,hit
+1956,G1956,en,unanswerable,"Which GPs in Attabira could reach the next PAI grade with the smallest score improvement, and on which themes are they weakest?",DSS-004,,DSS-004,hit,DSS-004,hit
+1971,G1971,en,standard,How many beneficiaries received benefits under Swachh Bharat Mission in Andhrua during 2024-25?,BEN-001,,BEN-001,hit,BEN-001,fallback
+1972,G1972,code_mixed,standard,Bhubaneswar block ke GPs me kitne beneficiary hain 2024-25 me?,BEN-003,,,clarify,,clarify
+1973,G1973,en,unanswerable,What is the village-wise count of beneficiaries in Andhrua under NSAP for 2024-2025?,BEN-002,,BEN-002,hit,BEN-002,hit
+1974,G1974,odia,unanswerable,2024-2025 ରେ ଆନ୍ଧ୍ରୁଆରେ କେତେ ହିତାଧିକାରୀ ପେନସନ ପାଇଛନ୍ତି?,BEN-010,,,declined_generically,,declined_generically
+1981,G1981,en,out_of_domain,What is the weather forecast for Bhubaneswar tomorrow?,no_match,,,hit,,hit
+1982,G1982,code_mixed,out_of_domain,Odisha panchayat election kab hoga?,no_match,,,hit,,hit
+1983,G1983,en,out_of_domain,Who is the current Sarpanch of Andhrua?,no_match,,,hit,,hit
+1984,G1984,odia,out_of_domain,ଆଜି ଭୁବନେଶ୍ୱରରେ ପାଗ କିପରି ଅଛି?,no_match,,,hit,,hit
+1985,G1985,en,out_of_domain,Can you write me a leave application in Odia?,no_match,,,hit,,hit
+1986,G1986,en,out_of_domain,What is the MGNREGA wage rate in Odisha this year?,no_match,,,hit,,hit
+2001,G2001,en,standard,What is the total budget outlay planned across all main GPDPs for 2024 to 2025?,BUD-006,SCH-003;EXP-004,BUD-006,hit,BUD-006,hit
+2002,G2002,en,standard,What's the aggregate budget outlay for all primary GPDPs for 2025 to 2026?,BUD-006,SCH-003;EXP-004,BUD-006,hit,BUD-006,hit
+2003,G2003,en,standard,Which GPs have planned zero-cost activities for 2024 to 2025?,PLU-008,DQY-007,PLU-008,hit,PLU-008,hit
+2004,G2004,en,standard,Which GPs proposed activities costing zero rupees for 2024 to 2025?,PLU-008,DQY-007,PLU-008,hit,PLU-008,hit
+2005,G2005,en,standard,How many sanitation activities have been completed under Swachh Bharat for 2025 to 2026?,STS-003,IMP-002;STS-001,STS-003,hit,STS-003,hit
+2006,G2006,en,standard,What is the count of finished sanitation projects for Swachh Bharat for 2025 to 2026?,STS-003,IMP-002;STS-001,STS-003,hit,STS-003,hit
+2007,G2007,en,standard,What is the total unspent balance across all GPs in the state for 2020 to 2021?,EXP-004,DSS-006,EXP-004,hit,EXP-004,hit
+2008,G2008,en,standard,What is the aggregate unutilized balance for all GPs in the state for 2020 to 2021?,EXP-004,DSS-006,EXP-004,hit,EXP-004,hit
+2009,G2009,en,standard,Show the breakdown of tied fund expenditure by sector (water vs sanitation) for 2025 to 2026.,EXP-009,EXP-011;FND-002,EXP-009,hit,EXP-009,hit
+2010,G2010,en,standard,Show me the distribution of tied funds spent on water versus sanitation for 2025 to 2026.,EXP-009,EXP-011;FND-002,EXP-011,hit,EXP-009,hit
+2011,G2011,en,standard,What is the total allocation for the 9 Sankalp themes state-wide for 2024 to 2025?,BUD-006,BUD-013;BUD-009,BUD-006,hit,BUD-006,hit
+2012,G2012,en,standard,Total state-wide funding for the 9 Sankalp themes for 2025 to 2026.,BUD-006,BUD-013;BUD-009,BUD-006,hit,BUD-006,hit
+2013,G2013,en,standard,List the GPs that have not allocated any funds to Sankalp themes for 2025 to 2026.,PLN-032,SCH-006,PLN-032,hit,PLN-032,hit
+2014,G2014,en,standard,Find GPs that have zero funds allocated toward Sankalp themes for 2025 to 2026.,PLN-032,SCH-006,PLN-032,hit,PLN-032,hit
+2015,G2015,en,standard,How many GPs have uploaded their main GPDP for FY 2025-26?,PLN-001,PLN-013,PLN-001,hit,PLN-001,hit
+2016,G2016,en,standard,Count the GPs that completed main GPDP uploads for FY 25-26.,PLN-001,PLN-013,PLN-001,hit,PLN-001,hit
+2017,G2017,en,standard,List the GPs that have not yet uploaded any GPDP for 2024 to 2026.,PLN-005,PLN-003,PLN-005,hit,PLN-005,hit
+2018,G2018,en,standard,Which GPs failed to upload any GPDP so far for 2024 to 2025?,PLN-005,PLN-003,PLN-005,hit,PLN-005,hit
+2019,G2019,en,standard,What is the total number of supplementary plans approved state-wide for 2025 to 2026?,PLN-002,PLN-013;PLU-004,PLN-002,hit,PLN-002,hit
+2020,G2020,en,standard,Provide the total number of approved supplementary plans at the state level for 2024 to 2025.,PLN-002,PLN-013;PLU-004,PLN-002,hit,PLN-002,hit
+2021,G2021,en,standard,How many GPs have submitted at least one supplementary plan in Ganjam district for 2024 to 2025?,PLU-004,PLN-001,PLU-004,hit,PLU-004,hit
+2022,G2022,en,standard,Count the GPs from Ganjam that have at least one supplementary plan for 2025 to 2026.,PLU-004,PLN-001,PLU-004,hit,PLU-004,hit
+2023,G2023,en,standard,What is the total number of activities planned in the main GPDPs for 2025 to 2026?,PLN-024,,PLN-024,hit,PLN-024,hit
+2024,G2024,en,standard,What is the overall number of activities proposed in main GPDPs for 2025 to 2026?,PLN-024,,PLN-024,hit,PLN-024,hit
+2025,G2025,en,standard,Which GP has the highest number of planned activities for 2024 to 2025?,PLN-031,PLN-033,PLN-031,hit,PLN-031,hit
+2026,G2026,en,standard,Identify the GP with the highest activity count for 2024 to 2025.,PLN-031,PLN-033,PLN-031,hit,PLN-031,hit
+2027,G2027,en,standard,What is the total estimated cost of all planned activities state-wide for 2024 to 2026?,BUD-006,SCH-003,BUD-006,hit,BUD-006,hit
+2028,G2028,en,standard,State-wide total of estimated costs for all activities for 2025 to 2026.,BUD-006,SCH-003,BUD-006,hit,BUD-006,hit
+2029,G2029,en,standard,Show the breakdown of planned activities by theme for 2024 to 2025.,PLN-024,BUD-006;PLN-044;PLN-072,PLN-024,hit,PLN-024,hit
+2030,G2030,en,standard,How are planned activities distributed across different themes for 2024 to 2025?,PLN-024,BUD-006;PLN-044;PLN-072,PLN-024,hit,PLN-024,hit
+2031,G2031,en,standard,How many activities are planned under the sanitation sector for 2024 to 2025?,PLN-049,PLN-024,PLN-049,hit,PLN-049,hit
+2032,G2032,en,standard,Number of activities proposed within the sanitation category for 2024 to 2025.,PLN-049,PLN-024,PLN-049,hit,PLN-049,hit
+2033,G2033,en,standard,Which GP has planned the most activities under piped water supply for 2024 to 2025?,PLN-031,PLN-049,PLN-031,hit,PLN-031,hit
+2034,G2034,en,standard,Find the GP with the greatest count of piped water supply plans for 2024 to 2026.,PLN-031,PLN-049,PLN-031,hit,PLN-031,hit
+2035,G2035,en,standard,How many GPs have their GPDPs still pending approval for 2024 to 2026?,PLN-014,PLN-019;PLN-020;PLN-021,PLN-014,hit,PLN-014,hit
+2036,G2036,en,standard,Count of GPs with GPDPs in pending approval status for 2024 to 2025.,PLN-014,PLN-019;PLN-020;PLN-021,PLN-014,hit,PLN-014,hit
+2037,G2037,en,standard,How many activities have been completed across the state for 2025 to 2026?,STS-003,IMP-002;STS-001;STS-013,IMP-002,hit,IMP-002,hit
+2038,G2038,en,standard,What is the total completed activity count for all districts in 2025 to 2026?,STS-003,IMP-002;STS-001;STS-013,IMP-002,hit,IMP-002,hit
+2039,G2039,en,standard,How many activities are in progress during 2024 to 2025?,STS-003,STS-001,STS-003,hit,STS-003,hit
+2040,G2040,en,standard,Give the total count of activities currently in progress for 2024 to 2025.,STS-003,STS-001,STS-003,hit,STS-003,hit
+2041,G2041,en,standard,Which sector has the best activity completion rate for 2024 to 2026?,IMP-005,IMP-008;IMP-009,,clarify_as_ratified,,clarify_as_ratified
+2042,G2042,en,standard,Identify the sector with the highest percentage of completed activities for 2024 to 2026.,IMP-005,IMP-008;IMP-009,,clarify_gold_offered,,clarify_gold_offered
+2043,G2043,en,standard,How many road construction activities are in progress for 2024 to 2026?,STS-003,,STS-003,hit,STS-003,hit
+2044,G2044,en,standard,What is the number of road works currently in progress for 2024 to 2026?,STS-003,,STS-003,hit,STS-003,hit
+2045,G2045,en,standard,Which districts are behind on GPDP submission for 2024 to 2026?,PLN-007,PLN-004;PLN-016,PLN-007,hit,PLN-007,hit
+2046,G2046,en,standard,Identify districts with delayed GPDP submissions for 2024 to 2026.,PLN-007,PLN-004;PLN-016,PLN-007,hit,PLN-007,hit
+2047,G2047,en,standard,Which GPs have expenditure recorded but zero physical progress for 2024 to 2025?,PHY-006,DQY-006,PHY-006,hit,PHY-006,hit
+2048,G2048,en,standard,Find GPs with non-zero expenditure and zero physical progress for 2024 to 2025.,PHY-006,DQY-006,PHY-006,hit,PHY-006,hit
+2049,G2049,en,standard,Give a district-wise summary of asset creation for 2024 to 2025.,AST-001,AST-002,AST-001,hit,AST-001,hit
+2050,G2050,en,standard,Show asset creation totals across all districts for 2024 to 2025.,AST-001,AST-002,AST-001,hit,AST-001,hit
+2051,G2051,en,standard,Show a five-year time series of fund utilization for 2025 to 2026.,TRD-003,EXP-002;TRD-006;EXP-003,TRD-003,hit,TRD-003,hit
+2052,G2052,en,standard,Give a time-series view of fund utilization covering the previous five years for 2025 to 2026.,TRD-003,EXP-002;TRD-006;EXP-003,TRD-003,hit,TRD-003,hit
