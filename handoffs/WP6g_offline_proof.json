@@ -1,0 +1,763 @@
+{
+ "about": "WP-6g offline proofs (free). T3.1: old vs new year reader over every question (and second turn) of WP6f_eval1_replay, WP6f_gold_replay_run1, WP6f_pilot_replay, WP6f_stage1 — 695 questions. T3.2/T3.3: each changed row re-executed on the sample DuckDB with its recorded template and filters, old years then new, with the echo. T1b: every refusal served in the WP-6e and WP-6f runs, and whether the reranker itself picked it (from WP6e/WP6f_rerank_calls.jsonl).",
+ "t3_1_changed_questions": [
+  {
+   "file": "WP6f_pilot_replay",
+   "n": 1055,
+   "turn": "q",
+   "q": "How has the beneficiary count under XV Finance Commission in Andhrua changed from 2022-23 to 2024-25?",
+   "old": [
+    "2022-2023",
+    "2024-2025"
+   ],
+   "new": [
+    "2022-2023",
+    "2023-2024",
+    "2024-2025"
+   ],
+   "old_window": [
+    "2022-04-01",
+    "2025-03-31"
+   ],
+   "new_window": [
+    "2022-04-01",
+    "2025-03-31"
+   ],
+   "query_id": "BEN-012",
+   "entities": [
+    {
+     "slot": "date_range",
+     "value": "2022-2023, 2024-2025",
+     "confidence": "exact",
+     "values": [
+      "2022-2023",
+      "2024-2025"
+     ]
+    },
+    {
+     "slot": "gp_name",
+     "value": "Andhrua",
+     "confidence": "exact"
+    },
+    {
+     "slot": "scheme",
+     "value": "XV Finance Commission",
+     "confidence": "exact"
+    }
+   ],
+   "tier": "tier2"
+  },
+  {
+   "file": "WP6f_pilot_replay",
+   "n": 1057,
+   "turn": "q",
+   "q": "Which districts consistently experience delays in GPDP approvals after 30 June 2025 from 2023-24 to 2025-26?",
+   "old": [
+    "2023-2024",
+    "2025-2026"
+   ],
+   "new": [
+    "2023-2024",
+    "2024-2025",
+    "2025-2026"
+   ],
+   "old_window": [
+    "2023-04-01",
+    "2026-03-31"
+   ],
+   "new_window": [
+    "2023-04-01",
+    "2026-03-31"
+   ],
+   "query_id": "PLN-023",
+   "entities": [
+    {
+     "slot": "date_range",
+     "value": "2023-2024, 2025-2026",
+     "confidence": "exact",
+     "values": [
+      "2023-2024",
+      "2025-2026"
+     ]
+    },
+    {
+     "slot": "deadline",
+     "value": "2025-06-30",
+     "confidence": "exact"
+    },
+    {
+     "slot": "top_n",
+     "value": "10",
+     "confidence": "numeric"
+    }
+   ],
+   "tier": "tier2"
+  },
+  {
+   "file": "WP6f_stage1",
+   "n": 1055,
+   "turn": "q",
+   "q": "How has the beneficiary count under XV Finance Commission in Andhrua changed from 2022-23 to 2024-25?",
+   "old": [
+    "2022-2023",
+    "2024-2025"
+   ],
+   "new": [
+    "2022-2023",
+    "2023-2024",
+    "2024-2025"
+   ],
+   "old_window": [
+    "2022-04-01",
+    "2025-03-31"
+   ],
+   "new_window": [
+    "2022-04-01",
+    "2025-03-31"
+   ],
+   "query_id": "BEN-012",
+   "entities": [
+    {
+     "slot": "date_range",
+     "value": "2022-2023, 2024-2025",
+     "confidence": "exact",
+     "values": [
+      "2022-2023",
+      "2024-2025"
+     ]
+    },
+    {
+     "slot": "gp_name",
+     "value": "Andhrua",
+     "confidence": "exact"
+    },
+    {
+     "slot": "scheme",
+     "value": "XV Finance Commission",
+     "confidence": "exact"
+    }
+   ],
+   "tier": "tier2"
+  },
+  {
+   "file": "WP6f_stage1",
+   "n": 1057,
+   "turn": "q",
+   "q": "Which districts consistently experience delays in GPDP approvals after 30 June 2025 from 2023-24 to 2025-26?",
+   "old": [
+    "2023-2024",
+    "2025-2026"
+   ],
+   "new": [
+    "2023-2024",
+    "2024-2025",
+    "2025-2026"
+   ],
+   "old_window": [
+    "2023-04-01",
+    "2026-03-31"
+   ],
+   "new_window": [
+    "2023-04-01",
+    "2026-03-31"
+   ],
+   "query_id": "PLN-023",
+   "entities": [
+    {
+     "slot": "date_range",
+     "value": "2023-2024, 2025-2026",
+     "confidence": "exact",
+     "values": [
+      "2023-2024",
+      "2025-2026"
+     ]
+    },
+    {
+     "slot": "deadline",
+     "value": "2025-06-30",
+     "confidence": "exact"
+    },
+    {
+     "slot": "top_n",
+     "value": "10",
+     "confidence": "numeric"
+    }
+   ],
+   "tier": "tier2"
+  }
+ ],
+ "t3_2_reexecuted": [
+  {
+   "n": 1055,
+   "q": "How has the beneficiary count under XV Finance Commission in Andhrua changed from 2022-23 to 2024-25?",
+   "query_id": "BEN-012",
+   "old_years": [
+    "2022-2023",
+    "2024-2025"
+   ],
+   "new_years": [
+    "2022-2023",
+    "2023-2024",
+    "2024-2025"
+   ],
+   "recorded_n_rows": null,
+   "before": {
+    "echo": "How has the beneficiary count under 15th Finance Commission (CFC) in Andhrua changed over 2022-2023 and 2024-2025?",
+    "n_rows": 0,
+    "rows": [],
+    "bound": {
+     "date_range": [
+      "2022-2023",
+      "2024-2025"
+     ],
+     "gp_name": "Andhrua",
+     "scheme": "XV Finance Commission"
+    }
+   },
+   "after": {
+    "echo": "How has the beneficiary count under 15th Finance Commission (CFC) in Andhrua changed over 2022-2023, 2023-2024 and 2024-2025?",
+    "n_rows": 0,
+    "rows": [],
+    "bound": {
+     "date_range": [
+      "2022-2023",
+      "2023-2024",
+      "2024-2025"
+     ],
+     "gp_name": "Andhrua",
+     "scheme": "XV Finance Commission"
+    }
+   }
+  },
+  {
+   "n": 1057,
+   "q": "Which districts consistently experience delays in GPDP approvals after 30 June 2025 from 2023-24 to 2025-26?",
+   "query_id": "PLN-023",
+   "old_years": [
+    "2023-2024",
+    "2025-2026"
+   ],
+   "new_years": [
+    "2023-2024",
+    "2024-2025",
+    "2025-2026"
+   ],
+   "recorded_n_rows": null,
+   "before": {
+    "echo": "Which Districts consistently experience delays in GPDP approvals after the deadline 2025-06-30 in 2023-2024 and 2025-2026 (top 10)?",
+    "n_rows": 9,
+    "rows": [
+     {
+      "district_name": "Bargarh",
+      "gps": 8,
+      "gps_late": 0,
+      "pct_late": 0.0,
+      "years_counted": 2,
+      "years_mostly_late": 0
+     },
+     {
+      "district_name": "Cuttack",
+      "gps": 4,
+      "gps_late": 0,
+      "pct_late": 0.0,
+      "years_counted": 2,
+      "years_mostly_late": 0
+     },
+     {
+      "district_name": "Ganjam",
+      "gps": 8,
+      "gps_late": 0,
+      "pct_late": 0.0,
+      "years_counted": 2,
+      "years_mostly_late": 0
+     },
+     {
+      "district_name": "Kandhamal",
+      "gps": 2,
+      "gps_late": 0,
+      "pct_late": 0.0,
+      "years_counted": 2,
+      "years_mostly_late": 0
+     },
+     {
+      "district_name": "Khordha",
+      "gps": 6,
+      "gps_late": 0,
+      "pct_late": 0.0,
+      "years_counted": 2,
+      "years_mostly_late": 0
+     },
+     {
+      "district_name": "Koraput",
+      "gps": 4,
+      "gps_late": 0,
+      "pct_late": 0.0,
+      "years_counted": 2,
+      "years_mostly_late": 0
+     },
+     {
+      "district_name": "Malkangiri",
+      "gps": 2,
+      "gps_late": 0,
+      "pct_late": 0.0,
+      "years_counted": 2,
+      "years_mostly_late": 0
+     },
+     {
+      "district_name": "Rayagada",
+      "gps": 2,
+      "gps_late": 0,
+      "pct_late": 0.0,
+      "years_counted": 2,
+      "years_mostly_late": 0
+     },
+     {
+      "district_name": "Sundargarh",
+      "gps": 4,
+      "gps_late": 0,
+      "pct_late": 0.0,
+      "years_counted": 2,
+      "years_mostly_late": 0
+     }
+    ],
+    "bound": {
+     "date_range": [
+      "2023-2024",
+      "2025-2026"
+     ],
+     "deadline": "2025-06-30",
+     "top_n": "10"
+    }
+   },
+   "after": {
+    "echo": "Which Districts consistently experience delays in GPDP approvals after the deadline 2025-06-30 in 2023-2024, 2024-2025 and 2025-2026 (top 10)?",
+    "n_rows": 9,
+    "rows": [
+     {
+      "district_name": "Kandhamal",
+      "gps": 3,
+      "gps_late": 1,
+      "pct_late": 33.33,
+      "years_counted": 3,
+      "years_mostly_late": 1
+     },
+     {
+      "district_name": "Cuttack",
+      "gps": 6,
+      "gps_late": 1,
+      "pct_late": 16.67,
+      "years_counted": 3,
+      "years_mostly_late": 0
+     },
+     {
+      "district_name": "Bargarh",
+      "gps": 12,
+      "gps_late": 0,
+      "pct_late": 0.0,
+      "years_counted": 3,
+      "years_mostly_late": 0
+     },
+     {
+      "district_name": "Ganjam",
+      "gps": 12,
+      "gps_late": 0,
+      "pct_late": 0.0,
+      "years_counted": 3,
+      "years_mostly_late": 0
+     },
+     {
+      "district_name": "Khordha",
+      "gps": 9,
+      "gps_late": 0,
+      "pct_late": 0.0,
+      "years_counted": 3,
+      "years_mostly_late": 0
+     },
+     {
+      "district_name": "Koraput",
+      "gps": 6,
+      "gps_late": 0,
+      "pct_late": 0.0,
+      "years_counted": 3,
+      "years_mostly_late": 0
+     },
+     {
+      "district_name": "Malkangiri",
+      "gps": 3,
+      "gps_late": 0,
+      "pct_late": 0.0,
+      "years_counted": 3,
+      "years_mostly_late": 0
+     },
+     {
+      "district_name": "Rayagada",
+      "gps": 3,
+      "gps_late": 0,
+      "pct_late": 0.0,
+      "years_counted": 3,
+      "years_mostly_late": 0
+     },
+     {
+      "district_name": "Sundargarh",
+      "gps": 6,
+      "gps_late": 0,
+      "pct_late": 0.0,
+      "years_counted": 3,
+      "years_mostly_late": 0
+     }
+    ],
+    "bound": {
+     "date_range": [
+      "2023-2024",
+      "2024-2025",
+      "2025-2026"
+     ],
+     "deadline": "2025-06-30",
+     "top_n": "10"
+    }
+   }
+  }
+ ],
+ "t1b_served_refusals": {
+  "WP6e": [
+   {
+    "run": "gold_replay_run1",
+    "n": 1040,
+    "q": "Which themes have remained consistently among the top priorities over the last five years?",
+    "served": "PLN-041",
+    "rerank_calls": 1,
+    "picks": [
+     "PLN-041"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1041,
+    "q": "Attabira me kitni activities dusre panchayat tier ko delegate hui 2025-26 me?",
+    "served": "PLU-005",
+    "rerank_calls": 1,
+    "picks": [
+     "PLU-005"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1233,
+    "q": "How many waste collection vehicles were repaired in 2024-25?",
+    "served": "SBM-SWM-033",
+    "rerank_calls": 1,
+    "picks": [
+     "SBM-SWM-033"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1421,
+    "q": "What is the fund allocated under XV Finance Commission at ZP, Block and GP tiers in Khordha for 2025-26?",
+    "served": "SCH-004",
+    "rerank_calls": 1,
+    "picks": [
+     "SCH-004"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1621,
+    "q": "What are the stage-wise completion dates for asset 509018477?",
+    "served": "PHY-002",
+    "rerank_calls": 1,
+    "picks": [
+     "PHY-002"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1622,
+    "q": "Which assets in Attabira have not advanced a stage in the last 90 days?",
+    "served": "PHY-005",
+    "rerank_calls": 1,
+    "picks": [
+     "PHY-005"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1712,
+    "q": "Which suspended activities in Attabira have payment vouchers dated after suspension in 2025-26?",
+    "served": "ALR-006",
+    "rerank_calls": 1,
+    "picks": [
+     "ALR-006"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1713,
+    "q": "Which GPs in Khordha have a resource envelope allocation but no uploaded plan for 2025-26?",
+    "served": "ALR-010",
+    "rerank_calls": 1,
+    "picks": [
+     "ALR-010"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1714,
+    "q": "Which activities in Begunia have been ongoing longer than their planned duration in 2025-26?",
+    "served": "ALR-007",
+    "rerank_calls": 1,
+    "picks": [
+     "ALR-007"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1715,
+    "q": "How many beneficiary records in Andhrua are missing the village field for 2024-25?",
+    "served": "DQY-005",
+    "rerank_calls": 1,
+    "picks": [
+     "DQY-005"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1857,
+    "q": "What is the average unit cost of tap connections across Khordha for 2025-26?",
+    "served": "AST-010",
+    "rerank_calls": 1,
+    "picks": [
+     "AST-010"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1858,
+    "q": "What are the unit count and unit cost of assets created under activity 125711758?",
+    "served": "AST-005",
+    "rerank_calls": 1,
+    "picks": [
+     "AST-005"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1859,
+    "q": "Where are the assets under activity 125711758 located, and how many units at each location?",
+    "served": "AST-004",
+    "rerank_calls": 1,
+    "picks": [
+     "AST-004"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1956,
+    "q": "Which GPs in Attabira could reach the next PAI grade with the smallest score improvement, and on which themes are they weakest?",
+    "served": "DSS-004",
+    "rerank_calls": 1,
+    "picks": [
+     "DSS-004"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1971,
+    "q": "How many beneficiaries received benefits under Swachh Bharat Mission in Andhrua during 2024-25?",
+    "served": "BEN-001",
+    "rerank_calls": 1,
+    "picks": [
+     "BEN-001"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1973,
+    "q": "What is the village-wise count of beneficiaries in Andhrua under NSAP for 2024-2025?",
+    "served": "BEN-002",
+    "rerank_calls": 1,
+    "picks": [
+     "BEN-002"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "pilot_replay",
+    "n": 1044,
+    "q": "count of planned activities in Attabira in 2025-26",
+    "served": "PLU-005",
+    "rerank_calls": 2,
+    "picks": [
+     "no_match"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": false
+   },
+   {
+    "run": "stage1",
+    "n": 1044,
+    "q": "count of planned activities in Attabira in 2025-26",
+    "served": "PLU-005",
+    "rerank_calls": 2,
+    "picks": [
+     "no_match"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": false
+   }
+  ],
+  "WP6f": [
+   {
+    "run": "gold_replay_run1",
+    "n": 1233,
+    "q": "How many waste collection vehicles were repaired in 2024-25?",
+    "served": "SBM-SWM-033",
+    "rerank_calls": 1,
+    "picks": [
+     "SBM-SWM-033"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1421,
+    "q": "What is the fund allocated under XV Finance Commission at ZP, Block and GP tiers in Khordha for 2025-26?",
+    "served": "SCH-004",
+    "rerank_calls": 1,
+    "picks": [
+     "SCH-004"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1621,
+    "q": "What are the stage-wise completion dates for asset 509018477?",
+    "served": "PHY-002",
+    "rerank_calls": 1,
+    "picks": [
+     "PHY-002"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1622,
+    "q": "Which assets in Attabira have not advanced a stage in the last 90 days?",
+    "served": "PHY-005",
+    "rerank_calls": 1,
+    "picks": [
+     "PHY-005"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1712,
+    "q": "Which suspended activities in Attabira have payment vouchers dated after suspension in 2025-26?",
+    "served": "ALR-006",
+    "rerank_calls": 1,
+    "picks": [
+     "ALR-006"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1713,
+    "q": "Which GPs in Khordha have a resource envelope allocation but no uploaded plan for 2025-26?",
+    "served": "ALR-010",
+    "rerank_calls": 1,
+    "picks": [
+     "ALR-010"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1714,
+    "q": "Which activities in Begunia have been ongoing longer than their planned duration in 2025-26?",
+    "served": "ALR-007",
+    "rerank_calls": 1,
+    "picks": [
+     "ALR-007"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1715,
+    "q": "How many beneficiary records in Andhrua are missing the village field for 2024-25?",
+    "served": "DQY-005",
+    "rerank_calls": 1,
+    "picks": [
+     "DQY-005"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1956,
+    "q": "Which GPs in Attabira could reach the next PAI grade with the smallest score improvement, and on which themes are they weakest?",
+    "served": "DSS-004",
+    "rerank_calls": 1,
+    "picks": [
+     "DSS-004"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   },
+   {
+    "run": "gold_replay_run1",
+    "n": 1973,
+    "q": "What is the village-wise count of beneficiaries in Andhrua under NSAP for 2024-2025?",
+    "served": "BEN-002",
+    "rerank_calls": 1,
+    "picks": [
+     "BEN-002"
+    ],
+    "named_near_miss": false,
+    "reranker_chose_it": true
+   }
+  ]
+ }
+}
