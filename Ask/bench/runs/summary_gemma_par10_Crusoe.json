@@ -1,0 +1,125 @@
+{
+ "mode": "gemma",
+ "model": "google/gemma-4-31b-it",
+ "questions": 100,
+ "verdicts": {
+  "clarify": 7,
+  "clarify_as_ratified": 1,
+  "clarify_gold_offered": 1,
+  "declined_generically": 1,
+  "hit": 88,
+  "wrong_template": 2
+ },
+ "wall_s_median": 4.234999999999999,
+ "wall_s_p90": 8.38,
+ "wall_s_total": 486.7,
+ "chat_calls": 192,
+ "chat_call_s_median": 1.6150000000000002,
+ "transport_errors": 8,
+ "empty_responses": 0,
+ "truncated": 0,
+ "providers": {
+  "Crusoe": 192
+ },
+ "openrouter_cost_usd": 0.12278,
+ "workers": 10,
+ "run_wall_s": 101.8,
+ "provider_pin": "Crusoe",
+ "untagged_calls": 0,
+ "usage": {
+  "totals": {
+   "calls": 289,
+   "prompt_tokens": 850743,
+   "completion_tokens": 10123,
+   "reasoning_tokens": 0,
+   "cached_prompt_tokens": 96726,
+   "total_tokens": 860866
+  },
+  "by_site": {
+   "embed_query": {
+    "calls": 97,
+    "model": "text-embedding-3-large",
+    "prompt_tokens": 2680,
+    "completion_tokens": 0,
+    "reasoning_tokens": 0,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 2680
+   },
+   "rerank": {
+    "calls": 94,
+    "model": "google/gemma-4-31b-it",
+    "prompt_tokens": 635363,
+    "completion_tokens": 2378,
+    "reasoning_tokens": 0,
+    "cached_prompt_tokens": 90642,
+    "total_tokens": 637741
+   },
+   "extraction": {
+    "calls": 93,
+    "model": "google/gemma-4-31b-it",
+    "prompt_tokens": 205777,
+    "completion_tokens": 7459,
+    "reasoning_tokens": 0,
+    "cached_prompt_tokens": 6064,
+    "total_tokens": 213236
+   },
+   "followup": {
+    "calls": 5,
+    "model": "google/gemma-4-31b-it",
+    "prompt_tokens": 6923,
+    "completion_tokens": 286,
+    "reasoning_tokens": 0,
+    "cached_prompt_tokens": 20,
+    "total_tokens": 7209
+   }
+  },
+  "extraction": {
+   "extraction_calls": 93,
+   "unavailable_calls": 0,
+   "unavailable_causes": {},
+   "all_none_answered": 43,
+   "all_none_rate_answered": 0.4624,
+   "by_slot_family": {
+    "date": {
+     "asked": 4,
+     "null": 4,
+     "null_rate": 1.0
+    },
+    "place": {
+     "asked": 255,
+     "null": 211,
+     "null_rate": 0.8275
+    },
+    "categorical": {
+     "asked": 328,
+     "null": 317,
+     "null_rate": 0.9665
+    },
+    "numeric": {
+     "asked": 27,
+     "null": 18,
+     "null_rate": 0.6667
+    },
+    "other": {
+     "asked": 1,
+     "null": 0,
+     "null_rate": 0.0
+    }
+   },
+   "reasoning_tokens_when_all_none": {
+    "n": 43,
+    "min": 0,
+    "max": 0,
+    "median": 0,
+    "mean": 0.0
+   },
+   "reasoning_tokens_when_read": {
+    "n": 50,
+    "min": 0,
+    "max": 0,
+    "median": 0,
+    "mean": 0.0
+   }
+  }
+ }
+}

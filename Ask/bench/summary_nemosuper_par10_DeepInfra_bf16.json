@@ -1,0 +1,127 @@
+{
+ "mode": "nemosuper",
+ "model": "nvidia/nemotron-3-super-120b-a12b",
+ "questions": 100,
+ "verdicts": {
+  "clarify": 22,
+  "clarify_as_ratified": 1,
+  "clarify_gold_offered": 17,
+  "declined_generically": 1,
+  "hit": 59
+ },
+ "wall_s_median": 16.505000000000003,
+ "wall_s_p90": 25.5,
+ "wall_s_total": 1740.5,
+ "chat_calls": 210,
+ "chat_call_s_median": 7.545,
+ "transport_errors": 17,
+ "empty_responses": 0,
+ "truncated": 38,
+ "providers": {
+  "DeepInfra": 210
+ },
+ "openrouter_cost_usd": 0.11256,
+ "workers": 10,
+ "run_wall_s": 184.7,
+ "provider_pin": "DeepInfra",
+ "quantization_pin": "bf16",
+ "untagged_calls": 0,
+ "usage": {
+  "totals": {
+   "calls": 308,
+   "prompt_tokens": 884589,
+   "completion_tokens": 93997,
+   "reasoning_tokens": 63458,
+   "cached_prompt_tokens": 0,
+   "total_tokens": 978586
+  },
+  "by_site": {
+   "embed_query": {
+    "calls": 98,
+    "model": "text-embedding-3-large",
+    "prompt_tokens": 2684,
+    "completion_tokens": 0,
+    "reasoning_tokens": 0,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 2684
+   },
+   "rerank": {
+    "calls": 95,
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "prompt_tokens": 622021,
+    "completion_tokens": 38182,
+    "reasoning_tokens": 18414,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 660203
+   },
+   "extraction": {
+    "calls": 111,
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "prompt_tokens": 254516,
+    "completion_tokens": 54008,
+    "reasoning_tokens": 43973,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 308524
+   },
+   "followup": {
+    "calls": 4,
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "prompt_tokens": 5368,
+    "completion_tokens": 1807,
+    "reasoning_tokens": 1071,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 7175
+   }
+  },
+  "extraction": {
+   "extraction_calls": 111,
+   "unavailable_calls": 1,
+   "unavailable_causes": {
+    "truncated": 1
+   },
+   "all_none_answered": 61,
+   "all_none_rate_answered": 0.5545,
+   "by_slot_family": {
+    "date": {
+     "asked": 4,
+     "null": 4,
+     "null_rate": 1.0
+    },
+    "place": {
+     "asked": 315,
+     "null": 271,
+     "null_rate": 0.8603
+    },
+    "categorical": {
+     "asked": 306,
+     "null": 296,
+     "null_rate": 0.9673
+    },
+    "numeric": {
+     "asked": 48,
+     "null": 42,
+     "null_rate": 0.875
+    },
+    "other": {
+     "asked": 3,
+     "null": 3,
+     "null_rate": 1.0
+    }
+   },
+   "reasoning_tokens_when_all_none": {
+    "n": 61,
+    "min": 80,
+    "max": 1055,
+    "median": 287,
+    "mean": 335.1
+   },
+   "reasoning_tokens_when_read": {
+    "n": 49,
+    "min": 173,
+    "max": 1037,
+    "median": 436,
+    "mean": 480.2
+   }
+  }
+ }
+}

@@ -1,0 +1,117 @@
+{
+ "mode": "gptoss",
+ "model": "openai/gpt-oss-120b",
+ "questions": 12,
+ "verdicts": {
+  "hit": 11,
+  "wrong_entities": 1
+ },
+ "wall_s_median": 6.945,
+ "wall_s_p90": 9.02,
+ "wall_s_total": 88.1,
+ "chat_calls": 23,
+ "chat_call_s_median": 2.97,
+ "transport_errors": 0,
+ "empty_responses": 0,
+ "truncated": 0,
+ "providers": {
+  "DeepInfra": 23
+ },
+ "openrouter_cost_usd": 0.00369,
+ "workers": 4,
+ "run_wall_s": 27.6,
+ "provider_pin": "DeepInfra",
+ "quantization_pin": null,
+ "untagged_calls": 0,
+ "usage": {
+  "totals": {
+   "calls": 34,
+   "prompt_tokens": 87394,
+   "completion_tokens": 2768,
+   "reasoning_tokens": 1769,
+   "cached_prompt_tokens": 0,
+   "total_tokens": 90162
+  },
+  "by_site": {
+   "embed_query": {
+    "calls": 11,
+    "model": "text-embedding-3-large",
+    "prompt_tokens": 428,
+    "completion_tokens": 0,
+    "reasoning_tokens": 0,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 428
+   },
+   "rerank": {
+    "calls": 11,
+    "model": "openai/gpt-oss-120b",
+    "prompt_tokens": 62035,
+    "completion_tokens": 831,
+    "reasoning_tokens": 475,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 62866
+   },
+   "extraction": {
+    "calls": 11,
+    "model": "openai/gpt-oss-120b",
+    "prompt_tokens": 23570,
+    "completion_tokens": 1743,
+    "reasoning_tokens": 1241,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 25313
+   },
+   "followup": {
+    "calls": 1,
+    "model": "openai/gpt-oss-120b",
+    "prompt_tokens": 1361,
+    "completion_tokens": 194,
+    "reasoning_tokens": 53,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 1555
+   }
+  },
+  "extraction": {
+   "extraction_calls": 11,
+   "unavailable_calls": 0,
+   "unavailable_causes": {},
+   "all_none_answered": 4,
+   "all_none_rate_answered": 0.3636,
+   "by_slot_family": {
+    "place": {
+     "asked": 26,
+     "null": 19,
+     "null_rate": 0.7308
+    },
+    "categorical": {
+     "asked": 12,
+     "null": 12,
+     "null_rate": 1.0
+    },
+    "numeric": {
+     "asked": 1,
+     "null": 1,
+     "null_rate": 1.0
+    },
+    "other": {
+     "asked": 1,
+     "null": 0,
+     "null_rate": 0.0
+    }
+   },
+   "reasoning_tokens_when_all_none": {
+    "n": 4,
+    "min": 45,
+    "max": 263,
+    "median": 92,
+    "mean": 115.0
+   },
+   "reasoning_tokens_when_read": {
+    "n": 7,
+    "min": 71,
+    "max": 194,
+    "median": 92,
+    "mean": 111.6
+   }
+  }
+ }
+}

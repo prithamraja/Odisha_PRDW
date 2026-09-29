@@ -1,0 +1,126 @@
+{
+ "mode": "nemoultra",
+ "model": "nvidia/nemotron-3-ultra-550b-a55b",
+ "questions": 100,
+ "verdicts": {
+  "clarify": 10,
+  "clarify_as_ratified": 1,
+  "clarify_gold_offered": 2,
+  "declined_generically": 1,
+  "hit": 84,
+  "wrong_template": 2
+ },
+ "wall_s_median": 9.325,
+ "wall_s_p90": 13.4,
+ "wall_s_total": 930.8,
+ "chat_calls": 192,
+ "chat_call_s_median": 3.91,
+ "transport_errors": 0,
+ "empty_responses": 0,
+ "truncated": 0,
+ "providers": {
+  "Venice": 192
+ },
+ "openrouter_cost_usd": 0.55504,
+ "workers": 5,
+ "run_wall_s": 194.5,
+ "provider_pin": "Venice",
+ "quantization_pin": null,
+ "untagged_calls": 0,
+ "usage": {
+  "totals": {
+   "calls": 289,
+   "prompt_tokens": 838773,
+   "completion_tokens": 10395,
+   "reasoning_tokens": 0,
+   "cached_prompt_tokens": 0,
+   "total_tokens": 849168
+  },
+  "by_site": {
+   "embed_query": {
+    "calls": 97,
+    "model": "text-embedding-3-large",
+    "prompt_tokens": 2680,
+    "completion_tokens": 0,
+    "reasoning_tokens": 0,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 2680
+   },
+   "rerank": {
+    "calls": 94,
+    "model": "nvidia/nemotron-3-ultra-550b-a55b",
+    "prompt_tokens": 615792,
+    "completion_tokens": 2653,
+    "reasoning_tokens": 0,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 618445
+   },
+   "extraction": {
+    "calls": 93,
+    "model": "nvidia/nemotron-3-ultra-550b-a55b",
+    "prompt_tokens": 213555,
+    "completion_tokens": 7225,
+    "reasoning_tokens": 0,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 220780
+   },
+   "followup": {
+    "calls": 5,
+    "model": "nvidia/nemotron-3-ultra-550b-a55b",
+    "prompt_tokens": 6746,
+    "completion_tokens": 517,
+    "reasoning_tokens": 0,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 7263
+   }
+  },
+  "extraction": {
+   "extraction_calls": 93,
+   "unavailable_calls": 0,
+   "unavailable_causes": {},
+   "all_none_answered": 44,
+   "all_none_rate_answered": 0.4731,
+   "by_slot_family": {
+    "date": {
+     "asked": 4,
+     "null": 3,
+     "null_rate": 0.75
+    },
+    "place": {
+     "asked": 255,
+     "null": 198,
+     "null_rate": 0.7765
+    },
+    "categorical": {
+     "asked": 324,
+     "null": 312,
+     "null_rate": 0.963
+    },
+    "numeric": {
+     "asked": 27,
+     "null": 20,
+     "null_rate": 0.7407
+    },
+    "other": {
+     "asked": 1,
+     "null": 0,
+     "null_rate": 0.0
+    }
+   },
+   "reasoning_tokens_when_all_none": {
+    "n": 44,
+    "min": 0,
+    "max": 0,
+    "median": 0,
+    "mean": 0.0
+   },
+   "reasoning_tokens_when_read": {
+    "n": 49,
+    "min": 0,
+    "max": 0,
+    "median": 0,
+    "mean": 0.0
+   }
+  }
+ }
+}

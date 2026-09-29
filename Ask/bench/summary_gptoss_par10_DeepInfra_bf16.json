@@ -1,0 +1,126 @@
+{
+ "mode": "gptoss",
+ "model": "openai/gpt-oss-120b",
+ "questions": 100,
+ "verdicts": {
+  "clarify": 10,
+  "clarify_as_ratified": 1,
+  "clarify_gold_offered": 2,
+  "declined_generically": 1,
+  "hit": 84,
+  "wrong_entities": 2
+ },
+ "wall_s_median": 7.695,
+ "wall_s_p90": 10.58,
+ "wall_s_total": 776.5,
+ "chat_calls": 191,
+ "chat_call_s_median": 3.19,
+ "transport_errors": 0,
+ "empty_responses": 0,
+ "truncated": 0,
+ "providers": {
+  "DeepInfra": 191
+ },
+ "openrouter_cost_usd": 0.03417,
+ "workers": 10,
+ "run_wall_s": 89.3,
+ "provider_pin": "DeepInfra",
+ "quantization_pin": "bf16",
+ "untagged_calls": 0,
+ "usage": {
+  "totals": {
+   "calls": 288,
+   "prompt_tokens": 792010,
+   "completion_tokens": 29188,
+   "reasoning_tokens": 19406,
+   "cached_prompt_tokens": 0,
+   "total_tokens": 821198
+  },
+  "by_site": {
+   "embed_query": {
+    "calls": 97,
+    "model": "text-embedding-3-large",
+    "prompt_tokens": 2680,
+    "completion_tokens": 0,
+    "reasoning_tokens": 0,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 2680
+   },
+   "rerank": {
+    "calls": 93,
+    "model": "openai/gpt-oss-120b",
+    "prompt_tokens": 582231,
+    "completion_tokens": 8027,
+    "reasoning_tokens": 5457,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 590258
+   },
+   "extraction": {
+    "calls": 93,
+    "model": "openai/gpt-oss-120b",
+    "prompt_tokens": 200430,
+    "completion_tokens": 20218,
+    "reasoning_tokens": 13599,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 220648
+   },
+   "followup": {
+    "calls": 5,
+    "model": "openai/gpt-oss-120b",
+    "prompt_tokens": 6669,
+    "completion_tokens": 943,
+    "reasoning_tokens": 350,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 7612
+   }
+  },
+  "extraction": {
+   "extraction_calls": 93,
+   "unavailable_calls": 0,
+   "unavailable_causes": {},
+   "all_none_answered": 47,
+   "all_none_rate_answered": 0.5054,
+   "by_slot_family": {
+    "date": {
+     "asked": 5,
+     "null": 5,
+     "null_rate": 1.0
+    },
+    "place": {
+     "asked": 255,
+     "null": 215,
+     "null_rate": 0.8431
+    },
+    "categorical": {
+     "asked": 335,
+     "null": 329,
+     "null_rate": 0.9821
+    },
+    "numeric": {
+     "asked": 29,
+     "null": 20,
+     "null_rate": 0.6897
+    },
+    "other": {
+     "asked": 1,
+     "null": 0,
+     "null_rate": 0.0
+    }
+   },
+   "reasoning_tokens_when_all_none": {
+    "n": 47,
+    "min": 25,
+    "max": 369,
+    "median": 122,
+    "mean": 129.8
+   },
+   "reasoning_tokens_when_read": {
+    "n": 46,
+    "min": 71,
+    "max": 424,
+    "median": 154,
+    "mean": 163.0
+   }
+  }
+ }
+}

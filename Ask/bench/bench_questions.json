@@ -1,0 +1,2590 @@
+[
+ {
+  "n": 1001,
+  "q": "How many Gram Panchayats in Khordha have uploaded the GPDP in 2024-25?",
+  "gold": "PLN-001",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/planning",
+  "id": "G1001",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "district_name": "Khordha"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "FY short form '24-25'"
+  ],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1004,
+  "q": "Which Gram Panchayats have not yet uploaded their GPDP in 2024-2025?",
+  "gold": "PLN-005",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/planning",
+  "id": "G1004",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": "",
+  "expected_result": {
+   "row_count": 0,
+   "test_status": "PASS (0 rows)",
+   "params_used": "{\"date_range\": \"2024-2025\", \"district_name\": null, \"block_name\": null}",
+   "sample_output": "Empty DataFrame\nColumns: [gp_name, block_name, district_name]\nIndex: []",
+   "source": "AI_Chatbot_Questions.xlsx : Test Report sheet"
+  }
+ },
+ {
+  "n": 1005,
+  "q": "24-25 me kaun se GP ne abhi tak GPDP upload nahi kiya?",
+  "gold": "PLN-005",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/planning",
+  "id": "G1005",
+  "bracket": "Planning",
+  "lang": "code_mixed",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1007,
+  "q": "Khordha jillare 2024-2025 re kete GP GPDP upload karichanti?",
+  "gold": "PLN-001",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/planning",
+  "id": "G1007",
+  "bracket": "Planning",
+  "lang": "odia_translit",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "district_name": "Khordha"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": true,
+  "notes": ""
+ },
+ {
+  "n": 1008,
+  "q": "ଆର୍ଥିକ ବର୍ଷ ୨୦୨୪-୨୫ରେ ଖୋର୍ଦ୍ଧାରେ କେତେ GP GPDP ଅପଲୋଡ କରିଛନ୍ତି?",
+  "gold": "PLN-001",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/planning",
+  "id": "G1008",
+  "bracket": "Planning",
+  "lang": "odia",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "district_name": "Khordha",
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "Odia numerals ୨୦୨୪-୨୫"
+  ],
+  "answerability": "Yes",
+  "sme_review": true,
+  "notes": "D18.P5 FIXED in WP-4: date_phrase.normalize_digits maps Odia numerals (U+0B66..U+0B6F) to ASCII before the year patterns run, so this question now binds $date_range = 2024-2025 and answers instead of clarifying. Was encoded as a deliberate known gap (WP-4a §6.2 / B9); the operator ruled fix-now."
+ },
+ {
+  "n": 1010,
+  "q": "Khurda district ka GPDP approval rate kya hai 2024-25 me?",
+  "gold": "PLN-016",
+  "acc": [
+   "PLN-002",
+   "PLN-013"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/planning",
+  "id": "G1010",
+  "bracket": "Planning",
+  "lang": "code_mixed",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "district_name": "Khordha"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "alias 'khurda' -> Khordha"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1011,
+  "q": "What percentage of Gram Panchayats in Bhubaneshwar block have uploaded their GPDP in 2024-2025?",
+  "gold": "PLN-003",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/planning",
+  "id": "G1011",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "block_name": "Bhubaneswar"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "misspelled block 'Bhubaneshwar'"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1012,
+  "q": "Which blocks achieved 100% GPDP submission in 2024-2025?",
+  "gold": "PLN-006",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/planning",
+  "id": "G1012",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "",
+  "expected_result": {
+   "row_count": 16,
+   "test_status": "PASS",
+   "params_used": "{\"date_range\": \"2024-2025\", \"district_name\": null}",
+   "sample_output": " block_name district_name  total_gps  gps_uploaded\nBhubaneswar       Khordha          3             3\nRangeilunda        Ganjam          2             2\n    Barpali       Bargarh          2             2",
+   "source": "AI_Chatbot_Questions.xlsx : Test Report sheet"
+  }
+ },
+ {
+  "n": 1014,
+  "q": "How many GPs in Bhubaneswar uploaded the GPDP after 30 June 2024 in 2024-25?",
+  "gold": "PLN-008",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/planning",
+  "id": "G1014",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "block_name": "Bhubaneswar",
+   "deadline": "2024-06-30"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "prose date '30 June 2024' -> ISO deadline"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1015,
+  "q": "Sir, kindly let me know the GPDP status of Andhrua Gram Panchayat for the financial year 2024-2025.",
+  "gold": "PLN-012",
+  "acc": [
+   "PLU-001"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/planning",
+  "id": "G1015",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "gp_name": "Andhrua"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "Honorific-laden full sentence. PLU-001 (plan status for a GP) is the sibling reading and is accepted."
+ },
+ {
+  "n": 1016,
+  "q": "what about last year?",
+  "gold": "PLN-012",
+  "acc": [
+   "PLU-001"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/planning",
+  "id": "G1016",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "followup",
+  "expected_behavior": "context_preserving_reroute",
+  "expected_entities": {
+   "date_range": "2023-2024",
+   "gp_name": "Andhrua"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "Year-only fragment: keep GP and subject, swap $date_range to known[-2].",
+  "session": "prev",
+  "prior_id": "G1015"
+ },
+ {
+  "n": 1025,
+  "q": "Which themes showed the greatest increase in planned activities between 2023-24 and 2024-25?",
+  "gold": "PLN-039",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/planning",
+  "id": "G1025",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range_2": "2023-2024",
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [
+   "two fiscal years in one question"
+  ],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": "",
+  "expected_result": {
+   "row_count": 7,
+   "test_status": "PASS",
+   "params_used": "{\"date_range\": \"2024-2025\", \"date_range_2\": \"2023-2024\", \"district_name\": null, \"block_name\": null, \"gp_name\": null, \"top_n\": 10}",
+   "sample_output": "                                                  theme  activities_year1  activities_year2  change_in_activities\nTheme 1 - Poverty Free and Enhanced Livelihoods Village               181               188                     7\n                     Theme 4 - Water Sufficient Village               475               440                   -35\n                                         Unmapped theme               262               211                   -51",
+   "source": "AI_Chatbot_Questions.xlsx : Test Report sheet",
+   "direction_pin": {
+    "why": "PLN-039 computes $date_range - $date_range_2 and orders it DESC, so an inverted pair answers \"greatest increase\" with the greatest DECLINE. WP-4's own replays did exactly that on all three runs (date_range=2023-2024, date_range_2=2024-2025 -> change_in_activities=+663 for a theme that fell by 663) and the row still graded `hit`, because route-graded evals never look at a value.",
+    "params": {
+     "date_range": "2024-2025",
+     "date_range_2": "2023-2024",
+     "district_name": null,
+     "block_name": null,
+     "gp_name": null,
+     "top_n": 10
+    },
+    "year_columns": {
+     "activities_year1": "date_range_2",
+     "activities_year2": "date_range"
+    },
+    "first_row": {
+     "theme": "Theme 1 - Poverty Free and Enhanced Livelihoods Village",
+     "activities_year1": 181,
+     "activities_year2": 188,
+     "change_in_activities": 7
+    },
+    "source": "executed read-only against Chatbot/data/panchayat_1.duckdb (WP-4c T3b); agrees with AI_Chatbot_Questions.xlsx Test Report on the rows that sheet carries",
+    "inverted_row": {
+     "theme": "Theme 6 - Self-sufficient Infrastructure in Village",
+     "activities_year1": 1173,
+     "activities_year2": 1836,
+     "change_in_activities": 663
+    }
+   }
+  }
+ },
+ {
+  "n": 1026,
+  "q": "Sanitation ke under 2024-25 me Andhrua me kitni activities plan hui?",
+  "gold": "PLN-049",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/planning",
+  "id": "G1026",
+  "bracket": "Planning",
+  "lang": "code_mixed",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "gp_name": "Andhrua",
+   "focus_area": "Sanitation"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1027,
+  "q": "Which focus area has the highest number of planned activities in 2024-2025?",
+  "gold": "PLN-052",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/planning",
+  "id": "G1027",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": "",
+  "expected_result": {
+   "row_count": 10,
+   "test_status": "PASS",
+   "params_used": "{\"date_range\": \"2024-2025\", \"district_name\": null, \"block_name\": null, \"gp_name\": null, \"top_n\": 10}",
+   "sample_output": "             focus_area_name  planned_activities  planned_cost\nPoverty allevation programme                 561     3581500.0\n                  Sanitation                 560    17771099.0\n                      Health                 430     3586989.0",
+   "source": "AI_Chatbot_Questions.xlsx : Test Report sheet"
+  }
+ },
+ {
+  "n": 1042,
+  "q": "aur sabse kam?",
+  "gold": "PLN-053",
+  "acc": [
+   "PLN-052"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/planning",
+  "id": "G1042",
+  "bracket": "Planning",
+  "lang": "code_mixed",
+  "case_type": "followup",
+  "expected_behavior": "context_preserving_reroute",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": "Code-mixed direction-flip fragment (two words, no English anchor). The only signal is 'kam' — the subject must come entirely from context. WP-5: `acc` widened to PLN-052, the same-template operation route, for the reason given on G1404.",
+  "session": "prev",
+  "prior_id": "G1027"
+ },
+ {
+  "n": 1028,
+  "q": "2024-2025 ରେ କେଉଁ ଫୋକସ ଏରିଆରେ କୌଣସି ଯୋଜନାବଦ୍ଧ କାର୍ଯ୍ୟ ନାହିଁ?",
+  "gold": "PLN-068",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/planning",
+  "id": "G1028",
+  "bracket": "Planning",
+  "lang": "odia",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": true,
+  "notes": "",
+  "expected_result": {
+   "row_count": 5,
+   "test_status": "PASS",
+   "params_used": "{\"date_range\": \"2024-2025\", \"district_name\": null, \"block_name\": null, \"gp_name\": null}",
+   "sample_output": "    focus_area_name\n   Animal husbandry\nCultural activities\n     Family welfare",
+   "source": "AI_Chatbot_Questions.xlsx : Test Report sheet"
+  }
+ },
+ {
+  "n": 1029,
+  "q": "How many activities below Rs 1000 are planned theme-wise in 2024-2025?",
+  "gold": "PLU-006",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/planning",
+  "id": "G1029",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "threshold": "1000"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [
+   "'Rs 1000' amount"
+  ],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": "",
+  "expected_result": {
+   "row_count": 7,
+   "test_status": "PASS",
+   "params_used": "{\"date_range\": \"2024-2025\", \"threshold\": 50, \"district_name\": null, \"block_name\": null, \"gp_name\": null}",
+   "sample_output": "                                              theme  low_cost_activities  total_activities  pct_low_cost\nTheme 6 - Self-sufficient Infrastructure in Village                   18              1173          1.53\n                 Theme 4 - Water Sufficient Village                    4               440          0.91\n             Theme 8 - Village with Good Governance                    2               572          0.35",
+   "source": "AI_Chatbot_Questions.xlsx : Test Report sheet"
+  }
+ },
+ {
+  "n": 1033,
+  "q": "How many fresh and how many maintenance activities does Andhrua have in 2024-25?",
+  "gold": "WRK-001",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/planning",
+  "id": "G1033",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "gp_name": "Andhrua"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1035,
+  "q": "Bhubaneswar ke kaun se GP maintenance par fresh asset se zyada kharch karte hain 2024-25 me?",
+  "gold": "WRK-005",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/planning",
+  "id": "G1035",
+  "bracket": "Planning",
+  "lang": "code_mixed",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "block_name": "Bhubaneswar"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1037,
+  "q": "How many GPs in Laxmipur uploaded the GPDP in 2024-25?",
+  "gold": "PLN-001",
+  "acc": [],
+  "partial": true,
+  "excluded": false,
+  "src": "WP4a-gold/planning",
+  "id": "G1037",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "ambiguity",
+  "expected_behavior": "clarify",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "'Laxmipur' is BOTH a loaded GP and a loaded block"
+  ],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": "Tier collision inside the 20-GP sample. Expected: clarify which tier is meant (reason ambiguous/unknown entity), never a silent pick. This is the sample's own instance of the D4 collision class."
+ },
+ {
+  "n": 1038,
+  "q": "Bheden ka plan status 2024-25?",
+  "gold": "PLU-001",
+  "acc": [
+   "PLN-012"
+  ],
+  "partial": true,
+  "excluded": false,
+  "src": "WP4a-gold/planning",
+  "id": "G1038",
+  "bracket": "Planning",
+  "lang": "code_mixed",
+  "case_type": "ambiguity",
+  "expected_behavior": "clarify",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "'Bheden' is both a GP and a block"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "Second tier-collision instance, code-mixed phrasing."
+ },
+ {
+  "n": 1201,
+  "q": "How many community soak pits have been planned in 2024-25?",
+  "gold": "SBM-GWM-003",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/sanitation_sbm",
+  "id": "G1201",
+  "bracket": "Sanitation (SBM)",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "",
+  "expected_result": {
+   "row_count": 1,
+   "test_status": "PASS",
+   "params_used": "{\"date_range\": \"2024-2025\", \"district_name\": null, \"block_name\": null, \"gp_name\": null}",
+   "sample_output": "               item  matching_activities  planned_activities  planned_cost  total_expenditure\ncommunity soak pits                   61                  61     1235172.0           494392.0",
+   "source": "AI_Chatbot_Questions.xlsx : Test Report sheet"
+  }
+ },
+ {
+  "n": 1202,
+  "q": "and household ones?",
+  "gold": "SBM-GWM-008",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/sanitation_sbm",
+  "id": "G1202",
+  "bracket": "Sanitation (SBM)",
+  "lang": "en",
+  "case_type": "followup",
+  "expected_behavior": "context_preserving_reroute",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "Fragment swaps the SBM item, not a geography slot. Under D5 the item is a keyword concept, so the reroute must land on the household-soak-pit template, not re-answer the community one.",
+  "session": "prev",
+  "prior_id": "G1201"
+ },
+ {
+  "n": 1205,
+  "q": "2024-25 me kitne household soak pit complete hue?",
+  "gold": "SBM-GWM-011",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/sanitation_sbm",
+  "id": "G1205",
+  "bracket": "Sanitation (SBM)",
+  "lang": "code_mixed",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1209,
+  "q": "How many single-pit to twin-pit toilet retrofits have been planned in 2024-2025?",
+  "gold": "SBM-SI-016",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/sanitation_sbm",
+  "id": "G1209",
+  "bracket": "Sanitation (SBM)",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "",
+  "expected_result": {
+   "row_count": 1,
+   "test_status": "PASS",
+   "params_used": "{\"date_range\": \"2024-2025\", \"district_name\": null, \"block_name\": null, \"gp_name\": null}",
+   "sample_output": "                                   item  matching_activities  planned_activities  planned_cost  total_expenditure\nsingle-pit to twin-pit toilet retrofits                  127                 127     1006000.0           364770.0",
+   "source": "AI_Chatbot_Questions.xlsx : Test Report sheet"
+  }
+ },
+ {
+  "n": 1211,
+  "q": "Public institutions me kitne toilet ban gaye 2024-25 me?",
+  "gold": "SBM-SI-004",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/sanitation_sbm",
+  "id": "G1211",
+  "bracket": "Sanitation (SBM)",
+  "lang": "code_mixed",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1213,
+  "q": "How many toilets and handwash units in AWCs and schools are ongoing in 2024-25?",
+  "gold": "SBM-SI-013",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/sanitation_sbm",
+  "id": "G1213",
+  "bracket": "Sanitation (SBM)",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [
+   "acronym AWC"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1218,
+  "q": "Household compost pit par kitna kharcha hua 2024-25 me?",
+  "gold": "SBM-SWM-011",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/sanitation_sbm",
+  "id": "G1218",
+  "bracket": "Sanitation (SBM)",
+  "lang": "code_mixed",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1220,
+  "q": "Segregation bins planned 24-25?",
+  "gold": "SBM-SWM-017",
+  "acc": [
+   "SBM-SWM-021",
+   "SBM-SWM-022"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/sanitation_sbm",
+  "id": "G1220",
+  "bracket": "Sanitation (SBM)",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "Clipped. The catalogue holds a general bin template plus household- and community-specific ones; all three are acceptable for an unqualified ask."
+ },
+ {
+  "n": 1222,
+  "q": "What is the expenditure on Gobardhan units in 2024-2025?",
+  "gold": "SBM-SWM-028",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/sanitation_sbm",
+  "id": "G1222",
+  "bracket": "Sanitation (SBM)",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "",
+  "expected_result": {
+   "row_count": 1,
+   "test_status": "PASS",
+   "params_used": "{\"date_range\": \"2024-2025\", \"district_name\": null, \"block_name\": null, \"gp_name\": null}",
+   "sample_output": "           item  matching_activities  expenditure  planned_cost  total_expenditure\nGobardhan units                   34      27720.0       89500.0            27720.0",
+   "source": "AI_Chatbot_Questions.xlsx : Test Report sheet"
+  }
+ },
+ {
+  "n": 1223,
+  "q": "Door-to-door kachra gaadi kitni chal rahi hain 2024-25 me?",
+  "gold": "SBM-SWM-031",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/sanitation_sbm",
+  "id": "G1223",
+  "bracket": "Sanitation (SBM)",
+  "lang": "code_mixed",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1226,
+  "q": "What is the O&M expenditure on community sanitary complexes in 2024-2025?",
+  "gold": "SBM-OM-001",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/sanitation_sbm",
+  "id": "G1226",
+  "bracket": "Sanitation (SBM)",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [
+   "abbreviation 'O&M'"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "",
+  "expected_result": {
+   "row_count": 1,
+   "test_status": "PASS",
+   "params_used": "{\"date_range\": \"2024-2025\", \"district_name\": null, \"block_name\": null, \"gp_name\": null}",
+   "sample_output": "                        item  maintenance_activities  planned_cost  om_expenditure\ncommunity sanitary complexes                       5      370000.0             0.0",
+   "source": "AI_Chatbot_Questions.xlsx : Test Report sheet"
+  }
+ },
+ {
+  "n": 1227,
+  "q": "What is the Operation & Maintenance expenditure on segregation sheds in 2024-25?",
+  "gold": "SBM-OM-003",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/sanitation_sbm",
+  "id": "G1227",
+  "bracket": "Sanitation (SBM)",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1228,
+  "q": "PPE kit aur safety equipment kitne plan hue 2024-25 me?",
+  "gold": "SBM-OM-008",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/sanitation_sbm",
+  "id": "G1228",
+  "bracket": "Sanitation (SBM)",
+  "lang": "code_mixed",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1402,
+  "q": "What percentage of the sanctioned budget is tied and untied in 2024-2025?",
+  "gold": "BUD-005",
+  "acc": [
+   "BUD-003"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/budgeting_funding",
+  "id": "G1402",
+  "bracket": "Budgeting & Funding",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "",
+  "expected_result": {
+   "row_count": 3,
+   "test_status": "PASS",
+   "params_used": "{\"date_range\": \"2024-2025\", \"district_name\": null, \"block_name\": null, \"gp_name\": null}",
+   "sample_output": "tied_untied  sanctioned_amount  pct_of_sanctioned\n     Untied         27613806.0              59.65\n       Tied         18230430.0              39.38\n      Other           445152.0               0.96",
+   "source": "AI_Chatbot_Questions.xlsx : Test Report sheet"
+  }
+ },
+ {
+  "n": 1405,
+  "q": "Which GPDP theme has the highest planned expenditure in 2024-2025?",
+  "gold": "BUD-007",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/budgeting_funding",
+  "id": "G1405",
+  "bracket": "Budgeting & Funding",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "",
+  "expected_result": {
+   "row_count": 7,
+   "test_status": "PASS",
+   "params_used": "{\"date_range\": \"2024-2025\", \"district_name\": null, \"block_name\": null, \"gp_name\": null, \"top_n\": 10}",
+   "sample_output": "                                              theme  planned_cost  activities\n                 Theme 4 - Water Sufficient Village    43521476.0         440\nTheme 6 - Self-sufficient Infrastructure in Village    35803908.0        1173\n                 Theme 5 - Clean and Green Village     18246099.0         574",
+   "source": "AI_Chatbot_Questions.xlsx : Test Report sheet"
+  }
+ },
+ {
+  "n": 1408,
+  "q": "Andhrua ko 2024-25 me total kitna fund mila?",
+  "gold": "BUD-001",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/budgeting_funding",
+  "id": "G1408",
+  "bracket": "Budgeting & Funding",
+  "lang": "code_mixed",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "gp_name": "Andhrua"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1412,
+  "q": "Compare the activity counts and expenditure of the 15th Finance Commission and the 5th State Finance Commission in Khordha for 2024-25.",
+  "gold": "SCH-008",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/budgeting_funding",
+  "id": "G1412",
+  "bracket": "Budgeting & Funding",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "district_name": "Khordha",
+   "scheme": "XV Finance Commission",
+   "scheme_2": "5TH STATE FINANCE COMMISSION"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "'15th Finance Commission' alias; explicit '5th SFC'"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1414,
+  "q": "What is the district-wise activity count under the XV Finance Commission for 2024-2025?",
+  "gold": "SCH-011",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/budgeting_funding",
+  "id": "G1414",
+  "bracket": "Budgeting & Funding",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "scheme": "XV Finance Commission"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "",
+  "expected_result": {
+   "row_count": 9,
+   "test_status": "PASS",
+   "params_used": "{\"date_range\": \"2024-2025\", \"scheme\": \"XV Finance Commission\"}",
+   "sample_output": "district_name  activities  expenditure\n       Ganjam          58    7174135.0\n      Khordha          45    4189933.0\n      Bargarh          40    6130492.0",
+   "source": "AI_Chatbot_Questions.xlsx : Test Report sheet"
+  }
+ },
+ {
+  "n": 1419,
+  "q": "2024-2025 ରେ ପ୍ରତ୍ୟେକ ପାଣ୍ଠି ଉତ୍ସରୁ କେତେ ଅର୍ଥ ମିଳିଛି?",
+  "gold": "BUD-002",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/budgeting_funding",
+  "id": "G1419",
+  "bracket": "Budgeting & Funding",
+  "lang": "odia",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": true,
+  "notes": ""
+ },
+ {
+  "n": 1424,
+  "q": "What is the total estimated cost of activities under the 14th Finance Commission in Bhubaneswar for 2023-24?",
+  "gold": "SCH-003",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP5-gold/categorical",
+  "id": "G1424",
+  "bracket": "Budgeting & Funding",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2023-2024",
+   "block_name": "Bhubaneswar",
+   "scheme": "Fourteen Finance Commission"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "scheme alias '14th' for a stored value spelled 'Fourteen'"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "D31.6 categorical widening. The alias and the stored value share no characters, so binding it proves the registry resolution ran rather than a string match."
+ },
+ {
+  "n": 1425,
+  "q": "Which GPs in Bhubaneswar have no activities under the 4th State Finance Scheme in 2024-25?",
+  "gold": "SCH-006",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP5-gold/categorical",
+  "id": "G1425",
+  "bracket": "Budgeting & Funding",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "block_name": "Bhubaneswar",
+   "scheme": "4TH STATE FINANCE SCHEME"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "scheme stored in UPPER CASE, asked in title case"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "D31.6 categorical widening. A zero-rows-is-the-answer question, so a wrongly bound scheme returns an empty table that reads exactly like a correct one."
+ },
+ {
+  "n": 1427,
+  "q": "What is the district-wise activity count under the 5th State Finance Commission for 2024-25?",
+  "gold": "SCH-011",
+  "acc": [
+   "SCH-001"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "WP5-gold/categorical",
+  "id": "G1427",
+  "bracket": "Budgeting & Funding",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "scheme": "5TH STATE FINANCE COMMISSION"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "scheme with no geography beside it"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "D31.6 categorical widening. `acc` admits SCH-001, which counts activities under a scheme within a named district — an equally legitimate reading of a question that names no district, and one G1409 already treats as the answer."
+ },
+ {
+  "n": 1502,
+  "q": "What percentage of the planned expenditure has been utilised in 2024-2025?",
+  "gold": "EXP-003",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/expenditure",
+  "id": "G1502",
+  "bracket": "Expenditure",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": "",
+  "expected_result": {
+   "row_count": 1,
+   "test_status": "PASS",
+   "params_used": "{\"date_range\": \"2024-2025\", \"district_name\": null, \"block_name\": null, \"gp_name\": null}",
+   "sample_output": " planned_cost  actual_expenditure  pct_utilised\n  112921943.0          42578449.6         37.71",
+   "source": "AI_Chatbot_Questions.xlsx : Test Report sheet"
+  }
+ },
+ {
+  "n": 1503,
+  "q": "and the unspent amount?",
+  "gold": "EXP-004",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/expenditure",
+  "id": "G1503",
+  "bracket": "Expenditure",
+  "lang": "en",
+  "case_type": "followup",
+  "expected_behavior": "context_preserving_reroute",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": "Complement fragment: same year and scope, the paired unspent template.",
+  "session": "prev",
+  "prior_id": "G1502",
+  "expected_result": {
+   "row_count": 1,
+   "test_status": "PASS",
+   "params_used": "{\"date_range\": \"2024-2025\", \"district_name\": null, \"block_name\": null, \"gp_name\": null}",
+   "sample_output": " planned_cost  actual_expenditure  unspent_amount  pct_unspent\n  112921943.0          42578449.6      70343493.4        62.29",
+   "source": "AI_Chatbot_Questions.xlsx : Test Report sheet"
+  }
+ },
+ {
+  "n": 1504,
+  "q": "2024-25 me total kitna paisa unspent reh gaya?",
+  "gold": "EXP-004",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/expenditure",
+  "id": "G1504",
+  "bracket": "Expenditure",
+  "lang": "code_mixed",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1513,
+  "q": "Andhrua me marammat aur rakhrakhav par kitna kharcha hua 2024-25 me?",
+  "gold": "EXP-037",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/expenditure",
+  "id": "G1513",
+  "bracket": "Expenditure",
+  "lang": "code_mixed",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "gp_name": "Andhrua"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1514,
+  "q": "2024-2025 re Andhrua re nua sampati tiari pain kete kharcha heichi?",
+  "gold": "EXP-036",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/expenditure",
+  "id": "G1514",
+  "bracket": "Expenditure",
+  "lang": "odia_translit",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "gp_name": "Andhrua"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": true,
+  "notes": ""
+ },
+ {
+  "n": 1515,
+  "q": "Which activities have actual expenditure exceeding the planned expenditure in Andhrua in 2024-2025?",
+  "gold": "EXP-035",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/expenditure",
+  "id": "G1515",
+  "bracket": "Expenditure",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "gp_name": "Andhrua"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1517,
+  "q": "How many activities have expenditure under Sanitation in 2024-2025?",
+  "gold": "EXP-010",
+  "acc": [
+   "EXP-026",
+   "EXP-030"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/expenditure",
+  "id": "G1517",
+  "bracket": "Expenditure",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "focus_area": "Sanitation"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": "TRIPLE DUPLICATE in the workbook: EXP-010, EXP-026 and EXP-030 carry identical parameterised questions. Grading on exact-ID match here would manufacture a 2-in-3 failure rate out of nothing. Flagged for WP-3 de-duplication."
+ },
+ {
+  "n": 1608,
+  "q": "Which blocks in Khordha have the highest activity completion rate for 2024-2025?",
+  "gold": "STS-007",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/implementation_progress",
+  "id": "G1608",
+  "bracket": "Implementation & Progress",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "district_name": "Khordha"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1610,
+  "q": "Bhubaneswar me kitne kaam Under Approval me atke hue hain 2024-25 me?",
+  "gold": "STS-010",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/implementation_progress",
+  "id": "G1610",
+  "bracket": "Implementation & Progress",
+  "lang": "code_mixed",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "block_name": "Bhubaneswar"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1611,
+  "q": "2024-2025 ରେ ଆରମ୍ଭ ହୋଇଥିବା କେତେ କାର୍ଯ୍ୟ ସମ୍ପୂର୍ଣ୍ଣ ହୋଇଛି?",
+  "gold": "IMP-002",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/implementation_progress",
+  "id": "G1611",
+  "bracket": "Implementation & Progress",
+  "lang": "odia",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": true,
+  "notes": "",
+  "expected_result": {
+   "row_count": 1,
+   "test_status": "PASS",
+   "params_used": "{\"date_range\": \"2024-2025\", \"district_name\": null, \"block_name\": null, \"gp_name\": null}",
+   "sample_output": " initiated_activities  completed_activities  completion_rate_pct\n                402.0                   2.0                  0.5",
+   "source": "AI_Chatbot_Questions.xlsx : Test Report sheet"
+  }
+ },
+ {
+  "n": 1614,
+  "q": "Which high-expenditure activities have not yet started in 2024-2025?",
+  "gold": "IMP-013",
+  "acc": [],
+  "partial": true,
+  "excluded": false,
+  "src": "WP4a-gold/implementation_progress",
+  "id": "G1614",
+  "bracket": "Implementation & Progress",
+  "lang": "en",
+  "case_type": "ambiguity",
+  "expected_behavior": "clarify",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": "RECLASSIFIED after WP-3 landed. 'High-expenditure' was undefined in the source question and WP-3 made it a REQUIRED $amount_threshold. Unstated here, so the correct behaviour is to ask 'above what amount?'. Contrast G1509/G1510, which state the figure ('above Rs 1,00,000', '5 lakh se upar') and must answer — the pair tests that the router distinguishes a supplied threshold from a missing one rather than defaulting silently."
+ },
+ {
+  "n": 1616,
+  "q": "2024-2025 ରେ କେଉଁ ଫୋକସ ଏରିଆରେ ସବୁଠାରୁ ଅଧିକ ଚାଲୁଥିବା କାର୍ଯ୍ୟ ଅଛି?",
+  "gold": "IMP-011",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/implementation_progress",
+  "id": "G1616",
+  "bracket": "Implementation & Progress",
+  "lang": "odia",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": true,
+  "notes": ""
+ },
+ {
+  "n": 1617,
+  "q": "Andhrua me kitne planned kaam abhi tak shuru hi nahi hue 2024-25 me?",
+  "gold": "IMP-003",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/implementation_progress",
+  "id": "G1617",
+  "bracket": "Implementation & Progress",
+  "lang": "code_mixed",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "gp_name": "Andhrua"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1620,
+  "q": "2024-2025 re Bhubaneswar block re kete kama ra physical progress evidence achi?",
+  "gold": "PHY-004",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/implementation_progress",
+  "id": "G1620",
+  "bracket": "Implementation & Progress",
+  "lang": "odia_translit",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "block_name": "Bhubaneswar"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": true,
+  "notes": ""
+ },
+ {
+  "n": 1621,
+  "q": "What are the stage-wise completion dates for asset 509018477?",
+  "gold": "PHY-002",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/implementation_progress",
+  "id": "G1621",
+  "bracket": "Implementation & Progress",
+  "lang": "en",
+  "case_type": "unanswerable",
+  "expected_behavior": "cannot_answer",
+  "expected_entities": {},
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "No",
+  "sme_review": false,
+  "notes": "No stage-wise completion dates exist anywhere in the DB. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
+  "unanswerable_ref": "PHY-002"
+ },
+ {
+  "n": 1625,
+  "q": "How many activities in Bhubaneswar are under approval for 2024-25?",
+  "gold": "STS-003",
+  "acc": [
+   "STS-010"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "WP5-gold/categorical",
+  "id": "G1625",
+  "bracket": "Implementation & Progress",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "block_name": "Bhubaneswar",
+   "status": "UNDER APPROVAL"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "status phrase that is also ordinary English"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "D31.6 categorical widening. Completes the status registry: G1603/G1604/G1605/G1623 cover ongoing, completed and abandoned, leaving the two approval states unmeasured. **AUTHORING ERROR FOUND BY THE RUN (WP-5):** STS-010 is a purpose-built template for exactly this question ('How many activities in {block_name} are stuck in Under Approval status for {date_range}?'), so routing there is at least as good a reading as STS-003 with $status bound — and the run took it. `acc` admits both. The consequence for what this row MEASURES is stated rather than hidden: on the STS-010 route there is no `$status` slot, so the categorical expectation is vacuous and G1626 ('Activity Approved') is the row that measures the status slot."
+ },
+ {
+  "n": 1701,
+  "q": "Which administratively approved activities in Bhubaneswar still have zero expenditure 90 days after sanction?",
+  "gold": "ALR-001",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/monitoring_alerts_dq",
+  "id": "G1701",
+  "bracket": "Monitoring, Alerts & Data Quality",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "block_name": "Bhubaneswar",
+   "threshold": "90"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "threshold in DAYS"
+  ],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1703,
+  "q": "Which activities in Khordha have a technically approved cost higher than the administratively approved cost in 2024-2025?",
+  "gold": "ALR-004",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/monitoring_alerts_dq",
+  "id": "G1703",
+  "bracket": "Monitoring, Alerts & Data Quality",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "district_name": "Khordha"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1704,
+  "q": "2024-2025 ରେ ଭୁବନେଶ୍ୱର ବ୍ଲକର କେଉଁ ଗ୍ରାମ ପଞ୍ଚାୟତରେ କୌଣସି କାର୍ଯ୍ୟ ହୋଇନାହିଁ?",
+  "gold": "ALR-012",
+  "acc": [
+   "ALR-013"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/monitoring_alerts_dq",
+  "id": "G1704",
+  "bracket": "Monitoring, Alerts & Data Quality",
+  "lang": "odia",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "block_name": "Bhubaneswar"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": true,
+  "notes": "Zero-activity rows are the finding, not an empty result (bootstrap lesson). ALR-013 is the any-module twin."
+ },
+ {
+  "n": 1706,
+  "q": "Which activities approved more than 180 days ago in Bhubaneswar are still not started?",
+  "gold": "ALR-008",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/monitoring_alerts_dq",
+  "id": "G1706",
+  "bracket": "Monitoring, Alerts & Data Quality",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "block_name": "Bhubaneswar",
+   "threshold": "180"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1707,
+  "q": "Which blocks in Khordha are below 50 percent activity completion in 2024-2025?",
+  "gold": "ALR-011",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/monitoring_alerts_dq",
+  "id": "G1707",
+  "bracket": "Monitoring, Alerts & Data Quality",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "district_name": "Khordha",
+   "threshold": "50"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "threshold in PERCENT — same slot name as G1701's days"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1709,
+  "q": "Which activities in Bhubaneswar are marked completed or ongoing but have no progress evidence in 2024-2025?",
+  "gold": "DQY-006",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/monitoring_alerts_dq",
+  "id": "G1709",
+  "bracket": "Monitoring, Alerts & Data Quality",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "block_name": "Bhubaneswar"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1711,
+  "q": "2024-2025 re Khordha re kete activity re funding scheme record hoini?",
+  "gold": "DQY-004",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/monitoring_alerts_dq",
+  "id": "G1711",
+  "bracket": "Monitoring, Alerts & Data Quality",
+  "lang": "odia_translit",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "district_name": "Khordha"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": true,
+  "notes": ""
+ },
+ {
+  "n": 1713,
+  "q": "Which GPs in Khordha have a resource envelope allocation but no uploaded plan for 2025-26?",
+  "gold": "ALR-010",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/monitoring_alerts_dq",
+  "id": "G1713",
+  "bracket": "Monitoring, Alerts & Data Quality",
+  "lang": "en",
+  "case_type": "unanswerable",
+  "expected_behavior": "cannot_answer",
+  "expected_entities": {},
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "No",
+  "sme_review": false,
+  "notes": "No resource-envelope table exists. PLN-005 is the tempting wrong route. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
+  "unanswerable_ref": "ALR-010"
+ },
+ {
+  "n": 1714,
+  "q": "Which activities in Begunia have been ongoing longer than their planned duration in 2025-26?",
+  "gold": "ALR-007",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/monitoring_alerts_dq",
+  "id": "G1714",
+  "bracket": "Monitoring, Alerts & Data Quality",
+  "lang": "en",
+  "case_type": "unanswerable",
+  "expected_behavior": "cannot_answer",
+  "expected_entities": {},
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "'Begunia' is a real Odisha block but is NOT in the 20-GP sample"
+  ],
+  "answerability": "No",
+  "sme_review": false,
+  "notes": "Double trap: unanswerable question AND an unloaded block. Either an honest can't-answer or an unknown-entity clarification is acceptable; a routed answer about some other block is not. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
+  "unanswerable_ref": "ALR-007"
+ },
+ {
+  "n": 1804,
+  "q": "2024-2025 re Khordha jillare block anusare prashasanika manjuri rashi kete?",
+  "gold": "SAN-004",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/sanctions_approvals",
+  "id": "G1804",
+  "bracket": "Sanctions & Approvals",
+  "lang": "odia_translit",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "district_name": "Khordha"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Yes",
+  "sme_review": true,
+  "notes": ""
+ },
+ {
+  "n": 1805,
+  "q": "How many activities in Bhubaneswar are still awaiting administrative approval in 2024-2025?",
+  "gold": "SAN-002",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/sanctions_approvals",
+  "id": "G1805",
+  "bracket": "Sanctions & Approvals",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "block_name": "Bhubaneswar"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "Caveat-critical (D3): approval tables cover ~17% of activities, so absence is not evidence of non-approval. The answer must say so."
+ },
+ {
+  "n": 1806,
+  "q": "Bhubaneswar me kitne percent planned activities ko admin approval mila 2024-25 me?",
+  "gold": "SAN-007",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/sanctions_approvals",
+  "id": "G1806",
+  "bracket": "Sanctions & Approvals",
+  "lang": "code_mixed",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "block_name": "Bhubaneswar"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1851,
+  "q": "How many assets were created in each GP during 2024-2025?",
+  "gold": "AST-001",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/assets",
+  "id": "G1851",
+  "bracket": "Assets",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": true,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "",
+  "expected_result": {
+   "row_count": 20,
+   "test_status": "PASS",
+   "params_used": "{\"date_range\": \"2024-2025\", \"district_name\": null, \"block_name\": null, \"gp_name\": null}",
+   "sample_output": "  gp_name block_name  asset_rows  asset_creating_activities  categorised_assets\nSharagada  Sheragada         276                        276                  23\n Kalimela   Kalimela         268                        268                 174\n Laxmipur   Laxmipur         264                        264                  60",
+   "source": "AI_Chatbot_Questions.xlsx : Test Report sheet"
+  }
+ },
+ {
+  "n": 1860,
+  "q": "Bhubaneswar block ru?",
+  "gold": "AST-001",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/assets",
+  "id": "G1860",
+  "bracket": "Assets",
+  "lang": "odia_translit",
+  "case_type": "followup",
+  "expected_behavior": "context_preserving_reroute",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "block_name": "Bhubaneswar"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": true,
+  "notes": "Transliterated-Odia slot-only fragment ('from Bhubaneswar block?'). is_slot_only_fragment must recognise a non-English postposition.",
+  "session": "prev",
+  "prior_id": "G1851"
+ },
+ {
+  "n": 1853,
+  "q": "Bhubaneswar me 2024-25 me kitne immovable asset bane?",
+  "gold": "AST-006",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/assets",
+  "id": "G1853",
+  "bracket": "Assets",
+  "lang": "code_mixed",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "block_name": "Bhubaneswar"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1907,
+  "q": "Khordha ka activity completion rate saalon me kaise badla?",
+  "gold": "TRD-005",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/trends_comparison",
+  "id": "G1907",
+  "bracket": "Trends & Comparison",
+  "lang": "code_mixed",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "district_name": "Khordha"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1909,
+  "q": "Compare Laxmipur and Kalimela for 2024-25.",
+  "gold": "TRD-011",
+  "acc": [
+   "TRD-010"
+  ],
+  "partial": true,
+  "excluded": false,
+  "src": "WP4a-gold/trends_comparison",
+  "id": "G1909",
+  "bracket": "Trends & Comparison",
+  "lang": "en",
+  "case_type": "ambiguity",
+  "expected_behavior": "clarify",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "BOTH names are a GP and a block in the sample"
+  ],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": "Two-way tier collision plus an unstated comparison subject. Expected: clarify the tier (and ideally the measure), never a silent block-vs-block answer."
+ },
+ {
+  "n": 1953,
+  "q": "Which blocks in Khordha combine high pending sanctions with low expenditure in 2024-25?",
+  "gold": "DSS-002",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/decision_support",
+  "id": "G1953",
+  "bracket": "Decision Support",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "district_name": "Khordha"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 1955,
+  "q": "Which asset sub-categories in Bhubaneswar show the highest repeat-maintenance frequency in 2024-2025?",
+  "gold": "DSS-003",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/decision_support",
+  "id": "G1955",
+  "bracket": "Decision Support",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "block_name": "Bhubaneswar"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "CAVEAT-RENDERING TEST, confirmed against the landed catalogue. The officer states a year; DSS-003 has NO $date_range slot — it is pooled across all six years by design ('a single year cannot show repeat maintenance'). So the year is deliberately absent from expected_entities. The answer will silently cover 2020-2026 unless the caveat is rendered, which is exactly the D3 failure mode. A correct response answers AND says the year was ignored."
+ },
+ {
+  "n": 1956,
+  "q": "Which GPs in Attabira could reach the next PAI grade with the smallest score improvement, and on which themes are they weakest?",
+  "gold": "DSS-004",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/decision_support",
+  "id": "G1956",
+  "bracket": "Decision Support",
+  "lang": "en",
+  "case_type": "unanswerable",
+  "expected_behavior": "cannot_answer",
+  "expected_entities": {},
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "No",
+  "sme_review": false,
+  "notes": "PAI grades and scores are absent from the database entirely. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
+  "unanswerable_ref": "DSS-004"
+ },
+ {
+  "n": 1972,
+  "q": "Bhubaneswar block ke GPs me kitne beneficiary hain 2024-25 me?",
+  "gold": "BEN-003",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/beneficiaries_dropped",
+  "id": "G1972",
+  "bracket": "Beneficiaries",
+  "lang": "code_mixed",
+  "case_type": "unanswerable",
+  "expected_behavior": "cannot_answer",
+  "expected_entities": {},
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Dropped",
+  "sme_review": false,
+  "notes": "WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
+  "unanswerable_ref": "BEN-003"
+ },
+ {
+  "n": 1973,
+  "q": "What is the village-wise count of beneficiaries in Andhrua under NSAP for 2024-2025?",
+  "gold": "BEN-002",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/beneficiaries_dropped",
+  "id": "G1973",
+  "bracket": "Beneficiaries",
+  "lang": "en",
+  "case_type": "unanswerable",
+  "expected_behavior": "cannot_answer",
+  "expected_entities": {},
+  "dashboard_eligible": false,
+  "entity_surface": [],
+  "answerability": "Dropped",
+  "sme_review": false,
+  "notes": "Names NSAP explicitly — the table exists in the schema and is empty. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
+  "unanswerable_ref": "BEN-002"
+ },
+ {
+  "n": 1983,
+  "q": "Who is the current Sarpanch of Andhrua?",
+  "gold": "no_match",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "WP4a-gold/out_of_domain",
+  "id": "G1983",
+  "bracket": "Out of domain",
+  "lang": "en",
+  "case_type": "out_of_domain",
+  "expected_behavior": "graceful_fallback",
+  "expected_entities": {},
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "real GP name; 'sarpanch' is in-domain vocabulary but no person data exists"
+  ],
+  "answerability": "n/a",
+  "sme_review": false,
+  "notes": "Hardest OOD case: in-domain vocabulary, a real entity, no answerable table. The DB has no sarpanch/secretary roster at all."
+ },
+ {
+  "n": 2006,
+  "q": "What is the count of finished sanitation projects for Swachh Bharat for 2025 to 2026?",
+  "gold": "STS-003",
+  "acc": [
+   "IMP-002",
+   "STS-001"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "Eval_1.xlsx row 19 (low_overlap)",
+  "id": "G2006",
+  "bracket": "Implementation & Progress",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "status": "WORK COMPLETED",
+   "focus_area": "Sanitation",
+   "date_range": "2025-2026"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "Eval_1 E03",
+   "low_overlap"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "Swachh Bharat is the Sanitation focus area here (operator ruling 2026-09-12: alias with caveat)."
+ },
+ {
+  "n": 2007,
+  "q": "What is the total unspent balance across all GPs in the state for 2020 to 2021?",
+  "gold": "EXP-004",
+  "acc": [
+   "DSS-006"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "Eval_1.xlsx row 32 (canonical)",
+  "id": "G2007",
+  "bracket": "Expenditure",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2020-2021"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "Eval_1 E04",
+   "canonical"
+  ],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 2008,
+  "q": "What is the aggregate unutilized balance for all GPs in the state for 2020 to 2021?",
+  "gold": "EXP-004",
+  "acc": [
+   "DSS-006"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "Eval_1.xlsx row 35 (low_overlap)",
+  "id": "G2008",
+  "bracket": "Expenditure",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2020-2021"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "Eval_1 E04",
+   "low_overlap"
+  ],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 2011,
+  "q": "What is the total allocation for the 9 Sankalp themes state-wide for 2024 to 2025?",
+  "gold": "BUD-006",
+  "acc": [
+   "BUD-013",
+   "BUD-009"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "Eval_1.xlsx row 54 (canonical)",
+  "id": "G2011",
+  "bracket": "Budgeting & Funding",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "Eval_1 E06",
+   "canonical"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "Sankalp themes = LSDG themes; 6 of 9 exist and the operator ruled to answer from those with no caveat (2026-09-12)."
+ },
+ {
+  "n": 2014,
+  "q": "Find GPs that have zero funds allocated toward Sankalp themes for 2025 to 2026.",
+  "gold": "PLN-032",
+  "acc": [
+   "SCH-006"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "Eval_1.xlsx row 73 (low_overlap)",
+  "id": "G2014",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2025-2026"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "Eval_1 E07",
+   "low_overlap"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "PLN-032 with $theme absent = GPs with no activity under ANY LSDG theme (operator ruling 2026-09-12 made the slot optional)."
+ },
+ {
+  "n": 2015,
+  "q": "How many GPs have uploaded their main GPDP for FY 2025-26?",
+  "gold": "PLN-001",
+  "acc": [
+   "PLN-013"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "Eval_1.xlsx row 83 (canonical)",
+  "id": "G2015",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "plan_type": "Main",
+   "date_range": "2025-2026"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "Eval_1 E08",
+   "canonical"
+  ],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": "Authoring defect fixed: rows 83-94 name FY 2025-26 AND append a second year; the appended year is dropped."
+ },
+ {
+  "n": 2016,
+  "q": "Count the GPs that completed main GPDP uploads for FY 25-26.",
+  "gold": "PLN-001",
+  "acc": [
+   "PLN-013"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "Eval_1.xlsx row 88 (low_overlap)",
+  "id": "G2016",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "plan_type": "Main",
+   "date_range": "2025-2026"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "Eval_1 E08",
+   "low_overlap"
+  ],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": "Authoring defect fixed: rows 83-94 name FY 2025-26 AND append a second year; the appended year is dropped."
+ },
+ {
+  "n": 2019,
+  "q": "What is the total number of supplementary plans approved state-wide for 2025 to 2026?",
+  "gold": "PLN-002",
+  "acc": [
+   "PLN-013",
+   "PLU-004"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "Eval_1.xlsx row 111 (canonical)",
+  "id": "G2019",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "plan_type": "Supplementary",
+   "date_range": "2025-2026"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "Eval_1 E10",
+   "canonical"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 2022,
+  "q": "Count the GPs from Ganjam that have at least one supplementary plan for 2025 to 2026.",
+  "gold": "PLU-004",
+  "acc": [
+   "PLN-001"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "Eval_1.xlsx row 129 (low_overlap)",
+  "id": "G2022",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "district_name": "Ganjam",
+   "date_range": "2025-2026"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "Eval_1 E11",
+   "low_overlap"
+  ],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 2026,
+  "q": "Identify the GP with the highest activity count for 2024 to 2025.",
+  "gold": "PLN-031",
+  "acc": [
+   "PLN-033"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "Eval_1.xlsx row 158 (low_overlap)",
+  "id": "G2026",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "top_n": "1",
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "Eval_1 E13",
+   "low_overlap"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "PLN-031 with $theme absent (operator ruling 2026-09-12)."
+ },
+ {
+  "n": 2027,
+  "q": "What is the total estimated cost of all planned activities state-wide for 2024 to 2026?",
+  "gold": "BUD-006",
+  "acc": [
+   "SCH-003"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "Eval_1.xlsx row 170 (canonical)",
+  "id": "G2027",
+  "bracket": "Budgeting & Funding",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "group_by": "total",
+   "date_range": [
+    "2024-2025",
+    "2025-2026"
+   ]
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "Eval_1 E14",
+   "canonical",
+   "year span"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 2036,
+  "q": "Count of GPs with GPDPs in pending approval status for 2024 to 2025.",
+  "gold": "PLN-014",
+  "acc": [
+   "PLN-019",
+   "PLN-020",
+   "PLN-021"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "Eval_1.xlsx row 250 (low_overlap)",
+  "id": "G2036",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "Eval_1 E18",
+   "low_overlap"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 2037,
+  "q": "How many activities have been completed across the state for 2025 to 2026?",
+  "gold": "STS-003",
+  "acc": [
+   "IMP-002",
+   "STS-001",
+   "STS-013"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "Eval_1.xlsx row 258 (canonical)",
+  "id": "G2037",
+  "bracket": "Implementation & Progress",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "status": "WORK COMPLETED",
+   "date_range": "2025-2026"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "Eval_1 E19",
+   "canonical"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 2039,
+  "q": "How many activities are in progress during 2024 to 2025?",
+  "gold": "STS-003",
+  "acc": [
+   "STS-001"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "Eval_1.xlsx row 269 (canonical)",
+  "id": "G2039",
+  "bracket": "Implementation & Progress",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "status": "WORK ONGOING",
+   "date_range": "2024-2025"
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "Eval_1 E20",
+   "canonical"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 2041,
+  "q": "Which sector has the best activity completion rate for 2024 to 2026?",
+  "gold": "IMP-005",
+  "acc": [
+   "IMP-008",
+   "IMP-009"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "Eval_1.xlsx row 280 (canonical)",
+  "id": "G2041",
+  "bracket": "Implementation & Progress",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "clarify",
+  "expected_entities": {},
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "Eval_1 E21",
+   "canonical",
+   "year span"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": "'sector' as the BREAKDOWN with no value named: the operator ruled the bot asks 'focus area or LSDG theme?' (2026-09-12). Gold is where the focus-area chip leads.",
+  "expected_clarification": "ambiguous_term"
+ },
+ {
+  "n": 2044,
+  "q": "What is the number of road works currently in progress for 2024 to 2026?",
+  "gold": "STS-003",
+  "acc": [],
+  "partial": false,
+  "excluded": false,
+  "src": "Eval_1.xlsx row 305 (low_overlap)",
+  "id": "G2044",
+  "bracket": "Implementation & Progress",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "status": "WORK ONGOING",
+   "focus_area": "Roads",
+   "date_range": [
+    "2024-2025",
+    "2025-2026"
+   ]
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "Eval_1 E22",
+   "low_overlap",
+   "year span"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 2045,
+  "q": "Which districts are behind on GPDP submission for 2024 to 2026?",
+  "gold": "PLN-007",
+  "acc": [
+   "PLN-004",
+   "PLN-016"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "Eval_1.xlsx row 314 (canonical)",
+  "id": "G2045",
+  "bracket": "Planning",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": [
+    "2024-2025",
+    "2025-2026"
+   ]
+  },
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "Eval_1 E23",
+   "canonical",
+   "year span"
+  ],
+  "answerability": "Partial",
+  "sme_review": false,
+  "notes": ""
+ },
+ {
+  "n": 2051,
+  "q": "Show a five-year time series of fund utilization for 2025 to 2026.",
+  "gold": "TRD-003",
+  "acc": [
+   "EXP-002",
+   "TRD-006",
+   "EXP-003"
+  ],
+  "partial": false,
+  "excluded": false,
+  "src": "Eval_1.xlsx row 347 (canonical)",
+  "id": "G2051",
+  "bracket": "Trends & Comparison",
+  "lang": "en",
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {},
+  "dashboard_eligible": false,
+  "entity_surface": [
+   "Eval_1 E26",
+   "canonical"
+  ],
+  "answerability": "Yes",
+  "sme_review": false,
+  "notes": ""
+ }
+]
