@@ -3,6 +3,8 @@ whose data or definition exists turned into templates.
 
     T1  BUD-003 / BUD-005 carry the sanctioned-amount-by-scheme note, BUD-002 the
         cashbook contrast; pilot 1005 / 1007 / 1009 grade on the measure asked.
+    T2  EXP-009 (and its twin EXP-011) own "compare / sector-wise tied spending
+        across focus areas"; TRD-008 hands a TIED-funds question to EXP-009.
 """
 import unittest
 
@@ -62,6 +64,29 @@ class T1PilotGradingNarrowed(unittest.TestCase):
         from grade_eval1 import grade
         row = grade(self._record("BUD-002", {"per_scheme": True}))
         self.assertEqual(row["outcome"], "correct")
+
+
+class T2TiedSpendAcrossFocusAreas(unittest.TestCase):
+
+    def test_exp009_and_its_twin_carry_the_note(self):
+        for qid in ("EXP-009", "EXP-011"):
+            with self.subTest(qid=qid):
+                desc = DESC_BY_QID[qid]
+                self.assertIn("ACROSS FOCUS AREAS", desc)
+                self.assertIn("sector-wise expenditure of tied funds for water and "
+                              "sanitation", desc)
+                self.assertIn("is TRD-002", desc)
+                self.assertIn("is TRD-008", desc)
+
+    def test_trd008_keeps_its_sentence_and_names_the_tied_point(self):
+        desc = DESC_BY_QID["TRD-008"]
+        self.assertIn("'Tied-fund expenditure, water vs sanitation' is EXP-009", desc)
+        self.assertIn("A question about TIED funds is EXP-009, even when it says "
+                      "'sector-wise'.", desc)
+
+    def test_trd002_is_unchanged(self):
+        self.assertTrue(DESC_BY_QID["TRD-002"].endswith(
+            "tied-fund spending on water vs sanitation for a year is EXP-009."))
 
 
 if __name__ == "__main__":

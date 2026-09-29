@@ -377,7 +377,7 @@ FAMILY_DESCRIPTIONS: dict[str, dict] = {
     },
 
     'exp_009__expenditure': {
-        "desc": 'TOTALS: How much tied-fund expenditure was incurred under a given focus area in a given year. Returns focus_area_name, tied_untied, activities, sanctioned_amount, actual_expenditure. One row per focus_area_name. Restricted to activities that have an administrative approval (17% of them). actual_expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "desc": "TOTALS: How much tied-fund expenditure was incurred under a given focus area in a given year. Returns focus_area_name, tied_untied, activities, sanctioned_amount, actual_expenditure. One row per focus_area_name. Restricted to activities that have an administrative approval (17% of them). actual_expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Comparing tied-fund spending ACROSS FOCUS AREAS in one year or span — 'compare tied fund spending between water and sanitation', 'sector-wise expenditure of tied funds for water and sanitation' — is THIS with a focus-area list: one row per focus area. Two different years side by side is TRD-002; approved cost against expenditure per sector in one district, not restricted to tied funds, is TRD-008.",
         "members": ['EXP-009', 'EXP-011'],
     },
 
@@ -1627,7 +1627,7 @@ FAMILY_DESCRIPTIONS: dict[str, dict] = {
     },
 
     'trd_008__physical_vs_financial': {
-        "desc": "COMPARES: What are the approved cost and expenditure sector-wise in a given district for a given year. Returns activities, approved_cost, expenditure, pct_utilised. One row per sector by default; other breakdowns on request. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Approved cost AND expenditure per focus area. 'Tied-fund expenditure, water vs sanitation' is EXP-009, which reports tied spend per focus area.",
+        "desc": "COMPARES: What are the approved cost and expenditure sector-wise in a given district for a given year. Returns activities, approved_cost, expenditure, pct_utilised. One row per sector by default; other breakdowns on request. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Approved cost AND expenditure per focus area. 'Tied-fund expenditure, water vs sanitation' is EXP-009, which reports tied spend per focus area. A question about TIED funds is EXP-009, even when it says 'sector-wise'.",
         "members": ['TRD-008'],
     },
 

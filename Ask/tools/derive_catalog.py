@@ -1207,6 +1207,15 @@ _DISAMBIGUATION: dict[str, str] = {
                "is BUD-002, a different measure.",
     "BUD-002": "CASHBOOK funding recorded per source. A question about the "
                "SANCTIONED amount is BUD-003 (amount) or BUD-005 (share).",
+    # WP-6f T2. Eval_1 42 / 44 / 49. One note serves EXP-011 too: the two are one
+    # statement, one family, and the family shows the first note it finds.
+    "EXP-009": "Comparing tied-fund spending ACROSS FOCUS AREAS in one year or span "
+               "— 'compare tied fund spending between water and sanitation', "
+               "'sector-wise expenditure of tied funds for water and sanitation' — "
+               "is THIS with a focus-area list: one row per focus area. Two "
+               "different years side by side is TRD-002; approved cost against "
+               "expenditure per sector in one district, not restricted to tied "
+               "funds, is TRD-008.",
     "TRD-002": "Compares TWO DIFFERENT named years side by side. A question that "
                "names ONE year or one span is never this: tied-fund spending on "
                "water vs sanitation for a year is EXP-009.",
@@ -1214,7 +1223,8 @@ _DISAMBIGUATION: dict[str, str] = {
                "need their GPDP approved' is a COUNT of GPs, PLN-014.",
     "TRD-008": "Approved cost AND expenditure per focus area. 'Tied-fund "
                "expenditure, water vs sanitation' is EXP-009, which reports tied "
-               "spend per focus area.",
+               "spend per focus area. A question about TIED funds is EXP-009, even "
+               "when it says 'sector-wise'.",
     "IMP-002": "'How many activities have been completed' — state-wide, across "
                "the state or 'for all districts' — is THIS (or STS-003 with status "
                "= WORK COMPLETED). STS-013 is a per-district table of EVERY status; "
