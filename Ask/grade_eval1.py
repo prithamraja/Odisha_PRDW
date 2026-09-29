@@ -35,7 +35,11 @@ what each row says it expects rather than on a template table:
   fund split by scheme   correct when answered per scheme (a scheme column in
                          the rows) or, for a one-scheme question, with that
                          scheme bound. The served and the rank-0 template are
-                         named per-source / tied-untied in the note.
+                         named per-source / tied-untied in the note. A row
+                         whose `expect` carries `accept` must also be served one
+                         of those templates (WP-6f T1: 1005 / 1009 the
+                         sanctioned amount, BUD-003 or SAN-013; 1007 its share,
+                         BUD-005).
   threshold reply        two turns: the first must ASK for the threshold; the
                          second must answer the expected template with the
                          expected figure bound — or, where the reply
@@ -247,6 +251,13 @@ def _grade_answer(final: dict, expect: dict, notes: list[str]) -> str:
         if expect["template"] in family(query_id) and str(value) == expect["value"]:
             return "correct"
         notes.append(f"bound threshold {value!r}, expected {expect['value']}")
+        return "incorrect"
+    # WP-6f T1: a row that names its measure ("sanctioned amount", "share of the
+    # sanctioned budget") accepts only the templates for that measure. Before,
+    # any per-scheme table passed, so 1009 answered from the CASHBOOK (BUD-002)
+    # was graded correct.
+    if "accept" in expect and not _accepted([query_id], tuple(expect["accept"])):
+        notes.append(f"a different measure: expected {' / '.join(expect['accept'])}")
         return "incorrect"
     if columns & SCHEME_COLUMNS:
         if "scheme" in expect:

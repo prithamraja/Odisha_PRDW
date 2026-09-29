@@ -162,12 +162,12 @@ FAMILY_DESCRIPTIONS: dict[str, dict] = {
     },
 
     'bud_002__budgeting': {
-        "desc": 'TOTALS: How much funding is recorded from each funding source in a given year. Returns funding_source, activities, amount, pct_of_total. One row per funding_source. amount is CASHBOOK voucher amounts (cash basis), which is a different convention from the plan-basis expenditure most questions use. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "desc": 'TOTALS: How much funding is recorded from each funding source in a given year. Returns funding_source, activities, amount, pct_of_total. One row per funding_source. amount is CASHBOOK voucher amounts (cash basis), which is a different convention from the plan-basis expenditure most questions use. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. CASHBOOK funding recorded per source. A question about the SANCTIONED amount is BUD-003 (amount) or BUD-005 (share).',
         "members": ['BUD-002'],
     },
 
     'bud_003__budgeting': {
-        "desc": 'TOTALS: How much funding is sanctioned under tied and untied components in a given year. Returns activities, general_amount, sc_amount, st_amount, sanctioned_amount. One row per tied_untied by default; one row per scheme on request. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "desc": "TOTALS: How much funding is sanctioned under tied and untied components in a given year. Returns activities, general_amount, sc_amount, st_amount, sanctioned_amount. One row per tied_untied by default; one row per scheme on request. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Also the SANCTIONED AMOUNT BY SCHEME: 'how much of the sanctioned amount came from SFC / Own Funds / the 15th Finance Commission', 'split the sanctioned funds into SFC and Own Funds' is THIS — $scheme for one scheme, the per-scheme breakdown for several. Funding RECORDED per source in the cashbook is BUD-002, a different measure.",
         "members": ['BUD-003'],
     },
 
@@ -177,7 +177,7 @@ FAMILY_DESCRIPTIONS: dict[str, dict] = {
     },
 
     'bud_005__budgeting': {
-        "desc": 'The PERCENTAGE for: What percentage of the sanctioned budget is tied and untied in a given year. Returns sanctioned_amount, pct_of_sanctioned. One row per tied_untied by default; one row per scheme on request. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "desc": "The PERCENTAGE for: What percentage of the sanctioned budget is tied and untied in a given year. Returns sanctioned_amount, pct_of_sanctioned. One row per tied_untied by default; one row per scheme on request. Restricted to activities that have an administrative approval (17% of them). Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Also the SHARE of the SANCTIONED budget BY SCHEME: 'what share / percentage of the sanctioned budget came from SFC and the 15th Finance Commission' is THIS — $scheme for one scheme, the per-scheme breakdown for several. Funding RECORDED per source in the cashbook is BUD-002, a different measure.",
         "members": ['BUD-005'],
     },
 

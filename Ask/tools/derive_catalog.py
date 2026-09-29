@@ -1191,6 +1191,22 @@ _DISAMBIGUATION: dict[str, str] = {
                "breakdown.",
     "BUD-001": "Funding RECORDED against each GP, one row per GP. The total "
                "estimated (planned) cost of planned activities is BUD-006.",
+    # WP-6f T1. Pilot 1005 / 1007 / 1009: the reranker weighed BUD-003's
+    # tied/untied wording against its scheme phrasings and flipped run to run,
+    # and once answered "sanctioned amount from the SFC" with the cashbook.
+    "BUD-003": "Also the SANCTIONED AMOUNT BY SCHEME: 'how much of the sanctioned "
+               "amount came from SFC / Own Funds / the 15th Finance Commission', "
+               "'split the sanctioned funds into SFC and Own Funds' is THIS — "
+               "$scheme for one scheme, the per-scheme breakdown for several. "
+               "Funding RECORDED per source in the cashbook is BUD-002, a different "
+               "measure.",
+    "BUD-005": "Also the SHARE of the SANCTIONED budget BY SCHEME: 'what share / "
+               "percentage of the sanctioned budget came from SFC and the 15th "
+               "Finance Commission' is THIS — $scheme for one scheme, the per-scheme "
+               "breakdown for several. Funding RECORDED per source in the cashbook "
+               "is BUD-002, a different measure.",
+    "BUD-002": "CASHBOOK funding recorded per source. A question about the "
+               "SANCTIONED amount is BUD-003 (amount) or BUD-005 (share).",
     "TRD-002": "Compares TWO DIFFERENT named years side by side. A question that "
                "names ONE year or one span is never this: tied-fund spending on "
                "water vs sanitation for a year is EXP-009.",
