@@ -1294,18 +1294,26 @@ def _extract_fill_values(
     openai_client,
 ) -> dict[str, str]:
     """Entities already present in the user's utterance, resolved, keyed by
-    slot — used to pre-fill clarify-chip placeholders (best-effort)."""
+    slot — used to pre-fill clarify-chip placeholders (best-effort).
+
+    A slot that any candidate takes as a list is read as one (WP-6h T1), the way
+    the answer path reads it: "from 2022-23 to 2024-25" is three years here too,
+    not the latest alone. What each chip's own template can hold is decided when
+    the chip is rendered (`_chip_fill`)."""
     slot_type: dict[str, str] = {}
+    list_slots: set[str] = set()
     for qid in picked_ids:
         template = template_map.get(qid)
         if template:
             for name, etype in _template_slot_types(template).items():
                 slot_type.setdefault(name, etype)
+            list_slots |= _list_slots(template.get("param_slots", []))
     if not slot_type:
         return {}
     try:
         raw = _extract_slot_values(
-            user_query, slot_type, openai_client, validator=validator
+            user_query, slot_type, openai_client, validator=validator,
+            list_slots=frozenset(list_slots),
         )
     except Exception:
         return {}

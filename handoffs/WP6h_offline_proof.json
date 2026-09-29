@@ -1,0 +1,1356 @@
+{
+ "t1": {
+  "method": "chip_proof.py run on the WP-6g mirror (old) and the WP-6h mirror (new); extractor stubbed to return nothing (the replays do not record its chip-fill output), so only the deterministic readers fill; candidates from the reranker call log (near misses, or all 30 on the miss path) or, for ambiguous-zone rows, retrieval from the cached query vectors",
+  "replays": "WP6e eval1/gold run1/pilot/stage1, WP6f eval1/gold run1/pilot/stage1, WP6g live check; first and second turns",
+  "questions": 607,
+  "fill_with_every_template_as_candidate_changed": 80,
+  "chip_turns_rebuilt": 79,
+  "chip_turns_changed": 19,
+  "chip_turns_not_rebuilt": [
+   {
+    "key": "WP6e_eval1_replay#311#t1",
+    "q": "What is the number of road works currently in progress for 2020-2021?",
+    "reason": "ambiguous_templates"
+   },
+   {
+    "key": "WP6e_gold_replay_run1#1981#t1",
+    "q": "What is the weather forecast for Bhubaneswar tomorrow?",
+    "reason": "ambiguous_templates"
+   },
+   {
+    "key": "WP6e_gold_replay_run1#1985#t1",
+    "q": "Can you write me a leave application in Odia?",
+    "reason": "ambiguous_templates"
+   },
+   {
+    "key": "WP6f_eval1_replay#311#t1",
+    "q": "What is the number of road works currently in progress for 2020-2021?",
+    "reason": "ambiguous_templates"
+   },
+   {
+    "key": "WP6f_gold_replay_run1#1981#t1",
+    "q": "What is the weather forecast for Bhubaneswar tomorrow?",
+    "reason": "ambiguous_templates"
+   },
+   {
+    "key": "WP6f_gold_replay_run1#1985#t1",
+    "q": "Can you write me a leave application in Odia?",
+    "reason": "ambiguous_templates"
+   }
+  ],
+  "old_rebuild_matches_recorded_exactly": 42,
+  "answered_turns": 1201,
+  "answered_turns_binding_differently": [],
+  "fill_changes": [
+   {
+    "q": "Provide the sum of the planned budget outlay across main GPDPs for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Show me the GPs whose planned activities have an estimated cost of zero for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Find GPs containing zero-cost planned activities for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "How many sanitation tasks are complete under the Swachh Bharat scheme for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Compare tied fund spending between water and sanitation for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "What is the sector-wise expenditure of tied funds for water and sanitation for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "How much money is allocated to the 9 Sankalp themes across the state for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "What is the aggregate allocation for Sankalp themes at the state level for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Which Gram Panchayats have zero allocation for Sankalp themes for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Which GPs didn't allocate money to any Sankalp theme for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "How many GPs have uploaded their main GPDP for FY 2025-26 for 2024 to 2025?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "What is the count of GPs that uploaded their main GPDP for 2025-26 for 2024 to 2025?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Total GPs that have uploaded main GPDPs for 2025-2026 for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "How many GPs have uploaded their main GPDP for FY 2025-26 for 2020 to 2021?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2020-2021",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "What is the count of GPs that uploaded their main GPDP for 2025-26 for 2021 to 2022?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2021-2022",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Number of GPs with uploaded main GPDPs for FY 2025-26 for 2022 to 2023.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2022-2023",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "How many Gram Panchayats submitted their main GPDPs for the 25-26 fiscal year for 2020 to 2021?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2020-2021",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Total GPs that have uploaded main GPDPs for 2025-2026 for 2021 to 2022.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2021-2022",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Count the GPs that completed main GPDP uploads for FY 25-26 for 2022 to 2023.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2022-2023",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "List the GPs that have not yet uploaded any GPDP for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Which GPs haven't uploaded a GPDP yet for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Show me the Gram Panchayats with pending GPDP uploads for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "How many supplementary plans are approved across the state for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "State-wide count of approved supplementary plans for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "What is the total volume of approved supplementary plans in the state for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Number of GPs in Ganjam with 1 or more supplementary plans for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Provide the aggregate number of activities planned across main GPDPs for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Which GP planned the maximum number of activities for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "What GP tops the list for the most planned activities for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "What is the total estimated cost of all planned activities state-wide for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Provide the overall expected cost of planned activities in the state for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Which GPs proposed activities costing zero rupees for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Count the activities scheduled for the sanitation sector for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "How many planned activities fall under sanitation for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Provide the total count of sanitation sector planned activities for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Find the GP with the greatest count of piped water supply plans for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "How many GPs have their GPDPs still pending approval for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Find out how many GPs still need their GPDPs approved for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Which sector has the best activity completion rate for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Identify the sector with the highest percentage of completed activities for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Which sector leads in activity completion for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Show the sector with the highest completion rate of activities for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "What sector has the greatest activity completion percentage for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "How many road construction activities are in progress for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Give the count of ongoing road construction activities for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "What is the number of road works currently in progress for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "How many GPDP road construction activities have an in-progress status for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Provide the total number of road construction activities currently underway for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Which districts are behind on GPDP submission for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Identify districts with delayed GPDP submissions for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Which districts have the lowest GPDP submission performance for 2024 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Show the districts lagging in GPDP submission during 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "List the districts that are behind schedule in GPDP submission for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "How has fund utilization changed over the last five years for 2025 to 2026?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2021-2022",
+       "2022-2023",
+       "2023-2024",
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Give a time-series view of fund utilization covering the previous five years for 2025 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2021-2022",
+       "2022-2023",
+       "2023-2024",
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Analyze fund utilization trends across the last five years for 2025 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2021-2022",
+       "2022-2023",
+       "2023-2024",
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Generate a time-series analysis of fund utilization for the last 5 years for 2020-2021.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2020-2021",
+       "2021-2022",
+       "2022-2023",
+       "2023-2024",
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "How has fund utilization changed over the last five years for 2020-2021?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2020-2021",
+       "2021-2022",
+       "2022-2023",
+       "2023-2024",
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Give a time-series view of fund utilization covering the previous five years for 2021-2022.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2021-2022",
+       "2022-2023",
+       "2023-2024",
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Analyze fund utilization trends across the last five years for 2022-2023.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2021-2022",
+       "2022-2023",
+       "2023-2024",
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Generate a time-series analysis of fund utilization for the last 5 years for 2024 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2021-2022",
+       "2022-2023",
+       "2023-2024",
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Generate a time-series analysis of fund utilization for the last 5 years for 2025 to 2026.",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2021-2022",
+       "2022-2023",
+       "2023-2024",
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Which themes showed the greatest increase in planned activities between 2023-24 and 2024-25?",
+    "changed": {
+     "date_range": {
+      "old": "2024-2025",
+      "new": [
+       "2023-2024",
+       "2024-2025"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Which themes have remained consistently among the top priorities over the last five years?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2021-2022",
+       "2022-2023",
+       "2023-2024",
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Which themes showed the greatest decline in planned activities between 2023-24 and 2024-25?",
+    "changed": {
+     "date_range": {
+      "old": "2024-2025",
+      "new": [
+       "2023-2024",
+       "2024-2025"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Bhubaneswar ka total kharcha 2023-24 se 2024-25 me kitna badla?",
+    "changed": {
+     "date_range": {
+      "old": "2024-2025",
+      "new": [
+       "2023-2024",
+       "2024-2025"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Compare the approved cost and expenditure theme-wise between 2023-24 and 2024-25.",
+    "changed": {
+     "date_range": {
+      "old": "2024-2025",
+      "new": [
+       "2023-2024",
+       "2024-2025"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Compare the activities planned and started theme-wise between 2023-24 and 2024-25.",
+    "changed": {
+     "date_range": {
+      "old": "2024-2025",
+      "new": [
+       "2023-2024",
+       "2024-2025"
+      ]
+     }
+    }
+   },
+   {
+    "q": "How has the beneficiary count under XV Finance Commission in Andhrua changed from 2022-23 to 2024-25?",
+    "changed": {
+     "date_range": {
+      "old": "2024-2025",
+      "new": [
+       "2022-2023",
+       "2023-2024",
+       "2024-2025"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Which districts consistently experience delays in GPDP approvals after 30 June 2025 from 2023-24 to 2025-26?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2023-2024",
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Which themes have remained consistently among the top priorities over the last five years in Bargarh?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2021-2022",
+       "2022-2023",
+       "2023-2024",
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Which themes have remained consistently among the lowest priorities over the last five years in Bargarh?",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2021-2022",
+       "2022-2023",
+       "2023-2024",
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Blocks consistently delayed in GPDP approvals from 2023-24 to 2025-26",
+    "changed": {
+     "date_range": {
+      "old": "2025-2026",
+      "new": [
+       "2023-2024",
+       "2024-2025",
+       "2025-2026"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Compare expenditure in 2022-23 and 2024-25",
+    "changed": {
+     "date_range": {
+      "old": "2024-2025",
+      "new": [
+       "2022-2023",
+       "2024-2025"
+      ]
+     }
+    }
+   },
+   {
+    "q": "How many activities were planned from 2022-23 to 2024-25?",
+    "changed": {
+     "date_range": {
+      "old": "2024-2025",
+      "new": [
+       "2022-2023",
+       "2023-2024",
+       "2024-2025"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Beneficiary trend in Barpali from 2022-23 till 2024-25",
+    "changed": {
+     "date_range": {
+      "old": "2024-2025",
+      "new": [
+       "2022-2023",
+       "2023-2024",
+       "2024-2025"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Planned cost between 2022-23 and 2024-25",
+    "changed": {
+     "date_range": {
+      "old": "2024-2025",
+      "new": [
+       "2022-2023",
+       "2024-2025"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Total expenditure from FY 2021-22 to FY 2023-24 in Khordha",
+    "changed": {
+     "date_range": {
+      "old": "2023-2024",
+      "new": [
+       "2021-2022",
+       "2022-2023",
+       "2023-2024"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Activities planned 2022-23 – 2024-25",
+    "changed": {
+     "date_range": {
+      "old": "2024-2025",
+      "new": [
+       "2022-2023",
+       "2023-2024",
+       "2024-2025"
+      ]
+     }
+    }
+   },
+   {
+    "q": "Planned activities in 2023-2025",
+    "changed": {
+     "date_range": {
+      "old": "2024-2025",
+      "new": [
+       "2023-2024",
+       "2024-2025"
+      ]
+     }
+    }
+   }
+  ],
+  "chip_changes": [
+   {
+    "key": "WP6e_eval1_replay#7#t1",
+    "q": "Provide the sum of the planned budget outlay across main GPDPs for 2024 to 2026.",
+    "candidates_from": "reranker near misses",
+    "old": [
+     "How much planned expenditure is allocated to each GPDP theme in 2025-2026 (main GPDP; as one total)?",
+     "How has planned expenditure under each GPDP theme changed over the years (main GPDP; as one total)?"
+    ],
+    "new": [
+     "How much planned expenditure is allocated to each GPDP theme in 2024-2025 and 2025-2026 (main GPDP; as one total)?",
+     "How has planned expenditure under each GPDP theme changed over the years (main GPDP; as one total)?"
+    ],
+    "send_text_equals_label": true
+   },
+   {
+    "key": "WP6e_eval1_replay#12#t1",
+    "q": "Show me the GPs whose planned activities have an estimated cost of zero for 2024 to 2026.",
+    "candidates_from": "reranker near misses",
+    "old": [
+     "How many no-cost activities are planned in a block for 2025-2026?",
+     "Which activities in a district have a zero or negative estimated cost recorded in 2025-2026?",
+     "What are the activities with zero expenditure under a focus area in 2025-2026?"
+    ],
+    "new": [
+     "How many no-cost activities are planned in a block for 2024-2025 and 2025-2026?",
+     "Which activities in a district have a zero or negative estimated cost recorded in 2024-2025 and 2025-2026?",
+     "What are the activities with zero expenditure under a focus area in 2024-2025 and 2025-2026?"
+    ],
+    "send_text_equals_label": true
+   },
+   {
+    "key": "WP6e_eval1_replay#42#t1",
+    "q": "Compare tied fund spending between water and sanitation for 2024 to 2026.",
+    "candidates_from": "reranker near misses",
+    "old": [
+     "How much tied-fund expenditure was incurred under a focus area in 2025-2026?",
+     "How much actual expenditure has been incurred under tied and untied funds in 2025-2026?",
+     "How much funding is sanctioned under tied and untied components in 2025-2026?"
+    ],
+    "new": [
+     "How much tied-fund expenditure was incurred under a focus area in 2024-2025 and 2025-2026?",
+     "How much actual expenditure has been incurred under tied and untied funds in 2024-2025 and 2025-2026?",
+     "How much funding is sanctioned under tied and untied components in 2024-2025 and 2025-2026?"
+    ],
+    "send_text_equals_label": true
+   },
+   {
+    "key": "WP6e_eval1_replay#145#t1",
+    "q": "Provide the aggregate number of activities planned across main GPDPs for 2024 to 2026.",
+    "candidates_from": "reranker near misses",
+    "old": [
+     "How many activities are planned under each GPDP theme in a gram panchayat in 2025-2026 (main GPDP; as one total)?",
+     "How has the number of planned activities under each theme changed over the last five years (main GPDP; as one total)?",
+     "Which GP has the highest number of planned activities under each GPDP theme in 2025-2026 (main GPDP; as one total)?"
+    ],
+    "new": [
+     "How many activities are planned under each GPDP theme in a gram panchayat in 2024-2025 and 2025-2026 (main GPDP; as one total)?",
+     "How has the number of planned activities under each theme changed over the last five years (main GPDP; as one total)?",
+     "Which GP has the highest number of planned activities under each GPDP theme in 2024-2025 and 2025-2026 (main GPDP; as one total)?"
+    ],
+    "send_text_equals_label": true
+   },
+   {
+    "key": "WP6e_eval1_replay#174#t1",
+    "q": "Provide the overall expected cost of planned activities in the state for 2024 to 2026.",
+    "candidates_from": "reranker near misses",
+    "old": [
+     "How much planned expenditure is allocated to each GPDP theme in 2025-2026 (as one total)?",
+     "What percentage of total planned expenditure is allocated to each focus area in 2025-2026 (as one total)?",
+     "What is the total actual expenditure under each GPDP theme in 2025-2026 (as one total)?"
+    ],
+    "new": [
+     "How much planned expenditure is allocated to each GPDP theme in 2024-2025 and 2025-2026 (as one total)?",
+     "What percentage of total planned expenditure is allocated to each focus area in 2024-2025 and 2025-2026 (as one total)?",
+     "What is the total actual expenditure under each GPDP theme in 2024-2025 and 2025-2026 (as one total)?"
+    ],
+    "send_text_equals_label": true
+   },
+   {
+    "key": "WP6e_eval1_replay#188#t1",
+    "q": "Which GPs proposed activities costing zero rupees for 2024 to 2026?",
+    "candidates_from": "reranker near misses",
+    "old": [
+     "How many no-cost activities are planned in a block for 2025-2026 (broken down by gram panchayat)?",
+     "Which activities in a district have a zero or negative estimated cost recorded in 2025-2026 (broken down by gram panchayat)?",
+     "How many low-cost activities (below a threshold rupees) are planned theme-wise in 2025-2026 (broken down by gram panchayat)?"
+    ],
+    "new": [
+     "How many no-cost activities are planned in a block for 2024-2025 and 2025-2026 (broken down by gram panchayat)?",
+     "Which activities in a district have a zero or negative estimated cost recorded in 2024-2025 and 2025-2026 (broken down by gram panchayat)?",
+     "How many low-cost activities (below a threshold rupees) are planned theme-wise in 2024-2025 and 2025-2026 (broken down by gram panchayat)?"
+    ],
+    "send_text_equals_label": true
+   },
+   {
+    "key": "WP6e_eval1_replay#283#t1",
+    "q": "Show the sector with the highest completion rate of activities for 2024 to 2026.",
+    "candidates_from": "reranker near misses",
+    "old": [
+     "Which focus area has the lowest completion rate in 2025-2026?",
+     "Which themes have the highest number of completed activities in 2025-2026?",
+     "What is the completion rate under each theme and focus area in 2025-2026?"
+    ],
+    "new": [
+     "Which focus area has the lowest completion rate in 2024-2025 and 2025-2026?",
+     "Which themes have the highest number of completed activities in 2024-2025 and 2025-2026?",
+     "What is the completion rate under each theme and focus area in 2024-2025 and 2025-2026?"
+    ],
+    "send_text_equals_label": true
+   },
+   {
+    "key": "WP6e_gold_replay_run1#2042#t1",
+    "q": "Identify the sector with the highest percentage of completed activities for 2024 to 2026.",
+    "candidates_from": "reranker near misses",
+    "old": [
+     "What is the completion rate under each theme and focus area in 2025-2026?",
+     "Which focus area has the lowest completion rate in 2025-2026?",
+     "Which themes have the highest number of completed activities in 2025-2026?"
+    ],
+    "new": [
+     "What is the completion rate under each theme and focus area in 2024-2025 and 2025-2026?",
+     "Which focus area has the lowest completion rate in 2024-2025 and 2025-2026?",
+     "Which themes have the highest number of completed activities in 2024-2025 and 2025-2026?"
+    ],
+    "send_text_equals_label": true
+   },
+   {
+    "key": "WP6e_stage1#42#t1",
+    "q": "Compare tied fund spending between water and sanitation for 2024 to 2026.",
+    "candidates_from": "reranker near misses",
+    "old": [
+     "How much tied-fund expenditure was incurred under a focus area in 2025-2026?",
+     "How much actual expenditure has been incurred under tied and untied funds in 2025-2026?",
+     "How much funding is sanctioned under tied and untied components in 2025-2026?"
+    ],
+    "new": [
+     "How much tied-fund expenditure was incurred under a focus area in 2024-2025 and 2025-2026?",
+     "How much actual expenditure has been incurred under tied and untied funds in 2024-2025 and 2025-2026?",
+     "How much funding is sanctioned under tied and untied components in 2024-2025 and 2025-2026?"
+    ],
+    "send_text_equals_label": true
+   },
+   {
+    "key": "WP6f_eval1_replay#281#t1",
+    "q": "Identify the sector with the highest percentage of completed activities for 2024 to 2026.",
+    "candidates_from": "reranker near misses",
+    "old": [
+     "Which themes have the highest number of completed activities in 2025-2026?",
+     "What is the completion rate under each theme and focus area in 2025-2026?",
+     "Which focus area has the lowest completion rate in 2025-2026?"
+    ],
+    "new": [
+     "Which themes have the highest number of completed activities in 2024-2025 and 2025-2026?",
+     "What is the completion rate under each theme and focus area in 2024-2025 and 2025-2026?",
+     "Which focus area has the lowest completion rate in 2024-2025 and 2025-2026?"
+    ],
+    "send_text_equals_label": true
+   },
+   {
+    "key": "WP6f_eval1_replay#283#t1",
+    "q": "Show the sector with the highest completion rate of activities for 2024 to 2026.",
+    "candidates_from": "reranker near misses",
+    "old": [
+     "What is the completion rate under each theme and focus area in 2025-2026?",
+     "Which focus area has the lowest completion rate in 2025-2026?",
+     "Which focus area has the highest number of completed activities in 2025-2026?"
+    ],
+    "new": [
+     "What is the completion rate under each theme and focus area in 2024-2025 and 2025-2026?",
+     "Which focus area has the lowest completion rate in 2024-2025 and 2025-2026?",
+     "Which focus area has the highest number of completed activities in 2024-2025 and 2025-2026?"
+    ],
+    "send_text_equals_label": true
+   },
+   {
+    "key": "WP6f_gold_replay_run1#2042#t1",
+    "q": "Identify the sector with the highest percentage of completed activities for 2024 to 2026.",
+    "candidates_from": "reranker near misses",
+    "old": [
+     "What is the completion rate under each theme and focus area in 2025-2026?",
+     "Which themes have the highest number of completed activities in 2025-2026?",
+     "Which focus area has the lowest completion rate in 2025-2026?"
+    ],
+    "new": [
+     "Which themes have the highest number of completed activities in 2024-2025 and 2025-2026?",
+     "What is the completion rate under each theme and focus area in 2024-2025 and 2025-2026?",
+     "Which focus area has the lowest completion rate in 2024-2025 and 2025-2026?"
+    ],
+    "send_text_equals_label": true
+   },
+   {
+    "key": "WP6g_live_check#1062#t1",
+    "q": "Blocks consistently delayed in GPDP approvals from 2023-24 to 2025-26",
+    "candidates_from": "reranker near misses",
+    "old": [
+     "Which Blocks consistently experience delays in GPDP approvals after the deadline a deadline in 2025-2026?",
+     "Which Blocks have the highest number of pending GPDP approvals in 2025-2026?",
+     "Which Districts consistently experience delays in GPDP approvals after the deadline a deadline in 2025-2026?"
+    ],
+    "new": [
+     "Which Blocks consistently experience delays in GPDP approvals after the deadline a deadline in 2023-2024, 2024-2025 and 2025-2026?",
+     "Which Blocks have the highest number of pending GPDP approvals in 2023-2024, 2024-2025 and 2025-2026?",
+     "Which Districts consistently experience delays in GPDP approvals after the deadline a deadline in 2023-2024, 2024-2025 and 2025-2026?"
+    ],
+    "send_text_equals_label": true
+   },
+   {
+    "key": "WP6g_live_check#1060#t1",
+    "q": "How many activities were planned from 2022-23 to 2024-25?",
+    "candidates_from": "reranker near misses",
+    "old": [
+     "How many activities are planned under each GPDP theme in a gram panchayat in 2024-2025?",
+     "How many activities in a gram panchayat are in each progress status for 2024-2025?",
+     "Are the planned activities balanced across themes in 2024-2025?"
+    ],
+    "new": [
+     "How many activities are planned under each GPDP theme in a gram panchayat in 2022-2023, 2023-2024 and 2024-2025?",
+     "How many activities in a gram panchayat are in each progress status for 2022-2023, 2023-2024 and 2024-2025?",
+     "Are the planned activities balanced across themes in 2022-2023, 2023-2024 and 2024-2025?"
+    ],
+    "send_text_equals_label": true
+   },
+   {
+    "key": "WP6g_live_check#1063#t1",
+    "q": "Beneficiary trend in Barpali from 2022-23 till 2024-25",
+    "candidates_from": "reranker near misses",
+    "old": [
+     "How many beneficiaries are recorded across GPs of a block under a scheme for 2024-2025?",
+     "How has the beneficiary count under a scheme in a gram panchayat changed over 2024-2025?",
+     "How many beneficiaries received benefits under a scheme in a gram panchayat during 2024-2025?"
+    ],
+    "new": [
+     "How many beneficiaries are recorded across GPs of a block under a scheme for 2022-2023, 2023-2024 and 2024-2025?",
+     "How has the beneficiary count under a scheme in a gram panchayat changed over 2022-2023, 2023-2024 and 2024-2025?",
+     "How many beneficiaries received benefits under a scheme in a gram panchayat during 2022-2023, 2023-2024 and 2024-2025?"
+    ],
+    "send_text_equals_label": true
+   },
+   {
+    "key": "WP6g_live_check#1066#t1",
+    "q": "Planned cost between 2022-23 and 2024-25",
+    "candidates_from": "reranker near misses",
+    "old": [
+     "How much planned expenditure is allocated to each GPDP theme in 2024-2025?",
+     "Compare the approved cost and expenditure theme-wise between 2022-2023 and 2024-2025.",
+     "Compare the activities planned and started theme-wise between 2022-2023 and 2024-2025."
+    ],
+    "new": [
+     "How much planned expenditure is allocated to each GPDP theme in 2022-2023 and 2024-2025?",
+     "Compare the approved cost and expenditure theme-wise between 2022-2023 and 2022-2023 and 2024-2025.",
+     "Compare the activities planned and started theme-wise between 2022-2023 and 2022-2023 and 2024-2025."
+    ],
+    "send_text_equals_label": true
+   },
+   {
+    "key": "WP6g_live_check#1061#t1",
+    "q": "Total expenditure from FY 2021-22 to FY 2023-24 in Khordha",
+    "candidates_from": "reranker near misses",
+    "old": [
+     "How did the total expenditure of a block change between 2021-2022 and 2023-2024 (as one total)?",
+     "How does a district compare with the state average on expenditure per GP and completion rate for 2023-2024 (as one total)?",
+     "What is the total amount recorded per scheme across a district in 2023-2024 (as one total)?"
+    ],
+    "new": [
+     "How did the total expenditure of a block change between 2021-2022 and 2021-2022, 2022-2023 and 2023-2024 (as one total)?",
+     "How does a district compare with the state average on expenditure per GP and completion rate for 2021-2022, 2022-2023 and 2023-2024 (as one total)?",
+     "What is the total amount recorded per scheme across a district in 2021-2022, 2022-2023 and 2023-2024 (as one total)?"
+    ],
+    "send_text_equals_label": true
+   },
+   {
+    "key": "WP6g_live_check#1064#t1",
+    "q": "Activities planned 2022-23 – 2024-25",
+    "candidates_from": "reranker near misses",
+    "old": [
+     "What activities are planned under a focus area in 2024-2025?",
+     "Are the planned activities balanced across themes in 2024-2025?",
+     "Compare the activities planned and started theme-wise between 2022-2023 and 2024-2025."
+    ],
+    "new": [
+     "What activities are planned under a focus area in 2022-2023, 2023-2024 and 2024-2025?",
+     "Are the planned activities balanced across themes in 2022-2023, 2023-2024 and 2024-2025?",
+     "Compare the activities planned and started theme-wise between 2022-2023 and 2022-2023, 2023-2024 and 2024-2025."
+    ],
+    "send_text_equals_label": true
+   },
+   {
+    "key": "WP6g_live_check#1067#t1",
+    "q": "Planned activities in 2023-2025",
+    "candidates_from": "reranker near misses",
+    "old": [
+     "How many activities are planned under each GPDP theme in a gram panchayat in 2024-2025?",
+     "Which focus area has the highest number of planned activities in 2024-2025?",
+     "Are the planned activities balanced across themes in 2024-2025?"
+    ],
+    "new": [
+     "How many activities are planned under each GPDP theme in a gram panchayat in 2023-2024 and 2024-2025?",
+     "Which focus area has the highest number of planned activities in 2023-2024 and 2024-2025?",
+     "Are the planned activities balanced across themes in 2023-2024 and 2024-2025?"
+    ],
+    "send_text_equals_label": true
+   }
+  ]
+ }
+}
