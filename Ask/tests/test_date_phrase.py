@@ -175,6 +175,173 @@ class NoFiscalYearTests(unittest.TestCase):
         self.assertEqual(resolve_fiscal_years("GPs with 23-25 works", LOADED_YEARS), [])
 
 
+THREE = ["2022-2023", "2023-2024", "2024-2025"]
+ENDS = ["2022-2023", "2024-2025"]
+
+
+class FiscalYearSpanTests(unittest.TestCase):
+    """WP-6g T1: "from X to Y" between two fiscal years is every year from X to
+    Y, both ends included (operator ruling 2026-09-29). It used to read as the
+    two end years: pilot rows 1055 and 1057 dropped 2023-24."""
+
+    def _years(self, text):
+        return resolve_fiscal_years(text, LOADED_YEARS)
+
+    def test_the_pilot_wording(self):
+        self.assertEqual(self._years("from 2022-23 to 2024-25"), THREE)
+        self.assertEqual(
+            self._years("Blocks consistently delayed in GPDP approvals from "
+                        "2023-24 to 2025-26"),
+            ["2023-2024", "2024-2025", "2025-2026"])
+
+    def test_each_end_form(self):
+        for text in ("2022-2023 to 2024-2025", "2022-23 to 2024-25",
+                     "22-23 to 24-25", "2022-23 to 24-25", "2022-2023 to 2024-25",
+                     "2022/23 to 2024/25", "2022–23 to 2024–25"):
+            with self.subTest(text=text):
+                self.assertEqual(self._years(text), THREE)
+
+    def test_each_label(self):
+        for text in ("FY 2022-23 to FY 2024-25", "from FY 2022-23 to FY 2024-25",
+                     "F.Y. 2022-23 to 2024-25", "FY22-23 to FY24-25",
+                     "financial year 2022-23 to financial year 2024-25",
+                     "fiscal year 2022-23 to 2024-25",
+                     "plan year 2022-23 to plan year 2024-25"):
+            with self.subTest(text=text):
+                self.assertEqual(self._years(text), THREE)
+
+    def test_every_link_word(self):
+        for link in ("to", "till", "until", "through", "thru", "TO", "Till"):
+            with self.subTest(link=link):
+                self.assertEqual(self._years(f"from 2022-23 {link} 2024-25"), THREE)
+
+    def test_a_spaced_en_or_em_dash(self):
+        for text in ("2022-23 – 2024-25", "2022-23 — 2024-25",
+                     "Activities planned 2022-23 – 2024-25"):
+            with self.subTest(text=text):
+                self.assertEqual(self._years(text), THREE)
+
+    def test_an_unspaced_dash_or_a_spaced_hyphen_is_not_a_link(self):
+        """Not in the ruled shape: each end is still read on its own."""
+        for text in ("2022-23–2024-25", "2022-23 - 2024-25"):
+            with self.subTest(text=text):
+                self.assertEqual(self._years(text), ENDS)
+
+    def test_from_is_neither_needed_nor_read(self):
+        self.assertEqual(self._years("from 2022-23 to 2024-25"),
+                         self._years("2022-23 to 2024-25"))
+        self.assertEqual(self._years("expenditure 2022-23 to 2024-25 in Khordha"),
+                         THREE)
+
+    def test_both_ends_are_included(self):
+        self.assertEqual(self._years("2024-25 to 2025-26"),
+                         ["2024-2025", "2025-2026"])
+        self.assertEqual(self._years("from 2024-25 to 2024-25"), ["2024-2025"])
+
+    def test_it_matches_the_bare_year_span(self):
+        """"2022 to 2025" already gave these three; the two spellings of one
+        period can no longer disagree."""
+        self.assertEqual(self._years("from 2022-23 to 2024-25"),
+                         self._years("from 2022 to 2025"))
+
+    def test_the_full_form_no_longer_reads_a_year_nobody_named(self):
+        """Before, the bare span took "2023 to 2024" out of the middle and the
+        bare-year scan read the ends: 2022-23, 2023-24 and 2025-26."""
+        self.assertEqual(self._years("from 2022-2023 to 2024-2025"), THREE)
+        self.assertEqual(
+            self._years("How did Bhubaneswar's expenditure change from "
+                        "2023-2024 to 2024-2025?"),
+            ["2023-2024", "2024-2025"])
+
+    def test_ten_years_is_the_widest_span(self):
+        self.assertEqual(
+            resolve_fiscal_years("from 2012-13 to 2021-22"),
+            [f"{y}-{y + 1}" for y in range(2012, 2022)])
+
+    def test_eleven_years_keeps_the_old_reading_and_is_logged(self):
+        with self.assertLogs("query_router.date_phrase", "INFO") as logs:
+            self.assertEqual(resolve_fiscal_years("from 2011-12 to 2021-22"),
+                             ["2011-2012", "2021-2022"])
+        self.assertIn("wider than 10", logs.output[0])
+
+    def test_a_reversed_pair_keeps_the_old_reading_and_is_logged(self):
+        with self.assertLogs("query_router.date_phrase", "INFO") as logs:
+            self.assertEqual(self._years("from 2024-25 to 2022-23"), ENDS)
+        self.assertIn("tail is before its head", logs.output[0])
+
+    def test_the_money_guard_holds_at_either_end(self):
+        """A figure at either end is not a year, so there is no span — each end
+        is judged by the single patterns exactly as before."""
+        self.assertEqual(self._years("Rs 2022-23 to 2024-25"), ["2024-2025"])
+        self.assertEqual(self._years("2022-23 to 2024-25 lakh"), ENDS)
+        self.assertEqual(self._years("2022-23 to ₹2024-25"), ["2022-2023"])
+
+    def test_an_end_naming_several_years_is_not_a_span_end(self):
+        self.assertEqual(self._years("2020-2022 to 2024-25"),
+                         ["2020-2021", "2022-2023", "2023-2024"])
+
+    def test_odia_digits(self):
+        self.assertEqual(self._years("୨୦୨୨-୨୩ to ୨୦୨୪-୨୫"), THREE)
+
+    # ── Mixed forms (the report says which are read and why) ──────────────────
+
+    def test_a_bare_head_and_a_fiscal_tail_is_a_span(self):
+        """A bare head is the fiscal year that starts in it under both readings
+        this module has, so the span is unambiguous. It used to lose the tail:
+        "2022 to 2024" was taken out of it, giving 2022-23 and 2023-24."""
+        for text in ("from 2022 to 2024-25", "FY 2022 to FY 2024-25",
+                     "2022 till 2024-2025", "2022 – 2024-25"):
+            with self.subTest(text=text):
+                self.assertEqual(self._years(text), THREE)
+
+    def test_a_fiscal_head_and_a_bare_tail_is_left_alone(self):
+        """"to 2025" ends the span at 2024-25 or names 2025-26 — the FY naming
+        question awaiting the operator. Byte-identical to before WP-6g."""
+        self.assertEqual(self._years("from 2022-23 to 2025"),
+                         ["2022-2023", "2025-2026"])
+        self.assertEqual(self._years("from 2022-2023 to 2025"), THREE)
+
+
+class UnchangedYearFormTests(unittest.TestCase):
+    """WP-6g §0: every reading that is not a "to" span between fiscal years is
+    exactly what it was before WP-6g."""
+
+    def test_the_brief_table(self):
+        for text, expected in (
+            ("from 2022 to 2025", THREE),
+            ("for 2022 to 2025", THREE),
+            ("in 2022-2025", THREE),
+            ("between 2022-23 and 2024-25", ENDS),
+            ("compare 2022-23 and 2024-25", ENDS),
+            ("2022-23 and 2024-25", ENDS),
+            ("2022-23 vs 2024-25", ENDS),
+            ("Compare expenditure in 2022-23 and 2024-25", ENDS),
+            ("Planned cost between 2022-23 and 2024-25", ENDS),
+            ("Planned activities in 2023-2025", ["2023-2024", "2024-2025"]),
+        ):
+            with self.subTest(text=text):
+                self.assertEqual(resolve_fiscal_years(text, LOADED_YEARS), expected)
+
+    def test_single_and_relative_years(self):
+        for text, expected in (
+            ("FY 2024-25", ["2024-2025"]), ("2024", ["2024-2025"]),
+            ("24-25", ["2024-2025"]), ("last year", ["2024-2025"]),
+            ("this year", ["2025-2026"]),
+            ("last two years", ["2024-2025", "2025-2026"]),
+        ):
+            with self.subTest(text=text):
+                self.assertEqual(resolve_fiscal_years(text, LOADED_YEARS), expected)
+
+    def test_the_calendar_window_reads_the_span_the_same_way(self):
+        """`extract_date_window` spans every period it reads, so the span needs
+        no change there: April 2022 to March 2025, the three fiscal years."""
+        for text in ("from 2022-23 to 2024-25", "FY 2022-23 – FY 2024-25",
+                     "from 2022-2023 to 2024-2025"):
+            with self.subTest(text=text):
+                self.assertEqual(extract_date_window(text),
+                                 ("2022-04-01", "2025-03-31"))
+
+
 class OdiaNumeralTests(unittest.TestCase):
     """Decision D18.P5. Odia is an official language of the state and its
     numerals are U+0B66..U+0B6F, which the ASCII-only `_YEAR` pattern read as no
