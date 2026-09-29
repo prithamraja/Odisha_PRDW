@@ -72,5 +72,12 @@
  {"n": 1064, "group": "WP-6g year span", "q": "Activities planned 2022-23 – 2024-25", "expect": {"years": ["2022-2023", "2023-2024", "2024-2025"], "answers": true}},
  {"n": 1065, "group": "WP-6g year span", "q": "Compare expenditure in 2022-23 and 2024-25", "expect": {"years": ["2022-2023", "2024-2025"], "answers": true, "control": "still two years"}},
  {"n": 1066, "group": "WP-6g year span", "q": "Planned cost between 2022-23 and 2024-25", "expect": {"years": ["2022-2023", "2024-2025"], "answers": true, "control": "still two years"}},
- {"n": 1067, "group": "WP-6g year span", "q": "Planned activities in 2023-2025", "expect": {"years": ["2023-2024", "2024-2025"], "answers": true, "control": "D33.7, unchanged"}}
+ {"n": 1067, "group": "WP-6g year span", "q": "Planned activities in 2023-2025", "expect": {"years": ["2023-2024", "2024-2025"], "answers": true, "control": "D33.7, unchanged"}},
+ {"n": 1070, "group": "WP-6h chip years", "q": "How many activities were planned from 2022-23 to 2024-25?", "chip": 1, "expect": {"years": ["2022-2023", "2023-2024", "2024-2025"], "from_row": 1060}},
+ {"n": 1071, "group": "WP-6h chip years", "q": "Total expenditure from FY 2021-22 to FY 2023-24 in Khordha", "chip": 1, "expect": {"years": ["2021-2022", "2022-2023", "2023-2024"], "from_row": 1061}},
+ {"n": 1072, "group": "WP-6h chip years", "q": "Blocks consistently delayed in GPDP approvals from 2023-24 to 2025-26", "chip": 1, "expect": {"years": ["2023-2024", "2024-2025", "2025-2026"], "from_row": 1062}},
+ {"n": 1073, "group": "WP-6h chip years", "q": "Beneficiary trend in Barpali from 2022-23 till 2024-25", "chip": 1, "expect": {"years": ["2022-2023", "2023-2024", "2024-2025"], "from_row": 1063}},
+ {"n": 1074, "group": "WP-6h chip years", "q": "Activities planned 2022-23 – 2024-25", "chip": 1, "expect": {"years": ["2022-2023", "2023-2024", "2024-2025"], "from_row": 1064}},
+ {"n": 1075, "group": "WP-6h chip years", "q": "Planned cost between 2022-23 and 2024-25", "chip": 1, "expect": {"years": ["2022-2023", "2024-2025"], "from_row": 1066}},
+ {"n": 1076, "group": "WP-6h chip years", "q": "Planned activities in 2023-2025", "chip": 1, "expect": {"years": ["2023-2024", "2024-2025"], "from_row": 1067}}
 ]

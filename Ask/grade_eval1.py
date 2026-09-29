@@ -65,6 +65,12 @@ bound before. Graded on the YEARS bound, across `$date_range` and
 `$date_range_2`, on the final turn; a template is checked only where the row
 names one. See `grade_wp6g`.
 
+THE WP-6h ROWS (1070 on, group "WP-6h chip years") are the eighth: WP-6g's seven
+asking rows, each TAPPING THE FIRST CHIP. The tap must answer with every year the
+officer named, or the chip must say it is narrower ("… (2024-25 only)?") and the
+answer bind exactly the years it names. A first turn that answers outright is
+graded the same way. See `grade_wp6h`.
+
 Chips are mapped back to template ids by their wording, the way the PM read
 them, and an id stands for its FAMILY — the templates with identical SQL and
 slots in `rerank_context` (PLN-025/027/029 are one statement at three scopes).
@@ -540,9 +546,67 @@ def grade_wp6g(record: dict) -> dict:
     return row
 
 
+# ── The WP-6h rows (the eighth standing group, 1070 on) ──────────────────────
+
+_ONLY_RE = re.compile(r"\(([^()]*) only\)\?$")
+
+
+def _narrowed_to(chip: str | None) -> list[str] | None:
+    """The years a chip marked "(2022-23 and 2024-25 only)" names, stored form."""
+    found = _ONLY_RE.search(chip or "")
+    if not found:
+        return None
+    return sorted(f"{a}-{int(a) + 1}" for a in re.findall(r"\b(\d{4})-\d{2}\b", found.group(1)))
+
+
+def grade_wp6h(record: dict) -> dict:
+    """One graded CSV row for one WP-6h chip-tap record: the answer binds every
+    year named, or exactly the years a chip marked "(… only)" says it keeps."""
+    expect = record.get("expect") or {}
+    turn2 = record.get("turn2") or None
+    answered_first = bool(record.get("query_id")) and         str(record.get("tier") or "").startswith("tier")
+    final = record if answered_first or turn2 is None else turn2
+    chip = None if answered_first or turn2 is None else turn2.get("q")
+    row = {"eval_row": int(record["n"]), "question_group": record.get("group", "WP-6h"),
+           "question": record.get("q", "") + (f"  ->  {chip}" if chip else ""),
+           "expected_template_ids": "", "expected_template_question": "",
+           "served_template_id": final.get("query_id") or "", "served_question": "",
+           "bound_filters": "", "outcome": "incorrect", "note": ""}
+    named = sorted(expect.get("years") or [])
+    narrowed = _narrowed_to(chip)
+    notes: list[str] = [f"named {', '.join(named)}"]
+    if narrowed is not None:
+        notes.append(f"chip marked narrower: {', '.join(narrowed)}")
+    if answered_first:
+        notes.append("answered on the first turn, no chip")
+    bound = _bound(final)
+    row["bound_filters"] = json.dumps(bound, ensure_ascii=False) if bound else ""
+    query_id = final.get("query_id")
+    if final.get("error") or record.get("error"):
+        notes.append(f"error: {(final.get('error') or record.get('error'))[:80]}")
+    elif query_id and str(final.get("tier") or "").startswith("tier"):
+        row["served_question"] = final.get("query_description") or ""
+        years = _years_bound(final)
+        row["outcome"] = "correct" if years == (narrowed or named) else "incorrect"
+        notes.append(f"served {query_id}, {final.get('n_rows')} rows, years "
+                     f"{', '.join(years) or 'none'}")
+    elif query_id in UNANSWERABLE_CATALOG:
+        notes.append(f"SERVED A REFUSAL: {query_id}")
+    elif final.get("clarification"):
+        clar = final["clarification"]
+        row["served_question"] = f"(asked {clar.get('reason')}: {(clar.get('prompt') or '')[:70]})"
+        row["outcome"] = "clarify"
+    else:
+        notes.append(f"declined: {(final.get('answer') or '')[:60]}")
+    row["note"] = "; ".join(notes)
+    return row
+
+
 def grade(record: dict) -> dict:
     """One graded CSV row for one replay record."""
     n = int(record["n"])
+    if str(record.get("group", "")).startswith("WP-6h"):
+        return grade_wp6h(record)
     if str(record.get("group", "")).startswith("WP-6g"):
         return grade_wp6g(record)
     if str(record.get("group", "")).startswith("WP-6f"):

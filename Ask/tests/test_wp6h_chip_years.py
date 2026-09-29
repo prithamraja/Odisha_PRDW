@@ -366,5 +366,38 @@ class AnswerPathTests(unittest.TestCase):
                     self.assertEqual(_years(got) if isinstance(value, list) else got, value)
 
 
+# ── T4 harness: tap the first chip, grade the eighth standing group ───────────
+
+class HarnessTests(unittest.TestCase):
+
+    CHIPS = {"clarification": {"options": [
+        {"label": "A (2024-25 only)?", "send_text": "A (2024-25 only)?"},
+        {"label": "B", "send_text": "B"}]}}
+
+    def test_a_number_taps_the_chip_in_that_place(self):
+        import run_custom_eval
+        self.assertEqual(run_custom_eval._pick_chip(self.CHIPS, 1), "A (2024-25 only)?")
+        self.assertEqual(run_custom_eval._pick_chip(self.CHIPS, 2), "B")
+        self.assertIsNone(run_custom_eval._pick_chip(self.CHIPS, 3))
+        self.assertEqual(run_custom_eval._pick_chip(self.CHIPS, "b"), "B")
+
+    def test_the_grader_accepts_every_year_or_a_visibly_narrower_chip(self):
+        import grade_eval1
+
+        def record(chip, years):
+            return {"n": 1070, "group": "WP-6h chip years", "q": "q",
+                    "expect": {"years": THREE}, "tier": "clarify",
+                    "clarification": {"reason": "ambiguous_templates", "options": []},
+                    "turn2": {"q": chip, "tier": "tier2", "query_id": "PLN-024",
+                              "entities": [{"slot": "date_range", "value": ", ".join(years),
+                                            "values": years}]}}
+        self.assertEqual(grade_eval1.grade(record("A?", THREE))["outcome"], "correct")
+        self.assertEqual(grade_eval1.grade(record("A?", ["2024-2025"]))["outcome"], "incorrect")
+        self.assertEqual(grade_eval1.grade(record("A (2024-25 only)?", ["2024-2025"]))["outcome"],
+                         "correct")
+        self.assertEqual(grade_eval1.grade(record("A (2024-25 only)?", THREE))["outcome"],
+                         "incorrect")
+
+
 if __name__ == "__main__":
     unittest.main()

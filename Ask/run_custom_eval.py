@@ -19,7 +19,8 @@ live run can show.
 
 CHIP TAPS (WP-6d T8). A spec may carry a `chip` instead: the second turn sends
 the first offered chip whose label contains that wording, with `from_chip`, the
-way an officer taps it. No such chip is recorded as an error on `turn2`.
+way an officer taps it. No such chip is recorded as an error on `turn2`. A
+number instead of wording taps the chip in that place ("chip": 1, WP-6h).
 
 THIS SPENDS MONEY — every question is an embed + a rerank + an extraction, and
 a clarification adds one more extraction for its chips — so it requires --yes
@@ -114,9 +115,16 @@ def _turn(client, message: str, session_id: str, *, reset: bool, retrieved: list
     return rec
 
 
-def _pick_chip(record: dict, wording: str) -> str | None:
-    """The send_text of the first chip whose label contains `wording` (WP-6d T8)."""
-    for option in ((record.get("clarification") or {}).get("options") or []):
+def _pick_chip(record: dict, wording: str | int) -> str | None:
+    """The send_text of the first chip whose label contains `wording` (WP-6d T8),
+    or, given a number, of the chip in that place (WP-6h: "tap the first chip",
+    whose wording is not known before the run)."""
+    options = (record.get("clarification") or {}).get("options") or []
+    if isinstance(wording, int) and not isinstance(wording, bool):
+        if 1 <= wording <= len(options):
+            return options[wording - 1].get("send_text") or options[wording - 1].get("label")
+        return None
+    for option in options:
         if wording.lower() in (option.get("label") or "").lower():
             return option.get("send_text") or option.get("label")
     return None
