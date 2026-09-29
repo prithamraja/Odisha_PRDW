@@ -1039,15 +1039,17 @@
   "id": "G1039",
   "bracket": "Planning",
   "lang": "odia_translit",
-  "case_type": "unanswerable",
-  "expected_behavior": "cannot_answer",
-  "expected_entities": {},
+  "case_type": "standard",
+  "expected_behavior": "clarify",
+  "expected_entities": {
+   "date_range": "2025-2026"
+  },
   "dashboard_eligible": false,
   "entity_surface": [],
   "answerability": "No",
   "sme_review": true,
-  "notes": "No submission deadline and no 'consistently delayed' rule exist in the DB. Honest refusal; offering PLN-010 (user-supplied deadline) as a chip is a bonus, silently routing to PLN-020 is the failure. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
-  "unanswerable_ref": "PLN-022"
+  "notes": "No submission deadline and no 'consistently delayed' rule exist in the DB. Honest refusal; offering PLN-010 (user-supplied deadline) as a chip is a bonus, silently routing to PLN-020 is the failure. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was. WP-6f (2026-09-29): PLN-022 is a TEMPLATE since migration M7, built to the operator-confirmed rule; it needs a deadline, which this question does not give, so ASKING for it (missing_parameter) is the ratified outcome.",
+  "expected_clarification": "missing_parameter"
  },
  {
   "n": 1040,
@@ -1060,15 +1062,14 @@
   "id": "G1040",
   "bracket": "Planning",
   "lang": "en",
-  "case_type": "unanswerable",
-  "expected_behavior": "cannot_answer",
+  "case_type": "standard",
+  "expected_behavior": "answer",
   "expected_entities": {},
   "dashboard_eligible": false,
   "entity_surface": [],
   "answerability": "No",
   "sme_review": false,
-  "notes": "'Consistently among the top priorities' is undefined. PLN-038 gives the series; answering AS IF PLN-038 were the question is a wrong route. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
-  "unanswerable_ref": "PLN-041"
+  "notes": "'Consistently among the top priorities' is undefined. PLN-038 gives the series; answering AS IF PLN-038 were the question is a wrong route. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was. WP-6f (2026-09-29, operator: 'in prod, this data is there'): PLN-041 is a TEMPLATE since migration M7, so this row expects it ANSWERED, not refused."
  },
  {
   "n": 1041,
@@ -1081,15 +1082,17 @@
   "id": "G1041",
   "bracket": "Planning",
   "lang": "code_mixed",
-  "case_type": "unanswerable",
-  "expected_behavior": "cannot_answer",
-  "expected_entities": {},
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2025-2026",
+   "block_name": "Attabira"
+  },
   "dashboard_eligible": false,
   "entity_surface": [],
   "answerability": "No",
   "sme_review": false,
-  "notes": "activity_delegation.is_delegated is 100% NULL. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
-  "unanswerable_ref": "PLU-005"
+  "notes": "activity_delegation.is_delegated is 100% NULL. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was. WP-6f (2026-09-29, operator: 'in prod, this data is there'): PLU-005 is a TEMPLATE since migration M7, so this row expects it ANSWERED, not refused."
  },
  {
   "acc": [],
@@ -4870,15 +4873,17 @@
   "id": "G1857",
   "bracket": "Assets",
   "lang": "en",
-  "case_type": "unanswerable",
-  "expected_behavior": "cannot_answer",
-  "expected_entities": {},
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2025-2026",
+   "district_name": "Khordha"
+  },
   "dashboard_eligible": false,
   "entity_surface": [],
   "answerability": "No",
   "sme_review": false,
-  "notes": "asset_unit_cost is 100% NULL. AST-007 (category expenditure) is the tempting wrong route and would answer a different question with real-looking money. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
-  "unanswerable_ref": "AST-010"
+  "notes": "asset_unit_cost is 100% NULL. AST-007 (category expenditure) is the tempting wrong route and would answer a different question with real-looking money. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was. WP-6f (2026-09-29, operator: 'in prod, this data is there'): AST-010 is a TEMPLATE since migration M7, so this row expects it ANSWERED, not refused."
  },
  {
   "n": 1858,
@@ -4891,15 +4896,16 @@
   "id": "G1858",
   "bracket": "Assets",
   "lang": "en",
-  "case_type": "unanswerable",
-  "expected_behavior": "cannot_answer",
-  "expected_entities": {},
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "activity_code": "125711758"
+  },
   "dashboard_eligible": false,
   "entity_surface": [],
   "answerability": "No",
   "sme_review": false,
-  "notes": "asset_unit_count and asset_unit_cost are both 100% NULL. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
-  "unanswerable_ref": "AST-005"
+  "notes": "asset_unit_count and asset_unit_cost are both 100% NULL. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was. WP-6f (2026-09-29, operator: 'in prod, this data is there'): AST-005 is a TEMPLATE since migration M7, so this row expects it ANSWERED, not refused."
  },
  {
   "n": 1859,
@@ -4912,15 +4918,16 @@
   "id": "G1859",
   "bracket": "Assets",
   "lang": "en",
-  "case_type": "unanswerable",
-  "expected_behavior": "cannot_answer",
-  "expected_entities": {},
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "activity_code": "125711758"
+  },
   "dashboard_eligible": false,
   "entity_surface": [],
   "answerability": "No",
   "sme_review": false,
-  "notes": "All four asset_loc_* columns are 100% NULL. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
-  "unanswerable_ref": "AST-004"
+  "notes": "All four asset_loc_* columns are 100% NULL. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was. WP-6f (2026-09-29, operator: 'in prod, this data is there'): AST-004 is a TEMPLATE since migration M7, so this row expects it ANSWERED, not refused."
  },
  {
   "n": 1861,
@@ -5442,17 +5449,19 @@
   "id": "G1971",
   "bracket": "Beneficiaries",
   "lang": "en",
-  "case_type": "unanswerable",
-  "expected_behavior": "cannot_answer",
-  "expected_entities": {},
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "gp_name": "Andhrua"
+  },
   "dashboard_eligible": false,
   "entity_surface": [
    "real scheme + real GP + real year — every entity binds, the metric does not"
   ],
   "answerability": "Dropped",
   "sme_review": false,
-  "notes": "The single most dangerous shape in the set: fully bindable entities over a table with zero rows. SBM-* activity counts are the tempting wrong route and would return an activity count dressed as a beneficiary count. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
-  "unanswerable_ref": "BEN-001"
+  "notes": "The single most dangerous shape in the set: fully bindable entities over a table with zero rows. SBM-* activity counts are the tempting wrong route and would return an activity count dressed as a beneficiary count. WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was. WP-6f (2026-09-29, operator: 'in prod, this data is there'): BEN-001 is a TEMPLATE since migration M7, so this row expects it ANSWERED, not refused."
  },
  {
   "n": 1972,
@@ -5465,15 +5474,17 @@
   "id": "G1972",
   "bracket": "Beneficiaries",
   "lang": "code_mixed",
-  "case_type": "unanswerable",
-  "expected_behavior": "cannot_answer",
-  "expected_entities": {},
+  "case_type": "standard",
+  "expected_behavior": "answer",
+  "expected_entities": {
+   "date_range": "2024-2025",
+   "block_name": "Bhubaneswar"
+  },
   "dashboard_eligible": false,
   "entity_surface": [],
   "answerability": "Dropped",
   "sme_review": false,
-  "notes": "WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was.",
-  "unanswerable_ref": "BEN-003"
+  "notes": "WP-4 T3: gold upgraded from 'no_match' to the unanswerable id, so 'declined for the RIGHT documented reason' is distinguishable from 'declined generically' (WP-4a §5). unanswerable_ref is kept as the provenance field it always was. WP-6f (2026-09-29, operator: 'in prod, this data is there'): BEN-003 is a TEMPLATE since migration M7, so this row expects it ANSWERED, not refused."
  },
  {
   "n": 1973,

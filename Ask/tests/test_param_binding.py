@@ -144,7 +144,7 @@ class BindParamValuesTests(unittest.TestCase):
         self.assertEqual(
             sum(1 for t in TEMPLATE_CATALOG.values()
                 for s in t["param_slots"] if s["name"] == "top_n"),
-            91,
+            94,     # 91 until WP-6f M7 added BEN-007, PLN-022, PLN-023
         )
 
     def test_the_declared_default_and_the_runtime_table_agree(self):
@@ -190,7 +190,7 @@ class BindParamValuesTests(unittest.TestCase):
             for s in t["param_slots"]
             if s["name"] in ("threshold", "amount_threshold")
         })
-        self.assertEqual(len(bearing), 15)
+        self.assertEqual(len(bearing), 16)       # 15 + AST-011 (WP-6f M7)
         floors = {qid for qid, _ in RANKING_FLOOR_DEFAULTS}
         self.assertEqual(floors, {"IMP-009", "IMP-019", "IMP-020"})
         for qid in sorted(set(bearing) - floors):

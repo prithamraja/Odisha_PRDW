@@ -435,12 +435,13 @@ class T4ZeroCountTests(unittest.TestCase):
         self.assertIn("No records matched", echo_answer(result))
 
     def test_the_test_report_zero_rows_are_untouched(self):
-        """The 21 statements the oracle records at zero rows still count zero
+        """The 26 statements the oracle records at zero rows (21 until WP-6f M7)
+        still count zero
         FRAME rows: the zero row is drawn at render time, never executed."""
         oracle = json.loads((_BACKEND / "tests" / "data" / "workbook_test_report.json")
                             .read_text(encoding="utf-8"))
         zero = sorted(q for q, e in oracle.items() if e.get("rows") == 0)
-        self.assertEqual(len(zero), 21)
+        self.assertEqual(len(zero), 26)
         from query_router.template_catalog import bind
         for qid in zero:
             with self.subTest(template=qid):

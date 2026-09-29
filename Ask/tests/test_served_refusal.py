@@ -40,7 +40,8 @@ def _serve(query_id: str):
 class ServedRefusalShapeTests(unittest.TestCase):
 
     def test_every_refusal_leaves_result_as_none_never_empty(self):
-        """The whole file in one assertion, over all 30."""
+        """The whole file in one assertion, over every entry (30 until WP-6f
+        moved fifteen into the template catalogue; 15 now)."""
         for qid in UNANSWERABLE_CATALOG:
             with self.subTest(qid=qid):
                 result = _serve(qid)

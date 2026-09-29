@@ -7,6 +7,9 @@ whose data or definition exists turned into templates.
         across focus areas"; TRD-008 hands a TIED-funds question to EXP-009.
     T3  a plain count of planned activities served by PLN-024 is ONE figure —
         declared on PLN-024 only, never a global cue.
+    T4  M7: the fifteen refusals whose data or definition exists are templates
+        that execute on the sample; the fifteen with no column stay refusals,
+        unchanged; a missing deadline is asked for in plain words.
 
 No API key and no network: the extractor is stubbed, and every router path runs
 against the sample database.
@@ -238,6 +241,124 @@ class T3PlainCountIsOneFigure(unittest.TestCase):
             {"block_name": "Barpali"})
         bound = {e.slot_name: e.resolved_value for e in result.entities}
         self.assertNotIn("group_by", bound)
+
+
+MOVED = ("PLU-005", "AST-004", "AST-005", "AST-010", "AST-011",
+         "BEN-001", "BEN-003", "BEN-007", "BEN-008", "BEN-011", "BEN-012",
+         "PLN-022", "PLN-023", "PLN-041", "PLN-042")
+STAYS = ("SCH-004", "PHY-002", "PHY-005", "SBM-SWM-033", "ALR-006", "ALR-007",
+         "ALR-010", "DSS-004", "BEN-002", "BEN-004", "BEN-005", "BEN-006",
+         "BEN-009", "BEN-010", "DQY-005")
+
+
+class T4RefusalsToTemplates(unittest.TestCase):
+
+    def test_m7_is_applied_and_its_lists_are_the_briefs(self):
+        from tools.migrations import m7_refusals_to_templates as m7
+        self.assertEqual(m7.MOVED, MOVED)
+        self.assertEqual(m7.STAYS, STAYS)
+        self.assertEqual(m7.applied(), [])
+
+    def test_the_moved_ids_are_templates_and_no_longer_refusals(self):
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        from query_router.unanswerable_catalog import UNANSWERABLE_CATALOG as U
+        for qid in MOVED:
+            with self.subTest(qid=qid):
+                self.assertIn(qid, T)
+                self.assertNotIn(qid, U)
+        self.assertEqual(sorted(U), sorted(STAYS))
+
+    def test_the_kept_refusals_are_unchanged(self):
+        """Same ids, questions, reasons and alternatives as before WP-6f."""
+        import ast
+        import re
+        import subprocess
+        from query_router.unanswerable_catalog import UNANSWERABLE_CATALOG as U
+        repo = _BACKEND.parent
+        try:
+            before_src = subprocess.run(
+                ["git", "-C", str(repo), "show",
+                 "e865c52:Ask/query_router/unanswerable_catalog.py"],
+                capture_output=True, text=True, encoding="utf-8", check=True).stdout
+        except Exception:                                    # pragma: no cover
+            self.skipTest("not a git checkout (a mirror): compared by M7 on apply")
+        body = re.search(r"UNANSWERABLE_CATALOG: dict\[str, dict\] = (\{.*?\n\})",
+                         before_src, re.S).group(1)
+        before = ast.literal_eval(body)
+        for qid in STAYS:
+            with self.subTest(qid=qid):
+                self.assertEqual(U[qid], before[qid])
+
+    def test_the_refusal_is_no_longer_served_for_a_moved_id(self):
+        from query_router.unanswerable_catalog import refusal_for
+        for qid in MOVED:
+            self.assertIsNone(refusal_for(qid))
+
+    @_needs_db
+    def test_every_new_statement_matches_its_test_report_line(self):
+        import json
+        from query_router.template_catalog import TEMPLATE_CATALOG as T, bind
+        oracle = json.loads((_BACKEND / "tests" / "data" / "workbook_test_report.json")
+                            .read_text(encoding="utf-8"))
+        for qid in MOVED:
+            with self.subTest(qid=qid):
+                values = dict(oracle[qid]["params"])
+                for slot in T[qid]["param_slots"]:
+                    if slot.get("bind") == "code" and values.get(slot["name"]):
+                        values[slot["name"]] = _validator().validate(
+                            str(values[slot["name"]]), "gp").resolved_code
+                sql, params = bind(qid, values)
+                self.assertEqual(len(_adapter().execute(sql, params).fetchall()),
+                                 oracle[qid]["rows"])
+
+    def test_ast011_threshold_is_derived_above_percent(self):
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        slot = next(s for s in T["AST-011"]["param_slots"] if s["name"] == "threshold")
+        self.assertEqual((slot["direction"], slot["unit"]), ("above", "percent"))
+        self.assertNotIn("default", slot)
+
+    def test_the_priority_echo_states_the_rule(self):
+        from query_router.template_catalog import TEMPLATE_CATALOG as T
+        self.assertIn("(top 3 by planned cost, in how many of the last 5 years)",
+                      T["PLN-041"]["abstract_question"])
+        self.assertIn("(bottom 3 by planned cost, in how many of the last 5 years)",
+                      T["PLN-042"]["abstract_question"])
+
+    @_needs_db
+    def test_a_missing_deadline_is_asked_in_plain_words(self):
+        entities, clarify, result = _answer(
+            "PLN-022", "Which blocks consistently experience delays in GPDP approvals "
+                       "in 2024-25?", {})
+        self.assertIsNotNone(clarify)
+        self.assertEqual(clarify.clarification.reason, "missing_parameter")
+        self.assertEqual(clarify.clarification.prompt,
+                         "By what date should the GPDP have been approved?")
+
+    @_needs_db
+    def test_delays_over_a_span_judge_each_year_against_its_own_deadline(self):
+        """30 June 2025 for 2025-26 is 30 June 2024 for 2024-25."""
+        from query_router.template_catalog import TEMPLATE_CATALOG as T, bind
+        sql, params = bind("PLN-023", {"date_range": ["2024-2025", "2025-2026"],
+                                       "deadline": "2025-06-30", "top_n": "10"})
+        rows = _adapter().execute(sql, params).fetchall()
+        late = _adapter().execute("""
+            SELECT COUNT(*) FROM v_plan WHERE plan_type = 'Main' AND (
+                (fiscal_year = '2024-2025' AND approval_date > DATE '2024-06-30') OR
+                (fiscal_year = '2025-2026' AND approval_date > DATE '2025-06-30'))
+        """).fetchone()[0]
+        self.assertEqual(sum(r[2] for r in rows), late)
+        self.assertTrue(all(r[4] == 2 for r in rows))       # years counted
+
+    @_needs_db
+    def test_bottom_three_counts_a_theme_with_nothing_planned(self):
+        """The grid is every theme x every year, so a theme absent from a year's
+        rows still ranks — at 0 — instead of dropping out of the bottom three."""
+        from query_router.template_catalog import TEMPLATE_CATALOG as T, bind
+        sql, params = bind("PLN-042", {"gp_name": _validator().validate(
+            "Andhrua", "gp").resolved_code})
+        rows = _adapter().execute(sql, params).fetchall()
+        self.assertEqual(len(rows), 6)                      # every theme
+        self.assertTrue(all(r[2] == 5 for r in rows))        # five years each
 
 
 if __name__ == "__main__":

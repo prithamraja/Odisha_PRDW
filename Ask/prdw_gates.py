@@ -272,7 +272,7 @@ def _run_test_modules(*modules: str):
 
 
 def check_served_refusal(args):
-    """`result is None`, never `[]`, on all 30 refusals.
+    """`result is None`, never `[]`, on every refusal (15 since WP-6f M7; 30 before).
 
     ONE LINE OF SURFACE AREA THAT FLIPS 19 GOLD ROWS AT ONCE. `grade_full_eval`
     decides "was this an answer?" partly on whether the record carries a result
@@ -300,6 +300,9 @@ def check_direction_pins(args):
 
 def check_refusal_recall(args):
     """Can a documented refusal be RETRIEVED? (D31.4, from WP-4c 7.4.)
+
+    Since WP-6f M7 the gold rows it measures are the 11 whose entry is still a
+    refusal; the 8 whose entry became a template are answered questions now.
 
     `recall_eval` divides every refusal away, so "recall@30 = 95.4%" said
     nothing about the 19 rows where BEN-001 sat at rank 51 of 376 — outside the

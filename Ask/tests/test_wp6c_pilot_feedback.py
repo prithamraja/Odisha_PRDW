@@ -115,6 +115,8 @@ EXPECTED_THRESHOLD_META = {
     "PLU-006": ("below", "rupees"), "PLU-009": ("below", "rupees"),
     "ALR-011": ("below", "percent"), "DSS-001": ("below", "percent"),
     "DSS-005": ("below", "percent"),
+    # WP-6f M7: derived by the same rule — `100.0 * (…) / … > $threshold`.
+    "AST-011": ("above", "percent"),
 }
 
 EXP_033_Q = "Which high-value activities have no expenditure in 2024-25?"

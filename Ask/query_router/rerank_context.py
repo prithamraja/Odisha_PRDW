@@ -131,6 +131,16 @@ FAMILY_DESCRIPTIONS: dict[str, dict] = {
         "members": ['AST-003'],
     },
 
+    'ast_004__asset_creation': {
+        "desc": 'LOOKS UP: Where are the assets under activity a given activity located, and how many units at each location. Returns activity_name, asset_subcategory_label, asset_location_code, units_at_location. One row per matching record.',
+        "members": ['AST-004'],
+    },
+
+    'ast_005__asset_creation': {
+        "desc": 'LOOKS UP: What are the unit count and unit cost of assets created under activity a given activity. Returns activity_name, asset_subcategory_label, unit_count, cost_per_unit. One row per matching record.',
+        "members": ['AST-005'],
+    },
+
     'ast_006__asset_creation': {
         "desc": 'COUNTS: How many immovable-type assets were created in a given block during a given year. Returns asset_type_label, asset_rows, activities. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
         "members": ['AST-006'],
@@ -151,9 +161,49 @@ FAMILY_DESCRIPTIONS: dict[str, dict] = {
         "members": ['AST-009'],
     },
 
+    'ast_010__asset_creation': {
+        "desc": 'TOTALS: What is the average unit cost of a given asset sub-category across a given district for a given year. Returns asset_subcategory_label, assets_counted, avg_cost_per_unit, min_cost_per_unit, max_cost_per_unit. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['AST-010'],
+    },
+
+    'ast_011__asset_creation': {
+        "desc": 'LISTS: Which a given asset sub-category assets in a given district have a unit cost more than a given threshold percent above the district average in a given year. Returns activity_name, asset_subcategory_label, cost_per_unit, district_avg_cost_per_unit, pct_above_district_avg. One row per matching record. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['AST-011'],
+    },
+
     'ast_012__asset_creation': {
         "desc": 'The YEAR-BY-YEAR trend of: How has the number of assets created per year in a given block changed. Returns asset_rows, categorised_assets, activities, expenditure. One row per fiscal_year by default; other breakdowns on request. expenditure is actual expenditure on the PLAN basis (activity_expenditure), not the cashbook. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
         "members": ['AST-012'],
+    },
+
+    'ben_001__beneficiary': {
+        "desc": 'COUNTS: How many beneficiaries received benefits under a given scheme in a given gram panchayat during a given year. Returns beneficiaries, activities. A single summary row by default; breakdowns on request. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['BEN-001'],
+    },
+
+    'ben_003__beneficiary': {
+        "desc": 'COUNTS: How many beneficiaries are recorded across GPs of a given block under a given scheme for a given year. Returns beneficiaries, activities. One row per gp_name × block_name by default; other breakdowns on request. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['BEN-003'],
+    },
+
+    'ben_007__beneficiary': {
+        "desc": "RANKS: Which scheme has the most recorded beneficiaries in a given block for a given year. Returns scheme_name, beneficiaries, activities. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.",
+        "members": ['BEN-007'],
+    },
+
+    'ben_008__beneficiary': {
+        "desc": 'LISTS: Which GPs in a given block have no recorded beneficiaries under a given scheme for a given year. Returns gp_name, block_name, district_name. One row per matching record. An ABSENCE, read from the GP ROSTER: the Gram Panchayats with no matching record at all. A query over the activity table alone can never return these rows, because the rows it would need do not exist there. Filterable by district, block; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['BEN-008'],
+    },
+
+    'ben_011__beneficiary': {
+        "desc": 'COMPARES: Compare beneficiary counts under a given scheme between a given block and a second block for a given year. Returns beneficiaries, activities, gps. One row per block_name by default; other breakdowns on request.',
+        "members": ['BEN-011'],
+    },
+
+    'ben_012__beneficiary': {
+        "desc": 'The YEAR-BY-YEAR trend of: How has the beneficiary count under a given scheme in a given gram panchayat changed over a given year. Returns beneficiaries, activities. One row per fiscal_year. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['BEN-012'],
     },
 
     'bud_001__budgeting': {
@@ -707,7 +757,7 @@ FAMILY_DESCRIPTIONS: dict[str, dict] = {
     },
 
     'pln_007__planning': {
-        "desc": "RANKS: Which Districts have the lowest GPDP submission rate in a given year. Returns total_gps, gps_uploaded, pct_uploaded. One row per district_name. A top-N list, lowest first; $top_n = 1 answers 'which is the single highest/lowest'. Counted FROM THE GP ROSTER by LEFT JOIN, so panchayats with zero activity are still in the denominator and still appear — which is the finding a review meeting is looking for.",
+        "desc": "RANKS: Which Districts have the lowest GPDP submission rate in a given year. Returns total_gps, gps_uploaded, pct_uploaded. One row per district_name. A top-N list, lowest first; $top_n = 1 answers 'which is the single highest/lowest'. Counted FROM THE GP ROSTER by LEFT JOIN, so panchayats with zero activity are still in the denominator and still appear — which is the finding a review meeting is looking for. 'Districts behind / lagging / delayed on GPDP SUBMISSION' is THIS. Delays in APPROVAL judged against a deadline the officer names are PLN-023 (districts) and PLN-022 (blocks).",
         "members": ['PLN-007'],
     },
 
@@ -769,6 +819,16 @@ FAMILY_DESCRIPTIONS: dict[str, dict] = {
     'pln_021__planning': {
         "desc": "RANKS: Which district have the highest number of pending GPDP approvals in a given year. Returns pending_approvals, gps_with_plan. One row per district_name by default; other breakdowns on request. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Filterable by district; answers state-wide when no place is named — one entry serves every scope. RANKS districts by their pending approvals. 'How many GPs still need their GPDP approved' is a COUNT of GPs, PLN-014.",
         "members": ['PLN-021'],
+    },
+
+    'pln_022__planning': {
+        "desc": "RANKS: Which Blocks consistently experience delays in GPDP approvals after the deadline a given deadline in a given year. Returns gps, gps_late, pct_late, years_counted, years_mostly_late. One row per block_name × district_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Filterable by district, block; answers state-wide when no place is named — one entry serves every scope. APPROVAL DELAYS judged against a DEADLINE the officer gives: per block, the GPs whose MAIN plan was approved after it, the share late and, over a span, in how many years most of its GPs were late. 'Behind / lagging / delayed on GPDP SUBMISSION' with no deadline named is PLN-007 (lowest submission rate); the individual late GPs are PLN-010.",
+        "members": ['PLN-022'],
+    },
+
+    'pln_023__planning': {
+        "desc": "RANKS: Which Districts consistently experience delays in GPDP approvals after the deadline a given deadline in a given year. Returns gps, gps_late, pct_late, years_counted, years_mostly_late. One row per district_name. A top-N list, highest first; $top_n = 1 answers 'which is the single highest/lowest'. Filterable by district; answers state-wide when no place is named — one entry serves every scope. APPROVAL DELAYS judged against a DEADLINE the officer gives: per district, the GPs whose MAIN plan was approved after it, the share late and, over a span, in how many years most of its GPs were late. 'Districts behind / lagging / delayed on GPDP SUBMISSION' with no deadline named is PLN-007 (lowest submission rate).",
+        "members": ['PLN-023'],
     },
 
     'pln_024__planning': {
@@ -834,6 +894,16 @@ FAMILY_DESCRIPTIONS: dict[str, dict] = {
     'pln_040__planning': {
         "desc": "The YEAR-BY-YEAR trend of: Which themes have shown the greatest decline in planned activities between a second year and a given year. Returns activities_year1, activities_year2, change_in_activities. One row per theme by default; other breakdowns on request. A top-N list, lowest first; $top_n = 1 answers 'which is the single highest/lowest'. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.",
         "members": ['PLN-040'],
+    },
+
+    'pln_041__planning': {
+        "desc": 'RANKS: Which themes have remained consistently among the top priorities over the last five years (top 3 by planned cost, in how many of the last 5 years). Returns theme, years_in_top_3, years_counted, period, planned_cost. One row per theme. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. A RULE over the five most recent years in the data: in how many of them each theme ranked in the TOP 3 by planned cost. The year-by-year series itself is PLN-038.',
+        "members": ['PLN-041'],
+    },
+
+    'pln_042__planning': {
+        "desc": 'RANKS: Which themes have remained consistently among the lowest priorities over the last five years (bottom 3 by planned cost, in how many of the last 5 years). Returns theme, years_in_bottom_3, years_counted, period, planned_cost. One row per theme. planned_cost is the planned cost the GP entered in the action plan. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. A RULE over the five most recent years in the data: in how many of them each theme ranked in the BOTTOM 3 by planned cost. The year-by-year series itself is PLN-038.',
+        "members": ['PLN-042'],
     },
 
     'pln_043__planning': {
@@ -959,6 +1029,11 @@ FAMILY_DESCRIPTIONS: dict[str, dict] = {
     'plu_004__plan_structure': {
         "desc": "COUNTS: How many GPs in a given block uploaded supplementary plans for a given year. Returns gps_with_supplementary, supplementary_plans. A single summary row by default; breakdowns on request. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope. Counts GPs that UPLOADED a supplementary plan. 'Supplementary plans APPROVED' is PLN-002 with plan_type = Supplementary (approved = has approval_date).",
         "members": ['PLU-004'],
+    },
+
+    'plu_005__plan_structure': {
+        "desc": 'COUNTS: How many activities in a given block are delegated to another panchayat tier for execution in a given year. Returns delegated_unit_level_code, delegated_unit_type_code, delegated_activities, gps. Filterable by district, block, GP; answers state-wide when no place is named — one entry serves every scope.',
+        "members": ['PLU-005'],
     },
 
     'plu_006__low_cost_no_cost_activities': {

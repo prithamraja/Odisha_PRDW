@@ -202,6 +202,22 @@
   "rows": 1,
   "status": "PASS"
  },
+ "AST-004": {
+  "answerable": "Partial",
+  "params": {
+   "activity_code": "50378563"
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "AST-005": {
+  "answerable": "Partial",
+  "params": {
+   "activity_code": "50378563"
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
  "AST-006": {
   "answerable": "Partial",
   "params": {
@@ -263,6 +279,39 @@
   "rows": 0,
   "status": "PASS (0 rows)"
  },
+ "AST-010": {
+  "answerable": "Partial",
+  "params": {
+   "asset_sub_category": "Road CC",
+   "block_name": null,
+   "date_range": "2021-2022",
+   "district_name": "Bargarh",
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "status": null,
+   "theme": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "AST-011": {
+  "answerable": "Partial",
+  "params": {
+   "asset_sub_category": null,
+   "block_name": null,
+   "date_range": "2021-2022",
+   "district_name": "Bargarh",
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "status": null,
+   "theme": null,
+   "threshold": 50
+  },
+  "rows": 9,
+  "status": "PASS"
+ },
  "AST-012": {
   "answerable": "Partial",
   "params": {
@@ -276,6 +325,113 @@
    "theme": null
   },
   "rows": 6,
+  "status": "PASS"
+ },
+ "BEN-001": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": null,
+   "gp_name": null,
+   "group_by": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
+  },
+  "rows": 1,
+  "status": "PASS"
+ },
+ "BEN-003": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": "Barpali",
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": null,
+   "gp_name": null,
+   "group_by": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
+  },
+  "rows": 0,
+  "status": "PASS"
+ },
+ "BEN-007": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": "Barpali",
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null,
+   "top_n": 10
+  },
+  "rows": 0,
+  "status": "PASS"
+ },
+ "BEN-008": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": "Barpali",
+   "date_range": "2024-2025",
+   "district_name": null,
+   "focus_area": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
+  },
+  "rows": 2,
+  "status": "PASS"
+ },
+ "BEN-011": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": "Barpali",
+   "block_name_2": "Attabira",
+   "date_range": "2024-2025",
+   "focus_area": null,
+   "group_by": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
+  },
+  "rows": 0,
+  "status": "PASS"
+ },
+ "BEN-012": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": [
+    "2022-2023",
+    "2023-2024",
+    "2024-2025"
+   ],
+   "district_name": null,
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
+  },
+  "rows": 0,
   "status": "PASS"
  },
  "BUD-001": {
@@ -2469,6 +2625,29 @@
   "rows": 9,
   "status": "PASS"
  },
+ "PLN-022": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "date_range": "2024-2025",
+   "deadline": "2024-06-30",
+   "district_name": null,
+   "top_n": 10
+  },
+  "rows": 10,
+  "status": "PASS"
+ },
+ "PLN-023": {
+  "answerable": "Partial",
+  "params": {
+   "date_range": "2024-2025",
+   "deadline": "2024-06-30",
+   "district_name": null,
+   "top_n": 10
+  },
+  "rows": 9,
+  "status": "PASS"
+ },
  "PLN-024": {
   "answerable": "Partial",
   "params": {
@@ -2765,6 +2944,34 @@
    "top_n": 10
   },
   "rows": 7,
+  "status": "PASS"
+ },
+ "PLN-041": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "district_name": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "tied_untied": null
+  },
+  "rows": 6,
+  "status": "PASS"
+ },
+ "PLN-042": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": null,
+   "district_name": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "tied_untied": null
+  },
+  "rows": 6,
   "status": "PASS"
  },
  "PLN-043": {
@@ -3252,6 +3459,23 @@
    "group_by": null
   },
   "rows": 1,
+  "status": "PASS"
+ },
+ "PLU-005": {
+  "answerable": "Partial",
+  "params": {
+   "block_name": "Attabira",
+   "date_range": "2025-2026",
+   "district_name": null,
+   "focus_area": null,
+   "gp_name": null,
+   "plan_type": null,
+   "scheme": null,
+   "status": null,
+   "theme": null,
+   "tied_untied": null
+  },
+  "rows": 0,
   "status": "PASS"
  },
  "PLU-006": {

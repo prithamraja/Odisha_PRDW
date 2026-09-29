@@ -35,6 +35,9 @@ WRK-005,Bhubaneswar ke kaun se GP maintenance par fresh asset se zyada kharch ka
 PLN-001,GPDP status?,Planning,en
 PLN-001,How many GPs in Laxmipur uploaded the GPDP in 2024-25?,Planning,en
 PLU-001,Bheden ka plan status 2024-25?,Planning,code_mixed
+PLN-022,2025-26 re kaun kaun blockre GPDP anumodan re barambar bilamba huachi?,Planning,odia_translit
+PLN-041,Which themes have remained consistently among the top priorities over the last five years?,Planning,en
+PLU-005,Attabira me kitni activities dusre panchayat tier ko delegate hui 2025-26 me?,Planning,code_mixed
 PLN-003,What percentage of Gram Panchayats in each block uploaded their GPDP in 2024-2025?,Planning,en
 PLN-040,Which themes showed the greatest decline in planned activities between 2023-24 and 2024-25?,Planning,en
 PLN-031,Which GPs planned the most activities under the Water Sufficient Village theme in 2024-25?,Planning,en
@@ -168,6 +171,9 @@ AST-006,Bhubaneswar me 2024-25 me kitne immovable asset bane?,Assets,code_mixed
 AST-007,Which asset category received the highest expenditure in Khordha for 2024-25?,Assets,en
 AST-009,Bhubaneswar ke kaun se GP ne 2024-25 me koi asset nahi banaya?,Assets,code_mixed
 AST-012,How has the number of assets created per year in Bhubaneswar changed?,Assets,en
+AST-010,What is the average unit cost of tap connections across Khordha for 2025-26?,Assets,en
+AST-005,What are the unit count and unit cost of assets created under activity 125711758?,Assets,en
+AST-004,"Where are the assets under activity 125711758 located, and how many units at each location?",Assets,en
 AST-008,How many assets were created under the Self-sufficient Infrastructure in Village theme in Bhubaneswar for 2024-25?,Assets,en
 TRD-011,"Compare activity counts, expenditure and completion rates between Bhubaneswar and Barpali for 2024-25.",Trends & Comparison,en
 TRD-010,"Compare planned expenditure, actual expenditure and completion rate between Andhrua and Barimunda for 2024-2025.",Trends & Comparison,en
@@ -184,6 +190,8 @@ DSS-005,2024-2025 re Bhubaneswar re kaun chalu kama manjuri rashira 25 percent t
 DSS-002,Which blocks in Khordha combine high pending sanctions with low expenditure in 2024-25?,Decision Support,en
 DSS-001,Andhrua me kaun se focus area ka approved cost zyada hai lekin completion 50 percent se kam hai 2024-25 me?,Decision Support,code_mixed
 DSS-003,Which asset sub-categories in Bhubaneswar show the highest repeat-maintenance frequency in 2024-2025?,Decision Support,en
+BEN-001,How many beneficiaries received benefits under Swachh Bharat Mission in Andhrua during 2024-25?,Beneficiaries,en
+BEN-003,Bhubaneswar block ke GPs me kitne beneficiary hain 2024-25 me?,Beneficiaries,code_mixed
 BUD-006,What is the total budget outlay planned across all main GPDPs for 2024 to 2025?,Budgeting & Funding,en
 BUD-006,What's the aggregate budget outlay for all primary GPDPs for 2025 to 2026?,Budgeting & Funding,en
 PLU-008,Which GPs have planned zero-cost activities for 2024 to 2025?,Planning,en

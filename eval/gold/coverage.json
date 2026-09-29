@@ -22,15 +22,15 @@
   "odia_translit": 15
  },
  "by_case_type": {
-  "ambiguity": 11,
+  "ambiguity": 10,
   "followup": 12,
   "out_of_domain": 6,
-  "standard": 227,
-  "unanswerable": 19
+  "standard": 236,
+  "unanswerable": 11
  },
  "by_expected_behavior": {
-  "answer": 225,
-  "cannot_answer": 19,
+  "answer": 233,
+  "cannot_answer": 11,
   "clarify": 13,
   "context_preserving_reroute": 12,
   "graceful_fallback": 6
@@ -51,19 +51,19 @@
   "Monitoring, Alerts & Data Quality": 6.3,
   "Decision Support": 1.7
  },
- "with_expected_entities": 242,
- "ratified_clarifications": 3,
+ "with_expected_entities": 249,
+ "ratified_clarifications": 4,
  "entity_expectations": {
-  "activity_code": 2,
+  "activity_code": 4,
   "amount_threshold": 2,
-  "block_name": 42,
+  "block_name": 44,
   "block_name_2": 1,
-  "date_range": 231,
+  "date_range": 236,
   "date_range_2": 5,
   "deadline": 1,
-  "district_name": 33,
+  "district_name": 34,
   "focus_area": 12,
-  "gp_name": 25,
+  "gp_name": 26,
   "gp_name_2": 1,
   "group_by": 12,
   "plan_type": 8,
@@ -75,7 +75,7 @@
   "tied_untied": 2,
   "top_n": 4
  },
- "entity_expectations_total": 418,
+ "entity_expectations_total": 429,
  "categorical_expectations": {
   "theme": 6,
   "scheme": 9,

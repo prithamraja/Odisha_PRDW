@@ -21312,6 +21312,885 @@ LIMIT $top_n
             # ── end derived ──
         ],
     },
+
+    'PLU-005': {
+        "abstract_question": 'How many activities in {block_name} are delegated to another panchayat tier for execution in {date_range}?',
+        "date_filter": None,
+        "date_kind": None,
+        "sql_template": """
+SELECT CAST(d.delegated_unit_level AS BIGINT) AS delegated_unit_level_code,
+       CAST(d.delegated_unit_type AS BIGINT)  AS delegated_unit_type_code,
+       COUNT(*) AS delegated_activities,
+       COUNT(DISTINCT v.gp_lgd_code) AS gps
+FROM v_activity v
+JOIN activity_delegation d ON d.activity_code = v.activity_code
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND d.is_delegated = 1
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
+  AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY 1, 2
+ORDER BY delegated_activities DESC
+""",
+        "param_slots": [
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+        ],
+        "result_ttl_seconds": 600,
+        "caveat": None,
+        "bracket": 'Planning',
+        "module": 'Plan Attributes',
+        "submodule": 'Plan Structure',
+        "question_type": 'Count',
+        "answerable": 'Partial',
+        "paraphrases": [
+            'How many activities in Attabira are delegated to another panchayat tier for execution in 2025-26?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
+            'How many activities in a given block are delegated to another panchayat tier for execution in a given year?',
+            'How many activities in a given district are delegated to another panchayat tier for execution in a given year?',
+            'How many activities in a given gram panchayat are delegated to another panchayat tier for execution in a given year?',
+            'How many activities in a given block are delegated to another panchayat tier for execution in a given year, in the main GPDP?',
+            'How many activities in a given block are delegated to another panchayat tier for execution in a given year, for ongoing activities?',
+            'How many activities in a given block are delegated to another panchayat tier for execution in a given year, under a given focus area?',
+            'How many activities in a given block are delegated to another panchayat tier for execution in a given year, under a given LSDG theme?',
+            'How many activities in a given block are delegated to another panchayat tier for execution in a given year, under a given scheme?',
+            'How many activities in a given block are delegated to another panchayat tier for execution in a given year, funded from tied grants?',
+            # ── end derived ──
+        ],
+    },
+
+    'AST-004': {
+        "abstract_question": 'Where are the assets under activity {activity_code} located, and how many units at each location?',
+        "date_filter": None,
+        "date_kind": None,
+        "sql_template": """
+SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name, v.fiscal_year,
+       v.asset_subcategory_label,
+       CAST(v.asset_loc_code AS BIGINT) AS asset_location_code,
+       v.asset_loc_unit_count AS units_at_location
+FROM v_asset v
+WHERE v.activity_code = $activity_code
+""",
+        "param_slots": [
+            {'name': 'activity_code', 'entity_type': 'activity_code'},
+        ],
+        "result_ttl_seconds": 600,
+        "caveat": None,
+        "bracket": 'Assets',
+        "module": 'Assets',
+        "submodule": 'Asset Creation',
+        "question_type": 'Lookup',
+        "answerable": 'Partial',
+        "paraphrases": [
+            'Where are the assets under activity 125711758 located, and how many units at each location?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
+            'Where are the assets under activity a given activity located, and how many units at each location?',
+            # ── end derived ──
+        ],
+    },
+
+    'AST-005': {
+        "abstract_question": 'What are the unit count and unit cost of assets created under activity {activity_code}?',
+        "date_filter": None,
+        "date_kind": None,
+        "sql_template": """
+SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name, v.fiscal_year,
+       v.asset_subcategory_label,
+       v.asset_unit_count AS unit_count,
+       v.asset_unit_cost  AS cost_per_unit
+FROM v_asset v
+WHERE v.activity_code = $activity_code
+""",
+        "param_slots": [
+            {'name': 'activity_code', 'entity_type': 'activity_code'},
+        ],
+        "result_ttl_seconds": 600,
+        "caveat": None,
+        "bracket": 'Assets',
+        "module": 'Assets',
+        "submodule": 'Asset Creation',
+        "question_type": 'Lookup',
+        "answerable": 'Partial',
+        "paraphrases": [
+            'What are the unit count and unit cost of assets created under activity 125711758?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
+            'What are the unit count and unit cost of assets created under activity a given activity?',
+            # ── end derived ──
+        ],
+    },
+
+    'AST-010': {
+        "abstract_question": 'What is the average unit cost of {asset_sub_category} across {district_name} for {date_range}?',
+        "date_filter": None,
+        "date_kind": None,
+        "sql_template": """
+SELECT v.asset_subcategory_label,
+       COUNT(*) AS assets_counted,
+       ROUND(AVG(v.asset_unit_cost), 2) AS avg_cost_per_unit,
+       MIN(v.asset_unit_cost) AS min_cost_per_unit,
+       MAX(v.asset_unit_cost) AS max_cost_per_unit
+FROM v_asset v
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND v.asset_unit_cost IS NOT NULL
+  AND ($asset_sub_category IS NULL OR v.asset_subcategory_label = $asset_sub_category)
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
+  AND ($gp_name       IS NULL OR v.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+GROUP BY 1
+ORDER BY assets_counted DESC
+""",
+        "param_slots": [
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'asset_sub_category', 'entity_type': 'asset_subcategory', 'optional': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+        ],
+        "result_ttl_seconds": 600,
+        "caveat": None,
+        "bracket": 'Assets',
+        "module": 'Assets',
+        "submodule": 'Asset Creation',
+        "question_type": 'Aggregation',
+        "answerable": 'Partial',
+        "paraphrases": [
+            'What is the average unit cost of tap connections across Khordha for 2025-26?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
+            'What is the average unit cost of a given asset sub-category across a given district for a given year?',
+            'What is the average unit cost of a given asset sub-category across a given block for a given year?',
+            'What is the average unit cost of a given asset sub-category across a given gram panchayat for a given year?',
+            'What is the average unit cost of a given asset sub-category across a given district for a given year, in the main GPDP?',
+            'What is the average unit cost of a given asset sub-category across a given district for a given year, for ongoing activities?',
+            'What is the average unit cost of a given asset sub-category across a given district for a given year, under a given focus area?',
+            'What is the average unit cost of a given asset sub-category across a given district for a given year, under a given LSDG theme?',
+            # ── end derived ──
+        ],
+    },
+
+    'AST-011': {
+        "abstract_question": 'Which {asset_sub_category} assets in {district_name} have a unit cost more than {threshold} percent above the district average in {date_range}?',
+        "date_filter": None,
+        "date_kind": None,
+        "sql_template": """
+WITH a AS (
+    SELECT v.activity_code, v.activity_name, v.gp_name, v.block_name, v.district_name,
+           v.asset_subcategory_label, v.asset_unit_cost,
+           AVG(v.asset_unit_cost) OVER (
+               PARTITION BY v.district_name, v.asset_subcategory_label) AS district_avg_unit_cost
+    FROM v_asset v
+    WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+      AND v.asset_unit_cost IS NOT NULL
+      AND ($asset_sub_category IS NULL OR v.asset_subcategory_label = $asset_sub_category)
+      AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+      AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+      AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+      AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+      AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+)
+SELECT a.activity_code, a.activity_name, a.gp_name, a.block_name, a.district_name,
+       a.asset_subcategory_label, a.asset_unit_cost AS cost_per_unit,
+       ROUND(a.district_avg_unit_cost, 2) AS district_avg_cost_per_unit,
+       ROUND(100.0 * (a.asset_unit_cost - a.district_avg_unit_cost)
+             / NULLIF(a.district_avg_unit_cost, 0), 2) AS pct_above_district_avg
+FROM a
+WHERE 100.0 * (a.asset_unit_cost - a.district_avg_unit_cost) / NULLIF(a.district_avg_unit_cost, 0) > $threshold
+  AND ($block_name IS NULL OR a.block_name IN (SELECT UNNEST($block_name)))
+  AND ($gp_name    IS NULL OR a.activity_code IN (SELECT activity_code FROM v_activity WHERE gp_lgd_code = $gp_name))
+ORDER BY pct_above_district_avg DESC
+""",
+        "param_slots": [
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'asset_sub_category', 'entity_type': 'asset_subcategory', 'optional': True},
+            {'name': 'threshold', 'entity_type': 'threshold', 'unit': 'percent', 'direction': 'above'},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+        ],
+        "result_ttl_seconds": 600,
+        "caveat": None,
+        "bracket": 'Assets',
+        "module": 'Assets',
+        "submodule": 'Asset Creation',
+        "question_type": 'Listing',
+        "answerable": 'Partial',
+        "paraphrases": [
+            'Which overhead tank assets in Khordha have a unit cost more than 50 percent above the district average in FY 2025-26?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
+            'Which a given asset sub-category assets in a given district have a unit cost more than a given threshold percent above the district average in a given year?',
+            'Which a given asset sub-category assets in a given block have a unit cost more than a given threshold percent above the district average in a given year?',
+            'Which a given asset sub-category assets in a given gram panchayat have a unit cost more than a given threshold percent above the district average in a given year?',
+            'Which a given asset sub-category assets in a given district have a unit cost more than a given threshold percent above the district average in a given year, in the main GPDP?',
+            'Which a given asset sub-category assets in a given district have a unit cost more than a given threshold percent above the district average in a given year, for ongoing activities?',
+            'Which a given asset sub-category assets in a given district have a unit cost more than a given threshold percent above the district average in a given year, under a given focus area?',
+            'Which a given asset sub-category assets in a given district have a unit cost more than a given threshold percent above the district average in a given year, under a given LSDG theme?',
+            # ── end derived ──
+        ],
+    },
+
+    'BEN-001': {
+        "abstract_question": 'How many beneficiaries received benefits under {scheme} in {gp_name} during {date_range}?',
+        "date_filter": None,
+        "date_kind": None,
+        "sql_template": """
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE 'All' END AS group_label,
+       COALESCE(SUM(n.beneficiary_count), 0) AS beneficiaries,
+       COUNT(DISTINCT n.activity_code) AS activities
+FROM activity_nsap n
+JOIN v_activity v ON v.activity_code = n.activity_code
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
+  AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY GROUPING SETS ((group_label), ())
+HAVING (GROUPING(group_label) = 1) = ($group_by IS NULL OR $group_by = 'total')
+""",
+        "param_slots": [
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
+        ],
+        "result_ttl_seconds": 600,
+        "caveat": None,
+        "bracket": 'Beneficiaries',
+        "module": 'Beneficiary',
+        "submodule": 'Beneficiary',
+        "question_type": 'Count',
+        "answerable": 'Partial',
+        "paraphrases": [
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
+            'How many beneficiaries received benefits under a given scheme in a given gram panchayat during a given year?',
+            'How many beneficiaries received benefits under a given scheme in a given district during a given year?',
+            'How many beneficiaries received benefits under a given scheme in a given block during a given year?',
+            'How many beneficiaries received benefits under a given scheme in a given gram panchayat during a given year, in the main GPDP?',
+            'How many beneficiaries received benefits under a given scheme in a given gram panchayat during a given year, for ongoing activities?',
+            'How many beneficiaries received benefits under a given scheme in a given gram panchayat during a given year, under a given focus area?',
+            'How many beneficiaries received benefits under a given scheme in a given gram panchayat during a given year, under a given LSDG theme?',
+            'How many beneficiaries received benefits under a given scheme in a given gram panchayat during a given year, funded from tied grants?',
+            # ── end derived ──
+        ],
+    },
+
+    'BEN-003': {
+        "abstract_question": 'How many beneficiaries are recorded across GPs of {block_name} under {scheme} for {date_range}?',
+        "date_filter": None,
+        "date_kind": None,
+        "sql_template": """
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.gp_name  -- absent: gp_name
+              END AS group_label, CASE WHEN $group_by IS NULL THEN v.block_name END AS block_name,
+       COALESCE(SUM(n.beneficiary_count), 0) AS beneficiaries,
+       COUNT(DISTINCT n.activity_code) AS activities
+FROM activity_nsap n
+JOIN v_activity v ON v.activity_code = n.activity_code
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
+  AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY 1, 2
+ORDER BY beneficiaries DESC
+""",
+        "param_slots": [
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
+        ],
+        "grouped_geo": [
+    'block_name',
+    'gp_name',
+],
+        "result_ttl_seconds": 600,
+        "caveat": None,
+        "bracket": 'Beneficiaries',
+        "module": 'Beneficiary',
+        "submodule": 'Beneficiary',
+        "question_type": 'Count',
+        "answerable": 'Partial',
+        "paraphrases": [
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
+            'How many beneficiaries are recorded across GPs of a given block under a given scheme for a given year?',
+            'How many beneficiaries are recorded across GPs of a given district under a given scheme for a given year?',
+            'How many beneficiaries are recorded across GPs of a given gram panchayat under a given scheme for a given year?',
+            'How many beneficiaries are recorded across GPs of a given block under a given scheme for a given year, in the main GPDP?',
+            'How many beneficiaries are recorded across GPs of a given block under a given scheme for a given year, for ongoing activities?',
+            'How many beneficiaries are recorded across GPs of a given block under a given scheme for a given year, under a given focus area?',
+            'How many beneficiaries are recorded across GPs of a given block under a given scheme for a given year, under a given LSDG theme?',
+            'How many beneficiaries are recorded across GPs of a given block under a given scheme for a given year, funded from tied grants?',
+            # ── end derived ──
+        ],
+    },
+
+    'BEN-007': {
+        "abstract_question": 'Which scheme has the most recorded beneficiaries in {block_name} for {date_range}?',
+        "date_filter": None,
+        "date_kind": None,
+        "sql_template": """
+SELECT COALESCE(v.scheme_name, '(not recorded)') AS scheme_name,
+       COALESCE(SUM(n.beneficiary_count), 0) AS beneficiaries,
+       COUNT(DISTINCT n.activity_code) AS activities
+FROM activity_nsap n
+JOIN v_activity v ON v.activity_code = n.activity_code
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
+  AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY 1
+ORDER BY beneficiaries DESC
+LIMIT $top_n
+""",
+        "param_slots": [
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+        ],
+        "result_ttl_seconds": 600,
+        "caveat": None,
+        "bracket": 'Beneficiaries',
+        "module": 'Beneficiary',
+        "submodule": 'Beneficiary',
+        "question_type": 'Ranking',
+        "answerable": 'Partial',
+        "paraphrases": [
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
+            'Which scheme has the most recorded beneficiaries in a given block for a given year?',
+            'Which scheme has the most recorded beneficiaries in a given district for a given year?',
+            'Which scheme has the most recorded beneficiaries in a given gram panchayat for a given year?',
+            'Which scheme has the most recorded beneficiaries in a given block for a given year, in the main GPDP?',
+            'Which scheme has the most recorded beneficiaries in a given block for a given year, for ongoing activities?',
+            'Which scheme has the most recorded beneficiaries in a given block for a given year, under a given focus area?',
+            'Which scheme has the most recorded beneficiaries in a given block for a given year, under a given LSDG theme?',
+            'Which scheme has the most recorded beneficiaries in a given block for a given year, funded from tied grants?',
+            # ── end derived ──
+        ],
+    },
+
+    'BEN-008': {
+        "abstract_question": 'Which GPs in {block_name} have no recorded beneficiaries under {scheme} for {date_range}?',
+        "date_filter": None,
+        "date_kind": None,
+        "sql_template": """
+SELECT g.gp_name, g.block_name, g.zp_name AS district_name
+FROM gram_panchayat g
+WHERE NOT EXISTS (
+        SELECT 1 FROM activity_nsap n
+        JOIN v_activity v ON v.activity_code = n.activity_code
+        WHERE v.gp_lgd_code = g.gp_lgd_code
+          AND v.fiscal_year IN (SELECT UNNEST($date_range))
+          AND COALESCE(n.beneficiary_count, 0) > 0
+          AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+          AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+          AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+          AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+          AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
+          AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied))
+  AND ($district_name IS NULL OR g.zp_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR g.block_name IN (SELECT UNNEST($block_name)))
+ORDER BY g.zp_name, g.block_name, g.gp_name
+""",
+        "param_slots": [
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+        ],
+        "result_ttl_seconds": 600,
+        "caveat": None,
+        "bracket": 'Beneficiaries',
+        "module": 'Beneficiary',
+        "submodule": 'Beneficiary',
+        "question_type": 'Listing',
+        "answerable": 'Partial',
+        "paraphrases": [
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
+            'Which GPs in a given block have no recorded beneficiaries under a given scheme for a given year?',
+            'Which GPs in a given district have no recorded beneficiaries under a given scheme for a given year?',
+            'Which GPs in a given block have no recorded beneficiaries under a given scheme for a given year, in the main GPDP?',
+            'Which GPs in a given block have no recorded beneficiaries under a given scheme for a given year, for ongoing activities?',
+            'Which GPs in a given block have no recorded beneficiaries under a given scheme for a given year, under a given focus area?',
+            'Which GPs in a given block have no recorded beneficiaries under a given scheme for a given year, under a given LSDG theme?',
+            'Which GPs in a given block have no recorded beneficiaries under a given scheme for a given year, funded from tied grants?',
+            # ── end derived ──
+        ],
+    },
+
+    'BEN-011': {
+        "abstract_question": 'Compare beneficiary counts under {scheme} between {block_name} and {block_name_2} for {date_range}.',
+        "date_filter": None,
+        "date_kind": None,
+        "sql_template": """
+SELECT CASE $group_by
+                WHEN 'district'     THEN v.district_name
+                WHEN 'block'        THEN v.block_name
+                WHEN 'gp'           THEN v.gp_name
+                WHEN 'theme'        THEN v.theme
+                WHEN 'focus_area'   THEN v.focus_area_name
+                WHEN 'status'       THEN v.status_label
+                WHEN 'scheme'       THEN v.scheme_name
+                WHEN 'plan_type'    THEN v.plan_type
+                WHEN 'fiscal_year'  THEN v.fiscal_year
+                WHEN 'total'        THEN 'All'
+                ELSE v.block_name  -- absent: block_name
+              END AS group_label,
+       COALESCE(SUM(n.beneficiary_count), 0) AS beneficiaries,
+       COUNT(DISTINCT n.activity_code) AS activities,
+       COUNT(DISTINCT v.gp_lgd_code) AS gps
+FROM activity_nsap n
+JOIN v_activity v ON v.activity_code = n.activity_code
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+  AND v.block_name IN ($block_name, $block_name_2)
+GROUP BY 1
+ORDER BY beneficiaries DESC
+""",
+        "param_slots": [
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'block_name', 'entity_type': 'block'},
+            {'name': 'block_name_2', 'entity_type': 'block_2'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+            {'name': 'group_by', 'entity_type': 'group_by', 'optional': True},
+        ],
+        "grouped_geo": [
+    'block_name',
+],
+        "result_ttl_seconds": 600,
+        "caveat": None,
+        "bracket": 'Beneficiaries',
+        "module": 'Beneficiary',
+        "submodule": 'Beneficiary',
+        "question_type": 'Comparison',
+        "answerable": 'Partial',
+        "paraphrases": [
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
+            'Compare beneficiary counts under a given scheme between a given block and a second block for a given year.',
+            'Compare beneficiary counts under a given scheme between a given block and a second block for a given year, in the main GPDP?',
+            'Compare beneficiary counts under a given scheme between a given block and a second block for a given year, for ongoing activities?',
+            'Compare beneficiary counts under a given scheme between a given block and a second block for a given year, under a given focus area?',
+            'Compare beneficiary counts under a given scheme between a given block and a second block for a given year, under a given LSDG theme?',
+            'Compare beneficiary counts under a given scheme between a given block and a second block for a given year, funded from tied grants?',
+            # ── end derived ──
+        ],
+    },
+
+    'BEN-012': {
+        "abstract_question": 'How has the beneficiary count under {scheme} in {gp_name} changed over {date_range}?',
+        "date_filter": None,
+        "date_kind": None,
+        "sql_template": """
+SELECT v.fiscal_year,
+       COALESCE(SUM(n.beneficiary_count), 0) AS beneficiaries,
+       COUNT(DISTINCT n.activity_code) AS activities
+FROM activity_nsap n
+JOIN v_activity v ON v.activity_code = n.activity_code
+WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+  AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+  AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
+  AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+  AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+  AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+  AND ($focus_area IS NULL OR v.focus_area_name IN (SELECT UNNEST($focus_area)))
+  AND ($theme IS NULL OR v.theme IN (SELECT UNNEST($theme)))
+  AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
+  AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+GROUP BY 1
+ORDER BY 1
+""",
+        "param_slots": [
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'focus_area', 'entity_type': 'focus_area', 'optional': True, 'list': True},
+            {'name': 'theme', 'entity_type': 'theme', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+        ],
+        "result_ttl_seconds": 600,
+        "caveat": None,
+        "bracket": 'Beneficiaries',
+        "module": 'Beneficiary',
+        "submodule": 'Beneficiary',
+        "question_type": 'Trend',
+        "answerable": 'Partial',
+        "paraphrases": [
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
+            'How has the beneficiary count under a given scheme in a given gram panchayat changed over a given year?',
+            'How has the beneficiary count under a given scheme in a given district changed over a given year?',
+            'How has the beneficiary count under a given scheme in a given block changed over a given year?',
+            'How has the beneficiary count under a given scheme in a given gram panchayat changed over a given year, in the main GPDP?',
+            'How has the beneficiary count under a given scheme in a given gram panchayat changed over a given year, for ongoing activities?',
+            'How has the beneficiary count under a given scheme in a given gram panchayat changed over a given year, under a given focus area?',
+            'How has the beneficiary count under a given scheme in a given gram panchayat changed over a given year, under a given LSDG theme?',
+            'How has the beneficiary count under a given scheme in a given gram panchayat changed over a given year, funded from tied grants?',
+            # ── end derived ──
+        ],
+    },
+
+    'PLN-022': {
+        "abstract_question": 'Which Blocks consistently experience delays in GPDP approvals after the deadline {deadline} in {date_range}?',
+        "date_filter": None,
+        "date_kind": None,
+        "sql_template": """
+WITH per_gp AS (
+    SELECT v.district_name, v.block_name, v.fiscal_year, v.gp_lgd_code,
+           MAX(CASE WHEN v.approval_date > CAST($deadline AS DATE)
+                        + to_years(CAST(LEFT(v.fiscal_year, 4) AS INTEGER)
+                                   - (SELECT MAX(CAST(LEFT(y, 4) AS INTEGER))
+                                      FROM (SELECT UNNEST($date_range) AS y)))
+                    THEN 1 ELSE 0 END) AS late
+    FROM v_plan v
+    WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+      AND v.plan_type = 'Main'
+      AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+      AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
+    GROUP BY 1, 2, 3, 4
+), per_year AS (
+    SELECT block_name, district_name, fiscal_year,
+           COUNT(*) AS gps, SUM(late) AS gps_late
+    FROM per_gp
+    GROUP BY block_name, district_name, fiscal_year
+)
+SELECT block_name, district_name,
+       SUM(gps) AS gps,
+       SUM(gps_late) AS gps_late,
+       ROUND(100.0 * SUM(gps_late) / NULLIF(SUM(gps), 0), 2) AS pct_late,
+       COUNT(*) AS years_counted,
+       SUM(CASE WHEN 2 * gps_late > gps THEN 1 ELSE 0 END) AS years_mostly_late
+FROM per_year
+GROUP BY block_name, district_name
+ORDER BY pct_late DESC, years_mostly_late DESC, block_name, district_name
+LIMIT $top_n
+""",
+        "param_slots": [
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'deadline', 'entity_type': 'deadline'},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+        ],
+        "grouped_geo": [
+    'district_name',
+    'block_name',
+],
+        "result_ttl_seconds": 600,
+        "caveat": None,
+        "bracket": 'Planning',
+        "module": 'GPDP',
+        "submodule": 'Planning',
+        "question_type": 'Ranking',
+        "answerable": 'Partial',
+        "paraphrases": [
+            'Which Blocks consistently experience delays in GPDP approvals in a given year?',
+            'Which Blocks consistently experience delays in GPDP approvals in FY 2025-26?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
+            'Which Blocks consistently experience delays in GPDP approvals after the deadline a given deadline in a given year?',
+            'Which Blocks consistently experience delays in GPDP approvals after the deadline a given deadline in a given year, for a given district?',
+            'Which Blocks consistently experience delays in GPDP approvals after the deadline a given deadline in a given year, for a given block?',
+            # ── end derived ──
+        ],
+    },
+
+    'PLN-023': {
+        "abstract_question": 'Which Districts consistently experience delays in GPDP approvals after the deadline {deadline} in {date_range}?',
+        "date_filter": None,
+        "date_kind": None,
+        "sql_template": """
+WITH per_gp AS (
+    SELECT v.district_name, v.block_name, v.fiscal_year, v.gp_lgd_code,
+           MAX(CASE WHEN v.approval_date > CAST($deadline AS DATE)
+                        + to_years(CAST(LEFT(v.fiscal_year, 4) AS INTEGER)
+                                   - (SELECT MAX(CAST(LEFT(y, 4) AS INTEGER))
+                                      FROM (SELECT UNNEST($date_range) AS y)))
+                    THEN 1 ELSE 0 END) AS late
+    FROM v_plan v
+    WHERE v.fiscal_year IN (SELECT UNNEST($date_range))
+      AND v.plan_type = 'Main'
+      AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+    GROUP BY 1, 2, 3, 4
+), per_year AS (
+    SELECT district_name, fiscal_year,
+           COUNT(*) AS gps, SUM(late) AS gps_late
+    FROM per_gp
+    GROUP BY district_name, fiscal_year
+)
+SELECT district_name,
+       SUM(gps) AS gps,
+       SUM(gps_late) AS gps_late,
+       ROUND(100.0 * SUM(gps_late) / NULLIF(SUM(gps), 0), 2) AS pct_late,
+       COUNT(*) AS years_counted,
+       SUM(CASE WHEN 2 * gps_late > gps THEN 1 ELSE 0 END) AS years_mostly_late
+FROM per_year
+GROUP BY district_name
+ORDER BY pct_late DESC, years_mostly_late DESC, district_name
+LIMIT $top_n
+""",
+        "param_slots": [
+            {'name': 'date_range', 'entity_type': 'fiscal_year', 'list': True},
+            {'name': 'deadline', 'entity_type': 'deadline'},
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'top_n', 'entity_type': 'top_n', 'optional': True, 'default': '10'},
+        ],
+        "grouped_geo": [
+    'district_name',
+],
+        "result_ttl_seconds": 600,
+        "caveat": None,
+        "bracket": 'Planning',
+        "module": 'GPDP',
+        "submodule": 'Planning',
+        "question_type": 'Ranking',
+        "answerable": 'Partial',
+        "paraphrases": [
+            'Which Districts consistently experience delays in GPDP approvals in a given year?',
+            'Which Districts consistently experience delays in GPDP approvals in FY 2025-26?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
+            'Which Districts consistently experience delays in GPDP approvals after the deadline a given deadline in a given year?',
+            'Which Districts consistently experience delays in GPDP approvals after the deadline a given deadline in a given year, for a given district?',
+            # ── end derived ──
+        ],
+    },
+
+    'PLN-041': {
+        "abstract_question": 'Which themes have remained consistently among the top priorities over the last five years (top 3 by planned cost, in how many of the last 5 years)?',
+        "date_filter": None,
+        "date_kind": None,
+        "sql_template": """
+WITH years AS (
+    SELECT DISTINCT fiscal_year FROM v_activity ORDER BY fiscal_year DESC LIMIT 5
+), themes AS (
+    SELECT DISTINCT theme FROM v_activity WHERE theme <> 'Unmapped theme'
+), cost AS (
+    SELECT v.fiscal_year, v.theme, SUM(COALESCE(v.total_cost, 0)) AS planned_cost
+    FROM v_activity v
+    WHERE v.fiscal_year IN (SELECT fiscal_year FROM years)
+      AND v.theme <> 'Unmapped theme'
+      AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+      AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
+      AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+      AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+      AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+      AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
+      AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+    GROUP BY 1, 2
+), ranked AS (
+    SELECT y.fiscal_year, t.theme, COALESCE(c.planned_cost, 0) AS planned_cost,
+           RANK() OVER (PARTITION BY y.fiscal_year
+                        ORDER BY COALESCE(c.planned_cost, 0) DESC) AS rank_in_year
+    FROM years y
+    CROSS JOIN themes t
+    LEFT JOIN cost c ON c.fiscal_year = y.fiscal_year AND c.theme = t.theme
+)
+SELECT theme,
+       SUM(CASE WHEN rank_in_year <= 3 THEN 1 ELSE 0 END) AS years_in_top_3,
+       COUNT(*) AS years_counted,
+       MIN(fiscal_year) || ' to ' || MAX(fiscal_year) AS period,
+       SUM(planned_cost) AS planned_cost
+FROM ranked
+GROUP BY theme
+ORDER BY years_in_top_3 DESC, planned_cost DESC, theme
+""",
+        "param_slots": [
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+        ],
+        "result_ttl_seconds": 600,
+        "caveat": None,
+        "bracket": 'Planning',
+        "module": 'GPDP',
+        "submodule": 'Planning',
+        "question_type": 'Ranking',
+        "answerable": 'Partial',
+        "paraphrases": [
+            'Which themes have remained consistently among the top priorities over the last five years?',
+            'Which themes have remained consistently among the top priorities over the 2022-23 to 2026-27?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
+            'Which themes have remained consistently among the top priorities over the last five years (top 3 by planned cost, in how many of the last 5 years), for a given district?',
+            'Which themes have remained consistently among the top priorities over the last five years (top 3 by planned cost, in how many of the last 5 years), for a given block?',
+            'Which themes have remained consistently among the top priorities over the last five years (top 3 by planned cost, in how many of the last 5 years), for a given gram panchayat (GP)?',
+            'Which themes have remained consistently among the top priorities over the last five years (top 3 by planned cost, in how many of the last 5 years), in the main GPDP?',
+            'Which themes have remained consistently among the top priorities over the last five years (top 3 by planned cost, in how many of the last 5 years), for ongoing activities?',
+            'Which themes have remained consistently among the top priorities over the last five years (top 3 by planned cost, in how many of the last 5 years), under a given scheme?',
+            'Which themes have remained consistently among the top priorities over the last five years (top 3 by planned cost, in how many of the last 5 years), funded from tied grants?',
+            # ── end derived ──
+        ],
+    },
+
+    'PLN-042': {
+        "abstract_question": 'Which themes have remained consistently among the lowest priorities over the last five years (bottom 3 by planned cost, in how many of the last 5 years)?',
+        "date_filter": None,
+        "date_kind": None,
+        "sql_template": """
+WITH years AS (
+    SELECT DISTINCT fiscal_year FROM v_activity ORDER BY fiscal_year DESC LIMIT 5
+), themes AS (
+    SELECT DISTINCT theme FROM v_activity WHERE theme <> 'Unmapped theme'
+), cost AS (
+    SELECT v.fiscal_year, v.theme, SUM(COALESCE(v.total_cost, 0)) AS planned_cost
+    FROM v_activity v
+    WHERE v.fiscal_year IN (SELECT fiscal_year FROM years)
+      AND v.theme <> 'Unmapped theme'
+      AND ($district_name IS NULL OR v.district_name IN (SELECT UNNEST($district_name)))
+      AND ($block_name    IS NULL OR v.block_name    IN (SELECT UNNEST($block_name)))
+      AND ($gp_name       IS NULL OR v.gp_lgd_code   = $gp_name)
+      AND ($plan_type IS NULL OR v.plan_type IN (SELECT UNNEST($plan_type)))
+      AND ($status IS NULL OR v.status_label IN (SELECT UNNEST($status)))
+      AND ($scheme IS NULL OR v.scheme_name IN (SELECT UNNEST($scheme)))
+      AND ($tied_untied IS NULL OR v.tied_untied = $tied_untied)
+    GROUP BY 1, 2
+), ranked AS (
+    SELECT y.fiscal_year, t.theme, COALESCE(c.planned_cost, 0) AS planned_cost,
+           RANK() OVER (PARTITION BY y.fiscal_year
+                        ORDER BY COALESCE(c.planned_cost, 0) ASC) AS rank_in_year
+    FROM years y
+    CROSS JOIN themes t
+    LEFT JOIN cost c ON c.fiscal_year = y.fiscal_year AND c.theme = t.theme
+)
+SELECT theme,
+       SUM(CASE WHEN rank_in_year <= 3 THEN 1 ELSE 0 END) AS years_in_bottom_3,
+       COUNT(*) AS years_counted,
+       MIN(fiscal_year) || ' to ' || MAX(fiscal_year) AS period,
+       SUM(planned_cost) AS planned_cost
+FROM ranked
+GROUP BY theme
+ORDER BY years_in_bottom_3 DESC, planned_cost ASC, theme
+""",
+        "param_slots": [
+            {'name': 'district_name', 'entity_type': 'district', 'optional': True, 'list': True},
+            {'name': 'block_name', 'entity_type': 'block', 'optional': True, 'list': True},
+            {'name': 'gp_name', 'entity_type': 'gp', 'optional': True, 'bind': 'code'},
+            {'name': 'plan_type', 'entity_type': 'plan_type', 'optional': True, 'list': True},
+            {'name': 'status', 'entity_type': 'status', 'optional': True, 'list': True},
+            {'name': 'scheme', 'entity_type': 'scheme', 'optional': True, 'list': True},
+            {'name': 'tied_untied', 'entity_type': 'tied_untied', 'optional': True},
+        ],
+        "result_ttl_seconds": 600,
+        "caveat": None,
+        "bracket": 'Planning',
+        "module": 'GPDP',
+        "submodule": 'Planning',
+        "question_type": 'Ranking',
+        "answerable": 'Partial',
+        "paraphrases": [
+            'Which themes have remained consistently among the lowest priorities over the last five years?',
+            'Which themes have remained consistently among the lowest priorities over the 2022-23 to 2026-27?',
+            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
+            'Which themes have remained consistently among the lowest priorities over the last five years (bottom 3 by planned cost, in how many of the last 5 years), for a given district?',
+            'Which themes have remained consistently among the lowest priorities over the last five years (bottom 3 by planned cost, in how many of the last 5 years), for a given block?',
+            'Which themes have remained consistently among the lowest priorities over the last five years (bottom 3 by planned cost, in how many of the last 5 years), for a given gram panchayat (GP)?',
+            'Which themes have remained consistently among the lowest priorities over the last five years (bottom 3 by planned cost, in how many of the last 5 years), in the main GPDP?',
+            'Which themes have remained consistently among the lowest priorities over the last five years (bottom 3 by planned cost, in how many of the last 5 years), for ongoing activities?',
+            'Which themes have remained consistently among the lowest priorities over the last five years (bottom 3 by planned cost, in how many of the last 5 years), under a given scheme?',
+            'Which themes have remained consistently among the lowest priorities over the last five years (bottom 3 by planned cost, in how many of the last 5 years), funded from tied grants?',
+            # ── end derived ──
+        ],
+    },
 }
 
 

@@ -79,8 +79,11 @@ DEFERRED_REGISTERS = ("odia", "odia_translit")
 
 # The row WP-4c moved from rank 51 to rank 4 by giving the Dropped entries a
 # scope-free line. It is named explicitly because it is the regression this
-# whole check exists to catch a second time.
-MUST_STAY_IN_WINDOW = "BEN-001"
+# whole check exists to catch a second time. That row was BEN-001; WP-6f M7 made
+# BEN-001 a template (activity_nsap exists, empty only in the sample), so the
+# pin moved to BEN-002 — the Dropped beneficiary refusal still in the catalogue
+# whose gold row (#1973, English) depends on the same scope-free line.
+MUST_STAY_IN_WINDOW = "BEN-002"
 
 
 def gold_refusal_rows() -> list[dict]:
@@ -288,7 +291,8 @@ def main() -> int:
     for r in pinned:
         verdict = "OK" if r["in_window"] else "REGRESSED"
         print(f"\n  {MUST_STAY_IN_WINDOW} pin: rank {r['rank']} "
-              f"(was 51 before WP-4c, 4 after) — {verdict}")
+              f"(BEN-001, the pin until WP-6f, was 51 before WP-4c and 4 after) "
+              f"— {verdict}")
 
     # CROWDING, REPORTED AND NOT ASSERTED (D33.9). The raw vectors walked, beyond
     # k, to collect k distinct ids — `recall_eval`'s "Crowding 1", over the same

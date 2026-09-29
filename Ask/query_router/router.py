@@ -337,6 +337,10 @@ _FISCAL_YEAR_ENTITY_TYPES = frozenset({"fiscal_year", "fiscal_year_2"})
 # statement keeps its own breakdown — see query_router/breakdown.py.
 _READER_ONLY_ENTITY_TYPES = frozenset({"group_by"})
 
+# How a missing `$deadline` is asked for (WP-6f T4). The slot is compared with a
+# plan's approval date on every template that has one.
+_DEADLINE_ASK = "By what date should the GPDP have been approved?"
+
 # A rupee amount stated outright — "above ₹1 lakh", "more than 50,000",
 # "over 2.5 crore". Reading it here means the frequent case never depends on the
 # LLM at all: not just deterministic arithmetic (the validator handles that),
@@ -1214,6 +1218,11 @@ def _fill_slots_or_clarify(
         # figures to tap (WP-6c T1): "For which threshold?" named no unit, and
         # the rankings' activity floor was unanswerable in those words.
         prompt, options = threshold_reply.ask(numeric.get(slot, {}))
+        # WP-6f T4: every deadline in the catalogue is compared with a plan's
+        # approval date (PLN-008/009/010, and PLN-022/023 since M7), so it is
+        # asked for in those words rather than "For which deadline?".
+        if prompt is None and slot_type.get(slot) == "deadline":
+            prompt = _DEADLINE_ASK
         clarify = _clarify(
             "missing_parameter",
             prompt or f"For which {slot.replace('_', ' ')}?",

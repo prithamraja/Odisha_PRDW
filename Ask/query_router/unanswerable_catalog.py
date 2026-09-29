@@ -1,8 +1,17 @@
 """
 The questions this database CANNOT answer, and why.
 
-Thirty of them: the 17 rows the workbook marks "Answerable from DB = No", and
-the 13 beneficiary questions on its Dropped sheet.
+Fifteen of them since WP-6f (2026-09-29): the questions with NO COLUMN anywhere
+in the schema to answer them from (tiers above the GP, stage dates, suspension,
+planned duration, resource envelopes, PAI grades, repair flags, beneficiary
+villages / names / cash / purpose), and BEN-010, whose pension-scheme column has
+no decode. There were thirty: the 17 rows the workbook marks "Answerable from DB
+= No" and the 13 beneficiary questions on its Dropped sheet. Migration M7
+(tools/migrations/m7_refusals_to_templates.py) moved the fifteen whose columns
+exist — empty in the sample — or whose blocker was a missing definition into
+template_catalog.py, keeping their ids, on the operator's ruling that production
+holds the data. `handoffs/WP6f_prod_schema_needs.md` lists what each remaining
+one would need.
 
 WHY THEY ARE IN THE CATALOGUE AT ALL
     Officers will ask these. Beneficiary questions especially — "how many
@@ -42,83 +51,6 @@ KEYS
 
 
 UNANSWERABLE_CATALOG: dict[str, dict] = {
-
-    'PLN-022': {
-        "question": 'Which Blocks consistently experience delays in GPDP approvals in a given year?',
-        "reason": "Requires a business rule for 'consistently delayed' and a submission deadline, neither of which exists in the database. PLN-010 with a user-supplied $deadline is the closest answerable form.",
-        "bracket": 'Planning',
-        "module": 'GPDP',
-        "submodule": 'Planning',
-        "source": 'No',
-        "alternative": 'PLN-010',
-        "paraphrases": [
-            'Which Blocks consistently experience delays in GPDP approvals in FY 2025-26?',
-            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
-            'Which Blocks consistently experience delays in GPDP approvals?',
-            # ── end derived ──
-        ],
-    },
-
-    'PLN-023': {
-        "question": 'Which Districts consistently experience delays in GPDP approvals in a given year?',
-        "reason": 'Same blocker as PLN-022 at district level.',
-        "bracket": 'Planning',
-        "module": 'GPDP',
-        "submodule": 'Planning',
-        "source": 'No',
-        "alternative": 'PLN-022',
-        "paraphrases": [
-            'Which Districts consistently experience delays in GPDP approvals in FY 2025-26?',
-            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
-            'Which Districts consistently experience delays in GPDP approvals?',
-            # ── end derived ──
-        ],
-    },
-
-    'PLN-041': {
-        "question": 'Which themes have remained consistently among the top priorities over the last five years?',
-        "reason": "'Consistently among the top priorities' is not a defined rule. PLN-038 gives the year-by-year series the user can judge from.",
-        "bracket": 'Planning',
-        "module": 'GPDP',
-        "submodule": 'Planning',
-        "source": 'No',
-        "alternative": 'PLN-038',
-        "paraphrases": [
-            'Which themes have remained consistently among the top priorities over the 2022-23 to 2026-27?',
-            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
-            # ── end derived ──
-        ],
-    },
-
-    'PLN-042': {
-        "question": 'Which themes have remained consistently among the lowest priorities over the last five years?',
-        "reason": 'Same blocker as PLN-041.',
-        "bracket": 'Planning',
-        "module": 'GPDP',
-        "submodule": 'Planning',
-        "source": 'No',
-        "alternative": 'PLN-041',
-        "paraphrases": [
-            'Which themes have remained consistently among the lowest priorities over the 2022-23 to 2026-27?',
-            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
-            # ── end derived ──
-        ],
-    },
-
-    'PLU-005': {
-        "question": 'How many activities in a given Block are delegated to another panchayat tier for execution in a given Plan Year?',
-        "reason": 'activity_delegation.is_delegated and delegated_unit_code are 100% NULL, so no activity can be identified as delegated to another panchayat tier.',
-        "bracket": 'Planning',
-        "module": 'Plan Attributes',
-        "submodule": 'Plan Structure',
-        "source": 'No',
-        "paraphrases": [
-            'How many activities in Attabira are delegated to another panchayat tier for execution in 2025-26?',
-            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
-            'How many activities are delegated to another panchayat tier for execution?',
-            # ── end derived ──
-        ],
-    },
 
     'SCH-004': {
         "question": 'What is the fund allocated under a given Scheme at ZP, Block, and GP tiers in a given District for a given Plan Year?',
@@ -160,64 +92,6 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
             'Which assets in Attabira have not advanced a stage in the last 90 days?',
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'Which assets have not advanced a stage in the last a given Threshold days?',
-            # ── end derived ──
-        ],
-    },
-
-    'AST-004': {
-        "question": 'Where are the assets under activity a given Activity Code located, and how many units at each location?',
-        "reason": 'asset_loc_code, asset_loc_unit_code, asset_loc_unit_type and asset_loc_unit_count are 100% NULL, so asset locations cannot be reported.',
-        "bracket": 'Assets',
-        "module": 'Assets',
-        "submodule": 'Asset Creation',
-        "source": 'No',
-        "paraphrases": [
-            'Where are the assets under activity 125711758 located, and how many units at each location?',
-            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
-            # ── end derived ──
-        ],
-    },
-
-    'AST-005': {
-        "question": 'What are the unit count and unit cost of assets created under activity a given Activity Code?',
-        "reason": 'asset_unit_count and asset_unit_cost are 100% NULL.',
-        "bracket": 'Assets',
-        "module": 'Assets',
-        "submodule": 'Asset Creation',
-        "source": 'No',
-        "paraphrases": [
-            'What are the unit count and unit cost of assets created under activity 125711758?',
-            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
-            # ── end derived ──
-        ],
-    },
-
-    'AST-010': {
-        "question": 'What is the average unit cost of a given Asset Sub Category across a given District for a given Plan Year?',
-        "reason": 'asset_unit_cost is 100% NULL, so an average unit cost cannot be computed.',
-        "bracket": 'Assets',
-        "module": 'Assets',
-        "submodule": 'Asset Creation',
-        "source": 'No',
-        "paraphrases": [
-            'What is the average unit cost of tap connections across Khordha for 2025-26?',
-            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
-            'What is the average unit cost of a given Asset Sub Category?',
-            # ── end derived ──
-        ],
-    },
-
-    'AST-011': {
-        "question": 'Which a given Asset Sub Category assets in a given District have a unit cost more than a given Threshold percent above the district average in a given year?',
-        "reason": 'asset_unit_cost is 100% NULL, so unit costs cannot be compared against a district average.',
-        "bracket": 'Assets',
-        "module": 'Assets',
-        "submodule": 'Asset Creation',
-        "source": 'No',
-        "paraphrases": [
-            'Which overhead tank assets in Khordha have a unit cost more than 50 percent above the district average in FY 2025-26?',
-            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
-            'Which a given Asset Sub Category assets have a unit cost more than a given Threshold percent above the district average?',
             # ── end derived ──
         ],
     },
@@ -297,21 +171,6 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         ],
     },
 
-    'BEN-001': {
-        "question": 'How many beneficiaries received benefits under a given Scheme in a given GP Name during a given Plan Year?',
-        "reason": 'Removed at your request. The only beneficiary table in the database, activity_nsap, has 0 rows, and activity_community_service.community_beneficiaries_expected and activity_training.training_trainees_total are 100% NULL. Nothing in the schema can answer it. Restore this row if the scraper starts populating NSAP data.',
-        "bracket": 'Beneficiaries',
-        "module": 'Beneficiary',
-        "submodule": 'Beneficiary',
-        "source": 'Dropped',
-        "paraphrases": [
-            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
-            'How many beneficiaries received benefits under a given Scheme?',
-            'Kitne beneficiaries ko benefit mila har Scheme?',
-            # ── end derived ──
-        ],
-    },
-
     'BEN-002': {
         "question": 'What is the village-wise count of beneficiaries in a given GP Name under a given Scheme for a given Plan Year?',
         "reason": 'Removed at your request. The only beneficiary table in the database, activity_nsap, has 0 rows, and activity_community_service.community_beneficiaries_expected and activity_training.training_trainees_total are 100% NULL. Nothing in the schema can answer it. Restore this row if the scraper starts populating NSAP data.',
@@ -323,21 +182,6 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'What is the village-wise count of beneficiaries under a given Scheme?',
             'Village-wise count of beneficiaries har Scheme kya hai?',
-            # ── end derived ──
-        ],
-    },
-
-    'BEN-003': {
-        "question": 'How many beneficiaries are recorded across GPs of a given Block under a given Scheme for a given Plan Year?',
-        "reason": 'Removed at your request. The only beneficiary table in the database, activity_nsap, has 0 rows, and activity_community_service.community_beneficiaries_expected and activity_training.training_trainees_total are 100% NULL. Nothing in the schema can answer it. Restore this row if the scraper starts populating NSAP data.',
-        "bracket": 'Beneficiaries',
-        "module": 'Beneficiary',
-        "submodule": 'Beneficiary',
-        "source": 'Dropped',
-        "paraphrases": [
-            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
-            'How many beneficiaries are recorded across GPs under a given Scheme?',
-            'Kitne beneficiaries darj hain GPs me har Scheme?',
             # ── end derived ──
         ],
     },
@@ -387,36 +231,6 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
         ],
     },
 
-    'BEN-007': {
-        "question": 'Which scheme has the most recorded beneficiaries in a given Block for a given Plan Year?',
-        "reason": 'Removed at your request. The only beneficiary table in the database, activity_nsap, has 0 rows, and activity_community_service.community_beneficiaries_expected and activity_training.training_trainees_total are 100% NULL. Nothing in the schema can answer it. Restore this row if the scraper starts populating NSAP data.',
-        "bracket": 'Beneficiaries',
-        "module": 'Beneficiary',
-        "submodule": 'Beneficiary',
-        "source": 'Dropped',
-        "paraphrases": [
-            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
-            'Which scheme has the most recorded beneficiaries?',
-            'Sabse zyada recorded beneficiaries kis scheme me hain?',
-            # ── end derived ──
-        ],
-    },
-
-    'BEN-008': {
-        "question": 'Which GPs in a given Block have no recorded beneficiaries under a given Scheme for a given Plan Year?',
-        "reason": 'Removed at your request. The only beneficiary table in the database, activity_nsap, has 0 rows, and activity_community_service.community_beneficiaries_expected and activity_training.training_trainees_total are 100% NULL. Nothing in the schema can answer it. Restore this row if the scraper starts populating NSAP data.',
-        "bracket": 'Beneficiaries',
-        "module": 'Beneficiary',
-        "submodule": 'Beneficiary',
-        "source": 'Dropped',
-        "paraphrases": [
-            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
-            'Which GPs have no recorded beneficiaries under a given Scheme?',
-            'Kin GPs me koi recorded beneficiaries har Scheme nahi hai?',
-            # ── end derived ──
-        ],
-    },
-
     'BEN-009': {
         "question": 'List the beneficiaries of a given Scheme in a given GP Name for a given Plan Year with village and benefit details.',
         "reason": 'Removed at your request. The only beneficiary table in the database, activity_nsap, has 0 rows, and activity_community_service.community_beneficiaries_expected and activity_training.training_trainees_total are 100% NULL. Nothing in the schema can answer it. Restore this row if the scraper starts populating NSAP data.',
@@ -443,36 +257,6 @@ UNANSWERABLE_CATALOG: dict[str, dict] = {
             # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
             'How many beneficiaries are recorded under each pension scheme?',
             'Kitne beneficiaries darj hain har pension scheme?',
-            # ── end derived ──
-        ],
-    },
-
-    'BEN-011': {
-        "question": 'Compare beneficiary counts under a given Scheme between a given Block and a given Block 2 for a given Plan Year.',
-        "reason": 'Removed at your request. The only beneficiary table in the database, activity_nsap, has 0 rows, and activity_community_service.community_beneficiaries_expected and activity_training.training_trainees_total are 100% NULL. Nothing in the schema can answer it. Restore this row if the scraper starts populating NSAP data.',
-        "bracket": 'Beneficiaries',
-        "module": 'Beneficiary',
-        "submodule": 'Beneficiary',
-        "source": 'Dropped',
-        "paraphrases": [
-            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
-            'Compare beneficiary counts under a given Scheme between a given Block and a given Block 2.',
-            'Beneficiary counts har Scheme ke beech Block and Block 2 compare karo',
-            # ── end derived ──
-        ],
-    },
-
-    'BEN-012': {
-        "question": 'How has the beneficiary count under a given Scheme in a given GP Name changed over a given Date Range?',
-        "reason": 'Removed at your request. The only beneficiary table in the database, activity_nsap, has 0 rows, and activity_community_service.community_beneficiaries_expected and activity_training.training_trainees_total are 100% NULL. Nothing in the schema can answer it. Restore this row if the scraper starts populating NSAP data.',
-        "bracket": 'Beneficiaries',
-        "module": 'Beneficiary',
-        "submodule": 'Beneficiary',
-        "source": 'Dropped',
-        "paraphrases": [
-            # ── derived by tools/derive_catalog.py: edit the question or the SQL, not these lines ──
-            'How has the beneficiary count under a given Scheme changed?',
-            'The beneficiary count har Scheme me kya change aaya?',
             # ── end derived ──
         ],
     },

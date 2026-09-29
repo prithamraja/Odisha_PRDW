@@ -1251,6 +1251,28 @@ _DISAMBIGUATION: dict[str, str] = {
     "TRD-002": "Compares TWO DIFFERENT named years side by side. A question that "
                "names ONE year or one span is never this: tied-fund spending on "
                "water vs sanitation for a year is EXP-009.",
+    # WP-6f T4 (M7): four former refusals, now built to a definition. Their
+    # neighbours were answered by the refusal before; these keep them apart.
+    "PLN-022": "APPROVAL DELAYS judged against a DEADLINE the officer gives: per "
+               "block, the GPs whose MAIN plan was approved after it, the share late "
+               "and, over a span, in how many years most of its GPs were late. "
+               "'Behind / lagging / delayed on GPDP SUBMISSION' with no deadline "
+               "named is PLN-007 (lowest submission rate); the individual late GPs "
+               "are PLN-010.",
+    "PLN-023": "APPROVAL DELAYS judged against a DEADLINE the officer gives: per "
+               "district, the GPs whose MAIN plan was approved after it, the share "
+               "late and, over a span, in how many years most of its GPs were late. "
+               "'Districts behind / lagging / delayed on GPDP SUBMISSION' with no "
+               "deadline named is PLN-007 (lowest submission rate).",
+    "PLN-007": "'Districts behind / lagging / delayed on GPDP SUBMISSION' is THIS. "
+               "Delays in APPROVAL judged against a deadline the officer names are "
+               "PLN-023 (districts) and PLN-022 (blocks).",
+    "PLN-041": "A RULE over the five most recent years in the data: in how many of "
+               "them each theme ranked in the TOP 3 by planned cost. The "
+               "year-by-year series itself is PLN-038.",
+    "PLN-042": "A RULE over the five most recent years in the data: in how many of "
+               "them each theme ranked in the BOTTOM 3 by planned cost. The "
+               "year-by-year series itself is PLN-038.",
     "PLN-021": "RANKS districts by their pending approvals. 'How many GPs still "
                "need their GPDP approved' is a COUNT of GPs, PLN-014.",
     "TRD-008": "Approved cost AND expenditure per focus area. 'Tied-fund "

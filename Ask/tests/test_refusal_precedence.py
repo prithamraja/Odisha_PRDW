@@ -27,6 +27,10 @@ closest entry in the whole index to what the officer typed is the catalogue's ow
 statement that this question has no answer, that statement IS the answer.
 
 No API key and no network: the retriever and reranker are stubs.
+
+WP-6f (M7) made BEN-001 and PLN-022 templates — their data or definition
+exists — so the rule is exercised with BEN-010, one of the fifteen that are
+still refusals. The shapes are the same; only the example entry changed.
 """
 import time
 import unittest
@@ -37,7 +41,7 @@ from query_router.config import CLARIFY_SCORE_MARGIN, NO_MATCH_LOWER_THRESHOLD
 from query_router.models import RouteTier
 from query_router.unanswerable_catalog import UNANSWERABLE_CATALOG
 
-REFUSAL = "BEN-001"
+REFUSAL = "BEN-010"             # still a refusal after WP-6f M7
 NEAR_MISS = "PLN-020"           # a real template, and the one PLN-022 lost to
 REFUSAL_Q = UNANSWERABLE_CATALOG[REFUSAL]["question"]
 
@@ -254,8 +258,8 @@ class RouteVectorRefusalTests(unittest.TestCase):
         router.rerank = lambda query, candidates, client, examples=None: (
             rerank_verdict, list(near_misses))
         return router._route_vector(
-            "How many beneficiaries received benefits under Swachh Bharat "
-            "Mission in Andhrua during 2024-25?",
+            "How many beneficiaries are recorded under each pension scheme in "
+            "Attabira for 2024-25?",
             "normalized", time.monotonic(),
             validator=SimpleNamespace(
                 validate=lambda *a, **k: (_ for _ in ()).throw(ValueError()),
@@ -268,8 +272,9 @@ class RouteVectorRefusalTests(unittest.TestCase):
         )
 
     def test_BEN_001s_shape_now_serves_the_documented_reason(self):
-        """3/3 in WP-4 this was "I couldn't match that exactly" over three IHHL
-        templates. The workbook's own reason exists and was never shown."""
+        """3/3 in WP-4 BEN-001 got "I couldn't match that exactly" over three IHHL
+        templates. The workbook's own reason existed and was never shown. (BEN-001
+        is a template since WP-6f; the shape is kept with BEN-010.)"""
         result = self._route(TOP_REFUSAL, "no_match", [NEAR_MISS])
         self.assertEqual(result.query_id, REFUSAL)
         self.assertIsNone(result.result,

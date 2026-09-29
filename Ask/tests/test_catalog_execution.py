@@ -44,6 +44,12 @@ _RETIRED_PATH = Path(__file__).parent / "data" / "retired_templates.json"
 _RETIRED = (json.loads(_RETIRED_PATH.read_text(encoding="utf-8"))
             if _RETIRED_PATH.exists() else {})
 _ADDED_IN_WP6 = {"PHY-006"}
+# WP-6f M7: fifteen former refusals whose data or definition exists
+# (tools/migrations/m7_refusals_to_templates.py). Not workbook "answerable" rows;
+# each carries its own Test Report line, executed like the rest.
+_MOVED_IN_WP6F = {"PLU-005", "AST-004", "AST-005", "AST-010", "AST-011",
+                  "BEN-001", "BEN-003", "BEN-007", "BEN-008", "BEN-011", "BEN-012",
+                  "PLN-022", "PLN-023", "PLN-041", "PLN-042"}
 
 _STATE: dict = {}
 
@@ -78,8 +84,11 @@ class CatalogueShapeTests(unittest.TestCase):
     """Checks that need no database."""
 
     def test_the_catalogue_holds_every_answerable_workbook_question(self):
-        # 346 signed off on 2026-08-13; WP-6 folded some and added some.
-        self.assertEqual(len(TEMPLATE_CATALOG), 346 - len(_RETIRED) + len(_ADDED_IN_WP6))
+        # 346 signed off on 2026-08-13; WP-6 folded some and added some; WP-6f
+        # moved fifteen refusals in.
+        self.assertEqual(len(TEMPLATE_CATALOG),
+                         346 - len(_RETIRED) + len(_ADDED_IN_WP6) + len(_MOVED_IN_WP6F))
+        self.assertLessEqual(_MOVED_IN_WP6F, set(TEMPLATE_CATALOG))
         self.assertEqual(set(TEMPLATE_CATALOG), set(_ORACLE))
         self.assertFalse(set(_RETIRED) & set(TEMPLATE_CATALOG))
 
@@ -208,13 +217,20 @@ class ExecutionGateTests(unittest.TestCase):
                 self.assertEqual(self.counts[qid], _ORACLE[qid]["rows"])
         self.assertEqual(mismatches, [])
 
-    def test_the_21_zero_row_queries_are_the_documented_ones(self):
+    def test_the_26_zero_row_queries_are_the_documented_ones(self):
         """Zero rows is a legitimate answer here — "which GPs uploaded no plan"
         is correctly empty when every loaded GP has one. Pinned as a SET so a NEW
         zero-row query (the shape a broken predicate produces) cannot hide among
-        them by coincidence of count."""
+        them by coincidence of count.
+
+        21 until WP-6f; M7 added five that read an empty table in the sample
+        (PLU-005 — no delegation recorded; BEN-003, BEN-007, BEN-011, BEN-012 —
+        activity_nsap has no rows). BEN-001 is a Count over a grouping set and
+        answers one zero row; BEN-008 lists every GP of the block."""
         expected_empty = sorted(q for q, o in _ORACLE.items() if o["rows"] == 0)
-        self.assertEqual(len(expected_empty), 21)
+        self.assertEqual(len(expected_empty), 26)
+        self.assertLessEqual({"PLU-005", "BEN-003", "BEN-007", "BEN-011", "BEN-012"},
+                             set(expected_empty))
         self.assertEqual(sorted(q for q, n in self.counts.items() if n == 0),
                          expected_empty)
 

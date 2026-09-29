@@ -218,8 +218,13 @@ try:
     if unlabelled:
         print(f"      (skipped {len(unlabelled)}: gold id has no parameterised text — "
               f"a workbook 'No' row)")
+    # "clarify_as_ratified" passes too: the synthetic prompt's reason is
+    # missing_parameter, which is exactly the ratified outcome of a row whose
+    # template needs a value the question does not give (G1039, WP-6f: PLN-022
+    # needs a deadline).
     bad2 = [s for v, rows in amb_buckets.items()
-            if v not in {"partial", "clarify_gold_offered"} for s in rows]
+            if v not in {"partial", "clarify_gold_offered", "clarify_as_ratified"}
+            for s in rows]
     if bad2:
         ok = False
         print(f"      FAIL — {len(bad2)} ambiguity rows did not grade as a pass "
