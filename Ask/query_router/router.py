@@ -63,10 +63,8 @@ from .suggestions       import elicitation_chips
 from .                  import breakdown
 from .                  import config
 from .config            import (
-    CLARIFY_SCORE_MARGIN,
     MAX_CLARIFY_OPTIONS,
     MAX_MISS_SUGGESTIONS,
-    NO_MATCH_LOWER_THRESHOLD,
     RESULT_CACHE_DEFAULT_TTL,
     USE_VECTOR_RETRIEVAL,
     VECTOR_TOP_K,
@@ -2331,97 +2329,28 @@ def _serve_query_id(
     )
 
 
-# ── A documented refusal must be reachable (D28.5, WP-4c T2c) ─────────────────
+# ── "Refusal wins" (D28.5) — REMOVED in WP-6g T1b ───────────────────────────
 #
-# THE DEFECT, from WP-4's three replays. Four of the 19 known-unanswerable gold
-# rows never reached their `UNANSWERABLE_CATALOG` entry: BEN-001 (3/3) and
-# BEN-003 (2/3) got "I couldn't match that exactly. Did you mean one of these?"
-# offering IHHL templates; BEN-003's third replay and BEN-010 got the
-# broad-question elicitation; and PLN-022 was ANSWERED with PLN-020 (2/3) —
-# a template whose own caveat reads "pending_approvals is 0 everywhere because
-# approval_date is always populated", i.e. a table of zeros served as the answer
-# to "which blocks are consistently delayed". The other 15 rows work, so the
-# machinery is right and the mechanism is narrow.
+# WP-4c added `_refusal_precedence`, which overrode the reranker and served a
+# documented refusal in three cases: the reranker declined and search's rank 0
+# was a refusal; it declined but named a refusal among its near misses; or it
+# picked an answerable template while a rank-0 refusal was ahead by more than
+# `CLARIFY_SCORE_MARGIN`. It was built when the reranker kept declining
+# genuinely unanswerable questions. Since then it only misfired: WP-6b served
+# PLN-022 for "districts behind on GPDP submission", WP-6d PLN-023 for "delayed
+# GPDP submissions", WP-6d/6e PLU-005 for "count of planned activities in
+# Attabira", and a tester's "Barimunda planned activities 2025-2026 — count?"
+# got ALR-007 although the reranker had picked PLN-024, correctly.
 #
-# THE MECHANISM. A refusal's fate rests entirely on one LLM judgement, and the
-# reranker's own rule set resolves against it: rule 9 says "if one of those
-# matches the user's intent, return it", rule 10 says "if NONE of the candidates
-# can answer the query exactly, return no_match". A candidate captioned CANNOT BE
-# ANSWERED satisfies rule 10 by construction, and rule 10 is the one that wins —
-# which is why the failure is 3/3 stable rather than a wobble. Both zone branches
-# then render that same entry as an ordinary question chip: a tappable suggestion
-# of a question the database cannot answer, whose tap reproduces the identical
-# clarification. The refusal was in the candidate list the whole time.
+# From the reranker call logs (brief `handoffs/WP6g_year_span.md` §0):
 #
-# THE FIX IS DETERMINISTIC, because the evidence is. Retrieval rank is not a
-# judgement call: if the single closest thing in the whole index to what the
-# officer typed is the catalogue's own statement that this question has no
-# answer, that statement is the answer. So a rank-0 refusal takes precedence over
-# a no-match verdict outright, and over a rerank pick only when retrieval can
-# actually tell them apart (see the margin below). Everything else stays a
-# clarification — with the refusal labelled as one.
-
-
-def _refusal_precedence(
-    scored: list[tuple[str, str, float]], picked: str | None,
-    near_misses: list[str] | None = None,
-) -> str | None:
-    """The known-unanswerable that should be served instead of `picked`, or None.
-
-    RANK 0 AND NOTHING WEAKER. "Somewhere in the top 30" is not evidence — the
-    unanswerables are 30 of 376 index entries and one is near almost anything.
-    Rank 0 means no catalogue entry, answerable or not, matched the question more
-    closely.
-
-    AGAINST A RERANK PICK, THE MARGIN APPLIES. `CLARIFY_SCORE_MARGIN` is already
-    this codebase's definition of "retrieval cannot separate these two"; inside
-    it, overruling the semantic layer with the surface layer would be exactly the
-    embedding-order bias the reranker exists to correct. Outside it, the two
-    layers genuinely disagree about whether the question is answerable at all,
-    and the catalogue's documented "no" is the safer of the two — a near-miss
-    that measures something else is the confidently-wrong class this project
-    exists to prevent, and PLN-020's all-zero table is what it looks like.
-
-    Against a NO-MATCH verdict no margin is needed: the alternative is a generic
-    decline, so this can only ever replace "I failed" with "here is why this
-    cannot be answered". It can never displace an answer.
-
-    AND on a no-match verdict, the RERANKER'S OWN NEAR-MISS LIST counts as well
-    as rank 0. Rule 10 asks it, when nothing can answer the query, to name the
-    ids that come closest; naming a documented refusal there while also returning
-    `no_match` is a contradiction, and it resolves in favour of the refusal —
-    "the closest thing is the entry that says this cannot be answered" is an
-    answer, and offering that entry as one of three tappable suggestions instead
-    is not. Nothing arbitrary is being read off the ranking: this is the semantic
-    layer's own judgement, taken at its word.
-    """
-    if not scored:
-        return None
-    by_id = {qid: s for qid, _q, s in scored}
-    top_qid, _question, top_score = scored[0]
-
-    if top_qid in UNANSWERABLE_CATALOG and top_qid != picked:
-        if top_score < NO_MATCH_LOWER_THRESHOLD:
-            # Below the floor nothing is a match, including this. The generic
-            # miss path — which offers the nearest questions — is honest.
-            return None
-        if picked and picked != "no_match":
-            picked_score = by_id.get(picked)
-            if (picked_score is not None
-                    and top_score - picked_score < CLARIFY_SCORE_MARGIN):
-                return None
-        _log.info("refusal precedence: serving %s (retrieval rank 0, score %.4f) "
-                  "instead of %r", top_qid, top_score, picked)
-        return top_qid
-
-    if picked and picked != "no_match":
-        return None
-    for qid in near_misses or ():
-        if qid in UNANSWERABLE_CATALOG and by_id.get(qid, 0.0) >= NO_MATCH_LOWER_THRESHOLD:
-            _log.info("refusal precedence: the reranker returned no_match but "
-                      "named %s as a near miss — serving the documented reason", qid)
-            return qid
-    return None
+#     run                  refusals the reranker chose   refusals the rule forced
+#     WP-6e, four runs     16, all correct                1 (pilot 1044, wrong)
+#     WP-6f, four runs     10, all correct                0
+#
+# Operator ruling 2026-09-29: "yes remove the rule." A refusal is served only
+# when the reranker picks it (`_serve_query_id` -> `_serve_unanswerable`). One
+# it names as a near miss is still offered, labelled, by `_reading_chips`.
 
 
 def _reading_chips(
@@ -2434,9 +2363,9 @@ def _reading_chips(
     An unanswerable entry offered as a plain suggestion reads as a question the
     system is inviting the user to ask, and tapping it produces the same
     clarification it came from. Labelled, the chip is an offer to explain — and
-    its send_text is still the entry's own question, which retrieves at rank 0 on
-    the way back in and is therefore SERVED as the refusal by
-    `_refusal_precedence`. The loop closes without an LLM in it.
+    its send_text is still the entry's own question, which the reranker then
+    picks and which is served as the refusal (WP-6g T1b: nothing overrides the
+    reranker any more).
     """
     chips: list[Chip] = []
     seen: set[str] = set()
@@ -2493,10 +2422,8 @@ def _route_vector(
             template_map=template_map,
         )
     if score_zone == "ambiguous":
-        # No refusal override here, deliberately: this zone IS "the top two are
-        # within the margin", so a rank-0 refusal has not out-matched anything.
-        # It is offered as a labelled reading instead, which is what makes it
-        # reachable at all (D28.5).
+        # A refusal among the readings is offered as a labelled chip, like
+        # everywhere else (see `_reading_chips`).
         fill = _extract_fill_values(
             user_query, [qid for qid, _, _ in scored],
             template_map, validator, openai_client,
@@ -2512,16 +2439,8 @@ def _route_vector(
     query_id, near_misses = rerank(user_query, candidates, openai_client,
                                    examples=examples)
 
-    # The catalogue's own "this cannot be answered", when it is the closest thing
-    # in the index to the question asked. Before the branch below, because that
-    # branch is where BEN-001 and BEN-003 spent all three WP-4 replays; and
-    # before the serving call, because PLN-022 was answered with a zero-filled
-    # near-miss instead.
-    refusal = _refusal_precedence(scored, query_id, near_misses)
-    if refusal is not None:
-        return _serve_unanswerable(refusal, user_query, normalized, start,
-                                   template_map)
-
+    # The reranker's decision is final (WP-6g T1b): a template it picks is served,
+    # a refusal it picks is served as the refusal, and a decline asks.
     if query_id == "no_match" or (
         query_id not in DASHBOARD_CATALOG
         and query_id not in UNANSWERABLE_CATALOG

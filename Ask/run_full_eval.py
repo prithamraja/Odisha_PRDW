@@ -70,7 +70,8 @@ def _capture_router_log(out_path: Path) -> logging.Handler:
         first, a disagreement is structurally unreachable, so a line here means
         some new path is supplying the slot from somewhere else;
       * `_refusal_precedence` — which documented refusals were reached, and
-        whether by rank or by the reranker's own near-miss list.
+        whether by rank or by the reranker's own near-miss list. Removed in
+        WP-6g T1b: a refusal is now served only as the reranker's own pick.
 
     `_order_paired_fiscal_years` used to be the second item on this list. It is
     deleted (WP-5 T1): the reader's own split IS the catalogue's chronological

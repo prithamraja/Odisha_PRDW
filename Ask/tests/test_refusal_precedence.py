@@ -1,43 +1,29 @@
-"""A documented refusal has to be reachable (D28.5, WP-4c T2c).
+"""A refusal is served only when the reranker picks it (WP-6g T1b).
 
-THE DEFECT, from WP-4's three replays. 15 of the 19 known-unanswerable gold rows
-served their `UNANSWERABLE_CATALOG` entry cleanly. Four did not:
+WP-4c's "refusal wins" rule (D28.5, `_refusal_precedence`) overrode the reranker
+in three cases: a no-match verdict with a refusal at search rank 0; a no-match
+verdict naming a refusal among the near misses; and an answerable pick with a
+rank-0 refusal ahead by more than `CLARIFY_SCORE_MARGIN`. Since WP-4c it only
+misfired — the last time on a tester's "Barimunda planned activities 2025-2026 —
+count?", where the reranker picked PLN-024 correctly and case 3 served the
+ALR-007 refusal instead. The reranker call logs show every correct refusal in
+WP-6e (16) and WP-6f (10) was the reranker's own pick; the rule forced one, and
+it was wrong. Operator ruling 2026-09-29: "yes remove the rule."
 
-  BEN-001  3/3  "I couldn't match that exactly. Did you mean one of these?" —
-                offering three Individual Household Latrine templates
-  BEN-003  2/3  the same; 1/3 the broad-question elicitation ("What would you
-                like to know about Khordha?")
-  BEN-010  2/3  the broad-question elicitation; 1/3 the generic miss
-  PLN-022  2/3  ANSWERED, with PLN-020 — whose own caveat reads
-                "pending_approvals is 0 everywhere because approval_date is
-                always populated". A table of zeros, served as the answer to
-                "which blocks are consistently delayed in GPDP approvals".
+These tests pin the behaviour that replaces it:
+  - a reranker pick stands, even when a refusal is search rank 0 and far ahead;
+  - a no-match verdict with a refusal at rank 0 asks, the refusal labelled;
+  - a refusal the reranker picks is served.
 
-THE MECHANISM. Whether a refusal is reached rests entirely on one LLM judgement,
-and the reranker's rule set resolves against it: rule 9 says "if one of those
-matches the user's intent, return it", rule 10 says "if NONE of the candidates
-can answer the query exactly, return no_match". A candidate captioned CANNOT BE
-ANSWERED satisfies rule 10 by construction, and rule 10 wins — which is why the
-failure is 3/3 stable rather than a wobble. Both zone branches then rendered the
-same entry as an ordinary question chip: a tappable suggestion of a question the
-database cannot answer, whose tap reproduces the identical clarification.
-
-THE FIX IS DETERMINISTIC, because retrieval rank is not a judgement call. If the
-closest entry in the whole index to what the officer typed is the catalogue's own
-statement that this question has no answer, that statement IS the answer.
-
-No API key and no network: the retriever and reranker are stubs.
-
-WP-6f (M7) made BEN-001 and PLN-022 templates — their data or definition
-exists — so the rule is exercised with BEN-010, one of the fifteen that are
-still refusals. The shapes are the same; only the example entry changed.
+No API key and no network: the retriever and reranker are stubs. BEN-010 is one
+of the fifteen entries that are still refusals after WP-6f (M7).
 """
 import time
 import unittest
 from types import SimpleNamespace
 
 from query_router import router
-from query_router.config import CLARIFY_SCORE_MARGIN, NO_MATCH_LOWER_THRESHOLD
+from query_router.config import CLARIFY_SCORE_MARGIN
 from query_router.models import RouteTier
 from query_router.unanswerable_catalog import UNANSWERABLE_CATALOG
 
@@ -56,86 +42,6 @@ TOP_REFUSAL = _scored(
     (NEAR_MISS, "Which Blocks have the highest number of pending GPDP "
                 "approvals in {date_range}?", 0.55),
 )
-
-
-class RefusalPrecedenceTests(unittest.TestCase):
-    """The rule, in isolation."""
-
-    def test_a_rank_0_refusal_beats_a_no_match_verdict(self):
-        """The alternative is a generic decline, so this can only replace
-        "I failed" with "here is why this cannot be answered"."""
-        self.assertEqual(
-            router._refusal_precedence(TOP_REFUSAL, "no_match"), REFUSAL)
-        self.assertEqual(router._refusal_precedence(TOP_REFUSAL, None), REFUSAL)
-
-    def test_a_rank_0_refusal_beats_a_separable_rerank_pick(self):
-        """PLN-022's shape: the reranker answered with a near-miss that measures
-        something else, and retrieval had the refusal well clear of it."""
-        self.assertEqual(
-            router._refusal_precedence(TOP_REFUSAL, NEAR_MISS), REFUSAL)
-
-    def test_a_near_tie_does_NOT_overrule_the_reranker(self):
-        """Inside `CLARIFY_SCORE_MARGIN` retrieval cannot separate the two, and
-        overruling the semantic layer on noise is exactly the embedding-order
-        bias the reranker exists to correct."""
-        tie = _scored((REFUSAL, REFUSAL_Q, 0.72),
-                      (NEAR_MISS, "…?", 0.72 - CLARIFY_SCORE_MARGIN / 2))
-        self.assertIsNone(router._refusal_precedence(tie, NEAR_MISS))
-        # …but with nothing picked, the margin is irrelevant.
-        self.assertEqual(router._refusal_precedence(tie, "no_match"), REFUSAL)
-
-    def test_a_refusal_below_the_no_match_floor_is_not_a_match(self):
-        """Below the floor nothing is a match, including this. The miss path,
-        which offers the nearest questions, is the honest answer."""
-        weak = _scored((REFUSAL, REFUSAL_Q, NO_MATCH_LOWER_THRESHOLD - 0.01))
-        self.assertIsNone(router._refusal_precedence(weak, "no_match"))
-
-    def test_a_refusal_below_rank_0_is_not_evidence(self):
-        """The unanswerables are 30 of 376 index entries, so one is near almost
-        anything. "Somewhere in the top 30" must not refuse a question."""
-        buried = _scored((NEAR_MISS, "…?", 0.80), (REFUSAL, REFUSAL_Q, 0.79))
-        self.assertIsNone(router._refusal_precedence(buried, NEAR_MISS))
-        self.assertIsNone(router._refusal_precedence(buried, "no_match"))
-
-    def test_the_reranker_picking_it_needs_no_override(self):
-        self.assertIsNone(router._refusal_precedence(TOP_REFUSAL, REFUSAL))
-
-    def test_an_answerable_top_hit_is_never_touched(self):
-        ordinary = _scored((NEAR_MISS, "…?", 0.80))
-        self.assertIsNone(router._refusal_precedence(ordinary, NEAR_MISS))
-
-    def test_nothing_retrieved_is_handled(self):
-        self.assertIsNone(router._refusal_precedence([], "no_match"))
-
-    # ── The reranker's own near-miss list, on a no-match verdict ──────────────
-
-    def test_a_refusal_named_as_a_near_miss_is_served(self):
-        """BEN-001's post-fix shape: the scope-free paraphrase brings it into the
-        window at rank 1, so rank 0 alone would not reach it. If the reranker
-        returns no_match and names it among the CLOSEST candidates, that is a
-        contradiction — and "the closest thing is the entry that says this cannot
-        be answered" is an answer."""
-        buried = _scored((NEAR_MISS, "…?", 0.63), (REFUSAL, REFUSAL_Q, 0.60))
-        self.assertEqual(
-            router._refusal_precedence(buried, "no_match", [REFUSAL]), REFUSAL)
-
-    def test_a_near_miss_refusal_does_NOT_overrule_a_served_template(self):
-        """Only on a no-match verdict. A positive pick stands unless the refusal
-        actually out-ranked it (the rank-0 rule above)."""
-        buried = _scored((NEAR_MISS, "…?", 0.63), (REFUSAL, REFUSAL_Q, 0.60))
-        self.assertIsNone(
-            router._refusal_precedence(buried, NEAR_MISS, [REFUSAL]))
-
-    def test_a_near_miss_below_the_floor_is_still_not_a_match(self):
-        weak = _scored((NEAR_MISS, "…?", 0.35),
-                       (REFUSAL, REFUSAL_Q, NO_MATCH_LOWER_THRESHOLD - 0.01))
-        self.assertIsNone(
-            router._refusal_precedence(weak, "no_match", [REFUSAL]))
-
-    def test_answerable_near_misses_change_nothing(self):
-        buried = _scored((NEAR_MISS, "…?", 0.63))
-        self.assertIsNone(
-            router._refusal_precedence(buried, "no_match", [NEAR_MISS]))
 
 
 class RefusalRetrievalSurfaceTests(unittest.TestCase):
@@ -218,8 +124,8 @@ class RefusalChipTests(unittest.TestCase):
             self.assertEqual(chip.label, chip.send_text)
 
     def test_the_chip_sends_the_entrys_own_question(self):
-        """Which is what closes the loop: that text retrieves at rank 0, so
-        `_refusal_precedence` serves the refusal with no LLM involved."""
+        """Which is what closes the loop: the reranker picks the entry's own
+        question on the way back in, and the refusal is served (WP-6g T1b)."""
         chips = router._reading_chips(TOP_REFUSAL, 3)
         refusal_chip = next(c for c in chips
                             if c.label.startswith("Why I can't answer:"))
@@ -245,8 +151,7 @@ class _StubRetriever:
 
 
 class RouteVectorRefusalTests(unittest.TestCase):
-    """The rule where it lives: through `_route_vector`, with the two LLM calls
-    stubbed out. This is the end-to-end shape of the four failing gold rows."""
+    """Through `_route_vector`, with the two LLM calls stubbed out."""
 
     def setUp(self):
         self._real_rerank = router.rerank
@@ -267,33 +172,60 @@ class RouteVectorRefusalTests(unittest.TestCase):
             openai_client=object(), retriever=_StubRetriever(scored),
             cache_conn=None, dashboard_results={},
             template_map={NEAR_MISS: {"param_slots": [],
-                                      "abstract_question": "…?"}},
+                                      "abstract_question": "…?",
+                                      "sql_template": "SELECT 1 AS n"}},
             dashboard_questions={}, start_date=None, end_date=None,
         )
 
-    def test_BEN_001s_shape_now_serves_the_documented_reason(self):
-        """3/3 in WP-4 BEN-001 got "I couldn't match that exactly" over three IHHL
-        templates. The workbook's own reason existed and was never shown. (BEN-001
-        is a template since WP-6f; the shape is kept with BEN-010.)"""
-        result = self._route(TOP_REFUSAL, "no_match", [NEAR_MISS])
+    def test_the_rule_is_gone(self):
+        self.assertFalse(hasattr(router, "_refusal_precedence"))
+
+    def test_a_reranker_pick_stands_against_a_rank_0_refusal_far_ahead(self):
+        """Case 3 of the old rule — the Barimunda shape: the reranker picked the
+        answerable template and a refusal was search rank 0, well clear of it.
+        The pick is served."""
+        far_ahead = _scored(
+            (REFUSAL, REFUSAL_Q, 0.80),
+            (NEAR_MISS, "…?", 0.80 - 3 * CLARIFY_SCORE_MARGIN),
+        )
+        served = []
+        real = router._serve_query_id
+        router._serve_query_id = lambda qid, *a, **k: served.append(qid) or "served"
+        try:
+            result = self._route(far_ahead, NEAR_MISS)
+        finally:
+            router._serve_query_id = real
+        self.assertEqual(served, [NEAR_MISS])
+        self.assertEqual(result, "served")
+
+    def test_a_no_match_with_a_rank_0_refusal_asks_with_the_refusal_labelled(self):
+        """Cases 1 and 2 of the old rule: the reranker declined and named the
+        refusal as a near miss. Now it is a labelled chip, not the answer."""
+        result = self._route(TOP_REFUSAL, "no_match", [REFUSAL, NEAR_MISS])
+        self.assertEqual(result.tier, RouteTier.CLARIFY)
+        self.assertEqual(result.clarification.reason, "ambiguous_templates")
+        labels = [c.label for c in result.clarification.options]
+        self.assertTrue(labels[0].startswith("Why I can't answer:"), labels)
+        self.assertEqual(result.clarification.options[0].send_text, REFUSAL_Q)
+        self.assertNotEqual(result.query_id, REFUSAL)
+
+    def test_a_refusal_the_reranker_picks_is_served(self):
+        result = self._route(TOP_REFUSAL, REFUSAL)
         self.assertEqual(result.query_id, REFUSAL)
         self.assertIsNone(result.result,
                           "an honest refusal has NO result set — not an empty "
                           "one (the coupling grade_full_eval asserts)")
         self.assertIn(UNANSWERABLE_CATALOG[REFUSAL]["reason"][:40],
                       result.fallback_message or "",
-                      "the workbook's own reason, verbatim")
+                      "the catalogue's own reason, verbatim")
 
-    def test_PLN_022s_shape_is_not_answered_with_a_near_miss(self):
-        """The reranker picked a template; retrieval had the refusal clear of
-        it. Serving the near-miss meant serving a table of zeros."""
-        result = self._route(TOP_REFUSAL, NEAR_MISS)
-        self.assertEqual(result.query_id, REFUSAL)
-        self.assertNotEqual(result.tier, RouteTier.TIER2_TEMPLATE)
+    def test_a_refusal_below_rank_0_that_the_reranker_picks_is_served(self):
+        buried = _scored((NEAR_MISS, "…?", 0.63), (REFUSAL, REFUSAL_Q, 0.60))
+        self.assertEqual(self._route(buried, REFUSAL).query_id, REFUSAL)
 
     def test_an_ambiguous_zone_asks_rather_than_refusing(self):
-        """The ambiguous zone IS "the top two are inside the margin", so a
-        rank-0 refusal has out-matched nothing. It becomes a labelled reading."""
+        """The zone is decided before the reranker; a rank-0 refusal there is a
+        labelled reading, as before."""
         ambiguous = _scored(
             (REFUSAL, REFUSAL_Q, 0.40),
             (NEAR_MISS, "…?", 0.40 - CLARIFY_SCORE_MARGIN / 2),
