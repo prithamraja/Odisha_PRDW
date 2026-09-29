@@ -33,6 +33,7 @@ touches the text the router routes on.
 from __future__ import annotations
 
 import calendar
+import logging
 import re
 
 __all__ = [
@@ -60,6 +61,8 @@ __all__ = [
 # and widening the surface without a test is how a normalisation starts eating
 # text nobody checked. One line to add if pilot logs show officers typing them.
 _ODIA_DIGITS = str.maketrans("୦୧୨୩୪୫୬୭୮୯", "0123456789")
+
+_log = logging.getLogger(__name__)
 
 
 def normalize_digits(text: str) -> str:
@@ -127,6 +130,45 @@ _FY_TWO_RE = re.compile(
 _FY_SPAN_RE = re.compile(
     _FY_LABEL + _YEAR + r"\s*(?:to|till|until|through|thru)\s*(20\d{2})(?!\d)",
     re.IGNORECASE)
+
+# '2022-23 to 2024-25' — a span between two FISCAL YEARS (WP-6g T1, operator
+# ruling 2026-09-29: "'from X to Y' should be the span"). `_FY_SPAN_RE` joins
+# only two BARE years, so each end written as a fiscal year was claimed on its
+# own by the single patterns below and nothing joined them: "blocks delayed from
+# 2023-24 to 2025-26" counted two years, not three.
+#
+# Each end is any form a single pattern reads — '2022-2023', '2022-23', '22-23',
+# with the optional label — and must name exactly ONE fiscal year. The link is a
+# word, or an en / em dash WITH spaces round it ("2022-23 – 2024-25"); a leading
+# "from" is neither needed nor read. Both ends are INCLUDED, which is what "2022
+# to 2025" already gives. "between X and Y", "X and Y", "vs" are not links: they
+# still name the two years (the operator has not ruled on "between").
+_FY_END = r"(?<!\d)(\d{2}|20\d{2})\s*[-–—/]\s*(\d{2}|20\d{2})(?!\d)"
+_SPAN_LINK = r"(?:\s+(?:to|till|until|through|thru)\s+|\s+[–—]\s+)"
+_FY_TO_FY_RE = re.compile(
+    _FY_LABEL + _FY_END + _SPAN_LINK + _FY_LABEL + _FY_END, re.IGNORECASE)
+
+# 'from 2022 to 2024-25' — a bare head and a fiscal tail. Unambiguous: a bare
+# year at the head of a span is the fiscal year that starts in it under BOTH of
+# this module's readings (the bare-year label and `_FY_SPAN_RE`'s head), so the
+# span is 2022-23 through 2024-25. Before, `_FY_SPAN_RE` took "2022 to 2024" out
+# of it and the tail's own year was lost. The head must not be the tail half of
+# a pair ("2020-2022 to 2024-25"), which is left to the patterns below.
+#
+# THE MIRROR IMAGE IS NOT READ: 'from 2022-23 to 2025' leaves the text alone.
+# A bare TAIL has two readings here — the end of the span ("2022 to 2025" stops
+# at 2024-25) or the fiscal year that starts in it ("in 2025" is 2025-26) — and
+# which year "FY 2025" names is the fiscal-year naming question awaiting the
+# operator (2026-09-29). Guessing would bind a year the officer may not mean.
+_BARE_TO_FY_RE = re.compile(
+    _FY_LABEL + r"(?<![-–—/])(?<![-–—/]\s)" + _YEAR + _SPAN_LINK + _FY_LABEL + _FY_END,
+    re.IGNORECASE)
+
+# The widest span of labelled fiscal years read as one. The data holds six; a
+# labelled span is not the figure-range risk `_MAX_SPAN_YEARS` guards for a bare
+# hyphen pair, so the bound is looser. Wider — or a tail before its head — is
+# left to the patterns below (the reading before WP-6g) and logged.
+_MAX_LABELLED_SPAN_YEARS = 10
 
 _MONTH_RE = re.compile(rf"\b({_MONTH_ALT})\b{_LINK}{_YEAR}", re.IGNORECASE)
 _BARE_YEAR_RE = re.compile(_YEAR)
@@ -225,6 +267,19 @@ def _fiscal_pair(head: int, tail: int, tail_digits: int) -> list[int] | None:
     return None
 
 
+def _one_fiscal_year(head: str, tail: str) -> int | None:
+    """The start year of the ONE fiscal year an end of a span names, or None.
+
+    The forms the single patterns read and no others: '2022-2023', '2022-23',
+    '22-23'. A two-digit head with a four-digit tail ('22-2023') is none of them,
+    and a pair naming several years ('2020-2022') is not one end of a span.
+    """
+    if len(head) == 2 and len(tail) == 4:
+        return None
+    named = _fiscal_pair(int(head), int(tail), len(tail))
+    return named[0] if named is not None and len(named) == 1 else None
+
+
 def _ordered(known_years) -> list[str]:
     """The loaded fiscal years, oldest first — the axis relative phrases move on."""
     return sorted({str(y).strip() for y in (known_years or []) if str(y).strip()})
@@ -267,6 +322,7 @@ def resolve_fiscal_years(text: str, known_years=()) -> list[str]:
 
         "FY 24-25"              -> ['2024-2025']
         "2024-25 vs 2023-24"    -> ['2023-2024', '2024-2025']
+        "from 2022-23 to 2024-25" -> ['2022-2023', '2023-2024', '2024-2025']
         "in 2024"               -> ['2024-2025']
         "last two years"        -> the two newest loaded years
         "how many GPs are there"-> []
@@ -297,7 +353,40 @@ def resolve_fiscal_years(text: str, known_years=()) -> list[str]:
             starts.extend(named)
             consumed.append(span)
 
-    # The SPAN is claimed first: its two years are one phrase, and every scan
+    def _claim_labelled_span(m: re.Match, head: int | None, tail: int | None,
+                             span: tuple[int, int]) -> None:
+        if head is None or tail is None:
+            return      # an end that is not ONE fiscal year — not this shape
+        if not head <= tail < head + _MAX_LABELLED_SPAN_YEARS:
+            _log.info("year span %r left to the single-year patterns: %s",
+                      m.group(0), "its tail is before its head" if tail < head
+                      else f"wider than {_MAX_LABELLED_SPAN_YEARS} fiscal years")
+            return
+        starts.extend(range(head, tail + 1))
+        consumed.append(span)
+
+    # A span between two FISCAL YEARS is claimed before everything (WP-6g T1):
+    # `_FY_SPAN_RE` would otherwise take "2023 to 2024" out of the middle of
+    # "2022-2023 to 2024-2025", and the single patterns read each end alone.
+    for m in _FY_TO_FY_RE.finditer(text):
+        span = (m.start(1), m.end(4))
+        if not (_passes_guards(text, m.start(1), m.end(2))
+                and _passes_guards(text, m.start(3), m.end(4))):
+            continue
+        _claim_labelled_span(m, _one_fiscal_year(m.group(1), m.group(2)),
+                             _one_fiscal_year(m.group(3), m.group(4)), span)
+
+    for m in _BARE_TO_FY_RE.finditer(text):
+        span = (m.start(1), m.end(3))
+        if any(span[0] < c_end and c_start < span[1] for c_start, c_end in consumed):
+            continue
+        if not (_passes_guards(text, *m.span(1))
+                and _passes_guards(text, m.start(2), m.end(3))):
+            continue
+        _claim_labelled_span(m, int(m.group(1)),
+                             _one_fiscal_year(m.group(2), m.group(3)), span)
+
+    # The bare SPAN is claimed next: its two years are one phrase, and every scan
     # below would otherwise read them as separate fiscal years.
     for m in _FY_SPAN_RE.finditer(text):
         span = (m.start(1), m.end(2))
