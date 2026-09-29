@@ -54,6 +54,7 @@ from .zones             import (
     resolved_question,
     unfilled_phrases,
     zone,
+    _template_for,
 )
 from .dashboard_catalog import DASHBOARD_CATALOG
 from .unanswerable_catalog import UNANSWERABLE_CATALOG, refusal_for
@@ -1310,6 +1311,10 @@ def _extract_fill_values(
             list_slots |= _list_slots(template.get("param_slots", []))
     if not slot_type:
         return {}
+    # The year is read whole even when no candidate takes a list (the five
+    # two-year comparisons): a chip has to know every year named to tell whether
+    # it can carry them.
+    list_slots |= {s for s, etype in slot_type.items() if etype == "fiscal_year"}
     try:
         raw = _extract_slot_values(
             user_query, slot_type, openai_client, validator=validator,
@@ -1508,7 +1513,7 @@ def _no_match(
     result.clarification = Clarification(
         reason="no_match",
         prompt="I can't answer that exactly, but I can answer these:",
-        options=_reading_chips(scored, MAX_MISS_SUGGESTIONS, fill),
+        options=_reading_chips(scored, MAX_MISS_SUGGESTIONS, fill, template_map),
     )
     return result
 
@@ -2388,10 +2393,52 @@ def _serve_query_id(
 # it names as a near miss is still offered, labelled, by `_reading_chips`.
 
 
+def _chip_years(template: dict | None, fill: dict) -> tuple[dict, str | None]:
+    """The fill ONE chip renders with, and a note when it holds fewer years than
+    the officer named (WP-6h T2).
+
+    The pre-fill reads every year the question names (`_extract_fill_values`).
+    A chip is sent back as its own text, so a year it leaves out is gone, and a
+    tap would answer a narrower question than the one asked with nothing to say
+    so. Per template:
+
+      - the year slot takes a list (329 templates): every year, joined as the
+        answer echo joins them — "in 2022-2023, 2023-2024 and 2024-2025";
+      - a two-year comparison (PLN-039/040, TRD-001/002/004, all "between
+        {date_range_2} and {date_range}"): exactly two years fill the pair,
+        the earlier in `$date_range_2`, the catalogue's convention;
+      - anything else that cannot hold them all: the latest year (or, on a
+        comparison, the two end years), with a note — "2024-25 only". Such a
+        chip is offered only when nothing else is (`_reading_chips`).
+
+    One year named, or none: the fill as it was.
+    """
+    named = sorted(set(str(v) for v in (fill.get("date_range")
+                                        if isinstance(fill.get("date_range"), (list, tuple))
+                                        else [fill.get("date_range")]) if v))
+    if len(named) <= 1:
+        return fill, None
+    slots = {s["name"]: s for s in (template or {}).get("param_slots", [])}
+    if "date_range_2" not in slots:
+        # Read for a comparison candidate; on any other chip it is not a year the
+        # officer named separately, and a chip without a template would append it.
+        fill = {k: v for k, v in fill.items() if k != "date_range_2"}
+    if "date_range" not in slots or slots["date_range"].get("list"):
+        return fill, None
+    short = year_ask.short_label
+    if "date_range_2" in slots:
+        pair = {**fill, "date_range": named[-1], "date_range_2": named[0]}
+        if len(named) == 2:
+            return pair, None
+        return pair, f"{short(named[0])} and {short(named[-1])} only"
+    return {**fill, "date_range": named[-1]}, f"{short(named[-1])} only"
+
+
 def _reading_chips(
     candidates: list[tuple[str, str, float]],
     limit: int,
     fill: dict[str, str] | None = None,
+    template_map: dict[str, dict] | None = None,
 ) -> list[Chip]:
     """`question_chips`, with a documented refusal labelled as one.
 
@@ -2401,11 +2448,30 @@ def _reading_chips(
     its send_text is still the entry's own question, which the reranker then
     picks and which is served as the refusal (WP-6g T1b: nothing overrides the
     reranker any more).
+
+    Every chip carries every year the officer named, or is not offered (WP-6h
+    T2, `_chip_years`). When no answerable chip could carry them, the narrower
+    ones are offered after all, each saying so — "…in 2024-2025 (2024-25
+    only)?" — so a tap answers exactly what the chip says.
     """
+    fill = fill or {}
+    planned = []
+    for qid, question, _score in candidates:
+        template = (template_map or {}).get(qid) or _template_for(question)
+        chip_fill, note = _chip_years(template, fill)
+        planned.append((qid, question, chip_fill, note))
+    narrowed_only = not any(note is None and qid not in UNANSWERABLE_CATALOG
+                            for qid, _, _, note in planned)
     chips: list[Chip] = []
     seen: set[str] = set()
-    for qid, question, _score in candidates:
-        text = readable_question(question, fill)
+    for qid, question, chip_fill, note in planned:
+        if note is not None and not narrowed_only:
+            _log.info("chip dropped: %s cannot hold every year named (%s): %r",
+                      qid, note, fill.get("date_range"))
+            continue
+        text = readable_question(question, chip_fill)
+        if note is not None:
+            text = f"{text.rstrip('?. ')} ({note})?"
         if text in seen:
             continue
         seen.add(text)
@@ -2466,7 +2532,7 @@ def _route_vector(
         return _clarify(
             "ambiguous_templates",
             "I can read that a few ways — which of these did you mean?",
-            _reading_chips(scored, MAX_CLARIFY_OPTIONS, fill),
+            _reading_chips(scored, MAX_CLARIFY_OPTIONS, fill, template_map),
             user_query, normalized, start,
         )
 
@@ -2496,7 +2562,7 @@ def _route_vector(
             return _clarify(
                 "ambiguous_templates",
                 "I couldn't match that exactly. Did you mean one of these?",
-                _reading_chips(picked, MAX_CLARIFY_OPTIONS, fill),
+                _reading_chips(picked, MAX_CLARIFY_OPTIONS, fill, template_map),
                 user_query, normalized, start,
             )
         # The LLM offered no near-misses (off-topic or broad) — go through the
