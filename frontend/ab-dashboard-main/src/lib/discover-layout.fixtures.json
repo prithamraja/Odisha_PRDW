@@ -1,6 +1,6 @@
 {
  "generated_at": "2026-11-21T20:25:15",
- "note": "WP-D12 T1: five live /chat turns on the WP-D12 service (mirror C:\\dev\\odisha-d12), saved whole. Real model output; do not edit by hand. The five turns the brief names, plus a sixth ('small_answer', run 2026-11-21T20:26:29) for the one-or-two-findings screenshot.",
+ "note": "WP-D12 T1: five live /chat turns on the WP-D12 service (mirror C:\\dev\\odisha-d12), saved whole. Real model output; do not edit by hand. The five turns the brief names, plus a sixth ('small_answer', run 2026-11-21T20:26:29) for the one-or-two-findings screenshot. The `layout` field of each was then recomputed offline with the final DiscoverChat/layout.py (a pure function of the recorded findings and answer_tagged; no model call) after two T2 fixes: zero-value members left out of ranked charts, and scope not translated twice.",
  "writer_model": "gpt-5.6-sol",
  "judge_model": "gpt-5.6-sol",
  "answers": {
@@ -535,7 +535,7 @@
        "scope": "district Cuttack",
        "total": "Rs 1.65 crore",
        "direction": null,
-       "shown": 5,
+       "shown": 3,
        "of": 25,
        "bars": [
         {
@@ -557,20 +557,6 @@
          "fraction": 6e-05,
          "share": "0.0%",
          "value": "Rs 1,000",
-         "role": "member"
-        },
-        {
-         "member": "Administrative & Technical Support",
-         "fraction": 0.0,
-         "share": "0.0%",
-         "value": "Rs 0",
-         "role": "member"
-        },
-        {
-         "member": "Agriculture",
-         "fraction": 0.0,
-         "share": "0.0%",
-         "value": "Rs 0",
          "role": "member"
         }
        ]
@@ -1114,7 +1100,7 @@
        "scope": "Gram Panchayat Chikilli",
        "total": "Rs 1.63 crore",
        "direction": null,
-       "shown": 3,
+       "shown": 2,
        "of": 3,
        "bars": [
         {
@@ -1129,13 +1115,6 @@
          "fraction": 0.068682,
          "share": "6.9%",
          "value": "Rs 11.19 lakh",
-         "role": "member"
-        },
-        {
-         "member": "Activity Approved",
-         "fraction": 0.0,
-         "share": "0.0%",
-         "value": "Rs 0",
          "role": "member"
         }
        ]

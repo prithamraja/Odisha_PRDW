@@ -417,6 +417,37 @@ class PanelRuleTests(unittest.TestCase):
         self.assertEqual([b["member"] for b in panel["bars"][:5]],
                          [f"Theme {i}" for i in range(5)])
 
+    def test_ranked_leaves_out_members_holding_nothing(self):
+        members = [("Roads", 9e5, 4), ("Water", 3e5, 2), ("Agriculture", 0.0, 1),
+                   ("Health", 0.0, 1), ("Sports", 0.0, 1)]
+        record = _decomposition("d1-90001", members, dimension="focus_area_name",
+                                dimension_phrase="focus area")
+        (panel,) = layout.build([record], "")["panels"]
+        self.assertEqual([b["member"] for b in panel["bars"]], ["Roads", "Water"])
+        self.assertEqual((panel["shown"], panel["of"]), (2, 5))
+
+    def test_ranked_with_only_the_null_member_holding_anything(self):
+        members = [("(not recorded)", 5e5, 9), ("Tied", 0.0, 1), ("Untied", 0.0, 1)]
+        record = _decomposition("d1-90001", members, null="(not recorded)")
+        (panel,) = layout.build([record], "")["panels"]
+        self.assertEqual([b["role"] for b in panel["bars"]], ["not_recorded"])
+        self.assertEqual((panel["shown"], panel["of"]), (0, 2))
+
+    def test_a_zero_period_stays_on_a_time_chart(self):
+        years = [("2022-2023", 5e5, 3), ("2020-2021", 2e5, 1), ("2021-2022", 0.0, 1)]
+        record = _decomposition("d2-90001", years, dimension="fiscal_year",
+                                temporal=True, measure="payment_amount",
+                                view="view2")
+        (panel,) = layout.build([record], "")["panels"]
+        self.assertEqual([b["member"] for b in panel["bars"]],
+                         ["2020-2021", "2021-2022", "2022-2023"])
+
+    def test_scope_is_not_translated_twice(self):
+        record = _two("d1-90001", subspace=[("theme", "Theme 4 - Water")])
+        record.data["subspace_phrase"] = "LSDG theme Theme 4 - Water"
+        (panel,) = layout.build([record], "")["panels"]
+        self.assertEqual(panel["scope"], "LSDG theme Theme 4 - Water")
+
     def test_time_is_in_time_order_not_stored_order(self):
         months = [("2024-03", 9e5), ("2023-11", 7e5), ("2024-01", 5e5),
                   ("2023-12", 3e5)]

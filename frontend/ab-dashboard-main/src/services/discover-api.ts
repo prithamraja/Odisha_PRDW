@@ -77,6 +77,110 @@ export interface DiscoverChatResponse {
   /** The service's reference render. We take the SPAN BOUNDARIES from it and
    *  nothing else — see `src/lib/discover-answer.ts`. */
   answer_html?: string;
+
+  // ---- the report layout (WP-D12). OPTIONAL: an older service omits it and
+  // every path that shows no findings sends `{}`. Anything but `version: 1`
+  // renders the report exactly as before.
+  layout?: DiscoverLayout | Record<string, never>;
+}
+
+// ---------------------------------------------------------------------------
+// The report layout (WP-D12, DiscoverChat/layout.py)
+//
+// Built by code from the stored records the answer already uses. EVERY string
+// here is formatted by the service — figures, shares, direction words — so the
+// tab formats no number and decides no ranking. `fraction` is the one number,
+// and it is for bar geometry only. Every item carries its own record `url`,
+// because on the bare-sentence fallback the `citations` map is empty.
+// ---------------------------------------------------------------------------
+
+export interface LayoutTotalCard {
+  id: string;
+  url: string;
+  kind: "total";
+  /** The record's total, formatted, direction in words where signed. */
+  value: string;
+  /** The measure, in officer words. */
+  label: string;
+  scope: string;
+}
+
+export interface LayoutPatternCard {
+  id: string;
+  url: string;
+  kind: "pattern";
+  /** The pattern's own sentence, verbatim. */
+  text: string;
+  scope: string;
+}
+
+export type LayoutCard = LayoutTotalCard | LayoutPatternCard;
+
+export interface LayoutWarning {
+  id: string;
+  url: string;
+  /** Rows with no value on file, formatted. */
+  rows: string;
+  /** What is missing — the breakdown's name ("sanctioning authority"). */
+  missing: string;
+  measure: string;
+  share: string;
+  amount: string;
+  scope: string;
+}
+
+export interface LayoutBar {
+  member: string;
+  /** abs(share), in [0, 1] — geometry only, never printed. */
+  fraction: number;
+  share: string;
+  value: string;
+  role: "member" | "not_recorded";
+}
+
+export interface LayoutCompareRow {
+  id: string;
+  url: string;
+  label: string;
+  total: string;
+  direction: string | null;
+  /** One per member, in the panel's `members` order. */
+  parts: LayoutBar[];
+}
+
+export interface LayoutComparePanel {
+  kind: "compare";
+  ids: string[];
+  by: string;
+  scope: string;
+  members: string[];
+  rows: LayoutCompareRow[];
+}
+
+export interface LayoutBarsPanel {
+  kind: "ranked" | "time";
+  id: string;
+  ids: string[];
+  url: string;
+  label: string;
+  by: string;
+  scope: string;
+  total: string;
+  direction: string | null;
+  /** Bars drawn (the null bar aside) and members there are. */
+  shown: number;
+  of: number;
+  bars: LayoutBar[];
+}
+
+export type LayoutPanel = LayoutComparePanel | LayoutBarsPanel;
+
+export interface DiscoverLayout {
+  version: number;
+  cards?: LayoutCard[];
+  warnings?: LayoutWarning[];
+  /** A panel of a kind this tab does not know is skipped, never fatal. */
+  panels?: Array<LayoutPanel | { kind: string; ids?: string[] }>;
 }
 
 /**

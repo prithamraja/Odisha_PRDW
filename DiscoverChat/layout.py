@@ -36,7 +36,7 @@ from functools import lru_cache
 
 from . import checks, config, glossary
 from .corpus import members_of
-from phase5b_report import _num                                  # noqa: E402
+from phase5b_report import _num, display_band_labels             # noqa: E402
 from phase5f_decompose import NULL_LABEL, _fmt, _pct             # noqa: E402
 
 VERSION = 1
@@ -121,9 +121,14 @@ def member_name(name, view: str) -> str:
 
 
 def _scope(data: dict) -> str:
-    """`subspace_phrase` through the same display path, so a card's scope reads
-    exactly as the opening "Within ..." of the record's display sentence."""
-    return _display(str(data.get("subspace_phrase", "")), data.get("view", ""))
+    """`subspace_phrase` with a size band shown with its unit (WP-D11b ruling
+    3, `display_band_labels`) and nothing else changed.
+
+    NOT `glossary.render`: the phrase is already in officer words (the builder
+    wrote it with `display_name`), and rendering it again re-translates them --
+    "LSDG theme Theme 4" became "LSDG LSDG theme Theme 4" on 7 of the corpus's
+    300 distinct scopes."""
+    return display_band_labels(str(data.get("subspace_phrase", "")))
 
 
 def _rows(n) -> str:
@@ -248,7 +253,14 @@ def _bars_panel(finding, kind: str) -> dict:
         cap = config.LAYOUT_MAX_TIME_BARS
         kept = sorted(real[:cap], key=lambda m: str(m["member"]))
     else:
-        kept = real[:config.LAYOUT_MAX_BARS]
+        # A member holding exactly nothing is not one of "the largest": 12,292
+        # ranked records would otherwise fill their five bars with "Rs 0 ·
+        # 0.0%" (Cuttack's tied grant: 3 focus areas hold money, 22 hold none).
+        # `of` still counts every member, so the caption stays true -- "the 3
+        # largest of 25". A zero PERIOD is kept on a time chart: a year with
+        # nothing in it is information.
+        kept = [m for m in real if float(m["value"]) != 0.0]
+        kept = kept[:config.LAYOUT_MAX_BARS]
     # The null member is always drawn, as an extra grey bar, even when it is not
     # among the largest: a missing-record share that a chart quietly dropped
     # would be the same figure without its warning.

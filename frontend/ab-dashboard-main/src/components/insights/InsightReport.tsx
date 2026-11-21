@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { AlertTriangle, ArrowRight, Loader2, X } from "lucide-react";
 
 import {
@@ -5,8 +6,13 @@ import {
   usedFallbackSelection,
   type CitedBlock,
 } from "@/lib/discover-answer";
+import { placePanels, usableLayout } from "@/lib/discover-answer-layout";
 import type { DiscoverChatResponse } from "@/services/discover-api";
 import { CitationProvider, CitationSpan } from "./CitationSpan";
+import { ReportCards } from "./ReportCards";
+import { ReportFooter } from "./ReportFooter";
+import { ReportPanelGroup } from "./ReportPanel";
+import { ReportWarnings } from "./ReportWarnings";
 import { RichText } from "./RichText";
 
 export interface ReportState {
@@ -65,21 +71,30 @@ function BlockText({ block }: { block: CitedBlock }) {
 function Block({ block }: { block: CitedBlock }) {
   if (block.kind === "finding") {
     return (
-      <div className="pl-4 border-l-2 border-accent-saffron/40">
-        <p className="text-[14px] leading-relaxed text-ink">
+      <div className="pl-4 border-l-2 border-report-cyan/40">
+        <p className="text-[14px] leading-relaxed text-report-ink">
           <BlockText block={block} />
         </p>
-        <p className="mt-1 text-[12px] text-muted-design">{block.coverage}</p>
+        <p className="mt-1 text-[12px] text-report-ink-muted">{block.coverage}</p>
       </div>
     );
   }
   return (
-    <p className="text-[14px] leading-relaxed text-ink/80">
+    <p className="text-[14px] leading-relaxed text-report-ink-soft">
       <BlockText block={block} />
     </p>
   );
 }
 
+/**
+ * The Insight report (WP-D8 hover-to-source; WP-D12 layout).
+ *
+ * Order inside the card: header → cards → prose with its charts → the "Needs
+ * checking" box → footer. The cards, charts and warnings come whole from the
+ * service's `layout` field; without a usable one (absent, `{}`, another
+ * version) the report renders exactly as it did before WP-D12. The prose is
+ * the service's, untouched: the layout sits AROUND it and changes no word.
+ */
 export function InsightReport({
   state,
   onDismiss,
@@ -92,26 +107,42 @@ export function InsightReport({
   const caption = response ? MOVE_CAPTIONS[response.move] : undefined;
   const isAskRoute = response?.move === "lookup";
   const fallbackSelection = usedFallbackSelection(response?.retrieval);
+  const layout = response ? usableLayout(response.layout) : null;
+  const placement =
+    layout && parsed ? placePanels(parsed.blocks, layout.panels) : null;
 
   return (
     <CitationProvider>
-      <div className="mb-8 border border-line bg-white rounded-xl overflow-hidden">
-        <div className="flex items-start gap-4 px-6 pt-5 pb-4 border-b border-line">
+      <div className="mb-8 border border-report-line bg-white rounded-xl overflow-hidden">
+        <div className="flex items-start gap-4 px-6 pt-5 pb-4 border-b border-report-line">
           <div className="min-w-0 flex-1">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-accent-saffron mb-1.5">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-report-cyan-deep mb-1.5">
               Insight report
             </div>
-            <h2 className="font-display text-[19px] leading-snug text-ink">
+            <h2 className="font-display text-[19px] leading-snug text-report-ink">
               {question}
             </h2>
             {caption && (
-              <div className="mt-2 text-[12px] text-muted-design">{caption}</div>
+              <div className="mt-2 text-[12px] text-report-ink-muted">
+                {caption}
+                {/* The dotted underline shows only on hover or focus where a
+                    pointer can hover, so the report has to say the figures
+                    are live. Two wordings, one shown per device by CSS. */}
+                {status === "done" && parsed?.hasCitations && (
+                  <span data-report-chrome="">
+                    {" · "}
+                    <span className="hidden [@media(hover:hover)]:inline">point at</span>
+                    <span className="[@media(hover:hover)]:hidden">tap</span>
+                    {" any number to see its source"}
+                  </span>
+                )}
+              </div>
             )}
           </div>
           <button
             onClick={onDismiss}
             aria-label="Dismiss insight report"
-            className="shrink-0 w-7 h-7 rounded-md border border-line text-muted-design hover:text-ink hover:border-ink/30 flex items-center justify-center transition-colors"
+            className="shrink-0 w-7 h-7 rounded-md border border-report-line text-report-ink-muted hover:text-report-ink hover:border-report-ink/30 flex items-center justify-center transition-colors"
           >
             <X size={13} />
           </button>
@@ -119,7 +150,7 @@ export function InsightReport({
 
         <div className="px-6 py-5">
           {status === "loading" && (
-            <div className="flex items-center gap-2.5 text-[13px] text-muted-design">
+            <div className="flex items-center gap-2.5 text-[13px] text-report-ink-muted">
               <Loader2 size={14} className="animate-spin" />
               Searching the findings this analysis has already mined&hellip;
             </div>
@@ -127,12 +158,12 @@ export function InsightReport({
 
           {status === "error" && (
             <div className="flex gap-3">
-              <AlertTriangle size={15} className="mt-0.5 shrink-0 text-accent-saffron" />
+              <AlertTriangle size={15} className="mt-0.5 shrink-0 text-report-cyan-deep" />
               <div className="min-w-0">
-                <p className="text-[14px] text-ink">
+                <p className="text-[14px] text-report-ink">
                   The report could not be generated.
                 </p>
-                <p className="mt-1 text-[13px] text-muted-design leading-relaxed">
+                <p className="mt-1 text-[13px] text-report-ink-muted leading-relaxed">
                   {error}
                 </p>
               </div>
@@ -147,36 +178,49 @@ export function InsightReport({
                   tab does, and an infrastructure failure stops looking like a
                   data finding. */}
               {fallbackSelection && (
-                <p className="mb-4 text-[12px] leading-relaxed text-muted-design">
+                <p className="mb-4 text-[12px] leading-relaxed text-report-ink-muted">
                   The selection step was unavailable for this answer; only exact
                   matches are shown.
                 </p>
               )}
 
-              <div className="space-y-4">
+              {layout && layout.cards.length > 0 && (
+                <div className="mb-6">
+                  <ReportCards cards={layout.cards} warning={layout.warnings[0]} />
+                </div>
+              )}
+
+              <div className="space-y-4" data-report-part="prose">
                 {parsed.blocks.map((block, i) => (
-                  <Block key={i} block={block} />
+                  <Fragment key={i}>
+                    <Block block={block} />
+                    {placement && <ReportPanelGroup panels={placement.byBlock[i]} />}
+                  </Fragment>
                 ))}
+                {placement && <ReportPanelGroup panels={placement.trailing} />}
               </div>
+
+              {layout && layout.warnings.length > 0 && (
+                <div className="mt-6">
+                  <ReportWarnings warnings={layout.warnings} />
+                </div>
+              )}
 
               {isAskRoute && onRouteToAsk && (
                 <button
                   onClick={() => onRouteToAsk(question)}
-                  className="mt-5 inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-ink hover:bg-ink/90 text-ivory text-[13px] font-medium transition-colors"
+                  className="mt-5 inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-report-ink hover:bg-report-ink/90 text-ivory text-[13px] font-medium transition-colors"
                 >
                   Put this question to Ask
                   <ArrowRight size={13} strokeWidth={2.25} />
                 </button>
               )}
 
-              {/* The corpus is a snapshot of one mining run. An answer that did
-                  not say when it was mined would invite a stale pattern to be
-                  read as today's, which is why the service stamps every one. */}
-              {parsed.stamp && (
-                <p className="mt-5 pt-4 border-t border-line text-[12px] text-muted-design">
-                  {parsed.stamp}
-                </p>
-              )}
+              <ReportFooter
+                stamp={parsed.stamp}
+                question={question}
+                answer={response?.answer ?? ""}
+              />
             </>
           )}
         </div>

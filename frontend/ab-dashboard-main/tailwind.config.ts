@@ -24,6 +24,22 @@ export default {
         'muted-design': '#8A857B',
         'accent-saffron': '#1F4E5F',
         'teal-deep': '#1F4E5F',
+        // WP-D12: the Insight report's own colours. Named colours rather than
+        // CSS variables scoped to the report, because the hover card is
+        // portalled to document.body and has to wear them too. Used by the
+        // report and its hover card only; nothing else in the app changes.
+        'report-ink': '#243447',
+        'report-ink-soft': '#3A4A5C',
+        'report-ink-muted': '#5B6878',
+        'report-grey': '#7F8E9D',
+        'report-axis': '#B8C4CE',
+        'report-line-strong': '#C9D3DC',
+        'report-line': '#DCE3E9',
+        'report-cyan': '#0E7490',
+        'report-cyan-deep': '#155E75',
+        'report-cyan-light': '#6DB9CC',
+        'report-cyan-edge': '#A9D3DD',
+        'report-cyan-wash': '#E8F4F7',
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

@@ -158,26 +158,26 @@ function CitationCard() {
       style={style}
       onMouseEnter={ctx.hold}
       onMouseLeave={ctx.releaseAfterDelay}
-      className="border border-line bg-white rounded-xl shadow-lg px-4 py-3.5"
+      className="border border-report-line bg-white rounded-xl shadow-lg px-4 py-3.5"
     >
-      <p className="text-[13px] leading-relaxed text-ink">
+      <p className="text-[13px] leading-relaxed text-report-ink">
         {citation.display_sentence}
       </p>
 
       {citation.scope && (
-        <p className="mt-2 text-[12px] leading-relaxed text-muted-design">
-          <span className="text-ink/70">Covers:</span> {citation.scope}
+        <p className="mt-2 text-[12px] leading-relaxed text-report-ink-muted">
+          <span className="text-report-ink-soft">Covers:</span> {citation.scope}
         </p>
       )}
 
       {citation.standing && (
-        <p className="mt-1 text-[12px] leading-relaxed text-muted-design">
+        <p className="mt-1 text-[12px] leading-relaxed text-report-ink-muted">
           {citation.standing}
         </p>
       )}
 
-      <div className="mt-3 pt-2.5 border-t border-line flex items-center justify-between gap-3">
-        <span className="text-[11px] text-muted-design">
+      <div className="mt-3 pt-2.5 border-t border-report-line flex items-center justify-between gap-3">
+        <span className="text-[11px] text-report-ink-muted">
           {citation.view}
           {citation.view && citation.stamp ? " — " : ""}
           {citation.stamp}
@@ -186,7 +186,7 @@ function CitationCard() {
           href={recordHref(citation.url)}
           target="_blank"
           rel="noreferrer"
-          className="shrink-0 text-[12px] font-medium text-ink underline underline-offset-2 hover:text-accent-saffron transition-colors"
+          className="shrink-0 text-[12px] font-medium text-report-ink underline underline-offset-2 hover:text-report-cyan-deep transition-colors"
         >
           Open record&nbsp;&#8599;
         </a>
@@ -202,7 +202,17 @@ function CitationCard() {
  * The text wears the text tokens — a bound figure is not a link and must not
  * read as one, or an officer starts reading the colour as meaning. The dotted
  * underline is the whole affordance.
+ *
+ * WP-D12 (ruling 6): where the device can hover, the underline shows only on
+ * hover, on keyboard focus and while the card is open — forty underlined
+ * figures at rest made nothing stand out. On a touch device, which cannot
+ * hover, it stays visible as before. The report's caption says the figures are
+ * live ("point at" / "tap" any number).
  */
+const UNDERLINE =
+  "border-0 border-b border-dotted border-report-ink/50 " +
+  "[@media(hover:hover)]:border-transparent " +
+  "hover:border-report-ink focus-visible:border-report-ink aria-expanded:border-report-ink";
 export function CitationSpan({
   citation,
   children,
@@ -240,7 +250,7 @@ export function CitationSpan({
         if (isOpen && ctx.open?.pinned) ctx.hide();
         else open(true);
       }}
-      className="inline cursor-help bg-transparent p-0 m-0 text-left font-inherit text-inherit leading-inherit border-0 border-b border-dotted border-ink/50 hover:border-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-saffron/60 rounded-[2px]"
+      className={`inline cursor-help bg-transparent p-0 m-0 text-left font-inherit text-inherit leading-inherit ${UNDERLINE} focus:outline-none focus-visible:ring-2 focus-visible:ring-report-cyan/60 rounded-[2px]`}
     >
       {children}
     </button>
