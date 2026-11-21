@@ -100,6 +100,11 @@ class AskResponse(BaseModel):
     answer_tagged: str = ""
     citations: dict = {}
     answer_html: str = ""
+    # WP-D12. Cards, charts and the "Needs checking" list, built by code from
+    # the stored records (`layout.build`). Every string an officer reads is
+    # formatted here; the front end decides no number and no ranking. {} when
+    # there is nothing to lay out or DISCOVERCHAT_LAYOUT=0.
+    layout: dict = {}
 
 
 @app.get("/health")
@@ -139,6 +144,7 @@ def chat(request: AskRequest) -> AskResponse:
         answer_html=(render.to_html(answer.tagged_text, answer.findings,
                                     run_date=answer.stamp)
                      if answer.tagged_text else ""),
+        layout=answer.layout,
     )
 
 

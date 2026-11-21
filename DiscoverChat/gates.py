@@ -42,7 +42,7 @@ logging.basicConfig(level=logging.ERROR)
 
 from DiscoverChat import (                                     # noqa: E402
     assemble, causal_gate, checks, classifier, config, context_brief,
-    corpus as corpus_mod, glossary, render, verifier, writer,
+    corpus as corpus_mod, glossary, layout, render, verifier, writer,
 )
 from DiscoverChat.retrieval import Retriever                    # noqa: E402
 
@@ -807,6 +807,9 @@ def _signed_direction(ctx):
     return (f"{signed:,} signed records: {minus_total:,} minus-sign figures, "
             f"{added_total:,} 'below' phrases added, digits unchanged; "
             f"{other:,} other records unchanged")
+
+
+check("layout-formatter-parity", "every figure a report card, chart or warning shows is a stored figure through the stored formatter (WP-D12)")(lambda ctx: layout.parity_check(ctx["corpus"]))
 
 
 @check("audit-reads-both-writer-shapes",

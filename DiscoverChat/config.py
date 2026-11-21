@@ -344,6 +344,29 @@ if DIRECTION_CHECK not in ("block", "log", "off"):
     raise ValueError(f"DISCOVERCHAT_DIRECTION_CHECK={DIRECTION_CHECK!r}: "
                      f"expected block, log or off")
 
+# ── WP-D12: the Insight report layout (D62) ──────────────────────────────────
+# `layout.build` turns the records an answer already uses into up to three
+# cards, up to three small charts and a "Needs checking" list -- by code, from
+# the stored records, with no model call. It is ADDITIVE: with it on or off,
+# every other field of the answer is byte-identical. Reversion, no code change:
+#     DISCOVERCHAT_LAYOUT=0          (the /chat `layout` field is then {})
+LAYOUT = os.getenv("DISCOVERCHAT_LAYOUT", "1") not in ("0", "", "false", "False")
+# Cards only on an answer with at least this many findings; below it the
+# answer is short enough to read whole, and panels are capped at
+# LAYOUT_MAX_PANELS_SMALL instead.
+LAYOUT_CARDS_MIN_FINDINGS = int(os.getenv("DISCOVERCHAT_LAYOUT_CARDS_MIN", "3"))
+LAYOUT_MAX_CARDS = int(os.getenv("DISCOVERCHAT_LAYOUT_MAX_CARDS", "3"))
+# A "not recorded" member holding at least this share of a record's measure
+# becomes a "Needs checking" line. The corpus's null shares are bimodal
+# (median 0.006; 3,794 of 9,745 at or above 0.30), so the cut sits in the gap.
+LAYOUT_NULL_SHARE_WARN = float(os.getenv("DISCOVERCHAT_LAYOUT_NULL_WARN", "0.30"))
+LAYOUT_MAX_WARNINGS = int(os.getenv("DISCOVERCHAT_LAYOUT_MAX_WARNINGS", "3"))
+LAYOUT_MAX_PANELS = int(os.getenv("DISCOVERCHAT_LAYOUT_MAX_PANELS", "3"))
+LAYOUT_MAX_PANELS_SMALL = int(os.getenv("DISCOVERCHAT_LAYOUT_MAX_PANELS_SMALL", "1"))
+LAYOUT_MAX_COMPARE_ROWS = int(os.getenv("DISCOVERCHAT_LAYOUT_MAX_COMPARE_ROWS", "5"))
+LAYOUT_MAX_BARS = int(os.getenv("DISCOVERCHAT_LAYOUT_MAX_BARS", "5"))
+LAYOUT_MAX_TIME_BARS = int(os.getenv("DISCOVERCHAT_LAYOUT_MAX_TIME_BARS", "12"))
+
 # ── WP-D7: provenance (D7.2) ─────────────────────────────────────────────────
 # Every citation in an answer carries the id and a URL that resolves to the
 # stored record. The base is configurable because the service and the front end
@@ -442,4 +465,14 @@ def knobs() -> dict:
         "consolidate": CONSOLIDATE,
         "consolidate_min_findings": CONSOLIDATE_MIN_FINDINGS,
         "classifier_model": CLASSIFIER_MODEL,
+        "layout": LAYOUT,
+        "layout_cards_min_findings": LAYOUT_CARDS_MIN_FINDINGS,
+        "layout_max_cards": LAYOUT_MAX_CARDS,
+        "layout_null_share_warn": LAYOUT_NULL_SHARE_WARN,
+        "layout_max_warnings": LAYOUT_MAX_WARNINGS,
+        "layout_max_panels": LAYOUT_MAX_PANELS,
+        "layout_max_panels_small": LAYOUT_MAX_PANELS_SMALL,
+        "layout_max_compare_rows": LAYOUT_MAX_COMPARE_ROWS,
+        "layout_max_bars": LAYOUT_MAX_BARS,
+        "layout_max_time_bars": LAYOUT_MAX_TIME_BARS,
     }

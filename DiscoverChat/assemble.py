@@ -21,8 +21,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from . import (classifier, config, judge as judge_mod, navigate,
-               render, writer as writer_mod)
+from . import (classifier, config, judge as judge_mod, layout as layout_mod,
+               navigate, render, writer as writer_mod)
 from .retrieval import Result
 
 
@@ -62,6 +62,11 @@ class Answer:
     # narrative, so a caller can tell the two apart without parsing the prose.
     tagged_text: str = ""
     citations: dict = field(default_factory=dict)
+    # WP-D12. Cards, charts and warnings, built by code from the same records
+    # (`layout.build`). Filled on the retrieve path whenever findings are shown
+    # -- the narrative AND the bare-sentence fallback -- and {} everywhere else.
+    # Additive: nothing above changes with it on or off.
+    layout: dict = field(default_factory=dict)
 
     def as_dict(self) -> dict:
         return {"move": self.move, "text": self.text,
@@ -69,7 +74,8 @@ class Answer:
                 "routing": self.routing, "prose": self.prose,
                 "retrieval": self.retrieval, "stamp": self.stamp,
                 "tagged_text": self.tagged_text,
-                "citations": sorted(self.citations)}
+                "citations": sorted(self.citations),
+                "layout": self.layout}
 
 
 # ── deterministic rendering ──────────────────────────────────────────────────
@@ -353,10 +359,18 @@ class Assembler:
                      f"relevance bar for this question; these are the "
                      f"{config.ANSWER_CAP} closest to what you asked.")
 
+        # WP-D12 (D62). After the prose is settled and from nothing but the
+        # findings and the tagged prose, so it cannot change a byte of either.
+        # On the fallback `tagged_text` is "" and every finding counts as cited
+        # -- the case a mid-size writer produces most, and where an officer
+        # most needs the cards and charts (ruling 7).
+        layout = layout_mod.build(findings, tagged_text, run_date=stamp)
+
         return Answer(move=routing.move, text=_stamped(text, stamp),
                       findings=findings, routing=routing.as_dict(),
                       prose=prose_meta, retrieval=retrieval_meta, stamp=stamp,
-                      tagged_text=tagged_text, citations=citations)
+                      tagged_text=tagged_text, citations=citations,
+                      layout=layout)
 
 
 def _stamped(text: str, stamp: str) -> str:
