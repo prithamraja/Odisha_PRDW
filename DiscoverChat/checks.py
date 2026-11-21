@@ -28,6 +28,8 @@ import re
 # path for `causal_gate`'s own import of `prose_gate`.
 from . import corpus as corpus_mod
 from . import causal_gate
+from . import config
+from . import glossary
 from .context_brief import for_consolidating_writer, for_writer
 
 # Engine pattern-type enums and other raw database tokens — check (c).
@@ -378,8 +380,14 @@ def bind_numerals(prose: str, findings: list, *, run_date: str = "") -> list:
     return bindings
 
 
-def check_citations(prose: str, findings: list, *, run_date: str = "") -> dict:
-    """The four blocking steps of D7.3, in the brief's order."""
+def check_citations(prose: str, findings: list, *, run_date: str = "",
+                    direction_mode: str | None = None) -> dict:
+    """The four blocking steps of D7.3, in the brief's order, then WP-D13's
+    direction step.
+
+    `direction_mode` overrides `config.DIRECTION_CHECK` for one call (tests and
+    the gate pin it; production passes nothing and gets the configured mode,
+    read at call time)."""
     body = (prose or "").strip()
     answer_ids = {f.id for f in findings}
     tagged = cited_ids(body)
@@ -418,8 +426,16 @@ def check_citations(prose: str, findings: list, *, run_date: str = "") -> dict:
     results["4_all_findings_cited"] = {"pass": not dropped, "dropped": dropped,
                                        "of": len(answer_ids)}
 
-    results["all_pass"] = all(v["pass"] for k, v in results.items()
-                              if k != "all_pass")
+    # 5. WP-D13 Fix 1 (D63): a negative figure of a signed measure is written
+    #    with its direction in words. Same sentences, same bindings as step 2.
+    mode = (direction_mode or config.DIRECTION_CHECK).lower()
+    if mode != "off":
+        results["5_direction"] = check_direction(body, findings, bindings,
+                                                 mode=mode)
+
+    results["all_pass"] = all(
+        v["pass"] for k, v in results.items()
+        if k != "all_pass" and not (k == "5_direction" and not v["counts"]))
     return results
 
 
@@ -444,4 +460,173 @@ def citation_failure_reason(results: dict) -> str:
         bits.append("These findings were supplied but never cited: "
                     + ", ".join(results["4_all_findings_cited"]["dropped"])
                     + ". Every finding supplied belongs in the answer.")
+    direction = results.get("5_direction")
+    if direction and direction["counts"] and not direction["pass"]:
+        bits.append(direction_failure_reason(direction))
     return " ".join(bits)
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+# WP-D13 Fix 1 (D63) — step 5, the direction check
+# ═════════════════════════════════════════════════════════════════════════════
+# THE GAP, MEASURED (2026-11-21, record d1-00248, true figure Rs 51.96 crore
+# BELOW plan). Steps 1-4 passed "Recorded spending is Rs 51.96 crore above plan"
+# and "Spending exceeded the plan by Rs 51.96 crore": step 2 compares DIGITS,
+# `_NUM` has no minus sign, and nothing read the words around a figure. This
+# step reads them, for the one family of figures where the words carry the
+# sign: negative money figures of the two signed measures.
+#
+# WHICH FIGURES. A numeral bound by `bind_numerals` (step 2's own binding -- no
+# second binder) to a signed decomposition, which that record's STORED sentence
+# shows as "Rs -N...". A token the stored sentence ALSO shows without a minus
+# (as positive money, a share or a count) is ambiguous -- the writer may be
+# quoting the unsigned occurrence -- so it is not checked, and is counted.
+#
+# THE RULE, per prose sentence holding at least one such figure:
+#   R1  it says the record's stored "below" words: "below plan" / "below
+#       sanction" ("below the plan" allowed). Exact words, no synonym list.
+#   R2  no minus sign stands directly before a figure (2023-24 is not one).
+#   R3  it does not say the opposite words ("above plan" / "above sanction"),
+#       unless a figure the stored sentence shows as POSITIVE money is also
+#       bound in it -- "one part ran Rs 1.73 lakh above plan while the whole was
+#       Rs 5.02 crore below plan" is a true sentence.
+# One "below plan" covers every figure in the sentence. A sentence citing a
+# signed record with shares or counts only is not checked.
+
+_POS_MONEY = re.compile(r"Rs (\d+(?:[.,]\d+)*)")
+_NEG_MONEY_TOKEN = re.compile(r"Rs -(\d+(?:[.,]\d+)*)")
+# A minus sign directly before a figure: a hyphen, the Unicode minus or an en
+# dash, not preceded by a digit or a letter (so "2023-24", "d1-00248" and
+# "Code-101" are not minus signs) -- or any of them after "Rs", spaced or not.
+_MINUS_BEFORE_FIGURE = re.compile(
+    r"(?<![0-9A-Za-z])[-−–](?=\d)|\bRs\.?\s*[-−–]\s*\d")
+
+_DIRECTION_FACTS: dict = {}
+
+
+def _words_re(words: str):
+    """'below plan' -> matches 'below plan' and 'below the plan', any case,
+    whole words only ('below planned' is not the stored words)."""
+    head, noun = words.split(" ", 1)
+    return re.compile(r"\b" + re.escape(head) + r"\s+(?:the\s+)?"
+                      + re.escape(noun) + r"\b", re.I)
+
+
+def signed_facts(finding) -> dict | None:
+    """What the stored sentence of a signed decomposition says about the sign
+    of each of its money figures, or None for any other record.
+
+        negative   variants of tokens shown ONLY as "Rs -N"
+        positive   variants of tokens shown as "Rs N" (no minus)
+        ambiguous  variants of tokens shown as "Rs -N" AND elsewhere unsigned
+    """
+    if finding is None or not finding.is_decomposition:
+        return None
+    measure = finding.data.get("measure", "")
+    if glossary.signed_below(measure) is None:
+        return None
+    cached = _DIRECTION_FACTS.get(finding.id)
+    if cached is not None and cached["stored"] == finding.sentence:
+        return cached
+    stored = finding.sentence
+    every, minus = {}, {}
+    for token in numerals(stored):
+        every[token] = every.get(token, 0) + 1
+    for token in _NEG_MONEY_TOKEN.findall(stored):
+        minus[token] = minus.get(token, 0) + 1
+
+    def variants(tokens):
+        out = set()
+        for token in tokens:
+            out |= _num_variants(token)
+        return out
+
+    ambiguous = {t for t in minus if every.get(t, 0) > minus[t]}
+    facts = {
+        "measure": measure,
+        "below": glossary.signed_below(measure),
+        "above": glossary.signed_above(measure),
+        "negative": variants(set(minus) - ambiguous),
+        "ambiguous": variants(ambiguous),
+        "positive": variants(set(_POS_MONEY.findall(stored))),
+        "stored": stored,
+    }
+    _DIRECTION_FACTS[finding.id] = facts
+    return facts
+
+
+def _example(facts: dict, token: str) -> str:
+    """The figure as the finding gives it: 'Rs 51.96 crore below plan'."""
+    match = re.search(r"Rs -" + re.escape(token) + r"(?: lakh| crore)?(?![0-9])",
+                      facts["stored"])
+    shown = match.group(0) if match else "Rs -" + token
+    return glossary.signed_money(shown, facts["measure"])
+
+
+def check_direction(body: str, findings: list, bindings: list, *,
+                    mode: str = "block") -> dict:
+    """Step 5 over one answer. `bindings` is step 2's `bind_numerals` output,
+    so the sentences and the figure-to-record bindings are step 2's own."""
+    by_id = {f.id: f for f in findings}
+    sentences = _tagged_sentences(body)
+    per_sentence = {}
+    for binding in bindings:
+        per_sentence.setdefault(binding["sentence_index"], []).append(binding)
+
+    failures, checked, skipped = [], 0, 0
+    for index in sorted(per_sentence):
+        negatives = {}            # record id -> [tokens]
+        positive_bound = False
+        for binding in per_sentence[index]:
+            facts = signed_facts(by_id.get(binding["matched"]))
+            if facts is None:
+                continue
+            variants = _num_variants(binding["token"])
+            if variants & facts["ambiguous"]:
+                skipped += 1
+                continue
+            if variants & facts["negative"]:
+                negatives.setdefault(binding["matched"], []).append(
+                    binding["token"])
+            elif variants & facts["positive"]:
+                positive_bound = True
+        if not negatives:
+            continue
+        checked += 1
+        sentence = sentences[index]
+        bare = _TAG.sub(" ", sentence)
+        rules, examples = [], []
+        for record_id, tokens in negatives.items():
+            facts = signed_facts(by_id[record_id])
+            examples.append(_example(facts, tokens[0]))
+            if not _words_re(facts["below"]).search(bare):
+                rules.append(f"R1: no '{facts['below']}' for {record_id}")
+            if _words_re(facts["above"]).search(bare) and not positive_bound:
+                rules.append(f"R3: says '{facts['above']}' for {record_id}")
+        if _MINUS_BEFORE_FIGURE.search(bare):
+            rules.append("R2: minus sign before a figure")
+        if rules:
+            failures.append({
+                "sentence_index": index,
+                "sentence": sentence,
+                "rules": rules,
+                "figures": [t for ts in negatives.values() for t in ts],
+                "records": sorted(negatives),
+                "as_the_finding_gives_it": examples,
+            })
+    return {"pass": not failures, "mode": mode, "counts": mode == "block",
+            "checked": checked, "skipped_ambiguous": skipped,
+            "failures": failures}
+
+
+def direction_failure_reason(direction: dict) -> str:
+    """Plain-English reason for step 5, fed back as the other reasons are."""
+    quoted = "; ".join('"' + strip_tags(f["sentence"]) + '"'
+                       for f in direction["failures"][:5])
+    example = next((e for f in direction["failures"]
+                    for e in f["as_the_finding_gives_it"]),
+                   "Rs 51.96 crore below plan")
+    return ("These sentences do not give the direction of a spending figure as "
+            "the finding gives it: " + quoted + ". Write each figure's "
+            'direction exactly as the finding gives it -- "' + example
+            + '" -- not with a minus sign and not in other words.')

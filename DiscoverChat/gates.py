@@ -744,8 +744,69 @@ def _citation_checks_fire(ctx):
         assert not result["all_pass"], f"the check missed a seeded {name}"
         assert checks.citation_failure_reason(result).strip(), (
             f"a seeded {name} was caught with no reason to feed back")
+
+    # WP-D13 Fix 1: a reversed direction, on a real signed record (d1-00248,
+    # Rs 51.96 crore BELOW plan). Pinned to block mode: the gate proves the
+    # step fires, whatever the configured default.
+    signed = ctx["corpus"].get("d1-00248")
+    right = checks.check_citations(
+        "Recorded spending is Rs 51.96 crore below plan [d1-00248].",
+        [signed], direction_mode="block")
+    assert right["all_pass"], (
+        f"the true direction was rejected: "
+        f"{checks.citation_failure_reason(right)}")
+    reversed_ = checks.check_citations(
+        "Recorded spending is Rs 51.96 crore above plan [d1-00248].",
+        [signed], direction_mode="block")
+    assert not reversed_["all_pass"] and not reversed_["5_direction"]["pass"], (
+        "the check missed a reversed direction")
+    assert "below plan" in checks.citation_failure_reason(reversed_)
+    seeded["reversed direction"] = None
     return (f"clean prose passes; {len(seeded)} seeded violations all caught "
             f"({', '.join(seeded)})")
+
+
+@check("signed-direction-in-words",
+       "every negative signed figure an officer or the writer sees says 'below plan', never a minus")
+def _signed_direction(ctx):
+    """WP-D13 Fix 1 T1, swept over every signed decomposition. The display
+    sentence keeps every digit, carries no "Rs -", adds one "below" phrase per
+    minus-sign figure, and drops the sign-convention sentence exactly when
+    every figure is negative. Every other record's display sentence is the
+    column translation alone, as before."""
+    from phase5f_decompose import _SIGNED_DIRECTION
+    import re
+    signed = minus_total = added_total = other = 0
+    problems = []
+    for record in ctx["corpus"].all():
+        shown = record.display_sentence()
+        before = glossary.render(record.sentence, record.view)
+        if not (record.is_decomposition
+                and record.data.get("measure") in _SIGNED_DIRECTION):
+            other += 1
+            if shown != before:
+                problems.append((record.id, "unsigned record changed"))
+            continue
+        signed += 1
+        measure, signs = record.data["measure"], record.data["signs"]
+        below = glossary.signed_below(measure)
+        note = glossary.signed_note(measure)
+        if note not in before:
+            problems.append((record.id, "builder's sign sentence not found"))
+            continue
+        minus = len(re.findall(r"Rs -\d", record.sentence))
+        dropped = note.count(below) if signs == "all_negative" else 0
+        added = shown.count(below) - (before.count(below) - dropped)
+        minus_total += minus
+        added_total += added
+        if ("Rs -" in shown or added != minus
+                or checks.numerals(shown) != checks.numerals(record.sentence)
+                or (note in shown) == (signs == "all_negative")):
+            problems.append((record.id, signs))
+    assert not problems, f"{len(problems)} records wrong: {problems[:5]}"
+    return (f"{signed:,} signed records: {minus_total:,} minus-sign figures, "
+            f"{added_total:,} 'below' phrases added, digits unchanged; "
+            f"{other:,} other records unchanged")
 
 
 @check("audit-reads-both-writer-shapes",

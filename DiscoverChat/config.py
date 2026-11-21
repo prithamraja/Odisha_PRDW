@@ -324,6 +324,21 @@ CONSOLIDATE = os.getenv("DISCOVERCHAT_CONSOLIDATE", "1") not in (
     "0", "", "false", "False")
 CONSOLIDATE_MIN_FINDINGS = int(os.getenv("DISCOVERCHAT_CONSOLIDATE_MIN", "1"))
 
+# ── WP-D13 Fix 1: the direction check (D63) ──────────────────────────────────
+# Step `5_direction` of `checks.check_citations`: a sentence that gives a
+# negative figure of a signed measure must say "below plan" / "below sanction",
+# carry no minus sign before a figure, and not say "above plan" unless a
+# positive figure is also given. Three modes:
+#   block  counts towards all_pass: one retry with the reason, then the bare
+#          sentences -- the existing failure process, unchanged
+#   log    recorded in the check results, does not count, not fed back
+#   off    the step is not run and not reported
+# The default is set by the WP-D13 T3 live trial (handoffs/WPD13_REPORT.md).
+DIRECTION_CHECK = os.getenv("DISCOVERCHAT_DIRECTION_CHECK", "log").strip().lower()
+if DIRECTION_CHECK not in ("block", "log", "off"):
+    raise ValueError(f"DISCOVERCHAT_DIRECTION_CHECK={DIRECTION_CHECK!r}: "
+                     f"expected block, log or off")
+
 # ── WP-D7: provenance (D7.2) ─────────────────────────────────────────────────
 # Every citation in an answer carries the id and a URL that resolves to the
 # stored record. The base is configurable because the service and the front end
