@@ -1,0 +1,2724 @@
+{
+ "generated_at": "2026-11-21T19:50:41",
+ "stamp": "as of 2026-09-11",
+ "writer_model": "gpt-5.6-sol",
+ "judge_model": "gpt-5.6-sol",
+ "questions": [
+  {
+   "n": 1,
+   "question": "Is spending on track?",
+   "judge_used": true,
+   "seconds": 35.8,
+   "findings": [
+    "d1-24173",
+    "d1-46759",
+    "d1-44064",
+    "d1-36141",
+    "1-03549"
+   ],
+   "signed_findings": [
+    "d1-24173",
+    "d1-46759",
+    "d1-44064",
+    "d1-36141"
+   ]
+  },
+  {
+   "n": 2,
+   "question": "What makes up the underspend?",
+   "judge_used": true,
+   "seconds": 49.6,
+   "findings": [
+    "d1-47492",
+    "d1-47028",
+    "d1-45609",
+    "d1-46072",
+    "d1-46554",
+    "d1-45225"
+   ],
+   "signed_findings": [
+    "d1-47492",
+    "d1-47028",
+    "d1-45609",
+    "d1-46072",
+    "d1-46554",
+    "d1-45225"
+   ]
+  },
+  {
+   "n": 3,
+   "question": "What should I raise at the next review meeting?",
+   "judge_used": true,
+   "seconds": 29.6,
+   "findings": [
+    "d1-46828",
+    "d1-46285",
+    "d1-46759",
+    "d1-24173",
+    "d1-45395",
+    "d1-45790",
+    "d1-47007",
+    "1-03549"
+   ],
+   "signed_findings": [
+    "d1-46828",
+    "d1-46285",
+    "d1-46759",
+    "d1-24173",
+    "d1-45395",
+    "d1-45790",
+    "d1-47007"
+   ]
+  },
+  {
+   "n": 4,
+   "question": "Where does the gap sit?",
+   "judge_used": true,
+   "seconds": 30.4,
+   "findings": [
+    "d1-46759",
+    "d1-49758",
+    "d4-00049"
+   ],
+   "signed_findings": [
+    "d1-46759",
+    "d1-49758",
+    "d4-00049"
+   ]
+  },
+  {
+   "n": 5,
+   "question": "Which blocks account for the shortfall?",
+   "judge_used": true,
+   "seconds": 22.2,
+   "findings": [
+    "d3-00025"
+   ],
+   "signed_findings": [
+    "d3-00025"
+   ]
+  },
+  {
+   "n": 6,
+   "question": "Which places are behaving differently from the rest?",
+   "judge_used": true,
+   "seconds": 34.8,
+   "findings": [
+    "d1-24173",
+    "1-01728",
+    "1-01723",
+    "1-01749",
+    "1-01783",
+    "1-01742",
+    "1-01733",
+    "1-01796",
+    "1-01711",
+    "1-01771",
+    "1-01753"
+   ],
+   "signed_findings": [
+    "d1-24173"
+   ]
+  },
+  {
+   "n": 7,
+   "question": "Who is driving the shortfall?",
+   "judge_used": true,
+   "seconds": 28.1,
+   "findings": [
+    "1-03481",
+    "1-03549",
+    "1-01315"
+   ],
+   "signed_findings": []
+  },
+  {
+   "n": 8,
+   "question": "Where is money planned but not spent?",
+   "judge_used": true,
+   "seconds": 81.0,
+   "findings": [
+    "d1-29024",
+    "d1-27925",
+    "d1-28178",
+    "d1-29842",
+    "d1-27660",
+    "d1-32203",
+    "d1-28703",
+    "d1-28967",
+    "d1-39534",
+    "d1-30370",
+    "d1-30622",
+    "1-03549"
+   ],
+   "signed_findings": [
+    "d1-29024",
+    "d1-27925",
+    "d1-28178",
+    "d1-29842",
+    "d1-27660",
+    "d1-32203",
+    "d1-28703",
+    "d1-28967",
+    "d1-39534",
+    "d1-30370",
+    "d1-30622"
+   ]
+  },
+  {
+   "n": 9,
+   "question": "Anything worth my attention this quarter?",
+   "judge_used": true,
+   "seconds": 31.0,
+   "findings": [
+    "d1-47449",
+    "d1-29024",
+    "d1-46285",
+    "d1-46782",
+    "d1-45395",
+    "2-00245",
+    "2-00151",
+    "1-03549"
+   ],
+   "signed_findings": [
+    "d1-47449",
+    "d1-29024",
+    "d1-46285",
+    "d1-46782",
+    "d1-45395"
+   ]
+  },
+  {
+   "n": 10,
+   "question": "How is Barpali block doing?",
+   "judge_used": true,
+   "seconds": 28.7,
+   "findings": [
+    "d4-00583",
+    "d4-00584",
+    "d3-00232",
+    "d3-00244",
+    "d1-09543",
+    "d2-00151",
+    "d4-00580",
+    "d1-09520"
+   ],
+   "signed_findings": [
+    "d4-00584"
+   ]
+  },
+  {
+   "n": 11,
+   "question": "Anything I should be looking at in Ganjam?",
+   "judge_used": true,
+   "seconds": 25.4,
+   "findings": [
+    "d4-02688",
+    "d2-00761",
+    "d1-14747",
+    "d4-02684",
+    "d3-01188",
+    "d1-14749",
+    "1-01723"
+   ],
+   "signed_findings": [
+    "d4-02688"
+   ]
+  },
+  {
+   "n": 12,
+   "question": "What should I know about Cuttack?",
+   "judge_used": true,
+   "seconds": 35.1,
+   "findings": [
+    "d4-02525",
+    "d4-02523",
+    "d1-14417",
+    "d3-01105",
+    "d1-14462",
+    "d2-00733",
+    "d1-14480",
+    "d1-14481",
+    "d4-02532",
+    "d1-14482",
+    "d1-14597",
+    "d1-14541",
+    "d1-14486"
+   ],
+   "signed_findings": [
+    "d3-01105"
+   ]
+  }
+ ],
+ "arms": {
+  "log": [
+   {
+    "arm": "log",
+    "n": 1,
+    "question": "Is spending on track?",
+    "seconds": 8.4,
+    "attempts": 1,
+    "fell_back": false,
+    "fell_back_on": [],
+    "reason": "",
+    "final_text": "Spending is below plan in this 20-Gram-Panchayat sample: costed activities are Rs 51.96 crore below plan, while approved activities are Rs 41.61 crore below plan. These gaps are spread across multiple Gram Panchayats, with Biswamathpur recording the largest amounts for both costed activities at Rs 7.23 crore below plan and approved activities at Rs 6.74 crore below plan, followed by Kalimela at Rs 5.90 crore and Rs 5.46 crore below plan respectively. \n\nTheme 6 - Self-sufficient Infrastructure in Village is Rs 20.13 crore below plan, also without a single Gram Panchayat dominating; Sharagada accounts for Rs 3.36 crore and Biswamathpur for Rs 2.66 crore below plan. Across districts, Bargarh and Ganjam have the lowest spending measured against plan in 6/7 LSDG themes; for Theme 4 - Water Sufficient Village, the lowest are Ganjam and Malkangiri.\n\nRural housing presents a more concentrated exception: it is Rs 2.23 crore below plan, of which Boipariguda accounts for 95.7%, or Rs 2.13 crore, despite holding 2.0% of the 305 activities; its spending-to-plan ratio is 0.0%. This makes Boipariguda’s rural-housing records a specific priority for reconciliation, alongside broader review of the distributed gaps in costed, approved and infrastructure activities.",
+    "final_tagged": "Spending is below plan in this 20-Gram-Panchayat sample: costed activities are Rs 51.96 crore below plan, while approved activities are Rs 41.61 crore below plan.[d1-36141] [d1-44064] These gaps are spread across multiple Gram Panchayats, with Biswamathpur recording the largest amounts for both costed activities at Rs 7.23 crore below plan and approved activities at Rs 6.74 crore below plan, followed by Kalimela at Rs 5.90 crore and Rs 5.46 crore below plan respectively.[d1-36141] [d1-44064]\n\nTheme 6 - Self-sufficient Infrastructure in Village is Rs 20.13 crore below plan, also without a single Gram Panchayat dominating; Sharagada accounts for Rs 3.36 crore and Biswamathpur for Rs 2.66 crore below plan.[d1-46759] Across districts, Bargarh and Ganjam have the lowest spending measured against plan in 6/7 LSDG themes; for Theme 4 - Water Sufficient Village, the lowest are Ganjam and Malkangiri.[1-03549]\n\nRural housing presents a more concentrated exception: it is Rs 2.23 crore below plan, of which Boipariguda accounts for 95.7%, or Rs 2.13 crore, despite holding 2.0% of the 305 activities; its spending-to-plan ratio is 0.0%.[d1-24173] This makes Boipariguda’s rural-housing records a specific priority for reconciliation, alongside broader review of the distributed gaps in costed, approved and infrastructure activities.[d1-24173] [d1-36141] [d1-44064] [d1-46759]",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "Spending is below plan in this 20-Gram-Panchayat sample: costed activities are Rs 51.96 crore below plan, while approved activities are Rs 41.61 crore below plan.[d1-36141] [d1-44064] These gaps are spread across multiple Gram Panchayats, with Biswamathpur recording the largest amounts for both costed activities at Rs 7.23 crore below plan and approved activities at Rs 6.74 crore below plan, followed by Kalimela at Rs 5.90 crore and Rs 5.46 crore below plan respectively.[d1-36141] [d1-44064]\n\nTheme 6 - Self-sufficient Infrastructure in Village is Rs 20.13 crore below plan, also without a single Gram Panchayat dominating; Sharagada accounts for Rs 3.36 crore and Biswamathpur for Rs 2.66 crore below plan.[d1-46759] Across districts, Bargarh and Ganjam have the lowest spending measured against plan in 6/7 LSDG themes; for Theme 4 - Water Sufficient Village, the lowest are Ganjam and Malkangiri.[1-03549]\n\nRural housing presents a more concentrated exception: it is Rs 2.23 crore below plan, of which Boipariguda accounts for 95.7%, or Rs 2.13 crore, despite holding 2.0% of the 305 activities; its spending-to-plan ratio is 0.0%.[d1-24173] This makes Boipariguda’s rural-housing records a specific priority for reconciliation, alongside broader review of the distributed gaps in costed, approved and infrastructure activities.[d1-24173] [d1-36141] [d1-44064] [d1-46759]",
+      "all_pass": true,
+      "failing_steps": [],
+      "counting_failures": [],
+      "direction": {
+       "pass": true,
+       "mode": "log",
+       "counts": false,
+       "checked": 1,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     }
+    ]
+   },
+   {
+    "arm": "log",
+    "n": 2,
+    "question": "What makes up the underspend?",
+    "seconds": 27.3,
+    "attempts": 2,
+    "fell_back": true,
+    "fell_back_on": [
+     "3_causal"
+    ],
+    "reason": "It used causal wording: 'therefore'. This analysis finds patterns and associations and cannot establish what causes what, so say how things go together rather than what produced what. Wording that works: is associated with; occurs alongside; moves together with; is concentrated in; coincides with; the same places also show; where X is high, Y tends to be high; the analysis does not establish which way this runs.",
+    "final_text": "",
+    "final_tagged": "",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "Across the themes reported, underspending is concentrated in records where the fund component is “not recorded”, rather than against named fund components. [d1-47028] [d1-46072] [d1-46554] [d1-45609] [d1-47492] [d1-45225] The fund-component field is therefore the main area for reconciliation before the underspend can be reliably attributed. [d1-47028] [d1-46072] [d1-46554] [d1-45609] [d1-47492] [d1-45225]\n\nSelf-sufficient Infrastructure has Rs 20.13 crore [d1-47028] below plan. Records without a fund component account for 91.9% [d1-47028], or Rs 18.51 crore [d1-47028], across 4,036 rows [d1-47028]; the remaining recorded components account for Rs 1.62 crore [d1-47028]. Water Sufficient Village has Rs 13.11 crore [d1-46072] below plan, of which 89.2% [d1-46072], or Rs 11.69 crore [d1-46072], is attached to 1,002 rows [d1-46072] without a fund component; recorded components account for Rs 1.42 crore [d1-46072]. Clean and Green Village has Rs 8.62 crore [d1-46554] below plan, with 84.1% [d1-46554], or Rs 7.24 crore [d1-46554], linked to 1,507 rows [d1-46554] lacking this information; recorded components account for Rs 1.37 crore [d1-46554].\n\nThe same pattern appears in the smaller theme-level underspends. Child Friendly Village is Rs 2.67 crore [d1-45609] below plan, with 93.9% [d1-45609], or Rs 2.51 crore [d1-45609], in 996 rows [d1-45609] without a fund component; recorded components account for Rs 16.41 lakh [d1-45609]. Village with Good Governance is Rs 2.41 crore [d1-47492] below plan, with 91.3% [d1-47492], or Rs 2.20 crore [d1-47492], in 1,681 such rows [d1-47492]; recorded components account for Rs 21.03 lakh [d1-47492]. Poverty Free and Enhanced Livelihoods Village is Rs 69.31 lakh [d1-45225] below plan, with 99.0% [d1-45225], or Rs 68.61 lakh [d1-45225], in 528 rows [d1-45225] without a fund component; recorded components account for Rs 70,788 [d1-45225].",
+      "all_pass": false,
+      "failing_steps": [
+       "3_causal",
+       "5_direction"
+      ],
+      "counting_failures": [
+       "3_causal"
+      ],
+      "direction": {
+       "pass": false,
+       "mode": "log",
+       "counts": false,
+       "checked": 7,
+       "skipped_ambiguous": 0,
+       "failures": [
+        {
+         "sentence_index": 3,
+         "sentence": "Records without a fund component account for 91.9% [d1-47028], or Rs 18.51 crore [d1-47028], across 4,036 rows [d1-47028]; the remaining recorded components account for Rs 1.62 crore [d1-47028].",
+         "rules": [
+          "R1: no 'below plan' for d1-47028"
+         ],
+         "figures": [
+          "18.51",
+          "1.62"
+         ],
+         "records": [
+          "d1-47028"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 18.51 crore below plan"
+         ]
+        }
+       ]
+      }
+     },
+     {
+      "attempt": 2,
+      "prose": "The underspend is consistently concentrated in records where the fund component is not recorded, rather than in identified fund components; these unclassified records account for 84.1% to 99.0% of the theme-level gaps reported. [d1-47492] [d1-47028] [d1-45609] [d1-46072] [d1-46554] [d1-45225]\n\nIn Theme 6—Self-sufficient Infrastructure in Village, Rs 18.51 crore of the Rs 20.13 crore underspend, or 91.9%, sits in 4,036 rows without a fund component; the five recorded components account for Rs 1.62 crore. [d1-47028] In Theme 4—Water Sufficient Village, unclassified records account for Rs 11.69 crore of the Rs 13.11 crore gap, or 89.2%, across 1,002 rows; the five recorded components account for Rs 1.42 crore. [d1-46072] In Theme 5—Clean and Green Village, 1,507 unclassified rows account for Rs 7.24 crore of the Rs 8.62 crore gap, or 84.1%, while the three recorded components account for Rs 1.37 crore. [d1-46554]\n\nThe same pattern appears in the smaller theme-level gaps. [d1-47492] [d1-45609] [d1-45225] In Theme 3—Child Friendly Village, 996 unclassified rows account for Rs 2.51 crore of the Rs 2.67 crore underspend, or 93.9%; the four recorded components account for Rs 16.41 lakh. [d1-45609] In Theme 8—Village with Good Governance, 1,681 such rows account for Rs 2.20 crore of the Rs 2.41 crore gap, or 91.3%; the six recorded components account for Rs 21.03 lakh. [d1-47492] In Theme 1—Poverty Free and Enhanced Livelihoods Village, 528 unclassified rows account for Rs 68.61 lakh of the Rs 69.31 lakh gap, or 99.0%; the two recorded components account for Rs 70,788. [d1-45225]\n\nThe immediate reconciliation priority is therefore the large volume of plan and spending records without a fund-component classification, while the smaller residual gaps can be reviewed against the recorded components within each theme. [d1-47492] [d1-47028] [d1-45609] [d1-46072] [d1-46554] [d1-45225]",
+      "all_pass": false,
+      "failing_steps": [
+       "3_causal",
+       "5_direction"
+      ],
+      "counting_failures": [
+       "3_causal"
+      ],
+      "direction": {
+       "pass": false,
+       "mode": "log",
+       "counts": false,
+       "checked": 6,
+       "skipped_ambiguous": 0,
+       "failures": [
+        {
+         "sentence_index": 1,
+         "sentence": "In Theme 6—Self-sufficient Infrastructure in Village, Rs 18.51 crore of the Rs 20.13 crore underspend, or 91.9%, sits in 4,036 rows without a fund component; the five recorded components account for Rs 1.62 crore. [d1-47028]",
+         "rules": [
+          "R1: no 'below plan' for d1-47028"
+         ],
+         "figures": [
+          "18.51",
+          "20.13",
+          "1.62"
+         ],
+         "records": [
+          "d1-47028"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 18.51 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 2,
+         "sentence": "In Theme 4—Water Sufficient Village, unclassified records account for Rs 11.69 crore of the Rs 13.11 crore gap, or 89.2%, across 1,002 rows; the five recorded components account for Rs 1.42 crore. [d1-46072]",
+         "rules": [
+          "R1: no 'below plan' for d1-46072"
+         ],
+         "figures": [
+          "11.69",
+          "13.11",
+          "1.42"
+         ],
+         "records": [
+          "d1-46072"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 11.69 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 3,
+         "sentence": "In Theme 5—Clean and Green Village, 1,507 unclassified rows account for Rs 7.24 crore of the Rs 8.62 crore gap, or 84.1%, while the three recorded components account for Rs 1.37 crore. [d1-46554]",
+         "rules": [
+          "R1: no 'below plan' for d1-46554"
+         ],
+         "figures": [
+          "7.24",
+          "8.62",
+          "1.37"
+         ],
+         "records": [
+          "d1-46554"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 7.24 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 5,
+         "sentence": "In Theme 3—Child Friendly Village, 996 unclassified rows account for Rs 2.51 crore of the Rs 2.67 crore underspend, or 93.9%; the four recorded components account for Rs 16.41 lakh. [d1-45609]",
+         "rules": [
+          "R1: no 'below plan' for d1-45609"
+         ],
+         "figures": [
+          "2.51",
+          "2.67",
+          "16.41"
+         ],
+         "records": [
+          "d1-45609"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 2.51 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 6,
+         "sentence": "In Theme 8—Village with Good Governance, 1,681 such rows account for Rs 2.20 crore of the Rs 2.41 crore gap, or 91.3%; the six recorded components account for Rs 21.03 lakh. [d1-47492]",
+         "rules": [
+          "R1: no 'below plan' for d1-47492"
+         ],
+         "figures": [
+          "2.20",
+          "2.41",
+          "21.03"
+         ],
+         "records": [
+          "d1-47492"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 2.20 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 7,
+         "sentence": "In Theme 1—Poverty Free and Enhanced Livelihoods Village, 528 unclassified rows account for Rs 68.61 lakh of the Rs 69.31 lakh gap, or 99.0%; the two recorded components account for Rs 70,788. [d1-45225]",
+         "rules": [
+          "R1: no 'below plan' for d1-45225"
+         ],
+         "figures": [
+          "68.61",
+          "69.31",
+          "70,788"
+         ],
+         "records": [
+          "d1-45225"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 68.61 lakh below plan"
+         ]
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "arm": "log",
+    "n": 3,
+    "question": "What should I raise at the next review meeting?",
+    "seconds": 28.1,
+    "attempts": 2,
+    "fell_back": true,
+    "fell_back_on": [
+     "2_numerals_cited",
+     "3_causal"
+    ],
+    "reason": "Every figure must be tagged with the finding it came from, and must appear in that finding. These do not: 6 (no finding cited in this sentence). Do not compute new numbers; use the figures exactly as the findings state them, and tag each one. It used causal wording: 'because'. This analysis finds patterns and associations and cannot establish what causes what, so say how things go together rather than what produced what. Wording that works: is associated with; occurs alongside; moves together with; is concentrated in; coincides with; the same places also show; where X is high, Y tends to be high; the analysis does not establish which way this runs.",
+    "final_text": "",
+    "final_tagged": "",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "The largest plan-to-spending gaps warrant attention in Theme 6 – Self-sufficient Infrastructure in Village at Rs 20.13 crore, Theme 4 – Water Sufficient Village at Rs 13.11 crore, and Theme 5 – Clean and Green Village at Rs 8.62 crore across the 20-Gram-Panchayat sample. [d1-46759] [d1-45790] [d1-46285] In Theme 6, maintenance of community systems accounts for 35.4% (Rs 7.12 crore) of the gap and roads for 23.5% (Rs 4.74 crore), while the remaining 6 focus areas account for Rs 8.27 crore. [d1-46828] Scheme details require particular reconciliation: 4,036 Theme 6 rows have no scheme recorded and account for 91.9% (Rs 18.51 crore) of its gap. [d1-47007]\n\nAt district level, ask Bargarh and Ganjam to review their records because they are lowest in spending measured against plan in 6/7 LSDG themes. [1-03549] Theme 4 is the exception, where Ganjam and Malkangiri are lowest. [1-03549]\n\nMost theme-level gaps are distributed across several Gram Panchayats, but some locations merit targeted questions. [d1-46759] [d1-45790] [d1-46285] In Theme 6, Sharagada accounts for 16.7% (Rs 3.36 crore) and Biswamathpur for 13.2% (Rs 2.66 crore) of the Rs 20.13 crore gap. [d1-46759] In Theme 5, Biswamathpur alone accounts for 25.0% (Rs 2.15 crore) of the Rs 8.62 crore gap despite holding 3.1% of the activities, with a recorded spending-to-plan ratio of 11.1%. [d1-46285] In Theme 4, Kalimela accounts for 25.5% (Rs 3.34 crore) of the Rs 13.11 crore gap and has a recorded spending-to-plan ratio of 16.3%. [d1-45790]\n\nRural housing is the clearest concentrated exception: Boipariguda accounts for 95.7% (Rs 2.13 crore) of the Rs 2.23 crore gap, while holding 2.0% of the activities and showing a recorded spending-to-plan ratio of 0.0%. [d1-24173] This record should be reconciled specifically at the review. [d1-24173]\n\nFinally, Theme 3 – Child Friendly Village shows spending Rs 16.41 lakh below sanction, led by Mendarajpur at 41.5% (Rs 6.81 lakh) and Dadhapatna at 18.7% (Rs 3.07 lakh). [d1-45395] Interpretation should remain cautious because the sanctioned basis covers only activities with a sanction record on file—about one in six—so the completeness of sanction records should be checked first. [d1-45395]",
+      "all_pass": false,
+      "failing_steps": [
+       "3_causal",
+       "5_direction"
+      ],
+      "counting_failures": [
+       "3_causal"
+      ],
+      "direction": {
+       "pass": false,
+       "mode": "log",
+       "counts": false,
+       "checked": 8,
+       "skipped_ambiguous": 0,
+       "failures": [
+        {
+         "sentence_index": 0,
+         "sentence": "The largest plan-to-spending gaps warrant attention in Theme 6 – Self-sufficient Infrastructure in Village at Rs 20.13 crore, Theme 4 – Water Sufficient Village at Rs 13.11 crore, and Theme 5 – Clean and Green Village at Rs 8.62 crore across the 20-Gram-Panchayat sample. [d1-46759] [d1-45790] [d1-46285]",
+         "rules": [
+          "R1: no 'below plan' for d1-46759",
+          "R1: no 'below plan' for d1-45790",
+          "R1: no 'below plan' for d1-46285"
+         ],
+         "figures": [
+          "20.13",
+          "13.11",
+          "8.62"
+         ],
+         "records": [
+          "d1-45790",
+          "d1-46285",
+          "d1-46759"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 20.13 crore below plan",
+          "Rs 13.11 crore below plan",
+          "Rs 8.62 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 1,
+         "sentence": "In Theme 6, maintenance of community systems accounts for 35.4% (Rs 7.12 crore) of the gap and roads for 23.5% (Rs 4.74 crore), while the remaining 6 focus areas account for Rs 8.27 crore. [d1-46828]",
+         "rules": [
+          "R1: no 'below plan' for d1-46828"
+         ],
+         "figures": [
+          "7.12",
+          "4.74",
+          "8.27"
+         ],
+         "records": [
+          "d1-46828"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 7.12 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 2,
+         "sentence": "Scheme details require particular reconciliation: 4,036 Theme 6 rows have no scheme recorded and account for 91.9% (Rs 18.51 crore) of its gap. [d1-47007]",
+         "rules": [
+          "R1: no 'below plan' for d1-47007"
+         ],
+         "figures": [
+          "18.51"
+         ],
+         "records": [
+          "d1-47007"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 18.51 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 6,
+         "sentence": "In Theme 6, Sharagada accounts for 16.7% (Rs 3.36 crore) and Biswamathpur for 13.2% (Rs 2.66 crore) of the Rs 20.13 crore gap. [d1-46759]",
+         "rules": [
+          "R1: no 'below plan' for d1-46759"
+         ],
+         "figures": [
+          "3.36",
+          "2.66",
+          "20.13"
+         ],
+         "records": [
+          "d1-46759"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 3.36 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 7,
+         "sentence": "In Theme 5, Biswamathpur alone accounts for 25.0% (Rs 2.15 crore) of the Rs 8.62 crore gap despite holding 3.1% of the activities, with a recorded spending-to-plan ratio of 11.1%. [d1-46285]",
+         "rules": [
+          "R1: no 'below plan' for d1-46285"
+         ],
+         "figures": [
+          "2.15",
+          "8.62"
+         ],
+         "records": [
+          "d1-46285"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 2.15 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 8,
+         "sentence": "In Theme 4, Kalimela accounts for 25.5% (Rs 3.34 crore) of the Rs 13.11 crore gap and has a recorded spending-to-plan ratio of 16.3%. [d1-45790]",
+         "rules": [
+          "R1: no 'below plan' for d1-45790"
+         ],
+         "figures": [
+          "3.34",
+          "13.11"
+         ],
+         "records": [
+          "d1-45790"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 3.34 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 9,
+         "sentence": "Rural housing is the clearest concentrated exception: Boipariguda accounts for 95.7% (Rs 2.13 crore) of the Rs 2.23 crore gap, while holding 2.0% of the activities and showing a recorded spending-to-plan ratio of 0.0%. [d1-24173]",
+         "rules": [
+          "R1: no 'below plan' for d1-24173"
+         ],
+         "figures": [
+          "2.13",
+          "2.23"
+         ],
+         "records": [
+          "d1-24173"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 2.13 crore below plan"
+         ]
+        }
+       ]
+      }
+     },
+     {
+      "attempt": 2,
+      "prose": "Raise the sizeable gaps between planned and recorded spending: Rs 20.13 crore in Theme 6—Self-sufficient Infrastructure in Village [d1-46759], Rs 13.11 crore in Theme 4—Water Sufficient Village [d1-45790], and Rs 8.62 crore in Theme 5—Clean and Green Village [d1-46285]. Across 6/7 themes, Bargarh and Ganjam have the lowest spending measured against plan among districts; Theme 4 is the exception, where Ganjam and Malkangiri are lowest [1-03549].\n\nTheme 6 requires both financial and record reconciliation. Of its Rs 20.13 crore gap, 91.9%—Rs 18.51 crore—is attached to 4,036 rows with no scheme recorded [d1-47007]. By focus area, maintenance of community systems accounts for 35.4%—Rs 7.12 crore—while roads account for 23.5%—Rs 4.74 crore [d1-46828]. By Gram Panchayat, Sharagada accounts for 16.7%—Rs 3.36 crore—and Biswamathpur for 13.2%—Rs 2.66 crore [d1-46759].\n\nAlso seek explanations and record checks where gaps are unusually concentrated. Boipariguda accounts for 95.7%—Rs 2.13 crore—of the Rs 2.23 crore rural-housing gap, despite holding 2.0% of the 305 activities; its recorded ratio is 0.0% [d1-24173]. In Theme 5, Biswamathpur accounts for 25.0%—Rs 2.15 crore—of the gap while holding 3.1% of the 2,127 activities [d1-46285]. In Theme 4, Kalimela accounts for 25.5%—Rs 3.34 crore—while holding 11.0% of the 1,575 activities [d1-45790].\n\nFinally, treat the Theme 3 sanction comparison cautiously because the sanctioned basis covers only activities with a sanction record on file, about one in six [d1-45395]. Within that limited base, spending is Rs 16.41 lakh below sanction; Mendarajpur accounts for 41.5%—Rs 6.81 lakh—and Dadhapatna for 18.7%—Rs 3.07 lakh [d1-45395].",
+      "all_pass": false,
+      "failing_steps": [
+       "2_numerals_cited",
+       "3_causal",
+       "5_direction"
+      ],
+      "counting_failures": [
+       "2_numerals_cited",
+       "3_causal"
+      ],
+      "direction": {
+       "pass": false,
+       "mode": "log",
+       "counts": false,
+       "checked": 8,
+       "skipped_ambiguous": 0,
+       "failures": [
+        {
+         "sentence_index": 0,
+         "sentence": "Raise the sizeable gaps between planned and recorded spending: Rs 20.13 crore in Theme 6—Self-sufficient Infrastructure in Village [d1-46759], Rs 13.11 crore in Theme 4—Water Sufficient Village [d1-45790], and Rs 8.62 crore in Theme 5—Clean and Green Village [d1-46285].",
+         "rules": [
+          "R1: no 'below plan' for d1-46759",
+          "R1: no 'below plan' for d1-45790",
+          "R1: no 'below plan' for d1-46285"
+         ],
+         "figures": [
+          "20.13",
+          "13.11",
+          "8.62"
+         ],
+         "records": [
+          "d1-45790",
+          "d1-46285",
+          "d1-46759"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 20.13 crore below plan",
+          "Rs 13.11 crore below plan",
+          "Rs 8.62 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 3,
+         "sentence": "Of its Rs 20.13 crore gap, 91.9%—Rs 18.51 crore—is attached to 4,036 rows with no scheme recorded [d1-47007].",
+         "rules": [
+          "R1: no 'below plan' for d1-47007"
+         ],
+         "figures": [
+          "20.13",
+          "18.51"
+         ],
+         "records": [
+          "d1-47007"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 20.13 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 4,
+         "sentence": "By focus area, maintenance of community systems accounts for 35.4%—Rs 7.12 crore—while roads account for 23.5%—Rs 4.74 crore [d1-46828].",
+         "rules": [
+          "R1: no 'below plan' for d1-46828"
+         ],
+         "figures": [
+          "7.12",
+          "4.74"
+         ],
+         "records": [
+          "d1-46828"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 7.12 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 5,
+         "sentence": "By Gram Panchayat, Sharagada accounts for 16.7%—Rs 3.36 crore—and Biswamathpur for 13.2%—Rs 2.66 crore [d1-46759].",
+         "rules": [
+          "R1: no 'below plan' for d1-46759"
+         ],
+         "figures": [
+          "3.36",
+          "2.66"
+         ],
+         "records": [
+          "d1-46759"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 3.36 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 7,
+         "sentence": "Boipariguda accounts for 95.7%—Rs 2.13 crore—of the Rs 2.23 crore rural-housing gap, despite holding 2.0% of the 305 activities; its recorded ratio is 0.0% [d1-24173].",
+         "rules": [
+          "R1: no 'below plan' for d1-24173"
+         ],
+         "figures": [
+          "2.13",
+          "2.23"
+         ],
+         "records": [
+          "d1-24173"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 2.13 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 8,
+         "sentence": "In Theme 5, Biswamathpur accounts for 25.0%—Rs 2.15 crore—of the gap while holding 3.1% of the 2,127 activities [d1-46285].",
+         "rules": [
+          "R1: no 'below plan' for d1-46285"
+         ],
+         "figures": [
+          "2.15"
+         ],
+         "records": [
+          "d1-46285"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 2.15 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 9,
+         "sentence": "In Theme 4, Kalimela accounts for 25.5%—Rs 3.34 crore—while holding 11.0% of the 1,575 activities [d1-45790].",
+         "rules": [
+          "R1: no 'below plan' for d1-45790"
+         ],
+         "figures": [
+          "3.34"
+         ],
+         "records": [
+          "d1-45790"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 3.34 crore below plan"
+         ]
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "arm": "log",
+    "n": 4,
+    "question": "Where does the gap sit?",
+    "seconds": 20.0,
+    "attempts": 2,
+    "fell_back": true,
+    "fell_back_on": [
+     "3_causal"
+    ],
+    "reason": "It used causal wording: 'therefore'. This analysis finds patterns and associations and cannot establish what causes what, so say how things go together rather than what produced what. Wording that works: is associated with; occurs alongside; moves together with; is concentrated in; coincides with; the same places also show; where X is high, Y tends to be high; the analysis does not establish which way this runs.",
+    "final_text": "",
+    "final_tagged": "",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "Across the 20-Gram-Panchayat sample, spending is Rs 51.96 crore below plan, and the gap is spread broadly rather than dominated by one GP. [d4-00049] Biswamathpur has the largest share at 13.9% (Rs 7.23 crore), followed by Kalimela at 11.3% (Rs 5.90 crore); the other 18 GPs account for Rs 38.84 crore. [d4-00049] Biswamathpur’s share warrants attention because it holds 4.3% of the 12,704 activities but 13.9% of the gap. [d4-00049]\n\nViewed by work type, New/Fresh works are Rs 34.36 crore below plan. [d1-49758] Biswamathpur again has the largest share at 15.8% (Rs 5.43 crore), followed by Kalimela at 11.5% (Rs 3.95 crore), while the remaining 18 GPs account for Rs 24.98 crore. [d1-49758] Biswamathpur holds 4.4% of the 11,047 New/Fresh activities but 15.8% of this gap. [d1-49758]\n\nWithin Theme 6—Self-sufficient Infrastructure in Village—the gap is Rs 20.13 crore and is also widely distributed. [d1-46759] Here, Sharagada leads with 16.7% (Rs 3.36 crore), followed by Biswamathpur with 13.2% (Rs 2.66 crore); the other 18 GPs account for Rs 14.12 crore. [d1-46759] Sharagada holds 5.2% of the 4,693 activities in this theme but 16.7% of the gap. [d1-46759] The records therefore point to a broad reconciliation issue, with particular attention warranted for Biswamathpur and Kalimela overall and in New/Fresh works, and for Sharagada under Theme 6. [d4-00049] [d1-49758] [d1-46759]",
+      "all_pass": false,
+      "failing_steps": [
+       "3_causal",
+       "5_direction"
+      ],
+      "counting_failures": [
+       "3_causal"
+      ],
+      "direction": {
+       "pass": false,
+       "mode": "log",
+       "counts": false,
+       "checked": 6,
+       "skipped_ambiguous": 0,
+       "failures": [
+        {
+         "sentence_index": 1,
+         "sentence": "Biswamathpur has the largest share at 13.9% (Rs 7.23 crore), followed by Kalimela at 11.3% (Rs 5.90 crore); the other 18 GPs account for Rs 38.84 crore. [d4-00049]",
+         "rules": [
+          "R1: no 'below plan' for d4-00049"
+         ],
+         "figures": [
+          "7.23",
+          "5.90",
+          "38.84"
+         ],
+         "records": [
+          "d4-00049"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 7.23 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 4,
+         "sentence": "Biswamathpur again has the largest share at 15.8% (Rs 5.43 crore), followed by Kalimela at 11.5% (Rs 3.95 crore), while the remaining 18 GPs account for Rs 24.98 crore. [d1-49758]",
+         "rules": [
+          "R1: no 'below plan' for d1-49758"
+         ],
+         "figures": [
+          "5.43",
+          "3.95",
+          "24.98"
+         ],
+         "records": [
+          "d1-49758"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 5.43 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 6,
+         "sentence": "Within Theme 6—Self-sufficient Infrastructure in Village—the gap is Rs 20.13 crore and is also widely distributed. [d1-46759]",
+         "rules": [
+          "R1: no 'below plan' for d1-46759"
+         ],
+         "figures": [
+          "20.13"
+         ],
+         "records": [
+          "d1-46759"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 20.13 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 7,
+         "sentence": "Here, Sharagada leads with 16.7% (Rs 3.36 crore), followed by Biswamathpur with 13.2% (Rs 2.66 crore); the other 18 GPs account for Rs 14.12 crore. [d1-46759]",
+         "rules": [
+          "R1: no 'below plan' for d1-46759"
+         ],
+         "figures": [
+          "3.36",
+          "2.66",
+          "14.12"
+         ],
+         "records": [
+          "d1-46759"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 3.36 crore below plan"
+         ]
+        }
+       ]
+      }
+     },
+     {
+      "attempt": 2,
+      "prose": "Across the 20-Gram-Panchayat sample, spending measured against plan is Rs 51.96 crore below plan, with no single Gram Panchayat dominating the gap.[d4-00049] Biswamathpur has the largest share at 13.9% (Rs 7.23 crore), followed by Kalimela at 11.3% (Rs 5.90 crore); the remaining 18 account for Rs 38.84 crore.[d4-00049] Biswamathpur’s 13.9% share of the gap occurs alongside only 4.3% of the 12,704 activities.[d4-00049]\n\nThe New/Fresh work category shows the same leading locations: its Rs 34.36 crore gap is largest in Biswamathpur at 15.8% (Rs 5.43 crore), followed by Kalimela at 11.5% (Rs 3.95 crore), while the remaining 18 account for Rs 24.98 crore.[d1-49758] Within Theme 6—Self-sufficient Infrastructure in Village—the Rs 20.13 crore gap is led instead by Sharagada at 16.7% (Rs 3.36 crore), followed by Biswamathpur at 13.2% (Rs 2.66 crore); the remaining 18 account for Rs 14.12 crore.[d1-46759] The review should therefore focus on reconciling Biswamathpur and Kalimela across the overall and New/Fresh records, while separately checking Sharagada’s Theme 6 records, without losing sight of the sizeable gap spread across the other Gram Panchayats.[d4-00049][d1-49758][d1-46759]",
+      "all_pass": false,
+      "failing_steps": [
+       "3_causal"
+      ],
+      "counting_failures": [
+       "3_causal"
+      ],
+      "direction": {
+       "pass": true,
+       "mode": "log",
+       "counts": false,
+       "checked": 1,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     }
+    ]
+   },
+   {
+    "arm": "log",
+    "n": 5,
+    "question": "Which blocks account for the shortfall?",
+    "seconds": 13.2,
+    "attempts": 1,
+    "fell_back": false,
+    "fell_back_on": [],
+    "reason": "",
+    "final_text": "The Rs 51.96 crore spending shortfall is spread across 16 blocks, with no single block dominating. Rangeilunda accounts for the largest share at 17.5% (Rs 9.11 crore below plan), followed by Kalimela at 11.3% (Rs 5.90 crore below plan). The remaining 14 blocks together account for Rs 36.96 crore below plan. Rangeilunda holds 9.2% of the 12,704 activities and has a shortfall-to-plan ratio of 23.1%.",
+    "final_tagged": "The Rs 51.96 crore spending shortfall is spread across 16 blocks, with no single block dominating.[d3-00025] Rangeilunda accounts for the largest share at 17.5% (Rs 9.11 crore below plan), followed by Kalimela at 11.3% (Rs 5.90 crore below plan).[d3-00025] The remaining 14 blocks together account for Rs 36.96 crore below plan.[d3-00025] Rangeilunda holds 9.2% of the 12,704 activities and has a shortfall-to-plan ratio of 23.1%.[d3-00025]",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "The Rs 51.96 crore spending shortfall is spread across 16 blocks, with no single block dominating.[d3-00025] Rangeilunda accounts for the largest share at 17.5% (Rs 9.11 crore below plan), followed by Kalimela at 11.3% (Rs 5.90 crore below plan).[d3-00025] The remaining 14 blocks together account for Rs 36.96 crore below plan.[d3-00025] Rangeilunda holds 9.2% of the 12,704 activities and has a shortfall-to-plan ratio of 23.1%.[d3-00025]",
+      "all_pass": true,
+      "failing_steps": [],
+      "counting_failures": [],
+      "direction": {
+       "pass": true,
+       "mode": "log",
+       "counts": false,
+       "checked": 1,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     }
+    ]
+   },
+   {
+    "arm": "log",
+    "n": 6,
+    "question": "Which places are behaving differently from the rest?",
+    "seconds": 14.3,
+    "attempts": 1,
+    "fell_back": false,
+    "fell_back_on": [],
+    "reason": "",
+    "final_text": "Boipariguda is the main financial outlier in rural housing: of the Rs 2.23 crore recorded below plan across 20 Gram Panchayats, it accounts for 95.7% (Rs 2.13 crore), while the remaining 19 together account for Rs 9.50 lakh. Boipariguda holds only 2.0% of the 305 activities behind these totals, and its ratio measure is 0.0%. Its plan- and sanction-based spending is also unevenly distributed across activity statuses, unlike the pattern in most Gram Panchayats. \n\nChikilli is the broadest distributional outlier. It alone differs from the 19/20 pattern for plan-based spending across fund components, and for sanction-based spending across focus areas, output types, fund components and fiscal years. Chikilli also differs in sanction-based spending across types of work and activity statuses. Laxmipur is a narrower outlier, with uneven plan-based spending across activity statuses and uneven sanction-based spending across both activity statuses and types of work. \n\nOther differences concern which categories record the lowest spending against plan. Maintenance and New/Fresh are lowest among work types in 16/20 Gram Panchayats; Haldikudar, Itipur, Karuabahal and 1 other Gram Panchayat follow different patterns. Code 101 is lowest among output types in 17/20 Gram Panchayats, while Code 105 is lowest in Andhrua, Itipur and Sharagada. These category-level exceptions indicate where records and local practices may merit checking, but do not by themselves establish differences in total spending.",
+    "final_tagged": "Boipariguda is the main financial outlier in rural housing: of the Rs 2.23 crore recorded below plan across 20 Gram Panchayats, it accounts for 95.7% (Rs 2.13 crore), while the remaining 19 together account for Rs 9.50 lakh. [d1-24173] Boipariguda holds only 2.0% of the 305 activities behind these totals, and its ratio measure is 0.0%. [d1-24173] Its plan- and sanction-based spending is also unevenly distributed across activity statuses, unlike the pattern in most Gram Panchayats. [1-01749] [1-01753]\n\nChikilli is the broadest distributional outlier. [1-01728] [1-01723] [1-01742] [1-01733] [1-01711] [1-01771] [1-01753] It alone differs from the 19/20 pattern for plan-based spending across fund components, and for sanction-based spending across focus areas, output types, fund components and fiscal years. [1-01728] [1-01723] [1-01742] [1-01733] [1-01711] Chikilli also differs in sanction-based spending across types of work and activity statuses. [1-01771] [1-01753] Laxmipur is a narrower outlier, with uneven plan-based spending across activity statuses and uneven sanction-based spending across both activity statuses and types of work. [1-01749] [1-01753] [1-01771]\n\nOther differences concern which categories record the lowest spending against plan. [1-01783] [1-01796] Maintenance and New/Fresh are lowest among work types in 16/20 Gram Panchayats; Haldikudar, Itipur, Karuabahal and 1 other Gram Panchayat follow different patterns. [1-01783] Code 101 is lowest among output types in 17/20 Gram Panchayats, while Code 105 is lowest in Andhrua, Itipur and Sharagada. [1-01796] These category-level exceptions indicate where records and local practices may merit checking, but do not by themselves establish differences in total spending. [1-01783] [1-01796]",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "Boipariguda is the main financial outlier in rural housing: of the Rs 2.23 crore recorded below plan across 20 Gram Panchayats, it accounts for 95.7% (Rs 2.13 crore), while the remaining 19 together account for Rs 9.50 lakh. [d1-24173] Boipariguda holds only 2.0% of the 305 activities behind these totals, and its ratio measure is 0.0%. [d1-24173] Its plan- and sanction-based spending is also unevenly distributed across activity statuses, unlike the pattern in most Gram Panchayats. [1-01749] [1-01753]\n\nChikilli is the broadest distributional outlier. [1-01728] [1-01723] [1-01742] [1-01733] [1-01711] [1-01771] [1-01753] It alone differs from the 19/20 pattern for plan-based spending across fund components, and for sanction-based spending across focus areas, output types, fund components and fiscal years. [1-01728] [1-01723] [1-01742] [1-01733] [1-01711] Chikilli also differs in sanction-based spending across types of work and activity statuses. [1-01771] [1-01753] Laxmipur is a narrower outlier, with uneven plan-based spending across activity statuses and uneven sanction-based spending across both activity statuses and types of work. [1-01749] [1-01753] [1-01771]\n\nOther differences concern which categories record the lowest spending against plan. [1-01783] [1-01796] Maintenance and New/Fresh are lowest among work types in 16/20 Gram Panchayats; Haldikudar, Itipur, Karuabahal and 1 other Gram Panchayat follow different patterns. [1-01783] Code 101 is lowest among output types in 17/20 Gram Panchayats, while Code 105 is lowest in Andhrua, Itipur and Sharagada. [1-01796] These category-level exceptions indicate where records and local practices may merit checking, but do not by themselves establish differences in total spending. [1-01783] [1-01796]",
+      "all_pass": true,
+      "failing_steps": [],
+      "counting_failures": [],
+      "direction": {
+       "pass": true,
+       "mode": "log",
+       "counts": false,
+       "checked": 1,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     }
+    ]
+   },
+   {
+    "arm": "log",
+    "n": 7,
+    "question": "Who is driving the shortfall?",
+    "seconds": 19.7,
+    "attempts": 2,
+    "fell_back": false,
+    "fell_back_on": [],
+    "reason": "",
+    "final_text": "The spending shortfall is spread across all Gram Panchayats rather than concentrated in any single one. At district level, Bargarh and Ganjam have the lowest spending against plan in 6/7 LSDG themes; the exception is Theme 4 - Water Sufficient Village, where Ganjam and Malkangiri are lowest. Across all fiscal years, Sarpanch is the sanctioning-authority category with the lowest spending against plan. These patterns identify where the shortfall is most visible, but do not establish what caused it.",
+    "final_tagged": "The spending shortfall is spread across all Gram Panchayats rather than concentrated in any single one. [1-03481] At district level, Bargarh and Ganjam have the lowest spending against plan in 6/7 LSDG themes; the exception is Theme 4 - Water Sufficient Village, where Ganjam and Malkangiri are lowest. [1-03549] Across all fiscal years, Sarpanch is the sanctioning-authority category with the lowest spending against plan. [1-01315] These patterns identify where the shortfall is most visible, but do not establish what caused it. [1-03481] [1-03549] [1-01315]",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "No single Gram Panchayat is driving the shortfall: across all LSDG themes, spending against plan is spread evenly across Gram Panchayats. [1-03481] District-level review should focus on Bargarh and Ganjam, which record the lowest spending against plan across most themes (6/7); the exception is Theme 4 - Water Sufficient Village, where Ganjam and Malkangiri are lowest. [1-03549] At the sanctioning-authority level, Sarpanch records have the lowest spending against plan across all fiscal years and should be prioritised for reconciliation. [1-01315]",
+      "all_pass": false,
+      "failing_steps": [
+       "3_causal"
+      ],
+      "counting_failures": [
+       "3_causal"
+      ],
+      "direction": {
+       "pass": true,
+       "mode": "log",
+       "counts": false,
+       "checked": 0,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     },
+     {
+      "attempt": 2,
+      "prose": "The spending shortfall is spread across all Gram Panchayats rather than concentrated in any single one. [1-03481] At district level, Bargarh and Ganjam have the lowest spending against plan in 6/7 LSDG themes; the exception is Theme 4 - Water Sufficient Village, where Ganjam and Malkangiri are lowest. [1-03549] Across all fiscal years, Sarpanch is the sanctioning-authority category with the lowest spending against plan. [1-01315] These patterns identify where the shortfall is most visible, but do not establish what caused it. [1-03481] [1-03549] [1-01315]",
+      "all_pass": true,
+      "failing_steps": [],
+      "counting_failures": [],
+      "direction": {
+       "pass": true,
+       "mode": "log",
+       "counts": false,
+       "checked": 0,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     }
+    ]
+   },
+   {
+    "arm": "log",
+    "n": 8,
+    "question": "Where is money planned but not spent?",
+    "seconds": 10.3,
+    "attempts": 1,
+    "fell_back": false,
+    "fell_back_on": [],
+    "reason": "",
+    "final_text": "The largest recorded plan–spend gaps requiring attention include Biswamathpur at Rs 7.23 crore, Bheden at Rs 5.60 crore, Boipariguda at Rs 4.75 crore and Dutimendi at Rs 2.90 crore below plan. Among 14 Gram Panchayats near a bus stop, the combined gap is Rs 37.82 crore; Kalimela accounts for Rs 5.90 crore and Bheden for Rs 5.60 crore, while the other 12 account for Rs 26.33 crore. \n\nA substantial part of the gap is recorded as “Uncategorised” in several Gram Panchayats: Rs 2.09 crore in Bheden, Rs 1.70 crore in Biswamathpur, Rs 91.35 lakh in Dutimendi, Rs 75.10 lakh in Hirlipali and Rs 51.17 lakh in Andhrua. It accounts for 59.0% of Hirlipali’s Rs 1.27 crore gap and 50.1% of Andhrua’s Rs 1.02 crore gap, making these classification records particularly relevant for reconciliation. Smaller but still notable uncategorised gaps appear in Bandhpali at Rs 34.71 lakh and Barimunda at Rs 22.81 lakh. \n\nElsewhere, the gap is spread across identifiable sectors rather than dominated by one category. In Boipariguda, Rural housing is Rs 2.13 crore below plan and Drinking water is Rs 1.26 crore below plan. In Mendarajpur, Buildings and Irrigation Sources are Rs 31.04 lakh and Rs 30.00 lakh below plan respectively, while Haldikudar records Rs 21.81 lakh below plan in Water Sources & Structures. At district level, Bargarh and Ganjam have the lowest spending measured against plan in 6/7 LSDG themes; for Theme 4 – Water Sufficient Village, the lowest are Ganjam and Malkangiri.",
+    "final_tagged": "The largest recorded plan–spend gaps requiring attention include Biswamathpur at Rs 7.23 crore, Bheden at Rs 5.60 crore, Boipariguda at Rs 4.75 crore and Dutimendi at Rs 2.90 crore below plan. [d1-28967] [d1-28703] [d1-29024] [d1-29842] Among 14 Gram Panchayats near a bus stop, the combined gap is Rs 37.82 crore; Kalimela accounts for Rs 5.90 crore and Bheden for Rs 5.60 crore, while the other 12 account for Rs 26.33 crore. [d1-39534]\n\nA substantial part of the gap is recorded as “Uncategorised” in several Gram Panchayats: Rs 2.09 crore in Bheden, Rs 1.70 crore in Biswamathpur, Rs 91.35 lakh in Dutimendi, Rs 75.10 lakh in Hirlipali and Rs 51.17 lakh in Andhrua. [d1-28703] [d1-28967] [d1-29842] [d1-30622] [d1-27660] It accounts for 59.0% of Hirlipali’s Rs 1.27 crore gap and 50.1% of Andhrua’s Rs 1.02 crore gap, making these classification records particularly relevant for reconciliation. [d1-30622] [d1-27660] Smaller but still notable uncategorised gaps appear in Bandhpali at Rs 34.71 lakh and Barimunda at Rs 22.81 lakh. [d1-27925] [d1-28178]\n\nElsewhere, the gap is spread across identifiable sectors rather than dominated by one category. [d1-29024] [d1-32203] [d1-30370] In Boipariguda, Rural housing is Rs 2.13 crore below plan and Drinking water is Rs 1.26 crore below plan. [d1-29024] In Mendarajpur, Buildings and Irrigation Sources are Rs 31.04 lakh and Rs 30.00 lakh below plan respectively, while Haldikudar records Rs 21.81 lakh below plan in Water Sources & Structures. [d1-32203] [d1-30370] At district level, Bargarh and Ganjam have the lowest spending measured against plan in 6/7 LSDG themes; for Theme 4 – Water Sufficient Village, the lowest are Ganjam and Malkangiri. [1-03549]",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "The largest recorded plan–spend gaps requiring attention include Biswamathpur at Rs 7.23 crore, Bheden at Rs 5.60 crore, Boipariguda at Rs 4.75 crore and Dutimendi at Rs 2.90 crore below plan. [d1-28967] [d1-28703] [d1-29024] [d1-29842] Among 14 Gram Panchayats near a bus stop, the combined gap is Rs 37.82 crore; Kalimela accounts for Rs 5.90 crore and Bheden for Rs 5.60 crore, while the other 12 account for Rs 26.33 crore. [d1-39534]\n\nA substantial part of the gap is recorded as “Uncategorised” in several Gram Panchayats: Rs 2.09 crore in Bheden, Rs 1.70 crore in Biswamathpur, Rs 91.35 lakh in Dutimendi, Rs 75.10 lakh in Hirlipali and Rs 51.17 lakh in Andhrua. [d1-28703] [d1-28967] [d1-29842] [d1-30622] [d1-27660] It accounts for 59.0% of Hirlipali’s Rs 1.27 crore gap and 50.1% of Andhrua’s Rs 1.02 crore gap, making these classification records particularly relevant for reconciliation. [d1-30622] [d1-27660] Smaller but still notable uncategorised gaps appear in Bandhpali at Rs 34.71 lakh and Barimunda at Rs 22.81 lakh. [d1-27925] [d1-28178]\n\nElsewhere, the gap is spread across identifiable sectors rather than dominated by one category. [d1-29024] [d1-32203] [d1-30370] In Boipariguda, Rural housing is Rs 2.13 crore below plan and Drinking water is Rs 1.26 crore below plan. [d1-29024] In Mendarajpur, Buildings and Irrigation Sources are Rs 31.04 lakh and Rs 30.00 lakh below plan respectively, while Haldikudar records Rs 21.81 lakh below plan in Water Sources & Structures. [d1-32203] [d1-30370] At district level, Bargarh and Ganjam have the lowest spending measured against plan in 6/7 LSDG themes; for Theme 4 – Water Sufficient Village, the lowest are Ganjam and Malkangiri. [1-03549]",
+      "all_pass": true,
+      "failing_steps": [
+       "5_direction"
+      ],
+      "counting_failures": [],
+      "direction": {
+       "pass": false,
+       "mode": "log",
+       "counts": false,
+       "checked": 7,
+       "skipped_ambiguous": 0,
+       "failures": [
+        {
+         "sentence_index": 1,
+         "sentence": "Among 14 Gram Panchayats near a bus stop, the combined gap is Rs 37.82 crore; Kalimela accounts for Rs 5.90 crore and Bheden for Rs 5.60 crore, while the other 12 account for Rs 26.33 crore. [d1-39534]",
+         "rules": [
+          "R1: no 'below plan' for d1-39534"
+         ],
+         "figures": [
+          "37.82",
+          "5.90",
+          "5.60",
+          "26.33"
+         ],
+         "records": [
+          "d1-39534"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 37.82 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 2,
+         "sentence": "A substantial part of the gap is recorded as “Uncategorised” in several Gram Panchayats: Rs 2.09 crore in Bheden, Rs 1.70 crore in Biswamathpur, Rs 91.35 lakh in Dutimendi, Rs 75.10 lakh in Hirlipali and Rs 51.17 lakh in Andhrua. [d1-28703] [d1-28967] [d1-29842] [d1-30622] [d1-27660]",
+         "rules": [
+          "R1: no 'below plan' for d1-28703",
+          "R1: no 'below plan' for d1-28967",
+          "R1: no 'below plan' for d1-29842",
+          "R1: no 'below plan' for d1-30622",
+          "R1: no 'below plan' for d1-27660"
+         ],
+         "figures": [
+          "2.09",
+          "1.70",
+          "91.35",
+          "75.10",
+          "51.17"
+         ],
+         "records": [
+          "d1-27660",
+          "d1-28703",
+          "d1-28967",
+          "d1-29842",
+          "d1-30622"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 2.09 crore below plan",
+          "Rs 1.70 crore below plan",
+          "Rs 91.35 lakh below plan",
+          "Rs 75.10 lakh below plan",
+          "Rs 51.17 lakh below plan"
+         ]
+        },
+        {
+         "sentence_index": 3,
+         "sentence": "It accounts for 59.0% of Hirlipali’s Rs 1.27 crore gap and 50.1% of Andhrua’s Rs 1.02 crore gap, making these classification records particularly relevant for reconciliation. [d1-30622] [d1-27660]",
+         "rules": [
+          "R1: no 'below plan' for d1-30622",
+          "R1: no 'below plan' for d1-27660"
+         ],
+         "figures": [
+          "1.27",
+          "1.02"
+         ],
+         "records": [
+          "d1-27660",
+          "d1-30622"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 1.27 crore below plan",
+          "Rs 1.02 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 4,
+         "sentence": "Smaller but still notable uncategorised gaps appear in Bandhpali at Rs 34.71 lakh and Barimunda at Rs 22.81 lakh. [d1-27925] [d1-28178]",
+         "rules": [
+          "R1: no 'below plan' for d1-27925",
+          "R1: no 'below plan' for d1-28178"
+         ],
+         "figures": [
+          "34.71",
+          "22.81"
+         ],
+         "records": [
+          "d1-27925",
+          "d1-28178"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 34.71 lakh below plan",
+          "Rs 22.81 lakh below plan"
+         ]
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "arm": "log",
+    "n": 9,
+    "question": "Anything worth my attention this quarter?",
+    "seconds": 30.9,
+    "attempts": 2,
+    "fell_back": false,
+    "fell_back_on": [],
+    "reason": "",
+    "final_text": "Plan-to-spending gaps warrant focused reconciliation in several areas. Theme 6—Self-sufficient Infrastructure in Village—records Rs 20.13 crore below plan across 16 blocks, led by Sheragada at Rs 3.36 crore and Rangeilunda at Rs 3.11 crore. Theme 5—Clean and Green Village—records Rs 8.62 crore below plan across 20 Gram Panchayats, with Biswamathpur accounting for Rs 2.15 crore despite holding 3.1% of the 2,127 activities. Boipariguda records Rs 4.75 crore below plan, concentrated in Rural housing at Rs 2.13 crore and Drinking water at Rs 1.26 crore.\n\nRecord completeness is a separate concern. Under Theme 8—Village with Good Governance—spending is Rs 2.41 crore below plan, of which records with no sanctioning authority account for 91.3%, or Rs 2.20 crore. This category covers 1,681 rows, making the missing authority details a clear reconciliation priority. Under Theme 3—Child Friendly Village—spending is Rs 16.41 lakh below sanction, but the sanctioned basis covers only activities with a sanction record on file, about one in six. Mendarajpur accounts for Rs 6.81 lakh and Dadhapatna for Rs 3.07 lakh of this gap.\n\nQuarterly patterns also merit review. Spending linked to planned activities is increasing over calendar quarter in 6/9 districts, while Bargarh, Koraput and Cuttack show different patterns. Separately, 8/9 measures show an above outlier at 2026-Q1; spending linked to a planned activity is the exception. Across 6/7 LSDG themes, Bargarh and Ganjam are the lowest districts in spending measured against plan; for Theme 4—Water Sufficient Village—the lowest are Ganjam and Malkangiri.",
+    "final_tagged": "Plan-to-spending gaps warrant focused reconciliation in several areas. Theme 6—Self-sufficient Infrastructure in Village—records Rs 20.13 crore below plan [d1-46782] across 16 blocks [d1-46782], led by Sheragada at Rs 3.36 crore [d1-46782] and Rangeilunda at Rs 3.11 crore [d1-46782]. Theme 5—Clean and Green Village—records Rs 8.62 crore below plan [d1-46285] across 20 Gram Panchayats [d1-46285], with Biswamathpur accounting for Rs 2.15 crore [d1-46285] despite holding 3.1% of the 2,127 activities [d1-46285]. Boipariguda records Rs 4.75 crore below plan [d1-29024], concentrated in Rural housing at Rs 2.13 crore [d1-29024] and Drinking water at Rs 1.26 crore [d1-29024].\n\nRecord completeness is a separate concern. Under Theme 8—Village with Good Governance—spending is Rs 2.41 crore below plan [d1-47449], of which records with no sanctioning authority account for 91.3% [d1-47449], or Rs 2.20 crore [d1-47449]. This category covers 1,681 rows [d1-47449], making the missing authority details a clear reconciliation priority [d1-47449]. Under Theme 3—Child Friendly Village—spending is Rs 16.41 lakh below sanction [d1-45395], but the sanctioned basis covers only activities with a sanction record on file, about one in six [d1-45395]. Mendarajpur accounts for Rs 6.81 lakh [d1-45395] and Dadhapatna for Rs 3.07 lakh [d1-45395] of this gap.\n\nQuarterly patterns also merit review. Spending linked to planned activities is increasing over calendar quarter in 6/9 districts [2-00245], while Bargarh, Koraput and Cuttack show different patterns [2-00245]. Separately, 8/9 measures show an above outlier at 2026-Q1 [2-00151]; spending linked to a planned activity is the exception [2-00151]. Across 6/7 LSDG themes [1-03549], Bargarh and Ganjam are the lowest districts in spending measured against plan [1-03549]; for Theme 4—Water Sufficient Village—the lowest are Ganjam and Malkangiri [1-03549].",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "Spending linked to planned activities is increasing over calendar quarter in 6/9 districts; Bargarh, Koraput and Cuttack show different patterns. [2-00245] Across 8/9 measures, 2026-Q1 is an above-trend outlier, but spending linked to a planned activity is the exception. [2-00151]\n\nThe largest plan-to-spending gap identified is under Theme 6—Self-sufficient Infrastructure in Village: Rs 20.13 crore below plan across 16 blocks, spread across the blocks, with Sheragada accounting for 16.7% (Rs 3.36 crore) and Rangeilunda 15.4% (Rs 3.11 crore). [d1-46782] Theme 5—Clean and Green Village—is Rs 8.62 crore below plan across 20 Gram Panchayats, also broadly spread, although Biswamathpur accounts for 25.0% (Rs 2.15 crore) while holding 3.1% of the 2,127 activities. [d1-46285] Across 6/7 themes, Bargarh and Ganjam have the lowest spending measured against plan among districts; for Theme 4—Water Sufficient Village, the lowest are Ganjam and Malkangiri. [1-03549]\n\nBoipariguda is Rs 4.75 crore below plan across 22 focus areas, led by Rural housing at 44.9% (Rs 2.13 crore) and Drinking water at 26.5% (Rs 1.26 crore). [d1-29024] Rural housing represents only 0.9% of the 647 activities, while its spending-to-plan ratio is recorded as 0.0%, making these records particularly suitable for reconciliation. [d1-29024]\n\nRecord completeness may affect interpretation in two areas. [d1-47449] [d1-45395] Under Theme 8—Village with Good Governance, spending is Rs 2.41 crore below plan, of which 91.3% (Rs 2.20 crore) relates to 1,681 rows with no sanctioning authority recorded. [d1-47449] Under Theme 3—Child Friendly Village, spending is Rs 16.41 lakh below sanction across 20 Gram Panchayats, led by Mendarajpur at 41.5% (Rs 6.81 lakh), but the sanctioned basis covers only activities with a sanction record on file—about one in six. [d1-45395]",
+      "all_pass": false,
+      "failing_steps": [
+       "3_causal"
+      ],
+      "counting_failures": [
+       "3_causal"
+      ],
+      "direction": {
+       "pass": true,
+       "mode": "log",
+       "counts": false,
+       "checked": 5,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     },
+     {
+      "attempt": 2,
+      "prose": "Plan-to-spending gaps warrant focused reconciliation in several areas. Theme 6—Self-sufficient Infrastructure in Village—records Rs 20.13 crore below plan [d1-46782] across 16 blocks [d1-46782], led by Sheragada at Rs 3.36 crore [d1-46782] and Rangeilunda at Rs 3.11 crore [d1-46782]. Theme 5—Clean and Green Village—records Rs 8.62 crore below plan [d1-46285] across 20 Gram Panchayats [d1-46285], with Biswamathpur accounting for Rs 2.15 crore [d1-46285] despite holding 3.1% of the 2,127 activities [d1-46285]. Boipariguda records Rs 4.75 crore below plan [d1-29024], concentrated in Rural housing at Rs 2.13 crore [d1-29024] and Drinking water at Rs 1.26 crore [d1-29024].\n\nRecord completeness is a separate concern. Under Theme 8—Village with Good Governance—spending is Rs 2.41 crore below plan [d1-47449], of which records with no sanctioning authority account for 91.3% [d1-47449], or Rs 2.20 crore [d1-47449]. This category covers 1,681 rows [d1-47449], making the missing authority details a clear reconciliation priority [d1-47449]. Under Theme 3—Child Friendly Village—spending is Rs 16.41 lakh below sanction [d1-45395], but the sanctioned basis covers only activities with a sanction record on file, about one in six [d1-45395]. Mendarajpur accounts for Rs 6.81 lakh [d1-45395] and Dadhapatna for Rs 3.07 lakh [d1-45395] of this gap.\n\nQuarterly patterns also merit review. Spending linked to planned activities is increasing over calendar quarter in 6/9 districts [2-00245], while Bargarh, Koraput and Cuttack show different patterns [2-00245]. Separately, 8/9 measures show an above outlier at 2026-Q1 [2-00151]; spending linked to a planned activity is the exception [2-00151]. Across 6/7 LSDG themes [1-03549], Bargarh and Ganjam are the lowest districts in spending measured against plan [1-03549]; for Theme 4—Water Sufficient Village—the lowest are Ganjam and Malkangiri [1-03549].",
+      "all_pass": true,
+      "failing_steps": [
+       "5_direction"
+      ],
+      "counting_failures": [],
+      "direction": {
+       "pass": false,
+       "mode": "log",
+       "counts": false,
+       "checked": 6,
+       "skipped_ambiguous": 0,
+       "failures": [
+        {
+         "sentence_index": 8,
+         "sentence": "Mendarajpur accounts for Rs 6.81 lakh [d1-45395] and Dadhapatna for Rs 3.07 lakh [d1-45395] of this gap.",
+         "rules": [
+          "R1: no 'below sanction' for d1-45395"
+         ],
+         "figures": [
+          "6.81",
+          "3.07"
+         ],
+         "records": [
+          "d1-45395"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 6.81 lakh below sanction"
+         ]
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "arm": "log",
+    "n": 10,
+    "question": "How is Barpali block doing?",
+    "seconds": 23.9,
+    "attempts": 2,
+    "fell_back": false,
+    "fell_back_on": [],
+    "reason": "",
+    "final_text": "Barpali’s 1,447 planned activities are almost evenly divided between Bandhpali, with 729 activities, and Bhatigaon, with 718 activities. The 171 ongoing activities are similarly distributed: 83 in Bandhpali and 88 in Bhatigaon. Recorded spending totals Rs 2.64 crore, with Bandhpali accounting for 53.1% (Rs 1.40 crore) and Bhatigaon for 46.9% (Rs 1.24 crore). \n\nPlan and sanction records warrant closer reconciliation. Of the planned activities, 1,067 have no recorded cost—539 in Bandhpali and 528 in Bhatigaon. Spending measured against plan is Rs 2.85 crore below plan; Bandhpali accounts for 68.2% (Rs 1.94 crore below plan), while Bhatigaon accounts for Rs 90.49 lakh below plan. Sanctions total Rs 2.96 crore, but the sanction basis covers only about one in six activities; Bandhpali accounts for Rs 1.62 crore and Bhatigaon for Rs 1.34 crore. \n\nSpending linked to planned activities totals Rs 2.55 crore, split between Bandhpali at 52.8% (Rs 1.34 crore) and Bhatigaon at 47.2% (Rs 1.20 crore). The linked share rose from 2.7% to 53.2% across six years, indicating improved linkage in the records unless the cashbook total increased alongside it. General-component spending totals Rs 2.99 crore across 7 LSDG themes, led by Theme 6—Self-sufficient Infrastructure in Village—at 33.1% (Rs 99.22 lakh) and Theme 4—Water Sufficient Village—at 30.6% (Rs 91.57 lakh); the remaining 5 themes account for Rs 1.09 crore.",
+    "final_tagged": "Barpali’s 1,447 planned activities are almost evenly divided between Bandhpali, with 729 activities, and Bhatigaon, with 718 activities. [d3-00232] The 171 ongoing activities are similarly distributed: 83 in Bandhpali and 88 in Bhatigaon. [d3-00244] Recorded spending totals Rs 2.64 crore, with Bandhpali accounting for 53.1% (Rs 1.40 crore) and Bhatigaon for 46.9% (Rs 1.24 crore). [d4-00583]\n\nPlan and sanction records warrant closer reconciliation. [d4-00580] [d4-00584] [d1-09520] Of the planned activities, 1,067 have no recorded cost—539 in Bandhpali and 528 in Bhatigaon. [d4-00580] Spending measured against plan is Rs 2.85 crore below plan; Bandhpali accounts for 68.2% (Rs 1.94 crore below plan), while Bhatigaon accounts for Rs 90.49 lakh below plan. [d4-00584] Sanctions total Rs 2.96 crore, but the sanction basis covers only about one in six activities; Bandhpali accounts for Rs 1.62 crore and Bhatigaon for Rs 1.34 crore. [d1-09520]\n\nSpending linked to planned activities totals Rs 2.55 crore, split between Bandhpali at 52.8% (Rs 1.34 crore) and Bhatigaon at 47.2% (Rs 1.20 crore). [d2-00151] The linked share rose from 2.7% to 53.2% across six years, indicating improved linkage in the records unless the cashbook total increased alongside it. [d2-00151] General-component spending totals Rs 2.99 crore across 7 LSDG themes, led by Theme 6—Self-sufficient Infrastructure in Village—at 33.1% (Rs 99.22 lakh) and Theme 4—Water Sufficient Village—at 30.6% (Rs 91.57 lakh); the remaining 5 themes account for Rs 1.09 crore. [d1-09543]",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "Barpali’s workload is almost evenly divided between its two sampled Gram Panchayats: of 1,447 planned activities, Bandhpali has 729 (50.4%) and Bhatigaon 718 (49.6%). [d3-00232] The 171 ongoing activities are similarly balanced, with 88 in Bhatigaon and 83 in Bandhpali. [d3-00244] Recorded spending totals Rs 2.64 crore, split between Bandhpali at Rs 1.40 crore (53.1%) and Bhatigaon at Rs 1.24 crore (46.9%). [d4-00583]\n\nThe main issue for review is the completeness and alignment of planning and financial records. Of the planned activities, 1,067 have no recorded cost—539 in Bandhpali and 528 in Bhatigaon. [d4-00580] Sanctions total Rs 2.96 crore, but the sanction basis covers only about one in six activities; Bandhpali accounts for Rs 1.62 crore and Bhatigaon Rs 1.34 crore. [d1-09520] Spending measured against plan is Rs 2.85 crore below plan, concentrated in Bandhpali at Rs 1.94 crore (68.2%), while Bhatigaon is Rs 90.49 lakh below plan. [d4-00584]\n\nSpending linked to a planned activity totals Rs 2.55 crore, divided between Bandhpali at Rs 1.34 crore and Bhatigaon at Rs 1.20 crore. [d2-00151] The linked share rose from 2.7% to 53.2% across six years; this indicates greater recording completeness unless the cashbook total also rose. [d2-00151] General-component spending is recorded separately at Rs 2.99 crore across 7 LSDG theme values, led by Theme 6—Self-sufficient Infrastructure in Village at Rs 99.22 lakh (33.1%) and Theme 4—Water Sufficient Village at Rs 91.57 lakh (30.6%); the other 5 themes account for Rs 1.09 crore. [d1-09543] The next review should therefore focus on reconciling uncosted plans, sanction coverage, plan-linked spending and the different recorded spending measures, with particular attention to Bandhpali’s larger share of the amount below plan. [d4-00580] [d1-09520] [d2-00151] [d4-00583] [d1-09543] [d4-00584]",
+      "all_pass": false,
+      "failing_steps": [
+       "3_causal"
+      ],
+      "counting_failures": [
+       "3_causal"
+      ],
+      "direction": {
+       "pass": true,
+       "mode": "log",
+       "counts": false,
+       "checked": 1,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     },
+     {
+      "attempt": 2,
+      "prose": "Barpali’s 1,447 planned activities are almost evenly divided between Bandhpali, with 729 activities, and Bhatigaon, with 718 activities. [d3-00232] The 171 ongoing activities are similarly distributed: 83 in Bandhpali and 88 in Bhatigaon. [d3-00244] Recorded spending totals Rs 2.64 crore, with Bandhpali accounting for 53.1% (Rs 1.40 crore) and Bhatigaon for 46.9% (Rs 1.24 crore). [d4-00583]\n\nPlan and sanction records warrant closer reconciliation. [d4-00580] [d4-00584] [d1-09520] Of the planned activities, 1,067 have no recorded cost—539 in Bandhpali and 528 in Bhatigaon. [d4-00580] Spending measured against plan is Rs 2.85 crore below plan; Bandhpali accounts for 68.2% (Rs 1.94 crore below plan), while Bhatigaon accounts for Rs 90.49 lakh below plan. [d4-00584] Sanctions total Rs 2.96 crore, but the sanction basis covers only about one in six activities; Bandhpali accounts for Rs 1.62 crore and Bhatigaon for Rs 1.34 crore. [d1-09520]\n\nSpending linked to planned activities totals Rs 2.55 crore, split between Bandhpali at 52.8% (Rs 1.34 crore) and Bhatigaon at 47.2% (Rs 1.20 crore). [d2-00151] The linked share rose from 2.7% to 53.2% across six years, indicating improved linkage in the records unless the cashbook total increased alongside it. [d2-00151] General-component spending totals Rs 2.99 crore across 7 LSDG themes, led by Theme 6—Self-sufficient Infrastructure in Village—at 33.1% (Rs 99.22 lakh) and Theme 4—Water Sufficient Village—at 30.6% (Rs 91.57 lakh); the remaining 5 themes account for Rs 1.09 crore. [d1-09543]",
+      "all_pass": true,
+      "failing_steps": [],
+      "counting_failures": [],
+      "direction": {
+       "pass": true,
+       "mode": "log",
+       "counts": false,
+       "checked": 1,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     }
+    ]
+   },
+   {
+    "arm": "log",
+    "n": 11,
+    "question": "Anything I should be looking at in Ganjam?",
+    "seconds": 25.9,
+    "attempts": 2,
+    "fell_back": false,
+    "fell_back_on": [],
+    "reason": "",
+    "final_text": "The main review issue in the four sampled Ganjam Gram Panchayats is reconciliation of plans, sanctions and expenditure records: spending measured against plan is Rs 17.85 crore below plan, spread across all four Gram Panchayats rather than dominated by one. Biswamathpur accounts for 40.5% (Rs 7.23 crore below plan), Sharagada for 25.9% (Rs 4.63 crore), and the remaining 2 together for Rs 6.00 crore. Planning records also contain 1,768 activities without a cost, including 722 in Sharagada and 421 in Mendarajpur, while sanction records cover only about one in six activities.\n\nSpending linked to a planned activity totals Rs 5.65 crore across the four Gram Panchayats, and the linked share went from 2.7% to 53.2% across these six years. This movement should be treated as greater completeness of linkage in the records unless the cashbook total also rises, rather than automatically as an increase in spending.\n\nSharagada warrants specific review of abandoned works: planned money on abandoned works totals Rs 1.91 crore, of which Sharagada accounts for 62.1% (Rs 1.19 crore), while holding 33.8% of the 2,723 activities; the remaining 3 Gram Panchayats together account for Rs 72.47 lakh.\n\nSanctioned amount totals Rs 6.30 crore across the sampled Gram Panchayats, led by Sharagada at 43.5% (Rs 2.74 crore) and Biswamathpur at 29.2% (Rs 1.84 crore). At block level, Rangeilunda accounts for 56.5% (Rs 3.56 crore), Sheragada for 43.5% (Rs 2.74 crore), and Khallikote for Rs 0. Chikilli is also the only Gram Panchayat in the 20-Gram-Panchayat sample where spending measured against sanction is not evenly spread across focus-area values.",
+    "final_tagged": "The main review issue in the four sampled Ganjam Gram Panchayats is reconciliation of plans, sanctions and expenditure records: spending measured against plan is Rs 17.85 crore below plan, spread across all four Gram Panchayats rather than dominated by one.[d4-02688] Biswamathpur accounts for 40.5% (Rs 7.23 crore below plan), Sharagada for 25.9% (Rs 4.63 crore), and the remaining 2 together for Rs 6.00 crore.[d4-02688] Planning records also contain 1,768 activities without a cost, including 722 in Sharagada and 421 in Mendarajpur, while sanction records cover only about one in six activities.[d4-02684][d1-14749]\n\nSpending linked to a planned activity totals Rs 5.65 crore across the four Gram Panchayats, and the linked share went from 2.7% to 53.2% across these six years.[d2-00761] This movement should be treated as greater completeness of linkage in the records unless the cashbook total also rises, rather than automatically as an increase in spending.[d2-00761]\n\nSharagada warrants specific review of abandoned works: planned money on abandoned works totals Rs 1.91 crore, of which Sharagada accounts for 62.1% (Rs 1.19 crore), while holding 33.8% of the 2,723 activities; the remaining 3 Gram Panchayats together account for Rs 72.47 lakh.[d1-14747]\n\nSanctioned amount totals Rs 6.30 crore across the sampled Gram Panchayats, led by Sharagada at 43.5% (Rs 2.74 crore) and Biswamathpur at 29.2% (Rs 1.84 crore).[d1-14749] At block level, Rangeilunda accounts for 56.5% (Rs 3.56 crore), Sheragada for 43.5% (Rs 2.74 crore), and Khallikote for Rs 0.[d3-01188] Chikilli is also the only Gram Panchayat in the 20-Gram-Panchayat sample where spending measured against sanction is not evenly spread across focus-area values.[1-01723]",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "The main issue for review is reconciliation between plans, sanctions and spending in the four sampled Ganjam Gram Panchayats. Spending is Rs 17.85 crore below plan; Biswamathpur accounts for Rs 7.23 crore (40.5%) and Sharagada for Rs 4.63 crore (25.9%), while the other two account for Rs 6.00 crore. [d4-02688] Planning records also contain 1,768 activities without a cost, including 722 (40.8%) in Sharagada and 421 (23.8%) in Mendarajpur. [d4-02684]\n\nSanction coverage merits a specific check because only about one in six activities has a sanction record on file. [d1-14749] The recorded sanctioned amount is Rs 6.30 crore, led by Sharagada at Rs 2.74 crore (43.5%) and Biswamathpur at Rs 1.84 crore (29.2%). [d1-14749] At block level, Rangeilunda accounts for Rs 3.56 crore (56.5%), Sheragada for Rs 2.74 crore (43.5%), and Khallikote for Rs 0; the Khallikote records should therefore be reconciled. [d3-01188]\n\nSharagada also warrants attention for abandoned works: it accounts for Rs 1.19 crore (62.1%) of the Rs 1.91 crore planned for abandoned works across the four Gram Panchayats, despite holding 33.8% of the activities covered by these totals. [d1-14747]\n\nSpending linked to a planned activity totals Rs 5.65 crore across the four Gram Panchayats, with Sharagada at Rs 1.78 crore (31.4%) and Biswamathpur at Rs 1.35 crore (23.8%). [d2-00761] The linked share rose from 2.7% to 53.2% across six years, but this should be treated as improved recording completeness unless the cashbook total rose alongside it. [d2-00761]\n\nFinally, spending against sanction is evenly spread across focus areas in 19/20 sampled Gram Panchayats; Chikilli is the sole exception and its focus-area distribution should be checked at review. [1-01723]",
+      "all_pass": false,
+      "failing_steps": [
+       "3_causal"
+      ],
+      "counting_failures": [
+       "3_causal"
+      ],
+      "direction": {
+       "pass": true,
+       "mode": "log",
+       "counts": false,
+       "checked": 1,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     },
+     {
+      "attempt": 2,
+      "prose": "The main review issue in the four sampled Ganjam Gram Panchayats is reconciliation of plans, sanctions and expenditure records: spending measured against plan is Rs 17.85 crore below plan, spread across all four Gram Panchayats rather than dominated by one.[d4-02688] Biswamathpur accounts for 40.5% (Rs 7.23 crore below plan), Sharagada for 25.9% (Rs 4.63 crore), and the remaining 2 together for Rs 6.00 crore.[d4-02688] Planning records also contain 1,768 activities without a cost, including 722 in Sharagada and 421 in Mendarajpur, while sanction records cover only about one in six activities.[d4-02684][d1-14749]\n\nSpending linked to a planned activity totals Rs 5.65 crore across the four Gram Panchayats, and the linked share went from 2.7% to 53.2% across these six years.[d2-00761] This movement should be treated as greater completeness of linkage in the records unless the cashbook total also rises, rather than automatically as an increase in spending.[d2-00761]\n\nSharagada warrants specific review of abandoned works: planned money on abandoned works totals Rs 1.91 crore, of which Sharagada accounts for 62.1% (Rs 1.19 crore), while holding 33.8% of the 2,723 activities; the remaining 3 Gram Panchayats together account for Rs 72.47 lakh.[d1-14747]\n\nSanctioned amount totals Rs 6.30 crore across the sampled Gram Panchayats, led by Sharagada at 43.5% (Rs 2.74 crore) and Biswamathpur at 29.2% (Rs 1.84 crore).[d1-14749] At block level, Rangeilunda accounts for 56.5% (Rs 3.56 crore), Sheragada for 43.5% (Rs 2.74 crore), and Khallikote for Rs 0.[d3-01188] Chikilli is also the only Gram Panchayat in the 20-Gram-Panchayat sample where spending measured against sanction is not evenly spread across focus-area values.[1-01723]",
+      "all_pass": true,
+      "failing_steps": [],
+      "counting_failures": [],
+      "direction": {
+       "pass": true,
+       "mode": "log",
+       "counts": false,
+       "checked": 1,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     }
+    ]
+   },
+   {
+    "arm": "log",
+    "n": 12,
+    "question": "What should I know about Cuttack?",
+    "seconds": 21.5,
+    "attempts": 1,
+    "fell_back": false,
+    "fell_back_on": [],
+    "reason": "",
+    "final_text": "Cuttack’s sample covers 2 Gram Panchayats with 1,104 planned activities: Dadhapatna has 565 activities and Govindapur 539 activities. Planned cost is Rs 5.35 crore, while recorded spending is Rs 2.17 crore, leaving spending Rs 3.18 crore below plan. Govindapur accounts for Rs 3.00 crore of planned cost and Rs 2.07 crore of the amount below plan; its spending-to-plan ratio is 30.9%. Dadhapatna records the larger spending total at Rs 1.24 crore and has 112 of the district’s 181 ongoing activities. \n\nThe portfolio is predominantly Public Works, covering 88.5% or 977 activities, while Beneficiary Oriented Programmes account for 127 activities. Sanitation is the largest focus area by activity count at 31.1% or 343 activities, but Roads is largest by planned cost at 28.7% or Rs 1.53 crore despite representing 5.9% of activities. Untied-grant planning is concentrated in Theme 6—Self-sufficient Infrastructure in Village—which accounts for 84.3% or Rs 3.11 crore of the Rs 3.69 crore planned. Tied-grant planning is almost entirely divided between Drinking water at 51.8% or Rs 85.61 lakh and Sanitation at 48.2% or Rs 79.71 lakh. Of all planned activities, 639 are costed and 465 are costless. \n\nRecord completeness needs attention when interpreting progress. Spending linked to planned activities totals Rs 2.07 crore across 6 fiscal years, and the linked share went from 2.7% to 53.2%; this rise indicates improved linkage unless the cashbook total also rose. Sanction records cover only about one in six activities, with Rs 2.33 crore recorded as sanctioned; Roads accounts for Rs 57.60 lakh and Drinking water for Rs 52.82 lakh. These limitations make reconciliation of plans, sanctions, cashbook spending and activity records important before drawing conclusions about implementation.",
+    "final_tagged": "Cuttack’s sample covers 2 Gram Panchayats with 1,104 planned activities: Dadhapatna has 565 activities and Govindapur 539 activities. [d1-14417] Planned cost is Rs 5.35 crore, while recorded spending is Rs 2.17 crore, leaving spending Rs 3.18 crore below plan. [d4-02523] [d4-02525] [d3-01105] Govindapur accounts for Rs 3.00 crore of planned cost and Rs 2.07 crore of the amount below plan; its spending-to-plan ratio is 30.9%. [d4-02523] [d3-01105] Dadhapatna records the larger spending total at Rs 1.24 crore and has 112 of the district’s 181 ongoing activities. [d4-02525] [d4-02532]\n\nThe portfolio is predominantly Public Works, covering 88.5% or 977 activities, while Beneficiary Oriented Programmes account for 127 activities. [d1-14541] Sanitation is the largest focus area by activity count at 31.1% or 343 activities, but Roads is largest by planned cost at 28.7% or Rs 1.53 crore despite representing 5.9% of activities. [d1-14480] [d1-14481] Untied-grant planning is concentrated in Theme 6—Self-sufficient Infrastructure in Village—which accounts for 84.3% or Rs 3.11 crore of the Rs 3.69 crore planned. [d1-14462] Tied-grant planning is almost entirely divided between Drinking water at 51.8% or Rs 85.61 lakh and Sanitation at 48.2% or Rs 79.71 lakh. [d1-14482] Of all planned activities, 639 are costed and 465 are costless. [d1-14597]\n\nRecord completeness needs attention when interpreting progress. [d2-00733] Spending linked to planned activities totals Rs 2.07 crore across 6 fiscal years, and the linked share went from 2.7% to 53.2%; this rise indicates improved linkage unless the cashbook total also rose. [d2-00733] Sanction records cover only about one in six activities, with Rs 2.33 crore recorded as sanctioned; Roads accounts for Rs 57.60 lakh and Drinking water for Rs 52.82 lakh. [d1-14486] These limitations make reconciliation of plans, sanctions, cashbook spending and activity records important before drawing conclusions about implementation. [d2-00733] [d1-14486]",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "Cuttack’s sample covers 2 Gram Panchayats with 1,104 planned activities: Dadhapatna has 565 activities and Govindapur 539 activities. [d1-14417] Planned cost is Rs 5.35 crore, while recorded spending is Rs 2.17 crore, leaving spending Rs 3.18 crore below plan. [d4-02523] [d4-02525] [d3-01105] Govindapur accounts for Rs 3.00 crore of planned cost and Rs 2.07 crore of the amount below plan; its spending-to-plan ratio is 30.9%. [d4-02523] [d3-01105] Dadhapatna records the larger spending total at Rs 1.24 crore and has 112 of the district’s 181 ongoing activities. [d4-02525] [d4-02532]\n\nThe portfolio is predominantly Public Works, covering 88.5% or 977 activities, while Beneficiary Oriented Programmes account for 127 activities. [d1-14541] Sanitation is the largest focus area by activity count at 31.1% or 343 activities, but Roads is largest by planned cost at 28.7% or Rs 1.53 crore despite representing 5.9% of activities. [d1-14480] [d1-14481] Untied-grant planning is concentrated in Theme 6—Self-sufficient Infrastructure in Village—which accounts for 84.3% or Rs 3.11 crore of the Rs 3.69 crore planned. [d1-14462] Tied-grant planning is almost entirely divided between Drinking water at 51.8% or Rs 85.61 lakh and Sanitation at 48.2% or Rs 79.71 lakh. [d1-14482] Of all planned activities, 639 are costed and 465 are costless. [d1-14597]\n\nRecord completeness needs attention when interpreting progress. [d2-00733] Spending linked to planned activities totals Rs 2.07 crore across 6 fiscal years, and the linked share went from 2.7% to 53.2%; this rise indicates improved linkage unless the cashbook total also rose. [d2-00733] Sanction records cover only about one in six activities, with Rs 2.33 crore recorded as sanctioned; Roads accounts for Rs 57.60 lakh and Drinking water for Rs 52.82 lakh. [d1-14486] These limitations make reconciliation of plans, sanctions, cashbook spending and activity records important before drawing conclusions about implementation. [d2-00733] [d1-14486]",
+      "all_pass": true,
+      "failing_steps": [],
+      "counting_failures": [],
+      "direction": {
+       "pass": true,
+       "mode": "log",
+       "counts": false,
+       "checked": 2,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     }
+    ]
+   }
+  ],
+  "block": [
+   {
+    "arm": "block",
+    "n": 1,
+    "question": "Is spending on track?",
+    "seconds": 31.0,
+    "attempts": 2,
+    "fell_back": false,
+    "fell_back_on": [],
+    "reason": "",
+    "final_text": "Across the 20-Gram-Panchayat sample, costed activities record spending of Rs 51.96 crore below plan, while approved activities record spending of Rs 41.61 crore below plan. These are separate views of the records and should not be added together. In both views, the below-plan amount is spread across Gram Panchayats: Biswamathpur records Rs 7.23 crore below plan for costed activities and Rs 6.74 crore below plan for approved activities, followed by Kalimela at Rs 5.90 crore below plan and Rs 5.46 crore below plan, respectively. \n\nTheme 6—Self-sufficient Infrastructure in Village—records spending of Rs 20.13 crore below plan. This is also dispersed, with Sharagada recording Rs 3.36 crore below plan and Biswamathpur Rs 2.66 crore below plan; the remaining 18 Gram Panchayats together record Rs 14.12 crore below plan.\n\nRural housing is the main concentration requiring specific reconciliation: spending records are Rs 2.23 crore below plan, of which Boipariguda accounts for 95.7%, or Rs 2.13 crore below plan. Boipariguda holds only 2.0% of the 305 rural-housing activities, and its recorded spending-to-plan ratio is 0.0%; the other 19 Gram Panchayats together record Rs 9.50 lakh below plan.\n\nAt district level, Bargarh and Ganjam have the lowest spending measured against plan across 6/7 LSDG themes. The exception is Theme 4—Water Sufficient Village—where Ganjam and Malkangiri are lowest.",
+    "final_tagged": "Across the 20-Gram-Panchayat sample, costed activities record spending of Rs 51.96 crore below plan, while approved activities record spending of Rs 41.61 crore below plan.[d1-36141] [d1-44064] These are separate views of the records and should not be added together.[d1-36141] [d1-44064] In both views, the below-plan amount is spread across Gram Panchayats: Biswamathpur records Rs 7.23 crore below plan for costed activities and Rs 6.74 crore below plan for approved activities, followed by Kalimela at Rs 5.90 crore below plan and Rs 5.46 crore below plan, respectively.[d1-36141] [d1-44064]\n\nTheme 6—Self-sufficient Infrastructure in Village—records spending of Rs 20.13 crore below plan.[d1-46759] This is also dispersed, with Sharagada recording Rs 3.36 crore below plan and Biswamathpur Rs 2.66 crore below plan; the remaining 18 Gram Panchayats together record Rs 14.12 crore below plan.[d1-46759]\n\nRural housing is the main concentration requiring specific reconciliation: spending records are Rs 2.23 crore below plan, of which Boipariguda accounts for 95.7%, or Rs 2.13 crore below plan.[d1-24173] Boipariguda holds only 2.0% of the 305 rural-housing activities, and its recorded spending-to-plan ratio is 0.0%; the other 19 Gram Panchayats together record Rs 9.50 lakh below plan.[d1-24173]\n\nAt district level, Bargarh and Ganjam have the lowest spending measured against plan across 6/7 LSDG themes.[1-03549] The exception is Theme 4—Water Sufficient Village—where Ganjam and Malkangiri are lowest.[1-03549]",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "Across the 20 Gram Panchayats, spending measured against plan is Rs 51.96 crore below plan for costed activities [d1-36141] and Rs 41.61 crore below plan for approved activities [d1-44064]. These gaps are spread across the sample rather than dominated by one Gram Panchayat [d1-36141] [d1-44064]. Biswamathpur has the largest gap in both views—Rs 7.23 crore for costed activities [d1-36141] and Rs 6.74 crore for approved activities [d1-44064]—followed by Kalimela at Rs 5.90 crore [d1-36141] and Rs 5.46 crore [d1-44064], respectively.\n\nTheme 6—Self-sufficient Infrastructure in Village—is Rs 20.13 crore below plan [d1-46759]. This gap is also dispersed, led by Sharagada at Rs 3.36 crore and Biswamathpur at Rs 2.66 crore [d1-46759]. Rural housing presents a different pattern: it is Rs 2.23 crore below plan [d1-24173], with Boipariguda accounting for 95.7% of the gap, or Rs 2.13 crore, despite holding 2.0% of the 305 activities [d1-24173]. The other 19 Gram Panchayats together account for Rs 9.50 lakh below plan in rural housing [d1-24173].\n\nAt district level, Bargarh and Ganjam have the lowest spending measured against plan across 6/7 LSDG themes [1-03549]. Theme 4—Water Sufficient Village—is the exception, where Ganjam and Malkangiri are lowest [1-03549]. These patterns warrant review of the broad approved and costed activity gaps, alongside focused reconciliation of Boipariguda’s rural-housing records and the district-level theme positions [d1-36141] [d1-44064] [d1-24173] [1-03549].",
+      "all_pass": false,
+      "failing_steps": [
+       "5_direction"
+      ],
+      "counting_failures": [
+       "5_direction"
+      ],
+      "direction": {
+       "pass": false,
+       "mode": "block",
+       "counts": true,
+       "checked": 6,
+       "skipped_ambiguous": 0,
+       "failures": [
+        {
+         "sentence_index": 2,
+         "sentence": "Biswamathpur has the largest gap in both views—Rs 7.23 crore for costed activities [d1-36141] and Rs 6.74 crore for approved activities [d1-44064]—followed by Kalimela at Rs 5.90 crore [d1-36141] and Rs 5.46 crore [d1-44064], respectively.",
+         "rules": [
+          "R1: no 'below plan' for d1-36141",
+          "R1: no 'below plan' for d1-44064"
+         ],
+         "figures": [
+          "7.23",
+          "5.90",
+          "6.74",
+          "5.46"
+         ],
+         "records": [
+          "d1-36141",
+          "d1-44064"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 7.23 crore below plan",
+          "Rs 6.74 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 4,
+         "sentence": "This gap is also dispersed, led by Sharagada at Rs 3.36 crore and Biswamathpur at Rs 2.66 crore [d1-46759].",
+         "rules": [
+          "R1: no 'below plan' for d1-46759"
+         ],
+         "figures": [
+          "3.36",
+          "2.66"
+         ],
+         "records": [
+          "d1-46759"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 3.36 crore below plan"
+         ]
+        }
+       ]
+      }
+     },
+     {
+      "attempt": 2,
+      "prose": "Across the 20-Gram-Panchayat sample, costed activities record spending of Rs 51.96 crore below plan, while approved activities record spending of Rs 41.61 crore below plan.[d1-36141] [d1-44064] These are separate views of the records and should not be added together.[d1-36141] [d1-44064] In both views, the below-plan amount is spread across Gram Panchayats: Biswamathpur records Rs 7.23 crore below plan for costed activities and Rs 6.74 crore below plan for approved activities, followed by Kalimela at Rs 5.90 crore below plan and Rs 5.46 crore below plan, respectively.[d1-36141] [d1-44064]\n\nTheme 6—Self-sufficient Infrastructure in Village—records spending of Rs 20.13 crore below plan.[d1-46759] This is also dispersed, with Sharagada recording Rs 3.36 crore below plan and Biswamathpur Rs 2.66 crore below plan; the remaining 18 Gram Panchayats together record Rs 14.12 crore below plan.[d1-46759]\n\nRural housing is the main concentration requiring specific reconciliation: spending records are Rs 2.23 crore below plan, of which Boipariguda accounts for 95.7%, or Rs 2.13 crore below plan.[d1-24173] Boipariguda holds only 2.0% of the 305 rural-housing activities, and its recorded spending-to-plan ratio is 0.0%; the other 19 Gram Panchayats together record Rs 9.50 lakh below plan.[d1-24173]\n\nAt district level, Bargarh and Ganjam have the lowest spending measured against plan across 6/7 LSDG themes.[1-03549] The exception is Theme 4—Water Sufficient Village—where Ganjam and Malkangiri are lowest.[1-03549]",
+      "all_pass": true,
+      "failing_steps": [],
+      "counting_failures": [],
+      "direction": {
+       "pass": true,
+       "mode": "block",
+       "counts": true,
+       "checked": 1,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     }
+    ]
+   },
+   {
+    "arm": "block",
+    "n": 2,
+    "question": "What makes up the underspend?",
+    "seconds": 21.8,
+    "attempts": 2,
+    "fell_back": false,
+    "fell_back_on": [],
+    "reason": "",
+    "final_text": "The underspend is concentrated in records where the fund component is not recorded; this category accounts for between 84.1% and 99.0% of the gap within each reported theme. \n\nThe largest reported gap is in Theme 6—Self-sufficient Infrastructure in Village: Rs 20.13 crore below plan, including Rs 18.51 crore associated with 4,036 rows lacking a fund component; the five recorded components account for the remaining Rs 1.62 crore. Theme 4—Water Sufficient Village is Rs 13.11 crore below plan, of which Rs 11.69 crore is associated with 1,002 such rows, while the five recorded components account for Rs 1.42 crore. Theme 5—Clean and Green Village is Rs 8.62 crore below plan, including Rs 7.24 crore associated with 1,507 rows without a recorded fund component; the three recorded components account for Rs 1.37 crore. \n\nThe same pattern appears in the smaller gaps: Theme 3—Child Friendly Village is Rs 2.67 crore below plan, with Rs 2.51 crore in 996 rows without a recorded fund component; Theme 8—Village with Good Governance is Rs 2.41 crore below plan, with Rs 2.20 crore in 1,681 such rows; and Theme 1—Poverty Free and Enhanced Livelihoods Village is Rs 69.31 lakh below plan, with Rs 68.61 lakh in 528 such rows. \n\nThe “not recorded” category does not identify the underlying fund source, so reconciling these missing fund-component entries should be the first step in determining which funds make up most of the underspend.",
+    "final_tagged": "The underspend is concentrated in records where the fund component is not recorded; this category accounts for between 84.1% and 99.0% of the gap within each reported theme. [d1-47492] [d1-47028] [d1-45609] [d1-46072] [d1-46554] [d1-45225]\n\nThe largest reported gap is in Theme 6—Self-sufficient Infrastructure in Village: Rs 20.13 crore below plan, including Rs 18.51 crore associated with 4,036 rows lacking a fund component; the five recorded components account for the remaining Rs 1.62 crore. [d1-47028] Theme 4—Water Sufficient Village is Rs 13.11 crore below plan, of which Rs 11.69 crore is associated with 1,002 such rows, while the five recorded components account for Rs 1.42 crore. [d1-46072] Theme 5—Clean and Green Village is Rs 8.62 crore below plan, including Rs 7.24 crore associated with 1,507 rows without a recorded fund component; the three recorded components account for Rs 1.37 crore. [d1-46554]\n\nThe same pattern appears in the smaller gaps: Theme 3—Child Friendly Village is Rs 2.67 crore below plan, with Rs 2.51 crore in 996 rows without a recorded fund component; Theme 8—Village with Good Governance is Rs 2.41 crore below plan, with Rs 2.20 crore in 1,681 such rows; and Theme 1—Poverty Free and Enhanced Livelihoods Village is Rs 69.31 lakh below plan, with Rs 68.61 lakh in 528 such rows. [d1-45609] [d1-47492] [d1-45225]\n\nThe “not recorded” category does not identify the underlying fund source, so reconciling these missing fund-component entries should be the first step in determining which funds make up most of the underspend. [d1-47492] [d1-47028] [d1-45609] [d1-46072] [d1-46554] [d1-45225]",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "Across the reported LSDG themes, most underspending is associated with rows where the fund component is not recorded, limiting visibility into which funding sources make up the gaps. [d1-47028] [d1-46072] [d1-46554] [d1-45609] [d1-47492] [d1-45225]\n\nTheme 6—Self-sufficient Infrastructure in Village—records Rs 20.13 crore below plan; 4,036 rows without a fund component account for 91.9%, or Rs 18.51 crore, while the five recorded components account for Rs 1.62 crore. [d1-47028] Theme 4—Water Sufficient Village—records Rs 13.11 crore below plan; 1,002 rows without a fund component account for 89.2%, or Rs 11.69 crore, while the five recorded components account for Rs 1.42 crore. [d1-46072] Theme 5—Clean and Green Village—records Rs 8.62 crore below plan; 1,507 rows without a fund component account for 84.1%, or Rs 7.24 crore, while the three recorded components account for Rs 1.37 crore. [d1-46554]\n\nThe same pattern appears in the smaller gaps. [d1-45609] [d1-47492] [d1-45225] Theme 3—Child Friendly Village—records Rs 2.67 crore below plan, of which 996 rows without a fund component account for 93.9%, or Rs 2.51 crore; the four recorded components account for Rs 16.41 lakh. [d1-45609] Theme 8—Village with Good Governance—records Rs 2.41 crore below plan, of which 1,681 rows without a fund component account for 91.3%, or Rs 2.20 crore; the six recorded components account for Rs 21.03 lakh. [d1-47492] Theme 1—Poverty Free and Enhanced Livelihoods Village—records Rs 69.31 lakh below plan, of which 528 rows without a fund component account for 99.0%, or Rs 68.61 lakh; the two recorded components account for Rs 70,788. [d1-45225]\n\nThe immediate reconciliation priority is therefore the missing fund-component information, particularly in Themes 6, 4 and 5, before the underspend can be reliably attributed across funding sources. [d1-47028] [d1-46072] [d1-46554]",
+      "all_pass": false,
+      "failing_steps": [
+       "3_causal"
+      ],
+      "counting_failures": [
+       "3_causal"
+      ],
+      "direction": {
+       "pass": true,
+       "mode": "block",
+       "counts": true,
+       "checked": 6,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     },
+     {
+      "attempt": 2,
+      "prose": "The underspend is concentrated in records where the fund component is not recorded; this category accounts for between 84.1% and 99.0% of the gap within each reported theme. [d1-47492] [d1-47028] [d1-45609] [d1-46072] [d1-46554] [d1-45225]\n\nThe largest reported gap is in Theme 6—Self-sufficient Infrastructure in Village: Rs 20.13 crore below plan, including Rs 18.51 crore associated with 4,036 rows lacking a fund component; the five recorded components account for the remaining Rs 1.62 crore. [d1-47028] Theme 4—Water Sufficient Village is Rs 13.11 crore below plan, of which Rs 11.69 crore is associated with 1,002 such rows, while the five recorded components account for Rs 1.42 crore. [d1-46072] Theme 5—Clean and Green Village is Rs 8.62 crore below plan, including Rs 7.24 crore associated with 1,507 rows without a recorded fund component; the three recorded components account for Rs 1.37 crore. [d1-46554]\n\nThe same pattern appears in the smaller gaps: Theme 3—Child Friendly Village is Rs 2.67 crore below plan, with Rs 2.51 crore in 996 rows without a recorded fund component; Theme 8—Village with Good Governance is Rs 2.41 crore below plan, with Rs 2.20 crore in 1,681 such rows; and Theme 1—Poverty Free and Enhanced Livelihoods Village is Rs 69.31 lakh below plan, with Rs 68.61 lakh in 528 such rows. [d1-45609] [d1-47492] [d1-45225]\n\nThe “not recorded” category does not identify the underlying fund source, so reconciling these missing fund-component entries should be the first step in determining which funds make up most of the underspend. [d1-47492] [d1-47028] [d1-45609] [d1-46072] [d1-46554] [d1-45225]",
+      "all_pass": true,
+      "failing_steps": [],
+      "counting_failures": [],
+      "direction": {
+       "pass": true,
+       "mode": "block",
+       "counts": true,
+       "checked": 4,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     }
+    ]
+   },
+   {
+    "arm": "block",
+    "n": 3,
+    "question": "What should I raise at the next review meeting?",
+    "seconds": 31.7,
+    "attempts": 2,
+    "fell_back": false,
+    "fell_back_on": [],
+    "reason": "",
+    "final_text": "At the next review, first seek reconciliation of the larger gaps between plans and recorded spending. Self-sufficient Infrastructure in Village is Rs 20.13 crore below plan. Maintenance of community systems accounts for 35.4%, or Rs 7.12 crore below plan, while Roads accounts for 23.5%, or Rs 4.74 crore below plan. Scheme details are missing for 4,036 rows; these records account for 91.9%, or Rs 18.51 crore below plan, within this theme. This limits scheme-level scrutiny and should be taken up as a record-completeness issue.\n\nOther substantial gaps are visible in Water Sufficient Village, where spending is Rs 13.11 crore below plan, and Clean and Green Village, where it is Rs 8.62 crore below plan. Across most LSDG themes (6/7), Bargarh and Ganjam are lowest in spending measured against plan among districts. Water Sufficient Village is the exception, where Ganjam and Malkangiri are lowest. These districts merit focused questioning on the underlying plans, spending records and work status.\n\nSeveral Gram Panchayat concentrations should also be checked. Boipariguda accounts for 95.7%, or Rs 2.13 crore below plan, of the Rural housing gap, despite holding 2.0% of the 305 activities; the recorded ratio is 0.0%, which warrants reconciliation with the underlying records. Biswamathpur accounts for 25.0%, or Rs 2.15 crore below plan, in Clean and Green Village while holding 3.1% of the 2,127 activities. Sharagada accounts for 16.7%, or Rs 3.36 crore below plan, in Self-sufficient Infrastructure in Village while holding 5.2% of the 4,693 activities. Kalimela accounts for 25.5%, or Rs 3.34 crore below plan, in Water Sufficient Village while holding 11.0% of the 1,575 activities.\n\nFinally, sanction-based comparisons need caution. In Child Friendly Village, spending is Rs 16.41 lakh below sanction, led by Mendarajpur at 41.5%, or Rs 6.81 lakh below sanction. However, the sanctioned basis covers only activities with a sanction record on file—about one in six —so the review should address sanction-record completeness before drawing broader conclusions.",
+    "final_tagged": "At the next review, first seek reconciliation of the larger gaps between plans and recorded spending. Self-sufficient Infrastructure in Village is Rs 20.13 crore below plan [d1-46759]. Maintenance of community systems accounts for 35.4% [d1-46828], or Rs 7.12 crore below plan [d1-46828], while Roads accounts for 23.5% [d1-46828], or Rs 4.74 crore below plan [d1-46828]. Scheme details are missing for 4,036 rows [d1-47007]; these records account for 91.9% [d1-47007], or Rs 18.51 crore below plan [d1-47007], within this theme. This limits scheme-level scrutiny and should be taken up as a record-completeness issue [d1-47007].\n\nOther substantial gaps are visible in Water Sufficient Village, where spending is Rs 13.11 crore below plan [d1-45790], and Clean and Green Village, where it is Rs 8.62 crore below plan [d1-46285]. Across most LSDG themes (6/7) [1-03549], Bargarh and Ganjam are lowest in spending measured against plan among districts [1-03549]. Water Sufficient Village is the exception, where Ganjam and Malkangiri are lowest [1-03549]. These districts merit focused questioning on the underlying plans, spending records and work status [1-03549].\n\nSeveral Gram Panchayat concentrations should also be checked. Boipariguda accounts for 95.7% [d1-24173], or Rs 2.13 crore below plan [d1-24173], of the Rural housing gap, despite holding 2.0% [d1-24173] of the 305 activities [d1-24173]; the recorded ratio is 0.0% [d1-24173], which warrants reconciliation with the underlying records [d1-24173]. Biswamathpur accounts for 25.0% [d1-46285], or Rs 2.15 crore below plan [d1-46285], in Clean and Green Village while holding 3.1% [d1-46285] of the 2,127 activities [d1-46285]. Sharagada accounts for 16.7% [d1-46759], or Rs 3.36 crore below plan [d1-46759], in Self-sufficient Infrastructure in Village while holding 5.2% [d1-46759] of the 4,693 activities [d1-46759]. Kalimela accounts for 25.5% [d1-45790], or Rs 3.34 crore below plan [d1-45790], in Water Sufficient Village while holding 11.0% [d1-45790] of the 1,575 activities [d1-45790].\n\nFinally, sanction-based comparisons need caution. In Child Friendly Village, spending is Rs 16.41 lakh below sanction [d1-45395], led by Mendarajpur at 41.5% [d1-45395], or Rs 6.81 lakh below sanction [d1-45395]. However, the sanctioned basis covers only activities with a sanction record on file—about one in six [d1-45395]—so the review should address sanction-record completeness before drawing broader conclusions [d1-45395].",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "Begin with Theme 6—Self-sufficient Infrastructure in Village—where spending measured against plan is Rs 20.13 crore below plan across the 20 Gram Panchayats. [d1-46759] Maintenance of community systems accounts for 35.4% (Rs 7.12 crore) and roads for 23.5% (Rs 4.74 crore), while the other six focus areas account for Rs 8.27 crore. [d1-46828] Scheme information needs reconciliation before this gap is interpreted: 4,036 rows have no scheme recorded and account for 91.9% (Rs 18.51 crore) of the amount below plan. [d1-47007] At GP level, review Sharagada, with 16.7% (Rs 3.36 crore), and Biswamathpur, with 13.2% (Rs 2.66 crore), of the Theme 6 amount below plan. [d1-46759]\n\nOther themes point to specific GPs for follow-up. [d1-45790] [d1-46285] In Theme 4—Water Sufficient Village—spending is Rs 13.11 crore below plan; Kalimela accounts for 25.5% (Rs 3.34 crore) and Boipariguda for 10.1% (Rs 1.32 crore). [d1-45790] In Theme 5—Clean and Green Village—the total is Rs 8.62 crore below plan; Biswamathpur accounts for 25.0% (Rs 2.15 crore), despite holding 3.1% of the activities, while Bheden accounts for 10.9% (Rs 93.73 lakh). [d1-46285]\n\nRural housing in Boipariguda warrants a record-level reconciliation because it accounts for 95.7% (Rs 2.13 crore) of the Rs 2.23 crore below plan across the sample, while holding 2.0% of the activities; its recorded ratio is 0.0%. [d1-24173] The other 19 Gram Panchayats together account for Rs 9.50 lakh below plan in this focus area. [d1-24173]\n\nAt district level, Bargarh and Ganjam are the lowest in spending measured against plan in 6/7 LSDG themes. [1-03549] Theme 4 is the exception, where Ganjam and Malkangiri are the lowest, so these district patterns should be raised alongside the GP-specific records. [1-03549]\n\nFinally, treat the Theme 3—Child Friendly Village—sanction comparison cautiously because the sanctioned basis covers only activities with a sanction record on file, about one in six. [d1-45395] Within that limited set, spending is Rs 16.41 lakh below sanction; Mendarajpur accounts for 41.5% (Rs 6.81 lakh) and Dadhapatna for 18.7% (Rs 3.07 lakh). [d1-45395]",
+      "all_pass": false,
+      "failing_steps": [
+       "3_causal",
+       "5_direction"
+      ],
+      "counting_failures": [
+       "3_causal",
+       "5_direction"
+      ],
+      "direction": {
+       "pass": false,
+       "mode": "block",
+       "counts": true,
+       "checked": 9,
+       "skipped_ambiguous": 0,
+       "failures": [
+        {
+         "sentence_index": 1,
+         "sentence": "Maintenance of community systems accounts for 35.4% (Rs 7.12 crore) and roads for 23.5% (Rs 4.74 crore), while the other six focus areas account for Rs 8.27 crore. [d1-46828]",
+         "rules": [
+          "R1: no 'below plan' for d1-46828"
+         ],
+         "figures": [
+          "7.12",
+          "4.74",
+          "8.27"
+         ],
+         "records": [
+          "d1-46828"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 7.12 crore below plan"
+         ]
+        }
+       ]
+      }
+     },
+     {
+      "attempt": 2,
+      "prose": "At the next review, first seek reconciliation of the larger gaps between plans and recorded spending. Self-sufficient Infrastructure in Village is Rs 20.13 crore below plan [d1-46759]. Maintenance of community systems accounts for 35.4% [d1-46828], or Rs 7.12 crore below plan [d1-46828], while Roads accounts for 23.5% [d1-46828], or Rs 4.74 crore below plan [d1-46828]. Scheme details are missing for 4,036 rows [d1-47007]; these records account for 91.9% [d1-47007], or Rs 18.51 crore below plan [d1-47007], within this theme. This limits scheme-level scrutiny and should be taken up as a record-completeness issue [d1-47007].\n\nOther substantial gaps are visible in Water Sufficient Village, where spending is Rs 13.11 crore below plan [d1-45790], and Clean and Green Village, where it is Rs 8.62 crore below plan [d1-46285]. Across most LSDG themes (6/7) [1-03549], Bargarh and Ganjam are lowest in spending measured against plan among districts [1-03549]. Water Sufficient Village is the exception, where Ganjam and Malkangiri are lowest [1-03549]. These districts merit focused questioning on the underlying plans, spending records and work status [1-03549].\n\nSeveral Gram Panchayat concentrations should also be checked. Boipariguda accounts for 95.7% [d1-24173], or Rs 2.13 crore below plan [d1-24173], of the Rural housing gap, despite holding 2.0% [d1-24173] of the 305 activities [d1-24173]; the recorded ratio is 0.0% [d1-24173], which warrants reconciliation with the underlying records [d1-24173]. Biswamathpur accounts for 25.0% [d1-46285], or Rs 2.15 crore below plan [d1-46285], in Clean and Green Village while holding 3.1% [d1-46285] of the 2,127 activities [d1-46285]. Sharagada accounts for 16.7% [d1-46759], or Rs 3.36 crore below plan [d1-46759], in Self-sufficient Infrastructure in Village while holding 5.2% [d1-46759] of the 4,693 activities [d1-46759]. Kalimela accounts for 25.5% [d1-45790], or Rs 3.34 crore below plan [d1-45790], in Water Sufficient Village while holding 11.0% [d1-45790] of the 1,575 activities [d1-45790].\n\nFinally, sanction-based comparisons need caution. In Child Friendly Village, spending is Rs 16.41 lakh below sanction [d1-45395], led by Mendarajpur at 41.5% [d1-45395], or Rs 6.81 lakh below sanction [d1-45395]. However, the sanctioned basis covers only activities with a sanction record on file—about one in six [d1-45395]—so the review should address sanction-record completeness before drawing broader conclusions [d1-45395].",
+      "all_pass": true,
+      "failing_steps": [],
+      "counting_failures": [],
+      "direction": {
+       "pass": true,
+       "mode": "block",
+       "counts": true,
+       "checked": 9,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     }
+    ]
+   },
+   {
+    "arm": "block",
+    "n": 4,
+    "question": "Where does the gap sit?",
+    "seconds": 18.6,
+    "attempts": 2,
+    "fell_back": true,
+    "fell_back_on": [
+     "5_direction"
+    ],
+    "reason": "These sentences do not give the direction of a spending figure as the finding gives it: \"Biswamathpur has the largest share at 13.9% (Rs 7.23 crore), followed by Kalimela at 11.3% (Rs 5.90 crore); the other 18 account for Rs 38.84 crore.\"; \"The same locations stand out when New/Fresh works are examined: the gap is Rs 34.36 crore, led by Biswamathpur at 15.8% (Rs 5.43 crore) and Kalimela at 11.5% (Rs 3.95 crore), while the remaining 18 account for Rs 24.98 crore.\"; \"For Theme 6—Self-sufficient Infrastructure in Village—the gap is Rs 20.13 crore and is again dispersed across the sample.\"; \"Sharagada is the main location to examine under this theme, with 16.7% of the gap (Rs 3.36 crore) against 5.2% of activities, followed by Biswamathpur at 13.2% (Rs 2.66 crore); the other 18 account for Rs 14.12 crore.\". Write each figure's direction exactly as the finding gives it -- \"Rs 7.23 crore below plan\" -- not with a minus sign and not in other words.",
+    "final_text": "",
+    "final_tagged": "",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "Across the 20-Gram-Panchayat sample, spending is Rs 51.96 crore below plan, with the gap spread across all Gram Panchayats rather than dominated by one.[d4-00049] Biswamathpur has the largest share at 13.9% (Rs 7.23 crore), followed by Kalimela at 11.3% (Rs 5.90 crore); the other 18 account for Rs 38.84 crore.[d4-00049] Biswamathpur holds only 4.3% of the 12,704 activities, compared with 13.9% of the gap.[d4-00049]\n\nNew/Fresh works show a similar pattern: spending is Rs 34.36 crore below plan across the 20 Gram Panchayats.[d1-49758] Biswamathpur again has the largest share at 15.8% (Rs 5.43 crore), despite holding 4.4% of the 11,047 activities; Kalimela follows at 11.5% (Rs 3.95 crore), while the remaining 18 account for Rs 24.98 crore.[d1-49758] Biswamathpur’s gap ratio is 17.9%.[d1-49758]\n\nWithin Theme 6—Self-sufficient Infrastructure in Village—the Rs 20.13 crore gap is also dispersed, but Sharagada is the largest contributor at 16.7% (Rs 3.36 crore), followed by Biswamathpur at 13.2% (Rs 2.66 crore); the other 18 account for Rs 14.12 crore.[d1-46759] Sharagada holds 5.2% of the 4,693 activities but 16.7% of this gap, and its gap ratio is 19.6%.[d1-46759] Review should therefore focus first on reconciling Biswamathpur and Kalimela across the overall and New/Fresh records, and Sharagada within infrastructure, while retaining attention on the substantial gap distributed across the other Gram Panchayats.[d4-00049][d1-49758][d1-46759]",
+      "all_pass": false,
+      "failing_steps": [
+       "3_causal"
+      ],
+      "counting_failures": [
+       "3_causal"
+      ],
+      "direction": {
+       "pass": true,
+       "mode": "block",
+       "counts": true,
+       "checked": 1,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     },
+     {
+      "attempt": 2,
+      "prose": "Across the 20-Gram-Panchayat sample, spending measured against plan is Rs 51.96 crore below plan, and the gap is spread across the sample rather than dominated by one Gram Panchayat. [d4-00049] Biswamathpur has the largest share at 13.9% (Rs 7.23 crore), followed by Kalimela at 11.3% (Rs 5.90 crore); the other 18 account for Rs 38.84 crore. [d4-00049]\n\nThe same locations stand out when New/Fresh works are examined: the gap is Rs 34.36 crore, led by Biswamathpur at 15.8% (Rs 5.43 crore) and Kalimela at 11.5% (Rs 3.95 crore), while the remaining 18 account for Rs 24.98 crore. [d1-49758] Biswamathpur’s share of the gap is notably larger than its share of activities—13.9% against 4.3% overall, and 15.8% against 4.4% for New/Fresh works. [d4-00049] [d1-49758]\n\nFor Theme 6—Self-sufficient Infrastructure in Village—the gap is Rs 20.13 crore and is again dispersed across the sample. [d1-46759] Sharagada is the main location to examine under this theme, with 16.7% of the gap (Rs 3.36 crore) against 5.2% of activities, followed by Biswamathpur at 13.2% (Rs 2.66 crore); the other 18 account for Rs 14.12 crore. [d1-46759] Overall, attention should focus on reconciling records in Biswamathpur and Kalimela across the broader and New/Fresh views, while Sharagada warrants specific review under village infrastructure. [d4-00049] [d1-49758] [d1-46759]",
+      "all_pass": false,
+      "failing_steps": [
+       "5_direction"
+      ],
+      "counting_failures": [
+       "5_direction"
+      ],
+      "direction": {
+       "pass": false,
+       "mode": "block",
+       "counts": true,
+       "checked": 5,
+       "skipped_ambiguous": 0,
+       "failures": [
+        {
+         "sentence_index": 1,
+         "sentence": "Biswamathpur has the largest share at 13.9% (Rs 7.23 crore), followed by Kalimela at 11.3% (Rs 5.90 crore); the other 18 account for Rs 38.84 crore. [d4-00049]",
+         "rules": [
+          "R1: no 'below plan' for d4-00049"
+         ],
+         "figures": [
+          "7.23",
+          "5.90",
+          "38.84"
+         ],
+         "records": [
+          "d4-00049"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 7.23 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 2,
+         "sentence": "The same locations stand out when New/Fresh works are examined: the gap is Rs 34.36 crore, led by Biswamathpur at 15.8% (Rs 5.43 crore) and Kalimela at 11.5% (Rs 3.95 crore), while the remaining 18 account for Rs 24.98 crore. [d1-49758]",
+         "rules": [
+          "R1: no 'below plan' for d1-49758"
+         ],
+         "figures": [
+          "34.36",
+          "5.43",
+          "3.95",
+          "24.98"
+         ],
+         "records": [
+          "d1-49758"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 34.36 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 4,
+         "sentence": "For Theme 6—Self-sufficient Infrastructure in Village—the gap is Rs 20.13 crore and is again dispersed across the sample. [d1-46759]",
+         "rules": [
+          "R1: no 'below plan' for d1-46759"
+         ],
+         "figures": [
+          "20.13"
+         ],
+         "records": [
+          "d1-46759"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 20.13 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 5,
+         "sentence": "Sharagada is the main location to examine under this theme, with 16.7% of the gap (Rs 3.36 crore) against 5.2% of activities, followed by Biswamathpur at 13.2% (Rs 2.66 crore); the other 18 account for Rs 14.12 crore. [d1-46759]",
+         "rules": [
+          "R1: no 'below plan' for d1-46759"
+         ],
+         "figures": [
+          "3.36",
+          "2.66",
+          "14.12"
+         ],
+         "records": [
+          "d1-46759"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 3.36 crore below plan"
+         ]
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "arm": "block",
+    "n": 5,
+    "question": "Which blocks account for the shortfall?",
+    "seconds": 8.5,
+    "attempts": 2,
+    "fell_back": false,
+    "fell_back_on": [],
+    "reason": "",
+    "final_text": "Across the 16 blocks, spending is Rs 51.96 crore below plan, with no single block dominating the shortfall. Rangeilunda accounts for the largest share at 17.5% (Rs 9.11 crore below plan), followed by Kalimela at 11.3% (Rs 5.90 crore); the remaining 14 blocks together account for Rs 36.96 crore. Rangeilunda also holds 9.2% of the 12,704 activities and records a shortfall ratio of 23.1%, making it the first block to examine while the wider reconciliation should cover all 16 blocks.",
+    "final_tagged": "Across the 16 blocks, spending is Rs 51.96 crore below plan, with no single block dominating the shortfall.[d3-00025] Rangeilunda accounts for the largest share at 17.5% (Rs 9.11 crore below plan), followed by Kalimela at 11.3% (Rs 5.90 crore); the remaining 14 blocks together account for Rs 36.96 crore.[d3-00025] Rangeilunda also holds 9.2% of the 12,704 activities and records a shortfall ratio of 23.1%, making it the first block to examine while the wider reconciliation should cover all 16 blocks.[d3-00025]",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "Across the 16 blocks, spending is Rs 51.96 crore below plan, with no single block dominating the shortfall. [d3-00025] Rangeilunda accounts for the largest share at 17.5% (Rs 9.11 crore below plan), followed by Kalimela at 11.3% (Rs 5.90 crore below plan). [d3-00025] The remaining 14 blocks together account for Rs 36.96 crore below plan. [d3-00025]\n\nRangeilunda holds 9.2% of the 12,704 activities covered by these totals, compared with 17.5% of the spending shortfall, and its shortfall ratio is 23.1%. [d3-00025] Attention should therefore cover all 16 blocks, while prioritising review of Rangeilunda and Kalimela because they account for the largest recorded amounts. [d3-00025]",
+      "all_pass": false,
+      "failing_steps": [
+       "3_causal"
+      ],
+      "counting_failures": [
+       "3_causal"
+      ],
+      "direction": {
+       "pass": true,
+       "mode": "block",
+       "counts": true,
+       "checked": 3,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     },
+     {
+      "attempt": 2,
+      "prose": "Across the 16 blocks, spending is Rs 51.96 crore below plan, with no single block dominating the shortfall.[d3-00025] Rangeilunda accounts for the largest share at 17.5% (Rs 9.11 crore below plan), followed by Kalimela at 11.3% (Rs 5.90 crore); the remaining 14 blocks together account for Rs 36.96 crore.[d3-00025] Rangeilunda also holds 9.2% of the 12,704 activities and records a shortfall ratio of 23.1%, making it the first block to examine while the wider reconciliation should cover all 16 blocks.[d3-00025]",
+      "all_pass": true,
+      "failing_steps": [],
+      "counting_failures": [],
+      "direction": {
+       "pass": true,
+       "mode": "block",
+       "counts": true,
+       "checked": 1,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     }
+    ]
+   },
+   {
+    "arm": "block",
+    "n": 6,
+    "question": "Which places are behaving differently from the rest?",
+    "seconds": 24.0,
+    "attempts": 1,
+    "fell_back": false,
+    "fell_back_on": [],
+    "reason": "",
+    "final_text": "Boipariguda is the clearest financial outlier: in rural housing, spending measured against plan is Rs 2.23 crore below plan across 20 Gram Panchayats, of which Boipariguda accounts for 95.7% (Rs 2.13 crore), while the remaining 19 together account for Rs 9.50 lakh. Boipariguda holds 2.0% of the 305 activities behind these totals, and its spending-to-plan ratio is 0.0%, making its rural-housing records a priority for reconciliation. \n\nChikilli stands apart across the widest range of spending distributions. It is the only Gram Panchayat where spending measured against plan is uneven across fund components, compared with an even spread in 19/20 Gram Panchayats. For spending measured against sanction, it is also the sole exception to the even pattern across focus areas, output types, fund components and fiscal years, each seen in 19/20 Gram Panchayats. Chikilli and Laxmipur are the only exceptions to the even sanction-spending pattern across types of work, found in 18/20 Gram Panchayats; they also join Boipariguda as the three exceptions to the even pattern across activity statuses, found in 17/20 Gram Panchayats. For plan-based spending across activity statuses, only Boipariguda and Laxmipur differ from the pattern seen in 18/20 Gram Panchayats. \n\nA smaller set of Gram Panchayats differs in which work or output categories record the lowest spending measured against plan. Maintenance and New/Fresh are lowest among work types in 16/20 Gram Panchayats, with different patterns in Haldikudar, Itipur, Karuabahal and one other Gram Panchayat. Code 101 is lowest among output types in 17/20 Gram Panchayats, while Code 105 is lowest in Andhrua, Itipur and Sharagada.",
+    "final_tagged": "Boipariguda is the clearest financial outlier: in rural housing, spending measured against plan is Rs 2.23 crore below plan across 20 Gram Panchayats, of which Boipariguda accounts for 95.7% (Rs 2.13 crore), while the remaining 19 together account for Rs 9.50 lakh. [d1-24173] Boipariguda holds 2.0% of the 305 activities behind these totals, and its spending-to-plan ratio is 0.0%, making its rural-housing records a priority for reconciliation. [d1-24173]\n\nChikilli stands apart across the widest range of spending distributions. [1-01728] [1-01723] [1-01742] [1-01733] [1-01711] [1-01771] [1-01753] It is the only Gram Panchayat where spending measured against plan is uneven across fund components, compared with an even spread in 19/20 Gram Panchayats. [1-01728] For spending measured against sanction, it is also the sole exception to the even pattern across focus areas, output types, fund components and fiscal years, each seen in 19/20 Gram Panchayats. [1-01723] [1-01742] [1-01733] [1-01711] Chikilli and Laxmipur are the only exceptions to the even sanction-spending pattern across types of work, found in 18/20 Gram Panchayats; they also join Boipariguda as the three exceptions to the even pattern across activity statuses, found in 17/20 Gram Panchayats. [1-01771] [1-01753] For plan-based spending across activity statuses, only Boipariguda and Laxmipur differ from the pattern seen in 18/20 Gram Panchayats. [1-01749]\n\nA smaller set of Gram Panchayats differs in which work or output categories record the lowest spending measured against plan. [1-01783] [1-01796] Maintenance and New/Fresh are lowest among work types in 16/20 Gram Panchayats, with different patterns in Haldikudar, Itipur, Karuabahal and one other Gram Panchayat. [1-01783] Code 101 is lowest among output types in 17/20 Gram Panchayats, while Code 105 is lowest in Andhrua, Itipur and Sharagada. [1-01796]",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "Boipariguda is the clearest financial outlier: in rural housing, spending measured against plan is Rs 2.23 crore below plan across 20 Gram Panchayats, of which Boipariguda accounts for 95.7% (Rs 2.13 crore), while the remaining 19 together account for Rs 9.50 lakh. [d1-24173] Boipariguda holds 2.0% of the 305 activities behind these totals, and its spending-to-plan ratio is 0.0%, making its rural-housing records a priority for reconciliation. [d1-24173]\n\nChikilli stands apart across the widest range of spending distributions. [1-01728] [1-01723] [1-01742] [1-01733] [1-01711] [1-01771] [1-01753] It is the only Gram Panchayat where spending measured against plan is uneven across fund components, compared with an even spread in 19/20 Gram Panchayats. [1-01728] For spending measured against sanction, it is also the sole exception to the even pattern across focus areas, output types, fund components and fiscal years, each seen in 19/20 Gram Panchayats. [1-01723] [1-01742] [1-01733] [1-01711] Chikilli and Laxmipur are the only exceptions to the even sanction-spending pattern across types of work, found in 18/20 Gram Panchayats; they also join Boipariguda as the three exceptions to the even pattern across activity statuses, found in 17/20 Gram Panchayats. [1-01771] [1-01753] For plan-based spending across activity statuses, only Boipariguda and Laxmipur differ from the pattern seen in 18/20 Gram Panchayats. [1-01749]\n\nA smaller set of Gram Panchayats differs in which work or output categories record the lowest spending measured against plan. [1-01783] [1-01796] Maintenance and New/Fresh are lowest among work types in 16/20 Gram Panchayats, with different patterns in Haldikudar, Itipur, Karuabahal and one other Gram Panchayat. [1-01783] Code 101 is lowest among output types in 17/20 Gram Panchayats, while Code 105 is lowest in Andhrua, Itipur and Sharagada. [1-01796]",
+      "all_pass": true,
+      "failing_steps": [],
+      "counting_failures": [],
+      "direction": {
+       "pass": true,
+       "mode": "block",
+       "counts": true,
+       "checked": 1,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     }
+    ]
+   },
+   {
+    "arm": "block",
+    "n": 7,
+    "question": "Who is driving the shortfall?",
+    "seconds": 4.5,
+    "attempts": 1,
+    "fell_back": false,
+    "fell_back_on": [],
+    "reason": "",
+    "final_text": "The shortfall is not concentrated in any single Gram Panchayat; spending against plan is spread broadly across all Gram Panchayats and LSDG themes. District-level attention should focus on Bargarh and Ganjam, which record the lowest spending against plan in 6/7 themes. The exception is Theme 4 – Water Sufficient Village, where Ganjam and Malkangiri are lowest. Across all fiscal years, sanctions under the Sarpanch show the lowest spending against plan among sanctioning-authority categories, making these records a consistent area for review.",
+    "final_tagged": "The shortfall is not concentrated in any single Gram Panchayat; spending against plan is spread broadly across all Gram Panchayats and LSDG themes. [1-03481] District-level attention should focus on Bargarh and Ganjam, which record the lowest spending against plan in 6/7 themes. [1-03549] The exception is Theme 4 – Water Sufficient Village, where Ganjam and Malkangiri are lowest. [1-03549] Across all fiscal years, sanctions under the Sarpanch show the lowest spending against plan among sanctioning-authority categories, making these records a consistent area for review. [1-01315]",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "The shortfall is not concentrated in any single Gram Panchayat; spending against plan is spread broadly across all Gram Panchayats and LSDG themes. [1-03481] District-level attention should focus on Bargarh and Ganjam, which record the lowest spending against plan in 6/7 themes. [1-03549] The exception is Theme 4 – Water Sufficient Village, where Ganjam and Malkangiri are lowest. [1-03549] Across all fiscal years, sanctions under the Sarpanch show the lowest spending against plan among sanctioning-authority categories, making these records a consistent area for review. [1-01315]",
+      "all_pass": true,
+      "failing_steps": [],
+      "counting_failures": [],
+      "direction": {
+       "pass": true,
+       "mode": "block",
+       "counts": true,
+       "checked": 0,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     }
+    ]
+   },
+   {
+    "arm": "block",
+    "n": 8,
+    "question": "Where is money planned but not spent?",
+    "seconds": 40.7,
+    "attempts": 2,
+    "fell_back": false,
+    "fell_back_on": [],
+    "reason": "",
+    "final_text": "At district level, Bargarh and Ganjam record the lowest spending measured against plan in 6/7 LSDG themes; for Theme 4 - Water Sufficient Village, the two lowest are Ganjam and Malkangiri. \n\nAmong the 14 Gram Panchayats classified as Near a bus stop, spending is Rs 37.82 crore below plan; Kalimela accounts for 15.6% (Rs 5.90 crore below plan) and Bheden for 14.8% (Rs 5.60 crore below plan), while the remaining 12 account for Rs 26.33 crore below plan. \n\nThe GP-level records show substantial amounts below plan in Biswamathpur at Rs 7.23 crore below plan, Bheden at Rs 5.60 crore below plan, Boipariguda at Rs 4.75 crore below plan and Dutimendi at Rs 2.90 crore below plan. Other recorded totals include Bandhpali at Rs 1.94 crore below plan, Mendarajpur at Rs 1.88 crore below plan, Hirlipali at Rs 1.27 crore below plan, Andhrua at Rs 1.02 crore below plan, Haldikudar at Rs 90.62 lakh below plan and Barimunda at Rs 69.45 lakh below plan. \n\nMost breakdowns distribute the amount below plan across many categories rather than showing one dominant category. The exceptions are Andhrua, where Uncategorised accounts for 50.1% (Rs 51.17 lakh below plan), and Hirlipali, where it accounts for 59.0% (Rs 75.10 lakh below plan). Uncategorised is also the largest component in Bheden at 37.3% (Rs 2.09 crore below plan), Dutimendi at 31.5% (Rs 91.35 lakh below plan), Biswamathpur at 23.6% (Rs 1.70 crore below plan), Bandhpali at 17.9% (Rs 34.71 lakh below plan) and Barimunda at 32.8% (Rs 22.81 lakh below plan), making these records a practical starting point for reconciliation. \n\nCategory-specific review should also cover Rural housing at 44.9% (Rs 2.13 crore below plan) and Drinking water at 26.5% (Rs 1.26 crore below plan) in Boipariguda; Buildings at 16.5% (Rs 31.04 lakh below plan) and Irrigation Sources at 16.0% (Rs 30.00 lakh below plan) in Mendarajpur; and Water Sources & Structures at 24.1% (Rs 21.81 lakh below plan) in Haldikudar.",
+    "final_tagged": "At district level, Bargarh and Ganjam record the lowest spending measured against plan in 6/7 LSDG themes; for Theme 4 - Water Sufficient Village, the two lowest are Ganjam and Malkangiri. [1-03549]\n\nAmong the 14 Gram Panchayats classified as Near a bus stop, spending is Rs 37.82 crore below plan; Kalimela accounts for 15.6% (Rs 5.90 crore below plan) and Bheden for 14.8% (Rs 5.60 crore below plan), while the remaining 12 account for Rs 26.33 crore below plan. [d1-39534]\n\nThe GP-level records show substantial amounts below plan in Biswamathpur at Rs 7.23 crore below plan, Bheden at Rs 5.60 crore below plan, Boipariguda at Rs 4.75 crore below plan and Dutimendi at Rs 2.90 crore below plan. [d1-28967] [d1-28703] [d1-29024] [d1-29842] Other recorded totals include Bandhpali at Rs 1.94 crore below plan, Mendarajpur at Rs 1.88 crore below plan, Hirlipali at Rs 1.27 crore below plan, Andhrua at Rs 1.02 crore below plan, Haldikudar at Rs 90.62 lakh below plan and Barimunda at Rs 69.45 lakh below plan. [d1-27925] [d1-32203] [d1-30622] [d1-27660] [d1-30370] [d1-28178]\n\nMost breakdowns distribute the amount below plan across many categories rather than showing one dominant category. [d1-29024] [d1-27925] [d1-28178] [d1-29842] [d1-32203] [d1-28703] [d1-28967] [d1-30370] The exceptions are Andhrua, where Uncategorised accounts for 50.1% (Rs 51.17 lakh below plan), and Hirlipali, where it accounts for 59.0% (Rs 75.10 lakh below plan). [d1-27660] [d1-30622] Uncategorised is also the largest component in Bheden at 37.3% (Rs 2.09 crore below plan), Dutimendi at 31.5% (Rs 91.35 lakh below plan), Biswamathpur at 23.6% (Rs 1.70 crore below plan), Bandhpali at 17.9% (Rs 34.71 lakh below plan) and Barimunda at 32.8% (Rs 22.81 lakh below plan), making these records a practical starting point for reconciliation. [d1-28703] [d1-29842] [d1-28967] [d1-27925] [d1-28178]\n\nCategory-specific review should also cover Rural housing at 44.9% (Rs 2.13 crore below plan) and Drinking water at 26.5% (Rs 1.26 crore below plan) in Boipariguda; Buildings at 16.5% (Rs 31.04 lakh below plan) and Irrigation Sources at 16.0% (Rs 30.00 lakh below plan) in Mendarajpur; and Water Sources & Structures at 24.1% (Rs 21.81 lakh below plan) in Haldikudar. [d1-29024] [d1-32203] [d1-30370]",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "At district level, Bargarh and Ganjam record the lowest spending against plan across 6/7 LSDG themes; the exception is Theme 4 - Water Sufficient Village, where Ganjam and Malkangiri are lowest. [1-03549]\n\nSeveral Gram Panchayats show substantial gaps between planned and recorded spending: Biswamathpur is Rs 7.23 crore below plan, Bheden Rs 5.60 crore, Boipariguda Rs 4.75 crore and Dutimendi Rs 2.90 crore. [d1-28967] [d1-28703] [d1-29024] [d1-29842] Among 14 Gram Panchayats classified as near a bus stop, the total gap is Rs 37.82 crore; Kalimela accounts for 15.6% (Rs 5.90 crore) and Bheden for 14.8% (Rs 5.60 crore), while the remaining 12 account for Rs 26.33 crore. [d1-39534]\n\nMost GP-level gaps are spread across several categories rather than confined to one type of work. [d1-29024] [d1-27925] [d1-28178] [d1-29842] [d1-32203] [d1-28703] [d1-28967] [d1-30370] The main exceptions are Andhrua, where Uncategorised accounts for 50.1% (Rs 51.17 lakh) of the Rs 1.02 crore gap, and Hirlipali, where it accounts for 59.0% (Rs 75.10 lakh) of the Rs 1.27 crore gap. [d1-27660] [d1-30622]\n\nUncategorised records are also the largest component in several other GPs, including Bheden at Rs 2.09 crore, Biswamathpur at Rs 1.70 crore, Dutimendi at Rs 91.35 lakh, Bandhpali at Rs 34.71 lakh and Barimunda at Rs 22.81 lakh, making these records a practical starting point for reconciliation. [d1-28703] [d1-28967] [d1-29842] [d1-27925] [d1-28178] Category-specific review should also note Rural housing at Rs 2.13 crore and Drinking water at Rs 1.26 crore in Boipariguda, Buildings at Rs 31.04 lakh and Irrigation Sources at Rs 30.00 lakh in Mendarajpur, and Water Sources & Structures at Rs 21.81 lakh in Haldikudar. [d1-29024] [d1-32203] [d1-30370]",
+      "all_pass": false,
+      "failing_steps": [
+       "5_direction"
+      ],
+      "counting_failures": [
+       "5_direction"
+      ],
+      "direction": {
+       "pass": false,
+       "mode": "block",
+       "counts": true,
+       "checked": 5,
+       "skipped_ambiguous": 0,
+       "failures": [
+        {
+         "sentence_index": 2,
+         "sentence": "Among 14 Gram Panchayats classified as near a bus stop, the total gap is Rs 37.82 crore; Kalimela accounts for 15.6% (Rs 5.90 crore) and Bheden for 14.8% (Rs 5.60 crore), while the remaining 12 account for Rs 26.33 crore. [d1-39534]",
+         "rules": [
+          "R1: no 'below plan' for d1-39534"
+         ],
+         "figures": [
+          "37.82",
+          "5.90",
+          "5.60",
+          "26.33"
+         ],
+         "records": [
+          "d1-39534"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 37.82 crore below plan"
+         ]
+        },
+        {
+         "sentence_index": 4,
+         "sentence": "The main exceptions are Andhrua, where Uncategorised accounts for 50.1% (Rs 51.17 lakh) of the Rs 1.02 crore gap, and Hirlipali, where it accounts for 59.0% (Rs 75.10 lakh) of the Rs 1.27 crore gap. [d1-27660] [d1-30622]",
+         "rules": [
+          "R1: no 'below plan' for d1-27660",
+          "R1: no 'below plan' for d1-30622"
+         ],
+         "figures": [
+          "51.17",
+          "1.02",
+          "75.10",
+          "1.27"
+         ],
+         "records": [
+          "d1-27660",
+          "d1-30622"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 51.17 lakh below plan",
+          "Rs 75.10 lakh below plan"
+         ]
+        },
+        {
+         "sentence_index": 5,
+         "sentence": "Uncategorised records are also the largest component in several other GPs, including Bheden at Rs 2.09 crore, Biswamathpur at Rs 1.70 crore, Dutimendi at Rs 91.35 lakh, Bandhpali at Rs 34.71 lakh and Barimunda at Rs 22.81 lakh, making these records a practical starting point for reconciliation. [d1-28703] [d1-28967] [d1-29842] [d1-27925] [d1-28178]",
+         "rules": [
+          "R1: no 'below plan' for d1-28703",
+          "R1: no 'below plan' for d1-28967",
+          "R1: no 'below plan' for d1-29842",
+          "R1: no 'below plan' for d1-27925",
+          "R1: no 'below plan' for d1-28178"
+         ],
+         "figures": [
+          "2.09",
+          "1.70",
+          "91.35",
+          "34.71",
+          "22.81"
+         ],
+         "records": [
+          "d1-27925",
+          "d1-28178",
+          "d1-28703",
+          "d1-28967",
+          "d1-29842"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 2.09 crore below plan",
+          "Rs 1.70 crore below plan",
+          "Rs 91.35 lakh below plan",
+          "Rs 34.71 lakh below plan",
+          "Rs 22.81 lakh below plan"
+         ]
+        },
+        {
+         "sentence_index": 6,
+         "sentence": "Category-specific review should also note Rural housing at Rs 2.13 crore and Drinking water at Rs 1.26 crore in Boipariguda, Buildings at Rs 31.04 lakh and Irrigation Sources at Rs 30.00 lakh in Mendarajpur, and Water Sources & Structures at Rs 21.81 lakh in Haldikudar. [d1-29024] [d1-32203] [d1-30370]",
+         "rules": [
+          "R1: no 'below plan' for d1-29024",
+          "R1: no 'below plan' for d1-32203",
+          "R1: no 'below plan' for d1-30370"
+         ],
+         "figures": [
+          "2.13",
+          "1.26",
+          "31.04",
+          "30.00",
+          "21.81"
+         ],
+         "records": [
+          "d1-29024",
+          "d1-30370",
+          "d1-32203"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 2.13 crore below plan",
+          "Rs 31.04 lakh below plan",
+          "Rs 21.81 lakh below plan"
+         ]
+        }
+       ]
+      }
+     },
+     {
+      "attempt": 2,
+      "prose": "At district level, Bargarh and Ganjam record the lowest spending measured against plan in 6/7 LSDG themes; for Theme 4 - Water Sufficient Village, the two lowest are Ganjam and Malkangiri. [1-03549]\n\nAmong the 14 Gram Panchayats classified as Near a bus stop, spending is Rs 37.82 crore below plan; Kalimela accounts for 15.6% (Rs 5.90 crore below plan) and Bheden for 14.8% (Rs 5.60 crore below plan), while the remaining 12 account for Rs 26.33 crore below plan. [d1-39534]\n\nThe GP-level records show substantial amounts below plan in Biswamathpur at Rs 7.23 crore below plan, Bheden at Rs 5.60 crore below plan, Boipariguda at Rs 4.75 crore below plan and Dutimendi at Rs 2.90 crore below plan. [d1-28967] [d1-28703] [d1-29024] [d1-29842] Other recorded totals include Bandhpali at Rs 1.94 crore below plan, Mendarajpur at Rs 1.88 crore below plan, Hirlipali at Rs 1.27 crore below plan, Andhrua at Rs 1.02 crore below plan, Haldikudar at Rs 90.62 lakh below plan and Barimunda at Rs 69.45 lakh below plan. [d1-27925] [d1-32203] [d1-30622] [d1-27660] [d1-30370] [d1-28178]\n\nMost breakdowns distribute the amount below plan across many categories rather than showing one dominant category. [d1-29024] [d1-27925] [d1-28178] [d1-29842] [d1-32203] [d1-28703] [d1-28967] [d1-30370] The exceptions are Andhrua, where Uncategorised accounts for 50.1% (Rs 51.17 lakh below plan), and Hirlipali, where it accounts for 59.0% (Rs 75.10 lakh below plan). [d1-27660] [d1-30622] Uncategorised is also the largest component in Bheden at 37.3% (Rs 2.09 crore below plan), Dutimendi at 31.5% (Rs 91.35 lakh below plan), Biswamathpur at 23.6% (Rs 1.70 crore below plan), Bandhpali at 17.9% (Rs 34.71 lakh below plan) and Barimunda at 32.8% (Rs 22.81 lakh below plan), making these records a practical starting point for reconciliation. [d1-28703] [d1-29842] [d1-28967] [d1-27925] [d1-28178]\n\nCategory-specific review should also cover Rural housing at 44.9% (Rs 2.13 crore below plan) and Drinking water at 26.5% (Rs 1.26 crore below plan) in Boipariguda; Buildings at 16.5% (Rs 31.04 lakh below plan) and Irrigation Sources at 16.0% (Rs 30.00 lakh below plan) in Mendarajpur; and Water Sources & Structures at 24.1% (Rs 21.81 lakh below plan) in Haldikudar. [d1-29024] [d1-32203] [d1-30370]",
+      "all_pass": true,
+      "failing_steps": [],
+      "counting_failures": [],
+      "direction": {
+       "pass": true,
+       "mode": "block",
+       "counts": true,
+       "checked": 6,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     }
+    ]
+   },
+   {
+    "arm": "block",
+    "n": 9,
+    "question": "Anything worth my attention this quarter?",
+    "seconds": 41.1,
+    "attempts": 2,
+    "fell_back": false,
+    "fell_back_on": [],
+    "reason": "",
+    "final_text": "Across 6/9 districts, spending linked to a planned activity is increasing over calendar quarter; Bargarh, Koraput and Cuttack show different patterns. Separately, 2026-Q1 is an above outlier for 8/9 measures, with spending linked to a planned activity as the exception. Quarter-wise records for these three districts and the measures showing the 2026-Q1 outlier merit review.\n\nSeveral below-plan amounts also warrant local reconciliation. In Theme 6 - Self-sufficient Infrastructure in Village, spending measured against plan totals Rs 20.13 crore below plan across 16 blocks; Sheragada accounts for 16.7%, or Rs 3.36 crore below plan, and Rangeilunda accounts for 15.4%, or Rs 3.11 crore below plan. In Theme 5 - Clean and Green Village, spending measured against plan totals Rs 8.62 crore below plan across 20 Gram Panchayats; Biswamathpur has the largest share at 25.0%, or Rs 2.15 crore below plan, while holding 3.1% of the 2,127 activities. Boipariguda records Rs 4.75 crore below plan, including Rural housing at 44.9%, or Rs 2.13 crore below plan, despite holding 0.9% of the 647 activities; Drinking water accounts for 26.5%, or Rs 1.26 crore below plan. Across 6/7 LSDG themes, Bargarh and Ganjam are the lowest districts in spending measured against plan; the exception is Theme 4 - Water Sufficient Village, where Ganjam and Malkangiri are lowest.\n\nRecord completeness limits interpretation in two areas. In Theme 8 - Village with Good Governance, spending measured against plan totals Rs 2.41 crore below plan, of which records with no sanctioning authority account for 91.3%, or Rs 2.20 crore below plan, across 1,681 rows. In Theme 3 - Child Friendly Village, spending measured against sanction totals Rs 16.41 lakh below sanction, but the sanctioned basis covers only activities with a sanction record on file—about one in six. Mendarajpur has the largest recorded share at 41.5%, or Rs 6.81 lakh below sanction, so this should be read alongside the limited sanction coverage.",
+    "final_tagged": "Across 6/9 districts [2-00245], spending linked to a planned activity is increasing over calendar quarter [2-00245]; Bargarh, Koraput and Cuttack show different patterns [2-00245]. Separately, 2026-Q1 [2-00151] is an above outlier for 8/9 measures [2-00151], with spending linked to a planned activity as the exception [2-00151]. Quarter-wise records for these three districts and the measures showing the 2026-Q1 outlier merit review [2-00245] [2-00151].\n\nSeveral below-plan amounts also warrant local reconciliation [d1-46782] [d1-46285] [d1-29024]. In Theme 6 - Self-sufficient Infrastructure in Village [d1-46782], spending measured against plan totals Rs 20.13 crore below plan [d1-46782] across 16 blocks [d1-46782]; Sheragada accounts for 16.7% [d1-46782], or Rs 3.36 crore below plan [d1-46782], and Rangeilunda accounts for 15.4% [d1-46782], or Rs 3.11 crore below plan [d1-46782]. In Theme 5 - Clean and Green Village [d1-46285], spending measured against plan totals Rs 8.62 crore below plan [d1-46285] across 20 Gram Panchayats [d1-46285]; Biswamathpur has the largest share at 25.0% [d1-46285], or Rs 2.15 crore below plan [d1-46285], while holding 3.1% of the 2,127 activities [d1-46285]. Boipariguda records Rs 4.75 crore below plan [d1-29024], including Rural housing at 44.9% [d1-29024], or Rs 2.13 crore below plan [d1-29024], despite holding 0.9% of the 647 activities [d1-29024]; Drinking water accounts for 26.5% [d1-29024], or Rs 1.26 crore below plan [d1-29024]. Across 6/7 LSDG themes [1-03549], Bargarh and Ganjam are the lowest districts in spending measured against plan [1-03549]; the exception is Theme 4 - Water Sufficient Village [1-03549], where Ganjam and Malkangiri are lowest [1-03549].\n\nRecord completeness limits interpretation in two areas [d1-47449] [d1-45395]. In Theme 8 - Village with Good Governance [d1-47449], spending measured against plan totals Rs 2.41 crore below plan [d1-47449], of which records with no sanctioning authority account for 91.3% [d1-47449], or Rs 2.20 crore below plan [d1-47449], across 1,681 rows [d1-47449]. In Theme 3 - Child Friendly Village [d1-45395], spending measured against sanction totals Rs 16.41 lakh below sanction [d1-45395], but the sanctioned basis covers only activities with a sanction record on file—about one in six [d1-45395]. Mendarajpur has the largest recorded share at 41.5% [d1-45395], or Rs 6.81 lakh below sanction [d1-45395], so this should be read alongside the limited sanction coverage [d1-45395].",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "Spending linked to planned activities is increasing over calendar quarter in 6/9 districts; Bargarh, Koraput and Cuttack show different patterns and merit separate review. [2-00245] Across other measures, 2026-Q1 is an above outlier in 8/9 cases; spending linked to planned activities is the exception. [2-00151]\n\nSubstantial plan-to-spending gaps appear in infrastructure and environmental themes. [d1-46782] [d1-46285] In Theme 6 – Self-sufficient Infrastructure in Village, spending is Rs 20.13 crore below plan across 16 blocks, including Rs 3.36 crore in Sheragada and Rs 3.11 crore in Rangeilunda; the remaining 14 blocks account for Rs 13.67 crore. [d1-46782] In Theme 5 – Clean and Green Village, spending is Rs 8.62 crore below plan across 20 Gram Panchayats; Biswamathpur accounts for Rs 2.15 crore despite holding 3.1% of the 2,127 activities, while Bheden accounts for Rs 93.73 lakh. [d1-46285] More broadly, Bargarh and Ganjam have the lowest spending measured against plan among districts in 6/7 themes; for Theme 4 – Water Sufficient Village, the lowest are Ganjam and Malkangiri. [1-03549]\n\nBoipariguda requires a focused reconciliation of planned activities and recorded spending: spending is Rs 4.75 crore below plan across 22 focus areas. [d1-29024] Rural housing accounts for Rs 2.13 crore, or 44.9%, despite representing 0.9% of the 647 activities, while drinking water accounts for Rs 1.26 crore, or 26.5%. [d1-29024]\n\nRecord completeness is also affecting the picture. [d1-47449] In Theme 8 – Village with Good Governance, spending is Rs 2.41 crore below plan, of which Rs 2.20 crore, or 91.3%, is attached to 1,681 rows with no sanctioning authority recorded. [d1-47449] In Theme 3 – Child Friendly Village, spending is Rs 16.41 lakh below sanction across 20 Gram Panchayats, led by Mendarajpur at Rs 6.81 lakh and Dadhapatna at Rs 3.07 lakh; however, this comparison covers only activities with a sanction record on file, about one in six. [d1-45395]",
+      "all_pass": false,
+      "failing_steps": [
+       "3_causal",
+       "5_direction"
+      ],
+      "counting_failures": [
+       "3_causal",
+       "5_direction"
+      ],
+      "direction": {
+       "pass": false,
+       "mode": "block",
+       "counts": true,
+       "checked": 6,
+       "skipped_ambiguous": 0,
+       "failures": [
+        {
+         "sentence_index": 7,
+         "sentence": "Rural housing accounts for Rs 2.13 crore, or 44.9%, despite representing 0.9% of the 647 activities, while drinking water accounts for Rs 1.26 crore, or 26.5%. [d1-29024]",
+         "rules": [
+          "R1: no 'below plan' for d1-29024"
+         ],
+         "figures": [
+          "2.13",
+          "1.26"
+         ],
+         "records": [
+          "d1-29024"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 2.13 crore below plan"
+         ]
+        }
+       ]
+      }
+     },
+     {
+      "attempt": 2,
+      "prose": "Across 6/9 districts [2-00245], spending linked to a planned activity is increasing over calendar quarter [2-00245]; Bargarh, Koraput and Cuttack show different patterns [2-00245]. Separately, 2026-Q1 [2-00151] is an above outlier for 8/9 measures [2-00151], with spending linked to a planned activity as the exception [2-00151]. Quarter-wise records for these three districts and the measures showing the 2026-Q1 outlier merit review [2-00245] [2-00151].\n\nSeveral below-plan amounts also warrant local reconciliation [d1-46782] [d1-46285] [d1-29024]. In Theme 6 - Self-sufficient Infrastructure in Village [d1-46782], spending measured against plan totals Rs 20.13 crore below plan [d1-46782] across 16 blocks [d1-46782]; Sheragada accounts for 16.7% [d1-46782], or Rs 3.36 crore below plan [d1-46782], and Rangeilunda accounts for 15.4% [d1-46782], or Rs 3.11 crore below plan [d1-46782]. In Theme 5 - Clean and Green Village [d1-46285], spending measured against plan totals Rs 8.62 crore below plan [d1-46285] across 20 Gram Panchayats [d1-46285]; Biswamathpur has the largest share at 25.0% [d1-46285], or Rs 2.15 crore below plan [d1-46285], while holding 3.1% of the 2,127 activities [d1-46285]. Boipariguda records Rs 4.75 crore below plan [d1-29024], including Rural housing at 44.9% [d1-29024], or Rs 2.13 crore below plan [d1-29024], despite holding 0.9% of the 647 activities [d1-29024]; Drinking water accounts for 26.5% [d1-29024], or Rs 1.26 crore below plan [d1-29024]. Across 6/7 LSDG themes [1-03549], Bargarh and Ganjam are the lowest districts in spending measured against plan [1-03549]; the exception is Theme 4 - Water Sufficient Village [1-03549], where Ganjam and Malkangiri are lowest [1-03549].\n\nRecord completeness limits interpretation in two areas [d1-47449] [d1-45395]. In Theme 8 - Village with Good Governance [d1-47449], spending measured against plan totals Rs 2.41 crore below plan [d1-47449], of which records with no sanctioning authority account for 91.3% [d1-47449], or Rs 2.20 crore below plan [d1-47449], across 1,681 rows [d1-47449]. In Theme 3 - Child Friendly Village [d1-45395], spending measured against sanction totals Rs 16.41 lakh below sanction [d1-45395], but the sanctioned basis covers only activities with a sanction record on file—about one in six [d1-45395]. Mendarajpur has the largest recorded share at 41.5% [d1-45395], or Rs 6.81 lakh below sanction [d1-45395], so this should be read alongside the limited sanction coverage [d1-45395].",
+      "all_pass": true,
+      "failing_steps": [],
+      "counting_failures": [],
+      "direction": {
+       "pass": true,
+       "mode": "block",
+       "counts": true,
+       "checked": 6,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     }
+    ]
+   },
+   {
+    "arm": "block",
+    "n": 10,
+    "question": "How is Barpali block doing?",
+    "seconds": 9.4,
+    "attempts": 1,
+    "fell_back": false,
+    "fell_back_on": [],
+    "reason": "",
+    "final_text": "In the two Barpali Gram Panchayats covered, planned activity volumes are nearly even: 1,447 activities, comprising 729 in Bandhpali and 718 in Bhatigaon. The 171 ongoing activities are similarly distributed, with 83 in Bandhpali and 88 in Bhatigaon. \n\nThe main issue for review is the completeness and alignment of planning and financial records. Of the planned activities, 1,067 have no recorded cost, split almost equally between Bandhpali at 539 and Bhatigaon at 528. Sanction records cover only about one in six activities; the recorded sanctioned amount is Rs 2.96 crore, including Rs 1.62 crore in Bandhpali and Rs 1.34 crore in Bhatigaon. Spending is recorded as Rs 2.85 crore below plan, with Bandhpali accounting for 68.2% of this gap at Rs 1.94 crore, while Bhatigaon accounts for Rs 90.49 lakh. \n\nRecorded spending totals Rs 2.64 crore and is broadly balanced between Bandhpali at Rs 1.40 crore and Bhatigaon at Rs 1.24 crore. Spending linked to planned activities totals Rs 2.55 crore, again distributed between Bandhpali at Rs 1.34 crore and Bhatigaon at Rs 1.20 crore. The linked share rose from 2.7% to 53.2% across six years, indicating improved recording completeness unless cashbook spending increased alongside it. In the separate general-component theme view, spending totals Rs 2.99 crore; Theme 6—Self-sufficient Infrastructure in Village accounts for Rs 99.22 lakh, Theme 4—Water Sufficient Village for Rs 91.57 lakh, and the other five themes together for Rs 1.09 crore.",
+    "final_tagged": "In the two Barpali Gram Panchayats covered, planned activity volumes are nearly even: 1,447 activities, comprising 729 in Bandhpali and 718 in Bhatigaon. [d3-00232] The 171 ongoing activities are similarly distributed, with 83 in Bandhpali and 88 in Bhatigaon. [d3-00244]\n\nThe main issue for review is the completeness and alignment of planning and financial records. [d4-00580] [d1-09520] [d4-00584] Of the planned activities, 1,067 have no recorded cost, split almost equally between Bandhpali at 539 and Bhatigaon at 528. [d4-00580] Sanction records cover only about one in six activities; the recorded sanctioned amount is Rs 2.96 crore, including Rs 1.62 crore in Bandhpali and Rs 1.34 crore in Bhatigaon. [d1-09520] Spending is recorded as Rs 2.85 crore below plan, with Bandhpali accounting for 68.2% of this gap at Rs 1.94 crore, while Bhatigaon accounts for Rs 90.49 lakh. [d4-00584]\n\nRecorded spending totals Rs 2.64 crore and is broadly balanced between Bandhpali at Rs 1.40 crore and Bhatigaon at Rs 1.24 crore. [d4-00583] Spending linked to planned activities totals Rs 2.55 crore, again distributed between Bandhpali at Rs 1.34 crore and Bhatigaon at Rs 1.20 crore. [d2-00151] The linked share rose from 2.7% to 53.2% across six years, indicating improved recording completeness unless cashbook spending increased alongside it. [d2-00151] In the separate general-component theme view, spending totals Rs 2.99 crore; Theme 6—Self-sufficient Infrastructure in Village accounts for Rs 99.22 lakh, Theme 4—Water Sufficient Village for Rs 91.57 lakh, and the other five themes together for Rs 1.09 crore. [d1-09543]",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "In the two Barpali Gram Panchayats covered, planned activity volumes are nearly even: 1,447 activities, comprising 729 in Bandhpali and 718 in Bhatigaon. [d3-00232] The 171 ongoing activities are similarly distributed, with 83 in Bandhpali and 88 in Bhatigaon. [d3-00244]\n\nThe main issue for review is the completeness and alignment of planning and financial records. [d4-00580] [d1-09520] [d4-00584] Of the planned activities, 1,067 have no recorded cost, split almost equally between Bandhpali at 539 and Bhatigaon at 528. [d4-00580] Sanction records cover only about one in six activities; the recorded sanctioned amount is Rs 2.96 crore, including Rs 1.62 crore in Bandhpali and Rs 1.34 crore in Bhatigaon. [d1-09520] Spending is recorded as Rs 2.85 crore below plan, with Bandhpali accounting for 68.2% of this gap at Rs 1.94 crore, while Bhatigaon accounts for Rs 90.49 lakh. [d4-00584]\n\nRecorded spending totals Rs 2.64 crore and is broadly balanced between Bandhpali at Rs 1.40 crore and Bhatigaon at Rs 1.24 crore. [d4-00583] Spending linked to planned activities totals Rs 2.55 crore, again distributed between Bandhpali at Rs 1.34 crore and Bhatigaon at Rs 1.20 crore. [d2-00151] The linked share rose from 2.7% to 53.2% across six years, indicating improved recording completeness unless cashbook spending increased alongside it. [d2-00151] In the separate general-component theme view, spending totals Rs 2.99 crore; Theme 6—Self-sufficient Infrastructure in Village accounts for Rs 99.22 lakh, Theme 4—Water Sufficient Village for Rs 91.57 lakh, and the other five themes together for Rs 1.09 crore. [d1-09543]",
+      "all_pass": true,
+      "failing_steps": [],
+      "counting_failures": [],
+      "direction": {
+       "pass": true,
+       "mode": "block",
+       "counts": true,
+       "checked": 1,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     }
+    ]
+   },
+   {
+    "arm": "block",
+    "n": 11,
+    "question": "Anything I should be looking at in Ganjam?",
+    "seconds": 17.1,
+    "attempts": 2,
+    "fell_back": true,
+    "fell_back_on": [
+     "5_direction"
+    ],
+    "reason": "These sentences do not give the direction of a spending figure as the finding gives it: \"The gap is distributed across all four, led by Biswamathpur at 40.5% (Rs 7.23 crore) and Sharagada at 25.9% (Rs 4.63 crore); costless activities are led by Sharagada at 40.8% (722 activities) and Mendarajpur at 23.8% (421 activities).\". Write each figure's direction exactly as the finding gives it -- \"Rs 7.23 crore below plan\" -- not with a minus sign and not in other words.",
+    "final_text": "",
+    "final_tagged": "",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "In the 4 sampled Gram Panchayats in Ganjam, planning, sanction and payment records merit reconciliation. [d4-02688] [d4-02684] [d1-14749] [d2-00761] Recorded spending is Rs 17.85 crore below plan; this is spread across all 4 Gram Panchayats, with Biswamathpur accounting for the largest amount at Rs 7.23 crore (40.5%). [d4-02688] The plans also contain 1,768 activities without a cost, including 722 in Sharagada and 421 in Mendarajpur. [d4-02684]\n\nOnly about one in six activities has a sanction record on file. [d1-14749] Recorded sanctions total Rs 6.30 crore, while Khallikote has Rs 0 at block level. [d3-01188] Spending linked to planned activities totals Rs 5.65 crore, and the linked share rose from 2.7% to 53.2% across six years; this indicates improved recording completeness unless the cashbook total rose alongside it. [d2-00761]\n\nSharagada warrants specific review for abandoned works: it accounts for Rs 1.19 crore, or 62.1%, of the Rs 1.91 crore planned for abandoned works across the 4 Gram Panchayats. [d1-14747] This is notably concentrated relative to Sharagada’s 33.8% share of the activities covered. [d1-14747]",
+      "all_pass": false,
+      "failing_steps": [
+       "4_all_findings_cited"
+      ],
+      "counting_failures": [
+       "4_all_findings_cited"
+      ],
+      "direction": {
+       "pass": true,
+       "mode": "block",
+       "counts": true,
+       "checked": 1,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     },
+     {
+      "attempt": 2,
+      "prose": "Ganjam’s main review issue is the completeness and reconciliation of planning, sanction and spending records. Across the four sampled Gram Panchayats, spending measured against plans is Rs 17.85 crore below plan [d4-02688], while 1,768 activities were planned without a cost [d4-02684]. The gap is distributed across all four, led by Biswamathpur at 40.5% (Rs 7.23 crore) and Sharagada at 25.9% (Rs 4.63 crore) [d4-02688]; costless activities are led by Sharagada at 40.8% (722 activities) and Mendarajpur at 23.8% (421 activities) [d4-02684].\n\nOnly about one in six activities has a sanction record on file [d1-14749]. Recorded sanctions total Rs 6.30 crore [d1-14749], with Sharagada accounting for 43.5% (Rs 2.74 crore) and Biswamathpur for 29.2% (Rs 1.84 crore) [d1-14749]. At block level, the same Rs 6.30 crore comprises 56.5% (Rs 3.56 crore) in Rangeilunda, 43.5% (Rs 2.74 crore) in Sheragada and Rs 0 in Khallikote [d3-01188]. Spending linked to planned activities totals Rs 5.65 crore across the four Gram Panchayats [d2-00761]; the linked share rose from 2.7% to 53.2% over six years, which reflects improved recording completeness unless the cashbook total also rose [d2-00761].\n\nSharagada merits specific review for abandoned works: planned money on such works totals Rs 1.91 crore across the four Gram Panchayats, of which Sharagada accounts for 62.1% (Rs 1.19 crore), despite holding 33.8% of the underlying 2,723 activities [d1-14747]. Separately, spending measured against sanction is evenly spread across focus areas in 19/20 Gram Panchayats in the wider sample; Chikilli is the only exception and may warrant checking for an unusual focus-area distribution [1-01723].",
+      "all_pass": false,
+      "failing_steps": [
+       "5_direction"
+      ],
+      "counting_failures": [
+       "5_direction"
+      ],
+      "direction": {
+       "pass": false,
+       "mode": "block",
+       "counts": true,
+       "checked": 2,
+       "skipped_ambiguous": 0,
+       "failures": [
+        {
+         "sentence_index": 2,
+         "sentence": "The gap is distributed across all four, led by Biswamathpur at 40.5% (Rs 7.23 crore) and Sharagada at 25.9% (Rs 4.63 crore) [d4-02688]; costless activities are led by Sharagada at 40.8% (722 activities) and Mendarajpur at 23.8% (421 activities) [d4-02684].",
+         "rules": [
+          "R1: no 'below plan' for d4-02688"
+         ],
+         "figures": [
+          "7.23",
+          "4.63"
+         ],
+         "records": [
+          "d4-02688"
+         ],
+         "as_the_finding_gives_it": [
+          "Rs 7.23 crore below plan"
+         ]
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "arm": "block",
+    "n": 12,
+    "question": "What should I know about Cuttack?",
+    "seconds": 43.3,
+    "attempts": 2,
+    "fell_back": true,
+    "fell_back_on": [
+     "3_causal"
+    ],
+    "reason": "It used causal wording: 'because'. This analysis finds patterns and associations and cannot establish what causes what, so say how things go together rather than what produced what. Wording that works: is associated with; occurs alongside; moves together with; is concentrated in; coincides with; the same places also show; where X is high, Y tends to be high; the analysis does not establish which way this runs.",
+    "final_text": "",
+    "final_tagged": "",
+    "checks": [
+     {
+      "attempt": 1,
+      "prose": "Cuttack records 1,104 planned activities across two Gram Panchayats [d1-14417]. Activity volumes are similar—Dadhapatna has 51.2% (565 activities) and Govindapur 48.8% (539 activities) [d1-14417]—but their financial profiles differ. Govindapur accounts for 56.2% (Rs 3.00 crore) of the Rs 5.35 crore planned cost [d4-02523], while Dadhapatna accounts for 57.1% (Rs 1.24 crore) of the Rs 2.17 crore spent [d4-02525]. Overall spending is Rs 3.18 crore below plan; Govindapur accounts for 65.3% (Rs 2.07 crore) of this amount and has a spending-to-plan ratio of 30.9%, while Dadhapatna accounts for 34.7% (Rs 1.10 crore) [d3-01105]. There are also 181 ongoing activities, including 112 in Dadhapatna and 69 in Govindapur [d4-02532].\n\nThe plans are predominantly for Public Works, which account for 88.5% (977 activities), compared with 127 Beneficiary Oriented Programmes [d1-14541]. Sanitation has the largest activity count at 31.1% (343 activities), followed by Maintenance of community system at 14.7% (162 activities) [d1-14480]. Financial allocations have a different emphasis: Roads account for 28.7% (Rs 1.53 crore) of planned cost despite representing 5.9% of activities, while Drinking water accounts for 17.2% (Rs 92.11 lakh) [d1-14481]. Untied grant planning is concentrated in Theme 6—Self-sufficient Infrastructure in Village—which accounts for 84.3% (Rs 3.11 crore) of Rs 3.69 crore [d1-14462]. Tied grant planning is almost entirely divided between Drinking water at 51.8% (Rs 85.61 lakh) and Sanitation at 48.2% (Rs 79.71 lakh), with the other 23 focus areas together accounting for Rs 1,000 [d1-14482].\n\nRecord completeness warrants attention. Of the 1,104 planned activities, 57.9% (639) are costed and 42.1% (465) are costless [d1-14597]. Sanction records cover only about one in six activities; recorded sanctions total Rs 2.33 crore, led by Roads at 24.7% (Rs 57.60 lakh) and Drinking water at 22.7% (Rs 52.82 lakh) [d1-14486]. Spending linked to planned activities totals Rs 2.07 crore across six fiscal years, and the linked share rose from 2.7% to 53.2%; this rise indicates improved recording completeness unless cashbook totals increased alongside it [d2-00733]. The spending-to-plan position, costless activities, sanction coverage and linkage of payments to plans should therefore be reconciled in the next review [d3-01105] [d1-14597] [d1-14486] [d2-00733].",
+      "all_pass": false,
+      "failing_steps": [
+       "3_causal"
+      ],
+      "counting_failures": [
+       "3_causal"
+      ],
+      "direction": {
+       "pass": true,
+       "mode": "block",
+       "counts": true,
+       "checked": 1,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     },
+     {
+      "attempt": 2,
+      "prose": "Across the two sampled Gram Panchayats, Cuttack records 1,104 planned activities with a planned cost of Rs 5.35 crore and spending of Rs 2.17 crore.[d1-14417] [d4-02523] [d4-02525] Recorded spending is Rs 3.18 crore below plan, while sanction records cover about one in six activities and total Rs 2.33 crore.[d3-01105] [d1-14486] Spending linked to planned activities totals Rs 2.07 crore across 6 fiscal years; the linked share rose from 2.7% to 53.2%, which should be checked against cashbook totals because changes in linkage may reflect recording completeness.[d2-00733]\n\nActivity volumes are similar in Dadhapatna, with 565 activities, and Govindapur, with 539 activities, but their financial and implementation profiles differ.[d1-14417] Govindapur holds Rs 3.00 crore of planned cost and is Rs 2.07 crore below plan, with a spending-to-plan ratio of 30.9%.[d4-02523] [d3-01105] Dadhapatna records the higher spending at Rs 1.24 crore and more ongoing activities at 112, compared with Rs 92.85 lakh and 69 ongoing activities in Govindapur.[d4-02525] [d4-02532]\n\nFunding is concentrated in selected themes and focus areas.[d1-14462] Theme 6—Self-sufficient Infrastructure in Village—accounts for 84.3% of the Rs 3.69 crore untied grant planned, although it represents 43.6% of activities.[d1-14462] Tied grant planning is divided between Drinking water at 51.8% (Rs 85.61 lakh) and Sanitation at 48.2% (Rs 79.71 lakh), with the other 23 focus areas together receiving Rs 1,000.[d1-14482] Roads account for 28.7% of planned cost but 5.9% of activities, and also lead sanctioned amounts at 24.7% (Rs 57.60 lakh).[d1-14481] [d1-14486]\n\nThe plan is predominantly Public Works, comprising 88.5% or 977 activities.[d1-14541] Sanitation is the largest focus area by activity count at 31.1% (343 activities), while Roads is the largest by planned cost at 28.7% (Rs 1.53 crore).[d1-14480] [d1-14481] Costless entries remain substantial at 42.1% or 465 activities, making their classification—alongside the limited sanction-record coverage—a useful point for record review.[d1-14597] [d1-14486]",
+      "all_pass": false,
+      "failing_steps": [
+       "3_causal"
+      ],
+      "counting_failures": [
+       "3_causal"
+      ],
+      "direction": {
+       "pass": true,
+       "mode": "block",
+       "counts": true,
+       "checked": 1,
+       "skipped_ambiguous": 0,
+       "failures": []
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "cuttack_before_fix1": {
+  "arm": "before_fix1",
+  "n": 12,
+  "question": "What should I know about Cuttack?",
+  "seconds": 37.4,
+  "attempts": 2,
+  "fell_back": false,
+  "fell_back_on": [],
+  "reason": "",
+  "final_text": "Across the 2 sampled Gram Panchayats, Cuttack records 1,104 planned activities, planned cost of Rs 5.35 crore and spending of Rs 2.17 crore. The signed spending-against-plan measure is Rs -3.18 crore, where a negative value denotes spending below plan.\n\nPlanning and spending are distributed differently between the two Gram Panchayats. Govindapur holds 48.8% of activities and 56.2% of planned cost (Rs 3.00 crore), but 42.9% of spending (Rs 92.85 lakh). Dadhapatna holds 51.2% of activities (565 activities), 43.8% of planned cost (Rs 2.34 crore) and 57.1% of spending (Rs 1.24 crore). The spending-against-plan measure is Rs -2.07 crore for Govindapur (65.3%, with a stated ratio of 30.9%) and Rs -1.10 crore for Dadhapatna (34.7%). Of 181 ongoing activities, Dadhapatna has 112 (61.9%) and Govindapur has 69 (38.1%).\n\nThe composition of the plan differs by activity count and planned value. Sanitation leads activity volume with 343 activities (31.1%), followed by maintenance of community system with 162 (14.7%). Roads lead planned cost with Rs 1.53 crore (28.7%) despite representing 5.9% of activities, while drinking water accounts for Rs 92.11 lakh (17.2%). Untied grant planning is concentrated in Theme 6—Self-sufficient Infrastructure in Village, with Rs 3.11 crore (84.3%) and 43.6% of activities. Tied grant planning is split mainly between drinking water at Rs 85.61 lakh (51.8%) and sanitation at Rs 79.71 lakh (48.2%); the other 23 focus areas together account for Rs 1,000. Public works account for 977 activities (88.5%), compared with 127 beneficiary-oriented programmes, while 639 activities (57.9%) are costed and 465 (42.1%) are costless.\n\nSanctions and payment links merit record-level reconciliation. Sanction records cover only about one in six activities, with Rs 2.33 crore recorded as sanctioned. Roads account for Rs 57.60 lakh (24.7%) of sanctions and drinking water for Rs 52.82 lakh (22.7%). Spending linked to planned activities totals Rs 2.07 crore across 6 fiscal years, and the linked share moved from 2.7% to 53.2% across those years. This movement indicates greater recording completeness only if the cashbook total does not rise alongside it, so linked payments should be checked against cashbook records before drawing conclusions about spending.",
+  "final_tagged": "Across the 2 sampled Gram Panchayats [d1-14417], Cuttack records 1,104 planned activities [d1-14417], planned cost of Rs 5.35 crore [d4-02523] and spending of Rs 2.17 crore [d4-02525]. The signed spending-against-plan measure is Rs -3.18 crore, where a negative value denotes spending below plan [d3-01105].\n\nPlanning and spending are distributed differently between the two Gram Panchayats [d4-02523] [d4-02525]. Govindapur holds 48.8% of activities [d1-14417] and 56.2% of planned cost (Rs 3.00 crore) [d4-02523], but 42.9% of spending (Rs 92.85 lakh) [d4-02525]. Dadhapatna holds 51.2% of activities (565 activities) [d1-14417], 43.8% of planned cost (Rs 2.34 crore) [d4-02523] and 57.1% of spending (Rs 1.24 crore) [d4-02525]. The spending-against-plan measure is Rs -2.07 crore for Govindapur (65.3%, with a stated ratio of 30.9%) and Rs -1.10 crore for Dadhapatna (34.7%) [d3-01105]. Of 181 ongoing activities [d4-02532], Dadhapatna has 112 (61.9%) and Govindapur has 69 (38.1%) [d4-02532].\n\nThe composition of the plan differs by activity count and planned value [d1-14480] [d1-14481]. Sanitation leads activity volume with 343 activities (31.1%), followed by maintenance of community system with 162 (14.7%) [d1-14480]. Roads lead planned cost with Rs 1.53 crore (28.7%) despite representing 5.9% of activities, while drinking water accounts for Rs 92.11 lakh (17.2%) [d1-14481]. Untied grant planning is concentrated in Theme 6—Self-sufficient Infrastructure in Village, with Rs 3.11 crore (84.3%) and 43.6% of activities [d1-14462]. Tied grant planning is split mainly between drinking water at Rs 85.61 lakh (51.8%) and sanitation at Rs 79.71 lakh (48.2%); the other 23 focus areas together account for Rs 1,000 [d1-14482]. Public works account for 977 activities (88.5%), compared with 127 beneficiary-oriented programmes [d1-14541], while 639 activities (57.9%) are costed and 465 (42.1%) are costless [d1-14597].\n\nSanctions and payment links merit record-level reconciliation [d1-14486] [d2-00733]. Sanction records cover only about one in six activities, with Rs 2.33 crore recorded as sanctioned [d1-14486]. Roads account for Rs 57.60 lakh (24.7%) of sanctions and drinking water for Rs 52.82 lakh (22.7%) [d1-14486]. Spending linked to planned activities totals Rs 2.07 crore across 6 fiscal years [d2-00733], and the linked share moved from 2.7% to 53.2% across those years [d2-00733]. This movement indicates greater recording completeness only if the cashbook total does not rise alongside it, so linked payments should be checked against cashbook records before drawing conclusions about spending [d2-00733].",
+  "checks": [
+   {
+    "attempt": 1,
+    "prose": "In the two Cuttack Gram Panchayats in the sample, 1,104 planned activities are broadly balanced: Dadhapatna has 51.2% (565 activities) and Govindapur 48.8% (539 activities). [d1-14417] Planned cost totals Rs 5.35 crore, led by Govindapur at 56.2% (Rs 3.00 crore), while recorded spending totals Rs 2.17 crore and is led by Dadhapatna at 57.1% (Rs 1.24 crore). [d4-02523] [d4-02525] The signed spending-against-plan measure is Rs -3.18 crore, indicating spending below plan; Govindapur accounts for 65.3% (Rs -2.07 crore), compared with Dadhapatna’s 34.7% (Rs -1.10 crore), and Govindapur’s measure is 30.9% when expressed as a ratio. [d3-01105] Of 181 ongoing activities, Dadhapatna has 61.9% (112 activities) and Govindapur 38.1% (69 activities). [d4-02532] These differing distributions merit Gram-Panchayat-wise reconciliation of plans, spending and ongoing works. [d4-02523] [d4-02525] [d3-01105] [d4-02532]\n\nThe portfolio is predominantly Public Works, accounting for 88.5% (977 activities), while Beneficiary Oriented Programmes account for 127 activities. [d1-14541] Only 57.9% (639 activities) are costed, while 42.1% (465 activities) are costless. [d1-14597] Sanitation leads by activity count at 31.1% (343 activities), but Roads leads planned cost at 28.7% (Rs 1.53 crore), followed by Drinking water at 17.2% (Rs 92.11 lakh). [d1-14480] [d1-14481] Untied grant planning is concentrated in Theme 6 – Self-sufficient Infrastructure in Village, which accounts for 84.3% (Rs 3.11 crore) of Rs 3.69 crore. [d1-14462] Tied grant planning totals Rs 1.65 crore and is almost entirely under Drinking water at 51.8% (Rs 85.61 lakh) and Sanitation at 48.2% (Rs 79.71 lakh), with the other focus areas together accounting for Rs 1,000. [d1-14482]\n\nSanctioned amount totals Rs 2.33 crore, led by Roads at 24.7% (Rs 57.60 lakh) and Drinking water at 22.7% (Rs 52.82 lakh), but this view covers only activities with a sanction record on file—about one in six. [d1-14486] Sanction patterns should therefore be reviewed alongside the missing or unmatched sanction records rather than treated as covering the full plan. [d1-14486] Spending linked to planned activities totals Rs 2.07 crore across 6 fiscal years, and the linked share rose from 2.7% to 53.2%; this movement reflects recording completeness unless the cashbook total also rose. [d2-00733] Cashbook totals and plan-payment linkages should be reconciled before interpreting the year-wise trend as a change in spending. [d2-00733]",
+    "all_pass": false,
+    "failing_steps": [
+     "3_causal"
+    ],
+    "counting_failures": [
+     "3_causal"
+    ],
+    "direction": null
+   },
+   {
+    "attempt": 2,
+    "prose": "Across the 2 sampled Gram Panchayats [d1-14417], Cuttack records 1,104 planned activities [d1-14417], planned cost of Rs 5.35 crore [d4-02523] and spending of Rs 2.17 crore [d4-02525]. The signed spending-against-plan measure is Rs -3.18 crore, where a negative value denotes spending below plan [d3-01105].\n\nPlanning and spending are distributed differently between the two Gram Panchayats [d4-02523] [d4-02525]. Govindapur holds 48.8% of activities [d1-14417] and 56.2% of planned cost (Rs 3.00 crore) [d4-02523], but 42.9% of spending (Rs 92.85 lakh) [d4-02525]. Dadhapatna holds 51.2% of activities (565 activities) [d1-14417], 43.8% of planned cost (Rs 2.34 crore) [d4-02523] and 57.1% of spending (Rs 1.24 crore) [d4-02525]. The spending-against-plan measure is Rs -2.07 crore for Govindapur (65.3%, with a stated ratio of 30.9%) and Rs -1.10 crore for Dadhapatna (34.7%) [d3-01105]. Of 181 ongoing activities [d4-02532], Dadhapatna has 112 (61.9%) and Govindapur has 69 (38.1%) [d4-02532].\n\nThe composition of the plan differs by activity count and planned value [d1-14480] [d1-14481]. Sanitation leads activity volume with 343 activities (31.1%), followed by maintenance of community system with 162 (14.7%) [d1-14480]. Roads lead planned cost with Rs 1.53 crore (28.7%) despite representing 5.9% of activities, while drinking water accounts for Rs 92.11 lakh (17.2%) [d1-14481]. Untied grant planning is concentrated in Theme 6—Self-sufficient Infrastructure in Village, with Rs 3.11 crore (84.3%) and 43.6% of activities [d1-14462]. Tied grant planning is split mainly between drinking water at Rs 85.61 lakh (51.8%) and sanitation at Rs 79.71 lakh (48.2%); the other 23 focus areas together account for Rs 1,000 [d1-14482]. Public works account for 977 activities (88.5%), compared with 127 beneficiary-oriented programmes [d1-14541], while 639 activities (57.9%) are costed and 465 (42.1%) are costless [d1-14597].\n\nSanctions and payment links merit record-level reconciliation [d1-14486] [d2-00733]. Sanction records cover only about one in six activities, with Rs 2.33 crore recorded as sanctioned [d1-14486]. Roads account for Rs 57.60 lakh (24.7%) of sanctions and drinking water for Rs 52.82 lakh (22.7%) [d1-14486]. Spending linked to planned activities totals Rs 2.07 crore across 6 fiscal years [d2-00733], and the linked share moved from 2.7% to 53.2% across those years [d2-00733]. This movement indicates greater recording completeness only if the cashbook total does not rise alongside it, so linked payments should be checked against cashbook records before drawing conclusions about spending [d2-00733].",
+    "all_pass": true,
+    "failing_steps": [],
+    "counting_failures": [],
+    "direction": null
+   }
+  ]
+ },
+ "calls": {
+  "n": 54,
+  "by_purpose": {
+   "judge": 12,
+   "write": 42
+  },
+  "usd": 2.3167,
+  "query_embeddings": 12,
+  "log": [
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "judge",
+    "turn_id": "dir-judge-7",
+    "attempt": 1,
+    "seconds": 14.2,
+    "prompt_tokens": 14900,
+    "completion_tokens": 1099,
+    "usd": 0.08158
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "judge",
+    "turn_id": "dir-judge-3",
+    "attempt": 1,
+    "seconds": 15.7,
+    "prompt_tokens": 14803,
+    "completion_tokens": 1299,
+    "usd": 0.08519
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "judge",
+    "turn_id": "dir-judge-5",
+    "attempt": 1,
+    "seconds": 8.2,
+    "prompt_tokens": 15314,
+    "completion_tokens": 303,
+    "usd": 0.06732
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "judge",
+    "turn_id": "dir-judge-4",
+    "attempt": 1,
+    "seconds": 16.5,
+    "prompt_tokens": 14829,
+    "completion_tokens": 1090,
+    "usd": 0.08112
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "judge",
+    "turn_id": "dir-judge-8",
+    "attempt": 1,
+    "seconds": 67.1,
+    "prompt_tokens": 15202,
+    "completion_tokens": 3012,
+    "usd": 0.12105
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "judge",
+    "turn_id": "dir-judge-6",
+    "attempt": 1,
+    "seconds": 20.9,
+    "prompt_tokens": 15177,
+    "completion_tokens": 1943,
+    "usd": 0.09957
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "judge",
+    "turn_id": "dir-judge-11",
+    "attempt": 1,
+    "seconds": 11.5,
+    "prompt_tokens": 12552,
+    "completion_tokens": 615,
+    "usd": 0.06251
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "judge",
+    "turn_id": "dir-judge-10",
+    "attempt": 1,
+    "seconds": 14.8,
+    "prompt_tokens": 12168,
+    "completion_tokens": 1123,
+    "usd": 0.07113
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "judge",
+    "turn_id": "dir-judge-2",
+    "attempt": 1,
+    "seconds": 35.6,
+    "prompt_tokens": 13967,
+    "completion_tokens": 1504,
+    "usd": 0.08595
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "judge",
+    "turn_id": "dir-judge-12",
+    "attempt": 1,
+    "seconds": 21.2,
+    "prompt_tokens": 14531,
+    "completion_tokens": 1888,
+    "usd": 0.09588
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "judge",
+    "turn_id": "dir-judge-9",
+    "attempt": 1,
+    "seconds": 17.1,
+    "prompt_tokens": 14281,
+    "completion_tokens": 1366,
+    "usd": 0.08444
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "judge",
+    "turn_id": "dir-judge-1",
+    "attempt": 1,
+    "seconds": 21.8,
+    "prompt_tokens": 14361,
+    "completion_tokens": 910,
+    "usd": 0.07564
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-log-1",
+    "attempt": 1,
+    "seconds": 8.4,
+    "prompt_tokens": 1184,
+    "completion_tokens": 907,
+    "usd": 0.02288
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-log-2",
+    "attempt": 1,
+    "seconds": 17.5,
+    "prompt_tokens": 1206,
+    "completion_tokens": 1875,
+    "usd": 0.04232
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-log-3",
+    "attempt": 1,
+    "seconds": 13.7,
+    "prompt_tokens": 1759,
+    "completion_tokens": 1520,
+    "usd": 0.03744
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-log-4",
+    "attempt": 1,
+    "seconds": 12.5,
+    "prompt_tokens": 948,
+    "completion_tokens": 1205,
+    "usd": 0.02789
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-log-5",
+    "attempt": 1,
+    "seconds": 13.2,
+    "prompt_tokens": 564,
+    "completion_tokens": 517,
+    "usd": 0.0126
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-log-6",
+    "attempt": 1,
+    "seconds": 14.3,
+    "prompt_tokens": 1356,
+    "completion_tokens": 1509,
+    "usd": 0.0356
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-log-7",
+    "attempt": 1,
+    "seconds": 6.9,
+    "prompt_tokens": 503,
+    "completion_tokens": 651,
+    "usd": 0.01503
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-log-8",
+    "attempt": 1,
+    "seconds": 10.3,
+    "prompt_tokens": 2445,
+    "completion_tokens": 1091,
+    "usd": 0.0316
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-log-9",
+    "attempt": 1,
+    "seconds": 14.9,
+    "prompt_tokens": 1469,
+    "completion_tokens": 1579,
+    "usd": 0.03746
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-log-10",
+    "attempt": 1,
+    "seconds": 14.3,
+    "prompt_tokens": 1576,
+    "completion_tokens": 1515,
+    "usd": 0.0366
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-log-11",
+    "attempt": 1,
+    "seconds": 9.8,
+    "prompt_tokens": 1464,
+    "completion_tokens": 1020,
+    "usd": 0.02626
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-log-12",
+    "attempt": 1,
+    "seconds": 21.5,
+    "prompt_tokens": 2136,
+    "completion_tokens": 1015,
+    "usd": 0.02884
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-log-7",
+    "attempt": 2,
+    "seconds": 12.8,
+    "prompt_tokens": 603,
+    "completion_tokens": 485,
+    "usd": 0.01211
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-log-11",
+    "attempt": 2,
+    "seconds": 16.1,
+    "prompt_tokens": 1567,
+    "completion_tokens": 1723,
+    "usd": 0.04073
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-log-4",
+    "attempt": 2,
+    "seconds": 7.6,
+    "prompt_tokens": 1050,
+    "completion_tokens": 753,
+    "usd": 0.01926
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-log-3",
+    "attempt": 2,
+    "seconds": 14.3,
+    "prompt_tokens": 1857,
+    "completion_tokens": 1570,
+    "usd": 0.03883
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-log-10",
+    "attempt": 2,
+    "seconds": 9.6,
+    "prompt_tokens": 1675,
+    "completion_tokens": 1013,
+    "usd": 0.02696
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-log-9",
+    "attempt": 2,
+    "seconds": 16.0,
+    "prompt_tokens": 1568,
+    "completion_tokens": 1610,
+    "usd": 0.03847
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-log-2",
+    "attempt": 2,
+    "seconds": 9.8,
+    "prompt_tokens": 1305,
+    "completion_tokens": 1088,
+    "usd": 0.02698
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-block-1",
+    "attempt": 1,
+    "seconds": 21.2,
+    "prompt_tokens": 1184,
+    "completion_tokens": 967,
+    "usd": 0.02408
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-block-2",
+    "attempt": 1,
+    "seconds": 12.2,
+    "prompt_tokens": 1206,
+    "completion_tokens": 1336,
+    "usd": 0.03154
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-block-3",
+    "attempt": 1,
+    "seconds": 15.4,
+    "prompt_tokens": 1759,
+    "completion_tokens": 1693,
+    "usd": 0.0409
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-block-4",
+    "attempt": 1,
+    "seconds": 9.7,
+    "prompt_tokens": 948,
+    "completion_tokens": 978,
+    "usd": 0.02335
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-block-5",
+    "attempt": 1,
+    "seconds": 5.8,
+    "prompt_tokens": 564,
+    "completion_tokens": 473,
+    "usd": 0.01172
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-block-6",
+    "attempt": 1,
+    "seconds": 24.0,
+    "prompt_tokens": 1356,
+    "completion_tokens": 1056,
+    "usd": 0.02654
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-block-7",
+    "attempt": 1,
+    "seconds": 4.5,
+    "prompt_tokens": 503,
+    "completion_tokens": 406,
+    "usd": 0.01013
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-block-8",
+    "attempt": 1,
+    "seconds": 18.2,
+    "prompt_tokens": 2445,
+    "completion_tokens": 2152,
+    "usd": 0.05282
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-block-9",
+    "attempt": 1,
+    "seconds": 19.3,
+    "prompt_tokens": 1469,
+    "completion_tokens": 2028,
+    "usd": 0.04644
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-block-10",
+    "attempt": 1,
+    "seconds": 9.4,
+    "prompt_tokens": 1576,
+    "completion_tokens": 931,
+    "usd": 0.02492
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-block-11",
+    "attempt": 1,
+    "seconds": 8.4,
+    "prompt_tokens": 1464,
+    "completion_tokens": 848,
+    "usd": 0.02282
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-block-12",
+    "attempt": 1,
+    "seconds": 28.4,
+    "prompt_tokens": 2136,
+    "completion_tokens": 1228,
+    "usd": 0.0331
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-block-5",
+    "attempt": 2,
+    "seconds": 2.7,
+    "prompt_tokens": 666,
+    "completion_tokens": 152,
+    "usd": 0.0057
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-block-11",
+    "attempt": 2,
+    "seconds": 8.8,
+    "prompt_tokens": 1501,
+    "completion_tokens": 943,
+    "usd": 0.02486
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-block-4",
+    "attempt": 2,
+    "seconds": 8.8,
+    "prompt_tokens": 1047,
+    "completion_tokens": 872,
+    "usd": 0.02163
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-block-2",
+    "attempt": 2,
+    "seconds": 9.6,
+    "prompt_tokens": 1305,
+    "completion_tokens": 994,
+    "usd": 0.0251
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-block-3",
+    "attempt": 2,
+    "seconds": 16.3,
+    "prompt_tokens": 1959,
+    "completion_tokens": 1778,
+    "usd": 0.0434
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-block-8",
+    "attempt": 2,
+    "seconds": 22.4,
+    "prompt_tokens": 2815,
+    "completion_tokens": 2354,
+    "usd": 0.05834
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-block-9",
+    "attempt": 2,
+    "seconds": 21.8,
+    "prompt_tokens": 1671,
+    "completion_tokens": 2336,
+    "usd": 0.0534
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-block-1",
+    "attempt": 2,
+    "seconds": 9.8,
+    "prompt_tokens": 1338,
+    "completion_tokens": 946,
+    "usd": 0.02427
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-block-12",
+    "attempt": 2,
+    "seconds": 14.9,
+    "prompt_tokens": 2235,
+    "completion_tokens": 1645,
+    "usd": 0.04184
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-off-12",
+    "attempt": 1,
+    "seconds": 20.4,
+    "prompt_tokens": 2151,
+    "completion_tokens": 2305,
+    "usd": 0.0547
+   },
+   {
+    "model": "gpt-5.6-sol",
+    "purpose": "write",
+    "turn_id": "dir-off-12",
+    "attempt": 2,
+    "seconds": 17.0,
+    "prompt_tokens": 2250,
+    "completion_tokens": 1845,
+    "usd": 0.0459
+   }
+  ]
+ }
+}

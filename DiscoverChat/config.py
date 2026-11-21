@@ -333,7 +333,12 @@ CONSOLIDATE_MIN_FINDINGS = int(os.getenv("DISCOVERCHAT_CONSOLIDATE_MIN", "1"))
 #          sentences -- the existing failure process, unchanged
 #   log    recorded in the check results, does not count, not fed back
 #   off    the step is not run and not reported
-# The default is set by the WP-D13 T3 live trial (handoffs/WPD13_REPORT.md).
+# The default was set by the WP-D13 T3 live trial (handoffs/WPD13_REPORT.md):
+# LOG. Under block, 2 of 12 answers fell back on false alarms -- correct
+# sentences that itemised "the gap" without repeating "below plan" -- against a
+# limit of 1. Every direction failure measured was R1 of that kind; no minus
+# sign and no "above plan" was written in 46 attempts. A looser R1 waits on
+# the PM's ruling.
 DIRECTION_CHECK = os.getenv("DISCOVERCHAT_DIRECTION_CHECK", "log").strip().lower()
 if DIRECTION_CHECK not in ("block", "log", "off"):
     raise ValueError(f"DISCOVERCHAT_DIRECTION_CHECK={DIRECTION_CHECK!r}: "
