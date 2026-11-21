@@ -51,9 +51,18 @@ class Finding:
         what the labelling sheet and every audit trail compare against. What
         reaches an answer is this. The substitution is a dictionary and a
         regular expression -- no model, and no figure altered.
+
+        WP-D13 Fix 1 (D63): on a decomposition of a signed measure, a negative
+        money figure then states its direction in words ("Rs 51.96 crore below
+        plan") and, when every figure is negative, the sign-convention sentence
+        is dropped. Every other record's display sentence is unchanged.
         """
         from . import glossary
-        return glossary.render(self.sentence, self.view)
+        shown = glossary.render(self.sentence, self.view)
+        if self.is_decomposition:
+            shown = glossary.direction_in_words(
+                shown, self.data.get("measure", ""), self.data.get("signs", ""))
+        return shown
 
     def coverage_line(self) -> str:
         """How this record stood in the analysis — stated, never implied.

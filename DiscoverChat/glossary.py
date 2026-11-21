@@ -14,11 +14,23 @@ DETERMINISTIC. A dictionary and a regular expression. No model is involved at
 any point in this path, so a rendered sentence is a pure function of the corpus
 record and cannot drift between two runs.
 
-NOT A REWRITE. Only whole-token column names are substituted. Every figure,
-every place name, every clause and the order of them all survive untouched --
-`findings-verbatim` in the gate still passes because the comparison it makes is
-against the same translation, and `numerals-traceable` still passes because no
-substitution here can add, remove or reformat a digit.
+TWO SUBSTITUTIONS, NEITHER TOUCHING A DIGIT. Every figure, every place name,
+every clause and the order of them all survive untouched -- `findings-verbatim`
+in the gate still passes because the comparison it makes is against the same
+translation, and `numerals-traceable` still passes because no substitution here
+can add, remove or reformat a digit.
+
+  1. Whole-token column names become officer phrases (`render`, D6.1).
+  2. On the two SIGNED measures only (`overspend_vs_plan`,
+     `overspend_vs_sanction`), a negative money figure states its direction in
+     words: "Rs -3.18 crore" becomes "Rs 3.18 crore below plan" (`signed_money`,
+     WP-D13 Fix 1, D63). The minus sign goes, the stored "below" words from
+     `phase5f_decompose._SIGNED_DIRECTION` are appended, the digits stay. And
+     where every figure in a decomposition is negative, the sentence explaining
+     the sign convention is dropped, because each figure now says its own
+     direction (`direction_in_words`). This is a rewrite of WORDING, at display
+     time only: the stored sentence, its embedding and the corpus files are
+     unchanged.
 
 ONE SOURCE FOR THE VOCABULARY (D6.1, "do not fork the dicts")
 -------------------------------------------------------------
@@ -43,7 +55,7 @@ import re
 from . import config                                   # noqa: F401  (sys.path)
 from phase5d_retrieval_corpus import display_name, _DISPLAY   # noqa: E402
 from phase5f_decompose import (                        # noqa: E402
-    measure_phrase, dimension_plural, _MEASURE_PHRASE,
+    measure_phrase, dimension_plural, _MEASURE_PHRASE, _SIGNED_DIRECTION,
 )
 from phase2_engine import VIEW1_CONFIG, VIEW4_CONFIG   # noqa: E402
 from phase4a_engine import VIEW2_CONFIG, VIEW3_CONFIG  # noqa: E402
@@ -194,4 +206,94 @@ def gaps() -> list:
         for col in _measures(view) + _dimensions(view):
             if not _phrase(view, col):
                 out.append({"view": view, "column": col})
+    return out
+
+
+# =============================================================================
+# WP-D13 Fix 1 (D63) -- the direction of a signed figure, in words
+# =============================================================================
+# THE PROBLEM. The two signed measures store their figures with a sign: "Rs
+# -51.96 crore" is spending Rs 51.96 crore BELOW plan. The stored sentence says
+# so once, in a separate sentence ("This measure is signed: ..."), and leaves
+# the reader -- and the writer model -- to apply that rule to every figure. The
+# writer then repeats "Rs -51.96 crore" or "the signed measure", and an officer
+# reads a minus sign in front of a rupee amount.
+#
+# THE FIX IS IN WHAT THE WRITER IS HANDED, NOT WHAT IT IS TOLD (D62 ruling 7).
+# Every negative money figure carries its direction in the same words the
+# builder already uses for the measure. The digits are untouched, so the
+# citation check -- which compares digit tokens against the STORED sentence --
+# sees exactly what it saw before.
+#
+# The three shapes are the only ones the corpus holds (measured 2026-11-21 over
+# all 5,717 signed decompositions: 18,984 tokens, no other shape): "Rs -N",
+# "Rs -N lakh", "Rs -N crore". The digit group is `_NUM`'s own shape in
+# `checks`, so a figure is one token in both places.
+
+_NEG_MONEY = re.compile(r"Rs -(\d+(?:[.,]\d+)*)( lakh| crore)?(?![A-Za-z0-9])")
+
+
+def signed_below(measure: str) -> str | None:
+    """'below plan' / 'below sanction' for a signed measure, else None."""
+    words = _SIGNED_DIRECTION.get(measure)
+    return words[1] if words else None
+
+
+def signed_above(measure: str) -> str | None:
+    """'above plan' / 'above sanction' for a signed measure, else None."""
+    words = _SIGNED_DIRECTION.get(measure)
+    return words[0] if words else None
+
+
+def signed_money(text: str, measure: str) -> str:
+    """Every "Rs -N[ lakh| crore]" in `text` as "Rs N[ lakh| crore] below plan".
+
+    Works on a whole sentence or on one bare formatted value
+    ("Rs -51.96 crore" -> "Rs 51.96 crore below plan"), so WP-D12's cards and
+    charts produce the same words from the same function. A measure that is not
+    signed returns `text` unchanged; so does text with no negative figure.
+    """
+    below = signed_below(measure)
+    if not below or not text:
+        return text
+    return _NEG_MONEY.sub(
+        lambda m: f"Rs {m.group(1)}{m.group(2) or ''} {below}", text)
+
+
+def signed_note(measure: str) -> str | None:
+    """The sign-convention sentence the decomposition builder writes for a
+    signed measure, rebuilt from the same `_SIGNED_DIRECTION` words.
+
+    The builder (`phase5f_decompose.build_sentence`) does not export the
+    sentence as a constant, so its frame is restated here. The corpus sweep in
+    `tests/test_direction.py` and the gate check `signed-direction-in-words`
+    assert it is found, verbatim, in every one of the 5,717 signed records -- a
+    change to the builder's wording fails there, loudly, rather than leaving the
+    sentence silently in place.
+    """
+    words = _SIGNED_DIRECTION.get(measure)
+    if not words:
+        return None
+    above, below = words
+    return (f"This measure is signed: a positive figure is spending {above} "
+            f"and a negative figure is spending {below}.")
+
+
+def direction_in_words(text: str, measure: str, signs: str) -> str:
+    """A signed decomposition's display sentence with each figure's direction
+    stated in words.
+
+    1. Every negative money figure -> "Rs N ... below plan" (`signed_money`).
+    2. The sign-convention sentence is REMOVED only when `signs ==
+       "all_negative"`: every figure then states its own direction and the
+       rule has nothing left to explain. For `mixed` and `all_positive` it is
+       KEPT unchanged -- there it is still what tells the reader how to read an
+       unmarked figure ("1 of them add Rs 1.73 lakh").
+    """
+    if measure not in _SIGNED_DIRECTION or not text:
+        return text
+    out = signed_money(text, measure)
+    if signs == "all_negative":
+        note = signed_note(measure)
+        out = out.replace(" " + note, "").replace(note + " ", "").replace(note, "")
     return out
