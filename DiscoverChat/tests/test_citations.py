@@ -208,12 +208,16 @@ class HoverRenderTests(unittest.TestCase):
 
 class WriterPromptTests(unittest.TestCase):
     def test_the_prompt_is_the_operators_text(self):
+        # The test follows the operator's file, never the reverse (WP-D13 Fix
+        # 1b T4): the operator's own edit (committed in cc72e71) replaced
+        # "Do not make causal claims ever ..." with the sentence below.
         prompt = context_brief.CONSOLIDATING_WRITER_PROMPT
         for line in ("Turn the analytical findings below into clear, concise "
                      "prose",
                      "consolidate them into a small number of underlying "
                      "patterns",
-                     "Do not make causal claims ever",
+                     "It is very important that you do not make causal claims "
+                     "- none of our data can be used to determine causality.",
                      "tag the finding it comes from with its id in square "
                      "brackets",
                      "Do not compute new numbers",

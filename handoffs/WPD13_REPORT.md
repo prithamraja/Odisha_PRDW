@@ -1,8 +1,10 @@
 # WP-D13 report — Insight report fixes
 
-**For:** the PM and the operator. **Executed:** 2026-11-21, mirror `C:\dev\odisha-d13`.
-One section per fix. Only Fix 1 was READY; Fix 2 moved to its own brief
+**For:** the PM and the operator. **Executed:** Fix 1 on 2026-11-21; Fix 1b
+and Fix 6 on 2026-11-22. Mirror `C:\dev\odisha-d13` (refreshed from HEAD
+`925511e` on 2026-11-22). One section per fix. Fix 2 moved to its own brief
 (`handoffs/WPD13b_headline_trial.md`, reported in `handoffs/WPD13b_REPORT.md`).
+Fix 7 is reported in `handoffs/WPD12_REPORT.md`.
 
 ---
 
@@ -325,3 +327,146 @@ and costs are in `direction_trial_results.json` → `calls.log`.
 - §1.4 test 2 expects the raw-minus sentence to fail on R2. It does, and it
   also fails R1 because it has no "below" words. The test asserts R2 is among
   the reasons.
+
+---
+
+# Fix 1b — A direction rule that fits how the writer writes
+
+## Outcome in one paragraph
+
+Built and green, with no model call. R1 ("below plan" must be in every
+sentence that carries a figure) is gone. In its place R1′ fails a sentence
+only if it uses one of the operator's wrong-direction words ("exceeded",
+"overspent", "surplus", "more than the plan", …). Replayed over all 77
+recorded attempts of the two WP-D13 trials, the step now **fails no correct
+sentence**: 0 failures in 203 checked sentences. All 43 of Fix 1's false
+alarms pass. So, by the brief's rule, **the direction check now ships as
+`block`**. The one old test failure is fixed, so the suite has no failures.
+
+## 1. Commits (current branch `master`, not pushed)
+
+| Commit | Task |
+|---|---|
+| `17b2327` | T1: R1′ in place of R1; the retry reason names the offending word |
+| `49302fd` | T2: tests (five sentences, each word family, the 43, the replay) |
+| `f6b5107` | T3: default `block` (`config.py`, only the direction-check lines) |
+| T4 commit | T4: the old prompt test follows the operator's text; this section |
+
+## 2. Gate and tests, baseline vs final
+
+| | Baseline (HEAD `925511e`) | Final |
+|---|---|---|
+| `python -m DiscoverChat.gates` | 36/36 green | **36/36 green** |
+| `python -m pytest DiscoverChat/tests -q` | 150 passed, 1 failed | **157 passed, 0 failed** |
+
+No gate change was needed. The seeded reversed-direction case in
+`citation-checks-fire` ("…Rs 51.96 crore above plan") is still caught (now on
+R3 alone), and its reason still contains "below plan".
+
+## 3. T1 — the rule as built
+
+- **R1′.** `checks.OPPOSITE_DIRECTION_WORDS` is the one list. It sits beside
+  step 5 and is matched as whole words, ignoring case: exceed, exceeds,
+  exceeded, exceeding; overspend, overspent, overspending; overshoot,
+  overshoots, overshooting, overshot; overrun, overran; surplus; in excess;
+  over [the] plan, over [the] sanction; more / higher / greater than [the]
+  plan or sanction. I read "overshoot…" as its four forms. Every other entry is
+  exactly the approved word, so "overruns", "overspends" and "excess" on its
+  own are **not** on the list.
+- **R2 and R3 are unchanged.** R1 is removed. A sentence that cites a signed
+  record with only shares or counts is still not checked.
+- **The retry reason** quotes each failing sentence, names what is wrong in
+  it, and gives the figure as the finding has it. For example: *These
+  sentences describe a spending figure in a way that says the opposite of the
+  finding: "Spending exceeded the plan by Rs 51.96 crore." (it uses
+  "exceeded"). The finding gives the figure as "Rs 51.96 crore below plan".
+  Write its direction that way -- not with a minus sign, and not with a word
+  that says the opposite.*
+
+**The five sentences of §1.1, now (block):**
+
+| Prose | `all_pass` | Failed on |
+|---|---|---|
+| "…totals Rs -51.96 crore" | False | R2 |
+| "…Rs 51.96 crore below plan" | **True** | — |
+| "…Rs 51.96 crore above plan" | False | R3 |
+| "Spending exceeded the plan by Rs 51.96 crore" | False | R1′ ("exceeded") |
+| "…Rs 61.96 crore below plan" | False | step 2 |
+
+## 4. T2 — tests (`test_direction.py`)
+
+- The five sentences above. "Above plan" now fails on R3 only, and "exceeded"
+  on R1′ only.
+- **The 43 sentences of §5 above**, read from the recorded trial file
+  (`direction_trial_results.json`, every recorded R1 failure). Each is still
+  checked, and each passes. The test also asserts there are exactly 43.
+- **Each word family fails once.** There are eight sentences, one per family,
+  each true in its figure and wrong in its words. Each fails R1′ alone, and its
+  word appears in the reason. Every listed form matches. Near-misses do not
+  match: "exceedingly", "overrunning", "higher than the planned cost", "below
+  plan", "shortfall".
+- A share-only sentence is still not checked, even when it uses "exceed".
+- Fix 1's "a follow-on sentence without below words fails" test is reversed.
+  Such a sentence now passes. A follow-on sentence with "surplus" fails, and
+  the reason names it.
+- **The T3 replay is also a test**, so the result is kept: all 77 attempts
+  pass step 5, and the two pre-Fix-1 Cuttack attempts fail on R2 only.
+
+## 5. T3 — offline replay, no model calls
+
+Step 5 in `block` was run over every recorded attempt. I used the same
+sentence split and bindings as production. For the headline trial I first
+stripped the markers, as that trial's own check did.
+
+| Source | Attempts | Sentences | Checked by step 5 | R1′ | R2 | R3 |
+|---|---|---|---|---|---|---|
+| Direction trial (log + block arms) | 40 | 317 | 138 | 0 | 0 | 0 |
+| Headline trial (baseline + headline arms) | 37 | 295 | 65 | 0 | 0 | 0 |
+| **Total, written on today's display sentences** | **77** | **612** | **203** | **0** | **0** | **0** |
+| Direction trial, Cuttack on the **pre-Fix-1** sentences | 2 | 32 | 3 | 0 | 3 | 0 |
+
+No figure was skipped as ambiguous. (The brief counts 697 sentences. My 612
+is the step's own split, which moves a leading tag back onto the sentence
+before it. I could not reproduce 697 with any split I tried.)
+
+**Every failure, verbatim.** All three are **true catches**: each shows a
+minus sign. They come from the two Cuttack attempts written on the old
+display sentences ("Rs -3.18 crore"), which production no longer hands the
+writer.
+
+1. Cuttack before Fix 1, attempt 1 — R2. The finding gives: Rs 3.18 crore below plan.
+   > The signed spending-against-plan measure is Rs -3.18 crore, indicating spending below plan; Govindapur accounts for 65.3% (Rs -2.07 crore), compared with Dadhapatna’s 34.7% (Rs -1.10 crore), and Govindapur’s measure is 30.9% when expressed as a ratio. [d3-01105]
+2. Cuttack before Fix 1, attempt 2 — R2. The finding gives: Rs 3.18 crore below plan.
+   > The signed spending-against-plan measure is Rs -3.18 crore, where a negative value denotes spending below plan [d3-01105].
+3. Cuttack before Fix 1, attempt 2 — R2. The finding gives: Rs 2.07 crore below plan.
+   > The spending-against-plan measure is Rs -2.07 crore for Govindapur (65.3%, with a stated ratio of 30.9%) and Rs -1.10 crore for Dadhapatna (34.7%) [d3-01105].
+
+**Default shipped: `block`.** No failure fell on a correct sentence.
+Reversal without a code change: `DISCOVERCHAT_DIRECTION_CHECK=log`.
+
+## 6. T4 — the one old test failure
+
+`test_citations.py::WriterPromptTests::test_the_prompt_is_the_operators_text`
+now looks for the operator's current line in `context_brief.py`: "It is very
+important that you do not make causal claims - none of our data can be used
+to determine causality." That line came in with commit `cc72e71`. The
+operator's file was not touched.
+
+## 7. Things worth knowing
+
+- **R1′ has no "positive figure" exception, while R3 has one.** I built it as
+  written. The cost is that a true sentence about a mixed-sign record fails if
+  it uses a list word for the positive part. For example: "One focus area
+  exceeded its sanction by Rs 1.73 lakh, while Sanitation was Rs 1.33 crore
+  below sanction". The same sentence with "above sanction" passes R3. This
+  touches only the 281 mixed records, and no recorded sentence did it. If the
+  PM wants R3's exception on R1′, it is a one-line change.
+- **The writer now gets direction feedback again.** Under `block`, a
+  wrong-direction word triggers one retry and then the bare sentences. The
+  Fix 6 live run below ran with this default.
+- **The Drive working copy had model edits that are not mine.** They appeared
+  at 19:11–19:12 on 2026-11-22, during this run, in `DiscoverChat/config.py`
+  (classifier, verifier and judge ids) and `Insights/src/discover_config.py`
+  (writer `gpt-6.2-sol`). They are left uncommitted and untouched.
+  `f6b5107` was staged from a patch, so it holds only the direction-check
+  lines.
