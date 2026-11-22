@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """WP-D13 Fix 1 (D63): signed figures in words, and the direction check.
+Fix 1b (D65/D66): R1 ("below plan" must be present) replaced by R1' (no word
+from the operator's wrong-direction list may be present).
 
 Offline -- no model calls. Run:
     python -m pytest DiscoverChat/tests/test_direction.py -q
@@ -121,19 +123,26 @@ class FiveSentenceTests(unittest.TestCase):
         self.assertTrue(r["all_pass"], checks.citation_failure_reason(r))
         self.assertEqual(r["5_direction"]["checked"], 1)
 
-    def test_above_plan_fails(self):
+    def test_above_plan_fails_on_r3(self):
         r = self.run_check("Recorded spending is Rs 51.96 crore above plan "
                            "[d1-00248].")
         self.assertFalse(r["all_pass"])
         self.assertTrue(r["2_numerals_cited"]["pass"])
         self.assertFalse(r["5_direction"]["pass"])
+        rules = r["5_direction"]["failures"][0]["rules"]
+        self.assertEqual([rule.split(":")[0] for rule in rules], ["R3"], rules)
+        self.assertIn('"above plan"', checks.citation_failure_reason(r))
 
-    def test_exceeded_fails_on_r1(self):
+    def test_exceeded_fails_on_r1_prime(self):
         r = self.run_check("Spending exceeded the plan by Rs 51.96 crore "
                            "[d1-00248].")
         self.assertFalse(r["all_pass"])
+        self.assertTrue(r["2_numerals_cited"]["pass"])
         rules = r["5_direction"]["failures"][0]["rules"]
-        self.assertTrue(any(rule.startswith("R1") for rule in rules), rules)
+        self.assertEqual(rules, ["R1': says 'exceeded'"])
+        reason = checks.citation_failure_reason(r)
+        self.assertIn('"exceeded"', reason)
+        self.assertIn("Rs 51.96 crore below plan", reason)
 
     def test_wrong_number_fails_on_step_2(self):
         r = self.run_check("Recorded spending is Rs 61.96 crore below plan "
@@ -161,15 +170,25 @@ class ShapeTests(unittest.TestCase):
         self.assertTrue(r["all_pass"])
         self.assertEqual(r["5_direction"]["checked"], 0)
 
-    def test_follow_on_sentence_fails_and_is_named(self):
+    def test_follow_on_sentence_without_below_words_passes(self):
+        # Fix 1b: R1 is gone. Naming the shortfall once and then listing its
+        # parts is how the writer writes, and it is correct.
         r = self.check("Spending is Rs 51.96 crore below plan [d1-00248]. "
                        "Most of it, Rs 46.90 crore, has no grant type on "
                        "file [d1-00248].", ["d1-00248"])
+        self.assertTrue(r["all_pass"], checks.citation_failure_reason(r))
+        self.assertEqual(r["5_direction"]["checked"], 2)
+
+    def test_follow_on_sentence_with_opposite_word_fails_and_is_named(self):
+        r = self.check("Spending is Rs 51.96 crore below plan [d1-00248]. "
+                       "Most of it, Rs 46.90 crore, is a surplus with no "
+                       "grant type on file [d1-00248].", ["d1-00248"])
         self.assertFalse(r["all_pass"])
         failures = r["5_direction"]["failures"]
         self.assertEqual([f["sentence_index"] for f in failures], [1])
         reason = checks.citation_failure_reason(r)
         self.assertIn("Most of it, Rs 46.90 crore", reason)
+        self.assertIn('"surplus"', reason)
         self.assertIn("Rs 46.90 crore below plan", reason)
 
     def test_positive_and_negative_both_phrased(self):
@@ -199,6 +218,158 @@ class ShapeTests(unittest.TestCase):
                                    [record], direction_mode="block")
         self.assertEqual(r["5_direction"]["skipped_ambiguous"], 1)
         self.assertEqual(r["5_direction"]["checked"], 0)
+
+
+class OppositeWordTests(unittest.TestCase):
+    """Fix 1b T2: R1' -- the operator's list of wrong-direction words (D66)."""
+
+    # One sentence per word family of the approved list, each true in its
+    # figure (d1-00248 is Rs 51.96 crore below plan) and wrong in its words.
+    FAMILIES = {
+        "exceed": "Spending exceeds the plan by Rs 51.96 crore [d1-00248].",
+        "overspend": "The sample overspent by Rs 51.96 crore [d1-00248].",
+        "overshoot": "Spending overshot by Rs 51.96 crore [d1-00248].",
+        "overrun": "The overrun is Rs 51.96 crore [d1-00248].",
+        "surplus": "There is a surplus of Rs 51.96 crore [d1-00248].",
+        "in excess": "Rs 51.96 crore was spent in excess [d1-00248].",
+        "over the plan": "Spending ran Rs 51.96 crore over the plan "
+                         "[d1-00248].",
+        "more than plan": "Spending was Rs 51.96 crore higher than plan "
+                          "[d1-00248].",
+    }
+
+    def setUp(self):
+        self.record = _corpus().get("d1-00248")
+
+    def run_check(self, prose):
+        return checks.check_citations(prose, [self.record],
+                                      direction_mode="block")
+
+    def test_each_word_family_fails_once(self):
+        for family, prose in self.FAMILIES.items():
+            with self.subTest(family=family):
+                r = self.run_check(prose)
+                self.assertTrue(r["2_numerals_cited"]["pass"])
+                self.assertFalse(r["all_pass"])
+                failures = r["5_direction"]["failures"]
+                self.assertEqual(len(failures), 1)
+                self.assertEqual(len(failures[0]["rules"]), 1)
+                self.assertTrue(failures[0]["rules"][0].startswith("R1'"))
+                word = failures[0]["words"][0]
+                self.assertIn('"' + word + '"',
+                              checks.citation_failure_reason(r))
+
+    def test_every_listed_form_matches_and_whole_words_only(self):
+        forms = ["exceed", "exceeds", "exceeded", "exceeding", "overspend",
+                 "overspent", "overspending", "overshoot", "overshoots",
+                 "overshooting", "overshot", "overrun", "overran", "surplus",
+                 "in excess", "over plan", "over the plan", "over sanction",
+                 "over the sanction", "more than plan", "higher than the plan",
+                 "greater than the sanction", "More Than The Plan"]
+        for form in forms:
+            self.assertRegex(form, checks._OPPOSITE_DIRECTION)
+        for near in ["exceedingly", "overrunning", "planned over",
+                     "higher than the planned cost", "moreover planning",
+                     "below plan", "the gap", "shortfall", "underspend"]:
+            self.assertNotRegex(near, checks._OPPOSITE_DIRECTION)
+
+    def test_share_only_sentence_is_not_checked(self):
+        r = self.run_check("Rows with no grant type on file exceed 90.3% of "
+                           "the gap [d1-00248].")
+        self.assertTrue(r["all_pass"], checks.citation_failure_reason(r))
+        self.assertEqual(r["5_direction"]["checked"], 0)
+
+
+_TRIAL = REPO / "DiscoverChat" / "experiments" / "direction_trial_results.json"
+_HEADLINE_TRIAL = (REPO / "handoffs" / "WPD13b_headline_trial"
+                   / "trial_results.json")
+
+
+def _unmarked(prose: str) -> str:
+    """The headline trial's own marker strip (run_headline_trial.unmarked)."""
+    out = []
+    for line in (prose or "").splitlines():
+        line = re.sub(r"^\W*SHORT ANSWER:\W*\s*", "", line, flags=re.I)
+        line = re.sub(r"^\s*##\s+", "", line)
+        out.append(line)
+    return "\n".join(out)
+
+
+class RecordedTrialTests(unittest.TestCase):
+    """Fix 1b T2/T3: the writer's own recorded sentences (no model call)."""
+
+    @classmethod
+    def setUpClass(cls):
+        import json
+        with open(_TRIAL, encoding="utf-8") as fh:
+            cls.trial = json.load(fh)
+        cls.findings = {q["n"]: q["findings"] for q in cls.trial["questions"]}
+
+    def records(self, ids):
+        return [_corpus().get(i) for i in ids]
+
+    def test_the_43_r1_false_alarms_now_pass(self):
+        """Every sentence Fix 1's R1 failed (WPD13_REPORT.md §5)."""
+        seen = 0
+        for arm, rows in self.trial["arms"].items():
+            for row in rows:
+                for attempt in row["checks"]:
+                    for failure in attempt["direction"]["failures"]:
+                        seen += 1
+                        self.assertTrue(all(rule.startswith("R1:")
+                                            for rule in failure["rules"]))
+                        r = checks.check_citations(
+                            failure["sentence"],
+                            self.records(self.findings[row["n"]]),
+                            run_date=self.trial["stamp"],
+                            direction_mode="block")
+                        with self.subTest(arm=arm, q=row["n"],
+                                          sentence=failure["sentence"][:60]):
+                            self.assertEqual(r["5_direction"]["checked"], 1)
+                            self.assertTrue(r["5_direction"]["pass"],
+                                            r["5_direction"]["failures"])
+        self.assertEqual(seen, 43)
+
+    def test_every_recorded_attempt_passes_step_5(self):
+        """The T3 replay: 40 + 37 attempts written on today's display
+        sentences, step 5 in block mode -- no failure. The two Cuttack
+        attempts written on the PRE-Fix-1 sentences fail on R2 only (they
+        show "Rs -3.18 crore"), which is the step working."""
+        import json
+        with open(_HEADLINE_TRIAL, encoding="utf-8") as fh:
+            headline = json.load(fh)
+        attempts = []
+        for rows in self.trial["arms"].values():
+            for row in rows:
+                for attempt in row["checks"]:
+                    attempts.append((attempt["prose"],
+                                     self.findings[row["n"]],
+                                     self.trial["stamp"]))
+        for row in headline["results"]:
+            for arm in ("baseline", "headline"):
+                for attempt in row[arm]["checks"]:
+                    if not attempt.get("empty"):
+                        attempts.append((_unmarked(attempt["prose"]),
+                                         row["findings"], headline["stamp"]))
+        self.assertEqual(len(attempts), 77)
+        checked = 0
+        for prose, ids, stamp in attempts:
+            r = checks.check_citations(prose, self.records(ids),
+                                       run_date=stamp, direction_mode="block")
+            checked += r["5_direction"]["checked"]
+            self.assertEqual(r["5_direction"]["failures"], [])
+        self.assertGreater(checked, 150)
+
+        before = self.trial["cuttack_before_fix1"]
+        rules = []
+        for attempt in before["checks"]:
+            r = checks.check_citations(attempt["prose"],
+                                       self.records(self.findings[before["n"]]),
+                                       run_date=self.trial["stamp"],
+                                       direction_mode="block")
+            rules += [rule for f in r["5_direction"]["failures"]
+                      for rule in f["rules"]]
+        self.assertEqual(rules, ["R2: minus sign before a figure"] * 3)
 
 
 class ModeTests(unittest.TestCase):
