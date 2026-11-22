@@ -338,3 +338,183 @@ DiscoverChat service so it serves `layout`, and copy the frontend `src/` and
 `tailwind.config.ts` into whichever mirror the dev server runs from (the
 operator's `:8080` server runs from `C:\dev\ab-dashboard-main`, which I did not
 update). A Tailwind config change needs the dev server restarted.
+
+---
+
+# Fix 7 — Display repairs found in the WP-D12 review
+
+**Executed:** 2026-11-22, mirrors `C:\dev\odisha-d13` (service) and
+`C:\dev\ab-dashboard-odisha` (frontend). **Brief:**
+`handoffs/WPD13_report_fixes.md` §7 (D66). There were no model calls, no
+prompt change and no corpus rebuild. Built after WP-D13 Fix 1b and Fix 6,
+which are reported in `handoffs/WPD13_REPORT.md`.
+
+## Outcome in one paragraph
+
+All three repairs are built and green. **No display sentence has a doubled
+word any more (0 of 71,183; 6,656 before).** Cited phrases now wrap like the
+text around them, so a paragraph no longer breaks early wherever a long
+underlined phrase began. A record whose parts move both ways no longer raises
+a "Needs checking" line: 29 records in the corpus lose one. Two items from §7
+above, "LSDG LSDG theme" and "long underlined phrases break the line", are
+fixed. §6 decision 5 is changed as ruled.
+
+## F7.1 Commits (current branch `master`, not pushed)
+
+| Commit | Task |
+|---|---|
+| `993764a` | T1: no doubled words (`glossary.render`), tests, saved fixtures recomputed |
+| `be792bf` | T2: cited phrases wrap (`CitationSpan.tsx`), tests, before/after shots |
+| `a04c23c` | T3: no warning from a mixed-sign record (`layout.py`), tests |
+| report commit | this section |
+
+## F7.2 Checks, before vs after
+
+| | Before (HEAD `f7a1f84`, after WP-D13 Fix 6) | After |
+|---|---|---|
+| `python -m DiscoverChat.gates` | 36/36 green | **36/36 green** (`findings-verbatim` and `layout-formatter-parity` included) |
+| `python -m pytest DiscoverChat/tests -q` | 173 passed, 0 failed | **182 passed, 0 failed** |
+| `npm test` (vitest) | 151 passed | **152 passed** |
+| `npm run lint` | 3 errors, 7 warnings (pre-existing, §2) | **the same 3 errors and 7 warnings** |
+| `npm run build` | green | **green** |
+
+The service suite has no failures: WP-D13 Fix 1b brought the old prompt test
+up to date.
+
+## F7.3 T1 — no doubled words in display sentences
+
+**The rule:** `glossary.render` skips a replacement where the text at that
+place already reads as the replacement. In other words, the match sits inside
+a copy of its own replacement, at the replacement's own position, with whole
+words on both sides. One pass, as before. Every raw column name still
+translates.
+
+**Whole-corpus sweep (both corpora, 71,183 display sentences):**
+
+| | Count |
+|---|---|
+| Display sentences with a doubled word the stored sentence lacks — before | **6,656** (matches the brief): "LSDG LSDG" 5,414; "reported reported" 1,240 sentences (2,480 occurrences, two per sentence); "calendar calendar" 2 |
+| — after | **0** |
+| Display sentences that changed | 6,656, all of them decompositions (view1 5,414, view4 1,240, view2 2) |
+| … every change is a pure removal of words, with no digit changed | 6,656 of 6,656 |
+| … losing exactly the repeated word | 6,498 |
+| … losing a longer garble (see below) | 158 |
+| Other display sentences, byte-identical | **64,527 of 64,527** |
+| Member labels the layout shows (`render` on every member name) | unchanged, all of them |
+
+The replacements now skipped, by key: `theme` → "LSDG theme" 3,098;
+`theme values` → "LSDG theme values" 2,316; `households` 632; `banks` 632;
+`wards` 316; `printers` 316; `dispensaries` 306; `laptops` 298; `scanners`
+296 (each → "reported …"); `quarter` → "calendar quarter" 2.
+
+**Where the brief was not exact (logged, not worked around).** The brief
+says the 6,656 "change only by losing the repeated word". That holds for
+6,498. The other 158 are view4 records whose stored sentence already says
+"reported banks and cooperative banks", which is the officer phrase for
+`banks` and contains "banks" twice. The old pass expanded both, giving
+"reported reported banks and cooperative banks and cooperative reported banks
+and cooperative banks". Those sentences now lose that 16-word garble and read
+as the stored phrase. They are still pure removals with no digit changed.
+
+**Also in `render`:** the substitution table and pattern are now built once
+per view and remembered. They are built from module constants only, so the
+output is identical, as the sweep shows. Before this, every call rebuilt them
+(§7: 48 s for a corpus sweep); the sweep now takes about 7 s.
+
+**Saved frontend fixtures — recomputed offline, as the brief asks.** In each
+affected payload, the old display sentence was replaced with the new one
+wherever it appears (raw, and HTML-escaped as `render.py` escapes it). Each
+replacement was checked first: the fixture's sentence had to equal the old
+rendering exactly.
+
+- `discover-layout.fixtures.json`: Cuttack (1 sentence, 11 places: the hover
+  card, `data-sentence` and `title` in `answer_html`), Chikilli (1 sentence,
+  9 places), and Kalimela (4 bare sentences in its fall-back `answer`).
+- `discover-layout-baseline.fixtures.json`: Kalimela's text (4 places), so
+  the "no layout renders as before" test still compares like with like.
+- `discover-answers.fixtures.json` (WP-D8, 2026-09-04): answers 1, 4 and 15
+  (4 sentences, 78 places). This file's ids are stale since the WP-D11b
+  rebuild, so each sentence was re-rendered from the fixture's **own** stored
+  sentence, not from today's record.
+- In total, 106 "LSDG" words were removed and nothing else changed (checked
+  on the word diff).
+
+**Tests** (`tests/test_display_repairs.py`, new, 7): the rule on short
+cases ("across 7 LSDG theme values" stays; "across 7 theme values" becomes it;
+the `banks` phrase); raw names still translate; the whole-corpus sweep
+(0 doubled words; 6,656 changed, 64,527 identical; every change a removal;
+6,498 + 158); member labels unchanged.
+
+## F7.4 T2 — cited phrases wrap like ordinary text
+
+- **The change:** in `CitationSpan.tsx`, the trigger is a `<span
+  role="button" tabIndex={0}>` instead of a `<button>`.
+- **Kept:**
+  - Hover and focus open the card.
+  - Enter and Space do what a click on the old button did: they open the card,
+    or close a card already pinned open. Space no longer scrolls the page.
+  - Escape closes the card.
+  - The underline shows on hover and focus only, where the device can hover.
+  - The focus ring. It is now drawn around each line of a wrapped phrase
+    (`box-decoration-clone`).
+- **Checked in the browser** (Chromium, Chikilli at 390px): the longest cited
+  phrase (118 characters) now spans 4 lines. Focus opened the card, Escape
+  closed it, Enter opened it, and Space opened it.
+- **Tests:** only the five selectors that named the `button` tag changed (4 in
+  `InsightReport.test.tsx`, 1 in `ReportLayout.test.tsx`; they now select
+  `[role="button"][data-finding-id]`). One new test: Enter and Space open the
+  card, other keys do not, Space's default is prevented, and the trigger is a
+  `SPAN` in the tab order.
+- **Screenshots** (`handoffs/WPD12_shots/`):
+
+  | Answer | Before | After |
+  |---|---|---|
+  | Mostly patterns, desktop | `f7_mostly_patterns_desktop_before.png` | `f7_mostly_patterns_desktop_after.png` |
+  | Mostly patterns, 390px | `f7_mostly_patterns_390_before.png` | `f7_mostly_patterns_390_after.png` |
+  | Chikilli, desktop | `f7_chikilli_desktop_before.png` | `f7_chikilli_desktop_after.png` |
+  | Chikilli, 390px | `f7_chikilli_390_before.png` | `f7_chikilli_390_after.png` |
+
+  Plus `f7_focus_ring_wrapped_390.png`, which shows the focus ring on a
+  wrapped phrase. In the mostly-patterns answer, every cited sentence used to
+  start a new line inside its paragraph. Now the paragraphs run on. At desktop
+  width, Chikilli's report is 39px shorter (1,479 against 1,518) because lines
+  are no longer cut short. The "before" shots already include the T1 fixture
+  change. They also include the WP-D13 Fix 6 caution line, which is in both
+  sets.
+
+## F7.5 T3 — no warning from a mixed-sign record
+
+- **The change:** `layout._warnings` skips a record whose `signs` is
+  `mixed`, as cards and charts already did. §6 decision 5 is reversed, as the
+  PM ruled.
+- **Whole-corpus sweep (66,779 decompositions):** **29 records lose a
+  warning.** All 29 are mixed, and all are "spending measured against plan".
+  No other record's warning changes, and 3,765 records still raise one.
+- **Saved fixtures:** I recomputed the `layout` field of all six saved
+  payloads offline from their recorded findings and prose. All six are
+  **identical** to what is saved, because none of them cites a mixed-sign
+  record. None of the 24 recorded trial answers that the layout tests use
+  cites one either. So no fixture changed for T3.
+- **Tests** (`test_layout.py`, +2): a mixed-sign record with a 45% "not
+  recorded" member raises no warning, and the same parts all running one way
+  still do. The whole-corpus sweep counts 29 lost, all mixed, and no new
+  warning anywhere.
+
+## F7.6 Files
+
+**Touched:** `DiscoverChat/glossary.py` (`render`, plus the remembered table
+it now reads), `DiscoverChat/layout.py` (`_warnings`),
+`DiscoverChat/tests/test_display_repairs.py` (new),
+`DiscoverChat/tests/test_layout.py`;
+`frontend/…/insights/CitationSpan.tsx`, `InsightReport.test.tsx`,
+`ReportLayout.test.tsx`, `src/lib/discover-layout.fixtures.json`,
+`discover-layout-baseline.fixtures.json`, `discover-answers.fixtures.json`;
+`handoffs/WPD12_shots/f7_*`, and this section.
+
+**Not touched:** `context_brief.py`, `checks.py`, `writer.py`, `Insights/**`,
+every colour value, and every component outside `insights/`.
+
+**Not deployed.** Nothing was pushed, Railway was not touched, and the
+operator's `:8080` mirror was not updated. To see T2 there, copy
+`src/components/insights/CitationSpan.tsx` into it. To see T1 and T3 in
+answers, restart the DiscoverChat service.
