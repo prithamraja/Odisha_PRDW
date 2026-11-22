@@ -326,20 +326,19 @@ CONSOLIDATE_MIN_FINDINGS = int(os.getenv("DISCOVERCHAT_CONSOLIDATE_MIN", "1"))
 
 # ── WP-D13 Fix 1: the direction check (D63) ──────────────────────────────────
 # Step `5_direction` of `checks.check_citations`: a sentence that gives a
-# negative figure of a signed measure must say "below plan" / "below sanction",
-# carry no minus sign before a figure, and not say "above plan" unless a
-# positive figure is also given. Three modes:
+# negative figure of a signed measure must not use a word that states the
+# opposite direction (R1', the operator's list beside the step in checks.py),
+# carry no minus sign before a figure (R2), and not say "above plan" unless a
+# positive figure is also given (R3). Three modes:
 #   block  counts towards all_pass: one retry with the reason, then the bare
 #          sentences -- the existing failure process, unchanged
 #   log    recorded in the check results, does not count, not fed back
 #   off    the step is not run and not reported
-# The default was set by the WP-D13 T3 live trial (handoffs/WPD13_REPORT.md):
-# LOG. Under block, 2 of 12 answers fell back on false alarms -- correct
-# sentences that itemised "the gap" without repeating "below plan" -- against a
-# limit of 1. Every direction failure measured was R1 of that kind; no minus
-# sign and no "above plan" was written in 46 attempts. A looser R1 waits on
-# the PM's ruling.
-DIRECTION_CHECK = os.getenv("DISCOVERCHAT_DIRECTION_CHECK", "log").strip().lower()
+# Default BLOCK, set by WP-D13 Fix 1b T3 (handoffs/WPD13_REPORT.md): replayed
+# offline over all 77 recorded attempts of the two WP-D13 trials, R1', R2 and
+# R3 fail no correct sentence. (Fix 1 had shipped LOG: its R1 demanded "below
+# plan" in every sentence and failed 43 correct ones; D65 removed it.)
+DIRECTION_CHECK = os.getenv("DISCOVERCHAT_DIRECTION_CHECK", "block").strip().lower()
 if DIRECTION_CHECK not in ("block", "log", "off"):
     raise ValueError(f"DISCOVERCHAT_DIRECTION_CHECK={DIRECTION_CHECK!r}: "
                      f"expected block, log or off")
