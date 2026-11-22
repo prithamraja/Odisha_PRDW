@@ -470,3 +470,216 @@ operator's file was not touched.
   (writer `gpt-6.2-sol`). They are left uncommitted and untouched.
   `f6b5107` was staged from a patch, so it holds only the direction-check
   lines.
+
+---
+
+# Fix 6 — The cause-and-effect check stops blocking answers; a caution line is added
+
+## Outcome in one paragraph
+
+Built and green. The cause-and-effect check is now a switch,
+`DISCOVERCHAT_CAUSAL_CHECK`, set to `log`. It still scans every answer and
+records what it finds, but it no longer causes a retry or a fall-back. No code
+was deleted, and the writer's instructions are unchanged. Every Insight report
+now ends with the operator's caution line, and Copy carries it. Live, on the
+15 WP-D13b questions with the same findings: **no answer lost its narrative
+(0 of 15; the baseline lost 2 of 15, both to this check)**, and the writer
+needed **16 attempts against 20**. The scan flagged 9 sentences in 5
+attempts. They are all listed in §6 for the operator to read.
+
+## 1. Commits (current branch `master`, not pushed)
+
+| Commit | Task |
+|---|---|
+| `9097653` | T1: the switch (`config.py`, `checks.py` at both call sites, the log line in `writer.py`) |
+| `e972251` | T2: the gate and the tests follow the mode |
+| `14940b2` | T3: the caution line (frontend), tests, screenshots |
+| T4 commit | T4: the live trial, its results, this section |
+
+`9097653` was staged from a patch so that it holds only the Fix 6 lines of
+`config.py`. The operator's uncommitted model edits in that file are still
+there and still uncommitted.
+
+## 2. Checks, before vs after
+
+| | Before (HEAD `4c40b90`, after Fix 1b) | After |
+|---|---|---|
+| `python -m DiscoverChat.gates` (default `log`) | 36/36 green | **36/36 green** |
+| same, pinned `DISCOVERCHAT_CAUSAL_CHECK=block` | — | **36/36 green** |
+| same, `DISCOVERCHAT_CAUSAL_CHECK=off` | — | **36/36 green** |
+| `python -m pytest DiscoverChat/tests -q` | 157 passed, 0 failed | **173 passed, 0 failed** |
+| `npm test` (vitest) | 146 passed, 10 files | **151 passed, 10 files** |
+| `npm run lint` | 3 errors, 7 warnings | **the same 3 errors and 7 warnings** (pre-existing, as in WP-D12) |
+| `npm run build` | green | **green** |
+
+## 3. T1 — the switch
+
+- **`DISCOVERCHAT_CAUSAL_CHECK` = `block` | `log` | `off`, default `log`.**
+  It is read and checked in `config.py` exactly like the direction switch. An
+  unknown value stops the service at start-up. Both the causal and the
+  direction modes are now in the settings dump (`/health` → `knobs`).
+- **Both places the chat service runs the scan use the same helper:** step
+  `3_causal` of `check_citations` (the live path) and `e_causal` of
+  `check_prose` (the path behind `DISCOVERCHAT_CONSOLIDATE=0`). Like the
+  direction check, both functions accept a one-call override (`causal_mode=`).
+  - `block`: the scan's result, byte for byte as before. It counts towards
+    `all_pass` and goes into the retry reason. A test checks this.
+  - `log`: the scan's result under the same key, plus `counts: false` and the
+    flagged sentences. It does not count towards `all_pass`, causes no retry
+    and no fall-back, and adds nothing to the retry reason.
+  - `off`: no scan, and no key.
+- **The log line.** In `log` mode, when an answer that is **shown** has
+  flagged words, the writer adds one line to `logs/citation_failures.jsonl`:
+  `kind: "causal_words_shown"`, `fell_back: false`, the question, the turn id,
+  the attempt, the words, and each flagged sentence with its words. Fall-back
+  lines carry no `kind`, so the two kinds cannot be confused. The line is
+  written on both writer paths. In the live run, 4 lines were written, one for
+  each of the 4 shown answers that had flagged words.
+- **The flagged-sentence list** scans each sentence on its own. The
+  whole-text scan reports each word only once, at its first place, so it
+  cannot list every sentence. The pass/fail verdict is still the whole-text
+  scan's.
+- **Nothing deleted or edited in** `causal_gate.py`,
+  `Insights/src/prose_gate.py`, `context_brief.py` or `classifier.py`.
+
+## 4. T2 — the gate and the tests
+
+- `causal-gate-catches`: unchanged. The scanner still has to fire.
+- `causal-scan` and the three live lines that assert `e_causal` passes: they
+  gate under `block`. Under `log` or `off` they report the count and do not
+  fail. Today that reads "27 answers scanned, 0 with cause-and-effect words
+  (mode log: reported, not gated)".
+- **One check outside the brief's list had to follow:** `citation-checks-fire`
+  seeds a causal claim and expects it to be caught. Under `log` it would no
+  longer be caught, and the gate would go red. I pinned its seeded calls to
+  `causal_mode="block"`, as it already pins direction to `block`. It still
+  proves the step fires, whatever the default.
+- The existing causal-rejection test (`test_a_causal_claim_fails`) pins
+  `block` and keeps its assertions, plus `all_pass` is False. The other causal
+  tests (`CausalGateTests`, `test_no_answer_asserts_a_cause`) test the scanner
+  and the code-written answers, not the writer's check, so they did not
+  change.
+- **New `tests/test_causal_mode.py`, 16 tests:**
+  - `log`: prose with "because" and "therefore" gives `all_pass` true, with
+    `3_causal` failing and `counts` false. The reason is empty.
+  - `log`, with a stub writer that writes "because": `consolidate` keeps the
+    narrative on attempt 1, makes no second call, and writes one log line with
+    the words and sentences.
+  - `log`, with a real failure of another step (an untagged figure): it still
+    retries and still falls back. The retry prompt carries that step's reason
+    and not the causal one.
+  - `block`: the retry, the fall-back and the reason are as before.
+  - `off`: the key is absent, and nothing is logged.
+  - The connective path (`check_prose`) in all three modes.
+  - An unknown value raises at start-up (checked in a subprocess). An unknown
+    one-call override raises too. The default is `log`, and the mode is in the
+    dump.
+
+## 5. T3 — the caution line
+
+- **The text, exactly:** "Produced with AI, so it may contain mistakes. It
+  shows patterns in the records and cannot tell what caused them. Please check
+  the source records before acting."
+- **One constant, one line:** `REPORT_CAUTION` near the top of
+  `frontend/…/insights/ReportFooter.tsx`. It is not exported, so lint gets no
+  new warning. The tests read the text from the page, so changing the words
+  breaks no test.
+- **Where and how it looks:** the footer, on its own full-width line directly
+  above the "as of … / Copy" row, on every report. It is 12px,
+  `report-ink-muted`, plain text, with no icon and no box. It is marked
+  `data-report-chrome=""` (and `data-report-caution=""` for the tests), and the
+  "no layout renders as before" text comparison still passes unchanged.
+- **Copy** now copies the question, the answer and the caution, each separated
+  by a blank line. The existing Copy test was updated to expect that.
+- **Tests (+5):** the line is shown on Cuttack (with a layout), on Cuttack
+  with `{}`, on the Ask decline (`{}`), and on Kalimela (a fall-back). It sits
+  directly above the stamp/Copy row inside the footer and has none of the box
+  classes. It is the same text on all six saved payloads, and it has no
+  nowrap or fixed width.
+- **No horizontal scroll at 360px.** I checked in the browser (Vite and
+  Chromium) on Cuttack, Cuttack with no layout, the decline and Kalimela: the
+  page scrolls 0px sideways, and no element goes past the right edge.
+- **Screenshots** (`handoffs/WPD13_shots/`): `f6_1_cuttack_desktop.png`,
+  `f6_2_cuttack_390.png`, and footer close-ups `f6_3_footer_desktop.png` and
+  `f6_4_footer_390.png`. At desktop width the line sits under the "Needs
+  checking" box in muted grey, and it does not compete with it.
+
+## 6. T4 — measured live
+
+**Design.** `DiscoverChat/experiments/run_causal_log_trial.py`, output
+`causal_log_trial_results.json`. It uses the 15 WP-D13b questions, each with
+the findings the judge picked for it in the WP-D13b **baseline** arm. The
+writer is the production `writer.consolidate` with today's wording, all 15 in
+parallel. So the only differences from that baseline arm are the two check
+modes: causal `log` (Fix 6) and direction `block` (Fix 1b; the baseline ran
+direction in `log`). I reused the findings rather than re-running the judge
+because it makes the comparison cleaner and needs no judge calls.
+
+**Writer model: `gpt-5.6-sol`**, the committed default, which the baseline
+also used. See §7 on the operator's uncommitted switch to `gpt-6.2-sol`.
+
+| | WP-D13b baseline arm | This run (causal `log`) |
+|---|---|---|
+| Answers that lost their narrative | 2 of 15 — Q2 Chikilli and Q10 "Who is driving the shortfall?", **both on the cause-and-effect step** | **0 of 15** |
+| Lost to the cause-and-effect step | 2 | **0 — pass mark met** |
+| Writer attempts | 20 | **16** |
+| Retries, and why (the first attempt's failing step) | 5: cause-and-effect 3, a finding left out 1, a figure not tagged 1 | 1: Q14, a finding left out (step 4) |
+| Direction step (now `block`) | — (ran in `log`) | checked on 8 answers, **0 failures** |
+| Attempts with words the scan flagged | 5 of 20 (each one rejected) | 5 of 16 (none rejected for it) |
+| Shown answers with flagged words (one log line each) | — | 4 (Q1, Q6, Q10, Q14) |
+
+**Every sentence the scan flagged, verbatim.** There is no pass mark on
+these; the operator's reading is now the safeguard.
+
+1. Q1 "Is spending on track?", attempt 1 (shown). Words: "because".
+   > Biswamathpur warrants early reconciliation because it has the largest recorded gap in both views: Rs 7.23 crore, or 13.9%, for costed activities and Rs 6.74 crore, or 16.2%, for approved activities.
+2. Q1 "Is spending on track?", attempt 1 (shown). Words: "therefore".
+   > Review should therefore combine reconciliation of Biswamathpur and Kalimela’s approved and costed records with thematic follow-up in Sheragada, Rangeilunda and Ganjam; the remaining gaps are distributed across many other Gram Panchayats, blocks and districts rather than being confined to these locations.
+3. Q6 "Which blocks account for the shortfall?", attempt 1 (shown). Words: "because".
+   > It holds 9.2% of the 12,704 activities but 17.5% of the spending shortfall, making it the clearest block for initial review, while reconciliation should still cover all 16 blocks because most of the shortfall is distributed among the others.
+4. Q10 "Who is driving the shortfall?", attempt 1 (shown). Words: "driving".
+   > No single Gram Panchayat is driving the spending shortfall: the 20 sampled Gram Panchayats are collectively Rs 51.96 crore below their costed plan totals, with the gap spread across all 20.
+5. Q10 "Who is driving the shortfall?", attempt 1 (shown). Words: "therefore", "because".
+   > Attention should therefore cover reconciliation across the full sample, while beginning with Biswamathpur and Kalimela because they have the largest recorded gaps.
+6. Q14 "Anything I should be looking at in Ganjam?", attempt 1 (not shown: this attempt failed step 4 and was retried). Words: "because".
+   > The sanction-based picture is incomplete because only about one in six activities has a sanction record on file.
+7. Q14 "Anything I should be looking at in Ganjam?", attempt 1 (not shown: this attempt failed step 4 and was retried). Words: "because".
+   > Recorded linkage between spending and planned activities rose from 2.7% to 53.2% over six years; this should be checked against cashbook totals because a rise may reflect more complete recording unless the cashbook total also rises.
+8. Q14 "Anything I should be looking at in Ganjam?", attempt 2 (shown). Words: "therefore".
+   > Sharagada should therefore be specifically reviewed for costless plans, abandoned works and sanction documentation.
+9. Q14 "Anything I should be looking at in Ganjam?", attempt 2 (shown). Words: "therefore".
+   > The linked share rose from 2.7% to 53.2% across six years, but this indicates greater recording completeness unless the cashbook total rose alongside it; the plan-to-payment linkage should therefore be reconciled with cashbooks before interpreting the increase as higher spending.
+
+Sentence 4 is the kind §6.2 predicted: a denial that starts with "No". The
+scan's list of denial words has no "no", and that list was not touched.
+
+**Model calls and cost.** 16 calls, all writer, against a cap of 45. They cost
+$0.37 at the price used for the earlier WP-D13 trials (`gpt-5.6-sol`, $4 / $20
+per 1M tokens in / out — the promotional price, recorded as running through
+at least 2026-11-21; I did not re-check it for 2026-11-22). There were no
+judge calls, no classifier calls and no query embeddings. Per-call tokens and
+times are in the results file. Turns took 4.7–26.9 s, run in parallel.
+
+## 7. Things worth knowing
+
+- **The operator is switching models in the Drive working copy.** At
+  19:11–19:12 on 2026-11-22 (during this run, uncommitted),
+  `Insights/src/discover_config.py` set the writer to `gpt-6.2-sol`, and
+  `DiscoverChat/config.py` set the judge to `gpt-6.2-sol` and the classifier
+  and verifier to `gpt-6-luna`. I ran T4 on the committed model
+  (`gpt-5.6-sol`), because the brief's numbers and the baseline arm use it,
+  and the writer model is not yet chosen (D67). To repeat T4 on another
+  writer, with no code change:
+  `DISCOVER_PROSE_MODEL=<id> python DiscoverChat/experiments/run_causal_log_trial.py`.
+  The script prices only `gpt-5.6-sol`, so it would show $0 for another model.
+- **What the officer gets is unchanged where it matters.** The API payload
+  (`prose.citation_checks`) already left out `3_causal`, and still does. The
+  flagged words reach only the log, not the answer.
+- **One comment in `writer.py` is now out of date.** Its D7.3 note says the
+  citation check is "Blocking, all four". The brief limits `writer.py` to the
+  log line, so I left the comment. The true picture is in `checks.py` and
+  `config.py`.
+- **Not deployed.** Nothing was pushed, Railway was not touched, and the
+  operator's `:8080` mirror (`C:\dev\ab-dashboard-main`) was not updated. To
+  see the caution line locally, copy `src/components/insights/ReportFooter.tsx`
+  into that mirror.
