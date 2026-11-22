@@ -355,6 +355,13 @@ def _warnings(shown: list, order: dict) -> list:
     for finding in shown:
         if not finding.is_decomposition:
             continue
+        # WP-D13 Fix 7 T3 (D66): no warning from a mixed-sign record. Its
+        # parts move both ways, so the "not recorded" share is a share of all
+        # the money moving, not of the net, and "they account for 45% of
+        # spending measured against plan" would be loose. Cards and charts
+        # already skip these records (29 in the corpus).
+        if finding.data.get("signs") == "mixed":
+            continue
         member = null_member(finding.data)
         if member is None:
             continue

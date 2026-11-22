@@ -353,6 +353,44 @@ class WarningRuleTests(unittest.TestCase):
         self.assertEqual(warning["amount"], "Rs 3.00 crore below plan")
         self.assertEqual(warning["share"], "75.0%")
 
+    def test_a_mixed_sign_record_raises_no_warning(self):
+        """WP-D13 Fix 7 T3 (D66): the null share of a mixed record is a share
+        of all the money moving both ways, not of the net."""
+        record = _decomposition(
+            "d1-90001", [("(not recorded)", -4.5e7, 923), ("Tied", 3e7, 50),
+                         ("Untied", -2.5e7, 40)],
+            measure="overspend_vs_plan", null="(not recorded)")
+        self.assertEqual(record.data["signs"], "mixed")
+        self.assertGreaterEqual(layout.null_member(record.data)["share"],
+                                config.LAYOUT_NULL_SHARE_WARN)
+        self.assertEqual(layout.build([record], "")["warnings"], [])
+        # The same parts all running one way still warn.
+        one_way = _decomposition(
+            "d1-90002", [("(not recorded)", -4.5e7, 923), ("Tied", -3e7, 50),
+                         ("Untied", -2.5e7, 40)],
+            measure="overspend_vs_plan", null="(not recorded)")
+        self.assertEqual([w["id"] for w in
+                          layout.build([one_way], "")["warnings"]], ["d1-90002"])
+
+    def test_the_whole_corpus_loses_29_warnings_all_mixed(self):
+        lost, warned = [], 0
+        for record in _corpus().all():
+            if not record.is_decomposition:
+                continue
+            member = layout.null_member(record.data)
+            would = (member is not None and abs(float(member["share"]))
+                     >= config.LAYOUT_NULL_SHARE_WARN)
+            now = bool(layout._warnings([record], {record.id: 0}))
+            self.assertFalse(now and not would, record.id)
+            if now:
+                warned += 1
+                self.assertNotEqual(record.data["signs"], "mixed", record.id)
+            elif would:
+                lost.append(record)
+        self.assertEqual(len(lost), 29)
+        self.assertTrue(all(r.data["signs"] == "mixed" for r in lost))
+        self.assertGreater(warned, 3000)
+
 
 class PanelRuleTests(unittest.TestCase):
 
