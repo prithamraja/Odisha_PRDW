@@ -437,13 +437,24 @@ def _causal(ctx):
                  + DECOMPOSE_QUESTIONS
                  + ["How is Chikilli doing?", "Is spending on track?",
                     "Which places are behaving differently from the rest?"])
+    flagged = []
     for question in questions:
         answer = assembler.answer(question)
         result = causal_gate.check(answer.text)
-        assert result["pass"], (
-            f"answer to {question!r} asserts a cause: "
-            f"{[p['surface'] for p in result['problems']]}")
-    return f"{len(questions)} answers scanned, none causal"
+        if not result["pass"]:
+            flagged.append((question,
+                            [p["surface"] for p in result["problems"]]))
+    # WP-D13 Fix 6 (D68): this gates under DISCOVERCHAT_CAUSAL_CHECK=block;
+    # under log or off it reports the count and does not fail.
+    if config.CAUSAL_CHECK == "block":
+        assert not flagged, (f"answer to {flagged[0][0]!r} asserts a cause: "
+                             f"{flagged[0][1]}" if flagged else "")
+        return f"{len(questions)} answers scanned, none causal"
+    return (f"{len(questions)} answers scanned, {len(flagged)} with "
+            f"cause-and-effect words (mode {config.CAUSAL_CHECK}: reported, "
+            f"not gated)"
+            + ("" if not flagged else
+               ": " + "; ".join(f"{q!r} {w}" for q, w in flagged)))
 
 
 @check("causal-gate-catches", "the ban actually fires on causal wording")
@@ -720,8 +731,10 @@ def _citation_checks_fire(ctx):
     principle, applied to D7.3). One seeded violation per step, plus the clean
     text that must PASS -- because a check that fails everything is as useless
     as one that fails nothing."""
+    # The causal step is pinned to block (WP-D13 Fix 6): the gate proves the
+    # step fires, whatever the configured default -- as for direction below.
     clean = checks.check_citations(CLEAN_PROSE, SEED_FINDINGS,
-                                   run_date=SEED_RUN_DATE)
+                                   run_date=SEED_RUN_DATE, causal_mode="block")
     assert clean["all_pass"], (
         f"the clean prose was rejected: {checks.citation_failure_reason(clean)}")
 
@@ -740,7 +753,8 @@ def _citation_checks_fire(ctx):
     }
     for name, prose in seeded.items():
         result = checks.check_citations(prose, SEED_FINDINGS,
-                                        run_date=SEED_RUN_DATE)
+                                        run_date=SEED_RUN_DATE,
+                                        causal_mode="block")
         assert not result["all_pass"], f"the check missed a seeded {name}"
         assert checks.citation_failure_reason(result).strip(), (
             f"a seeded {name} was caught with no reason to feed back")
@@ -1063,7 +1077,12 @@ def live_checks(ctx) -> list:
         judged = answer.retrieval.get("judge", {})
         result = checks.check_prose(answer.text, answer.findings,
                                     corpus_roster=assembler._roster)
-        ok = (result["e_causal"]["pass"]
+        # WP-D13 Fix 6 (D68): the causal scan gates under block only; under
+        # log or off it is reported (scanned here directly under off, where
+        # check_prose leaves the key out).
+        causal_pass = (result["e_causal"]["pass"] if "e_causal" in result
+                       else causal_gate.check(answer.text)["pass"])
+        ok = ((causal_pass or config.CAUSAL_CHECK != "block")
               and not judged.get("hallucinated_ids")
               and len(answer.findings) <= config.ANSWER_CAP)
         out.append((f"live:{question[:26]}",
@@ -1071,8 +1090,8 @@ def live_checks(ctx) -> list:
                     f"{judged.get('pool', '?')} pooled "
                     f"[{judged.get('source')}] | prose used="
                     f"{answer.prose.get('used')} | causal_pass="
-                    f"{result['e_causal']['pass']} | invented ids="
-                    f"{len(judged.get('hallucinated_ids', []))}",
+                    f"{causal_pass} (mode {config.CAUSAL_CHECK}) | invented "
+                    f"ids={len(judged.get('hallucinated_ids', []))}",
                     ok))
 
     # ── WP-D7 D7.1: no verifier call in a turn's trace ───────────────────────

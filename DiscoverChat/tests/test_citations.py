@@ -100,9 +100,12 @@ class CitationCheckTests(unittest.TestCase):
         self.assertEqual(result["4_all_findings_cited"]["dropped"], ["d1-00042"])
 
     def test_a_causal_claim_fails(self):
-        result = _check(CLEAN + " The shortfall was caused by late sanctions "
-                                "[1-00235].")
+        # Pinned to block (WP-D13 Fix 6): the service default is now log.
+        result = checks.check_citations(
+            CLEAN + " The shortfall was caused by late sanctions [1-00235].",
+            FINDINGS, run_date=RUN_DATE, causal_mode="block")
         self.assertFalse(result["3_causal"]["pass"])
+        self.assertFalse(result["all_pass"])
 
     def test_every_failure_gives_a_reason_to_feed_back(self):
         for prose in (CLEAN.replace("[1-00235]", "[1-99999]"),
