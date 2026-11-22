@@ -483,15 +483,41 @@ def citation_failure_reason(results: dict) -> str:
 # quoting the unsigned occurrence -- so it is not checked, and is counted.
 #
 # THE RULE, per prose sentence holding at least one such figure:
-#   R1  it says the record's stored "below" words: "below plan" / "below
-#       sanction" ("below the plan" allowed). Exact words, no synonym list.
+#   R1' it contains no word on `OPPOSITE_DIRECTION_WORDS` below -- words that
+#       state the opposite direction ("exceeded", "overspent", "surplus", "more
+#       than the plan", ...). Whole words, any case. No exception.
 #   R2  no minus sign stands directly before a figure (2023-24 is not one).
 #   R3  it does not say the opposite words ("above plan" / "above sanction"),
 #       unless a figure the stored sentence shows as POSITIVE money is also
 #       bound in it -- "one part ran Rs 1.73 lakh above plan while the whole was
 #       Rs 5.02 crore below plan" is a true sentence.
-# One "below plan" covers every figure in the sentence. A sentence citing a
-# signed record with shares or counts only is not checked.
+# A sentence citing a signed record with shares or counts only is not checked.
+#
+# WP-D13 Fix 1b (D65, operator approval D66, 2026-11-22): R1 is REMOVED. It
+# asked for the right words to be PRESENT ("below plan" in every sentence with
+# a figure); the writer says it once and then speaks of "the gap" and lists its
+# parts, so all 43 failures R1 raised in the live trial were correct sentences.
+# R1' asks for the wrong words to be ABSENT. Known limit, accepted by the
+# operator: a reversed direction said in words outside the list ("spending
+# outran the plan") passes.
+
+# R1' -- the operator's approved list (D66), the ONE place it lives. Each entry
+# is a regular expression matched as whole words, ignoring case. "overshoot..."
+# in the approved list is read as its four forms; every other entry is
+# exactly the words approved.
+OPPOSITE_DIRECTION_WORDS = (
+    r"exceed", r"exceeds", r"exceeded", r"exceeding",
+    r"overspend", r"overspent", r"overspending",
+    r"overshoot", r"overshoots", r"overshooting", r"overshot",
+    r"overrun", r"overran",
+    r"surplus",
+    r"in\s+excess",
+    r"over\s+(?:the\s+)?plan", r"over\s+(?:the\s+)?sanction",
+    r"(?:more|higher|greater)\s+than\s+(?:the\s+)?plan",
+    r"(?:more|higher|greater)\s+than\s+(?:the\s+)?sanction",
+)
+_OPPOSITE_DIRECTION = re.compile(
+    r"\b(?:" + "|".join(OPPOSITE_DIRECTION_WORDS) + r")\b", re.I)
 
 _POS_MONEY = re.compile(r"Rs (\d+(?:[.,]\d+)*)")
 _NEG_MONEY_TOKEN = re.compile(r"Rs -(\d+(?:[.,]\d+)*)")
@@ -595,14 +621,17 @@ def check_direction(body: str, findings: list, bindings: list, *,
         checked += 1
         sentence = sentences[index]
         bare = _TAG.sub(" ", sentence)
-        rules, examples = [], []
+        rules, examples, words = [], [], []
         for record_id, tokens in negatives.items():
             facts = signed_facts(by_id[record_id])
             examples.append(_example(facts, tokens[0]))
-            if not _words_re(facts["below"]).search(bare):
-                rules.append(f"R1: no '{facts['below']}' for {record_id}")
             if _words_re(facts["above"]).search(bare) and not positive_bound:
                 rules.append(f"R3: says '{facts['above']}' for {record_id}")
+                words.append(_words_re(facts["above"]).search(bare).group(0))
+        for match in _OPPOSITE_DIRECTION.finditer(bare):
+            word = re.sub(r"\s+", " ", match.group(0))
+            rules.append(f"R1': says '{word}'")
+            words.append(word)
         if _MINUS_BEFORE_FIGURE.search(bare):
             rules.append("R2: minus sign before a figure")
         if rules:
@@ -610,6 +639,8 @@ def check_direction(body: str, findings: list, bindings: list, *,
                 "sentence_index": index,
                 "sentence": sentence,
                 "rules": rules,
+                "words": words,
+                "minus_sign": bool(_MINUS_BEFORE_FIGURE.search(bare)),
                 "figures": [t for ts in negatives.values() for t in ts],
                 "records": sorted(negatives),
                 "as_the_finding_gives_it": examples,
@@ -620,13 +651,23 @@ def check_direction(body: str, findings: list, bindings: list, *,
 
 
 def direction_failure_reason(direction: dict) -> str:
-    """Plain-English reason for step 5, fed back as the other reasons are."""
-    quoted = "; ".join('"' + strip_tags(f["sentence"]) + '"'
-                       for f in direction["failures"][:5])
+    """Plain-English reason for step 5, fed back as the other reasons are.
+
+    Fix 1b: each failing sentence is quoted with what is wrong in it -- the
+    offending word itself, or the minus sign -- and the figure is given as the
+    finding has it."""
+    parts = []
+    for failure in direction["failures"][:5]:
+        wrong = ['"' + w + '"' for w in dict.fromkeys(failure.get("words", []))]
+        if failure.get("minus_sign"):
+            wrong.append("a minus sign before a figure")
+        parts.append('"' + strip_tags(failure["sentence"]) + '" (it uses '
+                     + " and ".join(wrong) + ")")
     example = next((e for f in direction["failures"]
                     for e in f["as_the_finding_gives_it"]),
                    "Rs 51.96 crore below plan")
-    return ("These sentences do not give the direction of a spending figure as "
-            "the finding gives it: " + quoted + ". Write each figure's "
-            'direction exactly as the finding gives it -- "' + example
-            + '" -- not with a minus sign and not in other words.')
+    return ("These sentences describe a spending figure in a way that says the "
+            "opposite of the finding: " + "; ".join(parts) + ". The finding "
+            'gives the figure as "' + example + '". Write its direction that '
+            "way -- not with a minus sign, and not with a word that says the "
+            "opposite.")
