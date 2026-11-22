@@ -238,7 +238,7 @@ describe("4. an unknown panel kind is skipped", () => {
 });
 
 describe("5. Copy", () => {
-  it("puts the question and the answer on the clipboard, then reads Copied", async () => {
+  it("puts the question, the answer and the caution on the clipboard, then reads Copied", async () => {
     vi.useFakeTimers();
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, "clipboard", {
@@ -246,19 +246,89 @@ describe("5. Copy", () => {
       configurable: true,
     });
     const { question, response } = entry("cuttack");
-    show(question, response);
+    const { container } = show(question, response);
+    const caution = container.querySelector("[data-report-caution]")!.textContent;
 
     const button = screen.getByRole("button", { name: "Copy" });
     await act(async () => {
       fireEvent.click(button);
     });
-    expect(writeText).toHaveBeenCalledWith(`${question}\n\n${response.answer}`);
+    expect(writeText).toHaveBeenCalledWith(
+      `${question}\n\n${response.answer}\n\n${caution}`
+    );
     expect(button.textContent).toBe("Copied");
 
     act(() => {
       vi.advanceTimersByTime(2000);
     });
     expect(button.textContent).toBe("Copy");
+  });
+});
+
+describe("6. The caution line (WP-D13 Fix 6)", () => {
+  /** The caution line of one rendered report, after checking where it sits. */
+  function cautionOf(container: HTMLElement): HTMLElement {
+    const lines = container.querySelectorAll<HTMLElement>("[data-report-caution]");
+    expect(lines).toHaveLength(1);
+    const line = lines[0];
+    // Marked as chrome, so the "no layout renders as before" text comparison
+    // does not see it.
+    expect(line.hasAttribute("data-report-chrome")).toBe(true);
+    // Its own line, directly above the "as of ... / Copy" row, inside the
+    // footer.
+    const row = line.nextElementSibling as HTMLElement;
+    expect(row).not.toBeNull();
+    expect(row.querySelector("button")?.textContent).toBe("Copy");
+    expect(line.parentElement?.className).toContain("border-t");
+    // Plain muted text: 12px, no icon, no box.
+    expect(line.tagName).toBe("P");
+    expect(line.className).toContain("text-[12px]");
+    expect(line.className).toContain("text-report-ink-muted");
+    expect(line.className).not.toMatch(/\b(border|bg-|rounded)/);
+    expect(line.querySelector("svg")).toBeNull();
+    expect(line.textContent?.trim().length).toBeGreaterThan(40);
+    return line;
+  }
+
+  it("is shown on an answer with a layout", () => {
+    const { question, response } = entry("cuttack");
+    expect(Object.keys(response.layout ?? {}).length).toBeGreaterThan(0);
+    const { container } = show(question, response);
+    cautionOf(container);
+  });
+
+  it("is shown on an answer whose layout is {}", () => {
+    const { question, response } = entry("cuttack");
+    const { container } = show(question, { ...response, layout: {} });
+    cautionOf(container);
+    const declined = show(entry("out_of_scope").question, entry("out_of_scope").response);
+    expect(entry("out_of_scope").response.layout ?? {}).toEqual({});
+    cautionOf(declined.container);
+  });
+
+  it("is shown on a fall-back to bare sentences", () => {
+    const { question, response } = entry("kalimela");
+    expect((response.prose as { fell_back?: boolean }).fell_back).toBe(true);
+    const { container } = show(question, response);
+    cautionOf(container);
+  });
+
+  it("is the same text on every report", () => {
+    const texts = new Set(
+      ENTRIES.map(([, e]) => {
+        const { container, unmount } = show(e.question, e.response);
+        const text = cautionOf(container).textContent;
+        unmount();
+        return text;
+      })
+    );
+    expect(texts.size).toBe(1);
+  });
+
+  it("never wraps without breaking: no nowrap or fixed width that could force a sideways scroll at 360px", () => {
+    const { container } = show(entry("cuttack").question, entry("cuttack").response);
+    const line = cautionOf(container);
+    expect(line.className).not.toMatch(/whitespace-nowrap|truncate|\bw-\[|min-w-/);
   });
 });
 
