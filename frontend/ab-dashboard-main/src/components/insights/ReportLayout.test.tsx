@@ -343,7 +343,7 @@ describe("the source underline and its hint", () => {
 
   it("hides the underline at rest only where the device can hover", () => {
     const { container } = show(entry("cuttack").question, entry("cuttack").response);
-    const figure = container.querySelector("button[data-finding-id]")!;
+    const figure = container.querySelector('[role="button"][data-finding-id]')!;
     expect(figure.className).toContain("border-dotted");
     expect(figure.className).toContain("[@media(hover:hover)]:border-transparent");
     expect(figure.className).toContain("hover:border-report-ink");

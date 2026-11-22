@@ -75,7 +75,7 @@ describe("InsightReport hover-to-source", () => {
     );
 
     // The two numerals the service bound, and no other body text.
-    const spans = container.querySelectorAll("button[data-finding-id]");
+    const spans = container.querySelectorAll("[role=button][data-finding-id]");
     expect([...spans].map((s) => s.textContent)).toEqual(["4", "6"]);
     expect([...spans].map((s) => s.getAttribute("data-finding-id"))).toEqual([
       "1-02147",
@@ -97,7 +97,7 @@ describe("InsightReport hover-to-source", () => {
     render(<InsightReport state={done()} onDismiss={() => {}} />);
 
     const figure = document.querySelector<HTMLElement>(
-      'button[data-finding-id="1-02147"]'
+      '[role="button"][data-finding-id="1-02147"]'
     )!;
     fireEvent.mouseEnter(figure);
 
@@ -120,7 +120,7 @@ describe("InsightReport hover-to-source", () => {
     render(<InsightReport state={done()} onDismiss={() => {}} />);
 
     const figure = document.querySelector<HTMLElement>(
-      'button[data-finding-id="1-02147"]'
+      '[role="button"][data-finding-id="1-02147"]'
     )!;
     fireEvent.focus(figure);
     expect(screen.getByRole("tooltip")).toBeTruthy();
@@ -130,11 +130,39 @@ describe("InsightReport hover-to-source", () => {
     expect(screen.queryByRole("tooltip")).toBeNull();
   });
 
+  it("opens from the keyboard with Enter and Space, and wraps like text (WP-D13 Fix 7)", () => {
+    render(<InsightReport state={done()} onDismiss={() => {}} />);
+
+    const figure = document.querySelector<HTMLElement>(
+      '[role="button"][data-finding-id="1-02147"]'
+    )!;
+    // A span, not a <button>: a browser never splits a button across lines.
+    expect(figure.tagName).toBe("SPAN");
+    expect(figure.tabIndex).toBe(0);
+
+    fireEvent.keyDown(figure, { key: "Enter" });
+    expect(screen.getByRole("tooltip")).toBeTruthy();
+    expect(figure.getAttribute("aria-expanded")).toBe("true");
+
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByRole("tooltip")).toBeNull();
+
+    const space = fireEvent.keyDown(figure, { key: " " });
+    expect(screen.getByRole("tooltip")).toBeTruthy();
+    // Space is handled, so it does not also scroll the page.
+    expect(space).toBe(false);
+
+    // Other keys do nothing.
+    fireEvent.keyDown(document, { key: "Escape" });
+    fireEvent.keyDown(figure, { key: "a" });
+    expect(screen.queryByRole("tooltip")).toBeNull();
+  });
+
   it("shows one card at a time", () => {
     render(<InsightReport state={done()} onDismiss={() => {}} />);
 
     const [first, second] = document.querySelectorAll<HTMLElement>(
-      "button[data-finding-id]"
+      "[role=button][data-finding-id]"
     );
     fireEvent.click(first);
     fireEvent.click(second);
@@ -152,7 +180,7 @@ describe("InsightReport hover-to-source", () => {
       />
     );
 
-    expect(container.querySelectorAll("button[data-finding-id]")).toHaveLength(0);
+    expect(container.querySelectorAll("[role=button][data-finding-id]")).toHaveLength(0);
     expect(container.textContent).toContain(
       "Kalimela recorded the highest number of completed activities in 4 of 6 fiscal years."
     );

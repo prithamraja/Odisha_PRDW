@@ -208,6 +208,13 @@ function CitationCard() {
  * figures at rest made nothing stand out. On a touch device, which cannot
  * hover, it stays visible as before. The report's caption says the figures are
  * live ("point at" / "tap" any number).
+ *
+ * WP-D13 Fix 7 T2: the trigger is a SPAN with role="button", not a <button>.
+ * A browser never splits a button across lines, so a long cited phrase jumped
+ * whole to the next line and left a gap. A span wraps like the text around it.
+ * What the button gave for free is kept by hand: it is in the tab order, Enter
+ * and Space do what a click does (Space without scrolling the page), and the
+ * focus ring, hover, focus and Escape behave as before.
  */
 const UNDERLINE =
   "border-0 border-b border-dotted border-report-ink/50 " +
@@ -221,7 +228,7 @@ export function CitationSpan({
   children: ReactNode;
 }) {
   const ctx = useContext(CitationContext);
-  const ref = useRef<HTMLButtonElement>(null);
+  const ref = useRef<HTMLSpanElement>(null);
   const isOpen = !!ctx?.open && ctx.open.element === ref.current;
 
   if (!ctx) return <>{children}</>;
@@ -230,10 +237,17 @@ export function CitationSpan({
     if (ref.current) ctx.show(citation, ref.current, pinned);
   };
 
+  // What a click on the old <button> did; Enter and Space do the same.
+  const activate = () => {
+    if (isOpen && ctx.open?.pinned) ctx.hide();
+    else open(true);
+  };
+
   return (
-    <button
+    <span
       ref={ref}
-      type="button"
+      role="button"
+      tabIndex={0}
       // The same attribute the service's own render puts on a bound span, so
       // what the frontend bound can be read straight off the DOM and compared
       // with `answer_html` without a debugger.
@@ -246,13 +260,16 @@ export function CitationSpan({
       }}
       onFocus={() => open(true)}
       onBlur={() => ctx.releaseAfterDelay()}
-      onClick={() => {
-        if (isOpen && ctx.open?.pinned) ctx.hide();
-        else open(true);
+      onClick={activate}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault(); // Space would otherwise scroll the page
+          activate();
+        }
       }}
-      className={`inline cursor-help bg-transparent p-0 m-0 text-left font-inherit text-inherit leading-inherit ${UNDERLINE} focus:outline-none focus-visible:ring-2 focus-visible:ring-report-cyan/60 rounded-[2px]`}
+      className={`cursor-help box-decoration-clone ${UNDERLINE} focus:outline-none focus-visible:ring-2 focus-visible:ring-report-cyan/60 rounded-[2px]`}
     >
       {children}
-    </button>
+    </span>
   );
 }
