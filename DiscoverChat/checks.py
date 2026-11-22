@@ -10,7 +10,8 @@ what the model WROTE AROUND them. Five checks:
       findings
   (c) no raw database token
   (d) length bounds
-  (e) the causal-verb ban (D41), delegated to causal_gate
+  (e) the causal-verb ban (D41), delegated to causal_gate -- blocking only
+      when DISCOVERCHAT_CAUSAL_CHECK=block (WP-D13 Fix 6, D68; default log)
 
 NO STYLE CHECKS. D40 is explicit and the operator rejected rules-in-the-prompt
 three times: whether the prose reads well is the operator's call at the gate,
@@ -149,8 +150,56 @@ def name_roster(findings: list) -> set:
     return roster
 
 
-def check_prose(prose: str, findings: list, *, corpus_roster: set | None = None) -> dict:
-    """Run every check over one piece of connective prose."""
+# ── WP-D13 Fix 6 (D68): the causal scan behind a switch ──────────────────────
+# Shared by check (e) of `check_prose` and step 3 of `check_citations`, so the
+# two places the chat service applies the scan cannot drift apart. NOTHING IS
+# DELETED: `causal_gate` and the word list in `prose_gate` are untouched, and
+# `block` returns exactly what the scan returned before this switch existed.
+
+def _causal_mode(override: str | None) -> str:
+    mode = (override or config.CAUSAL_CHECK).strip().lower()
+    if mode not in ("block", "log", "off"):
+        raise ValueError(f"causal check mode {mode!r}: expected block, log or "
+                         f"off")
+    return mode
+
+
+def _causal_step(text: str, mode: str) -> dict:
+    """The scan's result as the check records it, or None under `off`.
+
+    block  the scan's own dict, byte for byte -- it counts, as before
+    log    the same dict plus counts: false, and every sentence the scan
+           flags with the words found in it, for the log line the writer
+           keeps (a sentence is scanned on its own for that list; the
+           verdict is still the whole-text scan's)
+    """
+    if mode == "off":
+        return None
+    result = causal_gate.check(text)
+    if mode == "block":
+        return result
+    flagged = []
+    if not result["pass"]:
+        for sentence in _sentences(text):
+            words = [p["surface"] for p in causal_gate.scan(sentence)]
+            if words:
+                flagged.append({"sentence": sentence, "words": words})
+    return {**result, "mode": "log", "counts": False, "sentences": flagged}
+
+
+def _counts(step: dict) -> bool:
+    """Whether a step's verdict counts towards all_pass (log-mode steps do
+    not)."""
+    return step.get("counts", True)
+
+
+def check_prose(prose: str, findings: list, *, corpus_roster: set | None = None,
+                causal_mode: str | None = None) -> dict:
+    """Run every check over one piece of connective prose.
+
+    `causal_mode` overrides `config.CAUSAL_CHECK` for one call (tests and the
+    gate pin it; production passes nothing and gets the configured mode, read
+    at call time)."""
     allowed = supplied_text(findings) + "\n" + for_writer()
     allowed_nums = set()
     for token in numerals(allowed):
@@ -202,11 +251,13 @@ def check_prose(prose: str, findings: list, *, corpus_roster: set | None = None)
                           and n_words <= MAX_TOTAL_WORDS,
                           "sentences": n_sentences, "words": n_words}
 
-    # (e) the causal-verb ban (D41)
-    results["e_causal"] = causal_gate.check(body)
+    # (e) the causal-verb ban (D41), behind the Fix 6 switch
+    causal = _causal_step(body, _causal_mode(causal_mode))
+    if causal is not None:
+        results["e_causal"] = causal
 
     results["all_pass"] = all(v["pass"] for k, v in results.items()
-                              if k != "all_pass")
+                              if k != "all_pass" and _counts(v))
     return results
 
 
@@ -233,8 +284,9 @@ def failure_reason(results: dict) -> str:
                     % (results["d_shape"]["sentences"],
                        results["d_shape"]["words"],
                        MAX_SENTENCES, MAX_TOTAL_WORDS))
-    if not results["e_causal"]["pass"]:
-        bits.append(causal_gate.failure_reason(results["e_causal"]))
+    causal = results.get("e_causal")
+    if causal and _counts(causal) and not causal["pass"]:
+        bits.append(causal_gate.failure_reason(causal))
     return " ".join(bits)
 
 
@@ -253,8 +305,10 @@ def failure_reason(results: dict) -> str:
 # this sentence says it came from?", and a figure attached to the wrong district
 # is now a failure rather than a match.
 #
-# THE FOUR STEPS ARE THE BRIEF'S, IN THE BRIEF'S ORDER, and all four are
-# blocking. Order matters for the reported reason, not for the verdict: an
+# THE FOUR STEPS ARE THE BRIEF'S, IN THE BRIEF'S ORDER, and all four were
+# blocking. Since WP-D13 Fix 6 (D68) step 3, the causal scan, blocks only under
+# DISCOVERCHAT_CAUSAL_CHECK=block; the default `log` records it without
+# counting it. Order matters for the reported reason, not for the verdict: an
 # unknown id makes every downstream answer meaningless, so it is named first.
 #
 # ON THE NUMERAL NORMALISER. The brief asks for Rs / crore / lakh / percent
@@ -381,13 +435,15 @@ def bind_numerals(prose: str, findings: list, *, run_date: str = "") -> list:
 
 
 def check_citations(prose: str, findings: list, *, run_date: str = "",
-                    direction_mode: str | None = None) -> dict:
-    """The four blocking steps of D7.3, in the brief's order, then WP-D13's
-    direction step.
+                    direction_mode: str | None = None,
+                    causal_mode: str | None = None) -> dict:
+    """The four steps of D7.3, in the brief's order, then WP-D13's direction
+    step.
 
-    `direction_mode` overrides `config.DIRECTION_CHECK` for one call (tests and
-    the gate pin it; production passes nothing and gets the configured mode,
-    read at call time)."""
+    `direction_mode` overrides `config.DIRECTION_CHECK` and `causal_mode`
+    overrides `config.CAUSAL_CHECK` for one call (tests and the gate pin them;
+    production passes nothing and gets the configured modes, read at call
+    time)."""
     body = (prose or "").strip()
     answer_ids = {f.id for f in findings}
     tagged = cited_ids(body)
@@ -417,8 +473,11 @@ def check_citations(prose: str, findings: list, *, run_date: str = "",
             for b in unmatched],
     }
 
-    # 3. The causal scan, unchanged and blocking.
-    results["3_causal"] = causal_gate.check(strip_tags(body))
+    # 3. The causal scan. Blocking under DISCOVERCHAT_CAUSAL_CHECK=block;
+    #    recorded but not counted under log (WP-D13 Fix 6, D68); absent under off.
+    causal = _causal_step(strip_tags(body), _causal_mode(causal_mode))
+    if causal is not None:
+        results["3_causal"] = causal
 
     # 4. A finding the judge selected and the writer silently dropped is LOSS,
     #    not concision: the judge already picked the smallest sufficient set.
@@ -435,7 +494,7 @@ def check_citations(prose: str, findings: list, *, run_date: str = "",
 
     results["all_pass"] = all(
         v["pass"] for k, v in results.items()
-        if k != "all_pass" and not (k == "5_direction" and not v["counts"]))
+        if k != "all_pass" and _counts(v))
     return results
 
 
@@ -454,8 +513,9 @@ def citation_failure_reason(results: dict) -> str:
                     "and must appear in that finding. These do not: " + detail
                     + ". Do not compute new numbers; use the figures exactly as "
                       "the findings state them, and tag each one.")
-    if not results["3_causal"]["pass"]:
-        bits.append(causal_gate.failure_reason(results["3_causal"]))
+    causal = results.get("3_causal")
+    if causal and _counts(causal) and not causal["pass"]:
+        bits.append(causal_gate.failure_reason(causal))
     if not results["4_all_findings_cited"]["pass"]:
         bits.append("These findings were supplied but never cited: "
                     + ", ".join(results["4_all_findings_cited"]["dropped"])

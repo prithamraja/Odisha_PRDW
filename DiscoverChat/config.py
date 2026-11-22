@@ -343,6 +343,34 @@ if DIRECTION_CHECK not in ("block", "log", "off"):
     raise ValueError(f"DISCOVERCHAT_DIRECTION_CHECK={DIRECTION_CHECK!r}: "
                      f"expected block, log or off")
 
+# ── WP-D13 Fix 6: the cause-and-effect check stops blocking (D68) ────────────
+# The causal scan (`causal_gate`, D41's word list) at both places the chat
+# service applies it: step `3_causal` of `checks.check_citations` (the live
+# path) and check `e_causal` of `checks.check_prose` (the connective path,
+# DISCOVERCHAT_CONSOLIDATE=0). Three modes, read and validated exactly like
+# DISCOVERCHAT_DIRECTION_CHECK:
+#   block  today's behaviour: counts towards all_pass -- one retry with the
+#          reason, then the bare sentences
+#   log    the scan runs and its result is kept under the same key with
+#          counts: false. No retry, no fall-back, nothing in the retry reason.
+#          A shown answer the scan flagged gets one line in
+#          logs/citation_failures.jsonl (kind "causal_words_shown").
+#   off    the scan is not run and its key is absent
+# Default LOG, the operator's decision 2026-11-22 (D68): "remove the causal
+# check (just comment it out, don't delete the code)". Measured: the writer is
+# checked against words its prompt no longer names (the operator's 2026-09-14
+# edit replaced the banned-word line with one general sentence), and 7 of 32
+# answers lost their narrative to this check on 2026-11-21 -- none of the 28
+# failing sentences said one thing in the data caused another. The writer is
+# still told not to make causal claims (context_brief.py, unchanged), the
+# report builds keep their own check, and the Insight report now carries a
+# fixed caution line. Back to blocking, no code change:
+#     DISCOVERCHAT_CAUSAL_CHECK=block
+CAUSAL_CHECK = os.getenv("DISCOVERCHAT_CAUSAL_CHECK", "log").strip().lower()
+if CAUSAL_CHECK not in ("block", "log", "off"):
+    raise ValueError(f"DISCOVERCHAT_CAUSAL_CHECK={CAUSAL_CHECK!r}: "
+                     f"expected block, log or off")
+
 # ── WP-D12: the Insight report layout (D62) ──────────────────────────────────
 # `layout.build` turns the records an answer already uses into up to three
 # cards, up to three small charts and a "Needs checking" list -- by code, from
@@ -464,6 +492,8 @@ def knobs() -> dict:
         "consolidate": CONSOLIDATE,
         "consolidate_min_findings": CONSOLIDATE_MIN_FINDINGS,
         "classifier_model": CLASSIFIER_MODEL,
+        "causal_check": CAUSAL_CHECK,
+        "direction_check": DIRECTION_CHECK,
         "layout": LAYOUT,
         "layout_cards_min_findings": LAYOUT_CARDS_MIN_FINDINGS,
         "layout_max_cards": LAYOUT_MAX_CARDS,

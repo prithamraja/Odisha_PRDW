@@ -141,6 +141,8 @@ def write(question: str, findings: list, *, corpus_roster: set,
         # same prose; what changed is that an officer no longer waits a median
         # 28.7 s for a verdict on every turn.
         if not config.INLINE_VERIFY:
+            _log_causal_words(turn_id, question, attempt,
+                              check_result.get("e_causal"))
             return Prose(text=prose, fell_back=False, attempts=attempt,
                          check_results=result.check_results,
                          verdicts=result.verdicts)
@@ -148,6 +150,8 @@ def write(question: str, findings: list, *, corpus_roster: set,
         verdict = verifier.verify(prose, findings, turn_id=turn_id)
         result.verdicts.append(verdict)
         if verdict["verdict"] == "pass":
+            _log_causal_words(turn_id, question, attempt,
+                              check_result.get("e_causal"))
             return Prose(text=prose, fell_back=False, attempts=attempt,
                          check_results=result.check_results,
                          verdicts=result.verdicts)
@@ -293,6 +297,29 @@ def _log_failure(turn_id, question: str, prose: str, reason: str,
         pass
 
 
+def _log_causal_words(turn_id, question: str, attempt: int,
+                      causal: dict | None) -> None:
+    """WP-D13 Fix 6 (D68): in `log` mode, a SHOWN answer the causal scan
+    flagged gets one line in the failure log -- the words and the sentences
+    they are in. Marked `kind: causal_words_shown`, `fell_back: false`, so it
+    can never be counted as a fall-back (a fall-back line has no `kind`)."""
+    if not causal or causal.get("counts", True) or causal["pass"]:
+        return
+    path = llm.LOG_DIR / "citation_failures.jsonl"
+    record = {"ts": time.strftime("%Y-%m-%dT%H:%M:%S"),
+              "kind": "causal_words_shown", "fell_back": False,
+              "mode": causal.get("mode"), "turn_id": turn_id,
+              "question": question, "attempt": attempt,
+              "words": [p["surface"] for p in causal["problems"]],
+              "sentences": causal.get("sentences", [])}
+    try:
+        llm.LOG_DIR.mkdir(parents=True, exist_ok=True)
+        with open(path, "a", encoding="utf-8") as fh:
+            fh.write(json.dumps(record, ensure_ascii=False, default=str) + "\n")
+    except OSError:
+        pass
+
+
 def consolidate(question: str, findings: list, *, run_date: str = "",
                 turn_id=None) -> Consolidated:
     """One consolidated narrative. Two attempts, then the bare sentences.
@@ -338,6 +365,8 @@ def consolidate(question: str, findings: list, *, run_date: str = "",
             result.text = checks.strip_tags(prose)
             result.fell_back = False
             result.reason = ""
+            _log_causal_words(turn_id, question, attempt,
+                              results.get("3_causal"))
             return result
 
         reason = checks.citation_failure_reason(results)
