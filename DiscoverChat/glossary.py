@@ -51,6 +51,7 @@ raw makes it visible and countable, where a guessed phrase would be neither.
 from __future__ import annotations
 
 import re
+from functools import lru_cache
 
 from . import config                                   # noqa: F401  (sys.path)
 from phase5d_retrieval_corpus import display_name, _DISPLAY   # noqa: E402
@@ -148,10 +149,51 @@ def render(text: str, view: str) -> str:
     Longest alternative first, so `gp_name values` is matched as the two-token
     plural form before `gp_name` alone -- "Gram Panchayat values" is
     half-translated and reads worse than the raw name.
+
+    ALREADY TRANSLATED TEXT IS LEFT ALONE (WP-D13 Fix 7 T1, D66). The
+    decomposition builder stores its sentences in officer words already, so
+    "across 7 LSDG theme values" contains the key `theme values`, and one pass
+    still turned it into "LSDG LSDG theme values" (5,414 sentences), "reported
+    households" into "reported reported households" (1,240), and two
+    "calendar calendar". The rule: a replacement is skipped where the text at
+    that place already reads as the replacement -- the match sits inside a
+    copy of its own replacement, at the replacement's own offset.
     """
     if not text or view not in _CONFIGS:
         return text
+    table, pattern = _substitution(view)
 
+    def replace(match):
+        found = match.group(0)
+        shown = table[found]
+        if _already_reads_as(match.string, match.start(), found, shown):
+            return found
+        return shown
+    return pattern.sub(replace, text)
+
+
+def _already_reads_as(text: str, start: int, found: str, shown: str) -> bool:
+    """True when `found`, at `start` in `text`, is part of a copy of `shown`
+    that is already there -- whole words, at the offset `found` has in
+    `shown`."""
+    offset = shown.find(found)
+    while offset != -1:
+        begin = start - offset
+        end = begin + len(shown)
+        if (begin >= 0 and text[begin:end] == shown
+                and (begin == 0 or not text[begin - 1].isalnum())
+                and (end == len(text) or not text[end].isalnum())):
+            return True
+        offset = shown.find(found, offset + 1)
+    return False
+
+
+@lru_cache(maxsize=None)
+def _substitution(view: str):
+    """The view's substitution table and its one-pass pattern, built once.
+
+    Built from module constants only, so remembering it changes no output; it
+    used to be rebuilt on every call (48 s for a corpus sweep, WP-D12 §7)."""
     table = {}
     for col in set(_measures(view)) | set(_dimensions(view)) | set(_DISPLAY):
         phrase = _phrase(view, col)
@@ -173,7 +215,7 @@ def render(text: str, view: str) -> str:
         r"(?<![A-Za-z0-9_])(?:"
         + "|".join(re.escape(k) for k in sorted(table, key=len, reverse=True))
         + r")(?![A-Za-z0-9_])")
-    return pattern.sub(lambda m: table[m.group(0)], text)
+    return table, pattern
 
 
 def raw_columns(text: str, view: str) -> list:
