@@ -1,0 +1,246 @@
+<style>
+  #prdw-ask-mock {
+    --pa-bg: light-dark(#f7f4ee, #101718);
+    --pa-panel: light-dark(#ffffff, #182123);
+    --pa-soft: light-dark(#efebe3, #222d2f);
+    --pa-ink: light-dark(#172023, #eef2f1);
+    --pa-muted: light-dark(#667174, #a7b4b4);
+    --pa-line: light-dark(#ddd9d1, #344144);
+    --pa-teal: light-dark(#175764, #62bdc4);
+    --pa-teal-soft: light-dark(#e4f0f1, #18363a);
+    --pa-warm: light-dark(#a94e25, #f1a070);
+    --pa-success: light-dark(#34724b, #7ac292);
+    color-scheme: light dark;
+    color: var(--pa-ink);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  }
+  #prdw-ask-mock * { box-sizing: border-box; }
+  #prdw-ask-mock button, #prdw-ask-mock input, #prdw-ask-mock textarea { font: inherit; }
+  #prdw-ask-mock h1, #prdw-ask-mock h2, #prdw-ask-mock h3, #prdw-ask-mock p { margin: 0; }
+  #prdw-ask-mock .pa-screen {
+    min-height: 790px;
+    overflow: hidden;
+    border: 1px solid var(--pa-line);
+    border-radius: 18px;
+    background: var(--pa-bg);
+    box-shadow: 0 18px 44px light-dark(rgba(29,43,46,.08), rgba(0,0,0,.25));
+  }
+  #prdw-ask-mock .pa-header {
+    min-height: 58px;
+    padding: 10px 22px;
+    display: grid;
+    grid-template-columns: minmax(250px,1fr) auto minmax(250px,1fr);
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid var(--pa-line);
+    background: var(--pa-panel);
+  }
+  #prdw-ask-mock .pa-brand { display:flex; align-items:center; gap:10px; min-width:0; }
+  #prdw-ask-mock .pa-mark { width:30px; height:30px; flex:0 0 auto; display:grid; place-items:center; border-radius:7px; background:var(--pa-teal); color:light-dark(#fff,#081416); }
+  #prdw-ask-mock .pa-mark svg { width:16px; height:16px; }
+  #prdw-ask-mock .pa-brand-title { font:15px Georgia,serif; white-space:nowrap; }
+  #prdw-ask-mock .pa-brand-meta { margin-top:1px; color:var(--pa-muted); font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #prdw-ask-mock .pa-tabs { display:flex; padding:3px; gap:2px; border:1px solid var(--pa-line); border-radius:10px; background:var(--pa-bg); }
+  #prdw-ask-mock .pa-tab { min-height:34px; padding:0 17px; border:0; border-radius:7px; background:transparent; color:var(--pa-muted); }
+  #prdw-ask-mock .pa-tab[aria-selected="true"] { background:var(--pa-panel); color:var(--pa-ink); box-shadow:0 1px 4px light-dark(rgba(0,0,0,.08),rgba(0,0,0,.24)); }
+  #prdw-ask-mock .pa-coverage { justify-self:end; display:flex; align-items:center; gap:7px; color:var(--pa-muted); font-size:12px; }
+  #prdw-ask-mock .pa-dot { width:7px; height:7px; border-radius:50%; background:var(--pa-success); }
+  #prdw-ask-mock .pa-landing { min-height:720px; display:grid; place-items:center; padding:52px 30px 70px; }
+  #prdw-ask-mock .pa-hero { width:min(760px,100%); }
+  #prdw-ask-mock .pa-hero-copy { text-align:center; }
+  #prdw-ask-mock .pa-eyebrow { color:var(--pa-warm); font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; }
+  #prdw-ask-mock .pa-hero h1 { margin-top:10px; font:400 44px/1.08 Georgia,serif; letter-spacing:-.025em; }
+  #prdw-ask-mock .pa-hero h1 em { color:var(--pa-muted); font-weight:400; }
+  #prdw-ask-mock .pa-lede { width:min(560px,100%); margin:14px auto 0; color:var(--pa-muted); font-size:14px; line-height:1.55; }
+  #prdw-ask-mock .pa-composer {
+    margin-top:31px;
+    padding:10px 10px 10px 16px;
+    display:flex;
+    align-items:center;
+    gap:11px;
+    border:1px solid var(--pa-line);
+    border-radius:var(--pa-radius,15px);
+    background:var(--pa-panel);
+    box-shadow:0 12px 28px light-dark(rgba(35,48,50,.08),rgba(0,0,0,.22));
+  }
+  #prdw-ask-mock .pa-composer svg { width:17px; height:17px; color:var(--pa-muted); }
+  #prdw-ask-mock .pa-composer input, #prdw-ask-mock .pa-composer textarea { min-width:0; flex:1; border:0; outline:0; resize:none; background:transparent; color:var(--pa-ink); }
+  #prdw-ask-mock .pa-send { min-height:38px; padding:0 14px; display:flex; align-items:center; gap:7px; border:0; border-radius:9px; background:var(--pa-ink); color:var(--pa-panel); font-weight:650; }
+  #prdw-ask-mock .pa-send svg { width:14px; height:14px; color:inherit; }
+  #prdw-ask-mock .pa-scope { margin-top:14px; display:flex; justify-content:center; flex-wrap:wrap; gap:8px; color:var(--pa-muted); font-size:11px; }
+  #prdw-ask-mock .pa-scope span { display:inline-flex; align-items:center; gap:5px; }
+  #prdw-ask-mock .pa-scope svg { width:12px; height:12px; }
+  #prdw-ask-mock .pa-examples { margin-top:38px; border-block:1px solid var(--pa-line); }
+  #prdw-ask-mock .pa-example {
+    width:100%; min-height:50px; padding:10px 2px; display:grid; grid-template-columns:92px minmax(0,1fr) 24px;
+    align-items:center; gap:12px; border:0; border-bottom:1px solid var(--pa-line); background:transparent; color:inherit; text-align:left;
+  }
+  #prdw-ask-mock .pa-example:last-child { border-bottom:0; }
+  #prdw-ask-mock .pa-example small { color:var(--pa-muted); font-size:10px; letter-spacing:.1em; }
+  #prdw-ask-mock .pa-example strong { font-size:13px; font-weight:500; }
+  #prdw-ask-mock .pa-example svg { width:15px; height:15px; color:var(--pa-muted); }
+  #prdw-ask-mock .pa-more { margin-top:12px; display:flex; justify-content:center; }
+  #prdw-ask-mock .pa-more button { min-height:34px; padding:0 12px; border:1px solid var(--pa-line); border-radius:9px; background:var(--pa-panel); color:var(--pa-muted); font-size:12px; }
+  #prdw-ask-mock .pa-examples.is-expanded .pa-optional { display:grid; }
+  #prdw-ask-mock .pa-optional { display:none; }
+  #prdw-ask-mock .pa-compact .pa-landing { padding-top:34px; }
+  #prdw-ask-mock .pa-compact .pa-examples { margin-top:25px; }
+
+  #prdw-ask-mock .pa-conversation { min-height:720px; display:grid; grid-template-rows:auto 1fr auto; }
+  #prdw-ask-mock .pa-context {
+    min-height:58px; padding:10px 30px; display:flex; align-items:center; justify-content:space-between; gap:16px;
+    border-bottom:1px solid var(--pa-line); background:var(--pa-panel);
+  }
+  #prdw-ask-mock .pa-context-title { min-width:0; }
+  #prdw-ask-mock .pa-context-title strong { display:block; font:400 18px Georgia,serif; }
+  #prdw-ask-mock .pa-context-title span { display:block; margin-top:3px; color:var(--pa-muted); font-size:11px; }
+  #prdw-ask-mock .pa-context-pills { display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+  #prdw-ask-mock .pa-context-pill { min-height:30px; padding:0 9px; border:1px solid var(--pa-line); border-radius:999px; background:var(--pa-bg); color:var(--pa-muted); font-size:11px; }
+  #prdw-ask-mock .pa-thread { padding:26px 32px; }
+  #prdw-ask-mock .pa-thread-inner { width:min(850px,100%); margin:0 auto; }
+  #prdw-ask-mock .pa-user { display:flex; justify-content:flex-end; }
+  #prdw-ask-mock .pa-user-bubble { max-width:620px; padding:10px 14px; border-radius:12px 12px 4px 12px; background:var(--pa-ink); color:var(--pa-panel); font-size:13px; line-height:1.45; }
+  #prdw-ask-mock .pa-assistant { margin-top:24px; }
+  #prdw-ask-mock .pa-assistant-id { display:flex; align-items:center; gap:7px; color:var(--pa-muted); font-size:11px; }
+  #prdw-ask-mock .pa-mini-mark { width:21px; height:21px; display:grid; place-items:center; border-radius:6px; background:var(--pa-teal); color:light-dark(#fff,#081416); }
+  #prdw-ask-mock .pa-mini-mark svg { width:11px; height:11px; }
+  #prdw-ask-mock .pa-answer-summary { margin-top:12px; max-width:700px; font:400 17px/1.5 Georgia,serif; }
+  #prdw-ask-mock .pa-answer-note { margin-top:7px; max-width:700px; color:var(--pa-muted); font-size:12px; line-height:1.5; }
+  #prdw-ask-mock .pa-results { margin-top:18px; overflow:hidden; border:1px solid var(--pa-line); border-radius:var(--pa-radius,14px); background:var(--pa-panel); }
+  #prdw-ask-mock .pa-results-head { padding:12px 15px; display:flex; justify-content:space-between; gap:12px; align-items:center; border-bottom:1px solid var(--pa-line); }
+  #prdw-ask-mock .pa-results-head strong { font-size:12px; }
+  #prdw-ask-mock .pa-results-meta { color:var(--pa-muted); font-size:11px; }
+  #prdw-ask-mock .pa-view-switch { display:flex; gap:2px; padding:3px; border-radius:8px; background:var(--pa-soft); }
+  #prdw-ask-mock .pa-view-switch button { min-height:28px; padding:0 9px; border:0; border-radius:6px; background:transparent; color:var(--pa-muted); font-size:11px; }
+  #prdw-ask-mock .pa-view-switch button[aria-pressed="true"] { background:var(--pa-panel); color:var(--pa-ink); }
+  #prdw-ask-mock .pa-table-wrap { overflow-x:auto; }
+  #prdw-ask-mock table { width:100%; border-collapse:collapse; font-size:12px; font-variant-numeric:tabular-nums; }
+  #prdw-ask-mock th, #prdw-ask-mock td { padding:10px 15px; border-bottom:1px solid var(--pa-line); text-align:left; white-space:nowrap; }
+  #prdw-ask-mock th { color:var(--pa-muted); font-size:10px; font-weight:500; letter-spacing:.08em; text-transform:uppercase; }
+  #prdw-ask-mock td:not(:first-child), #prdw-ask-mock th:not(:first-child) { text-align:right; }
+  #prdw-ask-mock tbody tr:last-child td { border-bottom:0; }
+  #prdw-ask-mock .pa-chart { display:none; padding:18px 20px 20px; }
+  #prdw-ask-mock .pa-chart-row { display:grid; grid-template-columns:150px minmax(0,1fr) 64px; gap:12px; align-items:center; margin-top:12px; font-size:11px; }
+  #prdw-ask-mock .pa-track { height:10px; border-radius:999px; background:var(--pa-soft); overflow:hidden; }
+  #prdw-ask-mock .pa-bar { height:100%; border-radius:inherit; background:var(--pa-teal); }
+  #prdw-ask-mock .pa-value { text-align:right; font-variant-numeric:tabular-nums; }
+  #prdw-ask-mock .pa-results[data-view="chart"] .pa-table-wrap { display:none; }
+  #prdw-ask-mock .pa-results[data-view="chart"] .pa-chart { display:block; }
+  #prdw-ask-mock .pa-result-actions { margin-top:10px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  #prdw-ask-mock .pa-quiet { min-height:32px; padding:0 10px; border:1px solid var(--pa-line); border-radius:8px; background:var(--pa-panel); color:var(--pa-muted); font-size:11px; }
+  #prdw-ask-mock .pa-bottom { padding:12px 30px 16px; border-top:1px solid var(--pa-line); background:var(--pa-panel); }
+  #prdw-ask-mock .pa-bottom .pa-composer { width:min(850px,100%); margin:0 auto; box-shadow:none; background:var(--pa-bg); }
+  #prdw-ask-mock .pa-bottom-hint { width:min(850px,100%); margin:6px auto 0; color:var(--pa-muted); font-size:10px; text-align:center; }
+  @media (max-width:760px) {
+    #prdw-ask-mock .pa-screen { min-height:1050px; }
+    #prdw-ask-mock .pa-header { grid-template-columns:1fr auto; }
+    #prdw-ask-mock .pa-tabs { order:3; grid-column:1/-1; justify-self:center; }
+    #prdw-ask-mock .pa-coverage { font-size:0; }
+    #prdw-ask-mock .pa-landing { min-height:970px; padding:38px 18px 60px; }
+    #prdw-ask-mock .pa-hero h1 { font-size:36px; }
+    #prdw-ask-mock .pa-context { align-items:flex-start; flex-direction:column; padding-inline:18px; }
+    #prdw-ask-mock .pa-thread { padding-inline:18px; }
+    #prdw-ask-mock .pa-bottom { padding-inline:18px; }
+  }
+  @media (max-width:520px) {
+    #prdw-ask-mock .pa-brand-meta { display:none; }
+    #prdw-ask-mock .pa-composer { align-items:stretch; flex-wrap:wrap; }
+    #prdw-ask-mock .pa-composer input, #prdw-ask-mock .pa-composer textarea { min-height:36px; }
+    #prdw-ask-mock .pa-composer .pa-send { width:100%; justify-content:center; }
+    #prdw-ask-mock .pa-example { grid-template-columns:72px minmax(0,1fr) 20px; }
+    #prdw-ask-mock .pa-chart-row { grid-template-columns:110px minmax(0,1fr) 54px; gap:8px; }
+  }
+</style>
+
+<div id="prdw-ask-mock" class="viz-carousel" aria-label="Ask page design states">
+  <section class="pa-screen" data-variant="Guided landing" aria-label="Guided Ask landing page">
+    <header class="pa-header">
+      <div class="pa-brand"><div class="pa-mark"><i data-lucide="landmark" aria-hidden="true"></i></div><div><div class="pa-brand-title">PR&amp;DW Decision Aid</div><div class="pa-brand-meta">Odisha · Panchayati Raj &amp; Drinking Water</div></div></div>
+      <nav class="pa-tabs" aria-label="Primary views"><button type="button" class="pa-tab" aria-selected="true">Ask</button><button type="button" class="pa-tab" aria-selected="false">Discover</button></nav>
+      <div class="pa-coverage"><span class="pa-dot"></span>Coverage details available</div>
+    </header>
+    <main class="pa-landing" id="ask-landing" aria-label="Ask landing design controls">
+      <div class="pa-hero">
+        <div class="pa-hero-copy"><div class="pa-eyebrow">Ask the records</div><h1>Start with a decision,<br><em>not a dashboard.</em></h1><p class="pa-lede">Ask about GPDP planning, sanctions, expenditure, works, assets, or sanitation. Answers preserve the time period and geography you are working with.</p></div>
+        <label class="pa-composer"><i data-lucide="search" aria-hidden="true"></i><span class="sr-only">Ask about Odisha panchayat data</span><input placeholder="e.g. Which blocks achieved 100% GPDP submission in 2024–25?" aria-label="Ask about Odisha panchayat data"><button type="button" class="pa-send cursor-interaction">Ask <i data-lucide="arrow-up" aria-hidden="true"></i></button></label>
+        <div class="pa-scope"><span><i data-lucide="database" aria-hidden="true"></i>GP-level records</span><span>·</span><span><i data-lucide="calendar-days" aria-hidden="true"></i>Fiscal-year aware</span><span>·</span><span><i data-lucide="shield-check" aria-hidden="true"></i>Auditable answers</span></div>
+        <div class="pa-examples" id="ask-examples">
+          <button type="button" class="pa-example cursor-interaction"><small>PLANNING</small><strong>Which blocks achieved 100% GPDP submission in 2024–25?</strong><i data-lucide="arrow-up-right" aria-hidden="true"></i></button>
+          <button type="button" class="pa-example cursor-interaction"><small>SPEND</small><strong>What is the total actual expenditure incurred by each GP?</strong><i data-lucide="arrow-up-right" aria-hidden="true"></i></button>
+          <button type="button" class="pa-example cursor-interaction"><small>PROGRESS</small><strong>What is the completion rate under each theme and focus area?</strong><i data-lucide="arrow-up-right" aria-hidden="true"></i></button>
+          <button type="button" class="pa-example pa-optional cursor-interaction"><small>ASSETS</small><strong>How many assets were created in each GP during 2024–25?</strong><i data-lucide="arrow-up-right" aria-hidden="true"></i></button>
+          <button type="button" class="pa-example pa-optional cursor-interaction"><small>TRENDS</small><strong>Compare approved cost and expenditure across two fiscal years.</strong><i data-lucide="arrow-up-right" aria-hidden="true"></i></button>
+        </div>
+        <div class="pa-more"><button type="button" id="ask-more" class="cursor-interaction" aria-expanded="false">Show two more examples</button></div>
+      </div>
+    </main>
+  </section>
+
+  <section class="pa-screen" data-variant="Active answer" aria-label="Ask active answer page" hidden>
+    <header class="pa-header">
+      <div class="pa-brand"><div class="pa-mark"><i data-lucide="landmark" aria-hidden="true"></i></div><div><div class="pa-brand-title">PR&amp;DW Decision Aid</div><div class="pa-brand-meta">Odisha · Panchayati Raj &amp; Drinking Water</div></div></div>
+      <nav class="pa-tabs" aria-label="Primary views"><button type="button" class="pa-tab" aria-selected="true">Ask</button><button type="button" class="pa-tab" aria-selected="false">Discover</button></nav>
+      <div class="pa-coverage"><span class="pa-dot"></span>Coverage details available</div>
+    </header>
+    <main class="pa-conversation" id="ask-answer" aria-label="Ask answer design controls">
+      <section class="pa-context" aria-label="Current question context"><div class="pa-context-title"><strong>GPDP submission performance</strong><span>Current analytical context</span></div><div class="pa-context-pills"><button type="button" class="pa-context-pill cursor-interaction">2024–25</button><button type="button" class="pa-context-pill cursor-interaction">All districts</button><button type="button" class="pa-context-pill cursor-interaction">Start new question</button></div></section>
+      <section class="pa-thread">
+        <div class="pa-thread-inner">
+          <div class="pa-user"><div class="pa-user-bubble">Which blocks achieved 100% GPDP submission in 2024–25?</div></div>
+          <article class="pa-assistant">
+            <div class="pa-assistant-id"><span class="pa-mini-mark"><i data-lucide="shield" aria-hidden="true"></i></span><span>Decision Aid · just now</span></div>
+            <p class="pa-answer-summary">Sixteen blocks recorded 100% GPDP submission for 2024–25.</p>
+            <p class="pa-answer-note">The table is sorted alphabetically. Switch to chart view for a quicker comparison or adjust the fiscal year from the context row above.</p>
+            <div class="pa-results" id="ask-result" data-view="table">
+              <div class="pa-results-head"><div><strong>Blocks with complete submission</strong><div class="pa-results-meta">16 rows · percentage of GPs submitted</div></div><div class="pa-view-switch" aria-label="Result view"><button type="button" data-result-view="table" aria-pressed="true">Table</button><button type="button" data-result-view="chart" aria-pressed="false">Chart</button></div></div>
+              <div class="pa-table-wrap"><table><thead><tr><th>Block</th><th>GPs submitted</th><th>Total GPs</th><th>Submission</th></tr></thead><tbody><tr><td>Astaranga</td><td>15</td><td>15</td><td>100%</td></tr><tr><td>Balianta</td><td>16</td><td>16</td><td>100%</td></tr><tr><td>Bangomunda</td><td>26</td><td>26</td><td>100%</td></tr><tr><td>Baranga</td><td>16</td><td>16</td><td>100%</td></tr></tbody></table></div>
+              <div class="pa-chart" role="img" aria-label="Four sample blocks, each at one hundred percent GPDP submission"><div class="pa-chart-row"><span>Astaranga</span><span class="pa-track"><span class="pa-bar" style="width:100%"></span></span><span class="pa-value">100%</span></div><div class="pa-chart-row"><span>Balianta</span><span class="pa-track"><span class="pa-bar" style="width:100%"></span></span><span class="pa-value">100%</span></div><div class="pa-chart-row"><span>Bangomunda</span><span class="pa-track"><span class="pa-bar" style="width:100%"></span></span><span class="pa-value">100%</span></div><div class="pa-chart-row"><span>Baranga</span><span class="pa-track"><span class="pa-bar" style="width:100%"></span></span><span class="pa-value">100%</span></div></div>
+            </div>
+            <div class="pa-result-actions"><button type="button" class="pa-quiet cursor-interaction"><i data-lucide="download" aria-hidden="true"></i> Download CSV</button><button type="button" class="pa-quiet cursor-interaction">Ask about one block</button><button type="button" class="pa-quiet cursor-interaction">Compare with 2023–24</button></div>
+          </article>
+        </div>
+      </section>
+      <footer class="pa-bottom"><label class="pa-composer"><i data-lucide="search" aria-hidden="true"></i><span class="sr-only">Ask a follow-up</span><textarea rows="1" placeholder="Ask a follow-up about these results" aria-label="Ask a follow-up about these results"></textarea><button type="button" class="pa-send cursor-interaction">Ask <i data-lucide="arrow-up" aria-hidden="true"></i></button></label><div class="pa-bottom-hint">Current context: GPDP submission · 2024–25 · all districts</div></footer>
+    </main>
+  </section>
+</div>
+
+<script>
+  (() => {
+    const root = document.getElementById('prdw-ask-mock');
+    const examples = document.getElementById('ask-examples');
+    const more = document.getElementById('ask-more');
+    const result = document.getElementById('ask-result');
+    const landing = document.getElementById('ask-landing');
+    const answer = document.getElementById('ask-answer');
+    if (!root || !examples || !more || !result || !landing || !answer) return;
+
+    more.addEventListener('click', () => {
+      const expanded = more.getAttribute('aria-expanded') !== 'true';
+      more.setAttribute('aria-expanded', String(expanded));
+      more.textContent = expanded ? 'Show fewer examples' : 'Show two more examples';
+      examples.classList.toggle('is-expanded', expanded);
+    });
+    root.addEventListener('click', (event) => {
+      const control = event.target.closest('[data-result-view]');
+      if (!control) return;
+      const view = control.dataset.resultView;
+      result.dataset.view = view;
+      result.querySelectorAll('[data-result-view]').forEach((button) => button.setAttribute('aria-pressed', String(button === control)));
+    });
+
+    const landingState = { radius: 15, compact: false };
+    const answerState = { radius: 14, compact: false };
+    const renderLanding = () => { landing.style.setProperty('--pa-radius', `${landingState.radius}px`); landing.classList.toggle('pa-compact', landingState.compact); };
+    const renderAnswer = () => { answer.style.setProperty('--pa-radius', `${answerState.radius}px`); answer.classList.toggle('pa-compact', answerState.compact); };
+    renderLanding(); renderAnswer();
+    if (globalThis.Tweak) {
+      const a = new Tweak({ container: landing, onChange: renderLanding });
+      a.addSlider(landingState, 'radius', { label: 'Composer radius', min: 6, max: 24, unit: 'px', reference: 'ask.composer-radius' });
+      a.addToggle(landingState, 'compact', { label: 'Compact landing', reference: 'ask.landing-compact' });
+      const b = new Tweak({ container: answer, onChange: renderAnswer });
+      b.addSlider(answerState, 'radius', { label: 'Result radius', min: 6, max: 24, unit: 'px', reference: 'ask.result-radius' });
+      b.addToggle(answerState, 'compact', { label: 'Compact conversation', reference: 'ask.conversation-compact' });
+    }
+  })();
+</script>

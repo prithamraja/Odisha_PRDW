@@ -1,0 +1,210 @@
+<style>
+  #prdw-mock {
+    --pd-canvas: light-dark(#f6f3ed, #101719);
+    --pd-surface: light-dark(#ffffff, #182124);
+    --pd-soft: light-dark(#eeeae2, #212d30);
+    --pd-ink: light-dark(#172124, #edf2f1);
+    --pd-muted: light-dark(#667174, #aab7b7);
+    --pd-line: light-dark(#dcd9d1, #344145);
+    --pd-accent: light-dark(#155e63, #62c3c0);
+    --pd-accent-soft: light-dark(#e4f2f0, #18383a);
+    --pd-warm: light-dark(#ad4f26, #f2a06f);
+    --pd-good: light-dark(#39704a, #7dc391);
+    color-scheme: light dark;
+    color: var(--pd-ink);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  }
+  #prdw-mock * { box-sizing: border-box; }
+  #prdw-mock .pd-screen {
+    min-height: 780px; overflow: hidden; background: var(--pd-canvas);
+    border: 1px solid var(--pd-line); border-radius: 18px;
+    box-shadow: 0 16px 40px light-dark(rgba(33,46,48,.08), rgba(0,0,0,.24));
+  }
+  #prdw-mock .pd-topbar {
+    min-height: 58px; padding: 10px 22px; display: grid;
+    grid-template-columns: minmax(250px,1fr) auto minmax(250px,1fr);
+    align-items: center; gap: 16px; background: var(--pd-surface);
+    border-bottom: 1px solid var(--pd-line);
+  }
+  #prdw-mock .pd-brand { display:flex; align-items:center; gap:10px; min-width:0; }
+  #prdw-mock .pd-mark { width:30px; height:30px; flex:0 0 auto; display:grid; place-items:center; border-radius:7px; background:var(--pd-accent); color:light-dark(#fff,#081416); }
+  #prdw-mock .pd-mark svg { width:16px; height:16px; }
+  #prdw-mock .pd-brand-copy { min-width:0; }
+  #prdw-mock .pd-brand-name { font: 15px Georgia,serif; white-space:nowrap; }
+  #prdw-mock .pd-brand-meta { margin-top:1px; color:var(--pd-muted); font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #prdw-mock .pd-tabs { display:flex; align-items:center; padding:3px; gap:2px; border:1px solid var(--pd-line); border-radius:10px; background:var(--pd-canvas); }
+  #prdw-mock button, #prdw-mock input { font:inherit; }
+  #prdw-mock .pd-tab { min-height:34px; padding:0 17px; border:0; border-radius:7px; background:transparent; color:var(--pd-muted); }
+  #prdw-mock .pd-tab[aria-selected="true"] { background:var(--pd-surface); color:var(--pd-ink); box-shadow:0 1px 4px light-dark(rgba(0,0,0,.08),rgba(0,0,0,.24)); }
+  #prdw-mock .pd-fresh { justify-self:end; display:flex; align-items:center; gap:7px; color:var(--pd-muted); font-size:12px; }
+  #prdw-mock .pd-live { width:7px; height:7px; border-radius:50%; background:var(--pd-good); }
+  #prdw-mock h1, #prdw-mock h2, #prdw-mock h3, #prdw-mock p { margin:0; }
+  #prdw-mock .pd-page { padding:34px 38px 42px; }
+  #prdw-mock .pd-eyebrow { color:var(--pd-warm); font-size:11px; font-weight:700; letter-spacing:.13em; text-transform:uppercase; }
+  #prdw-mock h1 { margin-top:7px; font:400 34px/1.1 Georgia,serif; letter-spacing:-.02em; }
+  #prdw-mock .pd-lede { margin-top:9px; max-width:650px; color:var(--pd-muted); font-size:14px; line-height:1.55; }
+  #prdw-mock .pd-search { margin-top:24px; min-height:58px; display:flex; align-items:center; gap:12px; padding:9px 10px 9px 16px; border:1px solid var(--pd-line); border-radius:14px; background:var(--pd-surface); }
+  #prdw-mock .pd-search svg { width:17px; height:17px; color:var(--pd-muted); }
+  #prdw-mock .pd-search input { min-width:0; flex:1; border:0; outline:0; background:transparent; color:var(--pd-ink); }
+  #prdw-mock .pd-main-action { min-height:38px; padding:0 14px; border:0; border-radius:9px; background:var(--pd-ink); color:var(--pd-surface); font-weight:650; }
+  #prdw-mock .pd-chips { margin-top:10px; display:flex; flex-wrap:wrap; gap:7px; }
+  #prdw-mock .pd-chip { min-height:31px; padding:0 10px; border:1px solid var(--pd-line); border-radius:999px; background:var(--pd-surface); color:var(--pd-muted); font-size:12px; }
+  #prdw-mock .pd-workspace { margin-top:25px; display:grid; grid-template-columns:minmax(0,1fr) 280px; gap:20px; }
+  #prdw-mock .pd-report, #prdw-mock .pd-sidecard, #prdw-mock .pd-card { background:var(--pd-surface); border:1px solid var(--pd-line); border-radius:var(--pd-radius,16px); }
+  #prdw-mock .pd-report-head { padding:22px 24px 17px; border-bottom:1px solid var(--pd-line); }
+  #prdw-mock .pd-report-meta { display:flex; justify-content:space-between; gap:16px; color:var(--pd-muted); font-size:11px; }
+  #prdw-mock .pd-report h2 { margin-top:7px; font:400 22px/1.25 Georgia,serif; }
+  #prdw-mock .pd-takeaway { margin:20px 24px 8px; padding:16px 18px; border-radius:12px; background:var(--pd-accent-soft); }
+  #prdw-mock .pd-takeaway strong { color:var(--pd-accent); font-size:10px; letter-spacing:.11em; text-transform:uppercase; }
+  #prdw-mock .pd-takeaway p { margin-top:6px; font:400 17px/1.45 Georgia,serif; }
+  #prdw-mock .pd-evidence-list { padding:7px 24px 22px; }
+  #prdw-mock .pd-evidence { width:100%; padding:15px 0; display:grid; grid-template-columns:104px 1fr 20px; gap:16px; align-items:start; border:0; border-bottom:1px solid var(--pd-line); background:transparent; color:inherit; text-align:left; }
+  #prdw-mock .pd-evidence:last-child { border-bottom:0; }
+  #prdw-mock .pd-metric { color:var(--pd-accent); font-size:24px; line-height:1; font-weight:650; letter-spacing:-.03em; }
+  #prdw-mock .pd-metric small { display:block; margin-top:6px; color:var(--pd-muted); font-size:10px; font-weight:500; letter-spacing:.08em; text-transform:uppercase; }
+  #prdw-mock .pd-evidence strong { display:block; font-size:13px; }
+  #prdw-mock .pd-evidence p { margin-top:5px; color:var(--pd-muted); font-size:12px; line-height:1.45; }
+  #prdw-mock .pd-evidence > svg { width:16px; height:16px; margin-top:2px; color:var(--pd-muted); transition:transform .18s; }
+  #prdw-mock .pd-evidence[aria-expanded="true"] > svg { transform:rotate(180deg); }
+  #prdw-mock .pd-detail { display:none; grid-column:2/-1; color:var(--pd-muted); font-size:12px; line-height:1.5; }
+  #prdw-mock .pd-evidence[aria-expanded="true"] .pd-detail { display:block; }
+  #prdw-mock .pd-side { display:flex; flex-direction:column; gap:14px; }
+  #prdw-mock .pd-sidecard { padding:17px; }
+  #prdw-mock .pd-sidecard h3 { font-size:13px; }
+  #prdw-mock .pd-scope { display:flex; justify-content:space-between; gap:12px; margin-top:13px; font-size:12px; }
+  #prdw-mock .pd-scope span { color:var(--pd-muted); }
+  #prdw-mock .pd-source { width:100%; margin-top:9px; padding:10px; display:flex; gap:9px; align-items:flex-start; border:1px solid var(--pd-line); border-radius:10px; background:var(--pd-canvas); color:inherit; text-align:left; }
+  #prdw-mock .pd-source svg { width:14px; height:14px; flex:0 0 auto; margin-top:1px; color:var(--pd-accent); }
+  #prdw-mock .pd-source strong, #prdw-mock .pd-source span { display:block; }
+  #prdw-mock .pd-source strong { font-size:11px; }
+  #prdw-mock .pd-source span { margin-top:2px; color:var(--pd-muted); font-size:10px; line-height:1.35; }
+  #prdw-mock .pd-note { color:var(--pd-muted); font-size:11px; line-height:1.5; }
+  #prdw-mock .is-compact .pd-page { padding-top:24px; }
+  #prdw-mock .is-compact .pd-evidence { padding-block:10px; }
+  #prdw-mock .pd-brief-layout { display:grid; grid-template-columns:216px minmax(0,1fr); min-height:721px; }
+  #prdw-mock .pd-brief-nav { padding:30px 18px; background:var(--pd-surface); border-right:1px solid var(--pd-line); }
+  #prdw-mock .pd-brief-nav h2 { margin:7px 8px 18px; font:400 20px/1.2 Georgia,serif; }
+  #prdw-mock .pd-brief-link { width:100%; min-height:38px; padding:0 10px; display:flex; align-items:center; justify-content:space-between; border:0; border-radius:9px; background:transparent; color:var(--pd-muted); text-align:left; }
+  #prdw-mock .pd-brief-link[aria-current="page"] { background:var(--pd-accent-soft); color:var(--pd-accent); font-weight:650; }
+  #prdw-mock .pd-nav-note { margin:24px 10px 0; padding-top:18px; border-top:1px solid var(--pd-line); color:var(--pd-muted); font-size:11px; line-height:1.55; }
+  #prdw-mock .pd-brief-main { padding:32px 36px 40px; min-width:0; }
+  #prdw-mock .pd-brief-top { display:flex; justify-content:space-between; align-items:end; gap:20px; }
+  #prdw-mock .pd-brief-top h1 { font-size:31px; }
+  #prdw-mock .pd-quiet { min-height:36px; padding:0 12px; border:1px solid var(--pd-line); border-radius:9px; background:var(--pd-surface); color:var(--pd-ink); font-size:12px; }
+  #prdw-mock .pd-mini-search { margin-top:22px; display:flex; gap:9px; }
+  #prdw-mock .pd-mini-search .pd-search { margin:0; flex:1; min-height:48px; }
+  #prdw-mock .pd-grid { margin-top:22px; display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  #prdw-mock .pd-card { padding:17px; }
+  #prdw-mock .pd-card:first-child { grid-column:1/-1; border-left:4px solid var(--pd-warm); }
+  #prdw-mock .pd-card-meta { display:flex; justify-content:space-between; gap:12px; color:var(--pd-muted); font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+  #prdw-mock .pd-priority { color:var(--pd-warm); font-weight:700; }
+  #prdw-mock .pd-card h3 { margin-top:10px; font:400 18px/1.35 Georgia,serif; }
+  #prdw-mock .pd-card p { margin-top:8px; color:var(--pd-muted); font-size:12px; line-height:1.55; }
+  #prdw-mock .pd-actions { margin-top:14px; display:flex; flex-wrap:wrap; gap:8px; }
+  #prdw-mock .pd-text-action { min-height:32px; padding:0 10px; border:1px solid var(--pd-line); border-radius:8px; background:var(--pd-canvas); color:var(--pd-ink); font-size:11px; }
+  #prdw-mock .pd-action-emphasis .pd-text-action:first-child { background:var(--pd-ink); color:var(--pd-surface); border-color:var(--pd-ink); }
+  #prdw-mock .pd-number { font-weight:700; }
+  #prdw-mock .pd-density-compact .pd-card { padding:13px; }
+  @media (max-width:760px) {
+    #prdw-mock .pd-screen { min-height:1100px; }
+    #prdw-mock .pd-topbar { grid-template-columns:1fr auto; }
+    #prdw-mock .pd-tabs { order:3; grid-column:1/-1; justify-self:center; }
+    #prdw-mock .pd-fresh { font-size:0; }
+    #prdw-mock .pd-page, #prdw-mock .pd-brief-main { padding:26px 18px 34px; }
+    #prdw-mock .pd-workspace { grid-template-columns:1fr; }
+    #prdw-mock .pd-side { display:grid; grid-template-columns:1fr 1fr; }
+    #prdw-mock .pd-brief-layout { grid-template-columns:1fr; }
+    #prdw-mock .pd-brief-nav { display:none; }
+    #prdw-mock .pd-grid { grid-template-columns:1fr; }
+    #prdw-mock .pd-card:first-child { grid-column:auto; }
+  }
+  @media (max-width:520px) {
+    #prdw-mock .pd-brand-meta { display:none; }
+    #prdw-mock .pd-search { align-items:stretch; flex-wrap:wrap; }
+    #prdw-mock .pd-search input { min-height:34px; }
+    #prdw-mock .pd-search .pd-main-action { width:100%; }
+    #prdw-mock .pd-side { grid-template-columns:1fr; }
+    #prdw-mock .pd-evidence { grid-template-columns:82px 1fr 18px; gap:10px; }
+    #prdw-mock .pd-mini-search, #prdw-mock .pd-brief-top { flex-direction:column; align-items:stretch; }
+  }
+</style>
+
+<div id="prdw-mock" class="viz-carousel" aria-label="Two directions for the PR&amp;DW Discover experience">
+  <section class="pd-screen" data-variant="Evidence workspace" aria-label="Evidence workspace design">
+    <header class="pd-topbar">
+      <div class="pd-brand"><div class="pd-mark"><i data-lucide="landmark" aria-hidden="true"></i></div><div class="pd-brand-copy"><div class="pd-brand-name">PR&amp;DW Decision Aid</div><div class="pd-brand-meta">Odisha · Panchayati Raj &amp; Drinking Water</div></div></div>
+      <nav class="pd-tabs" aria-label="Primary views"><button type="button" class="pd-tab" aria-selected="false">Ask</button><button type="button" class="pd-tab" aria-selected="true">Discover</button></nav>
+      <div class="pd-fresh"><span class="pd-live"></span>Data through 17 Aug 2026</div>
+    </header>
+    <main class="pd-page" id="evidence-workspace" aria-label="Evidence workspace styling">
+      <div class="pd-eyebrow">Discover</div><h1>Turn findings into a decision</h1>
+      <p class="pd-lede">Ask across the mined findings, then inspect the evidence, scope, and source record without losing the main answer.</p>
+      <label class="pd-search"><i data-lucide="search" aria-hidden="true"></i><span class="sr-only">Ask about patterns in the data</span><input value="What should I know about Kalimela?" aria-label="Ask about patterns in the data"><button type="button" class="pd-main-action cursor-interaction">Analyze</button></label>
+      <div class="pd-chips" aria-label="Suggested questions"><button type="button" class="pd-chip cursor-interaction">Expenditure outliers</button><button type="button" class="pd-chip cursor-interaction">Sanction patterns</button><button type="button" class="pd-chip cursor-interaction">Water-supply works</button></div>
+      <div class="pd-workspace">
+        <article class="pd-report">
+          <header class="pd-report-head"><div class="pd-report-meta"><span>Insight report · Kalimela</span><span>5 supporting findings</span></div><h2>Planning breadth is high, but linkage and delivery records need attention.</h2></header>
+          <div class="pd-takeaway"><strong>What matters</strong><p>Of 852 planned activities, 684 have no scheme recorded; spending is also below plan across 28 focus areas.</p></div>
+          <div class="pd-evidence-list">
+            <button type="button" class="pd-evidence cursor-interaction" aria-expanded="false"><span class="pd-metric">80.3%<small>unlinked</small></span><span><strong>Scheme linkage is the clearest data-quality gap</strong><p>684 activities have no scheme recorded, limiting programme-level accountability.</p><span class="pd-detail">The remaining activity set is spread across four recorded scheme values. Open the source record to inspect the exact slice and exclusions.</span></span><i data-lucide="chevron-down" aria-hidden="true"></i></button>
+            <button type="button" class="pd-evidence cursor-interaction" aria-expanded="false"><span class="pd-metric">₹4.12cr<small>below plan</small></span><span><strong>The spending gap is distributed, not isolated</strong><p>Negative plan-versus-spend positions appear across 28 focus areas.</p><span class="pd-detail">Maintenance of community assets, roads, and other focus areas account for much of the observed gap in the mined findings.</span></span><i data-lucide="chevron-down" aria-hidden="true"></i></button>
+            <button type="button" class="pd-evidence cursor-interaction" aria-expanded="false"><span class="pd-metric">91.8%<small>spend share</small></span><span><strong>Recorded spending is concentrated in ongoing works</strong><p>Ongoing works carry most spending despite representing a smaller activity share.</p><span class="pd-detail">Treat this as a reconciliation prompt: compare status, plan value, and cashbook records before concluding that performance improved.</span></span><i data-lucide="chevron-down" aria-hidden="true"></i></button>
+          </div>
+        </article>
+        <aside class="pd-side" aria-label="Evidence and analysis scope">
+          <section class="pd-sidecard"><h3>Analysis scope</h3><div class="pd-scope"><span>Geography</span><strong>Kalimela GP</strong></div><div class="pd-scope"><span>Periods</span><strong>6 fiscal years</strong></div><div class="pd-scope"><span>Activities</span><strong>852 records</strong></div><div class="pd-scope"><span>Confidence</span><strong>5 cited findings</strong></div></section>
+          <section class="pd-sidecard"><h3>Source records</h3><button type="button" class="pd-source cursor-interaction"><i data-lucide="file-text" aria-hidden="true"></i><span><strong>Activity lifecycle</strong><span>Planning, status, scheme linkage</span></span></button><button type="button" class="pd-source cursor-interaction"><i data-lucide="file-text" aria-hidden="true"></i><span><strong>GP performance</strong><span>Spend, progress, evidence</span></span></button></section>
+          <p class="pd-note">Numbers open their exact evidence on demand; the answer stays readable until verification is needed.</p>
+        </aside>
+      </div>
+    </main>
+  </section>
+
+  <section class="pd-screen" data-variant="Executive briefing" aria-label="Executive briefing design" hidden>
+    <header class="pd-topbar">
+      <div class="pd-brand"><div class="pd-mark"><i data-lucide="landmark" aria-hidden="true"></i></div><div class="pd-brand-copy"><div class="pd-brand-name">PR&amp;DW Decision Aid</div><div class="pd-brand-meta">Odisha · Panchayati Raj &amp; Drinking Water</div></div></div>
+      <nav class="pd-tabs" aria-label="Primary views"><button type="button" class="pd-tab" aria-selected="false">Ask</button><button type="button" class="pd-tab" aria-selected="true">Discover</button></nav>
+      <div class="pd-fresh"><span class="pd-live"></span>Data through 17 Aug 2026</div>
+    </header>
+    <div class="pd-brief-layout" id="executive-briefing" aria-label="Executive briefing styling">
+      <aside class="pd-brief-nav"><div class="pd-eyebrow">Briefing</div><h2>Kalimela</h2><button type="button" class="pd-brief-link" aria-current="page"><span>Overview</span><span>3</span></button><button type="button" class="pd-brief-link"><span>Planning</span><span>2</span></button><button type="button" class="pd-brief-link"><span>Spending</span><span>3</span></button><button type="button" class="pd-brief-link"><span>Implementation</span><span>2</span></button><p class="pd-nav-note">A reading view for officers who want priorities first and evidence only when they drill in.</p></aside>
+      <main class="pd-brief-main">
+        <div class="pd-brief-top"><div><div class="pd-eyebrow">Discover · Executive brief</div><h1>What needs attention in Kalimela</h1><p class="pd-lede">Three decision signals synthesized from the currently mined findings.</p></div><button type="button" class="pd-quiet cursor-interaction">View all findings</button></div>
+        <div class="pd-mini-search"><label class="pd-search"><i data-lucide="search" aria-hidden="true"></i><span class="sr-only">Ask a follow-up</span><input placeholder="Ask a follow-up about this briefing" aria-label="Ask a follow-up about this briefing"></label><button type="button" class="pd-main-action cursor-interaction">Ask</button></div>
+        <div class="pd-grid">
+          <article class="pd-card"><div class="pd-card-meta"><span>Planning · 2 sources</span><span class="pd-priority">Review first</span></div><h3><span class="pd-number">684 of 852</span> activities have no scheme recorded.</h3><p>This is the strongest immediate reconciliation need. It prevents a reliable scheme-level view even though the planning record itself is broad.</p><div class="pd-actions"><button type="button" class="pd-text-action cursor-interaction">Inspect evidence</button><button type="button" class="pd-text-action cursor-interaction">Ask about the 684 activities</button></div></article>
+          <article class="pd-card"><div class="pd-card-meta"><span>Spending · 2 sources</span><span>6 fiscal years</span></div><h3>Recorded spending is <span class="pd-number">₹4.12 crore below plan</span>.</h3><p>The gap spans 28 focus areas, suggesting a systematic reconciliation question rather than one exceptional programme.</p><div class="pd-actions"><button type="button" class="pd-text-action cursor-interaction">See focus areas</button><button type="button" class="pd-text-action cursor-interaction">Open records</button></div></article>
+          <article class="pd-card"><div class="pd-card-meta"><span>Implementation · 1 source</span><span>129 activities</span></div><h3>Photo evidence exists for only a subset of activities.</h3><p>Coverage is strongest in Themes 4 and 5; the rest of the activity set deserves a targeted evidence check.</p><div class="pd-actions"><button type="button" class="pd-text-action cursor-interaction">Review coverage</button><button type="button" class="pd-text-action cursor-interaction">Ask a follow-up</button></div></article>
+        </div>
+      </main>
+    </div>
+  </section>
+</div>
+
+<script>
+  (() => {
+    const root = document.getElementById('prdw-mock');
+    if (!root) return;
+    root.addEventListener('click', (event) => {
+      const row = event.target.closest('.pd-evidence');
+      if (!row) return;
+      row.setAttribute('aria-expanded', String(row.getAttribute('aria-expanded') !== 'true'));
+    });
+    const evidence = document.getElementById('evidence-workspace');
+    const briefing = document.getElementById('executive-briefing');
+    const evidenceState = { cardRadius: 16, compact: false };
+    const briefingState = { cardRadius: 16, compact: false, emphasizeActions: true };
+    const renderEvidence = () => { evidence.style.setProperty('--pd-radius', `${evidenceState.cardRadius}px`); evidence.classList.toggle('is-compact', evidenceState.compact); };
+    const renderBriefing = () => { briefing.style.setProperty('--pd-radius', `${briefingState.cardRadius}px`); briefing.classList.toggle('pd-density-compact', briefingState.compact); briefing.classList.toggle('pd-action-emphasis', briefingState.emphasizeActions); };
+    renderEvidence(); renderBriefing();
+    if (globalThis.Tweak) {
+      const a = new Tweak({ container: evidence, onChange: renderEvidence });
+      a.addSlider(evidenceState, 'cardRadius', { label: 'Card radius', min: 6, max: 24, unit: 'px', reference: 'evidence.card-radius' });
+      a.addToggle(evidenceState, 'compact', { label: 'Compact evidence rows', reference: 'evidence.compact' });
+      const b = new Tweak({ container: briefing, onChange: renderBriefing });
+      b.addSlider(briefingState, 'cardRadius', { label: 'Card radius', min: 6, max: 24, unit: 'px', reference: 'briefing.card-radius' });
+      b.addToggle(briefingState, 'compact', { label: 'Compact briefing cards', reference: 'briefing.compact' });
+      b.addToggle(briefingState, 'emphasizeActions', { label: 'Emphasize primary actions', reference: 'briefing.actions' });
+    }
+  })();
+</script>
