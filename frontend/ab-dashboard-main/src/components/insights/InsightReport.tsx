@@ -71,7 +71,7 @@ function BlockText({ block }: { block: CitedBlock }) {
 function Block({ block }: { block: CitedBlock }) {
   if (block.kind === "finding") {
     return (
-      <div className="pl-4 border-l-2 border-report-cyan/40">
+      <div data-report-part="finding" className="pl-4 border-l-2 border-report-cyan/40">
         <p className="text-[14px] leading-relaxed text-report-ink">
           <BlockText block={block} />
         </p>
@@ -133,7 +133,7 @@ export function InsightReport({
                     pointer can hover, so the report has to say the figures
                     are live. Two wordings, one shown per device by CSS. */}
                 {status === "done" && parsed?.hasCitations && (
-                  <span data-report-chrome="">
+                  <span data-report-chrome="" data-print-hide="">
                     {" · "}
                     <span className="hidden [@media(hover:hover)]:inline">point at</span>
                     <span className="[@media(hover:hover)]:hidden">tap</span>
@@ -145,6 +145,7 @@ export function InsightReport({
           </div>
           <button
             onClick={onDismiss}
+            data-print-hide=""
             aria-label="Dismiss insight report"
             className="shrink-0 w-7 h-7 rounded-md border border-report-line text-report-ink-muted hover:text-report-ink hover:border-report-ink/30 flex items-center justify-center transition-colors"
           >
@@ -213,6 +214,7 @@ export function InsightReport({
               {isAskRoute && onRouteToAsk && (
                 <button
                   onClick={() => onRouteToAsk(question)}
+                  data-print-hide=""
                   className="mt-5 inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-report-ink hover:bg-report-ink/90 text-ivory text-[13px] font-medium transition-colors"
                 >
                   Put this question to Ask

@@ -4,6 +4,11 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { InsightReport } from "./InsightReport";
 import FIXTURES from "@/lib/discover-layout.fixtures.json";
 import BASELINE from "@/lib/discover-layout-baseline.fixtures.json";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+
+/** The app's stylesheet as written (the test runner blanks CSS imports). */
+const INDEX_CSS = readFileSync(resolve(__dirname, "../../index.css"), "utf8");
 import type {
   DiscoverChatResponse,
   DiscoverLayout,
@@ -434,6 +439,157 @@ describe("6. The caution line (WP-D13 Fix 6)", () => {
     const { container } = show(entry("cuttack").question, entry("cuttack").response);
     const line = cautionOf(container);
     expect(line.className).not.toMatch(/whitespace-nowrap|truncate|\bw-\[|min-w-/);
+  });
+});
+
+describe("7. What prints (WP-D13 Fix 10)", () => {
+  /** Every element marked to be left out of the print, by what it reads. */
+  const leftOut = (container: HTMLElement) =>
+    [...container.querySelectorAll<HTMLElement>("[data-print-hide]")].map(
+      (n) => n.getAttribute("aria-label") ?? n.textContent?.trim() ?? ""
+    );
+
+  it("leaves out the controls only: dismiss, Download, the hint and 'Put this question to Ask'", () => {
+    const cuttack = show(entry("cuttack").question, entry("cuttack").response);
+    expect(leftOut(cuttack.container)).toEqual([
+      // both wordings are in the DOM; CSS shows one per device
+      "· point attap any number to see its source",
+      "Dismiss insight report",
+      "Download PDF",
+    ]);
+    cuttack.unmount();
+
+    const declined = show(entry("out_of_scope").question, entry("out_of_scope").response);
+    expect(leftOut(declined.container)).toEqual([
+      "Dismiss insight report",
+      "Put this question to Ask",
+      "Download PDF",
+    ]);
+  });
+
+  it("keeps everything else: caution, stamp, cards, charts, the warning box and every 'Open record' link", () => {
+    const { question, response } = entry("cuttack");
+    const { container } = show(question, response);
+    const card = container.querySelector("[data-report-card]")!;
+    expect(card).not.toBeNull();
+    const kept = [
+      "[data-report-caution]",
+      '[data-report-part="cards"]',
+      '[data-report-part="prose"]',
+      '[data-report-part="warnings"]',
+      '[data-report-part="footer"]',
+      "figure",
+      "a[href*='/record/']",
+      "[data-finding-id]",
+    ];
+    for (const selector of kept) {
+      const nodes = [...card.querySelectorAll(selector)];
+      expect(nodes.length, selector).toBeGreaterThan(0);
+      for (const node of nodes) {
+        expect(node.closest("[data-print-hide]"), selector).toBeNull();
+      }
+    }
+    // The stamp is the footer's own line, not a control.
+    const stamp = screen.getByText(/^as of /);
+    expect(stamp.closest("[data-print-hide]")).toBeNull();
+  });
+
+  it("marks each bare finding of a fall-back so it is never split across pages", () => {
+    const { question, response } = entry("kalimela");
+    const { container } = show(question, response);
+    const findings = container.querySelectorAll('[data-report-part="finding"]');
+    expect(findings.length).toBeGreaterThan(0);
+    for (const f of findings) expect(f.textContent).toContain("a breakdown of the recorded totals");
+  });
+});
+
+describe("8. The print rules apply only to a report being downloaded (WP-D13 Fix 10)", () => {
+  /** index.css without comments. */
+  const css = INDEX_CSS.replace(/\/\*[\s\S]*?\*\//g, "");
+
+  /** The body of each block opened by `at` (e.g. "@media print"), brace-matched. */
+  function blocks(at: RegExp): string[] {
+    const out: string[] = [];
+    for (const m of css.matchAll(at)) {
+      let i = css.indexOf("{", m.index!) + 1;
+      const start = i;
+      for (let depth = 1; depth > 0; i++) {
+        if (css[i] === "{") depth++;
+        else if (css[i] === "}") depth--;
+      }
+      out.push(css.slice(start, i - 1));
+    }
+    return out;
+  }
+
+  /** The selector lists of the rules directly inside a block body. */
+  function selectors(body: string): string[] {
+    const out: string[] = [];
+    let depth = 0;
+    let prelude = "";
+    for (const ch of body) {
+      if (ch === "{") {
+        if (depth === 0) out.push(prelude.trim());
+        depth++;
+        prelude = "";
+      } else if (ch === "}") {
+        depth--;
+        prelude = "";
+      } else if (depth === 0) {
+        prelude += ch;
+      }
+    }
+    return out;
+  }
+
+  /** Split a selector list on its top-level commas (not those inside :is()). */
+  function split(list: string): string[] {
+    const parts: string[] = [];
+    let depth = 0;
+    let cur = "";
+    for (const ch of list) {
+      if (ch === "(") depth++;
+      if (ch === ")") depth--;
+      if (ch === "," && depth === 0) {
+        parts.push(cur.trim());
+        cur = "";
+      } else cur += ch;
+    }
+    parts.push(cur.trim());
+    return parts;
+  }
+
+  it("has print rules, and every selector in them starts at html[data-report-printing]", () => {
+    const print = blocks(/@media\s+print\b[^{]*/g);
+    expect(print.length).toBeGreaterThan(0);
+    const all = print.flatMap(selectors).flatMap(split);
+    expect(all.length).toBeGreaterThan(5);
+    for (const selector of all) {
+      expect(selector.startsWith("html[data-report-printing]"), selector).toBe(true);
+    }
+  });
+
+  it("sets the A4 page only as a named page, which only the downloading report selects", () => {
+    const pages = [...css.matchAll(/@page\b([^{]*)\{/g)].map((m) => m[1].trim());
+    expect(pages).toEqual(["report"]);
+    const [page] = blocks(/@page\s+report\b/g);
+    expect(page).toMatch(/size:\s*A4 portrait/);
+    expect(page).toMatch(/margin:\s*15mm/);
+    expect(css).toMatch(
+      /html\[data-report-printing\]\s*\{\s*page:\s*report;\s*\}/
+    );
+  });
+
+  it("keeps background colours, releases the scroll boxes and keeps cards, charts and warnings whole", () => {
+    const print = blocks(/@media\s+print\b[^{]*/g).join("\n");
+    expect(print).toMatch(/print-color-adjust:\s*exact/);
+    expect(print).toMatch(/overflow:\s*visible !important/);
+    expect(print).toMatch(/height:\s*auto !important/);
+    expect(print).toMatch(/\[data-print-hide\]\s*\{\s*display:\s*none !important/);
+    for (const part of ['[data-report-part="cards"] > *', "figure", '[data-report-part="warnings"] li']) {
+      expect(print).toContain(part);
+    }
+    expect(print).toMatch(/break-inside:\s*avoid/);
   });
 });
 

@@ -85,3 +85,103 @@
     border-radius: 3px;
   }
 }
+
+/*
+ * WP-D13 Fix 10 (D72): "Download PDF" prints the one Insight report on screen
+ * through the browser's own print box, as it is: nothing added.
+ *
+ * Every rule below hangs off html[data-report-printing], which the report's
+ * Download button sets only while its print box is open (ReportFooter.tsx),
+ * and the A4 page is a NAMED page that only that attribute selects. Ctrl+P
+ * anywhere else (the Ask page, the feed, a report printed without the button)
+ * prints exactly as before.
+ */
+@page report {
+  size: A4 portrait;
+  margin: 15mm;
+}
+
+@media print {
+  html[data-report-printing] {
+    page: report;
+  }
+
+  /* Only the report prints. Every element that neither holds the card nor
+     sits inside it leaves the layout: the header and tabs, the question box,
+     the feed, toasts, and the hover box (it lives in <body>, outside the
+     card). Taken out, not hidden, so no empty space is left where they were. */
+  html[data-report-printing] body *:not([data-print-target], [data-print-target] *, :has([data-print-target])) {
+    display: none !important;
+  }
+
+  /* The boxes the card sits in: no fixed height, no inner scroll, no padding,
+     no width cap, no tint. The page scrolls inside fixed-height boxes
+     (h-screen overflow-hidden in pages/Index.tsx, overflow-y-auto in
+     AnomaliesView.tsx); left as they are, the PDF stops after one page. */
+  html[data-report-printing],
+  html[data-report-printing] body,
+  html[data-report-printing] body :has([data-print-target]) {
+    display: block !important;
+    position: static !important;
+    width: auto !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    overflow: visible !important;
+    background: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  /* The card as on screen (border, tints, colours) from the top of page 1,
+     filling the width. Background colours print: the bars, the card tints
+     and the warning box are backgrounds, which browsers drop by default. */
+  html[data-report-printing] [data-print-target] {
+    margin: 0 !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* The controls only: dismiss, Download, the "point at / tap any number"
+     hint, "Put this question to Ask". "Open record" links stay, as links. */
+  html[data-report-printing] [data-print-target] [data-print-hide] {
+    display: none !important;
+  }
+
+  /* Nothing cut in half: a card, a chart, the "Needs checking" box (when it
+     fits on one page; a longer one breaks between items, never inside one,
+     and its heading stays with its first item), a bare finding and the
+     footer each stay on one page. */
+  html[data-report-printing] [data-print-target] :is(
+      [data-report-part="cards"] > *,
+      figure,
+      [data-report-part="warnings"],
+      [data-report-part="warnings"] li,
+      [data-report-part="finding"],
+      [data-report-part="footer"]
+    ) {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  html[data-report-printing] [data-print-target] [data-report-part="warnings"] h3 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  /* A figure whose hover box was open when Download was clicked prints with
+     the underline it has at rest (report-ink at 50%); the box itself is out. */
+  html[data-report-printing] [data-print-target] [data-finding-id][aria-expanded="true"] {
+    border-bottom-color: rgb(36 52 71 / 0.5) !important;
+  }
+}
+
+@media print and (hover: hover) {
+  html[data-report-printing] [data-print-target] [data-finding-id][aria-expanded="true"] {
+    border-bottom-color: transparent !important;
+  }
+}
