@@ -63,7 +63,42 @@ LAST_LINE = "Return only the finished prose."
 
 # USD per 1M tokens (input, output). gpt-5.6-sol at its promotional price,
 # recorded as running through at least 2026-11-21 -- the day of this run.
+# A model with no price here is NEVER costed at $0 (WP-D13 Fix 9 T4): its
+# tokens are reported and its cost reads "price not set for <id>". The
+# operator supplies the prices of the new models; none is guessed here.
 PRICES = {"gpt-5.6-sol": (4.0, 20.0)}
+
+
+def _usd(model: str, usage: dict):
+    """The call's cost in USD, or None when the model has no price on file."""
+    price = PRICES.get(model)
+    if price is None:
+        return None
+    return round((usage["prompt_tokens"] * price[0]
+                  + usage["completion_tokens"] * price[1]) / 1e6, 5)
+
+
+def spend(calls: list) -> dict:
+    """Tokens and cost over the counted calls. `usd` is None (never 0) when
+    any call's model has no price; `text` is the line to print."""
+    unpriced = sorted({c["model"] for c in calls if c["usd"] is None})
+    priced = [c for c in calls if c["usd"] is not None]
+    out = {"prompt_tokens": sum(c["prompt_tokens"] for c in calls),
+           "completion_tokens": sum(c["completion_tokens"] for c in calls),
+           "usd": (None if unpriced
+                   else round(sum(c["usd"] for c in priced), 4)),
+           "price_not_set": unpriced}
+    if unpriced:
+        text = (f"{out['prompt_tokens']:,} tokens in, "
+                f"{out['completion_tokens']:,} out; "
+                + "; ".join(f"price not set for {m}" for m in unpriced))
+        if priced:
+            text += (f"; ${sum(c['usd'] for c in priced):.4f} for the "
+                     f"{len(priced)} priced calls")
+    else:
+        text = f"${out['usd']:.4f}"
+    out["text"] = text
+    return out
 
 
 def _questions() -> list:
@@ -91,16 +126,13 @@ def _counted(model, prompt, max_completion, purpose, *, turn_id=None,
     record = _real_call(model, prompt, max_completion, purpose,
                         turn_id=turn_id, attempt=attempt)
     usage = record["usage"]
-    price_in, price_out = PRICES.get(model, (0.0, 0.0))
-    cost = (usage["prompt_tokens"] * price_in
-            + usage["completion_tokens"] * price_out) / 1e6
     with _lock:
         CALLS[slot] = {"model": model, "purpose": purpose, "turn_id": turn_id,
                        "attempt": attempt, "seconds": record["seconds"],
                        "finish_reason": record["finish_reason"],
                        "prompt_tokens": usage["prompt_tokens"],
                        "completion_tokens": usage["completion_tokens"],
-                       "usd": round(cost, 5),
+                       "usd": _usd(model, usage),
                        "response_text": record["response_text"]}
     return record
 
@@ -404,6 +436,7 @@ def main() -> int:
     structured = sum(1 for r in answered
                      if (r["headline"]["structure"] or {}).get("structured"))
     calls = [c for c in CALLS if c]
+    cost = spend(calls)
     out = {
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "stamp": stamp, "direction_mode": mode,
@@ -419,7 +452,10 @@ def main() -> int:
         "calls": {"n": len(calls),
                   "by_purpose": {p: sum(1 for c in calls if c["purpose"] == p)
                                  for p in sorted({c["purpose"] for c in calls})},
-                  "usd": round(sum(c["usd"] for c in calls), 4),
+                  "usd": cost["usd"],
+                  "prompt_tokens": cost["prompt_tokens"],
+                  "completion_tokens": cost["completion_tokens"],
+                  "price_not_set": cost["price_not_set"],
                   "query_embeddings": len(questions),
                   "log": [{k: v for k, v in c.items() if k != "response_text"}
                           for c in calls]},
@@ -428,7 +464,7 @@ def main() -> int:
     (OUT_DIR / "trial_results.json").write_text(
         json.dumps(out, ensure_ascii=False, indent=1, default=str),
         encoding="utf-8")
-    print(f"{len(calls)} model calls, ${out['calls']['usd']:.4f}; pass marks "
+    print(f"{len(calls)} model calls, {cost['text']}; pass marks "
           f"{out['pass_marks']}")
     write_sheet(out)
     return 0
