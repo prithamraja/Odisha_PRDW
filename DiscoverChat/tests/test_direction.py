@@ -273,6 +273,29 @@ class OppositeWordTests(unittest.TestCase):
                      "below plan", "the gap", "shortfall", "underspend"]:
             self.assertNotRegex(near, checks._OPPOSITE_DIRECTION)
 
+    def test_a_positive_figure_bound_lets_a_list_word_through(self):
+        """Fix 9 T1 (D70): R1' takes R3's exception. d1-00108 is mixed:
+        "1 of them add Rs 1.73 lakh" (positive), "Sanitation at Rs -1.33
+        crore" (negative), measured against sanction."""
+        record = _corpus().get("d1-00108")
+        self.assertEqual(record.data["signs"], "mixed")
+        r = checks.check_citations(
+            "One focus area exceeded its sanction by Rs 1.73 lakh, while "
+            "Sanitation was Rs 1.33 crore below sanction [d1-00108].",
+            [record], direction_mode="block")
+        self.assertTrue(r["all_pass"], checks.citation_failure_reason(r))
+        self.assertEqual(r["5_direction"]["checked"], 1)
+
+    def test_the_same_words_without_a_positive_figure_still_fail(self):
+        record = _corpus().get("d1-00108")
+        r = checks.check_citations(
+            "One focus area exceeded its sanction, while Sanitation was "
+            "Rs 1.33 crore below sanction [d1-00108].",
+            [record], direction_mode="block")
+        self.assertFalse(r["all_pass"])
+        self.assertEqual(r["5_direction"]["failures"][0]["rules"],
+                         ["R1': says 'exceeded'"])
+
     def test_share_only_sentence_is_not_checked(self):
         r = self.run_check("Rows with no grant type on file exceed 90.3% of "
                            "the gap [d1-00248].")

@@ -545,7 +545,11 @@ def citation_failure_reason(results: dict) -> str:
 # THE RULE, per prose sentence holding at least one such figure:
 #   R1' it contains no word on `OPPOSITE_DIRECTION_WORDS` below -- words that
 #       state the opposite direction ("exceeded", "overspent", "surplus", "more
-#       than the plan", ...). Whole words, any case. No exception.
+#       than the plan", ...). Whole words, any case. Same exception as R3
+#       (WP-D13 Fix 9, D70): not when a figure the stored sentence shows as
+#       POSITIVE money is also bound in the sentence -- "one focus area
+#       exceeded its sanction by Rs 1.73 lakh, while Sanitation was Rs 1.33
+#       crore below sanction" is a true sentence about a mixed-sign record.
 #   R2  no minus sign stands directly before a figure (2023-24 is not one).
 #   R3  it does not say the opposite words ("above plan" / "above sanction"),
 #       unless a figure the stored sentence shows as POSITIVE money is also
@@ -688,7 +692,9 @@ def check_direction(body: str, findings: list, bindings: list, *,
             if _words_re(facts["above"]).search(bare) and not positive_bound:
                 rules.append(f"R3: says '{facts['above']}' for {record_id}")
                 words.append(_words_re(facts["above"]).search(bare).group(0))
-        for match in _OPPOSITE_DIRECTION.finditer(bare):
+        # R1' takes R3's own condition (`positive_bound`), not a second one.
+        for match in (() if positive_bound
+                      else _OPPOSITE_DIRECTION.finditer(bare)):
             word = re.sub(r"\s+", " ", match.group(0))
             rules.append(f"R1': says '{word}'")
             words.append(word)
