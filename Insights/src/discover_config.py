@@ -26,7 +26,7 @@ import os
 # That is exactly the class of error the calibration gate exists to catch, so
 # `sol` is the pin. The operator can flip to either sibling with the env var,
 # with no code change and no re-run of anything upstream.
-DISCOVER_PROSE_MODEL = os.getenv("DISCOVER_PROSE_MODEL", "gpt-5.6-sol")
+DISCOVER_PROSE_MODEL = os.getenv("DISCOVER_PROSE_MODEL", "gpt-6.2-sol")
 
 # The completion budget lives HERE, next to the model, because it is a property
 # of the model and not of any one report.

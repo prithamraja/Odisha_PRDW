@@ -93,7 +93,7 @@ WRITER_MAX_COMPLETION = DISCOVER_MAX_COMPLETION_TOKENS  # D17 budget
 # chat path and the build step are judged by the same model.
 # Same vendor remains the disclosed limitation: Insights/.env serves one
 # completion vendor, so a cross-vendor judge needs a new credential.
-VERIFIER_MODEL = os.getenv("DISCOVERCHAT_VERIFIER_MODEL", "gpt-5.6-luna")
+VERIFIER_MODEL = os.getenv("DISCOVERCHAT_VERIFIER_MODEL", "gpt-6-luna")
 
 # 9,000, NOT WP-D4's 4,000, and the difference was measured rather than guessed.
 # The trial's ceiling was sized for one rewritten finding. This verifier reads a
@@ -139,12 +139,12 @@ VERIFIER_MAX_COMPLETION = int(os.getenv("DISCOVERCHAT_VERIFIER_TOKENS", "9000"))
 # gate counts empty and unparseable replies explicitly and fails on one.
 #
 # REVERSION IS THE ENVIRONMENT VARIABLE, no code change and no redeploy:
-#     DISCOVERCHAT_CLASSIFIER_MODEL=gpt-5.5
+#     DISCOVERCHAT_CLASSIFIER_MODEL=gpt-6.2-sol
 # Set it in the service environment (Railway: Variables) and restart. The gate
 # evidence for nano lives in `DiscoverChat/experiments/classifier_nano_results.json`;
 # a different id is unevidenced until that file is rebuilt on it:
 #     DISCOVERCHAT_CLASSIFIER_MODEL=<id> python DiscoverChat/experiments/run_classifier_nano.py --repeats 4
-CLASSIFIER_MODEL = os.getenv("DISCOVERCHAT_CLASSIFIER_MODEL", "gpt-5.4-nano")
+CLASSIFIER_MODEL = os.getenv("DISCOVERCHAT_CLASSIFIER_MODEL", "gpt-6-luna")
 CLASSIFIER_MAX_COMPLETION = int(os.getenv("DISCOVERCHAT_CLASSIFIER_TOKENS", "2000"))
 
 CLASSIFIER_EVIDENCE_PATH = HERE / "experiments" / "classifier_nano_results.json"
@@ -153,7 +153,7 @@ CLASSIFIER_EVIDENCE_PATH = HERE / "experiments" / "classifier_nano_results.json"
 # findings at once is a large reasoning job, and this WP has already lost two
 # calls to a reasoning model spending its whole budget on reasoning and
 # returning an empty string. Sized with that in mind, and retried on empty.
-JUDGE_MODEL = os.getenv("DISCOVERCHAT_JUDGE_MODEL", "gpt-5.6-sol")
+JUDGE_MODEL = os.getenv("DISCOVERCHAT_JUDGE_MODEL", "gpt-6.2-sol")
 JUDGE_MAX_COMPLETION = int(os.getenv("DISCOVERCHAT_JUDGE_TOKENS", "12000"))
 
 # WP-D9: which judge instruction is in force. "complete" keeps every finding
