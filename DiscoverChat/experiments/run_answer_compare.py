@@ -123,7 +123,10 @@ def run_arm(name: str, retriever) -> list:
                                             run_date=answer.stamp)
             entry["citation_check"] = {
                 k: v for k, v in result.items() if k != "3_causal"}
-            entry["citation_check"]["causal_pass"] = result["3_causal"]["pass"]
+            # Absent under DISCOVERCHAT_CAUSAL_CHECK=off (WP-D13 Fix 6).
+            causal = result.get("3_causal")
+            entry["citation_check"]["causal_pass"] = (
+                causal["pass"] if causal is not None else "not run")
             entry["numerals_bound"] = sum(1 for b in bindings if b["matched"])
             entry["numerals_total"] = len(bindings)
             entry["numerals_uncited"] = [b["token"] for b in bindings

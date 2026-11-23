@@ -68,10 +68,12 @@ def main() -> int:
         for n, check_result in enumerate(prose.check_results, start=1):
             failed = [k for k, v in check_result.items()
                       if k != "all_pass" and not v["pass"]]
+            # Absent under DISCOVERCHAT_CAUSAL_CHECK=off (WP-D13 Fix 6).
+            causal = check_result.get("e_causal")
             per_attempt.append({
                 "attempt": n, "checks_failed": failed,
-                "causal_words": [p["surface"] for p in
-                                 check_result["e_causal"]["problems"]],
+                "causal_words": ([p["surface"] for p in causal["problems"]]
+                                 if causal is not None else "not run"),
                 "sentences": check_result["d_shape"]["sentences"],
                 "words": check_result["d_shape"]["words"],
                 "numerals_checked": check_result["a_numerals"]["checked"],
