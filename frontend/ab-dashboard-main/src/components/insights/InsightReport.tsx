@@ -113,7 +113,11 @@ export function InsightReport({
 
   return (
     <CitationProvider>
-      <div className="mb-8 border border-report-line bg-white rounded-xl overflow-hidden">
+      {/* data-report-card: what "Download PDF" prints (WP-D13 Fix 10). */}
+      <div
+        data-report-card=""
+        className="mb-8 border border-report-line bg-white rounded-xl overflow-hidden"
+      >
         <div className="flex items-start gap-4 px-6 pt-5 pb-4 border-b border-report-line">
           <div className="min-w-0 flex-1">
             <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-report-cyan-deep mb-1.5">
@@ -216,11 +220,7 @@ export function InsightReport({
                 </button>
               )}
 
-              <ReportFooter
-                stamp={parsed.stamp}
-                question={question}
-                answer={response?.answer ?? ""}
-              />
+              <ReportFooter stamp={parsed.stamp} question={question} />
             </>
           )}
         </div>

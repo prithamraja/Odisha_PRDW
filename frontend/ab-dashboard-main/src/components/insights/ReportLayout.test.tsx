@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 
 import { InsightReport } from "./InsightReport";
 import FIXTURES from "@/lib/discover-layout.fixtures.json";
@@ -39,8 +39,9 @@ function show(question: string, response: DiscoverChatResponse) {
   );
 }
 
-/** The report's text without the two additions that are not about the
- *  answer: the "point at any number" hint and the Copy button. */
+/** The report's text without the additions that are not about the answer:
+ *  the "point at any number" hint, the caution line and the Download PDF
+ *  button. */
 function answerText(container: HTMLElement): string {
   const copy = container.cloneNode(true) as HTMLElement;
   copy.querySelectorAll("[data-report-chrome]").forEach((n) => n.remove());
@@ -87,6 +88,9 @@ const numerals = (text: string) => text.match(NUMERAL) ?? [];
 const squash = (text: string) => text.replace(/\s+/g, " ");
 
 afterEach(() => {
+  // A print box a test left "open" is closed, so the next test starts clean.
+  window.dispatchEvent(new Event("afterprint"));
+  vi.restoreAllMocks();
   vi.useRealTimers();
 });
 
@@ -237,31 +241,132 @@ describe("4. an unknown panel kind is skipped", () => {
   });
 });
 
-describe("5. Copy", () => {
-  it("puts the question, the answer and the caution on the clipboard, then reads Copied", async () => {
-    vi.useFakeTimers();
+describe("5. Download PDF (WP-D13 Fix 10)", () => {
+  /** What the page looked like at the moment the print box opened. */
+  interface AtPrint {
+    title: string;
+    printing: boolean;
+    target: boolean;
+  }
+
+  /** Stands in for the browser's print box, which jsdom does not have. */
+  function stubPrint(card: () => Element | null) {
+    const seen: AtPrint[] = [];
+    const print = vi.spyOn(window, "print").mockImplementation(() => {
+      seen.push({
+        title: document.title,
+        printing: document.documentElement.hasAttribute("data-report-printing"),
+        target: !!card()?.hasAttribute("data-print-target"),
+      });
+    });
+    return { print, seen };
+  }
+
+  const download = () => screen.getByRole("button", { name: "Download PDF" });
+  const closePrintBox = () => window.dispatchEvent(new Event("afterprint"));
+
+  it("is on every finished report: with a layout, with {}, on a fall-back and on the decline", () => {
+    const cases: Array<[string, DiscoverChatResponse]> = [
+      ["cuttack", entry("cuttack").response],
+      ["cuttack, layout {}", { ...entry("cuttack").response, layout: {} }],
+      ["kalimela (fall-back)", entry("kalimela").response],
+      ["out_of_scope (decline, layout {})", entry("out_of_scope").response],
+    ];
+    expect((entry("kalimela").response.prose as { fell_back?: boolean }).fell_back).toBe(true);
+    for (const [name, response] of cases) {
+      const question = entry(name.split(/[ ,]/)[0]).question;
+      const { unmount } = show(question, response);
+      const button = download();
+      expect(button.getAttribute("type"), name).toBe("button");
+      expect(button.hasAttribute("data-report-chrome"), name).toBe(true);
+      expect(button.querySelector("svg"), name).not.toBeNull(); // the download icon
+      unmount();
+    }
+  });
+
+  it("replaces Copy: there is no Copy button and the clipboard is never touched", () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, "clipboard", {
       value: { writeText },
       configurable: true,
     });
+    stubPrint(() => null);
+    const { question, response } = entry("cuttack");
+    show(question, response);
+    expect(screen.queryByRole("button", { name: /copy/i })).toBeNull();
+    expect(screen.queryByText(/^Copied$/)).toBeNull();
+    fireEvent.click(download());
+    closePrintBox();
+    expect(writeText).not.toHaveBeenCalled();
+  });
+
+  it("opens the print box once, under the file-name title, and puts the page back after printing", () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date(2026, 10, 23, 10, 30));
+    document.title = "PR&DW dashboard";
     const { question, response } = entry("cuttack");
     const { container } = show(question, response);
-    const caution = container.querySelector("[data-report-caution]")!.textContent;
+    const card = () => container.querySelector("[data-report-card]");
+    const { print, seen } = stubPrint(card);
 
-    const button = screen.getByRole("button", { name: "Copy" });
-    await act(async () => {
-      fireEvent.click(button);
-    });
-    expect(writeText).toHaveBeenCalledWith(
-      `${question}\n\n${response.answer}\n\n${caution}`
+    fireEvent.click(download());
+    expect(print).toHaveBeenCalledTimes(1);
+    expect(seen).toEqual([
+      {
+        title: "Insight report - What should I know about Cuttack - 2026-11-23",
+        printing: true,
+        target: true,
+      },
+    ]);
+    // Still set while the box is open: a browser whose print() returns at
+    // once (a phone) reads the title later.
+    expect(document.title).toBe(
+      "Insight report - What should I know about Cuttack - 2026-11-23"
     );
-    expect(button.textContent).toBe("Copied");
 
-    act(() => {
-      vi.advanceTimersByTime(2000);
-    });
-    expect(button.textContent).toBe("Copy");
+    closePrintBox();
+    expect(document.title).toBe("PR&DW dashboard");
+    expect(document.documentElement.hasAttribute("data-report-printing")).toBe(false);
+    expect(card()!.hasAttribute("data-print-target")).toBe(false);
+    expect(print).toHaveBeenCalledTimes(1);
+  });
+
+  it("makes the file name from the first 60 characters of the question, file-safe", () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date(2026, 0, 5, 9, 0));
+    const { response } = entry("cuttack");
+    const { seen } = stubPrint(() => null);
+
+    const messy =
+      '  Cuttack vs Puri: spend/plan "2025-26"? <all> blocks | and a tail that runs well past sixty characters  ';
+    const first = show(messy, response);
+    fireEvent.click(download());
+    closePrintBox();
+    first.unmount();
+
+    const unsafeOnly = show('?/\\:*"<>|', response);
+    fireEvent.click(download());
+    closePrintBox();
+    unsafeOnly.unmount();
+
+    expect(seen.map((s) => s.title)).toEqual([
+      "Insight report - Cuttack vs Puri spend plan 2025-26 all blocks and a - 2026-01-05",
+      "Insight report - 2026-01-05",
+    ]);
+  });
+
+  it("puts the original title back even after a second click before the box reported closing", () => {
+    document.title = "PR&DW dashboard";
+    const { question, response } = entry("cuttack");
+    show(question, response);
+    const { print, seen } = stubPrint(() => null);
+    fireEvent.click(download());
+    fireEvent.click(download());
+    expect(print).toHaveBeenCalledTimes(2);
+    expect(seen[1].title).toMatch(/^Insight report - What should I know about Cuttack - /);
+    closePrintBox();
+    expect(document.title).toBe("PR&DW dashboard");
+    expect(document.documentElement.hasAttribute("data-report-printing")).toBe(false);
   });
 });
 
@@ -274,11 +379,11 @@ describe("6. The caution line (WP-D13 Fix 6)", () => {
     // Marked as chrome, so the "no layout renders as before" text comparison
     // does not see it.
     expect(line.hasAttribute("data-report-chrome")).toBe(true);
-    // Its own line, directly above the "as of ... / Copy" row, inside the
-    // footer.
+    // Its own line, directly above the "as of ... / Download PDF" row, inside
+    // the footer.
     const row = line.nextElementSibling as HTMLElement;
     expect(row).not.toBeNull();
-    expect(row.querySelector("button")?.textContent).toBe("Copy");
+    expect(row.querySelector("button")?.textContent).toBe("Download PDF");
     expect(line.parentElement?.className).toContain("border-t");
     // Plain muted text: 12px, no icon, no box.
     expect(line.tagName).toBe("P");
