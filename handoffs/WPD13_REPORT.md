@@ -1,7 +1,8 @@
 # WP-D13 report — Insight report fixes
 
 **For:** the PM and the operator. **Executed:** Fix 1 on 2026-11-21; Fix 1b
-and Fix 6 on 2026-11-22; Fix 9 on 2026-11-23. Mirror `C:\dev\odisha-d13`
+and Fix 6 on 2026-11-22; Fix 9 and Fix 10 on 2026-11-23. Fix 10 is frontend
+only, built in the frontend mirror `C:\dev\ab-dashboard-odisha`. Mirror `C:\dev\odisha-d13`
 (refreshed from HEAD `925511e` on 2026-11-22, and on 2026-11-23 brought up to
 the Drive copy's model settings, as the standing rules ask). One section per fix. Fix 2 moved to its own brief
 (`handoffs/WPD13b_headline_trial.md`, reported in `handoffs/WPD13b_REPORT.md`).
@@ -796,3 +797,243 @@ not run them end to end, because they call models.
   "would show $0 for another model". That is fixed by T4.
 - `run_direction_trial.py` still costs an unpriced model at $0, as the brief
   left it. It is a one-function change if wanted.
+
+---
+
+# Fix 10 — Download the report as a PDF; the Copy button goes
+
+## Outcome in one paragraph
+
+Built and green. Every finished Insight report now has a **"Download PDF"**
+button where Copy was. It opens the browser's own print box on the report as
+it is on screen; the officer saves it from there. There is no PDF library, no
+call to the service, and no model call. Only the report prints, from the top
+of page 1, on A4, in colour, with nothing cut in half and nothing added by
+us. Ctrl+P anywhere else prints exactly as before; I checked this against the
+build from before the fix. **One thing the brief did not expect:** Chrome and
+Edge tick their own "Headers and footers" option by default, so a saved PDF
+also carries the browser's date line, page title, web address and page
+number in the margins unless the officer unticks it (§8). We add none of
+those. Removing them would be a design change, so I have left it for the PM.
+
+## 1. Commits (current branch `master`, not pushed)
+
+| Commit | Task |
+|---|---|
+| `2dea7df` | T1: "Download PDF" replaces Copy (`ReportFooter.tsx`, the card marker in `InsightReport.tsx`), tests |
+| `2512903` | T2: the print rules (`index.css`), the "do not print" markers (`InsightReport.tsx`), tests |
+| `1765cfc` | T3: the three PDFs (`handoffs/WPD13_fix10_pdf/`) and screenshots (`handoffs/WPD13_shots/f10_*`) |
+| report commit | this section |
+
+## 2. Tests and build, before vs after
+
+No service file changed, so the gate and the service tests were not run (as
+the brief says).
+
+| | Before (HEAD `bce10e5`) | After |
+|---|---|---|
+| `npm test` | 152 passed (10 files) | **162 passed (10 files)** |
+| `npm run build` | green | **green** |
+| `npm run lint` | 10 problems (3 errors, 7 warnings) | **the same 10**, all in `src/components/ui/*` and `tailwind.config.ts`; none in a changed file |
+| `tsc --noEmit` (app) | clean | **clean** |
+
+## 3. T1 — the button
+
+- **Where and what:** in the footer, in Copy's place, with the same size and
+  style, a download icon, and the label "Download PDF". It is marked
+  `data-report-chrome` as Copy was. It shows on every finished report: with a
+  layout, with `{}`, on a fall-back, and on the decline that routes to Ask.
+- **What a click does:**
+  1. Marks the page as "printing a report" (`data-report-printing` on
+     `<html>`) and marks this report card (`data-print-target`).
+  2. Sets the page title to the file name.
+  3. Calls `window.print()` once.
+  4. On `afterprint`, which Chrome and Edge fire when the print box closes,
+     puts back the old title and removes both marks. The marks stay until
+     then, so a browser whose `print()` returns at once still prints
+     correctly.
+- **The file name:** "Insight report - <the question, first 60 characters,
+  file-safe> - YYYY-MM-DD". "File-safe" means `\ / : * ? " < > |` and
+  control characters become spaces, then runs of spaces collapse. The date is
+  the day of download, on the officer's clock.
+  - Example: "Insight report - What should I know about Cuttack -
+    2026-11-23".
+  - A question made only of unsafe characters gives "Insight report -
+    2026-11-23".
+- **Copy is gone:** the button, the clipboard code and its timer. The caution
+  line and the stamp stay where they were. The footer's comment and the
+  comment in `ReportLayout.test.tsx` now describe Download.
+- **Tests** (`ReportLayout.test.tsx` §5, replacing the Copy test; +5 net):
+  - The button is on all four kinds of report.
+  - There is no Copy button, and a click never touches the clipboard.
+  - A click calls `window.print` exactly once, under the file-name title,
+    with both marks set. After printing, the old title is back and both
+    marks are gone.
+  - File-safe naming works, including the all-unsafe question.
+  - A second click before the box reports closing still restores the
+    original title.
+
+## 4. T2 — the print rules (`index.css`)
+
+All of them apply only while `html[data-report-printing]` is set.
+
+- **Only the report prints.** Any element that neither contains the report
+  card nor sits inside it is taken out of the layout. That covers the app
+  header and tabs, the question box, the feed below, toasts and the hover
+  box. Because they are removed rather than hidden, they leave no empty
+  space.
+- **The whole report prints, however long.** The boxes the card sits in lose
+  their fixed height (`h-screen overflow-hidden` in `pages/Index.tsx`), their
+  inner scroll (`overflow-y-auto` in `AnomaliesView.tsx`), their padding and
+  their width cap. No marker was needed in either file.
+- **Page:** A4 portrait with 15 mm margins. This is a *named* page
+  (`@page report`), which only the marked page selects, so plain Ctrl+P keeps
+  the browser's own page.
+- **Colours print** without "Background graphics" being ticked
+  (`print-color-adjust: exact` on the card).
+- **Left out (marked `data-print-hide`):**
+  - the dismiss button;
+  - the Download button;
+  - the "point at / tap any number" hint;
+  - "Put this question to Ask".
+  - "Open record" links stay, and work as links in the PDF.
+- **Nothing cut in half:** each of these stays on one page:
+  - a card;
+  - a chart;
+  - the "Needs checking" box, when it fits on a page (a longer one may break
+    between items but never inside one, and its heading stays with its first
+    item);
+  - a bare finding on a fall-back;
+  - the footer.
+
+  Prose paragraphs flow across pages as normal text does.
+- **A hover box open at the moment of Download** is not printed. The PDF is
+  pixel-identical to one made with no box open.
+- **Tests** (`ReportLayout.test.tsx` §7–8, +6):
+  - Exactly the four controls are marked. The caution line, stamp, cards,
+    charts, warning box, figures and every "Open record" link are not.
+  - Every selector inside `@media print` starts at
+    `html[data-report-printing]`, and the only `@page` rule is the named one.
+    I checked that this test fails when an unscoped print rule or a plain
+    `@page` rule is added.
+
+## 5. T3 — three real PDFs (`handoffs/WPD13_fix10_pdf/`)
+
+**How they were made.** Each PDF was made from the built page, served with
+`vite preview`, with `/chat` answered from the saved payloads
+(`discover-layout.fixtures.json`):
+1. The real "Download PDF" button was pressed. `window.print` was replaced by
+   a recorder, because a headless browser has no print box.
+2. Chrome's own print-to-PDF (Chromium 147) then printed the page in the
+   state the button left it in.
+3. "Background graphics" was **off**, as in the print box's default, so any
+   colour in the PDF is there because of our rule.
+
+The scripts that made and checked them are not committed.
+
+| PDF | Report | Pages | Only the report | Colours | Nothing cut in half | Nothing added |
+|---|---|---|---|---|---|---|
+| `1_cuttack_with_layout.pdf` | Cuttack, with cards, three charts and a "Needs checking" box | **3**, A4 | yes | yes: bar blues, the warning card and box tint (`#E8F4F7`) | yes | yes |
+| `2_kalimela_fallback.pdf` | Kalimela, fall-back to bare sentences, with layout | **4**, A4 | yes | yes | yes: each bare finding moves whole | yes |
+| `3_chikilli_long.pdf` | Chikilli, narrative with three charts | **3**, A4 | yes | yes | yes: the pair of charts moves whole to page 2 | yes |
+
+How each column was checked:
+- **Page size and margins:** read from the PDF, at 210 × 297 mm. The report
+  card's border sits 15 mm from every page edge.
+- **Nothing cut in half:** I looked at every page.
+- **Nothing added:** I compared the PDF's words with the words of the report
+  on screen, minus the controls. The only differences are:
+  - a word broken across a line end on the narrower page ("Self-sufficient",
+    "2024-2025", "activities—550");
+  - the "1." of the "Needs checking" list, which is on screen too but is drawn
+    by the browser rather than held as text.
+
+  No other word was added or lost.
+- **The file name:** each PDF's stored title is the file-name title (for
+  example "Insight report - How is Chikilli doing - 2026-11-23"). The old
+  title was back after printing.
+
+**Before vs after:** to check the parts that must not change, I built the
+frontend from `bce10e5` in a separate folder:
+- **The screen:** the report at 1280px and at 390px differs only in a 44px
+  strip where the button is. Nothing else on the screen moved.
+- **Ctrl+P elsewhere:** Ctrl+P on the Discover page with a report showing
+  (button not pressed), and Ctrl+P on the Ask page, give page-for-page
+  identical PDFs before and after. Both are one page, the browser's
+  default, as before.
+
+## 6. What the print box shows, in Chrome and in Edge
+
+I checked this in the installed browsers, **Chrome 157** and **Edge 158**,
+each with a fresh profile. I pressed the real button and read the print box
+itself; screenshots are `handoffs/WPD13_shots/f10_1`–`f10_4`.
+
+**Both browsers:**
+- **The preview** is the report alone, from the top of page 1, in colour.
+- **Page count:** Chrome says "3 sheets of paper" and Edge "Total: 3 sheets of
+  paper" for Cuttack, the same as the PDF.
+- **Destination:** the box opens on the computer's default printer, here
+  "Microsoft Print to PDF". "Save as PDF" is in the list; the officer picks
+  it once, and the browser remembers it next time.
+- **With "Save as PDF":**
+  - The page is A4 and the paper-size choice is not offered (Chrome hides
+    "Paper size", Edge hides "Layout"), because the page sets them. It shows
+    3 pages.
+  - "Background graphics" is unticked, and the colours still print.
+- **With a printer destination,** including "Microsoft Print to PDF", the
+  browser uses that printer's own paper: Letter on this computer. The report
+  is still 3 sheets. A4 is guaranteed only on "Save as PDF".
+- **"Headers and footers" is ticked by default.** The preview shows the date
+  and time top left, the page title (the file name) top centre, the web
+  address bottom left and "1/3" bottom right. See §8.
+- **The file name:** both browsers suggest the page title as the file name.
+  The title at the moment the box opened was the file-name title, which the
+  box itself shows in its header line. I did not click through to the Windows
+  save dialog, and I did not watch the title come back as the box closed: the
+  browsers were closed by the script. That step is covered by the unit test
+  and the headless runs.
+
+## 7. Phone-sized window
+
+- **On screen at 390px wide:** the button is 143 × 44 px, inside the report
+  card, on its own line under the stamp (where Copy sat). The page has no
+  sideways scroll, before or after. The only inner box that scrolls sideways
+  is the question input showing its own long text, as before.
+- **Printing from a 390px window:** the PDF is identical, page for page, to
+  the one from a 1280px window (Cuttack 3 pages, Kalimela 4). The print
+  layout follows the paper, not the window.
+- **A real phone is not tested.** Phones handle `window.print()` in their
+  own way. On Android Chrome the call returns at once. The code keeps the
+  title and the print marks until the browser reports the print finished, so
+  this should be safe, but it has not been seen on a device. iOS has not been
+  tried at all.
+
+## 8. Things worth knowing
+
+- **The browser's own header and footer — PM's call.**
+  - **What happens:** Chrome and Edge tick "Headers and footers" by default,
+    so unless the officer unticks it under "More settings", the PDF carries
+    the date and time, the page title, the web address and page numbers in
+    the margins. Our code adds none of it. The brief asks for nothing
+    added, but this is the browser's own default, so I logged it rather than
+    work around it.
+  - **One option, tested but not shipped:** an empty "page margin box" rule
+    in the print CSS (`@top-left { content: "" }` inside the named page)
+    removed the **top** line (date and title) in Chrome 157; the bottom line
+    stayed (`f10_7_…NOT_SHIPPED.png`). Adding the same rule for the bottom
+    would very likely remove the bottom line too, but I have not tried it,
+    and I have not tried either rule in Edge.
+- **A4 only on "Save as PDF".** A printer destination uses the printer's
+  paper size (above).
+- **Some pages end with white space.** When a chart or a bare finding does
+  not fit in the space left, it moves whole to the next page. On Chikilli
+  page 1, about 40% of the page is left empty. This is the price of
+  "nothing cut in half".
+- **Older browsers.** The rules rely on `:has()` (Chrome and Edge 105+,
+  Firefox 121+, Safari 15.4+). In an older browser the button would print
+  what Ctrl+P prints today: one page, cut off.
+- **Where the links point.** "Open record" links in the PDF point to the
+  service address the page was built with. In these test PDFs that is
+  `http://localhost:8100`; on the deployed site it is the deployed address.
+- **The comparison folder.** The "before" build was a scratch copy at
+  `C:\dev\ab-dashboard-odisha-before`, removed afterwards.
