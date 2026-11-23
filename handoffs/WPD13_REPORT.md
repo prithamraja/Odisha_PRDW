@@ -1,8 +1,9 @@
 # WP-D13 report — Insight report fixes
 
 **For:** the PM and the operator. **Executed:** Fix 1 on 2026-11-21; Fix 1b
-and Fix 6 on 2026-11-22. Mirror `C:\dev\odisha-d13` (refreshed from HEAD
-`925511e` on 2026-11-22). One section per fix. Fix 2 moved to its own brief
+and Fix 6 on 2026-11-22; Fix 9 on 2026-11-23. Mirror `C:\dev\odisha-d13`
+(refreshed from HEAD `925511e` on 2026-11-22, and on 2026-11-23 brought up to
+the Drive copy's model settings, as the standing rules ask). One section per fix. Fix 2 moved to its own brief
 (`handoffs/WPD13b_headline_trial.md`, reported in `handoffs/WPD13b_REPORT.md`).
 Fix 7 is reported in `handoffs/WPD12_REPORT.md`.
 
@@ -683,3 +684,115 @@ times are in the results file. Turns took 4.7–26.9 s, run in parallel.
   operator's `:8080` mirror (`C:\dev\ab-dashboard-main`) was not updated. To
   see the caution line locally, copy `src/components/insights/ReportFooter.tsx`
   into that mirror.
+
+---
+
+# Fix 9 — Small repairs from the review of Fixes 1b, 6 and 7
+
+## Outcome in one paragraph
+
+All four tasks are built, with no model call and no prompt or frontend
+change.
+- **T1:** the wrong-word rule now has the same exception as the "above plan"
+  rule. A true sentence about a mixed-sign record ("One focus area exceeded
+  its sanction by Rs 1.73 lakh, while Sanitation was Rs 1.33 crore below
+  sanction") passes. The same words with no positive figure still fail.
+- **T2:** the out-of-date comment in `writer.py` is corrected.
+- **T3:** the two experiment scripts no longer crash when the cause-and-effect
+  check is `off`.
+- **T4:** the two trial scripts named in the brief no longer report $0 for a
+  model with no price; they report the tokens and "price not set for <id>".
+
+The gate is green apart from the two model-evidence checks the standing rules
+name, and the service tests have no failures.
+
+## 1. Commits (current branch `master`, not pushed)
+
+| Commit | Task |
+|---|---|
+| `ab6f909` | T1: R1′ takes R3's exception (`checks.py`), tests |
+| `58a8740` | T2: the D7.3 comment in `writer.py` |
+| `5b1fb58` | T3: `run_answer_compare.py`, `measure_prose.py` read the causal result safely |
+| `6a85494` | T4: no $0 for an unpriced model (`run_causal_log_trial.py`, `run_headline_trial.py`), tests |
+| report commit | this section |
+
+## 2. Gate and tests, before vs after
+
+The mirror now carries the operator's model settings from the Drive copy
+(writer and judge `gpt-6.2-sol`, classifier and verifier `gpt-6-luna`).
+Those two files were copied in unchanged; they are not in any Fix 9 commit.
+
+| | Before (HEAD `e853475`) | After |
+|---|---|---|
+| `python -m DiscoverChat.gates` | 34/36 — red: `judge-model-evidenced`, `classifier-model-evidenced` (the operator's decision, D69) | **34/36 — the same two red, and no other** |
+| `python -m pytest DiscoverChat/tests -q` | 182 passed, 0 failed | **188 passed, 0 failed** |
+
+No model was called. No price was put in for the new models.
+
+## 3. T1 — the wrong-word rule gets the "above plan" rule's exception
+
+- **The change:** in `checks.check_direction`, an R1′ word no longer fails
+  a sentence when `positive_bound` is true. That is the condition R3 already
+  uses, read from the same variable; no second condition was written. The
+  comment beside the rule no longer says "No exception".
+- **Tests** (`test_direction.py`, +2), on `d1-00108` (mixed sign: "1 of them
+  add Rs 1.73 lakh", "Sanitation at Rs -1.33 crore", measured against
+  sanction):
+  - The brief's sentence, with both figures bound, passes.
+  - The same words with no positive figure ("One focus area exceeded its
+    sanction, while Sanitation was Rs 1.33 crore below sanction") still fail
+    on R1′ ("exceeded").
+  - "Spending exceeded the plan by Rs 51.96 crore" still fails. This test
+    already existed.
+  - The five sentences and the 77-attempt replay are unchanged: 0 failures.
+    These tests already existed and still pass.
+- **The word list is unchanged.** `OPPOSITE_DIRECTION_WORDS` is exactly as
+  built; the extra forms were dropped by the operator.
+
+## 4. T2 — the comment in `writer.py`
+
+The D7.3 note said the citation check is "Blocking, all four". It now says
+that steps 1, 2 and 4 always block, step 3 (the causal scan) blocks only under
+`DISCOVERCHAT_CAUSAL_CHECK=block`, and step 5 follows
+`DISCOVERCHAT_DIRECTION_CHECK`. Comment only; no code change.
+
+## 5. T3 — two experiment scripts and the `off` setting
+
+`run_answer_compare.py` (`3_causal`) and `measure_prose.py` (`e_causal`) now
+read the causal result safely, and record `"not run"` when the key is absent.
+I checked the new lines on all three settings. Under `block` and `log` they
+record exactly what they did before (`False` and `['because of']` on a test
+sentence); under `off` they record `"not run"`. Both scripts compile. I did
+not run them end to end, because they call models.
+
+## 6. T4 — no $0 for a model with no price
+
+- **Each trial script has its own price table.** There is no shared one. So,
+  as the brief says, I fixed `run_causal_log_trial.py` and
+  `run_headline_trial.py`.
+- **Left unchanged, as the brief says:** `run_direction_trial.py` has the same
+  pattern (`PRICES = {"gpt-5.6-sol": …}`, other models costed at $0). No other
+  script in `DiscoverChat/experiments/` prices calls.
+- **What the two scripts do now:**
+  - A call to a model with no price records `"usd": null` in the results file,
+    not 0.
+  - The totals record the input and output tokens and a `price_not_set` list.
+    If any model is unpriced, `usd` is null.
+  - The printed line reads, for example, "2,000 tokens in, 1,000 out; price
+    not set for gpt-6-luna; price not set for gpt-6.2-sol".
+  - A run that mixes priced and unpriced models adds "$… for the N priced
+    calls", and never prints a dollar total.
+  - A priced model is costed exactly as before.
+- **No price was put in** for `gpt-6.2-sol` or `gpt-6-luna`. A test checks
+  this.
+- **Tests** (`test_trial_costs.py`, new, 4): each script is loaded in its own
+  process, because loading one replaces the model-call function, and is
+  handed a fake model call. The tests cover unpriced, priced and mixed runs.
+  No model is called.
+
+## 7. Things worth knowing
+
+- **Fix 6 report §7 is out of date on one point.** It said the trial script
+  "would show $0 for another model". That is fixed by T4.
+- `run_direction_trial.py` still costs an unpriced model at $0, as the brief
+  left it. It is a one-function change if wanted.
