@@ -4,6 +4,14 @@
 **Authored:** PM, 2026-11-21. **Decision: D64.** **For:** the
 operator-controlled coding agent — the same one running WP-D13 Fix 1.
 
+> **Status, 2026-11-22 (D67): trial run and reported; the operator's review is
+> ON HOLD.** The operator is going to try other writer models, and the
+> headlines depend on the model. `REVIEW_SHEET.md` holds `gpt-5.6-sol`
+> output and is not to be marked. Once the writer model is chosen, re-run
+> `DiscoverChat/experiments/run_headline_trial.py` on that model (the first
+> run cost $2.08 for 52 calls) and mark the new sheet. Nothing here goes
+> live before that.
+
 This was "Fix 2" in `handoffs/WPD13_report_fixes.md`; it was moved here
 unchanged so it can be handed over on its own. Fix 1 stays in that file.
 
