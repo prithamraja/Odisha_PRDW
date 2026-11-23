@@ -1,0 +1,127 @@
+{
+ "mode": "haiku",
+ "model": "anthropic/claude-haiku-4.5",
+ "questions": 100,
+ "verdicts": {
+  "clarify": 12,
+  "clarify_as_ratified": 1,
+  "clarify_gold_offered": 1,
+  "declined_generically": 1,
+  "hit": 84,
+  "wrong_direction": 1
+ },
+ "wall_s_median": 5.615,
+ "wall_s_p90": 10.46,
+ "wall_s_total": 602.2,
+ "chat_calls": 192,
+ "chat_call_s_median": 1.54,
+ "transport_errors": 0,
+ "empty_responses": 0,
+ "truncated": 0,
+ "fenced_replies_unwrapped": 192,
+ "providers": {
+  "Anthropic": 192
+ },
+ "openrouter_cost_usd": 0.9967,
+ "workers": 6,
+ "run_wall_s": 107.8,
+ "provider_pin": "Anthropic",
+ "quantization_pin": null,
+ "untagged_calls": 0,
+ "usage": {
+  "totals": {
+   "calls": 288,
+   "prompt_tokens": 902999,
+   "completion_tokens": 19275,
+   "reasoning_tokens": 0,
+   "cached_prompt_tokens": 0,
+   "total_tokens": 922274
+  },
+  "by_site": {
+   "embed_query": {
+    "calls": 96,
+    "model": "text-embedding-3-large",
+    "prompt_tokens": 2674,
+    "completion_tokens": 0,
+    "reasoning_tokens": 0,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 2674
+   },
+   "rerank": {
+    "calls": 93,
+    "model": "anthropic/claude-haiku-4.5",
+    "prompt_tokens": 666726,
+    "completion_tokens": 13307,
+    "reasoning_tokens": 0,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 680033
+   },
+   "extraction": {
+    "calls": 95,
+    "model": "anthropic/claude-haiku-4.5",
+    "prompt_tokens": 227871,
+    "completion_tokens": 5341,
+    "reasoning_tokens": 0,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 233212
+   },
+   "followup": {
+    "calls": 4,
+    "model": "anthropic/claude-haiku-4.5",
+    "prompt_tokens": 5728,
+    "completion_tokens": 627,
+    "reasoning_tokens": 0,
+    "cached_prompt_tokens": 0,
+    "total_tokens": 6355
+   }
+  },
+  "extraction": {
+   "extraction_calls": 95,
+   "unavailable_calls": 0,
+   "unavailable_causes": {},
+   "all_none_answered": 42,
+   "all_none_rate_answered": 0.4421,
+   "by_slot_family": {
+    "date": {
+     "asked": 5,
+     "null": 5,
+     "null_rate": 1.0
+    },
+    "place": {
+     "asked": 260,
+     "null": 222,
+     "null_rate": 0.8538
+    },
+    "categorical": {
+     "asked": 346,
+     "null": 297,
+     "null_rate": 0.8584
+    },
+    "numeric": {
+     "asked": 33,
+     "null": 23,
+     "null_rate": 0.697
+    },
+    "other": {
+     "asked": 2,
+     "null": 1,
+     "null_rate": 0.5
+    }
+   },
+   "reasoning_tokens_when_all_none": {
+    "n": 42,
+    "min": 0,
+    "max": 0,
+    "median": 0,
+    "mean": 0.0
+   },
+   "reasoning_tokens_when_read": {
+    "n": 53,
+    "min": 0,
+    "max": 0,
+    "median": 0,
+    "mean": 0.0
+   }
+  }
+ }
+}

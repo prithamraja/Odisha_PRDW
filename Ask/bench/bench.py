@@ -39,7 +39,9 @@ OPENROUTER_MODELS = {"gemma": "google/gemma-4-31b-it",
                      "dsflash": "deepseek/deepseek-v4.1-flash",
                      "glmflash": "z-ai/glm-5.3-flash",
                      "gemini": "google/gemini-3.8-flash",
-                     "sonnet": "anthropic/claude-sonnet-5"}
+                     "sonnet": "anthropic/claude-sonnet-5",
+                     "haiku": "anthropic/claude-haiku-4.5",
+                     "geminilite": "google/gemini-3.5-flash-lite"}
 OPENAI_MODELS = {"luna": "gpt-5.6-luna"}      # reasoning models, called like gpt-5.4-mini
 # OpenRouter models that MUST take the reasoning branch. gpt-oss-120b reasons by
 # default: on the plain temperature-0/max_tokens path it spent the whole 500-token
@@ -47,7 +49,7 @@ OPENAI_MODELS = {"luna": "gpt-5.6-luna"}      # reasoning models, called like gp
 # failure shape. On the reasoning branch it gets reasoning_effort "low", exactly
 # what gpt-5.4-mini gets, and answers in ~3 s.
 REASONING_OPENROUTER = {"gptoss", "nemoultra", "nemosuper", "glmflash", "dsflash",
-                        "gemini", "sonnet"}
+                        "sonnet"}
 # sonnet does not accept `temperature` at all on OpenRouter, so the plain
 # branch is not merely worse for it, it is wrong. gemini spent 319 thinking
 # tokens on the plain branch and 0 on this one.
@@ -63,6 +65,13 @@ QUANTIZATION = None      # --quantization: and pin the precision it serves
 # step -- not a wrong answer, a missing one. Nemotron 3 Super truncated 38 calls
 # in 100 questions at the stock budget.
 REASONING_BUDGET = None
+# --temperature: force this temperature on every chat call, on either branch.
+# NOT universal: claude-sonnet-5 does not accept `temperature` at all through
+# OpenRouter, and Anthropic models reject temperature != 1 while extended
+# thinking is on, so a temperature-0 run of a Claude model must stay on the
+# plain branch. haiku-4.5, gemini-3.8-flash and gemini-3.5-flash-lite all list
+# `temperature` as supported.
+TEMPERATURE = None
 QFILE = SCRATCH / "bench_questions.json"
 
 # Which question a chat call belongs to. Set per request by the parallel
@@ -150,8 +159,15 @@ class Completions:
     def create(self, **kw):
         if "max_tokens" in kw:
             kw["max_tokens"] = 2000 if kw["max_tokens"] == 200 else max(kw["max_tokens"], 500)
-        if REASONING_BUDGET and "max_completion_tokens" in kw:
-            kw["max_completion_tokens"] = max(kw["max_completion_tokens"], REASONING_BUDGET)
+        if REASONING_BUDGET:
+            # Applies to BOTH branches: a plain-branch model that thinks (gemini
+            # spent 319 thinking tokens on one short prompt) truncates against
+            # the stock 500/2000 just as a reasoning-branch one does.
+            for field in ("max_completion_tokens", "max_tokens"):
+                if field in kw:
+                    kw[field] = max(kw[field], REASONING_BUDGET)
+        if TEMPERATURE is not None:
+            kw["temperature"] = TEMPERATURE
         if self.provider:
             # Pin OpenRouter to ONE host. Some hosts serve the same model badly:
             # ModelRun returns {"query_id":-0} for the template-picking prompt,
@@ -173,8 +189,24 @@ class Completions:
                 r = self.backend.chat.completions.create(**kw)
                 extra = getattr(r, "model_extra", None) or {}
                 ch = r.choices[0] if r.choices else None
+                # FENCE SHIM. claude-haiku-4.5 ignores response_format and wraps
+                # its JSON in a ```json fence, which json.loads rejects -- every
+                # call would fail for a formatting reason, not a reasoning one.
+                # Ask would need the same two lines to use such a model; the
+                # counter says how often it was needed.
+                fenced = False
+                if ch is not None and (ch.message.content or "").lstrip().startswith("```"):
+                    body = (ch.message.content or "").strip()
+                    body = body.split("```", 2)[1] if body.count("```") >= 2 else body.strip("`")
+                    if body.lower().startswith("json"):
+                        body = body[4:]
+                    try:
+                        ch.message.content = body.strip()
+                        fenced = True
+                    except Exception:
+                        pass
                 self.log.append({"n": n, "s": round(time.time() - t0, 2), "attempt": attempt,
-                                 "provider": extra.get("provider"),
+                                 "provider": extra.get("provider"), "fenced": fenced,
                                  "finish": getattr(ch, "finish_reason", None),
                                  "empty": not (ch and (ch.message.content or "").strip()),
                                  "cost": getattr(r.usage, "cost", None) if r.usage else None})
@@ -299,6 +331,7 @@ def write_outputs(tag, mode, model, records, call_log, extra=None):
         "transport_errors": sum("error" in c for c in call_log),
         "empty_responses": sum(c.get("empty", False) for c in call_log),
         "truncated": sum(c.get("finish") == "length" for c in call_log),
+        "fenced_replies_unwrapped": sum(c.get("fenced", False) for c in call_log),
         "providers": {p: sum(c.get("provider") == p for c in call_log)
                       for p in {c.get("provider") for c in call_log if "error" not in c}},
         "openrouter_cost_usd": round(sum(c.get("cost") or 0 for c in call_log), 5),
@@ -327,6 +360,7 @@ def run(mode, limit=None):
     tag = (mode + (f"_{PROVIDER}" if PROVIDER else "")
            + (f"_{QUANTIZATION}" if QUANTIZATION else "")
            + (f"_rb{REASONING_BUDGET}" if REASONING_BUDGET else "")
+           + (f"_t{TEMPERATURE:g}" if TEMPERATURE is not None else "")
            + (f"_smoke{limit}" if limit else ""))
     model, backend = configure(mode)
     call_log = []
@@ -367,6 +401,7 @@ def run_parallel(mode, workers, limit=None):
     tag = (f"{mode}_par{workers}" + (f"_{PROVIDER}" if PROVIDER else "")
            + (f"_{QUANTIZATION}" if QUANTIZATION else "")
            + (f"_rb{REASONING_BUDGET}" if REASONING_BUDGET else "")
+           + (f"_t{TEMPERATURE:g}" if TEMPERATURE is not None else "")
            + (f"_smoke{limit}" if limit else ""))
     model, backend = configure(mode)
     call_log = []
@@ -404,6 +439,12 @@ def run_parallel(mode, workers, limit=None):
 
     units = units_of(questions)
     records, lock, done = {}, threading.Lock(), [0]
+    # STREAMED PER QUESTION, because a run that dies half way through has still
+    # SPENT the money for the questions it finished. A claude-sonnet-5 run was
+    # killed by OpenRouter's in-flight credit limit after ~$1.11 of answers and
+    # left nothing on disk, because results were only written at the end.
+    partial_path = SCRATCH / f"partial_{tag}.jsonl"
+    partial = partial_path.open("w", encoding="utf-8")
 
     def run_unit(unit):
         with httpx.Client(base_url=f"http://127.0.0.1:{port}", timeout=300) as http:
@@ -420,6 +461,8 @@ def run_parallel(mode, workers, limit=None):
                 rec["wall_s"] = round(time.time() - t0, 2)
                 with lock:
                     records[spec["n"]] = rec
+                    partial.write(json.dumps(rec, ensure_ascii=False, default=str) + "\n")
+                    partial.flush()
                     done[0] += 1
                     print(f"[{done[0]:>3}/{len(questions)}] #{spec['n']} {rec['wall_s']:>6.1f}s "
                           f"{(rec.get('query_id') or rec.get('tier') or rec.get('error', '-'))!s:<12} "
@@ -428,9 +471,15 @@ def run_parallel(mode, workers, limit=None):
     print(f"running {len(questions)} questions as {len(units)} independent units, "
           f"{workers} at a time" + (f", pinned to {PROVIDER}" if PROVIDER else ""))
     t_run = time.time()
-    with ThreadPoolExecutor(workers) as pool:
-        list(pool.map(run_unit, units))
+    try:
+        with ThreadPoolExecutor(workers) as pool:
+            list(pool.map(run_unit, units))
+    except BaseException as ex:
+        print(f"\nRUN INTERRUPTED ({type(ex).__name__}: {str(ex)[:120]}) — "
+              f"grading the {len(records)} questions that completed; "
+              f"per-question records are in {partial_path.name}", flush=True)
     run_wall = round(time.time() - t_run, 1)
+    partial.close()
     server.should_exit = True
 
     by_n = {}
@@ -438,7 +487,9 @@ def run_parallel(mode, workers, limit=None):
         by_n.setdefault(c.get("n"), []).append(c)
     ordered = []
     for spec in questions:
-        rec = records[spec["n"]]
+        rec = records.get(spec["n"])
+        if rec is None:
+            continue                      # never ran (interrupted run)
         rec["llm_calls"] = by_n.get(spec["n"], [])
         rec["verdict"] = grade(dict(rec))
         ordered.append(rec)
@@ -456,13 +507,15 @@ if __name__ == "__main__":
     ap.add_argument("--limit", type=int)
     ap.add_argument("--workers", type=int, help="run in parallel on a local server")
     ap.add_argument("--provider", help="pin OpenRouter to one host, e.g. CoreWeave")
+    ap.add_argument("--temperature", type=float,
+                    help="force this temperature on every chat call")
     ap.add_argument("--reasoning-budget", type=int,
                     help="floor for max_completion_tokens on the reasoning branch")
     ap.add_argument("--quantization",
                     help="and pin the precision that host serves, e.g. fp8")
     a = ap.parse_args()
     PROVIDER, QUANTIZATION = a.provider, a.quantization
-    REASONING_BUDGET = a.reasoning_budget
+    REASONING_BUDGET, TEMPERATURE = a.reasoning_budget, a.temperature
     if a.select:
         select()
     elif a.workers:
