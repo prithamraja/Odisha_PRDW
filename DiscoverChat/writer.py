@@ -182,7 +182,10 @@ def write(question: str, findings: list, *, corpus_roster: set,
 #   (b) THE CITATION CHECK.  `checks.check_citations` — every cited id is in the
 #       answer set, every numeral appears in the stored sentence of a finding
 #       cited in the same sentence, the causal scan, and every supplied finding
-#       is cited at least once. Blocking, all four.
+#       is cited at least once. Steps 1, 2 and 4 always block. Step 3, the
+#       causal scan, blocks only under DISCOVERCHAT_CAUSAL_CHECK=block; the
+#       default `log` records it without counting it (WP-D13 Fix 6, D68). The
+#       direction step (5) follows DISCOVERCHAT_DIRECTION_CHECK.
 #   (c) NO DERIVED FIGURES.  The writer may not compute percentages, sums or
 #       differences. Asked in the prompt; enforced by (b), because a computed
 #       number is by definition in no finding's stored sentence.
