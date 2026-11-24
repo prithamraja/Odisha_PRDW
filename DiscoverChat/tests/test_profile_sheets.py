@@ -470,8 +470,8 @@ class ReaderTests(unittest.TestCase):
 
     def test_an_altered_index_is_refused(self):
         tmp = self.copy_store()
-        with open(os.path.join(tmp, INDEX_NAME), "a", encoding="utf-8") as fh:
-            fh.write(" ")
+        with open(os.path.join(tmp, INDEX_NAME), "ab") as fh:
+            fh.write(b" ")
         self.assertFalse(ProfileStore(tmp).available())
 
     def test_another_candidate_set_is_refused(self):

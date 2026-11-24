@@ -67,7 +67,7 @@ DECOMPOSE_STAMP_PATH = METAINSIGHTS / "decompose_corpus_stamp.json"
 # The WP-D14 place profile sheets: fetched by code, never searched, so no
 # vectors. Read by `profile_store.py`; nothing in the service calls it yet.
 PROFILE_SHEETS_DIR = METAINSIGHTS
-PROFILE_SHEETS_INDEX_PATH = METAINSIGHTS / "profile_sheets_index.json"
+PROFILE_SHEETS_INDEX_PATH = METAINSIGHTS / "profile_sheets_index.json.gz"
 PROFILE_SHEETS_STAMP_PATH = METAINSIGHTS / "profile_sheets_stamp.json"
 
 # The sidecar is a large BUILD OUTPUT (36,218 records, ~81 MB with vectors),

@@ -38,9 +38,9 @@
   },
   "files": [
     {
-      "file": "profile_sheets_index.json",
-      "sha256": "830aae7424cc05b1ffd8f6ee45daca3e53d06475baac099f7bd038f1ec48025c",
-      "bytes": 3245
+      "file": "profile_sheets_index.json.gz",
+      "sha256": "b8a9598d7d03cc83870a6460a7686d7cc4214aee9b1216a50ff55eebfffb00cc",
+      "bytes": 1115
     },
     {
       "file": "profile_sheets.part0.bin",
@@ -48,5 +48,5 @@
       "bytes": 236299
     }
   ],
-  "generated_at": "2026-11-24T10:09:23Z"
+  "generated_at": "2026-11-24T10:17:27Z"
 }

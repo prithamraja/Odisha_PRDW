@@ -12,7 +12,8 @@ this module yet; WP-D15 wires it into /chat. Its contract:
     sentence(id) -> dict | None      one sentence by its id
 
 The store is written by `Insights/src/phase5g_profile_sheets.py`: an index
-(`profile_sheets_index.json`) that maps level -> code -> [part, offset, length],
+(`profile_sheets_index.json.gz`, gzipped so a Windows checkout cannot rewrite
+its line ends and break its hash) that maps level -> code -> [part, offset, length],
 numbered part files holding each sheet as its own zlib-compressed JSON, and a
 stamp listing every file with its SHA-256. So one sheet is read without reading
 any other, and no sheet is held in memory until it is asked for.
@@ -28,13 +29,14 @@ Standard library only, so opening the store costs no more than the index.
 """
 from __future__ import annotations
 
+import gzip
 import hashlib
 import json
 import os
 import re
 import zlib
 
-INDEX_NAME = "profile_sheets_index.json"
+INDEX_NAME = "profile_sheets_index.json.gz"
 STAMP_NAME = "profile_sheets_stamp.json"
 PART_PATTERN = "profile_sheets.part{}.bin"
 LEVELS = ("gp", "block", "district", "all")
@@ -108,7 +110,7 @@ class ProfileStore:
             if os.path.getsize(path) != f["bytes"] or _sha256(path) != f["sha256"]:
                 raise ProfileStoreRefused(f"{f['file']} has been altered since "
                                           f"the stamp was written")
-        with open(self._path(INDEX_NAME), encoding="utf-8") as fh:
+        with gzip.open(self._path(INDEX_NAME), "rt", encoding="utf-8") as fh:
             index = json.load(fh)
         named = [f["file"] for f in files[1:]]
         if index.get("parts") != named:

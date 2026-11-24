@@ -29,7 +29,7 @@
 #   metainsights/global_feed_source_set.json (the run stamp),
 #   metainsights/decompose_corpus_stamp.json (the view hashes to match).
 # Outputs (new files; every existing file in metainsights/ is untouched):
-#   metainsights/profile_sheets_index.json
+#   metainsights/profile_sheets_index.json.gz
 #   metainsights/profile_sheets.part<N>.bin
 #   metainsights/profile_sheets_stamp.json
 #
@@ -59,7 +59,7 @@ for _p in (SRC_DIR, REPO_DIR):
         sys.path.insert(0, _p)
 
 from phase5b_report import format_measure                       # noqa: E402
-from phase5d_retrieval_corpus import sha256_of                  # noqa: E402
+from phase5d_retrieval_corpus import sha256_of, write_corpus_json  # noqa: E402
 from phase5f_decompose import RECONCILE_ABS, RECONCILE_REL      # noqa: E402
 from DiscoverChat.glossary import signed_money, signed_above    # noqa: E402
 from DiscoverChat.checks import numerals                        # noqa: E402
@@ -1233,11 +1233,10 @@ def write_store(result: dict, out_dir: str, provenance: dict, run_stamp: dict,
         "parts": parts,
         "sheets": index,
     }
-    with open(os.path.join(out_dir, INDEX_NAME), "w", encoding="utf-8",
-              newline="\n") as fh:
-        json.dump(index_payload, fh, ensure_ascii=False, indent=1,
-                  sort_keys=False)
-        fh.write("\n")
+    # Gzipped, through the corpora's own writer (no clock in the header): git
+    # treats it as binary, so a Windows checkout (core.autocrlf) cannot turn
+    # its line ends into CRLF and break its hash in the stamp.
+    write_corpus_json(os.path.join(out_dir, INDEX_NAME), index_payload)
 
     files = [{"file": name, "sha256": sha256_of(os.path.join(out_dir, name)),
               "bytes": os.path.getsize(os.path.join(out_dir, name))}
