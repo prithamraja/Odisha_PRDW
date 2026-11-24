@@ -70,6 +70,19 @@ for a loose reading exactly as for an exact one.
 | Real question sets in the repo: the 50 held questions (`DiscoverChat/experiments/judge_picks.json`) and 245 rows in `test_questions_query_mapping.csv`. | repo |
 | The sample holds 20 Gram Panchayats, 16 blocks and 9 districts. The state has about 6,800, 314 and 30. | spec §3 |
 
+## What WP-D15 built that you build on (PM-verified 2026-11-24, in `C:\dev\odisha-d15-pm`, tree `a3b81f5`)
+
+| Fact | Where |
+|---|---|
+| `geography()` now also returns `mentions`: every occurrence of every accepted name, with its level, code (Gram Panchayats), name and start and end position. The four older fields are computed as before and never read it. `Slots.mentions` is not in `as_dict()`, so the logged retrieval payload did not change. | `DiscoverChat/slots.py` |
+| `place.resolve(text, mentions, store, max_places=)` returns a `Plan`: `places`, `mode` (`full` / `main` / empty), `alternatives`, `note`, `dropped`, `why_no_sheet`. The level words of R4 are read by `_says()`; the R4 note is built by `note_for()`. A loose reading should reach `resolve` as a mention like any other, with how it was read carried beside it. | `DiscoverChat/place.py` |
+| The first line of an answer is `Answer.lead`. `render.to_html(..., lead=)` puts it at the start of the one narrative paragraph, not in a paragraph of its own: the page lines its hovers up against the answer text from the first character, and a separate paragraph switches every hover off. Set `lead`; do not add a paragraph. The lead is not passed through the number check. | `assemble.py`, `render.py` (report §7 item 10) |
+| The response's `place` field is built by `place.payload()`. It is `{}` on a turn with no sheet. `retrieval["place"]` is written to the call log whenever a name was found, sheet or no sheet. | `place.py`, `main.py` |
+| The gate line `place-switch-off-identical` replays 76 offline questions against a stored baseline, with the sheets off and on. None of the 76 holds a misspelt place, so it must stay green with the loose pass on, untouched. | `gates.py`, `handoffs/WPD15_trial/` |
+| The held questions are now **53** (the 50, plus TWO-01, TWO-02 and TWO-03). | `DiscoverChat/experiments/judge_picks.json` |
+| Baselines to expect: gate 46 of 48 (red: `judge-model-evidenced`, `classifier-model-evidenced`, by D69), suite 285 passed. | D81 |
+| The R4 note: WP-D15 printed it whenever a name exists at two levels. The operator ruled (R27, D82) that it is not printed when the officer's own words named the level, and WP-D15c builds that before you start. Follow the code you find, and read `handoffs/WPD15c_REPORT.md` if it exists. | report §2; `handoffs/WPD15c_review_fixes.md` T3 |
+
 ---
 
 ## T0 — preconditions and baselines (STOP on failure)
@@ -206,7 +219,7 @@ Close names in the data: Bheden block.
 A script under `handoffs/WPD15b_spelling/` that takes a **list of place names
 by level** and a **list of questions**, and reports. Run it on:
 
-**A. Correctly spelled questions**: the 50 held questions and the 245 rows of
+**A. Correctly spelled questions**: the 53 held questions and the 245 rows of
 `test_questions_query_mapping.csv`.
 
 **B. Made misspellings of every place name in the sample**, each put into
@@ -230,7 +243,7 @@ WP-D14 scale test will do for timing), and a 25-word question.
 **Pass marks.**
 
 1. **On set A, nothing changes.** Every existing field of the slot reader is
-   identical to the T0 record for all 295 questions, and no loose reading and
+   identical to the T0 record for all 298 questions, and no loose reading and
    no "could not find" is produced. A single one is a STOP.
 2. **On set B, for names of 7 letters or more:** at least 90% of the
    misspellings are read as the right place. Report every miss. (Names of 5
