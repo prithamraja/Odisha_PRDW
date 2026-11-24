@@ -1,0 +1,375 @@
+{
+ "step6": [],
+ "step7": [
+  {
+   "arm": "rule_on",
+   "id": "L02",
+   "sentence": "Neither block, nor Bheden, followed the quarter-by-quarter increase in linked spending seen in 9/16 blocks.",
+   "words": [
+    "quarter",
+    "quarter"
+   ]
+  },
+  {
+   "arm": "rule_on",
+   "id": "L07",
+   "sentence": "Across all social composition groups, the majority of planned untied funds were for works listed as serving the general public.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_on",
+   "id": "T05",
+   "sentence": "Kalimela accounts for 86.7% (Rs 5.90 crore below plan) in the ST-majority group; Haldikudar, the only other Panchayat in that group, is Rs 90.62 lakh below plan.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_on",
+   "id": "T05",
+   "sentence": "Dutimendi accounts for 53.5% (Rs 2.90 crore below plan) in the SC-majority group, with 35.6% of the group’s activities.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_on",
+   "id": "T13",
+   "sentence": "Output Code 101 accounted for the majority in 19/20 Gram Panchayats, with Boipariguda the exception.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_on",
+   "id": "T13",
+   "sentence": "Works listed for the general public accounted for the majority across all social composition groups.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_on",
+   "id": "MEA-03",
+   "sentence": "XV Finance Commission accounted for the majority of approved activities in 5/6 fiscal years, with no clear pattern in 2024-2025.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_on",
+   "id": "MEA-03",
+   "sentence": "The Sarpanch was the recorded sanctioning authority for the majority of technically approved activities in every fiscal year, including 63.0% (413 activities) under Self-sufficient Infrastructure in Village.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_on",
+   "id": "MEA-03",
+   "sentence": "It was also the only Gram Panchayat without a clear majority for Code 101, which accounted for most approved activities in 19/20 Gram Panchayats.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_on",
+   "id": "MEA-03",
+   "sentence": "The Mixed social composition group accounted for the majority of technically approved activities in every fiscal year, but showed no clear peak in 2024-2025, when approval records peaked in the other 2/3 groups.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_on",
+   "id": "MEA-05",
+   "sentence": "The mix by output type was more consistent: Code 101 accounted for the majority of planned tied grants across the sample, and Codes 101 and 105 were the leading types in 18/20 Gram Panchayats, with Dadhapatna and Dutimendi as the exceptions.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_on",
+   "id": "MEA-05",
+   "sentence": "The Sarpanch was listed as the sanctioning authority for 56.7% of the amount planned under the Tied Grant fund component and accounted for the majority in 5/6 fiscal years.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_on",
+   "id": "MEA-06",
+   "sentence": "Code 101 accounted for a majority of planned untied funding in 19/20 Gram Panchayats, with Boipariguda the only exception.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_on",
+   "id": "MEA-06",
+   "sentence": "The Mixed social composition group accounted for a majority of planned untied funding in 5/6 fiscal years, with 2024-2025 the exception.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_on",
+   "id": "MEA-08",
+   "sentence": "In SC-majority Gram Panchayats, cashbook outflows showed no clear seasonal pattern, and voucher counts followed a different pattern.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_on",
+   "id": "MEA-09",
+   "sentence": "In the sample, the Sarpanch accounted for the majority of activities with administrative approval in every fiscal year and had the highest count among sanctioning authorities in 6/7 themes.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_on",
+   "id": "MEA-09",
+   "sentence": "The XV Finance Commission accounted for the majority of approved activities in 5/6 fiscal years, with no clear pattern in 2024-2025.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_on",
+   "id": "MEA-09",
+   "sentence": "It was also the only sampled Gram Panchayat where Code 101 did not clearly account for the majority of approved activities.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_on",
+   "id": "VAG-04",
+   "sentence": "Spending recorded against planned activities was more spread out over the full period: the largest month, 2025-03, accounted for 4.4% of the recorded total, and the largest quarter, 2026-Q1, accounted for 8.3%.",
+   "words": [
+    "quarter"
+   ]
+  },
+  {
+   "arm": "rule_on",
+   "id": "VAG-04",
+   "sentence": "For the next review, check the flagged months and quarters against cashbook payouts before treating increases in spending recorded against plans as increases in money paid out.",
+   "words": [
+    "quarters"
+   ]
+  },
+  {
+   "arm": "rule_on",
+   "id": "VAG-06",
+   "sentence": "The linked share rose from 2.7% to 53.2% over six years, and linked spending rose over successive quarters in 6/9 districts, with different patterns in Bargarh, Koraput and Cuttack.",
+   "words": [
+    "quarters"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "L02",
+   "sentence": "The same two blocks ranked first and second for spending linked to planned activities.",
+   "words": [
+    "second"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "L07",
+   "sentence": "Across all social composition groups, the majority of planned untied funding was for works designated for the general public.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "T04",
+   "sentence": "It ranks third for both sanctions (Rs 2.96 crore) and spending on planned activities (Rs 2.64 crore).",
+   "words": [
+    "third"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "T05",
+   "sentence": "Dutimendi accounts for 53.5% of the gap among SC-majority Gram Panchayats, with Rs 2.90 crore below plan.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "T05",
+   "sentence": "Kalimela accounts for 86.7% of the gap in the ST-majority group, with Rs 5.90 crore below plan; the only other Gram Panchayat in that group, Haldikudar, was Rs 90.62 lakh below plan.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "T08",
+   "sentence": "In both Ganjam and Bargarh, the highest-spending block accounted for just under half of the district’s recorded spending in the sample.",
+   "words": [
+    "half"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "T13",
+   "sentence": "Works listed as serving the general public account for the majority of planned untied funding in every social composition group.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "T13",
+   "sentence": "It is the only exception to the pattern of Code 101 accounting for a majority of planned untied funding (19/20 Panchayats).",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "T15",
+   "sentence": "Code 101 accounted for the majority of abandoned activities in 8/9 districts, with no clear pattern in Koraput, and for the majority of planned funding on abandoned works in 17/20 Gram Panchayats, with no clear pattern in Andhrua, Boipariguda or Laxmipur.",
+   "words": [
+    "majority",
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "T15",
+   "sentence": "Second, review the Village with Good Governance records: of the Rs 42.00 lakh in planned funding on abandoned works under this theme, 63.6% (Rs 26.72 lakh) was recorded in 2021-2022, and 69.3% (Rs 29.11 lakh) had no sanctioning authority recorded.",
+   "words": [
+    "Second"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "GEO-12",
+   "sentence": "Its recorded planned cost of Rs 1.66 crore is the lowest in the 20-Gram-Panchayat sample, and its spending of Rs 75.12 lakh is the second lowest.",
+   "words": [
+    "second"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "GEO-12",
+   "sentence": "Photo evidence is on file for 53 activities, the third fewest in the sample.",
+   "words": [
+    "third"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "GEO-24",
+   "sentence": "It spent Rs 75.12 lakh, the second-lowest amount, but that was 45.3% of its recorded plan, above the sample’s middle value of 36.6%.",
+   "words": [
+    "second"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "MEA-02",
+   "sentence": "Works marked ongoing accounted for the majority of uploads in 17/20 Gram Panchayats; Boipariguda, Chikilli and Laxmipur had no clear pattern.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "MEA-03",
+   "sentence": "The XV Finance Commission accounted for a majority of approved activities in 5/6 fiscal years, with no clear pattern in 2024-2025.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "MEA-03",
+   "sentence": "The Sarpanch was the sanctioning authority recorded for a majority of activities with technical approval in every fiscal year.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "MEA-03",
+   "sentence": "It was also the only sampled Gram Panchayat where Code 101 did not account for a clear majority of approved activities.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "MEA-05",
+   "sentence": "Code 101 accounts for the majority of planned tied-grant funding across the sample, and Codes 101 and 105 are the leading categories in 18/20 Gram Panchayats.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "MEA-06",
+   "sentence": "Code 101 accounted for the majority of planned untied grants in 19/20 Gram Panchayats, with Boipariguda the only exception.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "MEA-06",
+   "sentence": "The “Mixed” social composition group accounted for the majority of planned untied grants in 5/6 fiscal years, with 2024-2025 the exception.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "MEA-08",
+   "sentence": "The broader payout pattern also differs in Panchayats with 10,000 people and above; SC-majority Panchayats show no clear payout seasonality and a different voucher pattern.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "MEA-09",
+   "sentence": "Drinking water and Sanitation led among focus areas in every fiscal year, and the XV Finance Commission accounted for the majority in 5/6 fiscal years, with no clear pattern in 2024-2025.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "MEA-09",
+   "sentence": "It was also the only exception to Code 101 accounting for the majority of approved activities in 19/20 Gram Panchayats.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "MEA-10",
+   "sentence": "In every social composition group, Women and child development had the highest trainee count among focus areas, and activities listed as serving the general public accounted for the majority of trainees.",
+   "words": [
+    "majority"
+   ]
+  },
+  {
+   "arm": "rule_off",
+   "id": "MEA-10",
+   "sentence": "Activities marked “Activity Approved” accounted for the majority of trainees in 17/20 Gram Panchayats; Barimunda, Boipariguda and Laxmipur showed no clear pattern by activity status.",
+   "words": [
+    "majority"
+   ]
+  }
+ ]
+}
