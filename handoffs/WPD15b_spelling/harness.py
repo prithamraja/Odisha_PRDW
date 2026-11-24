@@ -112,11 +112,10 @@ def read(se, store, text: str) -> dict:
     readings = geo.get("readings", [])
     plan = place.resolve(text, geo["mentions"], store,
                          readings=readings) if store is not None else None
-    return {"text": text, "geo": geo, "readings": readings, "not_found": geo.get("not_found", []),
+    return {"text": text, "geo": geo, "readings": readings,
             "loose": [r for r in readings if r["how"] == "loose"],
             "line": place.reading_note(text, readings),
-            "nf_message": place.not_found_message(geo.get("not_found", [])),
-            "payload": place.spelling_payload(text, readings, geo.get("not_found", [])),
+            "payload": place.spelling_payload(text, readings),
             "plan": plan, "tried": getattr(se, "last_loose", {})}
 
 
@@ -220,7 +219,6 @@ def run_set_b(se, store, names: dict, real: set) -> dict:
                                  "right": right, "wrong": wrong,
                                  "loose": bool(r["loose"]), "line_ok": line_ok,
                                  "asks_bad": asks_resolve(se, store, r) if r["loose"] else [],
-                                 "not_found": [n["typed"] for n in r["not_found"]],
                                  "near_unmarked": near_unmarked(se, r)})
     return summarise_b(rows)
 
@@ -268,7 +266,7 @@ def summarise_b(rows: list) -> dict:
 
 def run_set_a(se, store, record: dict | None, extra: list) -> dict:
     qs = set_a_questions() + [(f"extra:{i}", q) for i, q in enumerate(extra)]
-    changed, loose, nf, words = [], [], [], []
+    changed, loose, words = [], [], []
     tried, skipped, unmarked_tried = [], [], 0
     for qid, text in qs:
         r = read(se, store, text)
@@ -281,8 +279,6 @@ def run_set_a(se, store, record: dict | None, extra: list) -> dict:
         if r["loose"]:
             loose.append({"id": qid, "question": text,
                           "readings": [(x["typed"], x["level"], x["name"], x["score"]) for x in r["loose"]]})
-        if r["not_found"]:
-            nf.append({"id": qid, "question": text, "not_found": r["not_found"]})
         t = r["tried"]
         tried.append(len(t.get("tried", [])))
         skipped.append(t.get("skipped", 0))
@@ -291,7 +287,6 @@ def run_set_a(se, store, record: dict | None, extra: list) -> dict:
             unmarked_tried += 1
             words.append({"id": qid, "words": un})
     return {"questions": len(qs), "fields_changed": changed, "loose_readings": loose,
-            "not_found": nf,
             "spans_tried_per_question": {"middle": statistics.median(tried) if tried else 0,
                                          "most": max(tried, default=0)},
             "words_skipped_per_question": {"middle": statistics.median(skipped) if skipped else 0,
@@ -302,7 +297,9 @@ def run_set_a(se, store, record: dict | None, extra: list) -> dict:
 
 # ── set C ────────────────────────────────────────────────────────────────────
 
-SET_C = [   # (question, expected: ("read", level, name) | ("none",) | ("not_found", close names))
+SET_C = [   # (question, expected: ("read", level, name) | ("none",))
+    # WP-D15d (R29): the "could not find a place" reply is gone; the two rows
+    # that expected it ("Laxmipoor block", "Rampur block") now expect no line.
     ("What should I know about Kalimella?", ("read", "block", "Kalimela")),
     ("How is Malkangri doing?", ("read", "district", "Malkangiri")),
     ("How is Barpalli block doing?", ("read", "block", "Barpali")),
@@ -315,8 +312,8 @@ SET_C = [   # (question, expected: ("read", level, name) | ("none",) | ("not_fou
     ("What should I know about Kandhmal?", ("read", "district", "Kandhamal")),
     ("What has the analysis found in Koraputt?", ("read", "district", "Koraput")),
     ("Is Laxmipoor behind on anything?", ("none",)),
-    ("How is Laxmipoor block doing?", ("not_found", ["Laxmipur block"])),
-    ("How is Rampur block doing?", ("not_found", [])),
+    ("How is Laxmipoor block doing?", ("none",)),
+    ("How is Rampur block doing?", ("none",)),
 ]
 
 
@@ -332,12 +329,9 @@ def run_set_c(se, store) -> list:
             ok = want in answered and hows.get(want) == how_ok
             ok = ok and ((expect[0] == "read") == bool(r["line"]))
         elif expect[0] == "none":
-            ok = not r["readings"] and not r["not_found"] and not r["line"]
-        else:
-            closes = [c["label"] for nf in r["payload"].get("not_found", []) for c in nf["close"]]
-            ok = bool(r["not_found"]) and not r["readings"] and closes == expect[1]
+            ok = not r["readings"] and not r["line"]
         out.append({"question": q, "expected": list(expect), "ok": ok,
-                    "answered": answered, "line": r["line"], "message": r["nf_message"],
+                    "answered": answered, "line": r["line"],
                     "asks_bad": asks_resolve(se, store, r) if r["loose"] else []})
     return out
 
@@ -431,7 +425,6 @@ def main(argv=None) -> int:
     whatif_b = run_set_b(se, store, names, real)
     se._cutoff = saved
     out["whatif_80"] = {"A_loose_readings": whatif_a["loose_readings"],
-                        "A_not_found": whatif_a["not_found"],
                         "A_fields_changed": len(whatif_a["fields_changed"]),
                         "B_names_7_plus": whatif_b["names_7_plus"],
                         "B_names_5_6": whatif_b["names_5_6"],
@@ -458,8 +451,7 @@ def report(o: dict) -> str:
          f"tried {o['min_letters']}.", "",
          "## Pass marks", "",
          f"1. **Set A** ({A['questions']} questions): fields changed "
-         f"{len(A['fields_changed'])}; loose readings {len(A['loose_readings'])}; "
-         f"\"could not find\" {len(A['not_found'])}.",
+         f"{len(A['fields_changed'])}; loose readings {len(A['loose_readings'])}.",
          f"2. **Set B, names of 7+ letters:** {B['names_7_plus']['read_right']} of "
          f"{B['names_7_plus']['questions']} read right ({B['names_7_plus']['share']:.1%}). "
          f"Names of 5-6 letters (reported apart): {B['names_5_6']['read_right']} of "
@@ -482,10 +474,10 @@ def report(o: dict) -> str:
     L += ["", "## Set C", "", "| Question | OK | What the officer sees first |", "|---|---|---|"]
     for c in o.get("C", []):
         L.append(f"| {c['question']} | {'yes' if c['ok'] else '**NO**'} | "
-                 f"{(c['line'] or c['message'] or '(no line)').replace(chr(10), ' / ')} |")
+                 f"{(c['line'] or '(no line)').replace(chr(10), ' / ')} |")
     L += ["", "## Set B misses, names of 7+ letters", ""]
     L += [f"- {r['name']} ({r['level']}) <- {r['variant']!r} [{r['rule']}], frame {r['frame']}"
-          + (f" -> not found" if r["not_found"] else "") for r in B["misses_7_plus"]] or ["None."]
+          for r in B["misses_7_plus"]] or ["None."]
     L += ["", "## Set B wrong readings", ""]
     L += [f"- {r['variant']!r} (made from {r['name']} {r['level']}) read as {r['wrong']}"
           for r in B["wrong"]] or ["None."]
@@ -511,7 +503,7 @@ def report(o: dict) -> str:
           f"{len(o['whatif_80']['B_wrong_unexpected'])}",
           f"- Set A: loose readings {len(o['whatif_80']['A_loose_readings'])} "
           f"{[(x['question'], x['readings']) for x in o['whatif_80']['A_loose_readings']][:10]}; "
-          f"\"could not find\" {len(o['whatif_80']['A_not_found'])}; fields changed "
+          f"fields changed "
           f"{o['whatif_80']['A_fields_changed']}", ""]
     return "\n".join(L)
 

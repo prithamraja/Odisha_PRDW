@@ -1533,10 +1533,8 @@ def _spelling_exact(ctx):
                 f"{qid} {before['question']!r}: {key} changed: {before[key]} -> {geo[key]}")
         assert not [r for r in geo.get("readings", []) if r["how"] == "loose"], (
             f"{qid}: a correctly spelled question was read loosely")
-        assert not geo.get("not_found"), f"{qid}: 'could not find' on a held question"
     return (f"{len(held)} held questions: the exact reading is unchanged, no loose "
-            f"reading, no 'could not find' (loose pass "
-            f"{'on' if config.LOOSE_PLACES else 'OFF'})")
+            f"reading (loose pass {'on' if config.LOOSE_PLACES else 'OFF'})")
 
 
 @check("place-spelling-says-so",
@@ -1566,27 +1564,33 @@ def _spelling_says_so(ctx):
     return f"{len(table)} rows of the T2 table, word for word; an alias stays silent"
 
 
-@check("place-spelling-not-found",
-       "a word marked as a place that reads as nothing gets 'I could not find a place called ...', and nothing is searched (WP-D15b T3, R23)")
-def _spelling_not_found(ctx):
-    if not config.LOOSE_PLACES:
-        return "loose pass switched off (DISCOVERCHAT_LOOSE_PLACES=0)"
+@check("place-spelling-never-stops",
+       "a word marked as a place that reads as no place stops nothing: the turn is searched and answered, with no line about the word (WP-D15d, R29)")
+def _spelling_never_stops(ctx):
+    """WP-D15d removed the "could not find a place" reply (R29). A turn whose
+    marked word matches no place -- a near miss under the cut-off, a place
+    outside the data, or no place at all -- is searched and answered as it was
+    before WP-D15b, and says nothing about the word."""
+    from DiscoverChat import place
+    assert not hasattr(place, "not_found_message") and not hasattr(
+        place, "not_found_first_lines"), "the reply's builders are back"
     assembler = ctx["assembler"]
-    for text, message in (
-            ("How is Bhedan block doing?",
-             'I could not find a place called "Bhedan" in the data.\n'
-             'Close names in the data: Bheden block.'),
-            ("How is Rampur block doing?",
-             'I could not find a place called "Rampur" in the data.')):
+    for text, word in (("How is Bhedan block doing?", "Bhedan"),
+                       ("How is Rampur block doing?", "Rampur"),
+                       # Not "How many works in Tribal block areas ...": the
+                       # rules send a "how many" question to Ask before any
+                       # search, which is the lookup move, not a place stop.
+                       ("What stands out in Tribal block areas?", "Tribal")):
         answer = assembler.answer(text)
-        assert answer.text == f"{message}\n\n({answer.stamp})", (
-            f"{text!r} answered {answer.text[:120]!r}")
-        assert not answer.findings and answer.place.get("mode") == "not_found"
-        assert "judge" not in answer.retrieval, "a not-found turn was searched"
-    untouched = assembler.answer("Is Laxmipoor behind on anything?")
-    assert "could not find" not in untouched.text, "an unmarked word was refused"
-    return ("'Bhedan block' -> the message with 'Bheden block'; 'Rampur block' -> the "
-            "message alone; neither searched; an unmarked 'Laxmipoor' runs as today")
+        assert "judge" in answer.retrieval, f"{text!r} was not searched"
+        assert answer.text.strip() != f"({answer.stamp})", f"{text!r} was not answered"
+        assert "could not find" not in answer.text.lower(), f"{text!r} carries the old reply"
+        first_line = answer.text.split(chr(10) * 2)[0]
+        assert word not in answer.lead and word not in first_line, (
+            f"{text!r}: a line about {word!r}")
+        assert answer.place.get("mode") != "not_found" and "not_found" not in answer.place
+    return ("'Bhedan block', 'Rampur block' and 'Tribal block': each searched and "
+            "answered, no line about the word")
 
 
 # ── live-only ────────────────────────────────────────────────────────────────

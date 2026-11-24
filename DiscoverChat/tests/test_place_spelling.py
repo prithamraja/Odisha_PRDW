@@ -118,29 +118,9 @@ class LinesTests(_Sample):
                              [(alt["level"], alt["name"])])
 
 
-class NotFoundTests(_Sample):
-    """The T3 cases."""
-
-    def test_close_name_offered(self):
-        nf = self.se.read_places("How is Bhedan block doing?")["not_found"]
-        self.assertEqual(place.not_found_message(nf),
-                         'I could not find a place called "Bhedan" in the data.\n'
-                         'Close names in the data: Bheden block.')
-
-    def test_nothing_close(self):
-        nf = self.se.read_places("How is Rampur block doing?")["not_found"]
-        self.assertEqual(place.not_found_message(nf),
-                         'I could not find a place called "Rampur" in the data.')
-
-    def test_unmarked_is_left_alone(self):
-        geo = self.se.read_places("Is Laxmipoor behind on anything?")
-        self.assertEqual((geo["readings"], geo["not_found"]), ([], []))
-
-    def test_lowercase_marked_words_are_not_places(self):
-        # Hindi words typed in English beside a level word (set A rows).
-        for text in ("Khordha me kitne GP ka GPDP approval pending hai?",
-                     "How many assets were created in each GP during 2024-2025?"):
-            self.assertEqual(self.se.read_places(text)["not_found"], [], text)
+class _Turns(_Sample):
+    """Turns through the assembler, with a stubbed search that records what
+    it was asked."""
 
     def _turn(self, text):
         se = self.se
@@ -162,22 +142,14 @@ class NotFoundTests(_Sample):
                                    move=classifier.RETRIEVE, source="rule", reason="t")):
             return a.answer(text), searched
 
-    def test_the_turn_ends_with_the_message(self):
-        answer, searched = self._turn("How is Bhedan block doing?")
-        self.assertEqual(searched, [], "a not-found turn searched")
-        self.assertTrue(answer.text.startswith(
-            'I could not find a place called "Bhedan" in the data.\n'
-            'Close names in the data: Bheden block.\n\n('))
-        self.assertEqual(answer.place["mode"], "not_found")
-        self.assertEqual(answer.findings, [])
 
-    def test_another_place_read_first_line_above(self):
-        answer, searched = self._turn("How is Rampur block doing compared with Barpali block?")
-        self.assertEqual(len(searched), 1)
-        self.assertTrue(answer.text.startswith(
-            'I could not find a place called "Rampur" in the data.'))
-        self.assertNotIn("Close names", answer.text)
-        self.assertEqual([p["name"] for p in answer.place["answered"]], ["Barpali"])
+class TurnTests(_Turns):
+    """The reading line on turns with and without a sheet."""
+
+    def test_unmarked_is_left_alone(self):
+        geo = self.se.read_places("Is Laxmipoor behind on anything?")
+        self.assertEqual(geo["readings"], [])
+        self.assertNotIn("not_found", geo)
 
     def test_the_line_leads_a_turn_with_no_sheet(self):
         answer, _ = self._turn("Compare Kalimella, Bheden, Laxmipur and Boipariguda")
@@ -191,6 +163,71 @@ class NotFoundTests(_Sample):
         self.assertEqual(answer.place["mode"], "full")
         self.assertEqual(answer.place["readings"][0]["how"], "loose")
         self.assertEqual(answer.place["readings"][0]["typed"], "Barpalli")
+
+
+# WP-D15d (R29): the twelve questions of the brief's Appendix A that used to
+# end with "I could not find a place called ...".
+STOPPED_BEFORE = [
+    "How many works in Tribal block areas are still ongoing?",
+    "How is MGNREGA block convergence going?",
+    "Kaunsa GP sabse zyada kharch karta hai?",
+    "Konta GP re sabu thu besi kharcha heichi?",
+    "Kitne GP me kaam adhura hai?",
+    "Which Aspirational district has the lowest spending?",
+    "Is any Maoist block behind on spending?",
+    "Does the Nabarangpur district appear in the data?",
+    "What about Jeypore block?",
+    "Mayurbhanj district me kya chal raha hai?",
+    "Show Adivasi GP spending",
+    "Which Model GP is the best?",
+]
+
+
+class NoStopTests(_Turns):
+    """WP-D15d (R29): the "could not find a place" reply is gone. A word that
+    reads as no place stops nothing and gets no line; reading a misspelt
+    place is unchanged."""
+
+    def test_the_reply_is_gone(self):
+        self.assertFalse(hasattr(place, "not_found_message"))
+        self.assertFalse(hasattr(place, "not_found_first_lines"))
+        from DiscoverChat.slots import Slots
+        self.assertFalse(hasattr(Slots(question="q", expanded="q"), "not_found"))
+
+    def test_the_twelve_are_searched_and_read_as_with_the_pass_off(self):
+        for text in STOPPED_BEFORE:
+            with self.subTest(text=text):
+                on = self.se.read_places(text)
+                self.assertNotIn("not_found", on)
+                self.assertEqual([r for r in on["readings"] if r["how"] == "loose"], [])
+                with mock.patch.object(config, "LOOSE_PLACES", False):
+                    off = self.se.read_places(text)
+                for key in ("gp_lgd_codes", "gp_names", "blocks", "districts", "mentions"):
+                    self.assertEqual(on[key], off[key], key)
+                answer, searched = self._turn(text)
+                self.assertEqual(searched, [text], "the turn did not reach the search")
+                self.assertNotIn("could not find", answer.text.lower())
+                self.assertNotEqual(answer.place.get("mode"), "not_found")
+
+    def test_another_place_is_answered_with_no_line_about_the_word(self):
+        answer, searched = self._turn("How is Rampur block doing compared with Barpali block?")
+        self.assertEqual(len(searched), 1)
+        self.assertEqual([p["name"] for p in answer.place["answered"]], ["Barpali"])
+        self.assertNotIn("Rampur", answer.text.split("\n\n")[0])
+        self.assertNotIn("Rampur", answer.lead)
+        self.assertNotIn("could not find", answer.text.lower())
+
+    def test_the_unchanged_lines_word_for_word(self):
+        for text, line in (
+                ("How is Barpalli block doing?", 'Reading "Barpalli" as Barpali block.'),
+                ("What should I know about Kalimella?",
+                 'Reading "Kalimella" as Kalimela block. For the Gram Panchayat, '
+                 'ask about "Kalimela GP".'),
+                ("How is Sharagada block doing?",
+                 'Reading "Sharagada" as Sheragada block.')):
+            with self.subTest(text=text):
+                answer, _ = self._turn(text)
+                self.assertEqual(answer.text.split("\n\n")[0], line)
 
 
 class MadeUpRegistryTests(unittest.TestCase):
@@ -208,7 +245,7 @@ class MadeUpRegistryTests(unittest.TestCase):
         self.assertEqual(place.reading_note(text, geo["readings"]),
                          'Reading "Gopalpure" as Gopalpur block. Other close names: '
                          'Gopalapur block, Gopalpura block, Gopapur block.')
-        payload = place.spelling_payload(text, geo["readings"], geo["not_found"])
+        payload = place.spelling_payload(text, geo["readings"])
         self.assertEqual([c["ask"] for c in payload["close_names"]],
                          ["Gopalapur block", "Gopalpura block", "Gopapur block"])
 
