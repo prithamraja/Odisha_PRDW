@@ -1425,6 +1425,95 @@ def _every_insight_mode(ctx):
             f"(configured mode {config.EVERY_INSIGHT_CHECK})")
 
 
+# ── WP-D17: a breakdown sentence carries only its own numbers (R28, D83) ─────
+BREAKDOWN_CAUTIONS = (
+    "A rise here is a rise in recording completeness unless the cashbook total "
+    "rises with it; the linked share went from 2.7% to 53.2% across these six "
+    "years.",
+    "The sanctioned basis covers only the activities with a sanction record on "
+    "file, about one in six.",
+    "Only 17 completions are recorded in the whole sample, so this splits a "
+    "near-empty column.",
+    "A swap between the SC and ST components is suspected and unconfirmed; do "
+    "not read one against the other.",
+)
+
+
+@check("breakdowns-own-numbers",
+       "no stored breakdown sentence carries a caution or a number its builder did not compute for that record (WP-D17, R28)")
+def _breakdowns_own_numbers(ctx):
+    """Two proofs on the STORED file, no parquet needed.
+
+    1. None of the four removed caution texts is in any stored sentence.
+    2. Each sentence is REBUILT from its own stored record (total, gross,
+       signs, shape, scope, and every member's name, value, share and rows) by
+       the builder's own `build_sentence_marked`, held to the builder's digit
+       rule (`own_numbers_check`: the fixed text holds no digit), and the
+       stored sentence must be that rebuilt core followed by nothing, or by the
+       size clause and/or the ratio clause in their fixed shapes.
+
+    WHAT ONLY THE BUILDER PROVES. The size clause's share of the volume and the
+    volume in scope, and the ratio clause's figure, are computed from the view
+    parquets and are not stored on the record. Here they are checked only for
+    shape (their fixed text holds no digit; their member is the record's own
+    top member and, in the size clause, its share is the record's own). That
+    each of those figures was computed for this record is proved by the
+    builder's check at build time, on every record."""
+    import re
+    import phase5f_decompose as p5f
+    records = [f for f in ctx["corpus"].all() if f.is_decomposition]
+    hits = [(f.id, c[:40]) for f in records for c in BREAKDOWN_CAUTIONS
+            if c in f.sentence]
+    assert not hits, f"{len(hits)} stored sentences still hold a caution: {hits[:3]}"
+    size_re = re.compile(
+        r"For size: (?P<member>.+?) holds (?P<vshare>\S+) of the (?P<volume>.+?) "
+        r"behind these totals, against (?P<pct>\S+) of (?P<phrase>.+?) -- a "
+        r"group's total grows with how much of the work it holds\.")
+    ratio_re = re.compile(r"As a ratio rather than an amount, (?P<member>.+?) "
+                          r"is (?P<value>.+?)\.")
+    problems, with_size, with_ratio = [], 0, 0
+    for f in records:
+        d = f.data
+        from DiscoverChat import corpus as corpus_mod
+        members = corpus_mod.members_of(d)
+        try:
+            marked = p5f.build_sentence_marked(
+                d["view"], d["measure"], d["dimension"],
+                [tuple(p) for p in d["subspace"]], members, d["total"],
+                d["gross"], d["signs"], {"shape": d["shape"]}, "", "")
+            core = p5f.own_numbers_check(f.id, marked)
+        except SystemExit as exc:
+            problems.append(f"{f.id}: {exc}")
+            continue
+        if not f.sentence.startswith(core):
+            problems.append(f"{f.id}: the stored sentence is not its rebuilt core")
+            continue
+        tail = f.sentence[len(core):].strip()
+        top = members[0]
+        m = size_re.match(tail)
+        if m:
+            with_size += 1
+            if (m["member"] != top["member"]
+                    or m["pct"] != p5f._pct(top["share"])
+                    or m["phrase"] != p5f.measure_phrase(d["view"], d["measure"])):
+                problems.append(f"{f.id}: the size clause is not about its own top member")
+            tail = tail[m.end():].strip()
+        m = ratio_re.fullmatch(tail)
+        if m:
+            with_ratio += 1
+            if m["member"] != top["member"]:
+                problems.append(f"{f.id}: the ratio clause is not about its own top member")
+            tail = ""
+        if tail:
+            problems.append(f"{f.id}: text after the sentence's own lines: {tail[:80]!r}")
+    assert not problems, f"{len(problems)} breakdowns fail: {problems[:3]}"
+    return (f"{len(records):,} breakdown sentences: no caution text; every one "
+            f"rebuilt from its own record by the builder's code with no digit in "
+            f"its fixed text; {with_size:,} size and {with_ratio:,} ratio clauses "
+            f"checked for shape and member (their volume and ratio figures are "
+            f"proved by the builder's check, not here)")
+
+
 # ── WP-D15b: place names typed with spelling mistakes (D80) ──────────────────
 SPELLING_T0 = REPO / "handoffs" / "WPD15b_spelling" / "t0_geography.json"
 

@@ -287,30 +287,51 @@ _MEASURE_PHRASE = {
     },
 }
 
-# Caveats that belong to the MEASURE and must travel with any figure taken from
-# it. Every one is the glossary's own statement, compressed to a sentence -- the
-# reports emit these deterministically (phase5b's reading notes) and a
-# decomposition quoted without them is the same figure without its warning.
-_MEASURE_CAVEAT = {
-    "sc_amount": ("A swap between the SC and ST components is suspected and "
-                  "unconfirmed; do not read one against the other."),
-    "st_amount": ("A swap between the SC and ST components is suspected and "
-                  "unconfirmed; do not read one against the other."),
-    "overspend_vs_sanction": ("The sanctioned basis covers only the activities "
-                              "with a sanction record on file, about one in six."),
-    "fund_sanctioned_total": ("The sanctioned basis covers only the activities "
-                              "with a sanction record on file, about one in six."),
-    "work_proposed_cost": ("The sanctioned basis covers only the activities "
-                           "with a sanction record on file, about one in six."),
-    "is_completed": ("Only 17 completions are recorded in the whole sample, so "
-                     "this splits a near-empty column."),
-    "n_completed": ("Only 17 completions are recorded in the whole sample, so "
-                    "this splits a near-empty column."),
-    "activity_linked_expenditure": (
-        "A rise here is a rise in recording completeness unless the cashbook "
-        "total rises with it; the linked share went from 2.7% to 53.2% across "
-        "these six years."),
-}
+# WP-D17 (R28, D83): the four hand-typed cautions that used to end every
+# breakdown of eight measures are GONE. They carried whole-sample figures
+# ("2.7% to 53.2%", "about one in six", "17 completions") into sentences about
+# one place, where the writer read them as the place's own and the number check
+# approved them because the digits were in the cited record. A stored sentence
+# now carries only figures computed for its own subject. Each place's own
+# version of those facts is on its profile sheet.
+#
+# THE RULE, ENFORCED AT BUILD TIME (`own_numbers_check`): every value a
+# sentence interpolates is wrapped in two marker characters while the sentence
+# is built (`_v`); the plain sentence is the marked one with the markers
+# stripped, so the two can never differ. The text OUTSIDE the markers is the
+# fixed template, and it may hold no digit. A typed-in number is template text,
+# so it fails the build and the record is named.
+_OPEN, _CLOSE = "\x02", "\x03"
+
+
+def _v(value) -> str:
+    """A value interpolated into a sentence: a figure computed for this record,
+    or a name taken from the data (a member, a place, a fiscal year)."""
+    return f"{_OPEN}{value}{_CLOSE}"
+
+
+def strip_marks(marked: str) -> str:
+    return marked.replace(_OPEN, "").replace(_CLOSE, "")
+
+
+class TypedInNumber(SystemExit):
+    """A breakdown sentence holds a digit in its fixed text."""
+
+
+def own_numbers_check(record_id: str, marked: str) -> str:
+    """The plain sentence, or a stop naming the record. Every digit of the
+    sentence must sit inside a marked value; the fixed text holds none."""
+    import re as _re
+    fixed = _re.sub(_re.escape(_OPEN) + r"[^" + _CLOSE + r"]*" + _re.escape(_CLOSE),
+                    " ", marked)
+    stray = _re.findall(r"\S*\d\S*", fixed)
+    if stray or _OPEN in fixed or _CLOSE in fixed:
+        raise TypedInNumber(
+            f"STOP: breakdown {record_id} holds a number its builder did not "
+            f"compute for it, in the fixed text of its sentence: {stray}. Every "
+            f"number in a stored breakdown sentence must be a figure computed for "
+            f"that record or part of a name from the data (WP-D17, R28).")
+    return strip_marks(marked)
 
 # The two signed money measures need their direction stated once, in words, or a
 # minus sign in front of a crore figure is left to the reader to interpret.
@@ -523,15 +544,31 @@ def _pct(x: float) -> str:
 
 def build_sentence(view, measure, dimension, subspace_pairs, members, total,
                    gross, signs, shape, volume, utilization) -> str:
+    """The stored sentence (markers stripped). `build_sentence_marked` is the
+    same text with every interpolated value marked, for `own_numbers_check`."""
+    return strip_marks(build_sentence_marked(
+        view, measure, dimension, subspace_pairs, members, total, gross,
+        signs, shape, volume, utilization))
+
+
+def build_sentence_marked(view, measure, dimension, subspace_pairs, members,
+                          total, gross, signs, shape, volume,
+                          utilization) -> str:
+    """Every value interpolated goes through `_v`: the formatted figures, the
+    members' and places' names (`scope` holds data values such as a fiscal
+    year or "Theme 4"). The measure phrase, the dimension words and the verb
+    are the glossary's and the template's, so they stay outside the marks and
+    are held to the no-digit rule with the rest of the fixed text. `volume`
+    and `utilization` arrive marked from their own builders."""
     phrase = measure_phrase(view, measure)
-    scope = scope_phrase(view, subspace_pairs)
+    scope = _v(scope_phrase(view, subspace_pairs))
     plural = dimension_plural(dimension)
     n = len(members)
     top = members[0]
     verb = "nets to" if signs == "mixed" else "totals"
 
-    lines = [f"Within {scope}, {phrase} {verb} {_fmt(view, measure, total)} "
-             f"across {n} {plural}."]
+    lines = [f"Within {scope}, {phrase} {verb} {_v(_fmt(view, measure, total))} "
+             f"across {_v(n)} {plural}."]
 
     if measure in _SIGNED_DIRECTION:
         above, below = _SIGNED_DIRECTION[measure]
@@ -543,55 +580,53 @@ def build_sentence(view, measure, dimension, subspace_pairs, members, total,
         neg = [m for m in members if m["value"] < 0]
         lines.append(
             f"The parts run in both directions, so this net figure is not a "
-            f"size: {len(pos)} of them add "
-            f"{_fmt(view, measure, sum(m['value'] for m in pos))} and "
-            f"{len(neg)} subtract "
-            f"{_fmt(view, measure, -sum(m['value'] for m in neg))}. "
-            f"The largest single contribution is {top['member']} at "
-            f"{_fmt(view, measure, top['value'])}, which is "
-            f"{_pct(top['share'])} of the {_fmt(view, measure, gross)} "
+            f"size: {_v(len(pos))} of them add "
+            f"{_v(_fmt(view, measure, sum(m['value'] for m in pos)))} and "
+            f"{_v(len(neg))} subtract "
+            f"{_v(_fmt(view, measure, -sum(m['value'] for m in neg)))}. "
+            f"The largest single contribution is {_v(top['member'])} at "
+            f"{_v(_fmt(view, measure, top['value']))}, which is "
+            f"{_v(_pct(top['share']))} of the {_v(_fmt(view, measure, gross))} "
             f"moving in total.")
     elif shape["shape"] == "empty":
         lines.append("Every one of them is zero, so there is nothing to divide up.")
     elif shape["shape"] == "concentrated":
         lines.append(
-            f"It is concentrated: {top['member']} accounts for "
-            f"{_pct(top['share'])} of it ({_fmt(view, measure, top['value'])}).")
+            f"It is concentrated: {_v(top['member'])} accounts for "
+            f"{_v(_pct(top['share']))} of it "
+            f"({_v(_fmt(view, measure, top['value']))}).")
         lines.append(_remainder_clause(view, measure, members, 1))
     elif shape["shape"] == "even":
         lines.append(
             f"It is spread evenly across them -- no single "
             f"{dimension_singular(dimension)} accounts for it. The largest, "
-            f"{top['member']}, holds {_pct(top['share'])} "
-            f"({_fmt(view, measure, top['value'])}), against an even share of "
-            f"{_pct(1.0 / n)}.")
+            f"{_v(top['member'])}, holds {_v(_pct(top['share']))} "
+            f"({_v(_fmt(view, measure, top['value']))}), against an even share of "
+            f"{_v(_pct(1.0 / n))}.")
     else:
         second = members[1] if n > 1 else None
         text = (f"It is spread across them without one standing out: the "
-                f"largest is {top['member']} at {_pct(top['share'])} "
-                f"({_fmt(view, measure, top['value'])})")
+                f"largest is {_v(top['member'])} at {_v(_pct(top['share']))} "
+                f"({_v(_fmt(view, measure, top['value']))})")
         if second is not None:
-            text += (f", then {second['member']} at {_pct(second['share'])} "
-                     f"({_fmt(view, measure, second['value'])})")
+            text += (f", then {_v(second['member'])} at "
+                     f"{_v(_pct(second['share']))} "
+                     f"({_v(_fmt(view, measure, second['value']))})")
         lines.append(text + ".")
         lines.append(_remainder_clause(view, measure, members, 2 if second else 1))
 
     null_member = next((m for m in members if m["is_null"]), None)
     if null_member is not None:
         lines.append(
-            f"{_num(null_member['rows'], 0)} rows carry no "
+            f"{_v(_num(null_member['rows'], 0))} rows carry no "
             f"{display_name(dimension)} on file; they are counted here as "
             f"{NULL_LABEL} and account for "
-            f"{_fmt(view, measure, null_member['value'])}.")
+            f"{_v(_fmt(view, measure, null_member['value']))}.")
 
     if volume:
         lines.append(volume)
     if utilization:
         lines.append(utilization)
-
-    caveat = _MEASURE_CAVEAT.get(measure)
-    if caveat:
-        lines.append(caveat)
 
     return " ".join(line for line in lines if line)
 
@@ -601,15 +636,16 @@ def _remainder_clause(view, measure, members, shown: int) -> str:
 
     Empty when nothing is left, and singular when one thing is: a sentence that
     says "the remaining 1 values" is the kind of seam that makes a reader stop
-    trusting the rest of the number.
+    trusting the rest of the number. Marked (WP-D17).
     """
     rest = members[shown:]
     if not rest:
         return ""
-    amount = _fmt(view, measure, sum(m["value"] for m in rest))
+    amount = _v(_fmt(view, measure, sum(m["value"] for m in rest)))
     if len(rest) == 1:
-        return f"The one remaining, {rest[0]['member']}, accounts for {amount}."
-    return f"The remaining {_num(len(rest), 0)} together account for {amount}."
+        return f"The one remaining, {_v(rest[0]['member'])}, accounts for {amount}."
+    return (f"The remaining {_v(_num(len(rest), 0))} together account for "
+            f"{amount}.")
 
 
 def volume_clause(view, measure, dimension, subspace_pairs, members) -> str:
@@ -621,7 +657,7 @@ def volume_clause(view, measure, dimension, subspace_pairs, members) -> str:
     quote both; here there is no writer to require it of, so the sentence carries
     it itself. Returns "" where the comparison does not apply -- a temporal
     breakdown, or a decomposition OF the volume measure, where the share would
-    restate the figure it is meant to check.
+    restate the figure it is meant to check. Returned marked (WP-D17).
     """
     block = volume_share(view, dimension, measure, [list(p) for p in subspace_pairs])
     if not block:
@@ -632,9 +668,9 @@ def volume_clause(view, measure, dimension, subspace_pairs, members) -> str:
     vshare = block["share_of_volume"].get(top["member"])
     if vshare is None:
         return ""
-    return (f"For size: {top['member']} holds {vshare} of the "
-            f"{block['volume_in_scope']} behind these totals, against "
-            f"{_pct(top['share'])} of {measure_phrase(view, measure)} -- a "
+    return (f"For size: {_v(top['member'])} holds {_v(vshare)} of the "
+            f"{_v(block['volume_in_scope'])} behind these totals, against "
+            f"{_v(_pct(top['share']))} of {measure_phrase(view, measure)} -- a "
             f"group's total grows with how much of the work it holds.")
 
 
@@ -644,7 +680,8 @@ def utilization_clause(view, measure, dimension, subspace_pairs, members) -> str
     Offered only where phase5b offers it: the two signed overspend measures, on a
     categorical non-fiscal-year breakdown, on a view that carries both sides of
     the ratio. An absolute shortfall ranks groups by size; the ratio does not,
-    and the operator asked for the ratio at calibration session 2.
+    and the operator asked for the ratio at calibration session 2. Returned
+    marked (WP-D17).
     """
     top = members[0]
     if top["is_null"]:
@@ -657,7 +694,8 @@ def utilization_clause(view, measure, dimension, subspace_pairs, members) -> str
     values = _first_mapping(block, top["member"])
     if values is None:
         return ""
-    return f"As a ratio rather than an amount, {top['member']} is {values}."
+    return (f"As a ratio rather than an amount, {_v(top['member'])} is "
+            f"{_v(values)}.")
 
 
 def _first_mapping(block: dict, key: str):
@@ -875,9 +913,13 @@ def build_records(views: tuple, validator=None) -> tuple:
                     volume = volume_clause(view, measure, dimension, pairs, members)
                     utilization = utilization_clause(view, measure, dimension,
                                                      pairs, members)
-                    sentence = build_sentence(
-                        view, measure, dimension, pairs, members, total, gross,
-                        signs, shape, volume, utilization)
+                    # WP-D17: built marked, checked, then stripped -- the
+                    # stored sentence is the marked one without its markers.
+                    sentence = own_numbers_check(
+                        f"d{view[-1]}-{made:05d}",
+                        build_sentence_marked(
+                            view, measure, dimension, pairs, members, total,
+                            gross, signs, shape, volume, utilization))
                     embed_text = build_embed_text(
                         view, measure, dimension, pairs, members, sentence)
 

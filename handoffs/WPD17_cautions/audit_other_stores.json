@@ -1,0 +1,101 @@
+{
+ "mined_insights": {
+  "records": 4404,
+  "parts_with_a_digit": 1122,
+  "threshold": {
+   "min_records": 10,
+   "min_subjects": 5
+  },
+  "repeated_parts": [
+   {
+    "part": "Uneven only in: Code 109 (not evenly spread) -- this is about how the total is spread, not about how much any one of them spends",
+    "records": 58,
+    "subjects": 8
+   },
+   {
+    "part": "Exception: Theme 1 - Poverty Free and Enhanced Livelihoods Village (different pattern)",
+    "records": 49,
+    "subjects": 37
+   },
+   {
+    "part": "Exception: 2022-2023 (different pattern)",
+    "records": 40,
+    "subjects": 24
+   },
+   {
+    "part": "Exception: 2024-2025 (no clear pattern)",
+    "records": 36,
+    "subjects": 36
+   },
+   {
+    "part": "Exception: Theme 1 - Poverty Free and Enhanced Livelihoods Village (no clear pattern)",
+    "records": 25,
+    "subjects": 24
+   },
+   {
+    "part": "Uneven only in: Theme 1 - Poverty Free and Enhanced Livelihoods Village (not evenly spread) -- this is about how the total is spread, not about how much any one of them spends",
+    "records": 20,
+    "subjects": 8
+   },
+   {
+    "part": "Exception: 2025-2026 (different pattern)",
+    "records": 19,
+    "subjects": 19
+   },
+   {
+    "part": "sanctions_count (different pattern) and 1 others",
+    "records": 19,
+    "subjects": 16
+   },
+   {
+    "part": "Across most temporal_grain values (2/3), sanctions_count is increasing over (varies).",
+    "records": 16,
+    "subjects": 16
+   },
+   {
+    "part": "Across most measure values (6/9), (varies) shows seasonal pattern (PERIOD_12) over month.",
+    "records": 15,
+    "subjects": 15
+   },
+   {
+    "part": "Exception: Theme 4 - Water Sufficient Village (different pattern)",
+    "records": 14,
+    "subjects": 13
+   },
+   {
+    "part": "Across most temporal_grain values (2/3), activity_linked_expenditure is increasing over (varies).",
+    "records": 14,
+    "subjects": 14
+   },
+   {
+    "part": "Exception: 2024-2025 (different pattern)",
+    "records": 13,
+    "subjects": 10
+   },
+   {
+    "part": "Across most measure values (6/9), (varies) shows seasonal pattern (PERIOD_4) over quarter.",
+    "records": 13,
+    "subjects": 13
+   },
+   {
+    "part": "Exception: 2021-2022 (different pattern)",
+    "records": 11,
+    "subjects": 7
+   },
+   {
+    "part": "Exception: 2020-2021 (different pattern)",
+    "records": 10,
+    "subjects": 10
+   },
+   {
+    "part": "Across most measure values (7/9), Mixed accounts for the majority of (varies) among social_composition values.",
+    "records": 10,
+    "subjects": 10
+   }
+  ]
+ },
+ "profile_sheets": {
+  "check": "phase5g_profile_sheets.check_sentences (--check 5; gate line profile-sheets-formatter-parity)",
+  "result": "2,871 sentences: every numeral is a stored value through the stored formatter; 760 display strings regenerated; 2,871 ids unique, at most 60 characters, no space or bracket"
+ }
+}
