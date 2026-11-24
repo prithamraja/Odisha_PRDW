@@ -94,6 +94,11 @@ Use figures exactly as they appear in the findings. Do not compute new numbers â
 
 Return only the finished prose."""
 
+# WP-D15 (ruling R18, D78): the operator's paragraph, approved as proposed. Put
+# into the writer's prompt ONLY on a turn that hands place facts, directly
+# before the prompt's last line (`writer.consolidating_prompt`).
+PLACE_FACTS_PARAGRAPH = "Some answers also come with PLACE FACTS: standard figures about the place the officer asked about, each with an id starting p-. Start from the place facts that answer the question, then bring in the findings. You do not have to use every place fact. Tag them the same way as findings."
+
 
 def for_consolidating_writer() -> str:
     """The context brief that precedes the D7.3 prompt, verbatim.

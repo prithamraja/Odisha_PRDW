@@ -215,6 +215,10 @@ class Consolidated:
     attempts: int = 0
     reason: str = ""
     check_results: list = field(default_factory=list)
+    # WP-D15 T4: what the last attempt wrote ("" when it wrote nothing or the
+    # call failed), so a fall-back can show the place facts it chose. Not in
+    # `as_dict`: the payload is unchanged.
+    last_prose: str = ""
 
     def as_dict(self) -> dict:
         return {"mode": "consolidated", "fell_back": self.fell_back,
@@ -245,8 +249,28 @@ def _render_findings_for_consolidation(findings: list) -> str:
     return "\n".join(lines)
 
 
+_LAST_LINE = "Return only the finished prose."
+
+
+def consolidating_prompt(with_place_facts: bool) -> str:
+    """The operator's prompt; on a turn that hands place facts, with the R18
+    paragraph (context_brief.PLACE_FACTS_PARAGRAPH, D78) directly before its
+    last line. Read at call time, so a test or a trial that swaps
+    CONSOLIDATING_WRITER_PROMPT gets its own text with the paragraph added."""
+    prompt = context_brief.CONSOLIDATING_WRITER_PROMPT
+    if not with_place_facts:
+        return prompt
+    head, sep, tail = prompt.rpartition(_LAST_LINE)
+    if not sep or tail.strip():
+        raise ValueError("the writer prompt no longer ends with "
+                         f"{_LAST_LINE!r}; the place-facts paragraph has no "
+                         f"place to go")
+    return head + context_brief.PLACE_FACTS_PARAGRAPH + "\n\n" + _LAST_LINE + tail
+
+
 def build_consolidation_prompt(question: str, findings: list, *,
-                               run_date: str = "", reason: str = "") -> str:
+                               run_date: str = "", reason: str = "",
+                               place_groups=None) -> str:
     """Context brief, then the operator's prompt, then the findings.
 
     ORDER IS THE OPERATOR'S TEXT'S OWN. Appendix A opens "Turn the analytical
@@ -260,7 +284,39 @@ def build_consolidation_prompt(question: str, findings: list, *,
     says the context brief and the run date ARE supplied. A narrative written
     without knowing what was asked would consolidate the right findings into an
     answer to no question. Flagged in WPD7_REPORT for the operator to strike.
+
+    WP-D15 T2. `place_groups` (from `place.groups_for`) puts a PLACE FACTS
+    block per place before the findings, and the R18 paragraph into the
+    prompt. A turn with none builds exactly the string it built before. A turn
+    with place facts and no mined insight has no FINDINGS block.
     """
+    if not place_groups:
+        return _build_plain(question, findings, run_date=run_date,
+                            reason=reason)
+    from . import place as place_mod
+    parts = [context_brief.for_consolidating_writer(), ""]
+    parts.append(consolidating_prompt(True))
+    parts.append("")
+    if run_date:
+        parts.append(f"The analysis was run {run_date}.")
+    parts.append(f"The officer asked: {question}")
+    parts.append("")
+    parts.append(place_mod.render_for_writer(place_groups))
+    if findings:
+        parts.append("")
+        parts.append("FINDINGS")
+        parts.append(_render_findings_for_consolidation(findings))
+    if reason:
+        parts.append("")
+        parts.append("A previous attempt at this answer was rejected. The "
+                     "reason given was:")
+        parts.append(reason)
+    return "\n".join(parts)
+
+
+def _build_plain(question: str, findings: list, *, run_date: str = "",
+                 reason: str = "") -> str:
+    """The request as it was before WP-D15, unchanged byte for byte."""
     parts = [context_brief.for_consolidating_writer(), ""]
     parts.append(context_brief.CONSOLIDATING_WRITER_PROMPT)
     parts.append("")
@@ -323,8 +379,28 @@ def _log_causal_words(turn_id, question: str, attempt: int,
         pass
 
 
+def _log_number_words(turn_id, question: str, attempt: int,
+                      step: dict | None) -> None:
+    """WP-D15 step 7 (R20): a SHOWN answer that states a number in words gets
+    one line in the failure log, the way causal words are logged. Marked
+    `kind: number_words_shown`, `fell_back: false`; changes no answer."""
+    if not step or step["pass"]:
+        return
+    path = llm.LOG_DIR / "citation_failures.jsonl"
+    record = {"ts": time.strftime("%Y-%m-%dT%H:%M:%S"),
+              "kind": "number_words_shown", "fell_back": False,
+              "turn_id": turn_id, "question": question, "attempt": attempt,
+              "words": step["words"], "sentences": step["sentences"]}
+    try:
+        llm.LOG_DIR.mkdir(parents=True, exist_ok=True)
+        with open(path, "a", encoding="utf-8") as fh:
+            fh.write(json.dumps(record, ensure_ascii=False, default=str) + "\n")
+    except OSError:
+        pass
+
+
 def consolidate(question: str, findings: list, *, run_date: str = "",
-                turn_id=None) -> Consolidated:
+                turn_id=None, place_groups=None) -> Consolidated:
     """One consolidated narrative. Two attempts, then the bare sentences.
 
     NO VERIFIER ON THIS PATH, by D7.1 — and none is wired in even when
@@ -339,20 +415,24 @@ def consolidate(question: str, findings: list, *, run_date: str = "",
     """
     result = Consolidated()
     reason = ""
+    place_facts = [f for g in (place_groups or []) for f in g.facts]
 
     for attempt in (1, 2):
         result.attempts = attempt
         prompt = build_consolidation_prompt(question, findings,
-                                            run_date=run_date, reason=reason)
+                                            run_date=run_date, reason=reason,
+                                            place_groups=place_groups)
         try:
             record = llm.call(config.WRITER_MODEL, prompt,
                               config.WRITER_MAX_COMPLETION, "write",
                               turn_id=turn_id, attempt=attempt)
         except Exception as exc:
             result.reason = f"writer call failed: {type(exc).__name__}: {exc}"
+            result.last_prose = ""
             return result
 
         prose = (record["response_text"] or "").strip()
+        result.last_prose = prose
         if not prose:
             # The starvation case (D43): budget spent on reasoning, nothing
             # returned, no error. Worth one more attempt and no more.
@@ -361,7 +441,13 @@ def consolidate(question: str, findings: list, *, run_date: str = "",
                              % record["finish_reason"])
             continue
 
-        results = checks.check_citations(prose, findings, run_date=run_date)
+        if place_facts:
+            results = checks.check_citations(prose, findings,
+                                             run_date=run_date,
+                                             place_facts=place_facts)
+        else:
+            results = checks.check_citations(prose, findings,
+                                             run_date=run_date)
         result.check_results.append(results)
         if results["all_pass"]:
             result.tagged = prose
@@ -370,6 +456,8 @@ def consolidate(question: str, findings: list, *, run_date: str = "",
             result.reason = ""
             _log_causal_words(turn_id, question, attempt,
                               results.get("3_causal"))
+            _log_number_words(turn_id, question, attempt,
+                              results.get("7_number_words"))
             return result
 
         reason = checks.citation_failure_reason(results)
