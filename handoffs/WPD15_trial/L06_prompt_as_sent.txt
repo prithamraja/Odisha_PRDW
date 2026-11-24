@@ -1,0 +1,102 @@
+You are writing for a decision-aid system used by government officials in Odisha's Department of Panchayati Raj & Drinking Water. The system automatically analyses village-level planning and spending records — development plans, sanctions, payments, works and photo evidence from Gram Panchayats, blocks, and districts — and surfaces patterns worth an official's attention. The current data is a 20-Gram-Panchayat sample; percentages describe the sample, not the state.
+
+Your readers are busy block-, district- and state-level officials, not data analysts. They read these insights to decide where to direct attention: which districts to question, which records to reconcile, which local practices to check at the next review.
+
+Turn the analytical findings below into clear, concise prose for a senior government official.
+
+Do not rewrite each finding separately. Identify overlapping or repeated findings, consolidate them into a small number of underlying patterns, and explain those patterns as a coherent narrative. It is very important that you do not make causal claims - none of our data can be used to determine causality. Do not fabricate or overstate data.
+
+Preserve important numbers and exceptions where useful. Ignore ranking metadata such as "not in the ranked shortlist." Avoid database-style language and do not infer causes that are not supported by the findings.
+
+After every figure and every claim, tag the finding it comes from with its id in square brackets, exactly as given, e.g. [1-00235]. A sentence drawing on two findings carries both tags.
+
+Use figures exactly as they appear in the findings. Do not compute new numbers — no percentages, sums, or differences that are not stated in a finding.
+
+Some answers also come with PLACE FACTS: standard figures about the place the officer asked about, each with an id starting p-. Start from the place facts that answer the question, then bring in the findings. You do not have to use every place fact. Tag them the same way as findings.
+
+Return only the finished prose.
+
+The analysis was run as of 2026-09-11.
+The officer asked: What should I know about Kalimela?
+
+PLACE FACTS — Kalimela block
+[p-block-3843-A1] Kalimela block has 852 planned activities, the 5th most of 16 blocks. The middle value for these 16 is 712.
+[p-block-3843-A2] 392 of them (46.0%) have no cost attached.
+[p-block-3843-A3] Its planned cost is Rs 7.65 crore, the 2nd highest of 16 blocks. The middle value is Rs 4.48 crore.
+[p-block-3843-A4] Rs 2.08 crore has been sanctioned for the activities with an approval on file, the 5th highest of 16 blocks. The middle value is Rs 1.51 crore.
+[p-block-3843-A5] It spent Rs 1.76 crore on planned activities, the 5th highest of 16 blocks. The middle value is Rs 1.40 crore.
+[p-block-3843-A6] Spending is 23.0% of the planned cost, the 4th lowest of 16 blocks. The middle value is 36.6%.
+[p-block-3843-A7] Spending is Rs 5.90 crore below plan.
+[p-block-3843-B-2020-2021] In 2020-2021: 20 activities, Rs 44.90 lakh planned, Rs 42.01 lakh spent, 93.6% of the plan.
+[p-block-3843-B-2021-2022] In 2021-2022: 32 activities, Rs 64.43 lakh planned, Rs 33.21 lakh spent, 51.5% of the plan.
+[p-block-3843-B-2022-2023] In 2022-2023: 28 activities, Rs 35.77 lakh planned, Rs 28.84 lakh spent, 80.6% of the plan.
+[p-block-3843-B-2023-2024] In 2023-2024: 335 activities (196 with no cost), Rs 2.62 crore planned, Rs 28.94 lakh spent, 11.1% of the plan.
+[p-block-3843-B-2024-2025] In 2024-2025: 268 activities (72 with no cost), Rs 3.00 crore planned, Rs 31.60 lakh spent, 10.5% of the plan.
+[p-block-3843-B-2025-2026] In 2025-2026: 169 activities (124 with no cost), Rs 58.60 lakh planned, Rs 11.20 lakh spent, 19.1% of the plan.
+[p-block-3843-C-drinking-water] Drinking water: 166 activities, Rs 3.74 crore planned, Rs 60.98 lakh spent.
+[p-block-3843-C-land-improvement] Land improvement: 57 activities and Rs 73.95 lakh planned, with nothing spent.
+[p-block-3843-C-maintenance-of-community-system] Maintenance of community system: 100 activities, Rs 62.03 lakh planned, Rs 11.54 lakh spent.
+[p-block-3843-C-sanitation] Sanitation: 118 activities, Rs 52.89 lakh planned, Rs 33.62 lakh spent.
+[p-block-3843-C-roads] Roads: 27 activities, Rs 52.19 lakh planned, Rs 19.72 lakh spent.
+[p-block-3843-C-poverty-allevation-programme] Poverty allevation programme: 114 activities and Rs 37.09 lakh planned, with nothing spent.
+[p-block-3843-C-education] Education: 42 activities, Rs 29.23 lakh planned, Rs 13.21 lakh spent.
+[p-block-3843-C-water-conservation] Water Conservation: 8 activities, Rs 25.15 lakh planned, Rs 4.21 lakh spent.
+[p-block-3843-C-administrative-technical-support] Administrative & Technical Support: 13 activities, Rs 19.40 lakh planned, Rs 12.23 lakh spent.
+[p-block-3843-C-markets-and-fairs] Markets and fairs: 4 activities, Rs 12.50 lakh planned, Rs 3.47 lakh spent.
+[p-block-3843-C-gp-office-infrastructure] GP Office Infrastructure: 2 activities, Rs 8.84 lakh planned, Rs 8.64 lakh spent.
+[p-block-3843-C-health] Health: 57 activities, Rs 7.71 lakh planned, Rs 5.60 lakh spent.
+[p-block-3843-C-women-and-child-development] Women and child development: 55 activities, Rs 5.46 lakh planned, Rs 98,869 spent.
+[p-block-3843-C-public-distribution-system] Public distribution system: 5 activities and Rs 3.00 lakh planned, with nothing spent.
+[p-block-3843-C-rural-electrification] Rural electrification: 7 activities, Rs 1.44 lakh planned, Rs 1.43 lakh spent.
+[p-block-3843-C-social-welfare] Social welfare: 20 activities and Rs 68,500 planned, with nothing spent.
+[p-block-3843-C-technical-training-and-vocationa] Technical training and vocational education: 14 activities, Rs 15,000 planned, Rs 15,000 spent.
+[p-block-3843-C-agriculture] Agriculture: 12 activities, with no planned cost and nothing spent.
+[p-block-3843-C-animal-husbandry] Animal husbandry: 1 activity, with no planned cost and nothing spent.
+[p-block-3843-C-fuel-and-fodder] Fuel and fodder: 5 activities, with no planned cost and nothing spent.
+[p-block-3843-C-khadi] Khadi: 1 activity, with no planned cost and nothing spent.
+[p-block-3843-C-non-conventional-energy-sources] Non-conventional energy sources: 4 activities, with no planned cost and nothing spent.
+[p-block-3843-C-rural-housing] Rural housing: 5 activities, with no planned cost and nothing spent.
+[p-block-3843-C-welfare-of-the-weaker-sections] Welfare of the weaker sections: 15 activities, with no planned cost and nothing spent.
+[p-block-3843-CT-4] Theme 4 - Water Sufficient Village: 174 activities, Rs 3.99 crore planned, Rs 65.19 lakh spent.
+[p-block-3843-CT-6] Theme 6 - Self-sufficient Infrastructure in Village: 310 activities, Rs 2.27 crore planned, Rs 51.51 lakh spent.
+[p-block-3843-CT-5] Theme 5 - Clean and Green Village: 122 activities, Rs 52.89 lakh planned, Rs 33.62 lakh spent.
+[p-block-3843-CT-8] Theme 8 - Village with Good Governance: 116 activities, Rs 45.93 lakh planned, Rs 8.64 lakh spent.
+[p-block-3843-CT-unmapped] Unmapped theme: 49 activities, Rs 34.90 lakh planned, Rs 15.70 lakh spent.
+[p-block-3843-CT-3] Theme 3 - Child Friendly Village: 55 activities, Rs 5.46 lakh planned, Rs 98,869 spent.
+[p-block-3843-CT-1] Theme 1 - Poverty Free and Enhanced Livelihoods Village: 26 activities, Rs 15,000 planned, Rs 15,000 spent.
+[p-block-3843-D-plan] Of the planned cost, Rs 92.28 lakh is tied grant (12.1%) and Rs 6.73 crore is untied grant (87.9%).
+[p-block-3843-DS-xv-finance-commission] XV Finance Commission: 125 approvals, Rs 1.39 crore sanctioned.
+[p-block-3843-DS-5th-state-finance-commission] 5TH STATE FINANCE COMMISSION: 41 approvals, Rs 66.21 lakh sanctioned.
+[p-block-3843-DS-own-funds] Own Funds: 2 approvals, Rs 2.74 lakh sanctioned.
+[p-block-3843-D-authority] Approvals on file, by who approved: BDO 91, Sarpanch 72, Engineer 3, all others 2.
+[p-block-3843-E1] 154 works are marked ongoing, the 5th most of 16 blocks. The middle value is 104.
+[p-block-3843-E2] 13 works are marked completed, out of 17 in the whole sample.
+[p-block-3843-E3] 22 works are marked abandoned, with Rs 2.72 lakh planned on them. 21 of them were planned in 2024-2025.
+[p-block-3843-E4] 129 activities have photo evidence (553 uploads), the 5th most of 16 blocks. The middle value is 83.
+[p-block-3843-E5] 55 works planned in 2022-2023 or earlier are still marked ongoing. Rs 89.63 lakh of their Rs 1.04 crore planned cost has been spent (86.0%).
+[p-block-3843-F1] 168 of the 852 activities (19.7%) have an administrative approval on file, the 4th most of 16 blocks. The middle value is 104.
+    (An activity with no approval on file is not known to be unapproved; the record may simply be missing.)
+[p-block-3843-F2] 168 activities have a technical approval on file.
+[p-block-3843-G1] Its cashbook shows Rs 4.63 crore received and Rs 5.28 crore paid out.
+[p-block-3843-G3] 33.3% of the payments are linked to a planned activity, the 6th lowest of 16 blocks. The middle value is 46.5%.
+[p-block-3843-H2] 49 activities have no LSDG theme mapped; their planned cost is Rs 34.90 lakh.
+[p-block-3843-I4] Kalimela block has 1 Gram Panchayat in the data.
+[p-block-3843-J-119936] Kalimela Gram Panchayat: 852 activities, Rs 7.65 crore planned, Rs 1.76 crore spent, 23.0% of the plan.
+
+FINDINGS
+[d1-30946] Within Gram Panchayat Kalimela, spending, general component totals Rs 2.07 crore across 24 focus area values. It is spread across them without one standing out: the largest is Drinking water at 34.3% (Rs 70.85 lakh), then Sanitation at 20.0% (Rs 41.40 lakh). The remaining 22 together account for Rs 94.29 lakh. For size: Drinking water holds 19.5% of the 852 activities behind these totals, against 34.3% of spending, general component -- a group's total grows with how much of the work it holds.
+    (a breakdown of the recorded totals, not a mined pattern — the parts add up to the whole)
+[d1-31150] Within Gram Panchayat Kalimela, activities planned totals 852 activities across 6 fund component values. It is concentrated: (not recorded) accounts for 80.3% of it (684 activities). The remaining 5 together account for 168 activities. 684 rows carry no fund component on file; they are counted here as (not recorded) and account for 684 activities.
+    (a breakdown of the recorded totals, not a mined pattern — the parts add up to the whole)
+[d1-31128] Within Gram Panchayat Kalimela, planned cost totals Rs 7.65 crore across 4 scheme values. It is concentrated: (not recorded) accounts for 72.7% of it (Rs 5.57 crore). The remaining 3 together account for Rs 2.09 crore. 684 rows carry no scheme on file; they are counted here as (not recorded) and account for Rs 5.57 crore.
+    (a breakdown of the recorded totals, not a mined pattern — the parts add up to the whole)
+[d1-30939] Within Gram Panchayat Kalimela, planned cost totals Rs 7.65 crore across 24 focus area values. It is spread across them without one standing out: the largest is Drinking water at 48.8% (Rs 3.74 crore), then Land improvement at 9.7% (Rs 73.95 lakh). The remaining 22 together account for Rs 3.18 crore. For size: Drinking water holds 19.5% of the 852 activities behind these totals, against 48.8% of planned cost -- a group's total grows with how much of the work it holds.
+    (a breakdown of the recorded totals, not a mined pattern — the parts add up to the whole)
+[d1-30937] Within Gram Panchayat Kalimela, expected beneficiaries totals 8,820 people across 7 LSDG theme values. It is spread across them without one standing out: the largest is Theme 1 - Poverty Free and Enhanced Livelihoods Village at 45.1% (3,978 people), then Theme 6 - Self-sufficient Infrastructure in Village at 15.5% (1,367 people). The remaining 5 together account for 3,475 people. For size: Theme 1 - Poverty Free and Enhanced Livelihoods Village holds 3.1% of the 852 activities behind these totals, against 45.1% of expected beneficiaries -- a group's total grows with how much of the work it holds.
+    (a breakdown of the recorded totals, not a mined pattern — the parts add up to the whole)
+[d1-31016] Within Gram Panchayat Kalimela, spending, general component totals Rs 2.07 crore across 2 activity type values. It is concentrated: Public Works accounts for 100.0% of it (Rs 2.06 crore). The one remaining, Beneficiary Oriented Programmes, accounts for Rs 5,000. For size: Public Works holds 82.3% of the 852 activities behind these totals, against 100.0% of spending, general component -- a group's total grows with how much of the work it holds.
+    (a breakdown of the recorded totals, not a mined pattern — the parts add up to the whole)
+[d1-31173] Within Gram Panchayat Kalimela, planned cost totals Rs 7.65 crore across 22 asset category values. It is spread across them without one standing out: the largest is Uncategorised at 28.0% (Rs 2.14 crore), then Water Sources & Structures at 23.9% (Rs 1.83 crore). The remaining 20 together account for Rs 3.68 crore. For size: Uncategorised holds 57.5% of the 852 activities behind these totals, against 28.0% of planned cost -- a group's total grows with how much of the work it holds.
+    (a breakdown of the recorded totals, not a mined pattern — the parts add up to the whole)
+[d1-30940] Within Gram Panchayat Kalimela, tied grant planned totals Rs 92.28 lakh across 24 focus area values. It is spread across them without one standing out: the largest is Sanitation at 50.5% (Rs 46.59 lakh), then Drinking water at 49.5% (Rs 45.69 lakh). The remaining 22 together account for Rs 0. For size: Sanitation holds 13.8% of the 852 activities behind these totals, against 50.5% of tied grant planned -- a group's total grows with how much of the work it holds.
+    (a breakdown of the recorded totals, not a mined pattern — the parts add up to the whole)

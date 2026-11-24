@@ -1,0 +1,322 @@
+{
+ "step6": [
+  {
+   "arm": "sheet_choose",
+   "id": "T04",
+   "run": 3,
+   "attempt": 1,
+   "counts": true,
+   "phrase": "the highest of",
+   "sentence": "Barpali has the most planned activities in the sample: 1,447 across its 2 Gram Panchayats, the highest of 16 blocks [p-block-3676-A1][p-block-3676-I4].",
+   "cited_place_facts": [
+    {
+     "id": "p-block-3676-A1",
+     "standing": [
+      "the most of"
+     ]
+    },
+    {
+     "id": "p-block-3676-I4",
+     "standing": []
+    }
+   ]
+  },
+  {
+   "arm": "sheet_midsize",
+   "id": "GEO-18",
+   "run": 1,
+   "attempt": 1,
+   "counts": true,
+   "phrase": "7th highest",
+   "sentence": "Its 808 planned activities rank 7th highest, but its planned cost of Rs 3.36 crore is the 7th lowest; 447 activities (55.3%) have no cost attached, so the costed plan may not capture the full activity picture [p-block-3838-A1][p-block-3838-A2][p-block-3838-A3].",
+   "cited_place_facts": [
+    {
+     "id": "p-block-3838-A1",
+     "standing": [
+      "7th most"
+     ]
+    },
+    {
+     "id": "p-block-3838-A2",
+     "standing": []
+    },
+    {
+     "id": "p-block-3838-A3",
+     "standing": [
+      "7th lowest"
+     ]
+    }
+   ]
+  },
+  {
+   "arm": "sheet_midsize",
+   "id": "GEO-18",
+   "run": 1,
+   "attempt": 1,
+   "counts": true,
+   "phrase": "4th highest",
+   "sentence": "The main status issue is that 167 works are marked ongoing, the 4th highest count among 16 blocks, while no works are marked completed [p-block-3838-E1][p-block-3838-E2].",
+   "cited_place_facts": [
+    {
+     "id": "p-block-3838-E1",
+     "standing": [
+      "4th most"
+     ]
+    },
+    {
+     "id": "p-block-3838-E2",
+     "standing": []
+    }
+   ]
+  },
+  {
+   "arm": "sheet_midsize",
+   "id": "GEO-29",
+   "run": 1,
+   "attempt": 2,
+   "counts": true,
+   "phrase": "4th highest",
+   "sentence": "In the records reviewed, Khordha has 1,316 planned activities across 1 block and 3 Gram Panchayats; its activity count is the 4th highest among 9 districts. [p-district-321-A1]",
+   "cited_place_facts": [
+    {
+     "id": "p-district-321-A1",
+     "standing": [
+      "4th most"
+     ]
+    }
+   ]
+  },
+  {
+   "arm": "sheet_midsize",
+   "id": "TWO-01",
+   "run": 1,
+   "attempt": 1,
+   "counts": true,
+   "phrase": "the highest in",
+   "sentence": "Their planned costs are also among the highest in the comparison: Rs 7.65 crore in Kalimela and Rs 7.22 crore in Bheden, against a middle value of Rs 4.48 crore [p-block-3843-A3][p-block-3678-A3].",
+   "cited_place_facts": [
+    {
+     "id": "p-block-3843-A3",
+     "standing": [
+      "2nd highest"
+     ]
+    },
+    {
+     "id": "p-block-3678-A3",
+     "standing": [
+      "3rd highest"
+     ]
+    }
+   ]
+  }
+ ],
+ "step7": [
+  {
+   "arm": "sheet",
+   "id": "L01",
+   "run": 1,
+   "sentence": "It has 573 planned activities and a planned cost of Rs 3.48 crore, both the second lowest among the 9 sampled districts.",
+   "words": [
+    "second"
+   ]
+  },
+  {
+   "arm": "sheet",
+   "id": "L04",
+   "run": 1,
+   "sentence": "Only 23.8% of payments are linked to a planned activity, the second-lowest share among the nine districts in the sample.",
+   "words": [
+    "second"
+   ]
+  },
+  {
+   "arm": "sheet",
+   "id": "GEO-07",
+   "run": 1,
+   "sentence": "Second, check theme assignments: activities without a mapped theme account for 39.5% of planned cost and 32.6% of expected beneficiaries.",
+   "words": [
+    "Second"
+   ]
+  },
+  {
+   "arm": "sheet",
+   "id": "GEO-12",
+   "run": 1,
+   "sentence": "Its recorded plan of Rs 1.66 crore was the lowest in the 20-Gram-Panchayat sample, and spending of Rs 75.12 lakh was the second lowest.",
+   "words": [
+    "second"
+   ]
+  },
+  {
+   "arm": "sheet",
+   "id": "GEO-12",
+   "run": 1,
+   "sentence": "Photo evidence was on file for 53 activities, the third fewest in the sample.",
+   "words": [
+    "third"
+   ]
+  },
+  {
+   "arm": "sheet",
+   "id": "GEO-20",
+   "run": 1,
+   "sentence": "Its planned cost was Rs 6.51 crore, the fourth highest in the sample.",
+   "words": [
+    "fourth"
+   ]
+  },
+  {
+   "arm": "sheet",
+   "id": "T14",
+   "run": 2,
+   "sentence": "Of the Rs 17.85 crore gap, just over half is in village infrastructure (Rs 9.08 crore, or 50.9%).",
+   "words": [
+    "half"
+   ]
+  },
+  {
+   "arm": "sheet",
+   "id": "GEO-12",
+   "run": 2,
+   "sentence": "Its recorded planned cost of Rs 1.66 crore was the lowest in the sample, and its spending of Rs 75.12 lakh was the second lowest.",
+   "words": [
+    "second"
+   ]
+  },
+  {
+   "arm": "sheet",
+   "id": "GEO-12",
+   "run": 2,
+   "sentence": "Photo evidence was on file for 53 activities, the third fewest in the sample.",
+   "words": [
+    "third"
+   ]
+  },
+  {
+   "arm": "sheet",
+   "id": "L01",
+   "run": 3,
+   "sentence": "It recorded 573 planned activities and Rs 3.48 crore in planned costs, both the second lowest among the nine districts in the sample.",
+   "words": [
+    "second"
+   ]
+  },
+  {
+   "arm": "sheet",
+   "id": "L04",
+   "run": 3,
+   "sentence": "Only 23.8% of payments are linked to a planned activity, the second-lowest share among the 9 sampled districts.",
+   "words": [
+    "second"
+   ]
+  },
+  {
+   "arm": "sheet",
+   "id": "GEO-12",
+   "run": 3,
+   "sentence": "Its recorded plan cost of Rs 1.66 crore was the lowest in the 20-Gram-Panchayat sample, and its spending of Rs 75.12 lakh was the second lowest.",
+   "words": [
+    "second"
+   ]
+  },
+  {
+   "arm": "sheet_choose",
+   "id": "L04",
+   "run": 1,
+   "sentence": "Second, verify work status: no works are marked completed, and 90 works planned in 2022-2023 or earlier are still marked ongoing despite recorded spending of 92.1% of their planned cost.",
+   "words": [
+    "Second"
+   ]
+  },
+  {
+   "arm": "sheet_choose",
+   "id": "GEO-12",
+   "run": 1,
+   "sentence": "It spent Rs 75.12 lakh on planned activities, the second-lowest amount in the sample, but that was 45.3% of its recorded plan, above the sample midpoint of 42.0%.",
+   "words": [
+    "second"
+   ]
+  },
+  {
+   "arm": "sheet_choose",
+   "id": "GEO-12",
+   "run": 1,
+   "sentence": "Photo evidence is on file for 53 activities, the third-fewest in the sample.",
+   "words": [
+    "third"
+   ]
+  },
+  {
+   "arm": "sheet_choose",
+   "id": "GEO-19",
+   "run": 1,
+   "sentence": "Second, reconcile cashbook payments with activity records: only 38.3% of payments are linked to a planned activity, although the recorded linked share rose from 2.7% to 53.2% over the period reviewed.",
+   "words": [
+    "Second"
+   ]
+  },
+  {
+   "arm": "sheet_choose",
+   "id": "T04",
+   "run": 2,
+   "sentence": "It ranks third for both sanctions on file (Rs 2.96 crore) and spending on planned activities (Rs 2.64 crore).",
+   "words": [
+    "third"
+   ]
+  },
+  {
+   "arm": "sheet_choose",
+   "id": "GEO-12",
+   "run": 2,
+   "sentence": "Its recorded planned cost was Rs 1.66 crore, the lowest in the 20-Gram-Panchayat sample, and its spending of Rs 75.12 lakh was the second lowest.",
+   "words": [
+    "second"
+   ]
+  },
+  {
+   "arm": "sheet_choose",
+   "id": "GEO-12",
+   "run": 2,
+   "sentence": "Photo evidence is on file for 53 activities, the third fewest in the sample.",
+   "words": [
+    "third"
+   ]
+  },
+  {
+   "arm": "sheet_choose",
+   "id": "L01",
+   "run": 3,
+   "sentence": "The sample records 573 planned activities with a planned cost of Rs 3.48 crore, the second-lowest planned cost among the 9 districts represented.",
+   "words": [
+    "second"
+   ]
+  },
+  {
+   "arm": "sheet_choose",
+   "id": "L04",
+   "run": 3,
+   "sentence": "Only 23.8% of cashbook payments are linked to a planned activity, the second-lowest share in the sample.",
+   "words": [
+    "second"
+   ]
+  },
+  {
+   "arm": "sheet_midsize",
+   "id": "L04",
+   "run": 1,
+   "sentence": "Payments linked to a planned activity are 23.8% of payments, the second lowest among the nine districts.",
+   "words": [
+    "second"
+   ]
+  },
+  {
+   "arm": "sheet_midsize",
+   "id": "GEO-24",
+   "run": 1,
+   "sentence": "Its total planned cost is the lowest of 16 blocks and its spending is the second lowest, but spending is 45.3% of plan, the 7th highest; the middle value is 36.6%.",
+   "words": [
+    "second"
+   ]
+  }
+ ]
+}

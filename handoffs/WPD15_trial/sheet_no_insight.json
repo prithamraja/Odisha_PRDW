@@ -1,0 +1,212 @@
+{
+ "label": "sheet_no_insight",
+ "generated_at": "2026-11-24T19:47:29",
+ "writer_model": "gpt-6.2-sol",
+ "max_completion_tokens": 9000,
+ "prompt_source": "the live prompt (context_brief.py)",
+ "prompt_sha256": "e34e2e04b0dbeb341c9959c11eff2ce431730244d92c104f8d30635bd86ec19b",
+ "prompt_text": "Turn the analytical findings below into clear, concise prose for a senior government official.\n\nDo not rewrite each finding separately. Identify overlapping or repeated findings, consolidate them into a small number of underlying patterns, and explain those patterns as a coherent narrative. It is very important that you do not make causal claims - none of our data can be used to determine causality. Do not fabricate or overstate data.\n\nPreserve important numbers and exceptions where useful. Ignore ranking metadata such as \"not in the ranked shortlist.\" Avoid database-style language and do not infer causes that are not supported by the findings.\n\nAfter every figure and every claim, tag the finding it comes from with its id in square brackets, exactly as given, e.g. [1-00235]. A sentence drawing on two findings carries both tags.\n\nUse figures exactly as they appear in the findings. Do not compute new numbers — no percentages, sums, or differences that are not stated in a finding.\n\nReturn only the finished prose.",
+ "every_finding_rule": "on",
+ "causal_mode": "log",
+ "direction_mode": "block",
+ "standing_mode": "block",
+ "place_facts": "on (as the service)",
+ "insight_cap_with_sheet": 8,
+ "repeats": 1,
+ "held_set": {
+  "updated_at": "2026-11-24T19:43:47",
+  "corpus": {
+   "candidate_set_id": "610cb3d26dff7bf3",
+   "run_stamp": "as of 2026-09-11",
+   "records": 71183
+  }
+ },
+ "summary": {
+  "questions": 2,
+  "kept": 2,
+  "lost": 0,
+  "lost_on": {},
+  "lost_ids": [],
+  "passed_first_try": 2,
+  "writer_calls": 2,
+  "middle_seconds": 6.6,
+  "of_the_kept_answers": {
+   "middle_findings_handed": 0.0,
+   "middle_findings_used": 0.0,
+   "middle_words": 25.0,
+   "most_words": 30,
+   "middle_sentences": 2.0,
+   "middle_words_per_sentence": 12.5,
+   "share_of_long_sentences": 0.0,
+   "middle_figures": 0.0,
+   "middle_figures_per_sentence": 0.0,
+   "share_of_sentences_with_many_figures": 0.0,
+   "middle_coverage": null
+  }
+ },
+ "spend": {
+  "calls": 2,
+  "by_model": {
+   "gpt-6.2-sol": {
+    "calls": 2,
+    "prompt_tokens": 5430,
+    "completion_tokens": 70,
+    "usd": null
+   }
+  }
+ },
+ "results": [
+  {
+   "id": "ASK-1",
+   "run": 1,
+   "question": "What is the price of onions in Cuttack market?",
+   "findings": 0,
+   "findings_held": 0,
+   "seconds": 6.5,
+   "attempts": 1,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "The supplied Cuttack records cover village planning and spending, not market prices. They do not show the price of onions.",
+   "shown_text": "The supplied Cuttack records cover village planning and spending, not market prices. They do not show the price of onions.\n\n(as of 2026-09-11)",
+   "place": {
+    "version": 1,
+    "mode": "full",
+    "answered": [
+     {
+      "level": "district",
+      "code": "309",
+      "name": "Cuttack",
+      "label": "Cuttack district"
+     }
+    ],
+    "alternatives": [],
+    "note": "",
+    "lines_offered": 63,
+    "lines_used": [],
+    "insights_offered": 0,
+    "insights_held_back": 0
+   },
+   "lines_used_rows": [],
+   "uses_A6": false,
+   "uses_standing_line": false,
+   "wrong_numbers_shown": [],
+   "fallback_lines_not_verbatim": [],
+   "number_words_shown": [],
+   "two_year_series": false,
+   "measures": {
+    "findings_handed": 0,
+    "findings_used": 0,
+    "words": 20,
+    "sentences": 2,
+    "words_per_sentence": 10.0,
+    "longest_sentence_words": 12,
+    "long_sentences": 0,
+    "figures": 0,
+    "figures_per_sentence": 0.0,
+    "most_figures_in_a_sentence": 0,
+    "sentences_with_many_figures": 0,
+    "semicolons": 0,
+    "figures_handed": 0,
+    "figures_covered": 0,
+    "coverage": null
+   },
+   "tokens": {
+    "prompt": 2708,
+    "completion": 28
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 6.0,
+     "finish_reason": "stop",
+     "prompt_tokens": 2708,
+     "completion_tokens": 28,
+     "reasoning_tokens": 0,
+     "failed_on": [],
+     "standing_failures": [],
+     "standing_counts": true
+    }
+   ],
+   "attempt_prose": [
+    "The supplied Cuttack records cover village planning and spending, not market prices. They do not show the price of onions."
+   ]
+  },
+  {
+   "id": "ASK-2",
+   "run": 1,
+   "question": "What is the rainfall forecast for Koraput next week?",
+   "findings": 0,
+   "findings_held": 0,
+   "seconds": 6.7,
+   "attempts": 1,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "The records provided do not include a rainfall forecast for Koraput district. For next week’s outlook, check the latest district forecast and weather warnings from the India Meteorological Department (IMD).",
+   "shown_text": "The records provided do not include a rainfall forecast for Koraput district. For next week’s outlook, check the latest district forecast and weather warnings from the India Meteorological Department (IMD).\n\n(as of 2026-09-11)",
+   "place": {
+    "version": 1,
+    "mode": "full",
+    "answered": [
+     {
+      "level": "district",
+      "code": "322",
+      "name": "Koraput",
+      "label": "Koraput district"
+     }
+    ],
+    "alternatives": [],
+    "note": "",
+    "lines_offered": 63,
+    "lines_used": [],
+    "insights_offered": 0,
+    "insights_held_back": 0
+   },
+   "lines_used_rows": [],
+   "uses_A6": false,
+   "uses_standing_line": false,
+   "wrong_numbers_shown": [],
+   "fallback_lines_not_verbatim": [],
+   "number_words_shown": [],
+   "two_year_series": false,
+   "measures": {
+    "findings_handed": 0,
+    "findings_used": 0,
+    "words": 30,
+    "sentences": 2,
+    "words_per_sentence": 15.0,
+    "longest_sentence_words": 18,
+    "long_sentences": 0,
+    "figures": 0,
+    "figures_per_sentence": 0.0,
+    "most_figures_in_a_sentence": 0,
+    "sentences_with_many_figures": 0,
+    "semicolons": 0,
+    "figures_handed": 0,
+    "figures_covered": 0,
+    "coverage": null
+   },
+   "tokens": {
+    "prompt": 2722,
+    "completion": 42
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 6.3,
+     "finish_reason": "stop",
+     "prompt_tokens": 2722,
+     "completion_tokens": 42,
+     "reasoning_tokens": 0,
+     "failed_on": [],
+     "standing_failures": [],
+     "standing_counts": true
+    }
+   ],
+   "attempt_prose": [
+    "The records provided do not include a rainfall forecast for Koraput district. For next week’s outlook, check the latest district forecast and weather warnings from the India Meteorological Department (IMD)."
+   ]
+  }
+ ]
+}

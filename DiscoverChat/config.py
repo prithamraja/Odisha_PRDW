@@ -422,7 +422,11 @@ PROFILE_MAX_PLACES = int(os.getenv("DISCOVERCHAT_PROFILE_MAX_PLACES", "3"))
 # Step 6 of the number check: in a sentence that cites a place fact, every
 # standing phrase ("4th lowest", "the most of", "lowest quarter") must stand in
 # a sentence cited in it. block | log | off, as the direction check.
-STANDING_CHECK = os.getenv("DISCOVERCHAT_STANDING_CHECK", "block").strip().lower()
+# Default LOG, by the brief's own rule (WP-D15 T6 pass mark 4): the trial's 5
+# refusals were all false alarms -- true ranks worded "highest" where the line
+# says "most" (a count), or "among the highest". Back to blocking:
+#     DISCOVERCHAT_STANDING_CHECK=block
+STANDING_CHECK = os.getenv("DISCOVERCHAT_STANDING_CHECK", "log").strip().lower()
 if STANDING_CHECK not in ("block", "log", "off"):
     raise ValueError(f"DISCOVERCHAT_STANDING_CHECK={STANDING_CHECK!r}: "
                      f"expected block, log or off")

@@ -1,0 +1,1265 @@
+{
+ "label": "current",
+ "generated_at": "2026-11-24T19:48:31",
+ "writer_model": "gpt-6.2-sol",
+ "max_completion_tokens": 9000,
+ "prompt_source": "the live prompt (context_brief.py)",
+ "prompt_sha256": "e34e2e04b0dbeb341c9959c11eff2ce431730244d92c104f8d30635bd86ec19b",
+ "prompt_text": "Turn the analytical findings below into clear, concise prose for a senior government official.\n\nDo not rewrite each finding separately. Identify overlapping or repeated findings, consolidate them into a small number of underlying patterns, and explain those patterns as a coherent narrative. It is very important that you do not make causal claims - none of our data can be used to determine causality. Do not fabricate or overstate data.\n\nPreserve important numbers and exceptions where useful. Ignore ranking metadata such as \"not in the ranked shortlist.\" Avoid database-style language and do not infer causes that are not supported by the findings.\n\nAfter every figure and every claim, tag the finding it comes from with its id in square brackets, exactly as given, e.g. [1-00235]. A sentence drawing on two findings carries both tags.\n\nUse figures exactly as they appear in the findings. Do not compute new numbers — no percentages, sums, or differences that are not stated in a finding.\n\nReturn only the finished prose.",
+ "every_finding_rule": "on",
+ "causal_mode": "log",
+ "direction_mode": "block",
+ "standing_mode": "block",
+ "place_facts": "off",
+ "insight_cap_with_sheet": null,
+ "repeats": 1,
+ "held_set": {
+  "updated_at": "2026-11-24T19:43:47",
+  "corpus": {
+   "candidate_set_id": "610cb3d26dff7bf3",
+   "run_stamp": "as of 2026-09-11",
+   "records": 71183
+  }
+ },
+ "summary": {
+  "questions": 21,
+  "kept": 20,
+  "lost": 1,
+  "lost_on": {
+   "1_ids_known": 1
+  },
+  "lost_ids": [
+   "L01"
+  ],
+  "passed_first_try": 2,
+  "writer_calls": 40,
+  "middle_seconds": 23.4,
+  "of_the_kept_answers": {
+   "middle_findings_handed": 17.0,
+   "middle_findings_used": 17.0,
+   "middle_words": 278.0,
+   "most_words": 353,
+   "middle_sentences": 13.5,
+   "middle_words_per_sentence": 20.3,
+   "share_of_long_sentences": 0.267,
+   "middle_figures": 22.0,
+   "middle_figures_per_sentence": 1.6,
+   "share_of_sentences_with_many_figures": 0.241,
+   "middle_coverage": 0.3
+  }
+ },
+ "spend": {
+  "calls": 40,
+  "by_model": {
+   "gpt-6.2-sol": {
+    "calls": 40,
+    "prompt_tokens": 98509,
+    "completion_tokens": 23333,
+    "usd": null
+   }
+  }
+ },
+ "results": [
+  {
+   "id": "L01",
+   "question": "What should I know about Kandhamal?",
+   "wrong_numbers_shown": [],
+   "tokens": {
+    "prompt": 5663,
+    "completion": 1387
+   },
+   "findings": 18,
+   "seconds": 28.9,
+   "attempts": 2,
+   "lost": true,
+   "lost_on": [
+    "1_ids_known"
+   ],
+   "reason": "It cited finding ids that were not among the findings supplied: 3-00018. Use only the ids given, exactly as given.",
+   "tagged": "",
+   "measures": {
+    "findings_handed": 18,
+    "findings_used": 18,
+    "words": 293,
+    "sentences": 15,
+    "words_per_sentence": 19.5,
+    "longest_sentence_words": 38,
+    "long_sentences": 2,
+    "figures": 19,
+    "figures_per_sentence": 1.3,
+    "most_figures_in_a_sentence": 4,
+    "sentences_with_many_figures": 1,
+    "semicolons": 2,
+    "figures_handed": 90,
+    "figures_covered": 18,
+    "coverage": 0.2
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 16.2,
+     "finish_reason": "stop",
+     "completion_tokens": 649,
+     "reasoning_tokens": 196,
+     "failed_on": [
+      "4_all_findings_cited"
+     ]
+    },
+    {
+     "attempt": 2,
+     "seconds": 12.2,
+     "finish_reason": "stop",
+     "completion_tokens": 738,
+     "reasoning_tokens": 174,
+     "failed_on": [
+      "1_ids_known"
+     ]
+    }
+   ],
+   "attempt_prose": [
+    "In the sample, Kandhamal’s clearest review priority is to reconcile recorded spending with plans and sanctions. Spending was Rs 2.90 crore below plan [d1-15120], with Rs 2.33 crore of that gap on records with no sanctioning authority listed [d1-15291]. The scheme and fund component were each missing for 76.3% of planned activities [d1-15304][d1-15325]. Kandhamal stood out for rising recorded sanction amounts while most districts in the sample showed a decline [3-00021], but only about one in six activities had a sanction record on file [d1-15203]. The share of spending linked to a planned activity rose from 2.7% to 53.2% [d2-00817]; that shows more spending was linked in the records, not necessarily that more was spent [d2-00817].\n\nVillage infrastructure and water are the two areas to examine first [d1-15114][d1-15120][d1-15124][d1-15115]. Self-sufficient Infrastructure in Village accounted for 67.9% of planned untied grants [d1-15114] and had the largest recorded spending gap, at Rs 1.66 crore below plan [d1-15120]. Drinking water was the largest focus area by planned cost [d1-15134], and all planned tied grants were for drinking water and sanitation [d1-15135]. Water Sufficient Village had the most activities recorded as ongoing [d1-15124] and accounted for 50.3% of the planned amount on abandoned works [d1-15115].\n\nFor the next works review, check the abandonment records for 2022-2023, which account for 16 of Kandhamal’s 17 recorded abandonments [d3-01283]. No sanctioning authority was listed for any of the Rs 24.81 lakh planned for abandoned works [d1-15286]. Verify completion status against local records rather than treating the 3 recorded completions as a full count [d3-01281].",
+    "Kandhamal’s planned grants point to two priorities in the sample: village infrastructure and water. Self-sufficient Infrastructure in Village accounts for 67.9% of planned untied grants [d1-15114]. Drinking water is the largest focus area by planned cost, at Rs 89.50 lakh [d1-15134], and accounts for 57.6% of planned tied grants [d1-15135], with the rest allocated to sanitation [d1-15135]. Water Sufficient Village also has the most activities recorded as ongoing, at 53 [d1-15124].\n\nStart the spending reconciliation with infrastructure and water. Recorded spending is Rs 2.90 crore below plan [d1-15120], with the largest gaps in Self-sufficient Infrastructure in Village and Water Sufficient Village [d1-15120]. Those same themes also account for the largest amounts of voucher-linked spending: Rs 24.23 lakh [d1-15118] and Rs 22.94 lakh [d1-15118], respectively. The share of spending linked to a planned activity rose from 2.7% to 53.2% [d2-00817]; check the cashbook before treating that as an increase in spending [d2-00817].\n\nCheck the missing entries before drawing conclusions about sanctions or delivery. Scheme and fund component are each missing for 437 activities [d1-15304][d1-15325], and 53.2% of activities are uncategorised by asset type [d1-15346]. Records with no sanctioning authority on file account for 80.2% of the recorded gap against plan [d1-15291] and all Rs 24.81 lakh planned for abandoned works [d1-15286]. Recorded sanction amounts rose over the fiscal years in Kandhamal, unlike most districts in the sample [3-00018][3-00021], but only about one in six activities had a sanction record on file [d1-15203], and all recorded sanction amounts were for public works [d1-15203].\n\nFor the next works review, check the 16 activities recorded as abandoned in 2022-2023 [d3-01283] and the 167 activities recorded as having no cost in 2023-2024 [d3-01271]. Water Sufficient Village accounts for the largest share of planned money on abandoned works, at 50.3% [d1-15115]. Only 3 completions are recorded for Kandhamal [d3-01281]; verify work status before treating that count as a measure of delivery [d3-01281]."
+   ],
+   "run": 1
+  },
+  {
+   "id": "L04",
+   "question": "what should I know about Cuttack?",
+   "wrong_numbers_shown": [],
+   "tokens": {
+    "prompt": 6238,
+    "completion": 1238
+   },
+   "findings": 20,
+   "seconds": 29.6,
+   "attempts": 2,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "In the Cuttack sample, the first review priority is to reconcile planned costs and recorded spending in Govindapur. [d4-02523][d4-02525][d3-01105] Across the two sampled Gram Panchayats, planned costs totalled Rs 5.35 crore [d4-02523] and recorded spending totalled Rs 2.17 crore [d4-02525], leaving spending Rs 3.18 crore below plan. [d3-01105] Govindapur had the larger planned budget and accounted for 71.1% of the reported population [d4-02523][d4-02484], while Dadhapatna recorded more spending and more ongoing activities. [d4-02525][d4-02532] Govindapur accounted for 65.3% of the gap, with spending Rs 2.07 crore below plan. [d3-01105]\n\nRoads are the clearest focus for a check by sector: they represented 5.9% of activities but 41.6% of planned untied grants [d1-14483] and had the largest gap between planned cost and spending, at Rs 98.42 lakh below plan. [d1-14489] Roads also led recorded sanctions and general-component spending, with drinking water next on both measures. [d1-14486][d1-14488] More broadly, the self-sufficient village infrastructure theme accounted for 84.3% of planned untied grants [d1-14462], though Rs 89.50 lakh in planned untied grants had no asset category recorded. [d1-14685] Tied grants were planned almost entirely for drinking water and sanitation [d1-14482], and sanitation had the most planned activities. [d1-14480]\n\nThe activity counts provide context for that review: of 1,104 planned activities [d1-14480], 88.5% were public works [d1-14541], 42.1% had no cost assigned in the plan [d1-14597], and 49.9% were listed in 2023-2024. [d3-01150] Before drawing conclusions from the spending gap, check the underlying records: activities with no sanctioning authority recorded accounted for 94.1% of the gap [d1-14631], and all 9,165 expected beneficiaries were reported on entries with no scheme recorded. [d1-14662]\n\nThe share of spending linked to a planned activity rose from 2.7% to 53.2% across the six fiscal years reviewed. [d2-00733] That shows more spending was linked in the records, not that cashbook spending rose. [d2-00733] Separately, Cuttack did not follow the pattern of rising linked spending by calendar quarter seen in most sampled districts. [2-00245]",
+   "measures": {
+    "findings_handed": 20,
+    "findings_used": 20,
+    "words": 297,
+    "sentences": 13,
+    "words_per_sentence": 22.8,
+    "longest_sentence_words": 37,
+    "long_sentences": 5,
+    "figures": 20,
+    "figures_per_sentence": 1.5,
+    "most_figures_in_a_sentence": 5,
+    "sentences_with_many_figures": 3,
+    "semicolons": 0,
+    "figures_handed": 109,
+    "figures_covered": 20,
+    "coverage": 0.183
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 14.3,
+     "finish_reason": "stop",
+     "completion_tokens": 532,
+     "reasoning_tokens": 92,
+     "failed_on": [
+      "4_all_findings_cited"
+     ]
+    },
+    {
+     "attempt": 2,
+     "seconds": 14.8,
+     "finish_reason": "stop",
+     "completion_tokens": 706,
+     "reasoning_tokens": 83,
+     "failed_on": []
+    }
+   ],
+   "attempt_prose": [
+    "In the Cuttack sample, the 2 Gram Panchayats had a planned cost of Rs 5.35 crore [d4-02523] and recorded spending of Rs 2.17 crore [d4-02525], leaving spending Rs 3.18 crore below plan [d3-01105]. Govindapur had the larger share of planned cost (56.2%) [d4-02523], while Dadhapatna had the larger share of spending (57.1%) [d4-02525]. Govindapur is the first place to reconcile plans and payments: it accounts for 65.3% of the gap [d3-01105], with spending Rs 2.07 crore below plan [d3-01105].\n\nRoads are the first sector to check: they account for 41.6% of planned untied grants [d1-14483] and the largest share of the spending gap, at Rs 98.42 lakh below plan [d1-14489]. Sanitation had the most planned activities (343) [d1-14480] and the next-largest gap, at Rs 68.08 lakh below plan [d1-14489]. Planned tied grants were almost entirely split between drinking water and sanitation [d1-14482].\n\nAt the next review, check sanction records and whether payments are linked to planned activities before interpreting the gap [d1-14486][d1-14631][d2-00733]. Only about one in six activities had a sanction record on file [d1-14486], and activities with no sanctioning authority recorded account for 94.1% of the gap [d1-14631]. The share of spending linked to planned activities rose from 2.7% to 53.2% across six fiscal years [d2-00733], but that does not establish that cashbook spending rose [d2-00733]. Cuttack also did not follow the quarter-by-quarter increase in linked spending seen in most districts in the sample [2-00245].",
+    "In the Cuttack sample, the first review priority is to reconcile planned costs and recorded spending in Govindapur. [d4-02523][d4-02525][d3-01105] Across the two sampled Gram Panchayats, planned costs totalled Rs 5.35 crore [d4-02523] and recorded spending totalled Rs 2.17 crore [d4-02525], leaving spending Rs 3.18 crore below plan. [d3-01105] Govindapur had the larger planned budget and accounted for 71.1% of the reported population [d4-02523][d4-02484], while Dadhapatna recorded more spending and more ongoing activities. [d4-02525][d4-02532] Govindapur accounted for 65.3% of the gap, with spending Rs 2.07 crore below plan. [d3-01105]\n\nRoads are the clearest focus for a check by sector: they represented 5.9% of activities but 41.6% of planned untied grants [d1-14483] and had the largest gap between planned cost and spending, at Rs 98.42 lakh below plan. [d1-14489] Roads also led recorded sanctions and general-component spending, with drinking water next on both measures. [d1-14486][d1-14488] More broadly, the self-sufficient village infrastructure theme accounted for 84.3% of planned untied grants [d1-14462], though Rs 89.50 lakh in planned untied grants had no asset category recorded. [d1-14685] Tied grants were planned almost entirely for drinking water and sanitation [d1-14482], and sanitation had the most planned activities. [d1-14480]\n\nThe activity counts provide context for that review: of 1,104 planned activities [d1-14480], 88.5% were public works [d1-14541], 42.1% had no cost assigned in the plan [d1-14597], and 49.9% were listed in 2023-2024. [d3-01150] Before drawing conclusions from the spending gap, check the underlying records: activities with no sanctioning authority recorded accounted for 94.1% of the gap [d1-14631], and all 9,165 expected beneficiaries were reported on entries with no scheme recorded. [d1-14662]\n\nThe share of spending linked to a planned activity rose from 2.7% to 53.2% across the six fiscal years reviewed. [d2-00733] That shows more spending was linked in the records, not that cashbook spending rose. [d2-00733] Separately, Cuttack did not follow the pattern of rising linked spending by calendar quarter seen in most sampled districts. [2-00245]"
+   ],
+   "run": 1
+  },
+  {
+   "id": "L06",
+   "question": "What should I know about Kalimela?",
+   "wrong_numbers_shown": [],
+   "tokens": {
+    "prompt": 6220,
+    "completion": 1354
+   },
+   "findings": 18,
+   "seconds": 31.2,
+   "attempts": 2,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "Kalimela’s plan lists 852 activities [d1-31150] at a total cost of Rs 7.65 crore [d1-31128]. The first review priority is to reconcile missing classifications: 684 activities have no fund component recorded [d1-31150], while entries with no scheme account for 72.7% of planned cost [d1-31128]. A further classification issue is that 57.5% of activities have no asset category [d1-31173]. Recorded sanctions total Rs 2.08 crore [d1-30944], but cover only about one in six activities [d1-30944].\n\nThe cashbook is the next check. The recorded gap between planned cost and spending linked to planned activities is Rs 5.90 crore [d3-01817]. The fiscal years 2024-2025 [d1-31195][d3-01817] and 2023-2024 [d1-31195][d3-01817] had both the highest planned costs [d1-31195] and the largest gaps [d3-01817]. The share of spending linked to planned activities rose from 2.7% [d2-01777] to 53.2% [d2-01777], so check the linked records against the cashbook before treating the gap as underspending or the rise in linked spending as a rise in actual expenditure [d2-01777][d3-01817].\n\nDrinking water was the largest focus area in planned cost, recorded sanctions and general-component spending [d1-30939][d1-30944][d1-30946]. Sanitation was second in recorded sanctions and general-component spending [d1-30944][d1-30946] and had a slightly larger planned tied-grant allocation than drinking water [d1-30940]. Nearly all general-component spending was on public works [d1-31016], with 68.9% on work classified as new [d1-30970] and 91.8% on work still marked ongoing [d1-31061]. At the next review, check whether those status entries are current: only 13 completions are recorded [d1-30928], while 129 activities have photo evidence [d1-30934], most often under Clean and Green Village and Water Sufficient Village [d1-30934].\n\nThe beneficiary figures describe expected reach, not confirmed delivery [d1-31217][d1-31080][d1-30937]. Of the 8,820 expected beneficiaries [d1-31217], 75.8% were in 2024-2025 [d1-31217]. Looking at the same total by activity type, 71.8% were associated with activities listed as costless [d1-31080]; by theme, the largest share was for Poverty Free and Enhanced Livelihoods Village, at 45.1% [d1-30937].",
+   "measures": {
+    "findings_handed": 18,
+    "findings_used": 18,
+    "words": 283,
+    "sentences": 15,
+    "words_per_sentence": 18.9,
+    "longest_sentence_words": 39,
+    "long_sentences": 4,
+    "figures": 20,
+    "figures_per_sentence": 1.3,
+    "most_figures_in_a_sentence": 3,
+    "sentences_with_many_figures": 1,
+    "semicolons": 1,
+    "figures_handed": 108,
+    "figures_covered": 19,
+    "coverage": 0.176
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 14.3,
+     "finish_reason": "stop",
+     "completion_tokens": 566,
+     "reasoning_tokens": 74,
+     "failed_on": [
+      "4_all_findings_cited"
+     ]
+    },
+    {
+     "attempt": 2,
+     "seconds": 16.4,
+     "finish_reason": "stop",
+     "completion_tokens": 788,
+     "reasoning_tokens": 151,
+     "failed_on": []
+    }
+   ],
+   "attempt_prose": [
+    "Kalimela Gram Panchayat’s first priority at review should be to reconcile the plan, sanction and payment records. Of 852 planned activities, 684 (80.3%) have no fund component recorded [d1-31150]. Separately, 684 activities have no scheme recorded, accounting for Rs 5.57 crore (72.7%) of the Rs 7.65 crore planned cost [d1-31128]. Sanctions on file total Rs 2.08 crore and cover only about one in six activities [d1-30944].\n\nSpending linked to planned activities totals Rs 1.76 crore [d2-01777]. On that basis, recorded spending was Rs 5.90 crore below plan, with the largest gaps in 2024-2025 (Rs 2.68 crore below plan) and 2023-2024 (Rs 2.33 crore below plan) [d3-01817]. The share of spending linked to a planned activity rose from 2.7% to 53.2% across the six fiscal years, so check the cashbook before treating the recorded gap as actual underspending [d2-01777][d3-01817].\n\nDrinking water is the largest item in both the plan and recorded general-component spending: Rs 3.74 crore (48.8%) in planned cost [d1-30939] and Rs 70.85 lakh (34.3%) in spending [d1-30946]. Sanitation is the next-largest spending area at Rs 41.40 lakh (20.0%) [d1-30946]. The Rs 92.28 lakh in planned tied grants is split almost evenly between sanitation and drinking water, with nothing planned for other areas from those grants [d1-30940].\n\nAt the next works review, verify the status of activities carrying most of the recorded spending. Activities marked ongoing account for Rs 1.90 crore (91.8%) of general-component spending [d1-31061]. Photo evidence is on file for 129 activities [d1-30934], but only 13 completions are recorded in Kalimela; the whole sample has only 17 recorded completions, so these counts should not be read as a reliable measure of how much work is finished [d1-30928].",
+    "Kalimela’s plan lists 852 activities [d1-31150] at a total cost of Rs 7.65 crore [d1-31128]. The first review priority is to reconcile missing classifications: 684 activities have no fund component recorded [d1-31150], while entries with no scheme account for 72.7% of planned cost [d1-31128]. A further classification issue is that 57.5% of activities have no asset category [d1-31173]. Recorded sanctions total Rs 2.08 crore [d1-30944], but cover only about one in six activities [d1-30944].\n\nThe cashbook is the next check. The recorded gap between planned cost and spending linked to planned activities is Rs 5.90 crore [d3-01817]. The fiscal years 2024-2025 [d1-31195][d3-01817] and 2023-2024 [d1-31195][d3-01817] had both the highest planned costs [d1-31195] and the largest gaps [d3-01817]. The share of spending linked to planned activities rose from 2.7% [d2-01777] to 53.2% [d2-01777], so check the linked records against the cashbook before treating the gap as underspending or the rise in linked spending as a rise in actual expenditure [d2-01777][d3-01817].\n\nDrinking water was the largest focus area in planned cost, recorded sanctions and general-component spending [d1-30939][d1-30944][d1-30946]. Sanitation was second in recorded sanctions and general-component spending [d1-30944][d1-30946] and had a slightly larger planned tied-grant allocation than drinking water [d1-30940]. Nearly all general-component spending was on public works [d1-31016], with 68.9% on work classified as new [d1-30970] and 91.8% on work still marked ongoing [d1-31061]. At the next review, check whether those status entries are current: only 13 completions are recorded [d1-30928], while 129 activities have photo evidence [d1-30934], most often under Clean and Green Village and Water Sufficient Village [d1-30934].\n\nThe beneficiary figures describe expected reach, not confirmed delivery [d1-31217][d1-31080][d1-30937]. Of the 8,820 expected beneficiaries [d1-31217], 75.8% were in 2024-2025 [d1-31217]. Looking at the same total by activity type, 71.8% were associated with activities listed as costless [d1-31080]; by theme, the largest share was for Poverty Free and Enhanced Livelihoods Village, at 45.1% [d1-30937]."
+   ],
+   "run": 1
+  },
+  {
+   "id": "T02",
+   "question": "How is Chikilli doing?",
+   "wrong_numbers_shown": [],
+   "tokens": {
+    "prompt": 5438,
+    "completion": 1201
+   },
+   "findings": 20,
+   "seconds": 24.8,
+   "attempts": 2,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "Chikilli recorded Rs 1.39 crore in spending across 6 fiscal years [d3-01701], leaving spending Rs 4.12 crore below plan [d3-01702]. The gap was spread across years, with the largest in 2024-2025 (Rs 1.38 crore below plan) [d3-01702]. Across all fiscal years, Chikilli had both the lowest sanctioned amount and the lowest proposed cost at sanction among the Gram Panchayats reviewed [1-01299][1-01309]. It also had the fewest activities with technical and administrative approval in 5/6 fiscal years, with no clear pattern in 2023-2024 [1-01301][1-01305].\n\nVillage infrastructure is the main area to review against the plan. The Self-sufficient Infrastructure in Village theme accounted for 59.5% of planned costs (Rs 3.27 crore) [d1-29225] and 63.4% of the spending gap (Rs 2.61 crore below plan) [d1-29231]. By focus area, however, the gap was more dispersed: the largest amounts were in maintenance of community systems (Rs 98.63 lakh below plan) and roads (Rs 74.02 lakh below plan) [d1-29244]. The comparison with sanctions shows a different pattern: Chikilli was the only sampled Gram Panchayat where spending against sanction was unevenly spread across focus areas [1-01723]. Abandoned works accounted for Rs 46.72 lakh in planned costs, with the largest amounts in village infrastructure (Rs 20.44 lakh) and Clean and Green Village (Rs 15.77 lakh) [d1-29228].\n\nWork status is another priority for reconciliation. Activities marked “Activity Approved” accounted for 85.5% of the spending gap and 85.9% of all activities [d1-29304], while works marked ongoing accounted for 93.1% of recorded general-component spending [d1-29303]. The 65 ongoing activities were spread across fiscal years [d1-29332]; drinking water and sanitation had 15 activities each [d1-29246] and together accounted for the full Rs 1.06 crore in planned tied grants [d1-29239]. Unlike most Gram Panchayats in the sample, Chikilli showed no clear pattern in which work status accounted for most activities with photo evidence [1-01660].\n\nAt the next review, check activity costs and asset categories: of 640 planned activities, 329 were listed without a cost [d1-29307], and 412 had no asset category [d1-29312]. Reconcile payments linked to planned activities with the cashbook: the linked share rose from 2.7% to 53.2% across the six fiscal years, but that alone does not establish that spending rose [d2-01636].",
+   "measures": {
+    "findings_handed": 20,
+    "findings_used": 20,
+    "words": 342,
+    "sentences": 15,
+    "words_per_sentence": 22.8,
+    "longest_sentence_words": 31,
+    "long_sentences": 7,
+    "figures": 28,
+    "figures_per_sentence": 1.9,
+    "most_figures_in_a_sentence": 4,
+    "sentences_with_many_figures": 7,
+    "semicolons": 1,
+    "figures_handed": 95,
+    "figures_covered": 27,
+    "coverage": 0.284
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 13.0,
+     "finish_reason": "stop",
+     "completion_tokens": 496,
+     "reasoning_tokens": 33,
+     "failed_on": [
+      "4_all_findings_cited"
+     ]
+    },
+    {
+     "attempt": 2,
+     "seconds": 11.3,
+     "finish_reason": "stop",
+     "completion_tokens": 705,
+     "reasoning_tokens": 82,
+     "failed_on": []
+    }
+   ],
+   "attempt_prose": [
+    "Chikilli recorded Rs 1.39 crore in spending [d3-01701], against a planned cost of Rs 5.51 crore [d1-29225], leaving recorded spending Rs 4.12 crore below plan [d1-29231]. Village infrastructure is the first area to review: it accounted for 59.5% of planned cost [d1-29225] and 63.4% of the gap (Rs 2.61 crore below plan) [d1-29231]. The gap was spread across fiscal years [d3-01702] and focus areas [d1-29244], with the largest amounts in 2024-2025 (Rs 1.38 crore below plan) [d3-01702] and in maintenance of community systems (Rs 98.63 lakh below plan) [d1-29244].\n\nChikilli had the lowest sanctioned amount [1-01299] and the lowest proposed cost at sanction [1-01309] among the sampled Gram Panchayats in every fiscal year. It also had the fewest activities with technical approval [1-01301] and administrative approval [1-01305] in 5/6 fiscal years [1-01301][1-01305], with no clear pattern in 2023-2024 [1-01301][1-01305]. Activities marked “Activity Approved” accounted for 85.5% of the spending gap [d1-29304], broadly in line with their 85.9% share of activities [d1-29304].\n\nAt the next review, reconcile payments with plans and sanctions. The share of spending linked to a planned activity went from 2.7% to 53.2% [d2-01636], indicating more complete recording of those links, not necessarily higher spending [d2-01636]. Chikilli was also the only Gram Panchayat in the sample where the gap between spending and sanctions was unevenly spread across focus areas [1-01723]. When checking work status, note that Chikilli had no clear pattern in which status accounted for most activities with photo evidence [1-01660].",
+    "Chikilli recorded Rs 1.39 crore in spending across 6 fiscal years [d3-01701], leaving spending Rs 4.12 crore below plan [d3-01702]. The gap was spread across years, with the largest in 2024-2025 (Rs 1.38 crore below plan) [d3-01702]. Across all fiscal years, Chikilli had both the lowest sanctioned amount and the lowest proposed cost at sanction among the Gram Panchayats reviewed [1-01299][1-01309]. It also had the fewest activities with technical and administrative approval in 5/6 fiscal years, with no clear pattern in 2023-2024 [1-01301][1-01305].\n\nVillage infrastructure is the main area to review against the plan. The Self-sufficient Infrastructure in Village theme accounted for 59.5% of planned costs (Rs 3.27 crore) [d1-29225] and 63.4% of the spending gap (Rs 2.61 crore below plan) [d1-29231]. By focus area, however, the gap was more dispersed: the largest amounts were in maintenance of community systems (Rs 98.63 lakh below plan) and roads (Rs 74.02 lakh below plan) [d1-29244]. The comparison with sanctions shows a different pattern: Chikilli was the only sampled Gram Panchayat where spending against sanction was unevenly spread across focus areas [1-01723]. Abandoned works accounted for Rs 46.72 lakh in planned costs, with the largest amounts in village infrastructure (Rs 20.44 lakh) and Clean and Green Village (Rs 15.77 lakh) [d1-29228].\n\nWork status is another priority for reconciliation. Activities marked “Activity Approved” accounted for 85.5% of the spending gap and 85.9% of all activities [d1-29304], while works marked ongoing accounted for 93.1% of recorded general-component spending [d1-29303]. The 65 ongoing activities were spread across fiscal years [d1-29332]; drinking water and sanitation had 15 activities each [d1-29246] and together accounted for the full Rs 1.06 crore in planned tied grants [d1-29239]. Unlike most Gram Panchayats in the sample, Chikilli showed no clear pattern in which work status accounted for most activities with photo evidence [1-01660].\n\nAt the next review, check activity costs and asset categories: of 640 planned activities, 329 were listed without a cost [d1-29307], and 412 had no asset category [d1-29312]. Reconcile payments linked to planned activities with the cashbook: the linked share rose from 2.7% to 53.2% across the six fiscal years, but that alone does not establish that spending rose [d2-01636]."
+   ],
+   "run": 1
+  },
+  {
+   "id": "T04",
+   "question": "How is Barpali block doing?",
+   "wrong_numbers_shown": [],
+   "tokens": {
+    "prompt": 4780,
+    "completion": 1126
+   },
+   "findings": 15,
+   "seconds": 25.9,
+   "attempts": 2,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "In the sample, Barpali recorded Rs 2.64 crore in spending [d4-00583] against a planned cost of Rs 5.49 crore [d4-00581], a gap of Rs 2.85 crore below plan [d3-00238]. Barpali accounted for 48.4% of recorded spending in the Bargarh sample [d4-02188]. Within the block, spending was fairly evenly split between Bandhpali (53.1%) [d4-00583] and Bhatigaon (46.9%) [d4-00583], but Bandhpali accounted for 68.2% of the gap (Rs 1.94 crore below plan) [d3-00238]. Bhatigaon was Rs 90.49 lakh below plan [d3-00238]. Across fiscal years, spending was broadly spread out [d3-00322], while the largest gap was in 2025-2026 (Rs 80.35 lakh below plan) [d3-00323].\n\nStart the reconciliation with Bandhpali’s plan and spending figures, but check the completeness of records in both panchayats [d3-00238][d4-00580]. Of the 1,447 activities planned across 6 fiscal years [d3-00317], 1,067 had no cost recorded, with missing costs split nearly evenly between the two panchayats [d4-00580]. Recorded sanctions totalled Rs 2.96 crore, but only about one in six activities had a sanction record on file [d1-09520]. Spending linked to planned activities totalled Rs 2.55 crore, and the linked share rose from 2.7% to 53.2%; that increase shows more spending was linked in the records, not necessarily that spending rose [d2-00151].\n\nAt the works review, check the 6 activities still under approval, all in Bandhpali [d1-09528]. Ongoing activities were split nearly evenly: 88 in Bhatigaon and 83 in Bandhpali [d3-00244]. Barpali follows two wider sample patterns: ongoing works account for most voucher-linked spending in 14/16 blocks [1-00260], and most planned activities are recorded as uncategorised by asset type in 14/16 blocks [1-00219]. In the separate general-component spending figures, village infrastructure (Rs 99.22 lakh) and water sufficiency (Rs 91.57 lakh) were Barpali’s largest themes [d1-09543].",
+   "measures": {
+    "findings_handed": 15,
+    "findings_used": 15,
+    "words": 263,
+    "sentences": 13,
+    "words_per_sentence": 20.2,
+    "longest_sentence_words": 33,
+    "long_sentences": 4,
+    "figures": 27,
+    "figures_per_sentence": 2.1,
+    "most_figures_in_a_sentence": 4,
+    "sentences_with_many_figures": 5,
+    "semicolons": 1,
+    "figures_handed": 81,
+    "figures_covered": 24,
+    "coverage": 0.296
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 13.2,
+     "finish_reason": "stop",
+     "completion_tokens": 461,
+     "reasoning_tokens": 69,
+     "failed_on": [
+      "4_all_findings_cited"
+     ]
+    },
+    {
+     "attempt": 2,
+     "seconds": 12.3,
+     "finish_reason": "stop",
+     "completion_tokens": 665,
+     "reasoning_tokens": 108,
+     "failed_on": []
+    }
+   ],
+   "attempt_prose": [
+    "Barpali recorded spending of Rs 2.64 crore [d4-00583] against a planned cost of Rs 5.49 crore [d4-00581], leaving spending Rs 2.85 crore below plan [d3-00238]. Barpali accounted for 48.4% of Bargarh’s spending in the sample [d4-02188]. Within the block, spending was fairly evenly split between the two Gram Panchayats [d4-00583], but Bandhpali accounted for 68.2% of the gap (Rs 1.94 crore below plan) [d3-00238], while Bhatigaon was Rs 90.49 lakh below plan [d3-00238]. The gap was spread across 6 fiscal years [d3-00323], with the largest in 2025-2026 (Rs 80.35 lakh below plan) [d3-00323].\n\nStart the review in Bandhpali, where the recorded gap is larger [d3-00238], but check planning and sanction records in both panchayats: 1,067 planned activities had no cost recorded, split nearly evenly between them [d4-00580], and only about one in six activities had a sanction record on file [d1-09520]. The share of spending linked to planned activities rose from 2.7% to 53.2% [d2-00151]; check the cashbook before interpreting that change as an increase in spending [d2-00151].\n\nFor the works review, ongoing activities were nearly evenly split: 88 in Bhatigaon [d3-00244] and 83 in Bandhpali [d3-00244]. All 6 activities recorded as under approval were in Bandhpali [d1-09528].",
+    "In the sample, Barpali recorded Rs 2.64 crore in spending [d4-00583] against a planned cost of Rs 5.49 crore [d4-00581], a gap of Rs 2.85 crore below plan [d3-00238]. Barpali accounted for 48.4% of recorded spending in the Bargarh sample [d4-02188]. Within the block, spending was fairly evenly split between Bandhpali (53.1%) [d4-00583] and Bhatigaon (46.9%) [d4-00583], but Bandhpali accounted for 68.2% of the gap (Rs 1.94 crore below plan) [d3-00238]. Bhatigaon was Rs 90.49 lakh below plan [d3-00238]. Across fiscal years, spending was broadly spread out [d3-00322], while the largest gap was in 2025-2026 (Rs 80.35 lakh below plan) [d3-00323].\n\nStart the reconciliation with Bandhpali’s plan and spending figures, but check the completeness of records in both panchayats [d3-00238][d4-00580]. Of the 1,447 activities planned across 6 fiscal years [d3-00317], 1,067 had no cost recorded, with missing costs split nearly evenly between the two panchayats [d4-00580]. Recorded sanctions totalled Rs 2.96 crore, but only about one in six activities had a sanction record on file [d1-09520]. Spending linked to planned activities totalled Rs 2.55 crore, and the linked share rose from 2.7% to 53.2%; that increase shows more spending was linked in the records, not necessarily that spending rose [d2-00151].\n\nAt the works review, check the 6 activities still under approval, all in Bandhpali [d1-09528]. Ongoing activities were split nearly evenly: 88 in Bhatigaon and 83 in Bandhpali [d3-00244]. Barpali follows two wider sample patterns: ongoing works account for most voucher-linked spending in 14/16 blocks [1-00260], and most planned activities are recorded as uncategorised by asset type in 14/16 blocks [1-00219]. In the separate general-component spending figures, village infrastructure (Rs 99.22 lakh) and water sufficiency (Rs 91.57 lakh) were Barpali’s largest themes [d1-09543]."
+   ],
+   "run": 1
+  },
+  {
+   "id": "T14",
+   "question": "Anything I should be looking at in Ganjam?",
+   "wrong_numbers_shown": [],
+   "tokens": {
+    "prompt": 4260,
+    "completion": 1253
+   },
+   "findings": 15,
+   "seconds": 28.1,
+   "attempts": 2,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "Start with the gap between plans and spending, especially for village infrastructure. In the Ganjam sample, recorded spending was Rs 17.85 crore below plan [d3-01173] across 4 Gram Panchayats [d3-01173]. Biswamathpur had the largest gap at Rs 7.23 crore [d3-01173], but the gap was spread across the panchayats [d3-01173]. Theme 6 - Self-sufficient Infrastructure in Village accounted for Rs 9.08 crore of the gap [d1-14794], or 50.9% [d1-14794]. The gap was spread across years, with the largest in 2023-2024 [d3-01258] at Rs 6.44 crore [d3-01258]. Ganjam was among the lowest districts in the sample on spending against plan in all themes: alongside Bargarh in 6/7 themes [1-03549], and alongside Malkangiri in Theme 4 - Water Sufficient Village [1-03549].\n\nCheck abandoned works and sanction records first in Sharagada Gram Panchayat. It accounts for Rs 1.19 crore [d1-14747], or 62.1% [d1-14747], of Ganjam’s planned money on abandoned works. It also accounts for Rs 85.77 lakh [d3-01174], or 51.0% [d3-01174], of the gap between spending and sanctions, although only about one in six activities had a sanction record on file [d3-01174]. Missing cost estimates are a broader issue: 1,768 activities were planned without a cost [d4-02684], including 722 in Sharagada [d4-02684] and 421 in Mendarajpur [d4-02684]. For the focus-area review, Ganjam was lowest on spending against sanction in maintenance of community systems and sanitation, rather than drinking water and sanitation as in most sampled districts [1-00596]. That comparison is distinct from how the gap is spread within each panchayat: it was evenly spread across focus areas in 19/20 sampled panchayats [1-01723], with Chikilli the only exception [1-01723].\n\nReconcile sanctions and payments in Khallikote block. The records show Rs 0 in sanctions [d3-01188] alongside Rs 1.30 crore in payments linked to planned activities [d2-00768]. Ganjam and Bargarh led the sampled districts in voucher-linked spending in 5/6 fiscal years [1-01389], with no clear pattern in 2022-2023 [1-01389]. Ganjam’s share of spending linked to planned activities rose from 2.7% [d2-00768] to 53.2% [d2-00768]; that shows more spending was linked in the records, not necessarily that more was spent [d2-00768].\n\nAt the next review, also check how works are classified. Ganjam differed from the usual district pattern in which New/Fresh works had the highest planned tied-grant funding [1-00661], had the highest sanctioned amounts [1-00659], and accounted for most voucher-linked spending [1-00510].",
+   "measures": {
+    "findings_handed": 15,
+    "findings_used": 15,
+    "words": 353,
+    "sentences": 18,
+    "words_per_sentence": 19.6,
+    "longest_sentence_words": 31,
+    "long_sentences": 6,
+    "figures": 27,
+    "figures_per_sentence": 1.5,
+    "most_figures_in_a_sentence": 3,
+    "sentences_with_many_figures": 4,
+    "semicolons": 1,
+    "figures_handed": 64,
+    "figures_covered": 24,
+    "coverage": 0.375
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 13.4,
+     "finish_reason": "stop",
+     "completion_tokens": 452,
+     "reasoning_tokens": 128,
+     "failed_on": [
+      "4_all_findings_cited"
+     ]
+    },
+    {
+     "attempt": 2,
+     "seconds": 14.3,
+     "finish_reason": "stop",
+     "completion_tokens": 801,
+     "reasoning_tokens": 87,
+     "failed_on": []
+    }
+   ],
+   "attempt_prose": [
+    "Start with village infrastructure. In the Ganjam sample, recorded spending was Rs 17.85 crore below plan [d3-01173], with Rs 9.08 crore of that gap in the Self-sufficient Infrastructure in Village theme [d1-14794]. The gap was spread across the sampled Gram Panchayats, with the largest amount in Biswamathpur at Rs 7.23 crore below plan [d3-01173]. Review Biswamathpur’s plan and spending records, and check infrastructure works across the sampled panchayats [d3-01173][d1-14794].\n\nGive Sharagada a separate review of abandoned works and missing cost estimates. It accounted for Rs 1.19 crore in planned funds for abandoned works [d1-14747] and had 722 activities planned without a cost [d4-02684]. It also had the largest gap between recorded spending and sanctions, at Rs 85.77 lakh below sanction [d3-01174]. That comparison covers only activities with a sanction record on file—about one in six [d3-01174].\n\nAt block level, reconcile Khallikote’s sanction and payment records. The sample shows Rs 0 in recorded sanctions for Khallikote [d3-01188] alongside Rs 1.30 crore in payments linked to planned activities [d2-00768]. Check whether the corresponding sanctions are on file before drawing conclusions about those payments [d3-01188][d2-00768].",
+    "Start with the gap between plans and spending, especially for village infrastructure. In the Ganjam sample, recorded spending was Rs 17.85 crore below plan [d3-01173] across 4 Gram Panchayats [d3-01173]. Biswamathpur had the largest gap at Rs 7.23 crore [d3-01173], but the gap was spread across the panchayats [d3-01173]. Theme 6 - Self-sufficient Infrastructure in Village accounted for Rs 9.08 crore of the gap [d1-14794], or 50.9% [d1-14794]. The gap was spread across years, with the largest in 2023-2024 [d3-01258] at Rs 6.44 crore [d3-01258]. Ganjam was among the lowest districts in the sample on spending against plan in all themes: alongside Bargarh in 6/7 themes [1-03549], and alongside Malkangiri in Theme 4 - Water Sufficient Village [1-03549].\n\nCheck abandoned works and sanction records first in Sharagada Gram Panchayat. It accounts for Rs 1.19 crore [d1-14747], or 62.1% [d1-14747], of Ganjam’s planned money on abandoned works. It also accounts for Rs 85.77 lakh [d3-01174], or 51.0% [d3-01174], of the gap between spending and sanctions, although only about one in six activities had a sanction record on file [d3-01174]. Missing cost estimates are a broader issue: 1,768 activities were planned without a cost [d4-02684], including 722 in Sharagada [d4-02684] and 421 in Mendarajpur [d4-02684]. For the focus-area review, Ganjam was lowest on spending against sanction in maintenance of community systems and sanitation, rather than drinking water and sanitation as in most sampled districts [1-00596]. That comparison is distinct from how the gap is spread within each panchayat: it was evenly spread across focus areas in 19/20 sampled panchayats [1-01723], with Chikilli the only exception [1-01723].\n\nReconcile sanctions and payments in Khallikote block. The records show Rs 0 in sanctions [d3-01188] alongside Rs 1.30 crore in payments linked to planned activities [d2-00768]. Ganjam and Bargarh led the sampled districts in voucher-linked spending in 5/6 fiscal years [1-01389], with no clear pattern in 2022-2023 [1-01389]. Ganjam’s share of spending linked to planned activities rose from 2.7% [d2-00768] to 53.2% [d2-00768]; that shows more spending was linked in the records, not necessarily that more was spent [d2-00768].\n\nAt the next review, also check how works are classified. Ganjam differed from the usual district pattern in which New/Fresh works had the highest planned tied-grant funding [1-00661], had the highest sanctioned amounts [1-00659], and accounted for most voucher-linked spending [1-00510]."
+   ],
+   "run": 1
+  },
+  {
+   "id": "GEO-06",
+   "question": "How is Biswamathpur performing on spending?",
+   "wrong_numbers_shown": [],
+   "tokens": {
+    "prompt": 5728,
+    "completion": 1081
+   },
+   "findings": 16,
+   "seconds": 23.8,
+   "attempts": 2,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "Biswamathpur recorded Rs 1.42 crore in spending [d3-01669] against Rs 8.65 crore in planned costs [d3-01667] across 6 fiscal years [d3-01669][d3-01667], leaving spending Rs 7.23 crore below plan [d1-28986]. In the Rangeilunda sample, Biswamathpur accounted for 51.9% of recorded spending [d3-00577] but 79.4% of the gap against plan [d3-00578]. Recorded spending was spread across the years [d3-01669], but 2023-2024 alone accounted for 59.7% of planned costs [d3-01667] and 68.6% of Biswamathpur’s gap (Rs 4.96 crore below plan) [d1-28986]. That was the largest gap that year among the 20 Gram Panchayats sampled [d1-18254].\n\nPublic Works accounted for all voucher-linked spending [d1-28824] and 99.9% of the gap against plan [d1-28826]. Education and Drinking water were the largest areas of voucher-linked spending, at Rs 37.16 lakh and Rs 32.28 lakh, respectively [d1-28763], while Sanitation had the largest gap against plan, at Rs 2.10 crore below plan [d1-28765]. Activities marked “Activity Approved” accounted for 93.3% of the gap against plan [d1-28865], while works marked “WORK ONGOING” accounted for 92.3% of spending recorded under the general component [d1-28864].\n\nFor the next review, start by reconciling the 2023-2024 Public Works records, checking activity status and missing scheme details [d1-28986][d1-28826][d1-28865][d1-28927]. Records with no scheme listed accounted for 94.2% of the gap against plan [d1-28927]. The share of spending linked to planned activities rose from 2.7% to 53.2% [d2-01594]; that change shows more spending was linked in the records, not by itself that spending rose [d2-01594]. The separate comparison with sanctions shows spending Rs 42.13 lakh below sanction, but covers only about one in six activities [d3-01671]. Sanitation had the largest gap on that narrower measure too, at Rs 17.69 lakh below sanction [d1-28766].",
+   "measures": {
+    "findings_handed": 16,
+    "findings_used": 16,
+    "words": 254,
+    "sentences": 12,
+    "words_per_sentence": 21.2,
+    "longest_sentence_words": 34,
+    "long_sentences": 4,
+    "figures": 23,
+    "figures_per_sentence": 1.9,
+    "most_figures_in_a_sentence": 4,
+    "sentences_with_many_figures": 3,
+    "semicolons": 1,
+    "figures_handed": 99,
+    "figures_covered": 22,
+    "coverage": 0.222
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 14.3,
+     "finish_reason": "stop",
+     "completion_tokens": 530,
+     "reasoning_tokens": 106,
+     "failed_on": [
+      "4_all_findings_cited"
+     ]
+    },
+    {
+     "attempt": 2,
+     "seconds": 9.0,
+     "finish_reason": "stop",
+     "completion_tokens": 551,
+     "reasoning_tokens": 0,
+     "failed_on": []
+    }
+   ],
+   "attempt_prose": [
+    "Biswamathpur recorded spending of Rs 1.42 crore [d3-01669] against a plan of Rs 8.65 crore [d3-01667] across 6 fiscal years [d3-01669][d3-01667]. That was 16.4% of plan [d3-00578], leaving a gap of Rs 7.23 crore [d1-28986]. Recorded spending was fairly evenly spread across the years [d3-01669], but the gap was concentrated in 2023-2024 [d1-28986]: that year accounted for 68.6% of the gap [d1-28986] and 59.7% of planned costs [d3-01667]. It was also the largest gap for that year in the 20-Gram-Panchayat sample [d1-18254].\n\nFor the next review, start with Public Works in 2023-2024 [d1-28826][d1-28986]. Public Works accounted for all voucher-linked spending [d1-28824] and 99.9% of the gap against plan [d1-28826]. Check scheme details as part of that review: activities with no scheme recorded accounted for 94.2% of the gap [d1-28927]. Sanitation is the first focus area to check: it had the largest gap against both plan and sanction [d1-28765][d1-28766].\n\nKeep the sanction comparison separate. Recorded spending was Rs 42.13 lakh below sanction [d3-01671], but that comparison covers only about one in six activities—those with a sanction on file [d3-01671]. The share of spending linked to a planned activity rose from 2.7% [d2-01594] to 53.2% [d2-01594]; that reflects more complete recording and does not by itself show that spending rose [d2-01594].",
+    "Biswamathpur recorded Rs 1.42 crore in spending [d3-01669] against Rs 8.65 crore in planned costs [d3-01667] across 6 fiscal years [d3-01669][d3-01667], leaving spending Rs 7.23 crore below plan [d1-28986]. In the Rangeilunda sample, Biswamathpur accounted for 51.9% of recorded spending [d3-00577] but 79.4% of the gap against plan [d3-00578]. Recorded spending was spread across the years [d3-01669], but 2023-2024 alone accounted for 59.7% of planned costs [d3-01667] and 68.6% of Biswamathpur’s gap (Rs 4.96 crore below plan) [d1-28986]. That was the largest gap that year among the 20 Gram Panchayats sampled [d1-18254].\n\nPublic Works accounted for all voucher-linked spending [d1-28824] and 99.9% of the gap against plan [d1-28826]. Education and Drinking water were the largest areas of voucher-linked spending, at Rs 37.16 lakh and Rs 32.28 lakh, respectively [d1-28763], while Sanitation had the largest gap against plan, at Rs 2.10 crore below plan [d1-28765]. Activities marked “Activity Approved” accounted for 93.3% of the gap against plan [d1-28865], while works marked “WORK ONGOING” accounted for 92.3% of spending recorded under the general component [d1-28864].\n\nFor the next review, start by reconciling the 2023-2024 Public Works records, checking activity status and missing scheme details [d1-28986][d1-28826][d1-28865][d1-28927]. Records with no scheme listed accounted for 94.2% of the gap against plan [d1-28927]. The share of spending linked to planned activities rose from 2.7% to 53.2% [d2-01594]; that change shows more spending was linked in the records, not by itself that spending rose [d2-01594]. The separate comparison with sanctions shows spending Rs 42.13 lakh below sanction, but covers only about one in six activities [d3-01671]. Sanitation had the largest gap on that narrower measure too, at Rs 17.69 lakh below sanction [d1-28766]."
+   ],
+   "run": 1
+  },
+  {
+   "id": "GEO-07",
+   "question": "What stands out in Boipariguda?",
+   "wrong_numbers_shown": [],
+   "tokens": {
+    "prompt": 6071,
+    "completion": 1207
+   },
+   "findings": 20,
+   "seconds": 26.6,
+   "attempts": 2,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "The first year to review in Boipariguda is 2023-2024 [d1-29214][d1-29207][d1-29223]. It accounts for 79.7% of the Gram Panchayat’s Rs 4.75 crore gap between planned and recorded spending [d1-29214], alongside 64.7% of planned cost [d1-29207] and 95.8% of expected beneficiaries [d1-29223]. Across years, rural housing and drinking water show the largest spending gaps: Rs 2.13 crore below plan [d1-29024] and Rs 1.26 crore below plan [d1-29024], respectively. The share of spending linked to planned activities rose from 2.7% to 53.2% [d2-01615]; that shows more spending was linked in the records, not necessarily that more was spent [d2-01615].\n\nTwo gaps in the records are worth checking. Activities with no recorded fund component account for 99.0% of expected beneficiaries [d1-29189]. Activities not mapped to a development theme account for 39.5% of planned cost [d1-28999] and 32.6% of expected beneficiaries [d1-29015]. These unmapped activities also have the highest planned untied grant amount in Boipariguda, whereas village infrastructure leads in 18/20 Gram Panchayats in the sample [1-01794].\n\nFor the works review, drinking water and sanitation are the two largest categories by both proposed cost at sanction and voucher-linked spending [d1-29020][d1-29022]. Sanction records, however, cover only about one in six activities [d1-29020]. Separately, all recorded general-component spending was on public works [d1-29075], with maintenance the largest work category at 46.6% [d1-29041]. The Clean and Green Village and Water Sufficient Village themes had the most ongoing activities and the most activities with photo evidence [d1-29009][d1-29012].\n\nBoipariguda also differs from most of the sample in how spending and expected beneficiaries are distributed across activity statuses. Neither voucher-linked spending nor expected beneficiaries shows a clear pattern by status, unlike the usual concentration in ongoing works for spending and approved activities for expected beneficiaries [1-01675][1-01790]. Spending against sanction is unevenly spread across statuses, unlike in 17/20 Gram Panchayats in the sample [1-01753]. Output codes are another point to check: Code 103 joins Code 101 among the categories with the highest planned cost, in place of the more usual Code 105 [1-01834], and Code 103, rather than Code 101, has the lowest spending measured against plan [1-01797].",
+   "measures": {
+    "findings_handed": 20,
+    "findings_used": 20,
+    "words": 325,
+    "sentences": 16,
+    "words_per_sentence": 20.3,
+    "longest_sentence_words": 42,
+    "long_sentences": 4,
+    "figures": 22,
+    "figures_per_sentence": 1.4,
+    "most_figures_in_a_sentence": 5,
+    "sentences_with_many_figures": 2,
+    "semicolons": 1,
+    "figures_handed": 95,
+    "figures_covered": 20,
+    "coverage": 0.211
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 12.4,
+     "finish_reason": "stop",
+     "completion_tokens": 503,
+     "reasoning_tokens": 61,
+     "failed_on": [
+      "4_all_findings_cited"
+     ]
+    },
+    {
+     "attempt": 2,
+     "seconds": 13.8,
+     "finish_reason": "stop",
+     "completion_tokens": 704,
+     "reasoning_tokens": 94,
+     "failed_on": []
+    }
+   ],
+   "attempt_prose": [
+    "**Start with the 2023-2024 records.** [d1-29214][d1-29207][d1-29223] Boipariguda recorded spending Rs 4.75 crore below plan [d1-29214], with 79.7% of that gap in 2023-2024 [d1-29214]. That year accounted for 64.7% of planned cost [d1-29207] and 95.8% of expected beneficiaries [d1-29223]. Across years, rural housing showed the largest gap in rupee terms (Rs 2.13 crore below plan) [d1-29024], followed by drinking water (Rs 1.26 crore below plan) [d1-29024].\n\n**Check how activities are classified and funded.** [d1-28999][d1-29189][1-01794] Activities not mapped to a development theme accounted for 39.5% of planned cost [d1-28999] and had the largest planned untied grant in Boipariguda [1-01794]. By contrast, village infrastructure led on planned untied grants in 18/20 Gram Panchayats in the sample [1-01794]. Separately, records covering 99.0% of expected beneficiaries had no fund component recorded [d1-29189].\n\n**Use drinking water and sanitation as starting points for reconciling plans, sanctions and payments.** [d1-29020][d1-29022][d2-01615] They were the leading areas both for proposed cost at sanction [d1-29020] and for voucher-linked spending [d1-29022], but only about one in six activities had a sanction record on file [d1-29020]. The share of spending linked to planned activities rose from 2.7% [d2-01615] to 53.2% [d2-01615]; check the cashbook before treating that rise as an increase in spending [d2-01615].",
+    "The first year to review in Boipariguda is 2023-2024 [d1-29214][d1-29207][d1-29223]. It accounts for 79.7% of the Gram Panchayat’s Rs 4.75 crore gap between planned and recorded spending [d1-29214], alongside 64.7% of planned cost [d1-29207] and 95.8% of expected beneficiaries [d1-29223]. Across years, rural housing and drinking water show the largest spending gaps: Rs 2.13 crore below plan [d1-29024] and Rs 1.26 crore below plan [d1-29024], respectively. The share of spending linked to planned activities rose from 2.7% to 53.2% [d2-01615]; that shows more spending was linked in the records, not necessarily that more was spent [d2-01615].\n\nTwo gaps in the records are worth checking. Activities with no recorded fund component account for 99.0% of expected beneficiaries [d1-29189]. Activities not mapped to a development theme account for 39.5% of planned cost [d1-28999] and 32.6% of expected beneficiaries [d1-29015]. These unmapped activities also have the highest planned untied grant amount in Boipariguda, whereas village infrastructure leads in 18/20 Gram Panchayats in the sample [1-01794].\n\nFor the works review, drinking water and sanitation are the two largest categories by both proposed cost at sanction and voucher-linked spending [d1-29020][d1-29022]. Sanction records, however, cover only about one in six activities [d1-29020]. Separately, all recorded general-component spending was on public works [d1-29075], with maintenance the largest work category at 46.6% [d1-29041]. The Clean and Green Village and Water Sufficient Village themes had the most ongoing activities and the most activities with photo evidence [d1-29009][d1-29012].\n\nBoipariguda also differs from most of the sample in how spending and expected beneficiaries are distributed across activity statuses. Neither voucher-linked spending nor expected beneficiaries shows a clear pattern by status, unlike the usual concentration in ongoing works for spending and approved activities for expected beneficiaries [1-01675][1-01790]. Spending against sanction is unevenly spread across statuses, unlike in 17/20 Gram Panchayats in the sample [1-01753]. Output codes are another point to check: Code 103 joins Code 101 among the categories with the highest planned cost, in place of the more usual Code 105 [1-01834], and Code 103, rather than Code 101, has the lowest spending measured against plan [1-01797]."
+   ],
+   "run": 1
+  },
+  {
+   "id": "GEO-12",
+   "question": "What does the analysis say about Haldikudar?",
+   "wrong_numbers_shown": [],
+   "tokens": {
+    "prompt": 6774,
+    "completion": 1093
+   },
+   "findings": 20,
+   "seconds": 20.8,
+   "attempts": 2,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "Haldikudar’s records show spending Rs 90.62 lakh below plan, with the largest gaps in sanitation (Rs 28.32 lakh) and drinking water (Rs 25.12 lakh).[d1-30168] Those were also the only two focus areas with planned tied grants, which totalled Rs 61.52 lakh.[d1-30161] Sanitation and drinking water had the largest gaps against sanctions as well, at Rs 9.19 lakh and Rs 7.47 lakh respectively, but that comparison covers only about one in six activities with a sanction on file.[d1-30169] By asset category, Water Sources & Structures had the largest gap against plan (Rs 21.81 lakh).[d1-30370]\n\nThe first records to reconcile are those without a fund component: they account for 488 activities (83.8% of the plan) and Rs 65.78 lakh below plan (72.6% of the gap).[d1-30342][d1-30349] Scheme names were also missing for 488 activities, and records without a scheme account for all 10,455 expected beneficiaries.[d1-30322][d1-30341] In the separate breakdown by development theme, 4,136 expected beneficiaries (39.6%) were on records with no theme mapped.[d1-30158]\n\nUntied grant plans totalled Rs 1.04 crore, with 76.0% allocated to new works and 54.9% to the Self-sufficient Infrastructure in Village theme.[d1-30162][d1-30183][d1-30141] That theme also had the largest share of recorded sanctions (38.9%) and voucher-linked spending (43.4%).[d1-30144][d1-30145] By focus area, roads accounted for just 1.9% of activities but had the largest share of both planned untied grants (23.4%) and voucher-linked spending (22.5%).[d1-30162][d1-30166] The poverty alleviation programme, by contrast, had the most planned activities (241).[d1-30159]\n\nAcross the six fiscal years, Haldikudar recorded 582 planned activities, of which 356 were listed without a cost.[d3-01760][d1-30276] The most activities were recorded in 2025-2026 (194), while the highest planned cost was in 2021-2022 (Rs 35.26 lakh).[d3-01760][d1-30381] The share of cashbook spending linked to a planned activity rose from 2.7% to 53.2% across the six years; that shows improved linkage in the records, not necessarily higher spending.[d2-01714]",
+   "measures": {
+    "findings_handed": 20,
+    "findings_used": 20,
+    "words": 301,
+    "sentences": 14,
+    "words_per_sentence": 21.5,
+    "longest_sentence_words": 36,
+    "long_sentences": 3,
+    "figures": 32,
+    "figures_per_sentence": 2.3,
+    "most_figures_in_a_sentence": 4,
+    "sentences_with_many_figures": 5,
+    "semicolons": 1,
+    "figures_handed": 114,
+    "figures_covered": 32,
+    "coverage": 0.281
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 9.0,
+     "finish_reason": "stop",
+     "completion_tokens": 465,
+     "reasoning_tokens": 60,
+     "failed_on": [
+      "4_all_findings_cited"
+     ]
+    },
+    {
+     "attempt": 2,
+     "seconds": 11.7,
+     "finish_reason": "stop",
+     "completion_tokens": 628,
+     "reasoning_tokens": 31,
+     "failed_on": []
+    }
+   ],
+   "attempt_prose": [
+    "Haldikudar recorded Rs 1.66 crore in planned costs [d1-30381] and Rs 75.12 lakh in voucher-linked spending [d1-30166]. Recorded spending was Rs 90.62 lakh below plan, with the largest gaps in Sanitation (Rs 28.32 lakh below plan) and Drinking water (Rs 25.12 lakh below plan) [d1-30168]. These were also the only focus areas with planned tied grants, which totalled Rs 61.52 lakh [d1-30161]. Both had the largest gaps against sanctions as well, but that comparison covers only about one in six activities—those with a sanction on file [d1-30169].\n\nFor untied grants, Self-sufficient Infrastructure in Village accounted for 54.9% (Rs 57.26 lakh) of the Rs 1.04 crore planned [d1-30141]. By focus area, Roads had the largest share of planned untied grants, at 23.4% [d1-30162], and the largest share of voucher-linked spending, at 22.5% [d1-30166].\n\nThe first records to reconcile are those without a fund component or scheme. Of 582 planned activities, 488 had no fund component recorded [d1-30342]; records without that label account for 72.6% of the spending gap against plan (Rs 65.78 lakh below plan) [d1-30349]. Separately, 488 activities had no scheme recorded [d1-30322], and all 10,455 expected beneficiaries were recorded against entries without a scheme [d1-30341]. The share of spending linked to a planned activity rose from 2.7% to 53.2% across the six fiscal years, but that change alone does not establish that cashbook spending rose [d2-01714].",
+    "Haldikudar’s records show spending Rs 90.62 lakh below plan, with the largest gaps in sanitation (Rs 28.32 lakh) and drinking water (Rs 25.12 lakh).[d1-30168] Those were also the only two focus areas with planned tied grants, which totalled Rs 61.52 lakh.[d1-30161] Sanitation and drinking water had the largest gaps against sanctions as well, at Rs 9.19 lakh and Rs 7.47 lakh respectively, but that comparison covers only about one in six activities with a sanction on file.[d1-30169] By asset category, Water Sources & Structures had the largest gap against plan (Rs 21.81 lakh).[d1-30370]\n\nThe first records to reconcile are those without a fund component: they account for 488 activities (83.8% of the plan) and Rs 65.78 lakh below plan (72.6% of the gap).[d1-30342][d1-30349] Scheme names were also missing for 488 activities, and records without a scheme account for all 10,455 expected beneficiaries.[d1-30322][d1-30341] In the separate breakdown by development theme, 4,136 expected beneficiaries (39.6%) were on records with no theme mapped.[d1-30158]\n\nUntied grant plans totalled Rs 1.04 crore, with 76.0% allocated to new works and 54.9% to the Self-sufficient Infrastructure in Village theme.[d1-30162][d1-30183][d1-30141] That theme also had the largest share of recorded sanctions (38.9%) and voucher-linked spending (43.4%).[d1-30144][d1-30145] By focus area, roads accounted for just 1.9% of activities but had the largest share of both planned untied grants (23.4%) and voucher-linked spending (22.5%).[d1-30162][d1-30166] The poverty alleviation programme, by contrast, had the most planned activities (241).[d1-30159]\n\nAcross the six fiscal years, Haldikudar recorded 582 planned activities, of which 356 were listed without a cost.[d3-01760][d1-30276] The most activities were recorded in 2025-2026 (194), while the highest planned cost was in 2021-2022 (Rs 35.26 lakh).[d3-01760][d1-30381] The share of cashbook spending linked to a planned activity rose from 2.7% to 53.2% across the six years; that shows improved linkage in the records, not necessarily higher spending.[d2-01714]"
+   ],
+   "run": 1
+  },
+  {
+   "id": "GEO-18",
+   "question": "Is Laxmipur behind on anything?",
+   "wrong_numbers_shown": [],
+   "tokens": {
+    "prompt": 2942,
+    "completion": 664
+   },
+   "findings": 6,
+   "seconds": 11.4,
+   "attempts": 2,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "Yes. Laxmipur Gram Panchayat’s recorded spending was Rs 1.61 crore below plan across 6 fiscal years [d1-31961]. The largest gaps were in 2025-2026 (Rs 65.79 lakh below plan) and 2023-2024 (Rs 61.40 lakh below plan) [d1-31961]. Drinking water is a priority for review: it had the largest gap among focus areas (Rs 48.04 lakh below plan), followed by sanitation (Rs 44.29 lakh below plan) [d1-31771]. The same overall gap shows up in other breakdowns: Water Sufficient Village had the largest gap among themes (Rs 51.55 lakh below plan), and drinking water supply structures had the largest gap among asset categories (Rs 34.96 lakh below plan) [d1-31753][d1-31945].\n\nAt the next review, reconcile the sanction and spending records, starting with drinking water [d1-31894][d1-31772]. The 642 records with no sanctioning authority listed account for 90.1% of the gap against plan (Rs 1.45 crore below plan) [d1-31894]. The comparison against sanctions covers only about one in six activities; within that subset, spending was Rs 15.98 lakh below sanctioned amounts, with drinking water accounting for 62.1% of the gap (Rs 9.93 lakh below sanction) [d1-31772].",
+   "measures": {
+    "findings_handed": 6,
+    "findings_used": 6,
+    "words": 173,
+    "sentences": 8,
+    "words_per_sentence": 21.6,
+    "longest_sentence_words": 40,
+    "long_sentences": 3,
+    "figures": 16,
+    "figures_per_sentence": 2.0,
+    "most_figures_in_a_sentence": 4,
+    "sentences_with_many_figures": 3,
+    "semicolons": 1,
+    "figures_handed": 48,
+    "figures_covered": 16,
+    "coverage": 0.333
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 6.3,
+     "finish_reason": "stop",
+     "completion_tokens": 345,
+     "reasoning_tokens": 52,
+     "failed_on": [
+      "4_all_findings_cited"
+     ]
+    },
+    {
+     "attempt": 2,
+     "seconds": 5.1,
+     "finish_reason": "stop",
+     "completion_tokens": 319,
+     "reasoning_tokens": 0,
+     "failed_on": []
+    }
+   ],
+   "attempt_prose": [
+    "Yes. Laxmipur’s recorded spending was Rs 1.61 crore below plan [d1-31753]. The gap spans several areas, with the largest amounts in drinking water (Rs 48.04 lakh below plan) [d1-31771] and sanitation (Rs 44.29 lakh below plan) [d1-31771]. The largest gaps by financial year were in 2025-2026 (Rs 65.79 lakh below plan) [d1-31961] and 2023-2024 (Rs 61.40 lakh below plan) [d1-31961].\n\nAt the next review, start by reconciling drinking water spending and checking records with no sanctioning authority listed [d1-31772][d1-31894]. Among activities with a sanction on file—about one in six [d1-31772]—spending was Rs 15.98 lakh below sanction [d1-31772], with drinking water accounting for 62.1% of that gap [d1-31772]. Separately, records with no sanctioning authority listed account for 90.1% of the gap against plan [d1-31894]. These figures show where recorded spending is below plan or sanction; they do not establish whether works are delayed [d1-31753][d1-31772].",
+    "Yes. Laxmipur Gram Panchayat’s recorded spending was Rs 1.61 crore below plan across 6 fiscal years [d1-31961]. The largest gaps were in 2025-2026 (Rs 65.79 lakh below plan) and 2023-2024 (Rs 61.40 lakh below plan) [d1-31961]. Drinking water is a priority for review: it had the largest gap among focus areas (Rs 48.04 lakh below plan), followed by sanitation (Rs 44.29 lakh below plan) [d1-31771]. The same overall gap shows up in other breakdowns: Water Sufficient Village had the largest gap among themes (Rs 51.55 lakh below plan), and drinking water supply structures had the largest gap among asset categories (Rs 34.96 lakh below plan) [d1-31753][d1-31945].\n\nAt the next review, reconcile the sanction and spending records, starting with drinking water [d1-31894][d1-31772]. The 642 records with no sanctioning authority listed account for 90.1% of the gap against plan (Rs 1.45 crore below plan) [d1-31894]. The comparison against sanctions covers only about one in six activities; within that subset, spending was Rs 15.98 lakh below sanctioned amounts, with drinking water accounting for 62.1% of the gap (Rs 9.93 lakh below sanction) [d1-31772]."
+   ],
+   "run": 1
+  },
+  {
+   "id": "GEO-19",
+   "question": "Mendarajpur - show me what the analysis found.",
+   "wrong_numbers_shown": [],
+   "tokens": {
+    "prompt": 1743,
+    "completion": 591
+   },
+   "findings": 8,
+   "seconds": 9.6,
+   "attempts": 1,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "Mendarajpur’s recorded spending was Rs 1.88 crore [d1-32143] below plan. Most of that gap—78.5% [d1-32143], or Rs 1.47 crore [d1-32143]—was on 484 rows [d1-32143] with no sanctioning authority recorded. In a separate breakdown of the same gap, output Code 101 [d1-32083] accounted for 84.0% [d1-32083] of the shortfall but only 23.9% [d1-32083] of activities. These are two views of the same total, not separate shortfalls to add together. [d1-32143][d1-32083]\n\nThe plan shortfall was spread across years and focus areas. [d1-32222][d1-32001] The largest annual gaps were in 2025-2026 [d1-32222] at Rs 74.56 lakh [d1-32222] and 2023-2024 [d1-32222] at Rs 62.24 lakh [d1-32222]. Water Conservation had the largest gap by focus area, at Rs 40.75 lakh [d1-32001] below plan. The share of spending linked to a planned activity rose from 2.7% [d2-01861] to 53.2% [d2-01861]; that shows more complete linking, not necessarily higher spending. [d2-01861]\n\nThe comparison with sanctions covers only about one in six activities [d1-32002]—those with a sanction on file. [d1-32002] For those activities, spending was Rs 40.44 lakh [d1-32002] below sanction, with the largest gaps in Sanitation (Rs 9.04 lakh [d1-32002]) and Drinking water (Rs 8.88 lakh [d1-32002]). Those same areas accounted for almost all of the Rs 59.89 lakh [d1-31994] in planned tied grants. [d1-31994] Of the Rs 2.60 crore [d1-31974] in planned untied grants, the largest allocations were for Self-sufficient Infrastructure in Village (Rs 1.04 crore [d1-31974]) and Water Sufficient Village (Rs 58.37 lakh [d1-31974]).",
+   "measures": {
+    "findings_handed": 8,
+    "findings_used": 8,
+    "words": 217,
+    "sentences": 12,
+    "words_per_sentence": 18.1,
+    "longest_sentence_words": 30,
+    "long_sentences": 2,
+    "figures": 21,
+    "figures_per_sentence": 1.8,
+    "most_figures_in_a_sentence": 4,
+    "sentences_with_many_figures": 5,
+    "semicolons": 1,
+    "figures_handed": 63,
+    "figures_covered": 21,
+    "coverage": 0.333
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 9.6,
+     "finish_reason": "stop",
+     "completion_tokens": 591,
+     "reasoning_tokens": 64,
+     "failed_on": []
+    }
+   ],
+   "attempt_prose": [
+    "Mendarajpur’s recorded spending was Rs 1.88 crore [d1-32143] below plan. Most of that gap—78.5% [d1-32143], or Rs 1.47 crore [d1-32143]—was on 484 rows [d1-32143] with no sanctioning authority recorded. In a separate breakdown of the same gap, output Code 101 [d1-32083] accounted for 84.0% [d1-32083] of the shortfall but only 23.9% [d1-32083] of activities. These are two views of the same total, not separate shortfalls to add together. [d1-32143][d1-32083]\n\nThe plan shortfall was spread across years and focus areas. [d1-32222][d1-32001] The largest annual gaps were in 2025-2026 [d1-32222] at Rs 74.56 lakh [d1-32222] and 2023-2024 [d1-32222] at Rs 62.24 lakh [d1-32222]. Water Conservation had the largest gap by focus area, at Rs 40.75 lakh [d1-32001] below plan. The share of spending linked to a planned activity rose from 2.7% [d2-01861] to 53.2% [d2-01861]; that shows more complete linking, not necessarily higher spending. [d2-01861]\n\nThe comparison with sanctions covers only about one in six activities [d1-32002]—those with a sanction on file. [d1-32002] For those activities, spending was Rs 40.44 lakh [d1-32002] below sanction, with the largest gaps in Sanitation (Rs 9.04 lakh [d1-32002]) and Drinking water (Rs 8.88 lakh [d1-32002]). Those same areas accounted for almost all of the Rs 59.89 lakh [d1-31994] in planned tied grants. [d1-31994] Of the Rs 2.60 crore [d1-31974] in planned untied grants, the largest allocations were for Self-sufficient Infrastructure in Village (Rs 1.04 crore [d1-31974]) and Water Sufficient Village (Rs 58.37 lakh [d1-31974])."
+   ],
+   "run": 1
+  },
+  {
+   "id": "GEO-20",
+   "question": "Anything notable about Sharagada?",
+   "wrong_numbers_shown": [],
+   "tokens": {
+    "prompt": 4602,
+    "completion": 1077
+   },
+   "findings": 13,
+   "seconds": 18.6,
+   "attempts": 2,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "Sharagada’s first priority is to reconcile its plans with its payment records. Recorded spending was Rs 4.63 crore below plan [d1-32445], and 81.5% of that gap [d1-32445] was on entries with no fund component recorded. Separately, 827 entries had no scheme recorded [d1-32419], accounting for Rs 3.77 crore [d1-32419] of the Rs 6.51 crore in planned costs [d1-32419]. The plan also lists 722 of its 920 activities as costless [d1-32372]. Across the years reviewed, the cashbook shows Rs 6.34 crore paid out [d3-01904], while Rs 1.78 crore in spending was linked to planned activities [d2-01882]. The linked share rose from 2.7% [d2-01882] to 53.2% [d2-01882]; that is a change in how much spending could be matched to the plan, not evidence that payments rose [d2-01882].\n\nFor the next review, focus on maintenance, village infrastructure and the 2020-2021 records [d1-32285][d1-32243][d1-32485]. These are different views of the same plan-to-spending gap, not amounts to add together [d1-32285][d1-32243][d1-32485]. Maintenance accounts for 85.0% of planned untied grants [d1-32279] and Rs 4.19 crore of the gap [d1-32285]. Village infrastructure accounts for Rs 3.36 crore of the gap [d1-32243] and was also Rs 54.92 lakh below sanction [d1-32244], though the sanction comparison covers only about one in six activities [d1-32244]. The 2020-2021 records alone account for Rs 2.54 crore of the gap [d1-32485], even as the cashbook shows Rs 2.13 crore paid out that year [d3-01904].\n\nPublic works are the natural focus for a check of work status and photo evidence. All 85 activities marked ongoing are public works [d1-32328], and activities marked ongoing account for 72.7% of recorded general-component spending [d1-32363]. Of the 80 activities with photos [d1-32251], 35 are in village infrastructure [d1-32251] and 26 are in the Clean and Green Village theme [d1-32251]. At the next review, check whether the payment and photo records match the status shown for the works under review [d1-32328][d1-32363][d1-32251].",
+   "measures": {
+    "findings_handed": 13,
+    "findings_used": 13,
+    "words": 284,
+    "sentences": 15,
+    "words_per_sentence": 18.9,
+    "longest_sentence_words": 29,
+    "long_sentences": 2,
+    "figures": 24,
+    "figures_per_sentence": 1.6,
+    "most_figures_in_a_sentence": 3,
+    "sentences_with_many_figures": 3,
+    "semicolons": 1,
+    "figures_handed": 75,
+    "figures_covered": 23,
+    "coverage": 0.307
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 8.4,
+     "finish_reason": "stop",
+     "completion_tokens": 429,
+     "reasoning_tokens": 110,
+     "failed_on": [
+      "4_all_findings_cited"
+     ]
+    },
+    {
+     "attempt": 2,
+     "seconds": 10.1,
+     "finish_reason": "stop",
+     "completion_tokens": 648,
+     "reasoning_tokens": 48,
+     "failed_on": []
+    }
+   ],
+   "attempt_prose": [
+    "Sharagada’s records show spending Rs 4.63 crore below plan [d1-32445]. The first check is whether payments can be matched to planned activities: the share of cashbook payments linked to a planned activity rose from 2.7% to 53.2% across the six fiscal years, but that does not in itself show that spending rose [d2-01882]. Start with 2020-2021, which accounts for Rs 2.54 crore below plan [d1-32485] and shows Rs 2.13 crore in cashbook payments [d3-01904]. Also check the missing funding details: records without a fund component account for Rs 3.77 crore of the gap against plan [d1-32445], while records without a scheme account for Rs 3.77 crore in planned cost [d1-32419].\n\nFor the works review, focus on maintenance and village infrastructure. Maintenance accounts for 85.0% of planned untied grants [d1-32279] and 90.6% of the gap against plan [d1-32285]. Viewed by theme, Self-sufficient Infrastructure in Village accounts for 72.6% of that same gap [d1-32243]. It also accounts for Rs 54.92 lakh of the Rs 85.77 lakh gap against sanctions, though that comparison covers only about one in six activities because it includes only those with a sanction on file [d1-32244].",
+    "Sharagada’s first priority is to reconcile its plans with its payment records. Recorded spending was Rs 4.63 crore below plan [d1-32445], and 81.5% of that gap [d1-32445] was on entries with no fund component recorded. Separately, 827 entries had no scheme recorded [d1-32419], accounting for Rs 3.77 crore [d1-32419] of the Rs 6.51 crore in planned costs [d1-32419]. The plan also lists 722 of its 920 activities as costless [d1-32372]. Across the years reviewed, the cashbook shows Rs 6.34 crore paid out [d3-01904], while Rs 1.78 crore in spending was linked to planned activities [d2-01882]. The linked share rose from 2.7% [d2-01882] to 53.2% [d2-01882]; that is a change in how much spending could be matched to the plan, not evidence that payments rose [d2-01882].\n\nFor the next review, focus on maintenance, village infrastructure and the 2020-2021 records [d1-32285][d1-32243][d1-32485]. These are different views of the same plan-to-spending gap, not amounts to add together [d1-32285][d1-32243][d1-32485]. Maintenance accounts for 85.0% of planned untied grants [d1-32279] and Rs 4.19 crore of the gap [d1-32285]. Village infrastructure accounts for Rs 3.36 crore of the gap [d1-32243] and was also Rs 54.92 lakh below sanction [d1-32244], though the sanction comparison covers only about one in six activities [d1-32244]. The 2020-2021 records alone account for Rs 2.54 crore of the gap [d1-32485], even as the cashbook shows Rs 2.13 crore paid out that year [d3-01904].\n\nPublic works are the natural focus for a check of work status and photo evidence. All 85 activities marked ongoing are public works [d1-32328], and activities marked ongoing account for 72.7% of recorded general-component spending [d1-32363]. Of the 80 activities with photos [d1-32251], 35 are in village infrastructure [d1-32251] and 26 are in the Clean and Green Village theme [d1-32251]. At the next review, check whether the payment and photo records match the status shown for the works under review [d1-32328][d1-32363][d1-32251]."
+   ],
+   "run": 1
+  },
+  {
+   "id": "GEO-22",
+   "question": "What has been found in Attabira block?",
+   "wrong_numbers_shown": [],
+   "tokens": {
+    "prompt": 3828,
+    "completion": 1136
+   },
+   "findings": 12,
+   "seconds": 22.9,
+   "attempts": 2,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "In the sample, Attabira’s recorded spending was Rs 1.27 crore below plan [d1-08915][d1-08780][d1-08990]. The largest annual gap was in 2023-2024 [d1-08990], at Rs 47.21 lakh [d1-08990]. Drinking water had the largest gap among focus areas, at Rs 35.94 lakh [d1-08780], followed by sanitation at Rs 23.84 lakh [d1-08780].\n\nThe spending figures should be read alongside gaps in the records. Entries with no sanctioning authority on file accounted for 91.8% of the gap [d1-08915], and 688 of the 777 planned activities had no scheme recorded [d1-08926]. Spending linked to planned activities totalled Rs 1.06 crore [d2-00088]. The linked share went from 2.7% [d2-00088] to 53.2% [d2-00088]; that change alone does not establish that overall spending rose [d2-00088].\n\nAttabira recorded 214 costed activities [d3-00182], with the most in 2023-2024 [d3-00182]. It was also an exception to the prevailing work mix: New/Fresh was the most common planned work type in 14/16 blocks [1-00368], but not in Attabira [1-00368]. Of Attabira’s 29 abandoned activities [d3-00194], 16 were recorded in 2022-2023 [d3-00194]. The block recorded the sample’s only abandoned agriculture activity [d1-19912] and accounted for Rs 10.30 lakh [d1-22655], or 91.2% [d1-22655], of the money planned for abandoned markets and fairs works.\n\nTwo reported figures are worth checking against the underlying records: Attabira accounted for 21,000 expected beneficiaries [d1-46320], or 94.1% of the sample total for the Clean and Green Village theme [d1-46320], and Rs 2.85 lakh in reported own-source revenue collected [d4-02177], or 62.6% of the total for the sampled blocks in Bargarh [d4-02177].",
+   "measures": {
+    "findings_handed": 12,
+    "findings_used": 12,
+    "words": 226,
+    "sentences": 12,
+    "words_per_sentence": 18.8,
+    "longest_sentence_words": 49,
+    "long_sentences": 2,
+    "figures": 24,
+    "figures_per_sentence": 2.0,
+    "most_figures_in_a_sentence": 4,
+    "sentences_with_many_figures": 3,
+    "semicolons": 1,
+    "figures_handed": 75,
+    "figures_covered": 23,
+    "coverage": 0.307
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 10.6,
+     "finish_reason": "stop",
+     "completion_tokens": 526,
+     "reasoning_tokens": 57,
+     "failed_on": [
+      "4_all_findings_cited"
+     ]
+    },
+    {
+     "attempt": 2,
+     "seconds": 12.3,
+     "finish_reason": "stop",
+     "completion_tokens": 610,
+     "reasoning_tokens": 99,
+     "failed_on": []
+    }
+   ],
+   "attempt_prose": [
+    "In the sample, Attabira’s recorded spending was Rs 1.27 crore below plan [d1-08915][d1-08780][d1-08990]. The largest annual gap was in 2023-2024, at Rs 47.21 lakh [d1-08990]. Drinking water had the largest gap by focus area, at Rs 35.94 lakh [d1-08780], followed by sanitation at Rs 23.84 lakh [d1-08780].\n\nMissing details are a priority for reconciliation. No scheme was recorded for 688 of the 777 planned activities [d1-08926]. Separately, 688 records had no sanctioning authority on file [d1-08915]; those records accounted for 91.8% of the spending gap [d1-08915]. Spending linked to planned activities totalled Rs 1.06 crore across 6 fiscal years [d2-00088]. The linked share rose from 2.7% to 53.2% [d2-00088], showing more complete recording of those links, not necessarily an increase in cashbook spending [d2-00088].\n\nAbandonments warrant a closer look in 2022-2023, when 16 of Attabira’s 29 abandoned activities were recorded [d3-00194]. Markets and fairs also stand out: Attabira accounted for Rs 10.30 lakh in planned spending on abandoned works [d1-22655], or 91.2% of the amount across the 7 blocks in that comparison [d1-22655]. Attabira also had the only recorded agriculture abandonment in the sample [d1-19912].\n\nTwo reported figures are worth verifying at the next review. Attabira recorded 21,000 expected beneficiaries under Clean and Green Village [d1-46320], or 94.1% of the total across the 16 blocks in that comparison [d1-46320]. It also reported Rs 2.85 lakh in own-source revenue collected [d4-02177], or 62.6% of the total across the 3 sampled blocks in Bargarh [d4-02177].",
+    "In the sample, Attabira’s recorded spending was Rs 1.27 crore below plan [d1-08915][d1-08780][d1-08990]. The largest annual gap was in 2023-2024 [d1-08990], at Rs 47.21 lakh [d1-08990]. Drinking water had the largest gap among focus areas, at Rs 35.94 lakh [d1-08780], followed by sanitation at Rs 23.84 lakh [d1-08780].\n\nThe spending figures should be read alongside gaps in the records. Entries with no sanctioning authority on file accounted for 91.8% of the gap [d1-08915], and 688 of the 777 planned activities had no scheme recorded [d1-08926]. Spending linked to planned activities totalled Rs 1.06 crore [d2-00088]. The linked share went from 2.7% [d2-00088] to 53.2% [d2-00088]; that change alone does not establish that overall spending rose [d2-00088].\n\nAttabira recorded 214 costed activities [d3-00182], with the most in 2023-2024 [d3-00182]. It was also an exception to the prevailing work mix: New/Fresh was the most common planned work type in 14/16 blocks [1-00368], but not in Attabira [1-00368]. Of Attabira’s 29 abandoned activities [d3-00194], 16 were recorded in 2022-2023 [d3-00194]. The block recorded the sample’s only abandoned agriculture activity [d1-19912] and accounted for Rs 10.30 lakh [d1-22655], or 91.2% [d1-22655], of the money planned for abandoned markets and fairs works.\n\nTwo reported figures are worth checking against the underlying records: Attabira accounted for 21,000 expected beneficiaries [d1-46320], or 94.1% of the sample total for the Clean and Green Village theme [d1-46320], and Rs 2.85 lakh in reported own-source revenue collected [d4-02177], or 62.6% of the total for the sampled blocks in Bargarh [d4-02177]."
+   ],
+   "run": 1
+  },
+  {
+   "id": "GEO-24",
+   "question": "Is Lahunipara block an exception to anything?",
+   "wrong_numbers_shown": [],
+   "tokens": {
+    "prompt": 761,
+    "completion": 293
+   },
+   "findings": 7,
+   "seconds": 7.3,
+   "attempts": 1,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "Yes. In the sample, Lahunipara is the only block where Code 101 and Code 105 do not lead in either planned cost or planned untied grants; the pair leads on both measures in 15/16 blocks [1-00405][1-00389]. Lahunipara also departs from the usual pattern in general-component spending, where that pair leads in 14/16 blocks [1-00394]. When spending is measured against plan, Code 101 remains among the lowest in Lahunipara, but Code 104 takes the place of Code 105 [1-00353].\n\nThe block also differs by type of work. Maintenance and New/Fresh lead in planned cost and rank lowest in spending against plan in 14/16 blocks; Lahunipara and Balisankara are the exceptions on both measures [1-00425][1-00355]. Both blocks also depart from the usual pattern of Maintenance and New/Fresh leading in planned untied grants, as does Khallikote [1-00418].",
+   "measures": {
+    "findings_handed": 7,
+    "findings_used": 7,
+    "words": 129,
+    "sentences": 7,
+    "words_per_sentence": 18.4,
+    "longest_sentence_words": 34,
+    "long_sentences": 2,
+    "figures": 11,
+    "figures_per_sentence": 1.6,
+    "most_figures_in_a_sentence": 4,
+    "sentences_with_many_figures": 2,
+    "semicolons": 2,
+    "figures_handed": 8,
+    "figures_covered": 6,
+    "coverage": 0.75
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 7.3,
+     "finish_reason": "stop",
+     "completion_tokens": 293,
+     "reasoning_tokens": 66,
+     "failed_on": []
+    }
+   ],
+   "attempt_prose": [
+    "Yes. In the sample, Lahunipara is the only block where Code 101 and Code 105 do not lead in either planned cost or planned untied grants; the pair leads on both measures in 15/16 blocks [1-00405][1-00389]. Lahunipara also departs from the usual pattern in general-component spending, where that pair leads in 14/16 blocks [1-00394]. When spending is measured against plan, Code 101 remains among the lowest in Lahunipara, but Code 104 takes the place of Code 105 [1-00353].\n\nThe block also differs by type of work. Maintenance and New/Fresh lead in planned cost and rank lowest in spending against plan in 14/16 blocks; Lahunipara and Balisankara are the exceptions on both measures [1-00425][1-00355]. Both blocks also depart from the usual pattern of Maintenance and New/Fresh leading in planned untied grants, as does Khallikote [1-00418]."
+   ],
+   "run": 1
+  },
+  {
+   "id": "GEO-26",
+   "question": "How do the GPs in Sheragada block look?",
+   "wrong_numbers_shown": [],
+   "tokens": {
+    "prompt": 4942,
+    "completion": 1201
+   },
+   "findings": 19,
+   "seconds": 23.2,
+   "attempts": 2,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "In the sample, Sheragada recorded 920 planned activities [d1-12534], most of them marked “Activity Approved” [1-00256]. Unlike most blocks in the sample, Sheragada did not have a majority of planned activities classified as “New/Fresh” [1-00269]. The largest share of planned activities was in Village with Good Governance (50.1%) [d1-12534], but Self-sufficient Infrastructure in Village led both ongoing work (41.2%) [d1-12546] and general-component spending (48.9%) [d1-12542], with Clean and Green Village second on both measures [d1-12546][d1-12542]. Infrastructure also led planned untied grants [1-00367], while Water Sufficient Village and Clean and Green Village led planned tied grants [1-00413].\n\nThe peaks in the planning and financial records fall in different years. The most activities were planned in 2023-2024 [d3-00623], which also had the highest recorded spending [d3-00628]. Planned cost was highest in 2020-2021 [d3-00626], while the sanctioned amount was highest in 2021-2022 [d3-00627]. Across activity statuses, work marked “Work Ongoing” accounted for most of the sanctioned amount [1-00239], voucher-linked spending [1-00260] and activities with photo evidence [1-00247].\n\nFor the next review, start by reconciling sanctioning-authority records. The Gram Panchayat was listed as the sanctioning authority for 84 of the 85 ongoing activities [d1-12709] and accounted for 72.0% of general-component spending [d1-12705]. Yet 827 rows had no sanctioning authority recorded [d1-12705][d1-12709], including records accounting for Rs 10.57 lakh in general-component spending [d1-12705]. Across the sampled blocks with Gram Panchayat sanctions, Sheragada represented 49.4% of the activities [d1-40930] and 68.9% of the planned cost [d1-40930].\n\nTwo local checks are worth keeping separate: Sharagada GP had the most GP development plans among the sampled GPs in Ganjam, with 13 plans [d3-01166]; and Sheragada block had the largest reported population in the sample’s “Not ready” category for office internet and computers, at 11,767 people [d4-01245].",
+   "measures": {
+    "findings_handed": 19,
+    "findings_used": 19,
+    "words": 264,
+    "sentences": 13,
+    "words_per_sentence": 20.3,
+    "longest_sentence_words": 46,
+    "long_sentences": 2,
+    "figures": 16,
+    "figures_per_sentence": 1.2,
+    "most_figures_in_a_sentence": 3,
+    "sentences_with_many_figures": 2,
+    "semicolons": 1,
+    "figures_handed": 87,
+    "figures_covered": 16,
+    "coverage": 0.184
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 12.3,
+     "finish_reason": "stop",
+     "completion_tokens": 569,
+     "reasoning_tokens": 119,
+     "failed_on": [
+      "4_all_findings_cited"
+     ]
+    },
+    {
+     "attempt": 2,
+     "seconds": 10.9,
+     "finish_reason": "stop",
+     "completion_tokens": 632,
+     "reasoning_tokens": 84,
+     "failed_on": []
+    }
+   ],
+   "attempt_prose": [
+    "In the sample, Sheragada’s GPs recorded 920 planned activities. [d1-12534] Village with Good Governance was the largest theme in the plans, at 50.1% (461 activities). [d1-12534] Self-sufficient Infrastructure in Village accounted for 26.4% of planned activities, but led both ongoing work at 41.2% (35 activities) and general-component spending at 48.9% (Rs 1.39 crore). [d1-12534][d1-12546][d1-12542] Clean and Green Village ranked next on both measures. [d1-12546][d1-12542] Sheragada also differed from most sampled blocks in its mix of planned work: the usual New/Fresh majority did not hold. [1-00269]\n\nThe peaks fall in different years: 2023-2024 had the most planned activities (433) [d3-00623] and the highest recorded spending (Rs 44.41 lakh). [d3-00628] Planned cost was highest in 2020-2021 (Rs 2.90 crore) [d3-00626], while sanctioned amounts peaked in 2021-2022 (Rs 74.07 lakh). [d3-00627] As in most sampled blocks, activities marked as ongoing accounted for the majority of sanctioned amounts [1-00239], voucher-linked spending [1-00260], and activities with photo evidence. [1-00247]\n\nA priority for the next review is to reconcile the sanctioning-authority records. [d1-12709][d1-12705] Gram Panchayats are listed as the sanctioning authority for 98.8% (84 activities) of ongoing work [d1-12709] and 72.0% (Rs 2.05 crore) of general-component spending. [d1-12705] Yet 827 records have no sanctioning authority on file, and those records account for Rs 10.57 lakh in general-component spending. [d1-12705]",
+    "In the sample, Sheragada recorded 920 planned activities [d1-12534], most of them marked “Activity Approved” [1-00256]. Unlike most blocks in the sample, Sheragada did not have a majority of planned activities classified as “New/Fresh” [1-00269]. The largest share of planned activities was in Village with Good Governance (50.1%) [d1-12534], but Self-sufficient Infrastructure in Village led both ongoing work (41.2%) [d1-12546] and general-component spending (48.9%) [d1-12542], with Clean and Green Village second on both measures [d1-12546][d1-12542]. Infrastructure also led planned untied grants [1-00367], while Water Sufficient Village and Clean and Green Village led planned tied grants [1-00413].\n\nThe peaks in the planning and financial records fall in different years. The most activities were planned in 2023-2024 [d3-00623], which also had the highest recorded spending [d3-00628]. Planned cost was highest in 2020-2021 [d3-00626], while the sanctioned amount was highest in 2021-2022 [d3-00627]. Across activity statuses, work marked “Work Ongoing” accounted for most of the sanctioned amount [1-00239], voucher-linked spending [1-00260] and activities with photo evidence [1-00247].\n\nFor the next review, start by reconciling sanctioning-authority records. The Gram Panchayat was listed as the sanctioning authority for 84 of the 85 ongoing activities [d1-12709] and accounted for 72.0% of general-component spending [d1-12705]. Yet 827 rows had no sanctioning authority recorded [d1-12705][d1-12709], including records accounting for Rs 10.57 lakh in general-component spending [d1-12705]. Across the sampled blocks with Gram Panchayat sanctions, Sheragada represented 49.4% of the activities [d1-40930] and 68.9% of the planned cost [d1-40930].\n\nTwo local checks are worth keeping separate: Sharagada GP had the most GP development plans among the sampled GPs in Ganjam, with 13 plans [d3-01166]; and Sheragada block had the largest reported population in the sample’s “Not ready” category for office internet and computers, at 11,767 people [d4-01245]."
+   ],
+   "run": 1
+  },
+  {
+   "id": "GEO-29",
+   "question": "How is Khordha district doing overall?",
+   "wrong_numbers_shown": [],
+   "tokens": {
+    "prompt": 5748,
+    "completion": 1111
+   },
+   "findings": 20,
+   "seconds": 18.9,
+   "attempts": 2,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "Khordha leads the sampled districts on 7/9 measures [2-00160], but not on average payment or receipt amounts [2-00160]. Across its 3 sampled Gram Panchayats [d3-01287], recorded spending was Rs 3.33 crore [d4-02973], against Rs 5.95 crore in planned costs [d3-01290] and Rs 4.06 crore in sanctions [d4-02972]. Spending was Rs 2.63 crore below plan [d4-02974], with no single Panchayat or fiscal year dominating the gap [d4-02974][d3-01383]. Sanctions showed no clear trend over time [3-00021].\n\nVillage infrastructure accounted for 47.1% of planned activities [d1-15409] and 64.0% of planned untied grants [d1-15412]. Planned tied grants went entirely to sanitation and drinking water [d1-15433], which also had the largest spending gaps by focus area: Rs 70.08 lakh below plan for sanitation and Rs 35.86 lakh below plan for drinking water [d1-15440].\n\nThe first records to reconcile are those without a named sanctioning authority: 961 such records account for 71.7% of the spending gap [d1-15589]. Planned costs are also missing for 546 activities across the sampled Panchayats [d4-02970]. The share of spending linked to a planned activity rose from 2.7% to 53.2% [d2-00845], showing more complete linking, not necessarily higher spending [d2-00845]. Most voucher-linked spending was on work marked ongoing [1-00492], and 353 activities were recorded as ongoing [d3-01300]. Only 1 completion was recorded, in Andhrua [d3-01299]; with only 17 completions recorded across the whole sample [d3-01299], the completion records are too sparse to judge delivery.\n\nTwo differences are worth checking at the next review: Code 105, rather than the more usual Code 101, had the lowest spending against plan among output types [1-00707], and Khordha did not follow the common pattern of new work having the most voucher-linked spending [1-00695].",
+   "measures": {
+    "findings_handed": 20,
+    "findings_used": 20,
+    "words": 254,
+    "sentences": 12,
+    "words_per_sentence": 21.2,
+    "longest_sentence_words": 43,
+    "long_sentences": 2,
+    "figures": 21,
+    "figures_per_sentence": 1.8,
+    "most_figures_in_a_sentence": 4,
+    "sentences_with_many_figures": 1,
+    "semicolons": 1,
+    "figures_handed": 96,
+    "figures_covered": 21,
+    "coverage": 0.219
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 8.6,
+     "finish_reason": "stop",
+     "completion_tokens": 508,
+     "reasoning_tokens": 114,
+     "failed_on": [
+      "4_all_findings_cited"
+     ]
+    },
+    {
+     "attempt": 2,
+     "seconds": 10.3,
+     "finish_reason": "stop",
+     "completion_tokens": 603,
+     "reasoning_tokens": 104,
+     "failed_on": []
+    }
+   ],
+   "attempt_prose": [
+    "Khordha ranks highest among the sampled districts on 7/9 measures [2-00160], but recorded spending across its 3 sampled Gram Panchayats was Rs 3.33 crore [d4-02973], against Rs 4.06 crore sanctioned [d4-02972] and Rs 5.95 crore planned [d3-01290]. The reported spending gap of Rs 2.63 crore [d4-02974] was spread across all three panchayats and did not stand out in any one fiscal year [d4-02974][d3-01383]. Sanitation had the largest gap by focus area, at Rs 70.08 lakh below plan [d1-15440], followed by drinking water at Rs 35.86 lakh below plan [d1-15440].\n\nThe next review should prioritise reconciling plan, sanction and payment records. No sanctioning authority was recorded for 961 entries [d1-15589], which account for 71.7% of the spending gap [d1-15589]. Of the 1,316 planned activities [d3-01287], 546 had no cost recorded [d4-02970]. The share of spending linked to a planned activity rose from 2.7% to 53.2% [d2-00845]; check the cashbook totals before treating better linkage as evidence of higher spending [d2-00845].\n\nCompletion records also warrant a check: 353 activities were marked ongoing [d3-01300], but only 1 was recorded as complete, in Andhrua [d3-01299]. With just 17 completions recorded across the whole sample [d3-01299], the records alone are too sparse to judge how much work Khordha actually completed [d3-01299].",
+    "Khordha leads the sampled districts on 7/9 measures [2-00160], but not on average payment or receipt amounts [2-00160]. Across its 3 sampled Gram Panchayats [d3-01287], recorded spending was Rs 3.33 crore [d4-02973], against Rs 5.95 crore in planned costs [d3-01290] and Rs 4.06 crore in sanctions [d4-02972]. Spending was Rs 2.63 crore below plan [d4-02974], with no single Panchayat or fiscal year dominating the gap [d4-02974][d3-01383]. Sanctions showed no clear trend over time [3-00021].\n\nVillage infrastructure accounted for 47.1% of planned activities [d1-15409] and 64.0% of planned untied grants [d1-15412]. Planned tied grants went entirely to sanitation and drinking water [d1-15433], which also had the largest spending gaps by focus area: Rs 70.08 lakh below plan for sanitation and Rs 35.86 lakh below plan for drinking water [d1-15440].\n\nThe first records to reconcile are those without a named sanctioning authority: 961 such records account for 71.7% of the spending gap [d1-15589]. Planned costs are also missing for 546 activities across the sampled Panchayats [d4-02970]. The share of spending linked to a planned activity rose from 2.7% to 53.2% [d2-00845], showing more complete linking, not necessarily higher spending [d2-00845]. Most voucher-linked spending was on work marked ongoing [1-00492], and 353 activities were recorded as ongoing [d3-01300]. Only 1 completion was recorded, in Andhrua [d3-01299]; with only 17 completions recorded across the whole sample [d3-01299], the completion records are too sparse to judge delivery.\n\nTwo differences are worth checking at the next review: Code 105, rather than the more usual Code 101, had the lowest spending against plan among output types [1-00707], and Khordha did not follow the common pattern of new work having the most voucher-linked spending [1-00695]."
+   ],
+   "run": 1
+  },
+  {
+   "id": "GEO-30",
+   "question": "What has the analysis found in Koraput?",
+   "wrong_numbers_shown": [],
+   "tokens": {
+    "prompt": 5236,
+    "completion": 1223
+   },
+   "findings": 19,
+   "seconds": 21.8,
+   "attempts": 2,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "Koraput’s recorded spending was Rs 6.36 crore below plan in the sample [d3-01417]. The gap was concentrated in Boipariguda, which accounted for 74.7% of it [d3-01417], and in fiscal year 2023-2024, which accounted for 69.2% of the gap [d3-01465] and 51.5% of planned costs [d3-01462]. Boipariguda also accounted for 67.6% of the planned untied grant [d1-15794].\n\nThe gap was less concentrated by sector. Rural housing had the largest gap, at Rs 2.13 crore below plan [d1-15835], followed by drinking water at Rs 1.74 crore below plan [d1-15835]. Koraput accounted for 95.7% of the sample’s rural housing gap [d1-24185] and, looking separately at activity types, 67.9% of the gap for Beneficiary Oriented Programmes [d1-01886]. In the planned budget, Water Sufficient Village was the largest theme at Rs 2.80 crore [d1-15810], while Rs 2.48 crore had no theme assigned [d1-15810].\n\nThe records point to several checks for the next review. Entries with no sanctioning authority recorded accounted for 93.8% of the gap against plan [d1-15958]. The separate comparison against sanctions covers only about one in six activities [d3-01418]; on that basis, spending was Rs 37.43 lakh below sanction [d3-01418], with the gap more evenly split between the two blocks than the gap against plan [d3-01418][d3-01417]. Laxmipur had more activities with no planned cost recorded: 447 [d4-03300], against 248 in Boipariguda [d4-03300]. The share of spending linked to planned activities rose from 2.7% to 53.2% over the period [d2-00908], but that does not establish that total spending rose [d2-00908]. Koraput also did not follow the quarter-by-quarter rise in linked spending seen in most sampled districts [2-00245].\n\nKoraput differed from most sampled districts in how the figures were distributed across activity statuses and output codes. Its gaps against both plan and sanction were uneven across activity statuses [1-00565][1-00570], and voucher-linked spending showed no clear concentration in ongoing works [1-00492]. Codes 101 and 103 led on planned cost [1-00753] and ranked lowest on spending measured against plan [1-00598]; in most sampled districts, the corresponding pair was Codes 101 and 105 [1-00753][1-00598]. Code 101 also did not account for a majority of Koraput’s planned untied grant, unlike in most sampled districts [1-00434].",
+   "measures": {
+    "findings_handed": 19,
+    "findings_used": 19,
+    "words": 330,
+    "sentences": 17,
+    "words_per_sentence": 19.4,
+    "longest_sentence_words": 37,
+    "long_sentences": 3,
+    "figures": 23,
+    "figures_per_sentence": 1.4,
+    "most_figures_in_a_sentence": 4,
+    "sentences_with_many_figures": 2,
+    "semicolons": 2,
+    "figures_handed": 82,
+    "figures_covered": 21,
+    "coverage": 0.256
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 7.7,
+     "finish_reason": "stop",
+     "completion_tokens": 437,
+     "reasoning_tokens": 81,
+     "failed_on": [
+      "4_all_findings_cited"
+     ]
+    },
+    {
+     "attempt": 2,
+     "seconds": 14.0,
+     "finish_reason": "stop",
+     "completion_tokens": 786,
+     "reasoning_tokens": 139,
+     "failed_on": []
+    }
+   ],
+   "attempt_prose": [
+    "In the sample, Koraput’s recorded spending was Rs 6.36 crore below plan [d3-01417]. Boipariguda accounted for 74.7% of the gap [d3-01417], with spending Rs 4.75 crore below plan [d3-01417], compared with Rs 1.61 crore below plan in Laxmipur [d3-01417]. The gap was also concentrated in 2023-2024 [d3-01465], which accounted for 69.2% of it [d3-01465] and 51.5% of planned costs [d3-01462].\n\nNo single focus area dominated Koraput’s gap: rural housing had the largest gap at Rs 2.13 crore below plan [d1-15835], followed by drinking water at Rs 1.74 crore below plan [d1-15835]. Rural housing nevertheless stands out across the sample: Koraput accounted for 95.7% of the recorded rural housing gap across the districts covered [d1-24185].\n\nFor reconciliation, start with records that do not name a sanctioning authority: they account for 93.8% of Koraput’s gap against plan [d1-15958]. The separate comparison against sanctions shows spending Rs 37.43 lakh below sanction [d3-01418], but it covers only about one in six activities because it includes only those with a sanction record on file [d3-01418]. In Laxmipur, a further check is whether costs can be confirmed for the 447 activities planned without a recorded cost [d4-03300].",
+    "Koraput’s recorded spending was Rs 6.36 crore below plan in the sample [d3-01417]. The gap was concentrated in Boipariguda, which accounted for 74.7% of it [d3-01417], and in fiscal year 2023-2024, which accounted for 69.2% of the gap [d3-01465] and 51.5% of planned costs [d3-01462]. Boipariguda also accounted for 67.6% of the planned untied grant [d1-15794].\n\nThe gap was less concentrated by sector. Rural housing had the largest gap, at Rs 2.13 crore below plan [d1-15835], followed by drinking water at Rs 1.74 crore below plan [d1-15835]. Koraput accounted for 95.7% of the sample’s rural housing gap [d1-24185] and, looking separately at activity types, 67.9% of the gap for Beneficiary Oriented Programmes [d1-01886]. In the planned budget, Water Sufficient Village was the largest theme at Rs 2.80 crore [d1-15810], while Rs 2.48 crore had no theme assigned [d1-15810].\n\nThe records point to several checks for the next review. Entries with no sanctioning authority recorded accounted for 93.8% of the gap against plan [d1-15958]. The separate comparison against sanctions covers only about one in six activities [d3-01418]; on that basis, spending was Rs 37.43 lakh below sanction [d3-01418], with the gap more evenly split between the two blocks than the gap against plan [d3-01418][d3-01417]. Laxmipur had more activities with no planned cost recorded: 447 [d4-03300], against 248 in Boipariguda [d4-03300]. The share of spending linked to planned activities rose from 2.7% to 53.2% over the period [d2-00908], but that does not establish that total spending rose [d2-00908]. Koraput also did not follow the quarter-by-quarter rise in linked spending seen in most sampled districts [2-00245].\n\nKoraput differed from most sampled districts in how the figures were distributed across activity statuses and output codes. Its gaps against both plan and sanction were uneven across activity statuses [1-00565][1-00570], and voucher-linked spending showed no clear concentration in ongoing works [1-00492]. Codes 101 and 103 led on planned cost [1-00753] and ranked lowest on spending measured against plan [1-00598]; in most sampled districts, the corresponding pair was Codes 101 and 105 [1-00753][1-00598]. Code 101 also did not account for a majority of Koraput’s planned untied grant, unlike in most sampled districts [1-00434]."
+   ],
+   "run": 1
+  },
+  {
+   "id": "GEO-32",
+   "question": "Sundergarh district - what should I look at?",
+   "wrong_numbers_shown": [],
+   "tokens": {
+    "prompt": 4560,
+    "completion": 1398
+   },
+   "findings": 15,
+   "seconds": 24.9,
+   "attempts": 2,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "**Start by reconciling plans, sanctions and payments.** In the Sundargarh sample, recorded spending was Rs 2.19 crore below plan [d1-16661]: Rs 1.28 crore below in Karuabahal [d1-16661] and Rs 90.62 lakh below in Haldikudar [d1-16661]. Records with no sanctioning authority on file accounted for 82.8% of the gap [d1-16866]. Scheme information is also worth checking: records with no scheme on file accounted for 46.8% of planned cost [d1-16879]. Where sanctions were on file—about one in six activities [d1-16662]—spending was Rs 37.66 lakh below sanction [d1-16662], with the larger gap in Haldikudar (Rs 24.83 lakh) [d1-16662]. The share of spending linked to planned activities went from 2.7% [d2-00999] to 53.2% [d2-00999]; check the cashbook before reading that as an increase in spending [d2-00999].\n\n**Review drinking water and sanitation first, and check road allocations separately.** Drinking water and sanitation had the largest gaps against plan, at Rs 64.45 lakh [d1-16724] and Rs 55.17 lakh [d1-16724] below plan, respectively. They also had the largest gaps where sanctions were on file, with sanitation first (Rs 12.29 lakh below sanction) [d1-16725] and drinking water next (Rs 8.79 lakh below sanction) [d1-16725]. Self-sufficient Infrastructure in Village accounted for 52.9% of planned untied grants [d1-16697]. By focus area, roads had the largest planned untied-grant allocation (Rs 57.84 lakh) [d1-16718], followed by drinking water (Rs 35.67 lakh) [d1-16718]. Roads and drinking water also led voucher-linked spending, at Rs 39.90 lakh [d1-16722] and Rs 39.63 lakh [d1-16722], respectively.\n\n**Check how works, outputs and themes are classified.** Sundargarh differs from most sampled districts in how Maintenance and New/Fresh works rank for both planned untied grants and spending against plan [1-00777][1-00604]. It also differs in which output codes lead planned untied grants [1-00736]. For spending against plan, Sundargarh’s lowest-ranked outputs are Codes 101 and 104 [1-00597], rather than Codes 101 and 105 as in most sampled districts [1-00597]. Check the theme classifications as well: Sundargarh had the highest expected beneficiary count among sampled districts for activities without a mapped theme [1-03577].",
+   "measures": {
+    "findings_handed": 15,
+    "findings_used": 15,
+    "words": 306,
+    "sentences": 14,
+    "words_per_sentence": 21.9,
+    "longest_sentence_words": 32,
+    "long_sentences": 4,
+    "figures": 22,
+    "figures_per_sentence": 1.6,
+    "most_figures_in_a_sentence": 4,
+    "sentences_with_many_figures": 2,
+    "semicolons": 1,
+    "figures_handed": 77,
+    "figures_covered": 21,
+    "coverage": 0.273
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 11.0,
+     "finish_reason": "stop",
+     "completion_tokens": 678,
+     "reasoning_tokens": 58,
+     "failed_on": [
+      "4_all_findings_cited"
+     ]
+    },
+    {
+     "attempt": 2,
+     "seconds": 13.9,
+     "finish_reason": "stop",
+     "completion_tokens": 720,
+     "reasoning_tokens": 97,
+     "failed_on": []
+    }
+   ],
+   "attempt_prose": [
+    "Start by reconciling plans, sanctions and payments in the sampled Sundargarh Gram Panchayats. Recorded spending was Rs 2.19 crore below plan [d1-16661], with the larger gap in Karuabahal (Rs 1.28 crore below plan) [d1-16661], followed by Haldikudar (Rs 90.62 lakh below plan) [d1-16661]. Records with no sanctioning authority listed account for 82.8% of the plan gap (Rs 1.81 crore below plan) [d1-16866]. Separately, Rs 1.81 crore in planned costs has no scheme listed [d1-16879]. Check those missing entries before drawing conclusions about spending performance [d1-16866][d1-16879]. Where sanctions are on file—about one in six activities—the district was Rs 37.66 lakh below sanction [d1-16662], with the larger gap in Haldikudar (Rs 24.83 lakh below sanction) [d1-16662].\n\nFor the sector review, start with drinking water and sanitation. Drinking water had the largest gap against plan (Rs 64.45 lakh below plan) [d1-16724], followed by sanitation (Rs 55.17 lakh below plan) [d1-16724]. Among activities with sanctions on file, the order reverses: sanitation had the largest gap (Rs 12.29 lakh below sanction) [d1-16725], followed by drinking water (Rs 8.79 lakh below sanction) [d1-16725]. On the planning side, check roads and village infrastructure: Theme 6 – Self-sufficient Infrastructure in Village accounts for 52.9% of planned untied grants (Rs 1.37 crore) [d1-16697], and Roads is the largest focus area at 22.3% (Rs 57.84 lakh) [d1-16718].\n\nCheck the cashbook before interpreting the rise in spending linked to planned activities. The share linked to a plan rose from 2.7% to 53.2% across six fiscal years [d2-00999]. That shows more spending was linked to plans in the records; it does not establish that overall spending rose [d2-00999].\n\nAt the next review, check how works and outputs are classified. Sundargarh differs from most sampled districts in how Maintenance and New/Fresh works rank for planned untied grants and spending against plan [1-00777][1-00604]. Its lowest spending against plan by output type is recorded under Code 101 and Code 104 [1-00597], rather than Code 101 and Code 105 as in most sampled districts [1-00597]. Also check why some activities have no mapped development theme: in that group, Sundargarh recorded the highest expected beneficiary count among the sampled districts [1-03577].",
+    "**Start by reconciling plans, sanctions and payments.** In the Sundargarh sample, recorded spending was Rs 2.19 crore below plan [d1-16661]: Rs 1.28 crore below in Karuabahal [d1-16661] and Rs 90.62 lakh below in Haldikudar [d1-16661]. Records with no sanctioning authority on file accounted for 82.8% of the gap [d1-16866]. Scheme information is also worth checking: records with no scheme on file accounted for 46.8% of planned cost [d1-16879]. Where sanctions were on file—about one in six activities [d1-16662]—spending was Rs 37.66 lakh below sanction [d1-16662], with the larger gap in Haldikudar (Rs 24.83 lakh) [d1-16662]. The share of spending linked to planned activities went from 2.7% [d2-00999] to 53.2% [d2-00999]; check the cashbook before reading that as an increase in spending [d2-00999].\n\n**Review drinking water and sanitation first, and check road allocations separately.** Drinking water and sanitation had the largest gaps against plan, at Rs 64.45 lakh [d1-16724] and Rs 55.17 lakh [d1-16724] below plan, respectively. They also had the largest gaps where sanctions were on file, with sanitation first (Rs 12.29 lakh below sanction) [d1-16725] and drinking water next (Rs 8.79 lakh below sanction) [d1-16725]. Self-sufficient Infrastructure in Village accounted for 52.9% of planned untied grants [d1-16697]. By focus area, roads had the largest planned untied-grant allocation (Rs 57.84 lakh) [d1-16718], followed by drinking water (Rs 35.67 lakh) [d1-16718]. Roads and drinking water also led voucher-linked spending, at Rs 39.90 lakh [d1-16722] and Rs 39.63 lakh [d1-16722], respectively.\n\n**Check how works, outputs and themes are classified.** Sundargarh differs from most sampled districts in how Maintenance and New/Fresh works rank for both planned untied grants and spending against plan [1-00777][1-00604]. It also differs in which output codes lead planned untied grants [1-00736]. For spending against plan, Sundargarh’s lowest-ranked outputs are Codes 101 and 104 [1-00597], rather than Codes 101 and 105 as in most sampled districts [1-00597]. Check the theme classifications as well: Sundargarh had the highest expected beneficiary count among sampled districts for activities without a mapped theme [1-03577]."
+   ],
+   "run": 1
+  },
+  {
+   "id": "TWO-01",
+   "question": "Compare Kalimela and Bheden",
+   "wrong_numbers_shown": [],
+   "tokens": {
+    "prompt": 5934,
+    "completion": 1637
+   },
+   "findings": 18,
+   "seconds": 31.0,
+   "attempts": 2,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "Among the 6 [d3-02779] sampled Gram Panchayats recorded as not having a panchayat bhawan, Kalimela and Bheden planned almost the same number of activities: 852 [d3-02779] and 838 [d3-02779], respectively. Kalimela had more activities with a stated cost: 460 [d4-06154] versus 372 [d4-06154]. Its planned cost was higher at Rs 7.65 crore [d4-06156] versus Rs 7.22 crore [d4-06156], as was its sanctioned amount at Rs 2.08 crore [d4-06157] versus Rs 1.76 crore [d4-06157]. Recorded spending was closer: Rs 1.76 crore [d4-06158] in Kalimela and Rs 1.62 crore [d4-06158] in Bheden, leaving both well below plan—by Rs 5.90 crore [d4-06159] and Rs 5.60 crore [d4-06159], respectively.\n\nThe poverty alleviation programme is one place to reconcile plans with spending records: in each panchayat, the amount below plan matched the full planned cost—Rs 37.09 lakh [d1-22953][d1-22961] in Kalimela and Rs 36.50 lakh [d1-22953][d1-22961] in Bheden. Completion records also warrant a check: Kalimela accounted for all 13 [d3-02791] recorded completions in the group without a panchayat bhawan, while Bheden had none recorded [d3-02791]. Only 17 [d3-02791] completions were recorded in the entire sample, so these records offer a limited basis for comparing delivery [d3-02791].\n\nThe grant plans show different priorities. Kalimela’s largest planned untied allocation was for Water Sufficient Village, whereas Self-sufficient Infrastructure in Village led in 18/20 [1-01794] sampled panchayats. Bheden was the exception in tied-grant planning: Clean and Green Village and Self-sufficient Infrastructure in Village led, rather than Water Sufficient Village and Clean and Green Village [1-01838]. By focus area, Bheden prioritised Roads and Sanitation rather than Drinking water and Sanitation [1-01807]. General-component spending was Rs 2.07 crore [d1-35214] in Kalimela and Rs 1.72 crore [d1-35214] in Bheden. In Kalimela, Water Sufficient Village was the largest theme for that spending, followed by Self-sufficient Infrastructure in Village [d1-30922]. Kalimela also differed from the usual voucher-linked spending pattern: Code 101 [1-01837] and Code 104 [1-01837] led there, rather than Code 101 [1-01837] and Code 105 [1-01837].\n\nKalimela reported a larger population—10,681 people [d4-06110] versus 9,005 people [d4-06110]—and more wellbeing centres: 3 health facilities [d4-06131] versus 2 health facilities [d4-06131]. Both were in the group where office internet and computer readiness was marked “Not ready”; their reported Scheduled Tribe populations were 5,435 people [d4-01190] in Kalimela and 2,002 people [d4-01190] in Bheden.",
+   "measures": {
+    "findings_handed": 18,
+    "findings_used": 18,
+    "words": 343,
+    "sentences": 16,
+    "words_per_sentence": 21.4,
+    "longest_sentence_words": 35,
+    "long_sentences": 6,
+    "figures": 31,
+    "figures_per_sentence": 1.9,
+    "most_figures_in_a_sentence": 4,
+    "sentences_with_many_figures": 5,
+    "semicolons": 1,
+    "figures_handed": 93,
+    "figures_covered": 29,
+    "coverage": 0.312
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 12.0,
+     "finish_reason": "stop",
+     "completion_tokens": 628,
+     "reasoning_tokens": 225,
+     "failed_on": [
+      "2_numerals_cited",
+      "4_all_findings_cited"
+     ]
+    },
+    {
+     "attempt": 2,
+     "seconds": 19.0,
+     "finish_reason": "stop",
+     "completion_tokens": 1009,
+     "reasoning_tokens": 245,
+     "failed_on": []
+    }
+   ],
+   "attempt_prose": [
+    "Kalimela and Bheden planned nearly the same number of activities—852 and 838, respectively—among the Gram Panchayats marked “No” for panchayat bhawan in the sample.[d3-02779] Kalimela had more activities with a cost recorded (460 versus 372)[d4-06154] and a higher planned cost (Rs 7.65 crore versus Rs 7.22 crore).[d4-06156] Kalimela also had higher sanctions (Rs 2.08 crore versus Rs 1.76 crore)[d4-06157] and recorded spending (Rs 1.76 crore versus Rs 1.62 crore),[d4-06158] but its spending was further below plan (Rs 5.90 crore below plan versus Rs 5.60 crore below plan).[d4-06159]\n\nThe poverty alleviation programme is a specific area to reconcile: in both Panchayats, the recorded gap matched the full planned amount—Rs 37.09 lakh in Kalimela and Rs 36.50 lakh in Bheden.[d1-22953][d1-22961] Completion records also merit a check. Kalimela recorded 13 completions and Bheden recorded none, but only 17 were recorded in the entire sample. That makes the recorded difference a point to verify, not a reliable measure of delivery.[d3-02791]\n\nThe two Panchayats also differ in their grant plans. Kalimela planned its largest untied grant amount under Theme 4 – Water Sufficient Village, while Bheden followed the more common pattern of putting Theme 6 – Self-sufficient Infrastructure in Village first.[1-01794] For tied grants, Kalimela followed the common pattern of Drinking water and Sanitation leading by focus area; Bheden was the exception, with Roads and Sanitation leading.[1-01807]",
+    "Among the 6 [d3-02779] sampled Gram Panchayats recorded as not having a panchayat bhawan, Kalimela and Bheden planned almost the same number of activities: 852 [d3-02779] and 838 [d3-02779], respectively. Kalimela had more activities with a stated cost: 460 [d4-06154] versus 372 [d4-06154]. Its planned cost was higher at Rs 7.65 crore [d4-06156] versus Rs 7.22 crore [d4-06156], as was its sanctioned amount at Rs 2.08 crore [d4-06157] versus Rs 1.76 crore [d4-06157]. Recorded spending was closer: Rs 1.76 crore [d4-06158] in Kalimela and Rs 1.62 crore [d4-06158] in Bheden, leaving both well below plan—by Rs 5.90 crore [d4-06159] and Rs 5.60 crore [d4-06159], respectively.\n\nThe poverty alleviation programme is one place to reconcile plans with spending records: in each panchayat, the amount below plan matched the full planned cost—Rs 37.09 lakh [d1-22953][d1-22961] in Kalimela and Rs 36.50 lakh [d1-22953][d1-22961] in Bheden. Completion records also warrant a check: Kalimela accounted for all 13 [d3-02791] recorded completions in the group without a panchayat bhawan, while Bheden had none recorded [d3-02791]. Only 17 [d3-02791] completions were recorded in the entire sample, so these records offer a limited basis for comparing delivery [d3-02791].\n\nThe grant plans show different priorities. Kalimela’s largest planned untied allocation was for Water Sufficient Village, whereas Self-sufficient Infrastructure in Village led in 18/20 [1-01794] sampled panchayats. Bheden was the exception in tied-grant planning: Clean and Green Village and Self-sufficient Infrastructure in Village led, rather than Water Sufficient Village and Clean and Green Village [1-01838]. By focus area, Bheden prioritised Roads and Sanitation rather than Drinking water and Sanitation [1-01807]. General-component spending was Rs 2.07 crore [d1-35214] in Kalimela and Rs 1.72 crore [d1-35214] in Bheden. In Kalimela, Water Sufficient Village was the largest theme for that spending, followed by Self-sufficient Infrastructure in Village [d1-30922]. Kalimela also differed from the usual voucher-linked spending pattern: Code 101 [1-01837] and Code 104 [1-01837] led there, rather than Code 101 [1-01837] and Code 105 [1-01837].\n\nKalimela reported a larger population—10,681 people [d4-06110] versus 9,005 people [d4-06110]—and more wellbeing centres: 3 health facilities [d4-06131] versus 2 health facilities [d4-06131]. Both were in the group where office internet and computer readiness was marked “Not ready”; their reported Scheduled Tribe populations were 5,435 people [d4-01190] in Kalimela and 2,002 people [d4-01190] in Bheden."
+   ],
+   "run": 1
+  },
+  {
+   "id": "TWO-02",
+   "question": "How does Chikilli compare with Hirlipali?",
+   "wrong_numbers_shown": [],
+   "tokens": {
+    "prompt": 2483,
+    "completion": 839
+   },
+   "findings": 11,
+   "seconds": 15.8,
+   "attempts": 2,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "Chikilli recorded more spending under the general component than Hirlipali: Rs 1.63 crore across 640 activities [d1-29230], compared with Rs 1.30 crore across 777 activities [d1-30409]. Self-sufficient Infrastructure in Village was the largest spending theme in both, but it accounted for a larger share in Chikilli (46.9%, Rs 76.32 lakh) [d1-29230] than in Hirlipali (33.7%, Rs 43.89 lakh) [d1-30409]. The next-largest theme differed: Clean and Green Village in Chikilli (19.2%, Rs 31.28 lakh) [d1-29230] and Water Sufficient Village in Hirlipali (32.0%, Rs 41.67 lakh) [d1-30409]. Their grant plans were more alike: village infrastructure led planned untied grants in both [1-01794], and drinking water and sanitation led planned tied grants in both [1-01809].\n\nChikilli stood out in the sample on approvals and sanctions. It had the lowest sanctioned amount [1-01299] and the lowest proposed cost at sanction [1-01309] across all fiscal years. It also had the fewest activities with technical approval [1-01302] and with administrative approval [1-01305] in 5/6 fiscal years, with no clear pattern for either in 2023-2024 [1-01302][1-01305].\n\nFor the next review, the clearest difference to check is how Chikilli’s spending is distributed across fund components. Chikilli alone showed an uneven spread when spending was compared with plans [1-01728] and with sanctions [1-01733]; Hirlipali followed the even pattern on both measures [1-01728][1-01733]. Hirlipali also followed the usual pattern of having most of its sanctioned amount tied to ongoing works, while Chikilli showed no clear pattern by work status [1-01652].",
+   "measures": {
+    "findings_handed": 11,
+    "findings_used": 11,
+    "words": 223,
+    "sentences": 10,
+    "words_per_sentence": 22.3,
+    "longest_sentence_words": 31,
+    "long_sentences": 2,
+    "figures": 15,
+    "figures_per_sentence": 1.5,
+    "most_figures_in_a_sentence": 4,
+    "sentences_with_many_figures": 4,
+    "semicolons": 1,
+    "figures_handed": 25,
+    "figures_covered": 15,
+    "coverage": 0.6
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 8.0,
+     "finish_reason": "stop",
+     "completion_tokens": 400,
+     "reasoning_tokens": 34,
+     "failed_on": [
+      "4_all_findings_cited"
+     ]
+    },
+    {
+     "attempt": 2,
+     "seconds": 7.8,
+     "finish_reason": "stop",
+     "completion_tokens": 439,
+     "reasoning_tokens": 0,
+     "failed_on": []
+    }
+   ],
+   "attempt_prose": [
+    "Chikilli recorded more general-component spending than Hirlipali: Rs 1.63 crore [d1-29230] versus Rs 1.30 crore [d1-30409]. Village infrastructure was the largest spending theme in both, but it accounted for a larger share in Chikilli (46.9%) [d1-29230] than in Hirlipali (33.7%) [d1-30409]. Chikilli’s next-largest theme was Clean and Green Village (19.2%) [d1-29230], while Hirlipali spent nearly as much on Water Sufficient Village (32.0%) [d1-30409] as on infrastructure [d1-30409].\n\nDespite its higher recorded general-component spending [d1-29230][d1-30409], Chikilli had the lowest sanctioned amount and the lowest proposed cost at sanction in the sample in every fiscal year [1-01299][1-01309]. It also had the fewest activities with technical approval and the fewest with administrative approval in 5/6 fiscal years [1-01302][1-01305], with no clear pattern in 2023-2024 [1-01302][1-01305].\n\nThe clearest point for review is how spending is spread across fund components. Chikilli alone in the sample showed an uneven spread when spending was assessed against both plan and sanction; Hirlipali showed an even spread on both measures [1-01728][1-01733]. The sanction records also differ by work status: ongoing works accounted for most of Hirlipali’s sanctioned amount, while Chikilli showed no clear pattern [1-01652].",
+    "Chikilli recorded more spending under the general component than Hirlipali: Rs 1.63 crore across 640 activities [d1-29230], compared with Rs 1.30 crore across 777 activities [d1-30409]. Self-sufficient Infrastructure in Village was the largest spending theme in both, but it accounted for a larger share in Chikilli (46.9%, Rs 76.32 lakh) [d1-29230] than in Hirlipali (33.7%, Rs 43.89 lakh) [d1-30409]. The next-largest theme differed: Clean and Green Village in Chikilli (19.2%, Rs 31.28 lakh) [d1-29230] and Water Sufficient Village in Hirlipali (32.0%, Rs 41.67 lakh) [d1-30409]. Their grant plans were more alike: village infrastructure led planned untied grants in both [1-01794], and drinking water and sanitation led planned tied grants in both [1-01809].\n\nChikilli stood out in the sample on approvals and sanctions. It had the lowest sanctioned amount [1-01299] and the lowest proposed cost at sanction [1-01309] across all fiscal years. It also had the fewest activities with technical approval [1-01302] and with administrative approval [1-01305] in 5/6 fiscal years, with no clear pattern for either in 2023-2024 [1-01302][1-01305].\n\nFor the next review, the clearest difference to check is how Chikilli’s spending is distributed across fund components. Chikilli alone showed an uneven spread when spending was compared with plans [1-01728] and with sanctions [1-01733]; Hirlipali followed the even pattern on both measures [1-01728][1-01733]. Hirlipali also followed the usual pattern of having most of its sanctioned amount tied to ongoing works, while Chikilli showed no clear pattern by work status [1-01652]."
+   ],
+   "run": 1
+  },
+  {
+   "id": "TWO-03",
+   "question": "Compare Khordha and Cuttack districts",
+   "wrong_numbers_shown": [],
+   "tokens": {
+    "prompt": 4558,
+    "completion": 1223
+   },
+   "findings": 19,
+   "seconds": 23.4,
+   "attempts": 2,
+   "lost": false,
+   "lost_on": [],
+   "reason": "",
+   "tagged": "In the sample, Khordha recorded higher spending and a smaller gap against plan than Cuttack.[d4-02973][d4-02525][d3-01293][d3-01105] Across 3 Gram Panchayats in Khordha,[d4-02973] recorded spending was Rs 3.33 crore[d4-02973] against a planned cost of Rs 5.95 crore,[d3-01290] with spending Rs 2.63 crore below plan.[d3-01293] Across 2 Gram Panchayats in Cuttack,[d4-02525] recorded spending was Rs 2.17 crore[d4-02525] against a planned cost of Rs 5.35 crore,[d3-01102] with spending Rs 3.18 crore below plan.[d3-01105] Spending linked to planned activities was also higher in Khordha, at Rs 3.26 crore,[d2-00838] compared with Rs 2.07 crore in Cuttack.[d2-00719]\n\nFor a review of spending against plan, Govindapur stands out in Cuttack: it had the higher planned cost,[d3-01102] but Dadhapatna recorded more spending.[d4-02525] Govindapur accounted for Rs 2.07 crore of Cuttack’s gap.[d3-01105] In Khordha, Andhrua led on both planned cost and spending,[d3-01290][d4-02973] and had the largest gap at Rs 1.02 crore,[d3-01293] followed by Itipur at Rs 90.99 lakh.[d3-01293]\n\nThe two districts also differ in which work categories stand out. In Cuttack, New/Fresh works had the highest planned cost,[1-00693] planned tied-grant allocation,[1-00661] sanctioned amount,[1-00658] and voucher-linked spending,[1-00695] but ranked lowest on spending against plan.[1-00719] Khordha did not follow any of those New/Fresh patterns.[1-00693][1-00661][1-00658][1-00695][1-00719] By output type, Code 101 led voucher-linked spending in Cuttack but not in Khordha.[1-00651] Code 101 also ranked lowest in Cuttack on spending against both plan and sanction; in Khordha, Code 105 ranked lowest on both measures.[1-00707][1-00709]\n\nBoth districts share two broader patterns in the sample: drinking water and sanitation lead in planned tied-grant allocations,[1-00725] and ongoing works account for most voucher-linked spending.[1-00492] Cuttack, unlike Khordha, did not follow the pattern of rising spending linked to planned activities across calendar quarters.[2-00245]",
+   "measures": {
+    "findings_handed": 19,
+    "findings_used": 19,
+    "words": 273,
+    "sentences": 14,
+    "words_per_sentence": 19.5,
+    "longest_sentence_words": 27,
+    "long_sentences": 4,
+    "figures": 16,
+    "figures_per_sentence": 1.1,
+    "most_figures_in_a_sentence": 4,
+    "sentences_with_many_figures": 2,
+    "semicolons": 1,
+    "figures_handed": 61,
+    "figures_covered": 14,
+    "coverage": 0.23
+   },
+   "checks": [
+    {
+     "attempt": 1,
+     "seconds": 9.5,
+     "finish_reason": "stop",
+     "completion_tokens": 526,
+     "reasoning_tokens": 65,
+     "failed_on": [
+      "4_all_findings_cited"
+     ]
+    },
+    {
+     "attempt": 2,
+     "seconds": 13.9,
+     "finish_reason": "stop",
+     "completion_tokens": 697,
+     "reasoning_tokens": 71,
+     "failed_on": []
+    }
+   ],
+   "attempt_prose": [
+    "In the sample, Khordha recorded higher spending and a smaller gap against plan than Cuttack. Across 3 sampled Gram Panchayats, Khordha spent Rs 3.33 crore [d4-02973] against a planned cost of Rs 5.95 crore [d3-01290], leaving spending Rs 2.63 crore below plan [d3-01293]. Across 2 sampled Gram Panchayats, Cuttack spent Rs 2.17 crore [d4-02525] against a planned cost of Rs 5.35 crore [d3-01102], leaving spending Rs 3.18 crore below plan [d3-01105].\n\nThe local records point to different review priorities. In Cuttack, Govindapur had the higher planned cost [d3-01102] and the larger gap, at Rs 2.07 crore below plan [d3-01105], while Dadhapatna recorded the higher spending [d4-02525]. In Khordha, Andhrua had both the highest spending [d4-02973] and the largest gap, at Rs 1.02 crore below plan [d3-01293], followed by Itipur at Rs 90.99 lakh below plan [d3-01293].\n\nKhordha also warrants a closer look at which work categories account for spending gaps. Unlike Cuttack, it did not follow the common pattern in which New/Fresh works had the highest planned cost and the lowest spending relative to plan [1-00693][1-00719]. Khordha’s lowest spending relative to both plan and sanction was under Code 105, rather than Code 101 as in Cuttack [1-00707][1-00709]. In Cuttack, a separate check is whether vouchers are consistently linked to planned activities: it did not show the quarter-by-quarter increase in linked spending seen in Khordha and most sampled districts [2-00245]. Linked spending reflects how completely payments are matched to plans and should be checked against cashbook totals before drawing conclusions about changes in actual spending [d2-00719][d2-00838].",
+    "In the sample, Khordha recorded higher spending and a smaller gap against plan than Cuttack.[d4-02973][d4-02525][d3-01293][d3-01105] Across 3 Gram Panchayats in Khordha,[d4-02973] recorded spending was Rs 3.33 crore[d4-02973] against a planned cost of Rs 5.95 crore,[d3-01290] with spending Rs 2.63 crore below plan.[d3-01293] Across 2 Gram Panchayats in Cuttack,[d4-02525] recorded spending was Rs 2.17 crore[d4-02525] against a planned cost of Rs 5.35 crore,[d3-01102] with spending Rs 3.18 crore below plan.[d3-01105] Spending linked to planned activities was also higher in Khordha, at Rs 3.26 crore,[d2-00838] compared with Rs 2.07 crore in Cuttack.[d2-00719]\n\nFor a review of spending against plan, Govindapur stands out in Cuttack: it had the higher planned cost,[d3-01102] but Dadhapatna recorded more spending.[d4-02525] Govindapur accounted for Rs 2.07 crore of Cuttack’s gap.[d3-01105] In Khordha, Andhrua led on both planned cost and spending,[d3-01290][d4-02973] and had the largest gap at Rs 1.02 crore,[d3-01293] followed by Itipur at Rs 90.99 lakh.[d3-01293]\n\nThe two districts also differ in which work categories stand out. In Cuttack, New/Fresh works had the highest planned cost,[1-00693] planned tied-grant allocation,[1-00661] sanctioned amount,[1-00658] and voucher-linked spending,[1-00695] but ranked lowest on spending against plan.[1-00719] Khordha did not follow any of those New/Fresh patterns.[1-00693][1-00661][1-00658][1-00695][1-00719] By output type, Code 101 led voucher-linked spending in Cuttack but not in Khordha.[1-00651] Code 101 also ranked lowest in Cuttack on spending against both plan and sanction; in Khordha, Code 105 ranked lowest on both measures.[1-00707][1-00709]\n\nBoth districts share two broader patterns in the sample: drinking water and sanitation lead in planned tied-grant allocations,[1-00725] and ongoing works account for most voucher-linked spending.[1-00492] Cuttack, unlike Khordha, did not follow the pattern of rising spending linked to planned activities across calendar quarters.[2-00245]"
+   ],
+   "run": 1
+  }
+ ]
+}

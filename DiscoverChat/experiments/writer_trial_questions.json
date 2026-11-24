@@ -3,7 +3,8 @@
   "sources": {
     "live 2026-11-23": "Questions asked of the running service on 2026-11-23, on the current models.",
     "WP-D13b trial": "The fifteen questions of the WP-D13b headline trial (also used for the Fix 1 and Fix 6 live runs).",
-    "D5.1 set": "From experiments/questions.json, the WP-D5 question set: twelve of its 34 place questions (six Gram Panchayats, three blocks, three districts) and every measure, vague and open question not already in the trial fifteen."
+    "D5.1 set": "From experiments/questions.json, the WP-D5 question set: twelve of its 34 place questions (six Gram Panchayats, three blocks, three districts) and every measure, vague and open question not already in the trial fifteen.",
+    "WP-D15 two places": "Three questions that name two places (two blocks through ruling R4, two Gram Panchayats, two districts), added for the WP-D15 trial's two-place answers."
   },
   "questions": [
     {"id": "L01", "source": "live 2026-11-23", "question": "What should I know about Kandhamal?"},
@@ -60,6 +61,10 @@
 
     {"id": "OPN-01", "source": "D5.1 set", "question": "How is GPDP implementation going under XV FC?"},
     {"id": "OPN-02", "source": "D5.1 set", "question": "Are the ODF and SBM works progressing?"},
-    {"id": "OPN-03", "source": "D5.1 set", "question": "Is drinking water getting its share of the money?"}
+    {"id": "OPN-03", "source": "D5.1 set", "question": "Is drinking water getting its share of the money?"},
+
+    {"id": "TWO-01", "source": "WP-D15 two places", "question": "Compare Kalimela and Bheden"},
+    {"id": "TWO-02", "source": "WP-D15 two places", "question": "How does Chikilli compare with Hirlipali?"},
+    {"id": "TWO-03", "source": "WP-D15 two places", "question": "Compare Khordha and Cuttack districts"}
   ]
 }

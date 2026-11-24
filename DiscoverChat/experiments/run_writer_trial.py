@@ -44,6 +44,20 @@ WHAT IT REPORTS, per answer and as middle values over the run:
 
 Output: experiments/writer_trials/<label>.json and <label>.md (the answers, to
 read). --compare writes <a>_vs_<b>[_vs_<c>...].md.
+
+WP-D15 -- PLACE FACTS, THE WAY THE SERVICE HANDS THEM:
+  --sheets        each turn goes through the service's own `Assembler.answer`,
+                  with search and the judge replaced by the held picks: the
+                  places are resolved, the sheet lines handed, the insights
+                  capped, the check run and the fall-back built by the shipped
+                  code (T1-T4) -- nothing of it is copied here
+  --place-only    only the held questions that name a place (resolved by the
+                  shipped `place.resolve`)
+  --repeats N     each question written N times
+  --ask TEXT ...  extra questions with no held findings (a place question the
+                  judge kept nothing for), --sheets only
+Every answer is also re-read by a second, independent pass: each numeral it
+shows must stand in the stored sentence of a record tagged in its sentence.
 """
 from __future__ import annotations
 
@@ -172,8 +186,14 @@ def run_one(entry: dict, findings: list, stamp: str, label: str,
         attempts.append(item)
 
     last = attempts[-1]["prose"] if attempts else ""
+    wrong = ([] if out.fell_back else second_pass(
+        out.tagged, findings,
+        stamp + "\n" + context_brief.for_consolidating_writer()))
     return {
         "id": entry["id"], "question": entry["question"],
+        "wrong_numbers_shown": wrong,
+        "tokens": {"prompt": sum(c["prompt_tokens"] for c in calls),
+                   "completion": sum(c["completion_tokens"] for c in calls)},
         "findings": len(findings),
         "seconds": seconds,
         "attempts": out.attempts,
@@ -186,6 +206,222 @@ def run_one(entry: dict, findings: list, stamp: str, label: str,
         # still evidence of how the wording made the model write.
         "measures": measure(out.tagged or last, findings) if (out.tagged
                                                              or last) else None,
+        "checks": [{k: v for k, v in a.items() if k != "prose"}
+                   for a in attempts],
+        "attempt_prose": [a["prose"] for a in attempts],
+    }
+
+
+# ── WP-D15: the second pass, independent of the check ────────────────────────
+# Written apart from `checks` on purpose: a fault in the check's tokeniser or
+# sentence split must not be able to hide here too. Same rule, separate code:
+# every numeral the officer is shown stands in the stored sentence of a record
+# tagged in its sentence (a tag just after a full stop belongs to the sentence
+# it follows). Equal forms: a dash for a hyphen, "100.0" for "100", and a
+# fiscal year short or long when its two years are consecutive.
+
+_SP_DASH = {"\u2013": "-", "\u2014": "-", "\u2010": "-", "\u2011": "-"}
+_SP_TAG = re.compile(r"\[([^\[\]\n]{1,60})\]")
+_SP_NUM = re.compile(r"\d{4}-\d{2,4}|\d[\d,]*(?:\.\d+)?")
+
+
+def _sp_forms(token: str) -> set:
+    token = token.rstrip(",")
+    out = {token}
+    if token.endswith(".0"):
+        out.add(token[:-2])
+    if re.fullmatch(r"\d{4}-\d{2}", token):
+        y = int(token[:4])
+        if (y + 1) % 100 == int(token[5:]):
+            out.add(f"{y}-{y + 1}")
+    if re.fullmatch(r"\d{4}-\d{4}", token):
+        if int(token[5:]) == int(token[:4]) + 1:
+            out.add(f"{token[:4]}-{token[7:]}")
+    return out
+
+
+def _sp_tokens(text: str) -> list:
+    text = "".join(_SP_DASH.get(c, c) for c in text)
+    return [t.rstrip(",") for t in _SP_NUM.findall(text)]
+
+
+def second_pass(tagged: str, records: list, exempt_text: str) -> list:
+    """[{token, sentence}] for every numeral shown that no tagged record
+    holds. [] = no wrong number."""
+    stored = {}
+    for record in records:
+        forms = set()
+        for t in _sp_tokens(record.sentence):
+            forms |= _sp_forms(t)
+        stored[record.id] = forms
+    exempt = set()
+    for t in _sp_tokens(exempt_text):
+        exempt |= _sp_forms(t)
+    protected = re.sub(r"(\d)\.(\d)", "\\1\x00\\2", tagged or "")
+    pieces = [p.replace("\x00", ".") for p in re.split(r"(?<=[.!?])\s+", protected)
+              if p.strip()]
+    sentences = []
+    for piece in pieces:
+        lead = re.match(r"^((?:\s*\[[^\[\]\n]{1,60}\])+)\s*(.*)$", piece, re.S)
+        if lead and sentences:
+            sentences[-1] += " " + lead.group(1)
+            if lead.group(2).strip():
+                sentences.append(lead.group(2))
+        else:
+            sentences.append(piece)
+    wrong = []
+    for sentence in sentences:
+        tags = [t.strip() for t in _SP_TAG.findall(sentence)]
+        held = set()
+        for tag in tags:
+            held |= stored.get(tag, set())
+        for token in _sp_tokens(_SP_TAG.sub(" ", sentence)):
+            if _sp_forms(token) & (held | exempt):
+                continue
+            wrong.append({"token": token, "sentence": sentence})
+    return wrong
+
+
+def fallback_lines_wrong(text: str, findings: list, facts: list) -> list:
+    """A lost answer shows stored sentences verbatim. Every bullet line must
+    be one, word for word."""
+    stored = {f.display_sentence() for f in findings} | {f.sentence for f in facts}
+    bad = []
+    for line in text.splitlines():
+        if line.startswith("- ") and line[2:] not in stored:
+            bad.append(line)
+    return bad
+
+
+# ── WP-D15: one turn through the service ─────────────────────────────────────
+
+class ServiceTurns:
+    """The service's own Assembler, with search and the judge replaced by the
+    held picks and the router by the held route. Nothing of T1-T4 is copied:
+    `Assembler.answer` resolves the places, hands the lines, caps the insights,
+    runs the check and builds the fall-back."""
+
+    def __init__(self):
+        from types import SimpleNamespace
+        from DiscoverChat import assemble, classifier, place
+        from DiscoverChat.retrieval import Hit, Result
+        from DiscoverChat.slots import SlotExtractor
+        self.assemble, self.classifier, self.place = assemble, classifier, place
+        self.Hit, self.Result = Hit, Result
+        self.extractor = SlotExtractor()
+        store, why = place.open_store()
+        if store is None:
+            raise SystemExit(f"STOP: no profile sheet store: {why}")
+        self.store = store
+        self.assembler = assemble.Assembler(
+            SimpleNamespace(corpus=SimpleNamespace(all=lambda: [])),
+            allow_model=True, use_judge=False, sheets=store)
+        self.turns = {}
+        self.assembler._retrieve = lambda message, turn_id=None: (
+            self.turns[message][0], {"used": True, "held": True})
+        assemble.classifier.classify = lambda message, history, **kw: \
+            classifier.Routing(move=self.turns[message][1], source="held",
+                               reason="the held route")
+
+    def names_a_place(self, question: str) -> bool:
+        geo = self.extractor.geography(question)
+        return bool(self.place.resolve(question, geo["mentions"],
+                                       self.store).places)
+
+    def add(self, entry: dict, findings: list) -> None:
+        slots = self.extractor.extract(entry["question"])
+        result = self.Result(
+            slots=slots,
+            hits=[self.Hit(finding=f, cosine=0.0, boost=0.0, score=0.0)
+                  for f in findings],
+            considered=len(findings), best_cosine=0.0,
+            threshold=config.CANDIDATE_FLOOR, collapsed_count=0)
+        move = (entry.get("route") or {}).get("move") or "retrieve"
+        self.turns[entry["question"]] = (result, move)
+
+    def answer(self, question: str, turn_id: str):
+        return self.assembler.answer(question, turn_id=turn_id)
+
+
+def _standing_line(fact) -> bool:
+    return bool(checks.standing_phrases(fact.sentence))
+
+
+def run_one_service(entry: dict, findings: list, stamp: str, label: str,
+                    run: int, counter, service: ServiceTurns) -> dict:
+    turn_id = f"wt-{label}-{entry['id']}-r{run}"
+    started = time.time()
+    answer = service.answer(entry["question"], turn_id)
+    seconds = round(time.time() - started, 1)
+
+    calls = counter.for_turn(turn_id, "write")
+    results = iter(answer.prose.get("citation_checks", []))
+    attempts = []
+    for call in calls:
+        prose = (call["response_text"] or "").strip()
+        item = {"attempt": call["attempt"], "seconds": call["seconds"],
+                "finish_reason": call["finish_reason"],
+                "prompt_tokens": call["prompt_tokens"],
+                "completion_tokens": call["completion_tokens"],
+                "reasoning_tokens": call["reasoning_tokens"],
+                "prose": prose}
+        checked = next(results, {}) if prose else {}
+        item["failed_on"] = _failed_on(checked) if prose else ["empty reply"]
+        standing = checked.get("6_standing") or {}
+        item["standing_failures"] = [
+            {"phrase": f["phrase"], "sentence": f["sentence"],
+             "cited_place_facts": f["cited_place_facts"]}
+            for f in standing.get("failures", [])]
+        item["standing_counts"] = standing.get("counts")
+        attempts.append(item)
+
+    lost = not answer.prose.get("used")
+    facts = answer.place_facts
+    by_id = {f.id: f for f in facts}
+    place = answer.place or {}
+    used = place.get("lines_used", [])
+    shown_findings = answer.findings
+    if not lost:
+        wrong = second_pass(answer.tagged_text, list(shown_findings) + facts,
+                            stamp + "\n" + context_brief.for_consolidating_writer())
+        fallback_bad = []
+    else:
+        wrong = []
+        fallback_bad = fallback_lines_wrong(answer.text, shown_findings, facts)
+    steps = (answer.prose.get("citation_checks") or [{}])[-1] if not lost else {}
+    words7 = (steps.get("7_number_words") or {}).get("sentences", [])
+    cited_findings = (set(checks.cited_ids(answer.tagged_text))
+                      & {f.id for f in shown_findings}) if not lost else set()
+    by_year = (not lost
+               and any(by_id[i].row == "B" for i in used if i in by_id)
+               and any(f.view == "view2" for f in shown_findings
+                       if f.id in cited_findings))
+    last = attempts[-1]["prose"] if attempts else ""
+    return {
+        "id": entry["id"], "run": run, "question": entry["question"],
+        "findings": len(shown_findings),
+        "findings_held": len(findings),
+        "seconds": seconds,
+        "attempts": len(calls),
+        "lost": lost,
+        "lost_on": (attempts[-1]["failed_on"] if lost and attempts
+                    else (["writer call failed"] if lost else [])),
+        "reason": answer.prose.get("reason", ""),
+        "tagged": answer.tagged_text,
+        "shown_text": answer.text,
+        "place": place,
+        "lines_used_rows": [by_id[i].row for i in used if i in by_id],
+        "uses_A6": any(by_id[i].row == "A6" for i in used if i in by_id),
+        "uses_standing_line": any(_standing_line(by_id[i]) for i in used
+                                  if i in by_id),
+        "wrong_numbers_shown": wrong,
+        "fallback_lines_not_verbatim": fallback_bad,
+        "number_words_shown": words7,
+        "two_year_series": by_year,
+        "measures": (measure(answer.tagged_text or last, shown_findings)
+                     if (answer.tagged_text or last) else None),
+        "tokens": {"prompt": sum(c["prompt_tokens"] for c in calls),
+                   "completion": sum(c["completion_tokens"] for c in calls)},
         "checks": [{k: v for k, v in a.items() if k != "prose"}
                    for a in attempts],
         "attempt_prose": [a["prose"] for a in attempts],
@@ -269,11 +505,29 @@ def main(argv=None) -> int:
                              "out some of the findings")
     parser.add_argument("--only", nargs="+", default=[], metavar="ID")
     parser.add_argument("--sample", type=int, metavar="N")
+    parser.add_argument("--sheets", action="store_true",
+                        help="hand place facts the way the service does "
+                             "(WP-D15), through Assembler.answer")
+    parser.add_argument("--place-only", action="store_true",
+                        help="only the held questions that name a place")
+    parser.add_argument("--repeats", type=int, default=1, metavar="N",
+                        help="write each answer N times")
+    parser.add_argument("--ask", nargs="+", default=[], metavar="TEXT",
+                        help="extra questions with no held findings "
+                             "(--sheets only)")
     parser.add_argument("--workers", type=int, default=12)
     parser.add_argument("--compare", nargs="+", metavar="LABEL",
                         help="write one file putting two or more finished "
                              "runs side by side, and stop")
+    parser.add_argument("--ask-only", action="store_true",
+                        help="run the --ask questions and no held one")
+    parser.add_argument("--out-dir", metavar="DIR",
+                        help="where the run's files go (default "
+                             "experiments/writer_trials)")
     args = parser.parse_args(argv)
+    if args.out_dir:
+        global OUT_DIR
+        OUT_DIR = Path(args.out_dir).resolve()
 
     if args.compare:
         if len(args.compare) < 2:
@@ -307,21 +561,45 @@ def main(argv=None) -> int:
         print(f"STOP: {exc}")
         return 1
     rows = pick(rows, args.only, args.sample)
+    if args.ask and not args.sheets:
+        parser.error("--ask needs --sheets")
+    service = ServiceTurns() if (args.sheets or args.place_only) else None
+    if args.place_only:
+        rows = [r for r in rows if service.names_a_place(r[0]["question"])]
+    if args.ask_only:
+        rows = []
+    rows += [({"id": f"ASK-{i}", "source": "--ask", "question": text,
+               "route": {"move": "retrieve"}}, [])
+             for i, text in enumerate(args.ask, start=1)]
     if not rows:
         print("STOP: no held question to run. Build the held set first.")
         return 1
     stamp = config.run_stamp_line()
+    jobs = [(row, run) for run in range(1, args.repeats + 1) for row in rows]
 
-    counter = held_picks.CallCounter(llm, cap=2 * len(rows))
-    print(f"{len(rows)} question(s); writer {config.WRITER_MODEL}; prompt: "
+    counter = held_picks.CallCounter(llm, cap=2 * len(jobs))
+    print(f"{len(rows)} question(s) x {args.repeats}; writer "
+          f"{config.WRITER_MODEL}; prompt: "
           f"{prompt_source}; budget {config.WRITER_MAX_COMPLETION}; causal "
-          f"{config.CAUSAL_CHECK}, direction {config.DIRECTION_CHECK}; "
+          f"{config.CAUSAL_CHECK}, direction {config.DIRECTION_CHECK}, "
+          f"standing {config.STANDING_CHECK}; place facts "
+          f"{'ON (as the service)' if args.sheets else 'off'}; "
           f"every-finding rule "
           f"{'OFF (test only)' if args.allow_unused_findings else 'on'}")
-    with ThreadPoolExecutor(max(1, min(args.workers, len(rows)))) as pool:
-        results = list(pool.map(
-            lambda row: run_one(row[0], row[1], stamp, args.label, counter),
-            rows))
+    if args.sheets:
+        for row, _ in jobs:
+            service.add(row[0], row[1])
+        work = (lambda job: run_one_service(job[0][0], job[0][1], stamp,
+                                            args.label, job[1], counter,
+                                            service))
+    else:
+        work = (lambda job: dict(run_one(job[0][0], job[0][1], stamp,
+                                         args.label + (f"-r{job[1]}"
+                                                       if args.repeats > 1
+                                                       else ""), counter),
+                                 run=job[1]))
+    with ThreadPoolExecutor(max(1, min(args.workers, len(jobs)))) as pool:
+        results = list(pool.map(work, jobs))
 
     out = {
         "label": args.label,
@@ -336,6 +614,11 @@ def main(argv=None) -> int:
                                else "on"),
         "causal_mode": config.CAUSAL_CHECK,
         "direction_mode": config.DIRECTION_CHECK,
+        "standing_mode": config.STANDING_CHECK,
+        "place_facts": "on (as the service)" if args.sheets else "off",
+        "insight_cap_with_sheet": (config.PROFILE_INSIGHT_CAP if args.sheets
+                                   else None),
+        "repeats": args.repeats,
         "held_set": {"updated_at": held.get("updated_at"),
                      "corpus": held.get("corpus")},
         "summary": summarise(results),
@@ -418,7 +701,16 @@ def _answer_block(r: dict) -> list:
                                  if r["attempt_prose"] else "")
     else:
         text = checks.strip_tags(r["tagged"])
+    if r.get("place"):
+        lines.append(f"- place facts used ({len(r['place'].get('lines_used', []))}"
+                     f" of {r['place'].get('lines_offered')}): "
+                     + (", ".join(r.get("lines_used_rows", [])) or "none"))
+    if r.get("wrong_numbers_shown"):
+        lines.append(f"- **WRONG NUMBERS SHOWN**: {r['wrong_numbers_shown']}")
     lines += ["", text or "(nothing written)", ""]
+    if r["lost"] and r.get("shown_text"):
+        lines += ["What the officer sees instead:", "", "```",
+                  r["shown_text"], "```", ""]
     return lines
 
 
@@ -430,8 +722,9 @@ def write_report(out: dict) -> Path:
     lines += [f"| {name} | {value} |" for name, value in _summary_rows(out)]
     lines += ["", "## The instructions the writer was given", "",
               "```", out["prompt_text"], "```", "", "## The answers", ""]
-    for r in out["results"]:
-        lines += [f"### {r['id']} - {r['question']}", ""] + _answer_block(r)
+    for r in sorted(out["results"], key=lambda r: (r["id"], r.get("run", 1))):
+        run = f" (run {r['run']})" if out.get("repeats", 1) > 1 else ""
+        lines += [f"### {r['id']}{run} - {r['question']}", ""] + _answer_block(r)
     path = OUT_DIR / f"{out['label']}.md"
     path.write_text("\n".join(lines), encoding="utf-8")
     return path
