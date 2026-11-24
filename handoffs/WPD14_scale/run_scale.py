@@ -18,6 +18,11 @@
    memory added by opening the store, sheets written.
 4. CHECK: checks 2, 3, 5 and 6 on the made-up store.
 
+WP-D14b T5: the lookup processes also time `place()` and `find()` (the first
+find at a level builds that level's name map, and is timed apart from a
+repeat), and measure memory after opening and after the first find at every
+level. Opening is reported on its own line; it has no target (spec §8.1).
+
 Writes `measurements.json` beside this script; no data.
 """
 from __future__ import annotations
@@ -138,18 +143,32 @@ import json, os, sys, time, psutil
 sys.path.insert(0, sys.argv[1])
 proc = psutil.Process()
 from DiscoverChat.profile_store import ProfileStore
+level, code = sys.argv[3], sys.argv[4]
 rss0 = proc.memory_info().rss
 t0 = time.perf_counter()
 store = ProfileStore(sys.argv[2], allow_synthetic=True)
 store.verify()
 t1 = time.perf_counter()
-sheet = store.get(sys.argv[3], sys.argv[4])
+rss_open = proc.memory_info().rss
+sheet = store.get(level, code)
 t2 = time.perf_counter()
-rss1 = proc.memory_info().rss
-assert sheet is not None and sheet["code"] == sys.argv[4]
+place = store.place(level, code)
+t3 = time.perf_counter()
+found = store.find(level, place["name"])      # first find at this level
+t4 = time.perf_counter()
+again = store.find(level, place["name"])      # the map is built: a repeat
+t5 = time.perf_counter()
+assert sheet is not None and sheet["code"] == code
+assert place["code"] == code and code in found and found == again
+for lv in ("all", "district", "block", "gp"):  # first find at every level
+    store.find(lv, "no such place")
+rss_finds = proc.memory_info().rss
 print(json.dumps({"open_ms": (t1 - t0) * 1e3, "get_ms": (t2 - t1) * 1e3,
-                  "rss_added_mb": (rss1 - rss0) / 2**20,
-                  "sentences": len(sheet["sentences"])}))
+                  "place_ms": (t3 - t2) * 1e3, "find_first_ms": (t4 - t3) * 1e3,
+                  "find_ms": (t5 - t4) * 1e3,
+                  "rss_open_mb": (rss_open - rss0) / 2**20,
+                  "rss_after_finds_mb": (rss_finds - rss0) / 2**20,
+                  "found": len(found), "sentences": len(sheet["sentences"])}))
 """
 
 
@@ -239,31 +258,33 @@ def main() -> int:
         "n": len(runs),
         "levels": {lv: sum(1 for k in sample if k[0] == lv)
                    for lv in ("all", "district", "block", "gp")},
-        "get_ms_median": round(statistics.median(r["get_ms"] for r in runs), 2),
-        "get_ms_p95": round(pct([r["get_ms"] for r in runs], 0.95), 2),
-        "get_ms_max": round(max(r["get_ms"] for r in runs), 2),
-        "open_ms_median": round(statistics.median(r["open_ms"] for r in runs), 1),
-        "open_ms_p95": round(pct([r["open_ms"] for r in runs], 0.95), 1),
-        "open_plus_get_ms_p95": round(pct([r["open_ms"] + r["get_ms"]
-                                           for r in runs], 0.95), 1),
-        "rss_added_mb_median": round(statistics.median(r["rss_added_mb"]
-                                                       for r in runs), 1),
-        "rss_added_mb_max": round(max(r["rss_added_mb"] for r in runs), 1),
         "seconds": round(time.perf_counter() - t, 1),
+        "found_more_than_one": sum(1 for r in runs if r["found"] > 1),
     }
+    for key, nd in (("get_ms", 2), ("place_ms", 3), ("find_first_ms", 2),
+                    ("find_ms", 4), ("open_ms", 1), ("rss_open_mb", 1),
+                    ("rss_after_finds_mb", 1)):
+        vals = [r[key] for r in runs]
+        m["lookups"][f"{key}_median"] = round(statistics.median(vals), nd)
+        m["lookups"][f"{key}_p95"] = round(pct(vals, 0.95), nd)
+        m["lookups"][f"{key}_max"] = round(max(vals), nd)
     m["method"]["lookup"] = (
         f"{len(runs)} keys drawn uniformly (seed {SEED}) from all sheet keys. "
         "Each in its own new Python process: import the reader, open the store "
         "(`verify()`: read the stamp, SHA-256 every file, load the index), then "
-        "time `get(level, code)` alone with perf_counter. `get_ms` is the "
-        "lookup; `open_ms` is the one-off open a service pays once at start, "
-        "reported separately. The OS file cache is warm after the first "
-        "process (the store is read by each open's hash pass).")
+        "time `get(level, code)`, then `place(level, code)`, then "
+        "`find(level, <its name>)` twice, each alone with perf_counter. The "
+        "first find at a level builds that level's name map, so "
+        "`find_first_ms` includes it and `find_ms` is a repeat. `open_ms` is "
+        "the one-off open a service pays once at start, reported separately "
+        "with no target (spec §8.1, D77). The OS file cache is warm after the "
+        "first process (the store is read by each open's hash pass).")
     m["method"]["memory"] = (
-        "psutil RSS in the same fresh process: after importing the reader, "
-        "before opening; and after `verify()` plus one `get()`. The "
-        "difference is the memory added by opening the store and reading one "
-        "sheet. Median and maximum over the lookup processes.")
+        "psutil RSS in the same fresh process, against the RSS after importing "
+        "the reader and before opening: `rss_open_mb` right after `verify()`; "
+        "`rss_after_finds_mb` after one get, one place, and the first `find` "
+        "at every one of the four levels (all four name maps built). Median, "
+        "p95 and maximum over the lookup processes.")
     print(json.dumps(m["lookups"], indent=1))
 
     # ── checks 2, 3, 5, 6 on the made-up store ──────────────────────────────
@@ -281,9 +302,16 @@ def main() -> int:
         "build under 10 minutes": m["build_seconds"] < 600,
         "store under 300 MB": m["store_bytes"] < 300e6,
         "largest file under 95 MB": m["largest_file"][0] < 95e6,
-        "lookup median and p95 under 50 ms": (m["lookups"]["get_ms_median"] < 50
-                                              and m["lookups"]["get_ms_p95"] < 50),
-        "memory added under 100 MB": m["lookups"]["rss_added_mb_max"] < 100,
+        "get median and p95 under 50 ms": (m["lookups"]["get_ms_median"] < 50
+                                           and m["lookups"]["get_ms_p95"] < 50),
+        "place median and p95 under 50 ms": (m["lookups"]["place_ms_median"] < 50
+                                             and m["lookups"]["place_ms_p95"] < 50),
+        "find (first, map included) median and p95 under 50 ms": (
+            m["lookups"]["find_first_ms_median"] < 50
+            and m["lookups"]["find_first_ms_p95"] < 50),
+        "memory added by opening under 100 MB": m["lookups"]["rss_open_mb_max"] < 100,
+        "memory after the first find at each level under 100 MB":
+            m["lookups"]["rss_after_finds_mb_max"] < 100,
         "sheets 6,800 + 314 + 30 + 1": m["sheets"] == {
             "all": 1, "district": DISTRICTS, "block": BLOCKS,
             "gp": 6800},
