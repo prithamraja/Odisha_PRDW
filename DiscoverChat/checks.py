@@ -64,13 +64,39 @@ def numerals(text: str) -> list:
     return _NUM.findall(text or "")
 
 
+# WP-D15 T3 (all answers): short and long dashes in the prose are read as a
+# hyphen before numerals are read, so "2023–24" is the token "2023-24". One
+# character for one, so a position in the normalised text is the same position
+# in the original (the renderer relies on that). The two hyphen look-alikes a
+# model also writes (U+2010 hyphen, U+2011 non-breaking hyphen) are read the
+# same way; nothing else is.
+_DASHES = str.maketrans({"–": "-", "—": "-",
+                         "‐": "-", "‑": "-"})
+
+
+def normalize_dashes(text: str) -> str:
+    return (text or "").translate(_DASHES)
+
+
+_FY_SHORT = re.compile(r"^(\d{4})-(\d{2})$")
+_FY_LONG = re.compile(r"^(\d{4})-(\d{4})$")
+
+
 def _num_variants(token: str) -> set:
-    """Exact value, plus the one formatting-only variant: a trailing '.0'
-    dropped (100.0 -> 100). Rounding is NOT allowed — 48.3 -> 48 changes the
-    claim — and commas are never stripped."""
+    """Exact value, plus the formatting-only variants: a trailing '.0'
+    dropped (100.0 -> 100), and (WP-D15 T3, all answers) a fiscal year in its
+    short and long forms when the two years are consecutive (2023-24 <->
+    2023-2024; never 2023-25). Rounding is NOT allowed — 48.3 -> 48 changes
+    the claim — and commas are never stripped."""
     out = {token}
     if token.endswith(".0"):
         out.add(token[:-2])
+    m = _FY_SHORT.match(token)
+    if m and (int(m.group(1)) + 1) % 100 == int(m.group(2)):
+        out.add(f"{m.group(1)}-{int(m.group(1)) + 1}")
+    m = _FY_LONG.match(token)
+    if m and int(m.group(2)) == int(m.group(1)) + 1:
+        out.add(f"{m.group(1)}-{m.group(2)[2:]}")
     return out
 
 
@@ -401,7 +427,8 @@ def supplied_numerals(run_date: str = "") -> set:
     return out
 
 
-def bind_numerals(prose: str, findings: list, *, run_date: str = "") -> list:
+def bind_numerals(prose: str, findings: list, *, run_date: str = "",
+                  place_facts=()) -> list:
     """Every numeral in the prose, bound to the finding it is cited to.
 
     Returns one entry per numeral occurrence:
@@ -412,15 +439,20 @@ def bind_numerals(prose: str, findings: list, *, run_date: str = "") -> list:
     number itself is the hover target"), and it is computed here rather than in
     the renderer so that the number an officer hovers is bound by the same rule
     the check passed on. Two implementations would be two rules.
+
+    WP-D15: `place_facts` (the sheet lines handed on this turn) bind exactly as
+    findings do -- a numeral may be supported by the stored sentence of a place
+    fact cited in the same sentence. Dashes are read as hyphens first (T3).
     """
     exempt = supplied_numerals(run_date)
-    by_id = {f.id: f for f in findings}
-    stored = {f.id: _stored_numerals(f) for f in findings}
+    records = list(findings) + list(place_facts or ())
+    by_id = {f.id: f for f in records}
+    stored = {f.id: _stored_numerals(f) for f in records}
 
     bindings = []
     for index, sentence in enumerate(_tagged_sentences(prose)):
         tags = [t.strip() for t in _TAG.findall(sentence)]
-        bare = _TAG.sub(" ", sentence)
+        bare = normalize_dashes(_TAG.sub(" ", sentence))
         for token in numerals(bare):
             variants = _num_variants(token)
             matched = None
@@ -436,21 +468,35 @@ def bind_numerals(prose: str, findings: list, *, run_date: str = "") -> list:
 
 def check_citations(prose: str, findings: list, *, run_date: str = "",
                     direction_mode: str | None = None,
-                    causal_mode: str | None = None) -> dict:
+                    causal_mode: str | None = None,
+                    place_facts=None,
+                    standing_mode: str | None = None,
+                    number_words_mode: str | None = None) -> dict:
     """The four steps of D7.3, in the brief's order, then WP-D13's direction
-    step.
+    step, then WP-D15's standing (6) and number-word (7) steps.
 
     `direction_mode` overrides `config.DIRECTION_CHECK` and `causal_mode`
     overrides `config.CAUSAL_CHECK` for one call (tests and the gate pin them;
     production passes nothing and gets the configured modes, read at call
-    time)."""
+    time). `standing_mode` and `number_words_mode` do the same for
+    `config.STANDING_CHECK` and `config.NUMBER_WORDS`.
+
+    `place_facts` (WP-D15) are the sheet lines handed on this turn. Their ids
+    are known ids (step 1) and their stored sentences support numerals (step
+    2); they are never required (step 4); an A7 line is held to the direction
+    test (step 5); and a sentence citing one is checked for standing phrases
+    (step 6). With no place facts every step is what it was, except the two
+    all-answer fixes in step 2 (dashes, short fiscal years) and step 7, which
+    only logs."""
     body = (prose or "").strip()
+    place_facts = list(place_facts or ())
     answer_ids = {f.id for f in findings}
+    known_ids = answer_ids | {f.id for f in place_facts}
     tagged = cited_ids(body)
     results = {}
 
-    # 1. Every id tagged must be one of the findings this answer was built from.
-    unknown = sorted({t for t in tagged if t not in answer_ids})
+    # 1. Every id tagged must be one of the records this answer was built from.
+    unknown = sorted({t for t in tagged if t not in known_ids})
     results["1_ids_known"] = {"pass": not unknown, "unknown": unknown,
                               "cited": len(tagged)}
 
@@ -458,7 +504,8 @@ def check_citations(prose: str, findings: list, *, run_date: str = "",
     #    the SAME sentence of the prose. An uncited numeral is a failure — the
     #    brief is explicit — and so is one cited to a finding that does not
     #    contain it, which is the misattribution case check (a) cannot see.
-    bindings = bind_numerals(body, findings, run_date=run_date)
+    bindings = bind_numerals(body, findings, run_date=run_date,
+                             place_facts=place_facts)
     unmatched = [b for b in bindings if b["matched"] is None and not b["exempt"]]
     results["2_numerals_cited"] = {
         "pass": not unmatched,
@@ -481,16 +528,36 @@ def check_citations(prose: str, findings: list, *, run_date: str = "",
 
     # 4. A finding the judge selected and the writer silently dropped is LOSS,
     #    not concision: the judge already picked the smallest sufficient set.
+    #    WP-D15: the mined insights only. A place fact is never required.
     dropped = sorted(answer_ids - set(tagged))
     results["4_all_findings_cited"] = {"pass": not dropped, "dropped": dropped,
                                        "of": len(answer_ids)}
 
     # 5. WP-D13 Fix 1 (D63): a negative figure of a signed measure is written
     #    with its direction in words. Same sentences, same bindings as step 2.
+    #    WP-D15: a sheet's A7 line ("Spending is Rs 5.90 crore below plan.")
+    #    is held to the same test as a breakdown of overspend_vs_plan.
     mode = (direction_mode or config.DIRECTION_CHECK).lower()
     if mode != "off":
-        results["5_direction"] = check_direction(body, findings, bindings,
-                                                 mode=mode)
+        results["5_direction"] = check_direction(
+            body, list(findings) + place_facts, bindings, mode=mode)
+
+    # 6. WP-D15: standing phrases in a sentence that cites a place fact.
+    if place_facts:
+        smode = (standing_mode or config.STANDING_CHECK).strip().lower()
+        if smode not in ("block", "log", "off"):
+            raise ValueError(f"standing check mode {smode!r}: expected block, "
+                             f"log or off")
+        if smode != "off":
+            results["6_standing"] = check_standing(
+                body, list(findings) + place_facts, place_facts, mode=smode)
+
+    # 7. WP-D15 (R20): numbers written as words, logged and never counted.
+    wmode = (number_words_mode or config.NUMBER_WORDS).strip().lower()
+    if wmode not in ("log", "off"):
+        raise ValueError(f"number-words mode {wmode!r}: expected log or off")
+    if wmode != "off":
+        results["7_number_words"] = scan_number_words(strip_tags(body))
 
     results["all_pass"] = all(
         v["pass"] for k, v in results.items()
@@ -523,6 +590,9 @@ def citation_failure_reason(results: dict) -> str:
     direction = results.get("5_direction")
     if direction and direction["counts"] and not direction["pass"]:
         bits.append(direction_failure_reason(direction))
+    standing = results.get("6_standing")
+    if standing and standing["counts"] and not standing["pass"]:
+        bits.append(standing_failure_reason(standing))
     return " ".join(bits)
 
 
@@ -609,7 +679,14 @@ def signed_facts(finding) -> dict | None:
         negative   variants of tokens shown ONLY as "Rs -N"
         positive   variants of tokens shown as "Rs N" (no minus)
         ambiguous  variants of tokens shown as "Rs -N" AND elsewhere unsigned
+
+    WP-D15: a sheet's A7 line is the place's overspend_vs_plan, already in
+    words. "Spending is Rs 5.90 crore below plan." gives its figure as
+    negative; an "above plan" A7 (a positive figure) is not checked, exactly
+    as a positive breakdown figure is not.
     """
+    if getattr(finding, "is_place_fact", False):
+        return _place_a7_facts(finding)
     if finding is None or not finding.is_decomposition:
         return None
     measure = finding.data.get("measure", "")
@@ -645,8 +722,29 @@ def signed_facts(finding) -> dict | None:
     return facts
 
 
+_A7_BELOW = re.compile(r"Rs (\d+(?:[.,]\d+)*)(?: lakh| crore)? below plan")
+
+
+def _place_a7_facts(fact) -> dict | None:
+    if fact.row != "A7":
+        return None
+    match = _A7_BELOW.search(fact.sentence)
+    if match is None:
+        return None
+    measure = "overspend_vs_plan"
+    return {"measure": measure,
+            "below": glossary.signed_below(measure),
+            "above": glossary.signed_above(measure),
+            "negative": _num_variants(match.group(1)),
+            "ambiguous": set(), "positive": set(),
+            "stored": fact.sentence,
+            "example": match.group(0)}
+
+
 def _example(facts: dict, token: str) -> str:
     """The figure as the finding gives it: 'Rs 51.96 crore below plan'."""
+    if facts.get("example"):
+        return facts["example"]
     match = re.search(r"Rs -" + re.escape(token) + r"(?: lakh| crore)?(?![0-9])",
                       facts["stored"])
     shown = match.group(0) if match else "Rs -" + token
@@ -737,3 +835,151 @@ def direction_failure_reason(direction: dict) -> str:
             'gives the figure as "' + example + '". Write its direction that '
             "way -- not with a minus sign, and not with a word that says the "
             "opposite.")
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+# WP-D15 T3 — step 6, standing phrases (sentences that cite a place fact)
+# ═════════════════════════════════════════════════════════════════════════════
+# A sheet sentence carries its standing in words: "the 4th lowest of 16
+# blocks", "the most of 20 Gram Panchayats", "in the lowest quarter of the
+# 6,800". Step 2 reads digits, and "4th" is read as 4, so "the 4th HIGHEST"
+# passes step 2 when the line says "4th lowest". This step closes that gap for
+# the sentences it can see: in a sentence of the prose that cites at least one
+# place fact, every standing phrase must stand in the stored sentence of some
+# record cited in that same sentence -- the same rank with the same end word,
+# or the same quarter word. A sentence that cites no place fact is not checked.
+#
+# Known limits, stated: an ordinal written as a word ("the second highest") is
+# not a standing phrase here -- it is step 7's (logged, R20); "joint" is not
+# compared (the rank and the end word are).
+
+_ORDINAL_STANDING = re.compile(
+    r"\b(?:joint[\s-]+)?(\d+)(?:st|nd|rd|th)[\s-]+(highest|lowest|most|fewest)\b",
+    re.I)
+_FIRST_STANDING = re.compile(
+    r"\bthe\s+(?:joint\s+)?(highest|lowest|most|fewest)\s+(?:of|among|in)\b",
+    re.I)
+_QUARTER_STANDING = re.compile(
+    r"\b(lowest|lower[\s-]middle|upper[\s-]middle|highest)\s+quarter\b", re.I)
+
+
+def standing_phrases(text: str) -> list:
+    """[(key, surface)] for every standing phrase in `text`, in order.
+    key = ("rank", n, end word) or ("quarter", quarter word)."""
+    text = normalize_dashes(text)
+    found = []
+    for m in _ORDINAL_STANDING.finditer(text):
+        found.append((m.start(), ("rank", int(m.group(1)), m.group(2).lower()),
+                      re.sub(r"\s+", " ", m.group(0))))
+    for m in _FIRST_STANDING.finditer(text):
+        found.append((m.start(), ("rank", 1, m.group(1).lower()),
+                      re.sub(r"\s+", " ", m.group(0))))
+    for m in _QUARTER_STANDING.finditer(text):
+        word = re.sub(r"[\s-]+", "-", m.group(1).lower())
+        found.append((m.start(), ("quarter", word),
+                      re.sub(r"\s+", " ", m.group(0))))
+    found.sort(key=lambda x: x[0])
+    return [(key, surface) for _, key, surface in found]
+
+
+def check_standing(body: str, records: list, place_facts: list, *,
+                   mode: str = "block") -> dict:
+    """Step 6 over one answer. `records` = findings + place facts handed."""
+    by_id = {r.id: r for r in records}
+    place_ids = {f.id for f in place_facts}
+    failures, checked, phrases = [], 0, 0
+    for index, sentence in enumerate(_tagged_sentences(body)):
+        tags = [t.strip() for t in _TAG.findall(sentence)]
+        cited = [t for t in dict.fromkeys(tags) if t in by_id]
+        if not any(t in place_ids for t in cited):
+            continue
+        checked += 1
+        bare = _TAG.sub(" ", sentence)
+        allowed = set()
+        for tag in cited:
+            allowed |= {key for key, _ in standing_phrases(by_id[tag].sentence)}
+        for key, surface in standing_phrases(bare):
+            phrases += 1
+            if key in allowed:
+                continue
+            failures.append({
+                "sentence_index": index,
+                "sentence": sentence,
+                "phrase": surface,
+                "cited_place_facts": [
+                    {"id": t,
+                     "standing": [s for _, s in
+                                  standing_phrases(by_id[t].sentence)]}
+                    for t in cited if t in place_ids],
+            })
+    return {"pass": not failures, "mode": mode, "counts": mode == "block",
+            "checked": checked, "phrases": phrases, "failures": failures}
+
+
+def standing_failure_reason(standing: dict) -> str:
+    """One plain sentence for the retry, naming the phrase and the line it
+    should have matched."""
+    parts = []
+    for failure in standing["failures"][:5]:
+        lines = []
+        for fact in failure["cited_place_facts"]:
+            if fact["standing"]:
+                lines.append(f'{fact["id"]} says "'
+                             + '", "'.join(fact["standing"]) + '"')
+            else:
+                lines.append(f'{fact["id"]} gives no rank')
+        parts.append(f'"{failure["phrase"]}" in "'
+                     + strip_tags(failure["sentence"]) + '" ('
+                     + "; ".join(lines) + ")")
+    return ("These ranks are not the ones the place facts they cite give: "
+            + "; ".join(parts) + ". Give a rank or a quarter exactly as the "
+            "line you cite states it, or leave it out.")
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+# WP-D15 T3 — step 7, numbers written as words (R20: logged, never counted)
+# ═════════════════════════════════════════════════════════════════════════════
+# The word list is data, beside the other trigger lists (number_words.json).
+
+_NUMBER_WORDS = None
+
+
+def _number_words():
+    global _NUMBER_WORDS
+    if _NUMBER_WORDS is None:
+        import json
+        with open(config.DATA_NUMBER_WORDS, encoding="utf-8") as fh:
+            data = json.load(fh)
+        words = sorted({w.lower() for w in data["words"]}, key=len,
+                       reverse=True)
+        pattern = re.compile(
+            r"(?<![A-Za-z])(?:"
+            + "|".join(re.escape(w).replace(r"\-", r"[\s-]")
+                       .replace(r"\ ", r"[\s-]") for w in words)
+            + r")(?![A-Za-z])", re.I)
+        not_after = re.compile(
+            r"(?:" + "|".join(re.escape(w).replace(r"\-", r"[\s-]")
+                              for w in data["quarter_not_after"])
+            + r")\s+$", re.I)
+        _NUMBER_WORDS = (pattern, not_after)
+    return _NUMBER_WORDS
+
+
+def scan_number_words(text: str) -> dict:
+    """Every number word in the shown prose, with its sentence. A standing
+    phrase's "quarter" ("in the lowest quarter of the 6,800") is not one."""
+    pattern, not_after = _number_words()
+    hits = []
+    for sentence in _sentences(text):
+        words = []
+        for m in pattern.finditer(sentence):
+            word = m.group(0)
+            if (word.lower().startswith("quarter")
+                    and not_after.search(sentence[:m.start()])):
+                continue
+            words.append(word)
+        if words:
+            hits.append({"sentence": sentence, "words": words})
+    return {"pass": not hits, "mode": "log", "counts": False,
+            "words": [w for h in hits for w in h["words"]],
+            "sentences": hits}

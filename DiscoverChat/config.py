@@ -65,7 +65,8 @@ DECOMPOSE_VECTORS_PATH = METAINSIGHTS / "decompose_corpus.npy"
 DECOMPOSE_STAMP_PATH = METAINSIGHTS / "decompose_corpus_stamp.json"
 
 # The WP-D14 place profile sheets: fetched by code, never searched, so no
-# vectors. Read by `profile_store.py`; nothing in the service calls it yet.
+# vectors. Read by `profile_store.py`; served into the chat by WP-D15
+# (`place.py`, switch PROFILE_SHEETS below).
 PROFILE_SHEETS_DIR = METAINSIGHTS
 PROFILE_SHEETS_INDEX_PATH = METAINSIGHTS / "profile_sheets_index.json.gz"
 PROFILE_SHEETS_STAMP_PATH = METAINSIGHTS / "profile_sheets_stamp.json"
@@ -400,6 +401,40 @@ LAYOUT_MAX_COMPARE_ROWS = int(os.getenv("DISCOVERCHAT_LAYOUT_MAX_COMPARE_ROWS", 
 LAYOUT_MAX_BARS = int(os.getenv("DISCOVERCHAT_LAYOUT_MAX_BARS", "5"))
 LAYOUT_MAX_TIME_BARS = int(os.getenv("DISCOVERCHAT_LAYOUT_MAX_TIME_BARS", "12"))
 
+# ── WP-D15: place profile sheets in the chat (D78) ───────────────────────────
+# When a turn that searches names one, two or three places, the writer is
+# handed those places' profile sheet lines ("PLACE FACTS") beside the mined
+# insights (`place.py`, `writer.build_consolidation_prompt`). Rulings R4, R5,
+# R16-R20; brief handoffs/WPD15_profile_serve.md.
+#   DISCOVERCHAT_PROFILE_SHEETS=0  restores the service before WP-D15: no
+#                                  sheet is opened for a turn, and every field
+#                                  of every answer is what it was (the new
+#                                  `place` response field is then {}).
+PROFILE_SHEETS = os.getenv("DISCOVERCHAT_PROFILE_SHEETS", "1") not in (
+    "0", "", "false", "False")
+# On a turn that hands place facts, at most this many mined insights go with
+# them: the first N in the order the service already uses. The rest are not
+# shown and are counted in the payload. A turn with no place facts keeps
+# ANSWER_CAP.
+PROFILE_INSIGHT_CAP = int(os.getenv("DISCOVERCHAT_PROFILE_INSIGHT_CAP", "8"))
+# More places named than this: no sheet, and the turn runs as before (R16).
+PROFILE_MAX_PLACES = int(os.getenv("DISCOVERCHAT_PROFILE_MAX_PLACES", "3"))
+# Step 6 of the number check: in a sentence that cites a place fact, every
+# standing phrase ("4th lowest", "the most of", "lowest quarter") must stand in
+# a sentence cited in it. block | log | off, as the direction check.
+STANDING_CHECK = os.getenv("DISCOVERCHAT_STANDING_CHECK", "block").strip().lower()
+if STANDING_CHECK not in ("block", "log", "off"):
+    raise ValueError(f"DISCOVERCHAT_STANDING_CHECK={STANDING_CHECK!r}: "
+                     f"expected block, log or off")
+# Step 7 (R20): numbers written as words in a shown answer are logged to
+# logs/citation_failures.jsonl (kind number_words_shown). Never counts against
+# an answer. log | off.
+NUMBER_WORDS = os.getenv("DISCOVERCHAT_NUMBER_WORDS", "log").strip().lower()
+if NUMBER_WORDS not in ("log", "off"):
+    raise ValueError(f"DISCOVERCHAT_NUMBER_WORDS={NUMBER_WORDS!r}: "
+                     f"expected log or off")
+DATA_NUMBER_WORDS = HERE / "number_words.json"
+
 # ── WP-D7: provenance (D7.2) ─────────────────────────────────────────────────
 # Every citation in an answer carries the id and a URL that resolves to the
 # stored record. The base is configurable because the service and the front end
@@ -510,4 +545,9 @@ def knobs() -> dict:
         "layout_max_compare_rows": LAYOUT_MAX_COMPARE_ROWS,
         "layout_max_bars": LAYOUT_MAX_BARS,
         "layout_max_time_bars": LAYOUT_MAX_TIME_BARS,
+        "profile_sheets": PROFILE_SHEETS,
+        "profile_insight_cap": PROFILE_INSIGHT_CAP,
+        "profile_max_places": PROFILE_MAX_PLACES,
+        "standing_check": STANDING_CHECK,
+        "number_words": NUMBER_WORDS,
     }

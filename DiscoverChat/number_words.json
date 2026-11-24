@@ -1,0 +1,14 @@
+{
+  "what_this_is": "WP-D15 step 7 (ruling R20): words that state a number without digits. A shown answer that uses one is logged to logs/citation_failures.jsonl (kind number_words_shown); the answer is never refused for it. Matched as whole words, any case; a hyphen in an entry also matches a space. 'quarter' is not counted after one of quarter_not_after (the standing phrase 'in the lowest quarter of the 6,800'). Edit this list, not the code.",
+  "words": [
+    "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth",
+    "ninth", "tenth", "eleventh", "twelfth", "thirteenth", "fourteenth",
+    "fifteenth", "sixteenth", "seventeenth", "eighteenth", "nineteenth",
+    "twentieth",
+    "half", "halves", "thirds", "quarter", "quarters",
+    "two-thirds", "three-quarters",
+    "double", "doubled", "twice", "triple", "tripled", "tenfold",
+    "majority"
+  ],
+  "quarter_not_after": ["lowest", "lower-middle", "upper-middle", "highest"]
+}
