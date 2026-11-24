@@ -1425,6 +1425,81 @@ def _every_insight_mode(ctx):
             f"(configured mode {config.EVERY_INSIGHT_CHECK})")
 
 
+# ── WP-D15b: place names typed with spelling mistakes (D80) ──────────────────
+SPELLING_T0 = REPO / "handoffs" / "WPD15b_spelling" / "t0_geography.json"
+
+
+@check("place-spelling-exact-unchanged",
+       "on the held questions, every place is read exactly as before the loose pass, and nothing is read loosely or 'not found' (WP-D15b pass mark 1)")
+def _spelling_exact(ctx):
+    assert SPELLING_T0.exists(), f"no T0 record at {SPELLING_T0}"
+    record = json.loads(SPELLING_T0.read_text(encoding="utf-8"))
+    extractor = ctx["retriever"].extractor
+    held = {k: v for k, v in record.items() if k.startswith("held:")}
+    assert held, "the T0 record holds no held question"
+    for qid, before in held.items():
+        geo = extractor.read_places(before["question"])
+        for key in ("gp_lgd_codes", "gp_names", "blocks", "districts", "mentions"):
+            assert geo[key] == before[key], (
+                f"{qid} {before['question']!r}: {key} changed: {before[key]} -> {geo[key]}")
+        assert not [r for r in geo.get("readings", []) if r["how"] == "loose"], (
+            f"{qid}: a correctly spelled question was read loosely")
+        assert not geo.get("not_found"), f"{qid}: 'could not find' on a held question"
+    return (f"{len(held)} held questions: the exact reading is unchanged, no loose "
+            f"reading, no 'could not find' (loose pass "
+            f"{'on' if config.LOOSE_PLACES else 'OFF'})")
+
+
+@check("place-spelling-says-so",
+       "a loose reading always carries its line, R4 and the other close names included (WP-D15b T2)")
+def _spelling_says_so(ctx):
+    from DiscoverChat import place
+    extractor = ctx["retriever"].extractor
+    table = [
+        ("How is Barpalli block doing?", 'Reading "Barpalli" as Barpali block.'),
+        ("What should I know about Kalimella?",
+         'Reading "Kalimella" as Kalimela block. For the Gram Panchayat, ask about "Kalimela GP".'),
+        ("Compare Kalimela block and Barpalli block", 'Reading "Barpalli" as Barpali block.'),
+        ("How is Sharagada block doing?", 'Reading "Sharagada" as Sheragada block.'),
+    ]
+    if not config.LOOSE_PLACES:
+        return "loose pass switched off (DISCOVERCHAT_LOOSE_PLACES=0): nothing to say"
+    for text, line in table:
+        geo = extractor.read_places(text)
+        got = place.reading_note(text, geo["readings"])
+        assert got == line, f"{text!r}: line {got!r}, expected {line!r}"
+        for r in geo["readings"]:
+            if r["how"] == "loose":
+                assert f'Reading "{r["typed"]}"' in got
+    silent = place.reading_note("Tell me about Khurda",
+                                extractor.read_places("Tell me about Khurda")["readings"])
+    assert silent == "", "an alias was announced as a correction"
+    return f"{len(table)} rows of the T2 table, word for word; an alias stays silent"
+
+
+@check("place-spelling-not-found",
+       "a word marked as a place that reads as nothing gets 'I could not find a place called ...', and nothing is searched (WP-D15b T3, R23)")
+def _spelling_not_found(ctx):
+    if not config.LOOSE_PLACES:
+        return "loose pass switched off (DISCOVERCHAT_LOOSE_PLACES=0)"
+    assembler = ctx["assembler"]
+    for text, message in (
+            ("How is Bhedan block doing?",
+             'I could not find a place called "Bhedan" in the data.\n'
+             'Close names in the data: Bheden block.'),
+            ("How is Rampur block doing?",
+             'I could not find a place called "Rampur" in the data.')):
+        answer = assembler.answer(text)
+        assert answer.text == f"{message}\n\n({answer.stamp})", (
+            f"{text!r} answered {answer.text[:120]!r}")
+        assert not answer.findings and answer.place.get("mode") == "not_found"
+        assert "judge" not in answer.retrieval, "a not-found turn was searched"
+    untouched = assembler.answer("Is Laxmipoor behind on anything?")
+    assert "could not find" not in untouched.text, "an unmarked word was refused"
+    return ("'Bhedan block' -> the message with 'Bheden block'; 'Rampur block' -> the "
+            "message alone; neither searched; an unmarked 'Laxmipoor' runs as today")
+
+
 # ── live-only ────────────────────────────────────────────────────────────────
 def _log_size() -> int:
     """Bytes in the call log now — the marker the trace check reads from."""
