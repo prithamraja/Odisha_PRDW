@@ -186,9 +186,14 @@ def _short(place: dict) -> dict:
             "name": place["name"], "label": place["label"]}
 
 
-def resolve(text: str, mentions: list, store, *, max_places: int = 3) -> Plan:
+def resolve(text: str, mentions: list, store, *, max_places: int = 3,
+            readings=None) -> Plan:
     """The brief's T1 rules, in order. `mentions` is `Slots.mentions` for the
     text that is searched on this turn; `store` is an open ProfileStore."""
+    # WP-D15b: a loosely read place's R4 choice is said in its reading line
+    # (`reading_note`), not again in the note below.
+    loose_spans = {(r["start"], r["end"]) for r in readings or []
+                   if r.get("how") == "loose"}
     plan = Plan()
     chosen = []                  # (position, place dict, alternative or None)
     for cluster in _clusters(mentions or []):
@@ -216,7 +221,9 @@ def resolve(text: str, mentions: list, store, *, max_places: int = 3) -> Plan:
         # join the note; its alternative is kept either way (the page's
         # switch).
         candidates[pick]["r4_chose"] = (alternative is not None
-                                        and said not in candidates)
+                                        and said not in candidates
+                                        and (cluster["start"], cluster["end"])
+                                        not in loose_spans)
         chosen.append((cluster["start"], candidates[pick], alternative))
 
     # The same place named twice is one place, kept at its first mention.
@@ -392,6 +399,116 @@ def payload(plan: Plan, groups: list, *, lines_used: list,
             "lines_used": list(lines_used),
             "insights_offered": insights_offered,
             "insights_held_back": insights_held_back}
+
+
+# ── WP-D15b: saying a loose reading, and "could not find" (R21-R23) ──────────
+# Built from the slot reader's `readings` and `not_found` alone -- no sheet
+# store -- because the line is shown whenever a place was read loosely,
+# whether or not a profile sheet is used on that turn.
+
+def _label(level: str, name: str) -> str:
+    return f"{name} {_LEVEL_WORD[level]}"
+
+
+def loose_choices(text: str, readings: list) -> list:
+    """One entry per loosely read span: the level answered (R4 between the two
+    levels of one name, by the officer's words, as WP-D15 does), the other
+    level when R4 chose it, and the other close names."""
+    by_span = {}
+    for r in readings or []:
+        if r.get("how") == "loose":
+            by_span.setdefault((r["start"], r["end"]), []).append(r)
+    out = []
+    for (start, end), rs in sorted(by_span.items()):
+        levels = {r["level"]: r for r in rs}
+        said = _says(text, start, end)
+        if said in levels:
+            pick, r4 = said, False
+        else:
+            pick = min(levels, key=_RANK.get)
+            r4 = len(levels) > 1
+        chosen = levels[pick]
+        alt = next((levels[lv] for lv in sorted(levels, key=_RANK.get)
+                    if lv != pick), None)
+        out.append({"typed": chosen["typed"], "start": start, "end": end,
+                    "chosen": chosen, "alternative": alt, "r4_chose": r4,
+                    "others": chosen.get("others", [])})
+    return out
+
+
+def reading_note(text: str, readings: list) -> str:
+    """T2: one sentence group per loose reading, e.g.
+        Reading "Barpalli" as Barpali block.
+        Reading "Kalimella" as Kalimela block. For the Gram Panchayat, ask
+        about "Kalimela GP".
+        Reading "Rampor" as Rampur block. Other close names: Rampa block,
+        Ramapur block.
+    Exact and alias readings get no line (an alias is a known other name)."""
+    parts = []
+    for c in loose_choices(text, readings):
+        ch = c["chosen"]
+        line = f"Reading \"{c['typed']}\" as {_label(ch['level'], ch['name'])}."
+        if c["r4_chose"] and c["alternative"]:
+            alt = c["alternative"]
+            line += (f" For the {_LEVEL_WORD[alt['level']]}, ask about "
+                     f"\"{_ask({'name': alt['name'], 'level': alt['level']})}\".")
+        if c["others"]:
+            line += (" Other close names: "
+                     + ", ".join(_label(o["level"], o["name"]) for o in c["others"])
+                     + ".")
+        parts.append(line)
+    return " ".join(parts)
+
+
+def not_found_message(not_found: list) -> str:
+    """T3: the whole reply when no place was read at all.
+        I could not find a place called "Bhedan" in the data.
+        Close names in the data: Bheden block.
+    The second line only when a name scores at least 80 at the marked level."""
+    lines = []
+    for nf in not_found or []:
+        lines.append(f"I could not find a place called \"{nf['typed']}\" in the data.")
+        if nf.get("close"):
+            lines.append("Close names in the data: "
+                         + ", ".join(_label(c["level"], c["name"]) for c in nf["close"])
+                         + ".")
+    return "\n".join(lines)
+
+
+def not_found_first_lines(not_found: list) -> str:
+    """T3 point 4: when another place was read, only the first line of each."""
+    return " ".join(f"I could not find a place called \"{nf['typed']}\" in the data."
+                    for nf in not_found or [])
+
+
+def spelling_payload(text: str, readings: list, not_found: list) -> dict:
+    """The facts the `place` field carries about how places were read: every
+    reading (typed words, how, level, code, name, score), the other close
+    names as alternatives with a ready question each, and every word marked
+    as a place that was not found. {} when nothing was read loosely and
+    nothing was not found -- so an exactly spelled question's payload is
+    unchanged."""
+    choices = loose_choices(text, readings)
+    if not choices and not not_found:
+        return {}
+    close = []
+    for c in choices:
+        for o in c["others"]:
+            close.append({"level": o["level"], "code": o.get("code"),
+                          "label": _label(o["level"], o["name"]),
+                          "ask": _ask({"name": o["name"], "level": o["level"]}),
+                          "typed": c["typed"], "score": o["score"]})
+    return {
+        "readings": [{"typed": r["typed"], "how": r["how"], "level": r["level"],
+                      "code": r.get("code"), "name": r["name"],
+                      "score": r.get("score")} for r in readings or []],
+        "close_names": close,
+        "not_found": [{"typed": nf["typed"], "level": nf["level"],
+                       "close": [{"level": c["level"], "name": c["name"],
+                                  "label": _label(c["level"], c["name"]),
+                                  "score": c["score"]} for c in nf.get("close", [])]}
+                      for nf in not_found or []],
+    }
 
 
 # ── /record for a place fact (T5.2) ──────────────────────────────────────────

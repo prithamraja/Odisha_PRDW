@@ -298,6 +298,16 @@ class Assembler:
             # free exploration D42 rules out.
             message = navigate.contextualise(message, previous_question, anchors)
 
+        # WP-D15b T3 (R23). A word the officer marked as a place ("Rampur
+        # block") that reads as nothing, when no place at all was read: the
+        # turn ends here with "I could not find ...", and nothing is searched.
+        if config.LOOSE_PLACES and routing.move in _SHEET_MOVES:
+            extractor = getattr(self.retriever, "extractor", None)
+            if extractor is not None:
+                early = extractor.extract(message)
+                if early.not_found and not early.readings:
+                    return self._not_found_answer(message, early, routing, stamp)
+
         result, judge_meta = self._retrieve(message, turn_id=turn_id)
         retrieval_meta = {
             "judge": judge_meta,
@@ -321,26 +331,37 @@ class Assembler:
         # answered from their profile sheets as well as the mined insights. A
         # turn that names none (or the switch off, or no store) carries on
         # below exactly as before.
+        # WP-D15b T2/T3: how places were read, said in one code-written line
+        # whenever a place was read loosely or a marked word was not found.
+        spelling_line, spelling_facts = "", {}
+        if routing.move in _SHEET_MOVES:
+            spelling_line, spelling_facts = self._spelling(message, result.slots)
+
         if routing.move in _SHEET_MOVES:
             store = self.sheet_store()
             if store is not None:
                 plan = place_mod.resolve(
                     message, result.slots.mentions, store,
-                    max_places=config.PROFILE_MAX_PLACES)
+                    max_places=config.PROFILE_MAX_PLACES,
+                    readings=result.slots.readings)
                 if plan.places:
                     return self._answer_with_sheets(
                         message, routing, result, retrieval_meta, plan, store,
-                        stamp, turn_id)
+                        stamp, turn_id, spelling_line=spelling_line,
+                        spelling_facts=spelling_facts)
                 if plan.named_anything:
                     retrieval_meta["place"] = {
                         "answered": [], "dropped": plan.dropped,
                         "why_no_sheet": plan.why_no_sheet}
 
         if not result.hits:
+            text, lead, place = self._with_spelling(
+                nothing_found(result), spelling_line, spelling_facts,
+                retrieval_meta)
             return Answer(move=routing.move,
-                          text=_stamped(nothing_found(result), stamp),
+                          text=_stamped(text, stamp),
                           routing=routing.as_dict(), retrieval=retrieval_meta,
-                          stamp=stamp)
+                          stamp=stamp, place=place, lead=lead)
 
         findings = [h.finding for h in result.hits]
         body = render_findings(findings)
@@ -400,15 +421,21 @@ class Assembler:
         # A causally-worded decompose turn gets the limit stated before the
         # numbers, not after them: an officer who reads the split first has
         # already taken it for the answer to "who is driving this".
+        scoped = False
         if (routing.move == classifier.DECOMPOSE
                 and classifier.asked_causally(message)
                 and any(f.is_decomposition for f in findings)):
             text = f"{DECOMPOSE_SCOPE_NOTE}\n\n{text}"
+            scoped = True
 
         if result.capped:
             text += (f"\n\nMore than {config.ANSWER_CAP} findings clear the "
                      f"relevance bar for this question; these are the "
                      f"{config.ANSWER_CAP} closest to what you asked.")
+
+        # WP-D15b: the reading line leads a turn that used no sheet, too.
+        text, lead, place = self._with_spelling(
+            text, spelling_line, spelling_facts, retrieval_meta, scoped=scoped)
 
         # WP-D12 (D62). After the prose is settled and from nothing but the
         # findings and the tagged prose, so it cannot change a byte of either.
@@ -421,11 +448,54 @@ class Assembler:
                       findings=findings, routing=routing.as_dict(),
                       prose=prose_meta, retrieval=retrieval_meta, stamp=stamp,
                       tagged_text=tagged_text, citations=citations,
-                      layout=layout)
+                      layout=layout, place=place, lead=lead)
+
+    # ── WP-D15b: how places were read ────────────────────────────────────────
+    @staticmethod
+    def _spelling(message, slots) -> tuple:
+        """(the one line, the `place` facts) for this turn's readings: the
+        "could not find" first line of any marked word not found, then the
+        "Reading ... as ..." line of every loose reading. ("", {}) when every
+        place was spelled as stored -- the turn is then untouched."""
+        readings = getattr(slots, "readings", []) or []
+        not_found = getattr(slots, "not_found", []) or []
+        line = " ".join(x for x in (place_mod.not_found_first_lines(not_found),
+                                    place_mod.reading_note(message, readings))
+                        if x)
+        return line, place_mod.spelling_payload(message, readings, not_found)
+
+    @staticmethod
+    def _with_spelling(text, line, facts, retrieval_meta, *, scoped=False):
+        """A turn with no sheet: the line first, the facts in `place` (mode
+        "no_sheet"), the same facts in the call log. Untouched when there is
+        no line."""
+        if not line and not facts:
+            return text, "", {}
+        place = {"version": place_mod.PAYLOAD_VERSION, "mode": "no_sheet",
+                 "answered": [], "alternatives": [], "note": line, **facts}
+        retrieval_meta.setdefault("place", {}).update(place)
+        lead = "\n\n".join([line] + ([DECOMPOSE_SCOPE_NOTE] if scoped else []))
+        return f"{line}\n\n{text}", lead, place
+
+    def _not_found_answer(self, message, slots, routing, stamp) -> Answer:
+        """T3: nothing was read and a marked word was not found. The reply is
+        the message alone; nothing is searched or written."""
+        place = {"version": place_mod.PAYLOAD_VERSION, "mode": "not_found",
+                 "answered": [], "alternatives": [], "note": "",
+                 **place_mod.spelling_payload(message, slots.readings,
+                                              slots.not_found)}
+        return Answer(move=routing.move,
+                      text=_stamped(place_mod.not_found_message(slots.not_found),
+                                    stamp),
+                      routing=routing.as_dict(), stamp=stamp,
+                      retrieval={"slots": slots.as_dict(), "place": place},
+                      prose={"used": False, "why": "place not found"},
+                      place=place)
 
     # ── WP-D15: a turn with place facts ──────────────────────────────────────
     def _answer_with_sheets(self, message, routing, result, retrieval_meta,
-                            plan, store, stamp, turn_id) -> Answer:
+                            plan, store, stamp, turn_id, *, spelling_line="",
+                            spelling_facts=None) -> Answer:
         """T2, T4, T5. The place facts travel BESIDE the findings, never as
         findings: the writer gets them in one request with at most
         PROFILE_INSIGHT_CAP mined insights; the check knows their ids and
@@ -482,14 +552,20 @@ class Assembler:
 
         # The note is code's, outside the prose and outside the number check,
         # and it is the first line of the answer (T5.5).
-        if plan.note:
-            text = f"{plan.note}\n\n{text}"
-            lead.insert(0, plan.note)
+        # WP-D15b: a reading line (or a "could not find" line) and the R4
+        # note make one code-written first line together.
+        first = " ".join(x for x in (spelling_line, plan.note) if x)
+        if first:
+            text = f"{first}\n\n{text}"
+            lead.insert(0, first)
 
         layout = layout_mod.build(findings, tagged_text, run_date=stamp)
         place = place_mod.payload(plan, groups, lines_used=used,
                                   insights_offered=len(findings),
                                   insights_held_back=held_back)
+        if spelling_facts:
+            place.update(spelling_facts)
+            place["note"] = first
         retrieval_meta["place"] = dict(place, dropped=plan.dropped)
 
         return Answer(move=routing.move, text=_stamped(text, stamp),
