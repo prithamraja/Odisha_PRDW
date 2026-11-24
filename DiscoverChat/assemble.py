@@ -476,10 +476,9 @@ class Assembler:
             text = f"{DECOMPOSE_SCOPE_NOTE}\n\n{text}"
             lead.append(DECOMPOSE_SCOPE_NOTE)
 
-        if held_back:
-            text += (f"\n\nMore than {len(findings)} findings clear the "
-                     f"relevance bar for this question; these are the "
-                     f"{len(findings)} closest to what you asked.")
+        # WP-D15c (R26): no "More than N findings ..." line on a place
+        # answer, however many insights were held back. The count stays in
+        # `place.insights_held_back` and the log.
 
         # The note is code's, outside the prose and outside the number check,
         # and it is the first line of the answer (T5.5).
