@@ -1013,6 +1013,55 @@ def _prompt_is_appendix_a(ctx):
             f"ratified additions; no scores or coverage lines in the payload")
 
 
+# ── WP-D14: the place profile sheets (spec §9) ───────────────────────────────
+# The checks that need no view parquet. Checks 1 and 6 read the views and run
+# in `python Insights/src/phase5g_profile_sheets.py --check` only. The store is
+# read through the reader, bound to the findings corpus's candidate set.
+def _profile(ctx):
+    if "profile" not in ctx:
+        import phase5g_profile_sheets as p5g
+        from DiscoverChat import profile_store
+        ctx["profile"] = (p5g, profile_store.default_store())
+    return ctx["profile"]
+
+
+@check("profile-sheets-stamp", "the profile sheet store is the one built beside this corpus: same candidate set and view parquets, every file verified (WP-D14)")
+def _profile_stamp(ctx):
+    p5g, store = _profile(ctx)
+    return p5g.check_stamp(store, config.load_stamp(), config.decompose_stamp())
+
+
+@check("profile-sheets-add-up", "every profile sheet sum equals the sum of its member places' (spec §9 check 2)")
+def _profile_add_up(ctx):
+    p5g, store = _profile(ctx)
+    return p5g.check_parts_add_up(store)
+
+
+@check("profile-sheets-shares", "every profile sheet share is re-derived from its own parts, never averaged (spec §9 check 3)")
+def _profile_shares(ctx):
+    p5g, store = _profile(ctx)
+    return p5g.check_shares(store)
+
+
+@check("profile-sheets-insights", "every profile sheet figure a breakdown also states equals it, at every level (spec §9 check 4)")
+def _profile_insights(ctx):
+    p5g, store = _profile(ctx)
+    return p5g.check_insights(
+        store, [f.data for f in ctx["corpus"].all() if f.is_decomposition])
+
+
+@check("profile-sheets-formatter-parity", "every numeral in a profile sheet sentence is a stored figure through the stored formatter (spec §9 check 5)")
+def _profile_sentences(ctx):
+    p5g, store = _profile(ctx)
+    return p5g.check_sentences(store)
+
+
+@check("profile-sheets-reference", "the spec §13 figures and the Appendix A sentences are reproduced exactly (spec §9 check 7)")
+def _profile_reference(ctx):
+    p5g, store = _profile(ctx)
+    return p5g.check_reference(store)
+
+
 # ── live-only ────────────────────────────────────────────────────────────────
 def _log_size() -> int:
     """Bytes in the call log now — the marker the trace check reads from."""
