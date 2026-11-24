@@ -459,6 +459,23 @@ if NUMBER_WORDS not in ("log", "off"):
                      f"expected log or off")
 DATA_NUMBER_WORDS = HERE / "number_words.json"
 
+# ── WP-D15b: place names typed with spelling mistakes (D80, R21-R24) ─────────
+# After the exact pass, words of the officer's text that matched no place are
+# tried against the registry with Ask's scorer and Ask's cut-off for that level
+# (`slots.SlotExtractor`). A loose reading is always said, in one code-written
+# line (`place.reading_note`); a word marked as a place ("Rampur block") that
+# reads as nothing gets "I could not find a place called ...".
+#   DISCOVERCHAT_LOOSE_PLACES=0  restores the exact reading, byte for byte.
+LOOSE_PLACES = os.getenv("DISCOVERCHAT_LOOSE_PLACES", "1") not in (
+    "0", "", "false", "False")
+# The shortest single word tried (a pair or triple of words counts its
+# letters together).
+LOOSE_MIN_LETTERS = int(os.getenv("DISCOVERCHAT_LOOSE_MIN_LETTERS", "5"))
+# The ordinary words of this domain, never tried as a place (built by
+# handoffs/WPD15b_spelling/build_ordinary_words.py; place names are removed
+# from it at start-up against the registry).
+DATA_ORDINARY_WORDS = HERE / "ordinary_words.json"
+
 # ── WP-D7: provenance (D7.2) ─────────────────────────────────────────────────
 # Every citation in an answer carries the id and a URL that resolves to the
 # stored record. The base is configurable because the service and the front end
@@ -575,4 +592,6 @@ def knobs() -> dict:
         "profile_max_places": PROFILE_MAX_PLACES,
         "standing_check": STANDING_CHECK,
         "number_words": NUMBER_WORDS,
+        "loose_places": LOOSE_PLACES,
+        "loose_min_letters": LOOSE_MIN_LETTERS,
     }

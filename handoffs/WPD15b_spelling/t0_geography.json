@@ -1,0 +1,3729 @@
+{
+ "held:L01": {
+  "question": "What should I know about Kandhamal?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Kandhamal"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Kandhamal",
+    "start": 25,
+    "end": 34
+   }
+  ]
+ },
+ "held:L02": {
+  "question": "Which blocks stand out on expenditure?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:L03": {
+  "question": "What is unusual about water supply works?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:L04": {
+  "question": "what should I know about Cuttack?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Cuttack"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Cuttack",
+    "start": 25,
+    "end": 32
+   }
+  ]
+ },
+ "held:L05": {
+  "question": "What patterns show up in sanctions across districts?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:L06": {
+  "question": "What should I know about Kalimela?",
+  "gp_lgd_codes": [
+   "119936"
+  ],
+  "gp_names": [
+   "Kalimela"
+  ],
+  "blocks": [
+   "Kalimela"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Kalimela",
+    "start": 25,
+    "end": 33
+   },
+   {
+    "level": "gp",
+    "code": "119936",
+    "name": "Kalimela",
+    "start": 25,
+    "end": 33
+   }
+  ]
+ },
+ "held:L07": {
+  "question": "How are untied funds being used?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:T01": {
+  "question": "Is spending on track?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:T02": {
+  "question": "How is Chikilli doing?",
+  "gp_lgd_codes": [
+   "117835"
+  ],
+  "gp_names": [
+   "Chikilli"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "117835",
+    "name": "Chikilli",
+    "start": 7,
+    "end": 15
+   }
+  ]
+ },
+ "held:T03": {
+  "question": "Where is money planned but not spent?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:T04": {
+  "question": "How is Barpali block doing?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Barpali"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Barpali",
+    "start": 7,
+    "end": 14
+   }
+  ]
+ },
+ "held:T05": {
+  "question": "Which places are behaving differently from the rest?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:T06": {
+  "question": "Which blocks account for the shortfall?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:T07": {
+  "question": "Where does the gap sit?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:T08": {
+  "question": "Break down spending by block",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:T09": {
+  "question": "How is the total split across districts?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:T10": {
+  "question": "Who is driving the shortfall?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:T11": {
+  "question": "How is tied grant planned split across fiscal years?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:T12": {
+  "question": "Break it down by fiscal year",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:T13": {
+  "question": "Tell me about untied grants.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:T14": {
+  "question": "Anything I should be looking at in Ganjam?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Ganjam"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Ganjam",
+    "start": 35,
+    "end": 41
+   }
+  ]
+ },
+ "held:T15": {
+  "question": "What is the position on abandoned works?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:GEO-06": {
+  "question": "How is Biswamathpur performing on spending?",
+  "gp_lgd_codes": [
+   "117951"
+  ],
+  "gp_names": [
+   "Biswamathpur"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "117951",
+    "name": "Biswamathpur",
+    "start": 7,
+    "end": 19
+   }
+  ]
+ },
+ "held:GEO-07": {
+  "question": "What stands out in Boipariguda?",
+  "gp_lgd_codes": [
+   "119717"
+  ],
+  "gp_names": [
+   "Boipariguda"
+  ],
+  "blocks": [
+   "Boipariguda"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Boipariguda",
+    "start": 19,
+    "end": 30
+   },
+   {
+    "level": "gp",
+    "code": "119717",
+    "name": "Boipariguda",
+    "start": 19,
+    "end": 30
+   }
+  ]
+ },
+ "held:GEO-12": {
+  "question": "What does the analysis say about Haldikudar?",
+  "gp_lgd_codes": [
+   "121663"
+  ],
+  "gp_names": [
+   "Haldikudar"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "121663",
+    "name": "Haldikudar",
+    "start": 33,
+    "end": 43
+   }
+  ]
+ },
+ "held:GEO-18": {
+  "question": "Is Laxmipur behind on anything?",
+  "gp_lgd_codes": [
+   "119862"
+  ],
+  "gp_names": [
+   "Laxmipur"
+  ],
+  "blocks": [
+   "Laxmipur"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Laxmipur",
+    "start": 3,
+    "end": 11
+   },
+   {
+    "level": "gp",
+    "code": "119862",
+    "name": "Laxmipur",
+    "start": 3,
+    "end": 11
+   }
+  ]
+ },
+ "held:GEO-19": {
+  "question": "Mendarajpur - show me what the analysis found.",
+  "gp_lgd_codes": [
+   "275075"
+  ],
+  "gp_names": [
+   "Mendarajpur"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "275075",
+    "name": "Mendarajpur",
+    "start": 0,
+    "end": 11
+   }
+  ]
+ },
+ "held:GEO-20": {
+  "question": "Anything notable about Sharagada?",
+  "gp_lgd_codes": [
+   "118012"
+  ],
+  "gp_names": [
+   "Sharagada"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "118012",
+    "name": "Sharagada",
+    "start": 23,
+    "end": 32
+   }
+  ]
+ },
+ "held:GEO-22": {
+  "question": "What has been found in Attabira block?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Attabira"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Attabira",
+    "start": 23,
+    "end": 31
+   }
+  ]
+ },
+ "held:GEO-24": {
+  "question": "Is Lahunipara block an exception to anything?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Lahunipara"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Lahunipara",
+    "start": 3,
+    "end": 13
+   }
+  ]
+ },
+ "held:GEO-26": {
+  "question": "How do the GPs in Sheragada block look?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Sheragada"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Sheragada",
+    "start": 18,
+    "end": 27
+   }
+  ]
+ },
+ "held:GEO-29": {
+  "question": "How is Khordha district doing overall?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 7,
+    "end": 14
+   }
+  ]
+ },
+ "held:GEO-30": {
+  "question": "What has the analysis found in Koraput?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Koraput"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Koraput",
+    "start": 31,
+    "end": 38
+   }
+  ]
+ },
+ "held:GEO-32": {
+  "question": "Sundergarh district - what should I look at?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Sundargarh"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Sundargarh",
+    "start": 0,
+    "end": 10
+   }
+  ]
+ },
+ "held:MEA-02": {
+  "question": "What does the analysis say about photo evidence?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:MEA-03": {
+  "question": "Anything about technical sanction?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:MEA-04": {
+  "question": "Which works have been abandoned?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:MEA-05": {
+  "question": "How is the tied grant behaving?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:MEA-06": {
+  "question": "Findings on untied grant",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:MEA-07": {
+  "question": "What is happening with receipts?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:MEA-08": {
+  "question": "Any pattern in payments?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:MEA-09": {
+  "question": "Anything on administrative approval?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:MEA-10": {
+  "question": "What has been found about training?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:VAG-02": {
+  "question": "What should I raise at the next review meeting?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:VAG-03": {
+  "question": "Where is the biggest problem?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:VAG-04": {
+  "question": "Is money moving steadily or in year-end bursts?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:VAG-06": {
+  "question": "Anything worth my attention this quarter?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:OPN-01": {
+  "question": "How is GPDP implementation going under XV FC?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:OPN-02": {
+  "question": "Are the ODF and SBM works progressing?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:OPN-03": {
+  "question": "Is drinking water getting its share of the money?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "held:TWO-01": {
+  "question": "Compare Kalimela and Bheden",
+  "gp_lgd_codes": [
+   "119936",
+   "116438"
+  ],
+  "gp_names": [
+   "Kalimela",
+   "Bheden"
+  ],
+  "blocks": [
+   "Kalimela",
+   "Bheden"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Kalimela",
+    "start": 8,
+    "end": 16
+   },
+   {
+    "level": "gp",
+    "code": "119936",
+    "name": "Kalimela",
+    "start": 8,
+    "end": 16
+   },
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bheden",
+    "start": 21,
+    "end": 27
+   },
+   {
+    "level": "gp",
+    "code": "116438",
+    "name": "Bheden",
+    "start": 21,
+    "end": 27
+   }
+  ]
+ },
+ "held:TWO-02": {
+  "question": "How does Chikilli compare with Hirlipali?",
+  "gp_lgd_codes": [
+   "116350",
+   "117835"
+  ],
+  "gp_names": [
+   "Hirlipali",
+   "Chikilli"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "117835",
+    "name": "Chikilli",
+    "start": 9,
+    "end": 17
+   },
+   {
+    "level": "gp",
+    "code": "116350",
+    "name": "Hirlipali",
+    "start": 31,
+    "end": 40
+   }
+  ]
+ },
+ "held:TWO-03": {
+  "question": "Compare Khordha and Cuttack districts",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Cuttack",
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 8,
+    "end": 15
+   },
+   {
+    "level": "district",
+    "code": null,
+    "name": "Cuttack",
+    "start": 20,
+    "end": 27
+   }
+  ]
+ },
+ "csv:001:PLN-001": {
+  "question": "How many Gram Panchayats in Khordha have uploaded the GPDP in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 28,
+    "end": 35
+   }
+  ]
+ },
+ "csv:002:PLN-001": {
+  "question": "GPDP upload status Bhubaneswar block, 24-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 19,
+    "end": 30
+   }
+  ]
+ },
+ "csv:003:PLN-005": {
+  "question": "Which Gram Panchayats have not yet uploaded their GPDP in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:004:PLN-005": {
+  "question": "24-25 me kaun se GP ne abhi tak GPDP upload nahi kiya?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:005:PLN-001": {
+  "question": "ଖୋର୍ଦ୍ଧା ଜିଲ୍ଲାରେ 2024-2025 ରେ କେତେ ଗ୍ରାମ ପଞ୍ଚାୟତ GPDP ଅପଲୋଡ କରିଛନ୍ତି?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:006:PLN-001": {
+  "question": "Khordha jillare 2024-2025 re kete GP GPDP upload karichanti?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 0,
+    "end": 7
+   }
+  ]
+ },
+ "csv:007:PLN-001": {
+  "question": "ଆର୍ଥିକ ବର୍ଷ ୨୦୨୪-୨୫ରେ ଖୋର୍ଦ୍ଧାରେ କେତେ GP GPDP ଅପଲୋଡ କରିଛନ୍ତି?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:008:PLN-001": {
+  "question": "How many GPs in Kordha uploaded GPDP in FY 24-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:009:PLN-016": {
+  "question": "Khurda district ka GPDP approval rate kya hai 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 0,
+    "end": 6
+   }
+  ]
+ },
+ "csv:010:PLN-003": {
+  "question": "What percentage of Gram Panchayats in Bhubaneshwar block have uploaded their GPDP in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:011:PLN-006": {
+  "question": "Which blocks achieved 100% GPDP submission in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:012:PLN-007": {
+  "question": "Which districts had the lowest GPDP submission rate last year?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:013:PLN-008": {
+  "question": "How many GPs in Bhubaneswar uploaded the GPDP after 30 June 2024 in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 16,
+    "end": 27
+   }
+  ]
+ },
+ "csv:014:PLN-012": {
+  "question": "Sir, kindly let me know the GPDP status of Andhrua Gram Panchayat for the financial year 2024-2025.",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 43,
+    "end": 50
+   }
+  ]
+ },
+ "csv:015:PLN-014": {
+  "question": "Khordha me kitne GP ka GPDP approval abhi tak pending hai 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 0,
+    "end": 7
+   }
+  ]
+ },
+ "csv:016:PLN-015": {
+  "question": "Bhubaneswar block me GPDP approval rate kitna hai 2024-25 ka?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 0,
+    "end": 11
+   }
+  ]
+ },
+ "csv:017:PLN-020": {
+  "question": "Which blocks have the most pending GPDP approvals in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:018:PLN-020": {
+  "question": "2024-2025 ରେ କେଉଁ ବ୍ଲକରେ ସବୁଠାରୁ ଅଧିକ GPDP ଅନୁମୋଦନ ବାକି ଅଛି?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:019:PLN-024": {
+  "question": "How many activities are planned under each GPDP theme in Andhrua in 2024-25?",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 57,
+    "end": 64
+   }
+  ]
+ },
+ "csv:020:PLN-029": {
+  "question": "Which GPDP theme has the highest number of planned activities in Khordha in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 65,
+    "end": 72
+   }
+  ]
+ },
+ "csv:021:PLN-031": {
+  "question": "Which GPs planned the most activities under Clean and Green Village in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:022:PLN-038": {
+  "question": "How has the number of planned activities per theme changed year on year?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:023:PLN-039": {
+  "question": "Which themes showed the greatest increase in planned activities between 2023-24 and 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:024:PLN-049": {
+  "question": "Sanitation ke under 2024-25 me Andhrua me kitni activities plan hui?",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 31,
+    "end": 38
+   }
+  ]
+ },
+ "csv:025:PLN-052": {
+  "question": "Which focus area has the highest number of planned activities in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:026:PLN-068": {
+  "question": "2024-2025 ରେ କେଉଁ ଫୋକସ ଏରିଆରେ କୌଣସି ଯୋଜନାବଦ୍ଧ କାର୍ଯ୍ୟ ନାହିଁ?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:027:PLU-006": {
+  "question": "How many activities below Rs 1000 are planned theme-wise in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:028:PLU-009": {
+  "question": "Andhrua ke kitne percent activities 1 lakh se kam ki hain 2024-25 me?",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 0,
+    "end": 7
+   }
+  ]
+ },
+ "csv:029:PLU-007": {
+  "question": "What is the cost-band split of activities in Khordha for 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 45,
+    "end": 52
+   }
+  ]
+ },
+ "csv:030:PLU-003": {
+  "question": "Andhrua ka supplementary plan hai kya 2024-25 ke liye?",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 0,
+    "end": 7
+   }
+  ]
+ },
+ "csv:031:WRK-001": {
+  "question": "How many fresh and how many maintenance activities does Andhrua have in 2024-25?",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 56,
+    "end": 63
+   }
+  ]
+ },
+ "csv:032:WRK-003": {
+  "question": "What share of Khordha's expenditure went to maintenance in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 14,
+    "end": 21
+   }
+  ]
+ },
+ "csv:033:WRK-005": {
+  "question": "Bhubaneswar ke kaun se GP maintenance par fresh asset se zyada kharch karte hain 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 0,
+    "end": 11
+   }
+  ]
+ },
+ "csv:034:PLN-001": {
+  "question": "GPDP status?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:035:PLN-001": {
+  "question": "How many GPs in Laxmipur uploaded the GPDP in 2024-25?",
+  "gp_lgd_codes": [
+   "119862"
+  ],
+  "gp_names": [
+   "Laxmipur"
+  ],
+  "blocks": [
+   "Laxmipur"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Laxmipur",
+    "start": 16,
+    "end": 24
+   },
+   {
+    "level": "gp",
+    "code": "119862",
+    "name": "Laxmipur",
+    "start": 16,
+    "end": 24
+   }
+  ]
+ },
+ "csv:036:PLU-001": {
+  "question": "Bheden ka plan status 2024-25?",
+  "gp_lgd_codes": [
+   "116438"
+  ],
+  "gp_names": [
+   "Bheden"
+  ],
+  "blocks": [
+   "Bheden"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bheden",
+    "start": 0,
+    "end": 6
+   },
+   {
+    "level": "gp",
+    "code": "116438",
+    "name": "Bheden",
+    "start": 0,
+    "end": 6
+   }
+  ]
+ },
+ "csv:037:PLN-022": {
+  "question": "2025-26 re kaun kaun blockre GPDP anumodan re barambar bilamba huachi?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:038:PLN-041": {
+  "question": "Which themes have remained consistently among the top priorities over the last five years?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:039:PLU-005": {
+  "question": "Attabira me kitni activities dusre panchayat tier ko delegate hui 2025-26 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Attabira"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Attabira",
+    "start": 0,
+    "end": 8
+   }
+  ]
+ },
+ "csv:040:PLN-003": {
+  "question": "What percentage of Gram Panchayats in each block uploaded their GPDP in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:041:PLN-040": {
+  "question": "Which themes showed the greatest decline in planned activities between 2023-24 and 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:042:PLN-031": {
+  "question": "Which GPs planned the most activities under the Water Sufficient Village theme in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:043:PLN-032": {
+  "question": "Which Gram Panchayats have not planned any activities under Theme 8 in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:044:PLN-032": {
+  "question": "Child Friendly Village theme ke under 2024-25 me kaunse GP ne koi activity plan nahi ki?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:045:PLN-031": {
+  "question": "2024-25 me Poverty Free and Enhanced Livelihoods Village theme ke under sabse zyada activities kis GP ne plan ki?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:046:SBM-GWM-003": {
+  "question": "How many community soak pits have been planned in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:047:SBM-GWM-006": {
+  "question": "How many soak pits were completed in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:048:SBM-GWM-002": {
+  "question": "What is the expenditure on Grey Water Management activities in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:049:SBM-GWM-011": {
+  "question": "2024-25 me kitne household soak pit complete hue?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:050:SBM-GWM-003": {
+  "question": "2024-2025 ରେ କେତେ ସାମୁଦାୟିକ ସୋକ୍‌ପିଟ୍ ଯୋଜନା କରାଯାଇଛି?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:051:SBM-GWM-004": {
+  "question": "How many community soak pits have been approved in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:052:SBM-GWM-012": {
+  "question": "What is the expenditure on household soak pits in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:053:SBM-SI-016": {
+  "question": "How many single-pit to twin-pit toilet retrofits have been planned in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:054:SBM-SI-009": {
+  "question": "2024-25 me kitne IHHL complete hue?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:055:SBM-SI-004": {
+  "question": "Public institutions me kitne toilet ban gaye 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:056:SBM-SI-005": {
+  "question": "What is the expenditure on toilets in public institutions in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:057:SBM-SI-013": {
+  "question": "How many toilets and handwash units in AWCs and schools are ongoing in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:058:SBM-SI-014": {
+  "question": "2024-2025 re kete anganwadi o school re toilet sarichi?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:059:SBM-SI-022": {
+  "question": "How many septic-tank-with-soak-pit retrofits have been approved in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:060:SBM-SI-006": {
+  "question": "2024-2025 ରେ କେତେ ବ୍ୟକ୍ତିଗତ ଘରୋଇ ଶୌଚାଳୟ ଯୋଜନା କରାଯାଇଛି?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:061:SBM-SWM-004": {
+  "question": "How many community compost pits are ongoing in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:062:SBM-SWM-011": {
+  "question": "Household compost pit par kitna kharcha hua 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:063:SBM-SWM-015": {
+  "question": "2024-25 me kitne segregation shed ban kar taiyar ho gaye?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:064:SBM-SWM-017": {
+  "question": "Segregation bins planned 24-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:065:SBM-SWM-027": {
+  "question": "2024-2025 re kete Gobardhan unit sampurna heichi?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:066:SBM-SWM-028": {
+  "question": "What is the expenditure on Gobardhan units in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:067:SBM-SWM-031": {
+  "question": "Door-to-door kachra gaadi kitni chal rahi hain 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:068:SBM-SWM-035": {
+  "question": "How many weighing machines have been planned in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:069:SBM-SWM-001": {
+  "question": "How many Solid Waste Management activities have been planned in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:070:SBM-OM-001": {
+  "question": "What is the O&M expenditure on community sanitary complexes in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:071:SBM-OM-003": {
+  "question": "What is the Operation & Maintenance expenditure on segregation sheds in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:072:SBM-OM-008": {
+  "question": "PPE kit aur safety equipment kitne plan hue 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:073:SBM-OM-010": {
+  "question": "What is the total Operation & Maintenance expenditure in Andhrua in 2024-2025?",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 57,
+    "end": 64
+   }
+  ]
+ },
+ "csv:074:SBM-OM-004": {
+  "question": "2024-2025 ରେ ପ୍ଲାଷ୍ଟିକ ବର୍ଜ୍ୟବସ୍ତୁ ପରିଚାଳନା ୟୁନିଟ ପାଇଁ କେତେ ଖର୍ଚ୍ଚ ହୋଇଛି?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:075:SBM-OM-007": {
+  "question": "Faecal sludge management plant par kitna kharcha hua 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:076:SBM-SWM-005": {
+  "question": "2024-25 me kitne compost pit complete hue?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:077:SBM-SI-003": {
+  "question": "How many toilets in public institutions are ongoing in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:078:BUD-002": {
+  "question": "How much funding is recorded from each funding source in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:079:BUD-005": {
+  "question": "What percentage of the sanctioned budget is tied and untied in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:080:BUD-022": {
+  "question": "Which focus area has the highest planned expenditure in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:081:BUD-007": {
+  "question": "Which GPDP theme has the highest planned expenditure in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:082:BUD-006": {
+  "question": "2024-25 me har theme ko kitna planned expenditure mila?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:083:BUD-027": {
+  "question": "2024-2025 ରେ କେଉଁ ଫୋକସ ଏରିଆକୁ କୌଣସି ଯୋଜନାବଦ୍ଧ ଖର୍ଚ୍ଚ ମିଳିନାହିଁ?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:084:BUD-001": {
+  "question": "Andhrua ko 2024-25 me total kitna fund mila?",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 0,
+    "end": 7
+   }
+  ]
+ },
+ "csv:085:SCH-001": {
+  "question": "How many activities are recorded under CFC in Khordha for 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 46,
+    "end": 53
+   }
+  ]
+ },
+ "csv:086:SCH-005": {
+  "question": "Which scheme has the highest expenditure in Bhubaneswar for 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 44,
+    "end": 55
+   }
+  ]
+ },
+ "csv:087:SCH-008": {
+  "question": "SFC vs CFC comparison",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:088:SCH-008": {
+  "question": "Compare the activity counts and expenditure of the 15th Finance Commission and the 5th State Finance Commission in Khordha for 2024-25.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 115,
+    "end": 122
+   }
+  ]
+ },
+ "csv:089:SCH-010": {
+  "question": "SFC ke under Bhubaneswar me General/SC/ST funding split kya hai 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 13,
+    "end": 24
+   }
+  ]
+ },
+ "csv:090:SCH-011": {
+  "question": "What is the district-wise activity count under the XV Finance Commission for 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:091:FND-001": {
+  "question": "2024-2025 re Andhrua ra kama pain tied o untied panthi kete bhaga heichi?",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 13,
+    "end": 20
+   }
+  ]
+ },
+ "csv:092:FND-004": {
+  "question": "Khordha me 2024-25 me kitne percent sanctioned fund tied hai?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 0,
+    "end": 7
+   }
+  ]
+ },
+ "csv:093:FND-005": {
+  "question": "Bhubaneswar me SC aur ST ke liye kitna fund earmark hua 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 0,
+    "end": 11
+   }
+  ]
+ },
+ "csv:094:FND-007": {
+  "question": "Which GPs in Bhubaneswar have sanctioned activities but no SC/ST earmark in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 13,
+    "end": 24
+   }
+  ]
+ },
+ "csv:095:BUD-002": {
+  "question": "2024-2025 ରେ ପ୍ରତ୍ୟେକ ପାଣ୍ଠି ଉତ୍ସରୁ କେତେ ଅର୍ଥ ମିଳିଛି?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:096:FND-009": {
+  "question": "Which scheme funds the largest number of activities in Bhubaneswar in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 55,
+    "end": 66
+   }
+  ]
+ },
+ "csv:097:SCH-005": {
+  "question": "2024-2025 re kaun scheme re sabuthara adhika kharcha heichi Bhubaneswar block re?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 60,
+    "end": 71
+   }
+  ]
+ },
+ "csv:098:SCH-002": {
+  "question": "Which activities of Andhrua are funded under Own Funds in 2024-25?",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 20,
+    "end": 27
+   }
+  ]
+ },
+ "csv:099:SCH-003": {
+  "question": "What is the total estimated cost of activities under the 14th Finance Commission in Bhubaneswar for 2023-24?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 84,
+    "end": 95
+   }
+  ]
+ },
+ "csv:100:SCH-006": {
+  "question": "Which GPs in Bhubaneswar have no activities under the 4th State Finance Scheme in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 13,
+    "end": 24
+   }
+  ]
+ },
+ "csv:101:SCH-009": {
+  "question": "Khordha me XV Finance Commission ke under activities ka status breakdown kya hai 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 0,
+    "end": 7
+   }
+  ]
+ },
+ "csv:102:SCH-011": {
+  "question": "What is the district-wise activity count under the 5th State Finance Commission for 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:103:EXP-001": {
+  "question": "What is the total actual expenditure incurred by each GP in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:104:EXP-003": {
+  "question": "What percentage of the planned expenditure has been utilised in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:105:EXP-004": {
+  "question": "2024-25 me total kitna paisa unspent reh gaya?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:106:EXP-028": {
+  "question": "2024-2025 ରେ କେଉଁ ଫୋକସ ଏରିଆରେ ସର୍ବାଧିକ ପ୍ରକୃତ ଖର୍ଚ୍ଚ ହୋଇଛି?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:107:EXP-015": {
+  "question": "Which GPDP theme has the highest actual expenditure in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:108:EXP-006": {
+  "question": "How much actual expenditure has been incurred under each funding source in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:109:EXP-013": {
+  "question": "Kaun se funding source me sabse zyada paisa bacha hua hai 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:110:EXP-033": {
+  "question": "Which high-value activities above Rs 1,00,000 have no expenditure in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:111:EXP-033": {
+  "question": "5 lakh se upar ki kaun si activity par abhi tak kharcha nahi hua 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:112:EXP-024": {
+  "question": "Andhrua ra 2024-2025 ra receipt, payment o closing balance kete?",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 0,
+    "end": 7
+   }
+  ]
+ },
+ "csv:113:EXP-002": {
+  "question": "How has the total actual expenditure of Andhrua changed over the years?",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 40,
+    "end": 47
+   }
+  ]
+ },
+ "csv:114:EXP-037": {
+  "question": "Andhrua me marammat aur rakhrakhav par kitna kharcha hua 2024-25 me?",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 0,
+    "end": 7
+   }
+  ]
+ },
+ "csv:115:EXP-036": {
+  "question": "2024-2025 re Andhrua re nua sampati tiari pain kete kharcha heichi?",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 13,
+    "end": 20
+   }
+  ]
+ },
+ "csv:116:EXP-035": {
+  "question": "Which activities have actual expenditure exceeding the planned expenditure in Andhrua in 2024-2025?",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 78,
+    "end": 85
+   }
+  ]
+ },
+ "csv:117:EXP-021": {
+  "question": "Which theme has the highest utilisation of 15th CFC funds at district level in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:118:EXP-010": {
+  "question": "How many activities have expenditure under Sanitation in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:119:EXP-031": {
+  "question": "Which activities have the highest expenditure in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:120:EXP-004": {
+  "question": "2024-2025 ରେ ମୋଟ କେତେ ଟଙ୍କା ଖର୍ଚ୍ଚ ହୋଇନାହିଁ?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:121:EXP-023": {
+  "question": "What percentage of sanctioned funds was utilised in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:122:EXP-001": {
+  "question": "expenditure Andhrua?",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 12,
+    "end": 19
+   }
+  ]
+ },
+ "csv:123:EXP-008": {
+  "question": "Tied aur untied fund se 2024-25 me kitna kharcha hua?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:124:EXP-001": {
+  "question": "What is the total actual expenditure incurred by each GP in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:125:STS-001": {
+  "question": "How many activities in Andhrua are in each progress status for 2024-25?",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 23,
+    "end": 30
+   }
+  ]
+ },
+ "csv:126:STS-013": {
+  "question": "What is the district-wise activity status summary for 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:127:STS-003": {
+  "question": "How many activities in Bhubaneswar are ongoing in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 23,
+    "end": 34
+   }
+  ]
+ },
+ "csv:128:STS-003": {
+  "question": "Bhubaneswar me kitne kaam abandoned hain 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 0,
+    "end": 11
+   }
+  ]
+ },
+ "csv:129:STS-004": {
+  "question": "Which GPs in Khordha have the highest number of abandoned activities in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 13,
+    "end": 20
+   }
+  ]
+ },
+ "csv:130:STS-006": {
+  "question": "Bhubaneswar me kitne percent taken-up kaam complete hue 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 0,
+    "end": 11
+   }
+  ]
+ },
+ "csv:131:STS-007": {
+  "question": "Which blocks in Khordha have the highest activity completion rate for 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 16,
+    "end": 23
+   }
+  ]
+ },
+ "csv:132:STS-009": {
+  "question": "Bhubaneswar ke kaun se GP me ek bhi kaam complete nahi hua 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 0,
+    "end": 11
+   }
+  ]
+ },
+ "csv:133:STS-010": {
+  "question": "Bhubaneswar me kitne kaam Under Approval me atke hue hain 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 0,
+    "end": 11
+   }
+  ]
+ },
+ "csv:134:IMP-002": {
+  "question": "2024-2025 ରେ ଆରମ୍ଭ ହୋଇଥିବା କେତେ କାର୍ଯ୍ୟ ସମ୍ପୂର୍ଣ୍ଣ ହୋଇଛି?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:135:IMP-005": {
+  "question": "What is the completion rate under each theme and focus area in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:136:IMP-009": {
+  "question": "Which focus area has the lowest completion rate in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:137:IMP-013": {
+  "question": "Which high-expenditure activities have not yet started in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:138:IMP-018": {
+  "question": "Kaun si activities Work Ongoing dikha rahi hain lekin poora approved paisa kharch ho gaya 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:139:IMP-011": {
+  "question": "2024-2025 ରେ କେଉଁ ଫୋକସ ଏରିଆରେ ସବୁଠାରୁ ଅଧିକ ଚାଲୁଥିବା କାର୍ଯ୍ୟ ଅଛି?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:140:IMP-003": {
+  "question": "Andhrua me kitne planned kaam abhi tak shuru hi nahi hue 2024-25 me?",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 0,
+    "end": 7
+   }
+  ]
+ },
+ "csv:141:IMP-007": {
+  "question": "Which themes have the largest implementation gap between planned and initiated in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:142:PHY-001": {
+  "question": "What physical-progress evidence has been recorded for activity 125711758?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:143:PHY-004": {
+  "question": "2024-2025 re Bhubaneswar block re kete kama ra physical progress evidence achi?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 13,
+    "end": 24
+   }
+  ]
+ },
+ "csv:144:STS-003": {
+  "question": "2024-2025 re Bhubaneswar block re kete kama sarichi?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 13,
+    "end": 24
+   }
+  ]
+ },
+ "csv:145:STS-003": {
+  "question": "How many activities in Bhubaneswar are under approval for 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 23,
+    "end": 34
+   }
+  ]
+ },
+ "csv:146:STS-003": {
+  "question": "2023-24 me Bhubaneswar me kitni activities approved status me hain?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 11,
+    "end": 22
+   }
+  ]
+ },
+ "csv:147:ALR-001": {
+  "question": "Which administratively approved activities in Bhubaneswar still have zero expenditure 90 days after sanction?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 46,
+    "end": 57
+   }
+  ]
+ },
+ "csv:148:ALR-002": {
+  "question": "Khordha me kaun si activities ka kharcha admin approved cost se zyada ho gaya 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 0,
+    "end": 7
+   }
+  ]
+ },
+ "csv:149:ALR-004": {
+  "question": "Which activities in Khordha have a technically approved cost higher than the administratively approved cost in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 20,
+    "end": 27
+   }
+  ]
+ },
+ "csv:150:ALR-012": {
+  "question": "2024-2025 ରେ ଭୁବନେଶ୍ୱର ବ୍ଲକର କେଉଁ ଗ୍ରାମ ପଞ୍ଚାୟତରେ କୌଣସି କାର୍ଯ୍ୟ ହୋଇନାହିଁ?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:151:ALR-013": {
+  "question": "Khordha me kaun se GP ka 2024-25 me kisi bhi module me data entry nahi hua?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 0,
+    "end": 7
+   }
+  ]
+ },
+ "csv:152:ALR-008": {
+  "question": "Which activities approved more than 180 days ago in Bhubaneswar are still not started?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 52,
+    "end": 63
+   }
+  ]
+ },
+ "csv:153:ALR-011": {
+  "question": "Which blocks in Khordha are below 50 percent activity completion in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 16,
+    "end": 23
+   }
+  ]
+ },
+ "csv:154:DQY-001": {
+  "question": "Khordha me kitni activities ka focus area record nahi hua 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 0,
+    "end": 7
+   }
+  ]
+ },
+ "csv:155:DQY-006": {
+  "question": "Which activities in Bhubaneswar are marked completed or ongoing but have no progress evidence in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 20,
+    "end": 31
+   }
+  ]
+ },
+ "csv:156:DQY-011": {
+  "question": "Which activities in Bhubaneswar report expenditure but have no payment vouchers in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 20,
+    "end": 31
+   }
+  ]
+ },
+ "csv:157:DQY-004": {
+  "question": "2024-2025 re Khordha re kete activity re funding scheme record hoini?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 13,
+    "end": 20
+   }
+  ]
+ },
+ "csv:158:SAN-003": {
+  "question": "What is the total administratively sanctioned amount for each GP in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:159:SAN-001": {
+  "question": "How many activities in Andhrua received administrative approval in 2024-2025?",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 23,
+    "end": 30
+   }
+  ]
+ },
+ "csv:160:SAN-004": {
+  "question": "2024-2025 re Khordha jillare block anusare prashasanika manjuri rashi kete?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 13,
+    "end": 20
+   }
+  ]
+ },
+ "csv:161:SAN-002": {
+  "question": "How many activities in Bhubaneswar are still awaiting administrative approval in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 23,
+    "end": 34
+   }
+  ]
+ },
+ "csv:162:SAN-007": {
+  "question": "Bhubaneswar me kitne percent planned activities ko admin approval mila 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 0,
+    "end": 11
+   }
+  ]
+ },
+ "csv:163:SAN-011": {
+  "question": "Khordha me kaun si activities ko sabse zyada admin sanction amount mila 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 0,
+    "end": 7
+   }
+  ]
+ },
+ "csv:164:SAN-005": {
+  "question": "What are the administrative approval order number, date and issuing authority for activity 125711758?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:165:SAN-003": {
+  "question": "2024-2025 ରେ ଆନ୍ଧ୍ରୁଆ ପାଇଁ ମୋଟ ପ୍ରଶାସନିକ ମଞ୍ଜୁରୀ ରାଶି କେତେ?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:166:SAN-010": {
+  "question": "How many administrative approvals in Khordha were issued in each quarter of 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 37,
+    "end": 44
+   }
+  ]
+ },
+ "csv:167:AST-001": {
+  "question": "How many assets were created in each GP during 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:168:AST-002": {
+  "question": "2024-2025 ରେ ଭୁବନେଶ୍ୱର ବ୍ଲକରେ ସମ୍ପତ୍ତି ଶ୍ରେଣୀ ଅନୁସାରେ କେତେ ସମ୍ପତ୍ତି ସୃଷ୍ଟି ହୋଇଛି?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:169:AST-006": {
+  "question": "Bhubaneswar me 2024-25 me kitne immovable asset bane?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 0,
+    "end": 11
+   }
+  ]
+ },
+ "csv:170:AST-007": {
+  "question": "Which asset category received the highest expenditure in Khordha for 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 57,
+    "end": 64
+   }
+  ]
+ },
+ "csv:171:AST-009": {
+  "question": "Bhubaneswar ke kaun se GP ne 2024-25 me koi asset nahi banaya?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 0,
+    "end": 11
+   }
+  ]
+ },
+ "csv:172:AST-012": {
+  "question": "How has the number of assets created per year in Bhubaneswar changed?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 49,
+    "end": 60
+   }
+  ]
+ },
+ "csv:173:AST-010": {
+  "question": "What is the average unit cost of tap connections across Khordha for 2025-26?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 56,
+    "end": 63
+   }
+  ]
+ },
+ "csv:174:AST-005": {
+  "question": "What are the unit count and unit cost of assets created under activity 125711758?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:175:AST-004": {
+  "question": "Where are the assets under activity 125711758 located, and how many units at each location?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:176:AST-008": {
+  "question": "How many assets were created under the Self-sufficient Infrastructure in Village theme in Bhubaneswar for 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 90,
+    "end": 101
+   }
+  ]
+ },
+ "csv:177:TRD-011": {
+  "question": "Compare activity counts, expenditure and completion rates between Bhubaneswar and Barpali for 2024-25.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar",
+   "Barpali"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 66,
+    "end": 77
+   },
+   {
+    "level": "block",
+    "code": null,
+    "name": "Barpali",
+    "start": 82,
+    "end": 89
+   }
+  ]
+ },
+ "csv:178:TRD-010": {
+  "question": "Compare planned expenditure, actual expenditure and completion rate between Andhrua and Barimunda for 2024-2025.",
+  "gp_lgd_codes": [
+   "119599",
+   "119598"
+  ],
+  "gp_names": [
+   "Barimunda",
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 76,
+    "end": 83
+   },
+   {
+    "level": "gp",
+    "code": "119599",
+    "name": "Barimunda",
+    "start": 88,
+    "end": 97
+   }
+  ]
+ },
+ "csv:179:TRD-012": {
+  "question": "How does Khordha compare with the state average on expenditure per GP and completion rate for 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 9,
+    "end": 16
+   }
+  ]
+ },
+ "csv:180:TRD-004": {
+  "question": "Bhubaneswar ka total kharcha 2023-24 se 2024-25 me kitna badla?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 0,
+    "end": 11
+   }
+  ]
+ },
+ "csv:181:TRD-006": {
+  "question": "ଆନ୍ଧ୍ରୁଆର ବର୍ଷ ଅନୁସାରେ ମୋଟ ଖର୍ଚ୍ଚ କେତେ?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:182:TRD-002": {
+  "question": "Compare the approved cost and expenditure theme-wise between 2023-24 and 2024-25.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:183:TRD-005": {
+  "question": "Khordha ka activity completion rate saalon me kaise badla?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 0,
+    "end": 7
+   }
+  ]
+ },
+ "csv:184:TRD-006": {
+  "question": "Andhrua ra barsa bhittire mota kharcha kete?",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 0,
+    "end": 7
+   }
+  ]
+ },
+ "csv:185:TRD-011": {
+  "question": "Compare Laxmipur and Kalimela for 2024-25.",
+  "gp_lgd_codes": [
+   "119936",
+   "119862"
+  ],
+  "gp_names": [
+   "Kalimela",
+   "Laxmipur"
+  ],
+  "blocks": [
+   "Kalimela",
+   "Laxmipur"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Laxmipur",
+    "start": 8,
+    "end": 16
+   },
+   {
+    "level": "gp",
+    "code": "119862",
+    "name": "Laxmipur",
+    "start": 8,
+    "end": 16
+   },
+   {
+    "level": "block",
+    "code": null,
+    "name": "Kalimela",
+    "start": 21,
+    "end": 29
+   },
+   {
+    "level": "gp",
+    "code": "119936",
+    "name": "Kalimela",
+    "start": 21,
+    "end": 29
+   }
+  ]
+ },
+ "csv:186:TRD-001": {
+  "question": "Compare the activities planned and started theme-wise between 2023-24 and 2024-25.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:187:DSS-006": {
+  "question": "Bhubaneswar ke kaun se GP me sabse zyada paisa bacha hua hai 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 0,
+    "end": 11
+   }
+  ]
+ },
+ "csv:188:DSS-005": {
+  "question": "2024-2025 re Bhubaneswar re kaun chalu kama manjuri rashira 25 percent tharu kama kharcha karichi?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 13,
+    "end": 24
+   }
+  ]
+ },
+ "csv:189:DSS-002": {
+  "question": "Which blocks in Khordha combine high pending sanctions with low expenditure in 2024-25?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Khordha"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Khordha",
+    "start": 16,
+    "end": 23
+   }
+  ]
+ },
+ "csv:190:DSS-001": {
+  "question": "Andhrua me kaun se focus area ka approved cost zyada hai lekin completion 50 percent se kam hai 2024-25 me?",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 0,
+    "end": 7
+   }
+  ]
+ },
+ "csv:191:DSS-003": {
+  "question": "Which asset sub-categories in Bhubaneswar show the highest repeat-maintenance frequency in 2024-2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 30,
+    "end": 41
+   }
+  ]
+ },
+ "csv:192:BEN-001": {
+  "question": "How many beneficiaries received benefits under Swachh Bharat Mission in Andhrua during 2024-25?",
+  "gp_lgd_codes": [
+   "119598"
+  ],
+  "gp_names": [
+   "Andhrua"
+  ],
+  "blocks": [],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "gp",
+    "code": "119598",
+    "name": "Andhrua",
+    "start": 72,
+    "end": 79
+   }
+  ]
+ },
+ "csv:193:BEN-003": {
+  "question": "Bhubaneswar block ke GPs me kitne beneficiary hain 2024-25 me?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [
+   "Bhubaneswar"
+  ],
+  "districts": [],
+  "mentions": [
+   {
+    "level": "block",
+    "code": null,
+    "name": "Bhubaneswar",
+    "start": 0,
+    "end": 11
+   }
+  ]
+ },
+ "csv:194:BUD-006": {
+  "question": "What is the total budget outlay planned across all main GPDPs for 2024 to 2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:195:BUD-006": {
+  "question": "What's the aggregate budget outlay for all primary GPDPs for 2025 to 2026?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:196:PLU-008": {
+  "question": "Which GPs have planned zero-cost activities for 2024 to 2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:197:PLU-008": {
+  "question": "Which GPs proposed activities costing zero rupees for 2024 to 2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:198:STS-003": {
+  "question": "How many sanitation activities have been completed under Swachh Bharat for 2025 to 2026?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:199:STS-003": {
+  "question": "What is the count of finished sanitation projects for Swachh Bharat for 2025 to 2026?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:200:EXP-004": {
+  "question": "What is the total unspent balance across all GPs in the state for 2020 to 2021?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:201:EXP-004": {
+  "question": "What is the aggregate unutilized balance for all GPs in the state for 2020 to 2021?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:202:EXP-009": {
+  "question": "Show the breakdown of tied fund expenditure by sector (water vs sanitation) for 2025 to 2026.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:203:EXP-009": {
+  "question": "Show me the distribution of tied funds spent on water versus sanitation for 2025 to 2026.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:204:BUD-006": {
+  "question": "What is the total allocation for the 9 Sankalp themes state-wide for 2024 to 2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:205:BUD-006": {
+  "question": "Total state-wide funding for the 9 Sankalp themes for 2025 to 2026.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:206:PLN-032": {
+  "question": "List the GPs that have not allocated any funds to Sankalp themes for 2025 to 2026.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:207:PLN-032": {
+  "question": "Find GPs that have zero funds allocated toward Sankalp themes for 2025 to 2026.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:208:PLN-001": {
+  "question": "How many GPs have uploaded their main GPDP for FY 2025-26?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:209:PLN-001": {
+  "question": "Count the GPs that completed main GPDP uploads for FY 25-26.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:210:PLN-005": {
+  "question": "List the GPs that have not yet uploaded any GPDP for 2024 to 2026.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:211:PLN-005": {
+  "question": "Which GPs failed to upload any GPDP so far for 2024 to 2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:212:PLN-002": {
+  "question": "What is the total number of supplementary plans approved state-wide for 2025 to 2026?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:213:PLN-002": {
+  "question": "Provide the total number of approved supplementary plans at the state level for 2024 to 2025.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:214:PLU-004": {
+  "question": "How many GPs have submitted at least one supplementary plan in Ganjam district for 2024 to 2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Ganjam"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Ganjam",
+    "start": 63,
+    "end": 69
+   }
+  ]
+ },
+ "csv:215:PLU-004": {
+  "question": "Count the GPs from Ganjam that have at least one supplementary plan for 2025 to 2026.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [
+   "Ganjam"
+  ],
+  "mentions": [
+   {
+    "level": "district",
+    "code": null,
+    "name": "Ganjam",
+    "start": 19,
+    "end": 25
+   }
+  ]
+ },
+ "csv:216:PLN-024": {
+  "question": "What is the total number of activities planned in the main GPDPs for 2025 to 2026?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:217:PLN-024": {
+  "question": "What is the overall number of activities proposed in main GPDPs for 2025 to 2026?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:218:PLN-031": {
+  "question": "Which GP has the highest number of planned activities for 2024 to 2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:219:PLN-031": {
+  "question": "Identify the GP with the highest activity count for 2024 to 2025.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:220:BUD-006": {
+  "question": "What is the total estimated cost of all planned activities state-wide for 2024 to 2026?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:221:BUD-006": {
+  "question": "State-wide total of estimated costs for all activities for 2025 to 2026.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:222:PLN-024": {
+  "question": "Show the breakdown of planned activities by theme for 2024 to 2025.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:223:PLN-024": {
+  "question": "How are planned activities distributed across different themes for 2024 to 2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:224:PLN-049": {
+  "question": "How many activities are planned under the sanitation sector for 2024 to 2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:225:PLN-049": {
+  "question": "Number of activities proposed within the sanitation category for 2024 to 2025.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:226:PLN-031": {
+  "question": "Which GP has planned the most activities under piped water supply for 2024 to 2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:227:PLN-031": {
+  "question": "Find the GP with the greatest count of piped water supply plans for 2024 to 2026.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:228:PLN-014": {
+  "question": "How many GPs have their GPDPs still pending approval for 2024 to 2026?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:229:PLN-014": {
+  "question": "Count of GPs with GPDPs in pending approval status for 2024 to 2025.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:230:STS-003": {
+  "question": "How many activities have been completed across the state for 2025 to 2026?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:231:STS-003": {
+  "question": "What is the total completed activity count for all districts in 2025 to 2026?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:232:STS-003": {
+  "question": "How many activities are in progress during 2024 to 2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:233:STS-003": {
+  "question": "Give the total count of activities currently in progress for 2024 to 2025.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:234:IMP-005": {
+  "question": "Which sector has the best activity completion rate for 2024 to 2026?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:235:IMP-005": {
+  "question": "Identify the sector with the highest percentage of completed activities for 2024 to 2026.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:236:STS-003": {
+  "question": "How many road construction activities are in progress for 2024 to 2026?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:237:STS-003": {
+  "question": "What is the number of road works currently in progress for 2024 to 2026?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:238:PLN-007": {
+  "question": "Which districts are behind on GPDP submission for 2024 to 2026?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:239:PLN-007": {
+  "question": "Identify districts with delayed GPDP submissions for 2024 to 2026.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:240:PHY-006": {
+  "question": "Which GPs have expenditure recorded but zero physical progress for 2024 to 2025?",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:241:PHY-006": {
+  "question": "Find GPs with non-zero expenditure and zero physical progress for 2024 to 2025.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:242:AST-001": {
+  "question": "Give a district-wise summary of asset creation for 2024 to 2025.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:243:AST-001": {
+  "question": "Show asset creation totals across all districts for 2024 to 2025.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:244:TRD-003": {
+  "question": "Show a five-year time series of fund utilization for 2025 to 2026.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ },
+ "csv:245:TRD-003": {
+  "question": "Give a time-series view of fund utilization covering the previous five years for 2025 to 2026.",
+  "gp_lgd_codes": [],
+  "gp_names": [],
+  "blocks": [],
+  "districts": [],
+  "mentions": []
+ }
+}
