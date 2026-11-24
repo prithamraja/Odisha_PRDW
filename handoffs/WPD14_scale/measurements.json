@@ -1,0 +1,99 @@
+{
+  "what_this_is": "WP-D14 T7 scale test measurements (no data).",
+  "machine": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel | 12 cores / 16 logical | 15.7 GB RAM | Windows-11-10.0.22621-SP0 | Python 3.14.0",
+  "method": {
+    "build_seconds": "Wall clock around the builder subprocess (`phase5g_profile_sheets.py --synthetic`), process start to exit: imports, DuckDB queries over the three parquets, writing out every sentence, compressing and writing the store, hashing it for the stamp.",
+    "store_mb": "Sum of the bytes of every store file (index, parts, stamp), MB = 10^6 bytes.",
+    "lookup": "1000 keys drawn uniformly (seed 14) from all sheet keys. Each in its own new Python process: import the reader, open the store (`verify()`: read the stamp, SHA-256 every file, load the index), then time `get(level, code)` alone with perf_counter. `get_ms` is the lookup; `open_ms` is the one-off open a service pays once at start, reported separately. The OS file cache is warm after the first process (the store is read by each open's hash pass).",
+    "memory": "psutil RSS in the same fresh process: after importing the reader, before opening; and after `verify()` plus one `get()`. The difference is the memory added by opening the store and reading one sheet. Median and maximum over the lookup processes."
+  },
+  "made_up_state": {
+    "view1": 4319360,
+    "view3": 40800,
+    "view4": 6800,
+    "gps": 6800,
+    "blocks": 314,
+    "districts": 30,
+    "seconds": 66.0
+  },
+  "build_seconds": 26.9,
+  "builder_output": [
+    "log: name trimmed (theme / focus area): 'Theme 5 - Clean and Green Village '",
+    "  all            1 sheets        99 sentences",
+    "  district      30 sheets     2,384 sentences",
+    "  block        314 sheets    28,466 sentences",
+    "  gp         6,800 sheets   420,580 sentences",
+    "  2 files, 41.0 MB, largest 40.9 MB",
+    "  built in 12.0 s, written in 8.9 s (total 20.9 s) -> C:\\dev\\odisha-d14-scale\\store"
+  ],
+  "store_bytes": 41008082,
+  "store_mb": 41.0,
+  "largest_file": [
+    40941031,
+    "profile_sheets.part0.bin"
+  ],
+  "largest_file_mb": 40.9,
+  "files": [
+    [
+      "profile_sheets_index.json.gz",
+      65395
+    ],
+    [
+      "profile_sheets.part0.bin",
+      40941031
+    ],
+    [
+      "profile_sheets_stamp.json",
+      1656
+    ]
+  ],
+  "sheets": {
+    "all": 1,
+    "district": 30,
+    "block": 314,
+    "gp": 6800
+  },
+  "sentences": {
+    "all": 99,
+    "district": 2384,
+    "block": 28466,
+    "gp": 420580
+  },
+  "lookups": {
+    "n": 1000,
+    "levels": {
+      "all": 1,
+      "district": 7,
+      "block": 44,
+      "gp": 948
+    },
+    "get_ms_median": 0.56,
+    "get_ms_p95": 0.86,
+    "get_ms_max": 1.26,
+    "open_ms_median": 48.5,
+    "open_ms_p95": 63.3,
+    "open_plus_get_ms_p95": 64.0,
+    "rss_added_mb_median": 2.0,
+    "rss_added_mb_max": 2.2,
+    "seconds": 185.8
+  },
+  "checks": [
+    "profile sheets --check  (C:\\dev\\odisha-d14-scale\\store)",
+    "  PASS  2 the parts add up                     17,940 parent figures equal the sum of their members (Gram Panchayat -> block -> district -> whole)",
+    "  PASS  3 shares re-derived                    28,580 shares re-derived from their own parts, 345 places with more than one member",
+    "  PASS  5 sentences hold only stored figures   451,529 sentences: every numeral is a stored value through the stored formatter; 117,725 display strings regenerated; 451,529 ids unique, at most 60 characters, no space or bracket",
+    "  PASS  6 every place has a sheet              gp 6,800, block 314, district 30, all 1 sheets, one per place in the master; 0 with no activity",
+    "",
+    "  all green"
+  ],
+  "checks_green": true,
+  "checks_seconds": 25.5,
+  "targets": {
+    "build under 10 minutes": true,
+    "store under 300 MB": true,
+    "largest file under 95 MB": true,
+    "lookup median and p95 under 50 ms": true,
+    "memory added under 100 MB": true,
+    "sheets 6,800 + 314 + 30 + 1": true
+  }
+}
