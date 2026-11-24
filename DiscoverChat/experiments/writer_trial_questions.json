@@ -1,0 +1,65 @@
+{
+  "what_this_is": "The questions whose judge picks are held for writer tests. build_judge_picks.py runs search and the judge ONCE for each and saves the result in judge_picks.json; every writer test then starts from those saved picks. To add a question, add a line here with a new id and run build_judge_picks.py again - only questions not yet held are run.",
+  "sources": {
+    "live 2026-11-23": "Questions asked of the running service on 2026-11-23, on the current models.",
+    "WP-D13b trial": "The fifteen questions of the WP-D13b headline trial (also used for the Fix 1 and Fix 6 live runs).",
+    "D5.1 set": "From experiments/questions.json, the WP-D5 question set: twelve of its 34 place questions (six Gram Panchayats, three blocks, three districts) and every measure, vague and open question not already in the trial fifteen."
+  },
+  "questions": [
+    {"id": "L01", "source": "live 2026-11-23", "question": "What should I know about Kandhamal?"},
+    {"id": "L02", "source": "live 2026-11-23", "question": "Which blocks stand out on expenditure?"},
+    {"id": "L03", "source": "live 2026-11-23", "question": "What is unusual about water supply works?"},
+    {"id": "L04", "source": "live 2026-11-23", "question": "what should I know about Cuttack?"},
+    {"id": "L05", "source": "live 2026-11-23", "question": "What patterns show up in sanctions across districts?"},
+    {"id": "L06", "source": "live 2026-11-23", "question": "What should I know about Kalimela?"},
+    {"id": "L07", "source": "live 2026-11-23", "question": "How are untied funds being used?"},
+
+    {"id": "T01", "source": "WP-D13b trial", "question": "Is spending on track?"},
+    {"id": "T02", "source": "WP-D13b trial", "question": "How is Chikilli doing?"},
+    {"id": "T03", "source": "WP-D13b trial", "question": "Where is money planned but not spent?"},
+    {"id": "T04", "source": "WP-D13b trial", "question": "How is Barpali block doing?"},
+    {"id": "T05", "source": "WP-D13b trial", "question": "Which places are behaving differently from the rest?"},
+    {"id": "T06", "source": "WP-D13b trial", "question": "Which blocks account for the shortfall?"},
+    {"id": "T07", "source": "WP-D13b trial", "question": "Where does the gap sit?"},
+    {"id": "T08", "source": "WP-D13b trial", "question": "Break down spending by block"},
+    {"id": "T09", "source": "WP-D13b trial", "question": "How is the total split across districts?"},
+    {"id": "T10", "source": "WP-D13b trial", "question": "Who is driving the shortfall?"},
+    {"id": "T11", "source": "WP-D13b trial", "question": "How is tied grant planned split across fiscal years?"},
+    {"id": "T12", "source": "WP-D13b trial", "question": "Break it down by fiscal year"},
+    {"id": "T13", "source": "WP-D13b trial", "question": "Tell me about untied grants."},
+    {"id": "T14", "source": "WP-D13b trial", "question": "Anything I should be looking at in Ganjam?"},
+    {"id": "T15", "source": "WP-D13b trial", "question": "What is the position on abandoned works?"},
+
+    {"id": "GEO-06", "source": "D5.1 set", "question": "How is Biswamathpur performing on spending?"},
+    {"id": "GEO-07", "source": "D5.1 set", "question": "What stands out in Boipariguda?"},
+    {"id": "GEO-12", "source": "D5.1 set", "question": "What does the analysis say about Haldikudar?"},
+    {"id": "GEO-18", "source": "D5.1 set", "question": "Is Laxmipur behind on anything?"},
+    {"id": "GEO-19", "source": "D5.1 set", "question": "Mendarajpur - show me what the analysis found."},
+    {"id": "GEO-20", "source": "D5.1 set", "question": "Anything notable about Sharagada?"},
+    {"id": "GEO-22", "source": "D5.1 set", "question": "What has been found in Attabira block?"},
+    {"id": "GEO-24", "source": "D5.1 set", "question": "Is Lahunipara block an exception to anything?"},
+    {"id": "GEO-26", "source": "D5.1 set", "question": "How do the GPs in Sheragada block look?"},
+    {"id": "GEO-29", "source": "D5.1 set", "question": "How is Khordha district doing overall?"},
+    {"id": "GEO-30", "source": "D5.1 set", "question": "What has the analysis found in Koraput?"},
+    {"id": "GEO-32", "source": "D5.1 set", "question": "Sundergarh district - what should I look at?"},
+
+    {"id": "MEA-02", "source": "D5.1 set", "question": "What does the analysis say about photo evidence?"},
+    {"id": "MEA-03", "source": "D5.1 set", "question": "Anything about technical sanction?"},
+    {"id": "MEA-04", "source": "D5.1 set", "question": "Which works have been abandoned?"},
+    {"id": "MEA-05", "source": "D5.1 set", "question": "How is the tied grant behaving?"},
+    {"id": "MEA-06", "source": "D5.1 set", "question": "Findings on untied grant"},
+    {"id": "MEA-07", "source": "D5.1 set", "question": "What is happening with receipts?"},
+    {"id": "MEA-08", "source": "D5.1 set", "question": "Any pattern in payments?"},
+    {"id": "MEA-09", "source": "D5.1 set", "question": "Anything on administrative approval?"},
+    {"id": "MEA-10", "source": "D5.1 set", "question": "What has been found about training?"},
+
+    {"id": "VAG-02", "source": "D5.1 set", "question": "What should I raise at the next review meeting?"},
+    {"id": "VAG-03", "source": "D5.1 set", "question": "Where is the biggest problem?"},
+    {"id": "VAG-04", "source": "D5.1 set", "question": "Is money moving steadily or in year-end bursts?"},
+    {"id": "VAG-06", "source": "D5.1 set", "question": "Anything worth my attention this quarter?"},
+
+    {"id": "OPN-01", "source": "D5.1 set", "question": "How is GPDP implementation going under XV FC?"},
+    {"id": "OPN-02", "source": "D5.1 set", "question": "Are the ODF and SBM works progressing?"},
+    {"id": "OPN-03", "source": "D5.1 set", "question": "Is drinking water getting its share of the money?"}
+  ]
+}

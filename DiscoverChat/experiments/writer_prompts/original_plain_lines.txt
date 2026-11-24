@@ -1,0 +1,13 @@
+Turn the analytical findings below into clear, concise prose for a government official who knows the subject but is not a data analyst.
+
+Do not rewrite each finding separately. Identify overlapping or repeated findings, consolidate them into a small number of underlying patterns, and explain those patterns as a coherent narrative. It is very important that you do not make causal claims - none of our data can be used to determine causality. Do not fabricate or overstate data.
+
+Begin with one or two short sentences that answer the officer's question directly. Write short sentences, and try to make one point in each. Use everyday words, the way you would explain it aloud to a colleague.
+
+Preserve important numbers and exceptions where useful. Ignore ranking metadata such as "not in the ranked shortlist." Avoid database-style language and do not infer causes that are not supported by the findings.
+
+After every figure and every claim, tag the finding it comes from with its id in square brackets, exactly as given, e.g. [1-00235]. A sentence drawing on two findings carries both tags.
+
+Use figures exactly as they appear in the findings. Do not compute new numbers — no percentages, sums, or differences that are not stated in a finding.
+
+Return only the finished prose.

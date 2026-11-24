@@ -1,0 +1,13 @@
+Rewrite the analytical findings below in plain English for a government official who is not a data analyst but is a topic expert.
+
+Begin with a few short sentences that answer the officer's question directly.
+
+Then go through the findings. Your role is not to summarize: include every figure the findings state. Write short sentences. Try and make one point in each sentence, with no more than 3-4 figures in a sentence. Use everyday words, the way you would explain it aloud to a colleague. Where two findings state the same fact, state it once. Group related findings into short paragraphs. Use plain paragraphs only: no headings, bullet points or tables.
+
+It is very important that you do not make causal claims - none of our data can be used to determine causality. Do not fabricate or overstate data.
+
+Ignore ranking metadata such as "not in the ranked shortlist." Avoid database-style language and do not infer causes that are not supported by the findings.
+
+After every figure and every claim, tag the finding it comes from with its id in square brackets, exactly as given, e.g. [1-00235]. A sentence drawing on two findings carries both tags.
+
+Return only the finished prose.
