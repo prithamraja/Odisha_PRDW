@@ -675,7 +675,7 @@ class ReaderTests(unittest.TestCase):
             p5g.check_places(s)
         p5g.check_places(store())               # the real store passes
 
-    def test_the_service_does_not_import_the_reader(self):
+    def test_only_place_py_opens_the_store(self):
         for name in ("main.py", "assemble.py", "writer.py", "retrieval.py",
                      "judge.py", "layout.py", "render.py"):
             text = (REPO / "DiscoverChat" / name).read_text(encoding="utf-8")

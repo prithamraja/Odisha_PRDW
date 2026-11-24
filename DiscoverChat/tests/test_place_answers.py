@@ -52,10 +52,13 @@ CLEAN = ("Code 101 accounts for 51.96 percent of total cost across 19 of 22 "
 # The brief's T1 table.
 T1 = [
     ("What should I know about Kalimela?", [("block", "3843")], "full", [("gp", "119936")], True),
-    ("What should I know about Kalimela GP?", [("gp", "119936")], "full", [("block", "3843")], True),
-    ("How is Kalimela Gram Panchayat doing", [("gp", "119936")], "full", [("block", "3843")], True),
-    ("the panchayat of Kalimela", [("gp", "119936")], "full", [("block", "3843")], True),
-    ("How is Kalimela block doing", [("block", "3843")], "full", [("gp", "119936")], True),
+    # WP-D15c (R27): the officer named the level -- no note, alternative kept.
+    ("What should I know about Kalimela GP?", [("gp", "119936")], "full", [("block", "3843")], False),
+    ("How is Kalimela Gram Panchayat doing", [("gp", "119936")], "full", [("block", "3843")], False),
+    ("the panchayat of Kalimela", [("gp", "119936")], "full", [("block", "3843")], False),
+    ("How is Kalimela block doing", [("block", "3843")], "full", [("gp", "119936")], False),
+    ("Compare Kalimela GP and Bheden", [("gp", "119936"), ("block", "3678")], "main",
+     [("block", "3843"), ("gp", "116438")], True),
     ("Kalyansinghpur", [("block", "3914")], "full", [("gp", "121162")], True),
     ("How is Chikilli doing?", [("gp", "117835")], "full", [], False),
     ("How is Barpali block doing?", [("block", "3676")], "full", [], False),
@@ -110,9 +113,11 @@ class ResolutionTests(_Base):
         self.assertEqual(self.plan("What should I know about Kalimela?").note,
                          'This answer is about Kalimela block. For the Gram '
                          'Panchayat, ask about "Kalimela GP".')
-        self.assertEqual(self.plan("What should I know about Kalimela GP?").note,
-                         'This answer is about Kalimela Gram Panchayat. For the '
-                         'block, ask about "Kalimela block".')
+        # WP-D15c (R27): the officer wrote "GP", so no note.
+        self.assertEqual(self.plan("What should I know about Kalimela GP?").note, "")
+        self.assertEqual(self.plan("Compare Kalimela GP and Bheden").note,
+                         'This answer is about Bheden block. For the Gram '
+                         'Panchayat, ask about "Bheden GP".')
         self.assertEqual(self.plan("Kalyansinghpur").note,
                          'This answer is about Kalyansingpur block. For the Gram '
                          'Panchayat, ask about "Kalyansinghpur GP".')
@@ -556,6 +561,114 @@ class TurnTests(_Base):
             answer = self.turn("What should I know about Kalimela?", FINDINGS, [CLEAN])
         self.assertEqual(answer.place, {})
         self.assertFalse(answer.text.startswith("This answer is about"))
+
+    # ── WP-D15c ───────────────────────────────────────────────────────────────
+    def test_r26_no_more_than_line_on_a_place_answer(self):
+        many = [_finding(f"1-0{i:04d}", f"Across {i} things, x reaches {i}.")
+                for i in range(1, 11)]
+        answer = self.turn("What should I know about Kalimela?", many,
+                           ["It reaches 1 [1-00001]."])
+        self.assertEqual(answer.place["insights_held_back"], 2)
+        self.assertNotIn("More than", answer.text)
+
+    def test_r26_the_line_stays_on_an_ordinary_capped_turn(self):
+        slots = self.extractor.extract("Is spending on track?")
+        result = Result(slots=slots,
+                        hits=[Hit(finding=f, cosine=0.7, boost=0.0, score=0.7)
+                              for f in FINDINGS],
+                        considered=100, best_cosine=0.7,
+                        threshold=config.CANDIDATE_FLOOR, collapsed_count=0,
+                        capped=True)
+        self.assembler._retrieve = lambda message, turn_id=None: (result, {"used": True})
+        self.assembler.allow_model = False
+        with mock.patch.object(assemble.classifier, "classify",
+                               return_value=_routing()):
+            answer = self.assembler.answer("Is spending on track?")
+        self.assertIn(f"More than {config.ANSWER_CAP} findings", answer.text)
+
+    def test_r25_left_out_ids_kept_in_the_prose_record(self):
+        answer = self.turn("Is spending on track?", FINDINGS,
+                           ["Untied grant planned reaches Rs 1.24 crore in "
+                            "Boipariguda across 12 blocks [1-00987]."])
+        self.assertTrue(answer.prose["used"])
+        self.assertEqual(answer.prose["left_out"], ["1-00235"])
+        # A sheet answer that cites no insight at all is kept (no floor).
+        a1 = self.kalimela()["A1"].id
+        answer = self.turn("What should I know about Kalimela?", FINDINGS,
+                           [f"Kalimela block has 852 planned activities [{a1}]."])
+        self.assertTrue(answer.prose["used"])
+        self.assertEqual(answer.prose["left_out"], ["1-00235", "1-00987"])
+
+    def test_r25_the_fall_back_is_unchanged(self):
+        bad = "It reached Rs 9.99 crore [1-00235]."
+        answer = self.turn("Is spending on track?", FINDINGS, [bad, bad])
+        self.assertFalse(answer.prose["used"])
+        self.assertEqual(answer.prose["left_out"], [])
+        for f in FINDINGS:
+            self.assertIn(f.display_sentence(), answer.text)
+
+    def test_r25_block_restores_the_old_rule(self):
+        with mock.patch.object(config, "EVERY_INSIGHT_CHECK", "block"):
+            answer = self.turn("Is spending on track?", FINDINGS,
+                               ["Untied grant planned reaches Rs 1.24 crore in "
+                                "Boipariguda across 12 blocks [1-00987].",
+                                "Untied grant planned reaches Rs 1.24 crore in "
+                                "Boipariguda across 12 blocks [1-00987]."])
+        self.assertFalse(answer.prose["used"])
+        self.assertIn("never cited", answer.prose["reason"])
+
+
+class StandingEndTests(_Base):
+    """WP-D15c T4: highest = most, lowest = fewest; "among the highest" is
+    not a rank. The five correct sentences of WP-D15 report §4.5 pass; the
+    four kinds of real mistake are still caught."""
+
+    def facts(self, *places):
+        out = []
+        for level, code in places:
+            info = self.store.place(level, code)
+            plan = place.Plan(places=[{k: info[k] for k in ("level", "code", "name", "label")}],
+                              mode="full")
+            out += place.all_facts(place.groups_for(plan, self.store))
+        return out
+
+    def step6(self, prose, facts):
+        return checks.check_citations(prose, [], place_facts=facts,
+                                      standing_mode="block")["6_standing"]
+
+    def test_the_five_false_alarms_now_pass(self):
+        cases = [
+            ("Barpali has the most planned activities in the sample: 1,447 across its 2 "
+             "Gram Panchayats, the highest of 16 blocks [p-block-3676-A1][p-block-3676-I4].",
+             [("block", "3676")]),
+            ("Its 808 planned activities rank 7th highest, but its planned cost of Rs 3.36 "
+             "crore is the 7th lowest [p-block-3838-A1][p-block-3838-A3].", [("block", "3838")]),
+            ("167 works are marked ongoing, the 4th highest count among 16 blocks "
+             "[p-block-3838-E1][p-block-3838-E2].", [("block", "3838")]),
+            ("Its activity count is the 4th highest among 9 districts. [p-district-321-A1]",
+             [("district", "321")]),
+            ("Their planned costs are also among the highest in the comparison: Rs 7.65 "
+             "crore in Kalimela and Rs 7.22 crore in Bheden [p-block-3843-A3][p-block-3678-A3].",
+             [("block", "3843"), ("block", "3678")]),
+        ]
+        for prose, places in cases:
+            with self.subTest(prose=prose[:50]):
+                step = self.step6(prose, self.facts(*places))
+                self.assertTrue(step["pass"], step["failures"])
+
+    def test_the_four_mistakes_are_still_caught(self):
+        facts = self.facts(("block", "3843"))       # A1 "5th most", A6 "4th lowest"
+        for prose in ("Spending is 23.0%, the 4th highest of 16 blocks [p-block-3843-A6].",
+                      "It has 852 planned activities, the most of 16 blocks [p-block-3843-A1].",
+                      "It has 852 planned activities, the 3rd most of 16 blocks [p-block-3843-A1].",
+                      "Spending is 23.0%, in the lowest quarter of blocks [p-block-3843-A6]."):
+            with self.subTest(prose=prose):
+                self.assertFalse(self.step6(prose, facts)["pass"])
+
+    def test_the_default_stays_log(self):
+        self.assertEqual(config.STANDING_CHECK, "log")
+        self.assertEqual(config.EVERY_INSIGHT_CHECK, "log")
+        self.assertIn("every_insight_check", config.knobs())
 
 
 # ═════════════════════════════════════════════════════════════════════════════

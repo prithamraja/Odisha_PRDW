@@ -761,10 +761,13 @@ def _citation_checks_fire(ctx):
         "causal claim": CLEAN_PROSE + " The shortfall was caused by late "
                                       "sanctions [1-00235].",
     }
+    # Step 4 is pinned to block too (WP-D15c): the seeded "dropped finding"
+    # proves the old rule still fires when it is switched back on.
     for name, prose in seeded.items():
         result = checks.check_citations(prose, SEED_FINDINGS,
                                         run_date=SEED_RUN_DATE,
-                                        causal_mode="block")
+                                        causal_mode="block",
+                                        every_insight_mode="block")
         assert not result["all_pass"], f"the check missed a seeded {name}"
         assert checks.citation_failure_reason(result).strip(), (
             f"a seeded {name} was caught with no reason to feed back")
@@ -1102,14 +1105,18 @@ R18_PARAGRAPH = ("Some answers also come with PLACE FACTS: standard figures "
 PLACE_TABLE = [
     ("What should I know about Kalimela?", [("block", "3843")], "full",
      [("gp", "119936")], True),
+    # WP-D15c (R27): the officer's own words named the level -- no note; the
+    # alternative is kept for the page's switch.
     ("What should I know about Kalimela GP?", [("gp", "119936")], "full",
-     [("block", "3843")], True),
+     [("block", "3843")], False),
     ("How is Kalimela Gram Panchayat doing", [("gp", "119936")], "full",
-     [("block", "3843")], True),
+     [("block", "3843")], False),
     ("the panchayat of Kalimela", [("gp", "119936")], "full",
-     [("block", "3843")], True),
+     [("block", "3843")], False),
     ("How is Kalimela block doing", [("block", "3843")], "full",
-     [("gp", "119936")], True),
+     [("gp", "119936")], False),
+    ("Compare Kalimela GP and Bheden", [("gp", "119936"), ("block", "3678")],
+     "main", [("block", "3843"), ("gp", "116438")], True),
     ("Kalyansinghpur", [("block", "3914")], "full", [("gp", "121162")], True),
     ("How is Chikilli doing?", [("gp", "117835")], "full", [], False),
     ("How is Barpali block doing?", [("block", "3676")], "full", [], False),
@@ -1163,6 +1170,9 @@ def _place_resolution(ctx):
     first = _resolve(ctx, PLACE_TABLE[0][0])
     assert first.note == ('This answer is about Kalimela block. For the Gram '
                           'Panchayat, ask about "Kalimela GP".'), first.note
+    mixed = _resolve(ctx, "Compare Kalimela GP and Bheden")
+    assert mixed.note == ('This answer is about Bheden block. For the Gram '
+                          'Panchayat, ask about "Bheden GP".'), mixed.note
     full = len(store.sentences("block", "3843"))
     return (f"{len(PLACE_TABLE)} rows of the T1 table reproduced; every "
             f"note's quoted words resolve to its alternative; Kalimela block "
@@ -1180,7 +1190,7 @@ def _place_fixture(ctx, level="block", code="3843"):
 
 
 @check("place-facts-optional",
-       "a place fact is never required: an answer that cites none passes step 4; a mined insight still is (WP-D15 T3)")
+       "a place fact is never required: an answer that cites none passes step 4; a mined insight is, under DISCOVERCHAT_EVERY_INSIGHT_CHECK=block (WP-D15 T3, WP-D15c)")
 def _place_facts_optional(ctx):
     rows = _place_fixture(ctx)
     facts = list(rows.values())
@@ -1200,46 +1210,87 @@ def _place_facts_optional(ctx):
     dropped = ("Kalimela block has 852 planned activities "
                f"[{rows['A1'].id}]. Code 101 accounts for 51.96 percent of "
                "total cost across 19 of 22 measures [1-00235].")
+    # Pinned to block (WP-D15c): under the default `log` a left-out insight
+    # is recorded and does not fail; this asserts the old rule still holds.
     result = checks.check_citations(dropped, SEED_FINDINGS,
-                                    run_date=SEED_RUN_DATE, place_facts=facts)
-    assert not result["4_all_findings_cited"]["pass"], (
+                                    run_date=SEED_RUN_DATE, place_facts=facts,
+                                    every_insight_mode="block")
+    assert not result["all_pass"] and not result["4_all_findings_cited"]["pass"], (
         "a dropped mined insight passed step 4 on a place turn")
     unhanded = "Kalimela has 852 planned activities [p-block-9999-A1]."
     result = checks.check_citations(unhanded, [], place_facts=facts)
     assert not result["1_ids_known"]["pass"], "an id not handed passed step 1"
     return (f"{len(facts)} Kalimela block lines handed: an answer citing none "
-            f"passes; citing one passes; a dropped insight still fails step "
-            f"4; an id not handed fails step 1")
+            f"passes; citing one passes; a dropped insight fails step 4 under "
+            f"block; an id not handed fails step 1")
 
 
 @check("place-standing-check",
        "a rank or quarter in a sentence citing a place fact must be the one the cited line states (WP-D15 T3 step 6)")
 def _place_standing(ctx):
-    rows = _place_fixture(ctx)
-    facts = list(rows.values())
-    a6, a1 = rows["A6"].id, rows["A1"].id
-    cases = [
-        (f"Spending is 23.0% of the planned cost, the 4th lowest of 16 blocks [{a6}].", True),
-        (f"Spending is 23.0% of the planned cost, the 4th highest of 16 blocks [{a6}].", False),
-        (f"Kalimela block has 852 planned activities, the 5th most of 16 blocks [{a1}].", True),
-        (f"Kalimela block has 852 planned activities, the 5th highest of 16 blocks [{a1}].", False),
-        (f"Kalimela block has 852 planned activities, the most of 16 blocks [{a1}].", False),
-        (f"Spending is 23.0% of the planned cost, in the lowest quarter of blocks [{a6}].", False),
-        ("Spending is the 4th highest of all blocks [1-00235].", True),
+    """WP-D15c T4: the five correct sentences step 6 refused in the WP-D15
+    trial (report §4.5) pass; the four kinds of real mistake are still caught.
+    Pinned to block so the gate proves the step fires, whatever the default."""
+    from DiscoverChat import place
+    store = _place_store(ctx)
+
+    def lines(*places):
+        facts = []
+        for level, code in places:
+            info = store.place(level, code)
+            plan = place.Plan(places=[{k: info[k] for k in ("level", "code",
+                                                              "name", "label")}],
+                              mode="full")
+            facts += place.all_facts(place.groups_for(plan, store))
+        return facts
+
+    trial = [   # (sentence, places handed) -- report §4.5, the tags as written
+        ("Barpali has the most planned activities in the sample: 1,447 across "
+         "its 2 Gram Panchayats, the highest of 16 blocks "
+         "[p-block-3676-A1][p-block-3676-I4].", [("block", "3676")]),
+        ("Its 808 planned activities rank 7th highest, but its planned cost of "
+         "Rs 3.36 crore is the 7th lowest; 447 activities (55.3%) have no cost "
+         "attached [p-block-3838-A1][p-block-3838-A2][p-block-3838-A3].",
+         [("block", "3838")]),
+        ("The main status issue is that 167 works are marked ongoing, the 4th "
+         "highest count among 16 blocks, while no works are marked completed "
+         "[p-block-3838-E1][p-block-3838-E2].", [("block", "3838")]),
+        ("Khordha has 1,316 planned activities; its activity count is the 4th "
+         "highest among 9 districts. [p-district-321-A1]",
+         [("district", "321")]),
+        ("Their planned costs are also among the highest in the comparison: Rs "
+         "7.65 crore in Kalimela and Rs 7.22 crore in Bheden "
+         "[p-block-3843-A3][p-block-3678-A3].",
+         [("block", "3843"), ("block", "3678")]),
     ]
-    for prose, should_pass in cases:
-        result = checks.check_citations(prose, SEED_FINDINGS[:1] if "1-00235" in prose else [],
-                                        place_facts=facts, standing_mode="block")
+    caught = [  # Kalimela block: A1 "5th most", A6 "4th lowest"
+        "Spending is 23.0% of the planned cost, the 4th highest of 16 blocks [p-block-3843-A6].",
+        "Kalimela block has 852 planned activities, the most of 16 blocks [p-block-3843-A1].",
+        "Kalimela block has 852 planned activities, the 3rd most of 16 blocks [p-block-3843-A1].",
+        "Spending is 23.0% of the planned cost, in the lowest quarter of blocks [p-block-3843-A6].",
+    ]
+    kalimela = lines(("block", "3843"))
+    cases = ([(s, lines(*p), True) for s, p in trial]
+             + [(s, kalimela, False) for s in caught]
+             + [(f"Kalimela block has 852 planned activities, the 5th highest "
+                 f"of 16 blocks [p-block-3843-A1].", kalimela, True),
+                ("Spending is the 4th highest of all blocks [1-00235].",
+                 kalimela, True)])
+    for prose, facts, should_pass in cases:
+        result = checks.check_citations(
+            prose, SEED_FINDINGS[:1] if "1-00235" in prose else [],
+            place_facts=facts, standing_mode="block")
         step = result.get("6_standing")
         assert step is not None, "step 6 did not run on a place turn"
         assert step["pass"] == should_pass, (
             f"step 6 gave {step['pass']} for {prose!r}: {step['failures']}")
         if not should_pass:
             assert "these ranks" in checks.citation_failure_reason(result).lower()
-    return (f"{len(cases)} sentences: the line's own rank passes; the other "
-            f"end word, a first place it does not hold and a quarter it does "
-            f"not state are caught; a sentence citing no place fact is not "
-            f"checked (mode {config.STANDING_CHECK})")
+    return (f"the 5 correct sentences refused in the WP-D15 trial pass; the "
+            f"other end, a first place not held, a rank not given and a "
+            f"quarter not stated are caught; highest = most; a sentence citing "
+            f"no place fact is not checked ({len(cases)} cases; mode "
+            f"{config.STANDING_CHECK})")
 
 
 @check("place-prompt-ratified",
@@ -1337,6 +1388,41 @@ def _place_switch_off(ctx):
             f"{len(base['questions'])} answers byte-identical to the "
             f"pre-WP-D15 service; switch on: {with_place} answers carry place "
             f"facts, the other {len(base['questions']) - with_place} unchanged")
+
+
+# ── WP-D15c: the every-insight rule is a mode (R25, D82) ─────────────────────
+@check("every-insight-check-mode",
+       "under log a left-out insight is recorded, does not fail the answer and is not in the retry reason; under block it fails as before (WP-D15c, R25)")
+def _every_insight_mode(ctx):
+    left_out = ("Code 101 accounts for 51.96 percent of total cost across 19 of "
+                "22 measures [1-00235]. Untied grant planned reaches Rs 1.24 "
+                "crore in Boipariguda across 12 blocks [1-00987].")
+    logged = checks.check_citations(left_out, SEED_FINDINGS,
+                                    run_date=SEED_RUN_DATE, causal_mode="block",
+                                    every_insight_mode="log")
+    step = logged["4_all_findings_cited"]
+    assert step["dropped"] == ["d1-00042"] and step["pass"] is False, step
+    assert step["counts"] is False and logged["all_pass"], (
+        "under log a left-out insight failed the answer")
+    assert "never cited" not in checks.citation_failure_reason(logged)
+    both = checks.check_citations(left_out + " There were 7 more.",
+                                  SEED_FINDINGS, run_date=SEED_RUN_DATE,
+                                  every_insight_mode="log")
+    reason = checks.citation_failure_reason(both)
+    assert not both["all_pass"] and "7" in reason and "never cited" not in reason, (
+        "a draft retried for another reason was told to add the left-out insight")
+    blocked = checks.check_citations(left_out, SEED_FINDINGS,
+                                     run_date=SEED_RUN_DATE, causal_mode="block",
+                                     every_insight_mode="block")
+    assert not blocked["all_pass"] and "never cited" in checks.citation_failure_reason(blocked)
+    assert set(blocked["4_all_findings_cited"]) == {"pass", "dropped", "of"}, (
+        "block mode no longer returns the old step's keys")
+    nothing = checks.check_citations("The records do not cover onion prices.",
+                                     SEED_FINDINGS, every_insight_mode="log")
+    assert nothing["all_pass"], "an answer citing no insight failed under log (no floor)"
+    return (f"log: left-out d1-00042 recorded, answer passes, retry reason "
+            f"silent on it; block: fails as before with its old keys; no floor "
+            f"(configured mode {config.EVERY_INSIGHT_CHECK})")
 
 
 # ── live-only ────────────────────────────────────────────────────────────────

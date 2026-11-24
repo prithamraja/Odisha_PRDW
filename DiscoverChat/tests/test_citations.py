@@ -99,6 +99,45 @@ class CitationCheckTests(unittest.TestCase):
         self.assertFalse(result["4_all_findings_cited"]["pass"])
         self.assertEqual(result["4_all_findings_cited"]["dropped"], ["d1-00042"])
 
+    # ── WP-D15c (R25): step 4 is a mode ─────────────────────────────────────
+    _LEFT_OUT = ("Code 101 accounts for 51.96 percent across 19 of 22 "
+                 "[1-00235]. Untied grant reaches Rs 1.24 crore in 12 "
+                 "blocks [1-00987].")
+
+    def test_log_a_left_out_finding_is_recorded_and_does_not_fail(self):
+        result = checks.check_citations(self._LEFT_OUT, FINDINGS,
+                                        run_date=RUN_DATE,
+                                        every_insight_mode="log")
+        step = result["4_all_findings_cited"]
+        self.assertEqual((step["pass"], step["dropped"], step["counts"]),
+                         (False, ["d1-00042"], False))
+        self.assertTrue(result["all_pass"])
+        self.assertNotIn("never cited", checks.citation_failure_reason(result))
+
+    def test_log_a_retry_for_another_reason_says_nothing_of_left_out(self):
+        result = checks.check_citations(self._LEFT_OUT + " There were 7 more.",
+                                        FINDINGS, run_date=RUN_DATE,
+                                        every_insight_mode="log")
+        reason = checks.citation_failure_reason(result)
+        self.assertFalse(result["all_pass"])
+        self.assertIn("7", reason)
+        self.assertNotIn("never cited", reason)
+
+    def test_block_is_the_old_rule_exactly(self):
+        # Pinned to block: under the default log a left-out finding passes.
+        result = checks.check_citations(self._LEFT_OUT, FINDINGS,
+                                        run_date=RUN_DATE,
+                                        every_insight_mode="block")
+        self.assertFalse(result["all_pass"])
+        self.assertEqual(set(result["4_all_findings_cited"]),
+                         {"pass", "dropped", "of"})
+        self.assertIn("never cited", checks.citation_failure_reason(result))
+
+    def test_no_floor(self):
+        result = checks.check_citations("Nothing here bears on onion prices.",
+                                        FINDINGS, every_insight_mode="log")
+        self.assertTrue(result["all_pass"])
+
     def test_a_causal_claim_fails(self):
         # Pinned to block (WP-D13 Fix 6): the service default is now log.
         result = checks.check_citations(
