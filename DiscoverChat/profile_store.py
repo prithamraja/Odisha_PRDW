@@ -10,6 +10,11 @@ this module yet; WP-D15 wires it into /chat. Its contract:
     sentences(level, code) -> list   in the hand-over order; each item is
                                      {"id", "row", "sentence", "note"}
     sentence(id) -> dict | None      one sentence by its id
+    place(level, code) -> dict | None {"level", "code", "name", "label",
+                                     "parents"}, from the index alone
+    find(level, name) -> list        the codes at that level whose name equals
+                                     `name`, ignoring case and outer spaces;
+                                     [] when none, several when a name repeats
 
 The store is written by `Insights/src/phase5g_profile_sheets.py`: an index
 (`profile_sheets_index.json.gz`, gzipped so a Windows checkout cannot rewrite
@@ -22,7 +27,8 @@ THE READER REFUSES (raises `ProfileStoreRefused`; `available()` says False):
   * a file the stamp names that is missing or altered (the WP-D11b discipline);
   * a store whose candidate set differs from the findings corpus's -- two run
     stamps in one answer would date it wrongly whichever one it printed;
-  * any store marked synthetic (the T7 scale test's).
+  * any store marked synthetic (the T7 scale test's);
+  * an index built before WP-D14b, with no name table ("rebuild the store").
 
 It computes nothing. Every figure, share, rank and sentence is in the store.
 Standard library only, so opening the store costs no more than the index.
@@ -37,6 +43,9 @@ import re
 import zlib
 
 INDEX_NAME = "profile_sheets_index.json.gz"
+# 2 = WP-D14b: the index carries `places`, the name table (level -> code ->
+# name, label, parent codes). An index without it is refused.
+INDEX_FORMAT = 2
 STAMP_NAME = "profile_sheets_stamp.json"
 PART_PATTERN = "profile_sheets.part{}.bin"
 LEVELS = ("gp", "block", "district", "all")
@@ -71,6 +80,7 @@ class ProfileStore:
         self._stamp = None
         self._index = None
         self._verified = False
+        self._names = {}          # level -> {folded name: [codes]}, built on first find
 
     # ── checks ──────────────────────────────────────────────────────────────
     def _path(self, name: str) -> str:
@@ -118,6 +128,9 @@ class ProfileStore:
         if index.get("candidate_set_id") != st.get("candidate_set_id"):
             raise ProfileStoreRefused("the index and the stamp disagree on the "
                                       "candidate set")
+        if index.get("format") != INDEX_FORMAT or "places" not in index:
+            raise ProfileStoreRefused("the index was built before WP-D14b and "
+                                      "has no name table; rebuild the store")
         self._index = index
         self._verified = True
 
@@ -155,6 +168,39 @@ class ProfileStore:
         return [{"id": s["id"], "row": s["row"], "sentence": s["sentence"],
                  "note": notes.get(s["note"]) if s.get("note") else None}
                 for s in sheet["sentences"]]
+
+    def place(self, level: str, code) -> dict | None:
+        """A place's name, label and parents, from the index alone."""
+        places = self.index()["places"]
+        entry = places.get(level, {}).get(str(code))
+        if entry is None:
+            return None
+        parents = {}
+        for parent in ("block", "district"):
+            if parent in entry:
+                pcode = entry[parent]
+                parents[parent] = {"code": pcode,
+                                   "name": places[parent][pcode]["name"]}
+        return {"level": level, "code": str(code), "name": entry["name"],
+                "label": entry["label"], "parents": parents}
+
+    @staticmethod
+    def _fold(name) -> str:
+        return str(name or "").strip().casefold()
+
+    def find(self, level: str, name) -> list:
+        """Every code at `level` whose name equals `name`, ignoring case and
+        outer spaces. Several when a name repeats at that level: choosing
+        among them is the caller's job, never guessed here."""
+        places = self.index()["places"].get(level)
+        if places is None:
+            return []
+        if level not in self._names:
+            table = {}
+            for code, entry in places.items():
+                table.setdefault(self._fold(entry["name"]), []).append(code)
+            self._names[level] = table
+        return list(self._names[level].get(self._fold(name), []))
 
     def sentence(self, sentence_id: str) -> dict | None:
         m = SHEET_ID_RE.match(sentence_id or "")
@@ -203,3 +249,11 @@ def sentences(level: str, code) -> list:
 
 def sentence(sentence_id: str) -> dict | None:
     return default_store().sentence(sentence_id)
+
+
+def place(level: str, code) -> dict | None:
+    return default_store().place(level, code)
+
+
+def find(level: str, name) -> list:
+    return default_store().find(level, name)

@@ -64,7 +64,8 @@ from phase5f_decompose import RECONCILE_ABS, RECONCILE_REL      # noqa: E402
 from DiscoverChat.glossary import signed_money, signed_above    # noqa: E402
 from DiscoverChat.checks import numerals                        # noqa: E402
 from DiscoverChat.profile_store import (                        # noqa: E402
-    ProfileStore, INDEX_NAME, STAMP_NAME, PART_PATTERN, SHEET_ID_RE,
+    ProfileStore, INDEX_NAME, INDEX_FORMAT, STAMP_NAME, PART_PATTERN,
+    SHEET_ID_RE,
 )
 
 MI_DIR = os.path.join(BASE_DIR, "metainsights")
@@ -1214,6 +1215,10 @@ def write_store(result: dict, out_dir: str, provenance: dict, run_stamp: dict,
 
     counts = {}
     ids = set()
+    # T3 (WP-D14b): the name table. One entry per sheet, in the sheets' own
+    # order: the trimmed name, the sheet's own label, and the parents' codes
+    # (a block has only its district; a district and the whole have none).
+    places = {level: {} for level in STORE_ORDER}
     for level in STORE_ORDER:
         n_sheets = n_sentences = 0
         for (lv, code) in sorted(k for k in sheets if k[0] == level):
@@ -1226,6 +1231,11 @@ def write_store(result: dict, out_dir: str, provenance: dict, run_stamp: dict,
             if buf and len(buf) + len(blob) > PART_LIMIT:
                 flush()
             index[level][code] = [part_no, len(buf), len(blob)]
+            entry = {"name": sheet["name"], "label": sheet["label"]}
+            for parent in ("block", "district"):
+                if parent in sheet["parents"]:
+                    entry[parent] = sheet["parents"][parent]["code"]
+            places[level][code] = entry
             buf.extend(blob)
             n_sheets += 1
             n_sentences += len(sheet["sentences"])
@@ -1245,9 +1255,12 @@ def write_store(result: dict, out_dir: str, provenance: dict, run_stamp: dict,
             "Panchayat, block, district and the whole, each stored as its own "
             "zlib-compressed JSON inside the numbered part files; `sheets` maps "
             "level -> code -> [part, byte offset, byte length], so one sheet is "
-            "read without reading any other. Built by "
+            "read without reading any other; `places` maps level -> code -> "
+            "name, label and parent codes, so a name finds its sheet without "
+            "opening any (format 2, WP-D14b). Built by "
             "Insights/src/phase5g_profile_sheets.py; read by "
             "DiscoverChat/profile_store.py. Fetched by code, never searched."),
+        "format": INDEX_FORMAT,
         "candidate_set_id": run_stamp["candidate_set_id"],
         "source_generated_at": run_stamp["generated_at"],
         "whole_name": result["whole"],
@@ -1257,6 +1270,7 @@ def write_store(result: dict, out_dir: str, provenance: dict, run_stamp: dict,
         "notes": NOTES,
         "parts": parts,
         "sheets": index,
+        "places": places,
     }
     # Gzipped, through the corpora's own writer (no clock in the header): git
     # treats it as binary, so a Windows checkout (core.autocrlf) cannot turn
