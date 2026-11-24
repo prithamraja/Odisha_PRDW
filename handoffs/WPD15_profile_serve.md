@@ -104,7 +104,13 @@ alternative the officer may have meant, and a plain note.
 Rules, in order:
 
 1. **Names to codes.** A block or a district name becomes a code through
-   `profile_store.find`. A name with no sheet is dropped and logged. A name
+   `profile_store.find`. **Pass `find` the name `geography` returns, never the
+   officer's typed words**: `find` matches the stored spelling only. A typed
+   "Kalyansinghpur" comes back from `geography` as block `Kalyansingpur`, and
+   that spelling finds block 3914; the typed one finds nothing (PM-verified on
+   the WP-D14b store: for all 16 blocks and 9 districts, the name `geography`
+   returns finds exactly the right code). A name with no sheet is dropped and
+   logged. A name
    with more than one code (statewide) is dropped and logged as ambiguous:
    asking "which one?" is not in this package.
 2. **One mention, two levels (R4).** When one mention in the text resolved to
