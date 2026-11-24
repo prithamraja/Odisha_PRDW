@@ -89,6 +89,12 @@ class Slots:
     districts: list = field(default_factory=list)
     measures: list = field(default_factory=list)
     measure_phrases: list = field(default_factory=list)
+    # WP-D15 T1: where in the text each place name stood -- one entry per
+    # occurrence, {"level", "code" (Gram Panchayats only), "name", "start",
+    # "end"}. Read by `place.resolve` to tell one mention that resolved to two
+    # levels from two mentions. Deliberately NOT in `as_dict`, so the
+    # retrieval payload every caller already logs is unchanged.
+    mentions: list = field(default_factory=list)
 
     @property
     def has_geography(self) -> bool:
@@ -150,6 +156,10 @@ class SlotExtractor:
         # types one has not said which. Boosting both is the honest reading;
         # picking one silently is the confidently-wrong class.
         seen_spans = {"gp": [], "block": [], "district": []}
+        # WP-D15 T1: every occurrence of every name accepted below, with its
+        # position. Built beside the existing logic and never read by it, so
+        # the four fields above keep exactly the values they had.
+        mentions, taken = [], {"gp": [], "block": [], "district": []}
         for pattern, surface, etype in self._geo_vocab:
             m = pattern.search(text)
             if not m:
@@ -175,6 +185,16 @@ class SlotExtractor:
                 if resolved not in found[key]:
                     found[key].append(resolved)
             seen_spans[etype].append((m.start(), m.end()))
+            for occ in pattern.finditer(text):
+                if any(occ.start() < e and occ.end() > s
+                       for s, e in taken[etype]):
+                    continue
+                taken[etype].append((occ.start(), occ.end()))
+                mentions.append({
+                    "level": etype,
+                    "code": str(entity.resolved_code) if etype == "gp" else None,
+                    "name": resolved, "start": occ.start(), "end": occ.end()})
+        found["mentions"] = sorted(mentions, key=lambda x: (x["start"], x["level"]))
         return found
 
     # -- measures -------------------------------------------------------------
