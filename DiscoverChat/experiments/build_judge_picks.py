@@ -128,6 +128,58 @@ def write(held: dict) -> None:
     tmp.replace(held_picks.PICKS_PATH)
 
 
+# WP-D17 (R28, D83): the four cautions the breakdown builder used to append to
+# every breakdown of eight measures. `--refresh` moves a held sentence to the
+# rebuilt store only when the old one is the new one plus exactly one of these.
+REMOVED_CAUTIONS = (
+    "A rise here is a rise in recording completeness unless the cashbook total "
+    "rises with it; the linked share went from 2.7% to 53.2% across these six "
+    "years.",
+    "The sanctioned basis covers only the activities with a sanction record on "
+    "file, about one in six.",
+    "Only 17 completions are recorded in the whole sample, so this splits a "
+    "near-empty column.",
+    "A swap between the SC and ST components is suspected and unconfirmed; do "
+    "not read one against the other.",
+)
+
+
+def refresh(held: dict, corpus) -> tuple:
+    """Refresh, do not re-judge. For every held insight: keep it when its
+    sentence is the store's; take the store's when the held one is the store's
+    plus one removed caution; otherwise leave it and list its question, which
+    must be held again with --redo (a judge call). Returns (held, changed,
+    questions to redo)."""
+    changed, redo = 0, []
+    for entry in held.get("entries", []):
+        for item in entry.get("findings", []):
+            record = corpus.get(item["id"])
+            if record is None:
+                redo.append(entry["id"])
+                continue
+            if record.sentence == item["sentence"]:
+                continue
+            if any(item["sentence"] == record.sentence + " " + c
+                   for c in REMOVED_CAUTIONS):
+                item["sentence"] = record.sentence
+                changed += 1
+            else:
+                redo.append(entry["id"])
+    redo = sorted(set(redo))
+    held.setdefault("refreshed", []).append({
+        "at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+        "why": ("WP-D17 (R28, D83): the breakdown store was rebuilt without "
+                "its four typed-in cautions. The held picks stay the judge's "
+                "picks; each held sentence that was the new sentence plus one "
+                "removed caution now holds the new sentence."),
+        "sentences_refreshed": changed,
+        "not_refreshed_questions": redo,
+        "corpus": {"candidate_set_id": held_picks.candidate_set_id(corpus),
+                   "records": len(corpus)},
+    })
+    return held, changed, redo
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--list", action="store_true",
@@ -137,6 +189,9 @@ def main(argv=None) -> int:
     parser.add_argument("--redo", nargs="+", default=[], metavar="ID",
                         help="hold these question ids again (ALL for every one)")
     parser.add_argument("--workers", type=int, default=10)
+    parser.add_argument("--refresh", action="store_true",
+                        help="move held sentences to a rebuilt store that only "
+                             "dropped the four cautions (WP-D17); no judge call")
     args = parser.parse_args(argv)
 
     questions = held_picks.load_questions()
@@ -159,8 +214,21 @@ def main(argv=None) -> int:
             print("  " + line)
         return 1 if found else 0
 
-    # A rebuilt corpus makes every old pick suspect, so they are not mixed.
-    if held["entries"] and held_picks.problems(held, corpus) \
+    if args.refresh:
+        held, changed, redo = refresh(held, corpus)
+        write(held)
+        print(f"refreshed {changed} held sentence(s); not refreshable: "
+              f"{redo or 'none'}")
+        if redo:
+            print("Hold those again: python DiscoverChat/experiments/"
+                  "build_judge_picks.py --redo " + " ".join(redo))
+        return 0
+
+    # A rebuilt corpus makes every old pick suspect, so they are not mixed --
+    # except the questions being held again now (WP-D17: a question the
+    # refresh could not cover is redone alone).
+    stale = {line.split(":", 1)[0] for line in held_picks.problems(held, corpus)}
+    if held["entries"] and stale - set(args.redo) \
             and "ALL" not in args.redo:
         print("The held picks no longer match the corpus. Rebuild all of them "
               "with --redo ALL.")
@@ -199,6 +267,8 @@ def main(argv=None) -> int:
                    "records": len(corpus)},
         "entries": [kept[q["id"]] for q in questions if q["id"] in kept],
     }
+    if held.get("refreshed"):
+        out["refreshed"] = held["refreshed"]
     write(out)
 
     for_writer = [e for e in out["entries"] if e.get("reaches_writer")]
