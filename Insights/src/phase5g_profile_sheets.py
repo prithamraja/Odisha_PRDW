@@ -665,7 +665,7 @@ REQUIRED_COLUMNS = {
     "view1": ["gp_lgd_code", "block_code", "district_code", "fiscal_year",
               "theme", "focus_area_name", "sanctioned_scheme_name",
               "sanction_authority", "total_cost", "total_expenditure",
-              "fund_tied_total", "fund_untied_total", "fund_abandoned_total",
+              "fund_tied_total", "fund_untied_total",
               "fund_sanctioned_total", "is_ongoing", "is_abandoned",
               "is_admin_approved", "has_approval_cost_only"],
     "view3": ["gp_lgd_code", "block_code", "district_code", "fiscal_year"]
@@ -787,7 +787,11 @@ def _build_main(con, years_old: list) -> None:
         WITH s3 AS (SELECT CAST({k} AS VARCHAR) AS code, {sums}
                     FROM view3 GROUP BY 1),
              s1 AS (SELECT CAST({k} AS VARCHAR) AS code,
-                    SUM(fund_abandoned_total) AS E3_planned,
+                    -- R10 (D77): the planned cost of the works marked
+                    -- abandoned. Not fund_abandoned_total, which 19 rows that
+                    -- are not marked abandoned also carry (spec §12 item 8).
+                    SUM(CASE WHEN is_abandoned = 1
+                             THEN COALESCE(total_cost, 0) ELSE 0 END) AS E3_planned,
                     SUM(CASE WHEN is_ongoing = 1 AND fiscal_year IN ({old})
                              THEN 1 ELSE 0 END) AS E5,
                     SUM(CASE WHEN is_ongoing = 1 AND fiscal_year IN ({old})
