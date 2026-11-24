@@ -314,11 +314,31 @@ def standing_phrase(level: str, row: dict, kind: str, whole: str) -> str | None:
     else:
         phrase = (f"in the {quarter(st['rank_low'], n)} quarter of the "
                   f"{n:,} {plural} in {where}")
-    top = row["standing"].get("all")
-    if group != "all" and top and top["peers"] > EXACT_PEERS_MAX:
+    if names_two_groups(row):
+        top = row["standing"]["all"]
         phrase += (f" and in the {quarter(top['rank_low'], top['peers'])} "
                    f"quarter of the {top['peers']:,} in {whole}")
     return phrase
+
+
+def names_two_groups(row: dict) -> bool:
+    """The standing clause names a block or district AND the whole: the group
+    used is not the whole, and the whole has more than 50 peers."""
+    group = row.get("sentence_group")
+    top = row.get("standing", {}).get("all")
+    return bool(group and group != "all" and top
+                and top["peers"] > EXACT_PEERS_MAX)
+
+
+def middle_sentence(row: dict, median: str | None, always_n: bool = False) -> str:
+    """` The middle value is …`, or ` … for these {n} is …` when the sentence
+    names two groups (R11) -- or always, for A1. {n} is the first group's size."""
+    if median is None:
+        return ""
+    if always_n or names_two_groups(row):
+        n = row["standing"][row["sentence_group"]]["peers"]
+        return f" The middle value for these {n:,} is {median}."
+    return f" The middle value is {median}."
 
 
 def middle_value(row: dict, kind: str) -> str | None:
@@ -349,9 +369,7 @@ def main_sentences(sheet: dict, whole: str) -> dict:
     def ranked(fig, body):
         phrase, median = _ranked_tail(level, rows[fig], fig, whole)
         text = body + (f", {phrase}." if phrase else ".")
-        if median is not None:
-            text += f" The middle value is {median}."
-        return text
+        return text + middle_sentence(rows[fig], median)
 
     a1 = rows["A1"]
     if a1["value"] == 0:
@@ -361,10 +379,7 @@ def main_sentences(sheet: dict, whole: str) -> dict:
         text = (f"{place} has {fmt_count(a1['value'])} planned "
                 f"{agree(a1['value'], 'activity', 'activities')}")
         text += f", {phrase}." if phrase else "."
-        if median is not None:
-            n = a1["standing"][a1["sentence_group"]]["peers"]
-            text += f" The middle value for these {n:,} is {median}."
-        out["A1"] = text
+        out["A1"] = text + middle_sentence(a1, median, always_n=True)
 
     a2 = rows["A2"]
     if a1["value"] != 0:
@@ -438,7 +453,10 @@ def main_sentences(sheet: dict, whole: str) -> dict:
                 f"{agree(e5['value'], 'work', 'works')} planned in "
                 f"{e5['cutoff_year']} or earlier "
                 f"{agree(e5['value'], 'is', 'are')} still marked ongoing.")
-        if e5["planned"] != 0:
+        if e5["planned"] != 0 and e5["spent"] == 0:
+            text += (f" Nothing has been spent of {'its' if one else 'their'} "
+                     f"{fmt_money(e5['planned'])} planned cost.")
+        elif e5["planned"] != 0:
             text += (f" {fmt_money(e5['spent'])} of {'its' if one else 'their'} "
                      f"{fmt_money(e5['planned'])} planned cost has been spent "
                      f"({fmt_share(e5['share'])}).")
@@ -451,12 +469,11 @@ def main_sentences(sheet: dict, whole: str) -> dict:
             out["F1"] = (f"None of the {fmt_count(a1['value'])} {noun} has an "
                          f"administrative approval on file.")
         else:
-            body = (f"{fmt_count(f1['value'])} of the {fmt_count(a1['value'])} "
-                    f"{noun} ({fmt_share(f1['share'])}) "
-                    f"{agree(f1['value'], 'has', 'have')} an administrative "
-                    f"approval on file")
-            phrase, _ = _ranked_tail(level, f1, "F1", whole)
-            out["F1"] = body + (f", {phrase}." if phrase else ".")
+            out["F1"] = ranked("F1", (
+                f"{fmt_count(f1['value'])} of the {fmt_count(a1['value'])} "
+                f"{noun} ({fmt_share(f1['share'])}) "
+                f"{agree(f1['value'], 'has', 'have')} an administrative "
+                f"approval on file"))
     f2 = rows["F2"]
     out["F2"] = ("No activities have a technical approval on file."
                  if f2["value"] == 0 else
@@ -470,11 +487,10 @@ def main_sentences(sheet: dict, whole: str) -> dict:
                  f"Its cashbook shows {g1['display']} received and "
                  f"{g2['display']} paid out.")
     if g2["value"] != 0:
-        text = f"{g3['display']} of the payments are linked to a planned activity."
-        median = middle_value(g3, "share")
-        if median is not None:
-            text += f" The middle value is {median}."
-        out["G3"] = text
+        out["G3"] = ("None of the payments is linked to a planned activity."
+                     if g3["value"] == 0 else
+                     ranked("G3", f"{g3['display']} of the payments are linked "
+                                  f"to a planned activity"))
 
     h1 = rows["H1"]
     if h1["value"]:
@@ -484,10 +500,15 @@ def main_sentences(sheet: dict, whole: str) -> dict:
     h2 = rows["H2"]
     if h2["value"]:
         one = h2["value"] == 1
-        out["H2"] = (f"{fmt_count(h2['value'])} "
-                     f"{agree(h2['value'], 'activity has', 'activities have')} "
-                     f"no LSDG theme mapped; {'its' if one else 'their'} planned "
-                     f"cost is {fmt_money(h2['planned'])}.")
+        head = (f"{fmt_count(h2['value'])} "
+                f"{agree(h2['value'], 'activity has', 'activities have')} "
+                f"no LSDG theme mapped; ")
+        if h2["planned"] == 0:
+            out["H2"] = head + ("it has no cost attached." if one else
+                                "none of them has a cost attached.")
+        else:
+            out["H2"] = (head + f"{'its' if one else 'their'} planned cost is "
+                                f"{fmt_money(h2['planned'])}.")
     if level == "gp":
         h3, h4, h5 = rows["H3"], rows["H4"], rows["H5"]
         if h3["flag"]:
