@@ -421,6 +421,16 @@ def _numerals(ctx):
         allowed |= set(checks.numerals(assemble.ASK_ROUTE_MESSAGE))
         allowed |= set(checks.numerals(answer.stamp))
         allowed |= {str(config.ANSWER_CAP)}
+        # WP-D15: a place turn shows sheet lines, each a stored sentence of
+        # the profile sheet store; their numerals trace to that record the
+        # way a finding's trace to the corpus. The capped line names the
+        # sheet turn's insight cap.
+        shown = set((answer.place or {}).get("lines_used", []))
+        for fact in answer.place_facts:
+            if fact.id in shown:
+                allowed |= set(checks.numerals(fact.sentence))
+        if answer.place:
+            allowed |= {str(config.PROFILE_INSIGHT_CAP)}
         for token in checks.numerals(answer.text):
             checked += 1
             assert token in allowed, (
@@ -1009,8 +1019,18 @@ def _prompt_is_appendix_a(ctx):
     assert "[1-00235] " in built and "[d1-00042] " in built
     assert "the parts add up to the whole" in built, (
         "a decomposition reached the writer without its scope note")
+    # Ratified addition 3 (D78, ruling R18): the place-facts paragraph. It is
+    # NOT part of the standing prompt; it is added on a place turn only, and
+    # `place-prompt-ratified` pins its words and its position.
+    assert context_brief.PLACE_FACTS_PARAGRAPH == R18_PARAGRAPH, (
+        "the R18 paragraph (D78) is not the operator's text")
+    assert R18_PARAGRAPH not in prompt, (
+        "the R18 paragraph was pasted into the standing prompt; it belongs "
+        "only to a turn that hands place facts")
     return (f"{len(prompt.split())} words, Appendix A verbatim plus the two "
-            f"ratified additions; no scores or coverage lines in the payload")
+            f"ratified additions; the R18 place-facts paragraph (D78) is "
+            f"added on place turns only; no scores or coverage lines in the "
+            f"payload")
 
 
 # ── WP-D14: the place profile sheets (spec §9) ───────────────────────────────
@@ -1066,6 +1086,257 @@ def _profile_places(ctx):
 def _profile_reference(ctx):
     p5g, store = _profile(ctx)
     return p5g.check_reference(store)
+
+
+# ── WP-D15: the place profile sheets in the chat (D78) ───────────────────────
+# The operator's paragraph, ruling R18, as approved on 2026-11-24 (D78). Held
+# HERE as a literal, so an edit to context_brief.py alone turns the gate red.
+R18_PARAGRAPH = ("Some answers also come with PLACE FACTS: standard figures "
+                 "about the place the officer asked about, each with an id "
+                 "starting p-. Start from the place facts that answer the "
+                 "question, then bring in the findings. You do not have to use "
+                 "every place fact. Tag them the same way as findings.")
+
+# The brief's T1 table: text -> (answered [(level, code)], mode, alternatives
+# [(level, code)], note expected).
+PLACE_TABLE = [
+    ("What should I know about Kalimela?", [("block", "3843")], "full",
+     [("gp", "119936")], True),
+    ("What should I know about Kalimela GP?", [("gp", "119936")], "full",
+     [("block", "3843")], True),
+    ("How is Kalimela Gram Panchayat doing", [("gp", "119936")], "full",
+     [("block", "3843")], True),
+    ("the panchayat of Kalimela", [("gp", "119936")], "full",
+     [("block", "3843")], True),
+    ("How is Kalimela block doing", [("block", "3843")], "full",
+     [("gp", "119936")], True),
+    ("Kalyansinghpur", [("block", "3914")], "full", [("gp", "121162")], True),
+    ("How is Chikilli doing?", [("gp", "117835")], "full", [], False),
+    ("How is Barpali block doing?", [("block", "3676")], "full", [], False),
+    ("How is Khordha district doing overall?", [("district", "321")], "full",
+     [], False),
+    ("How is Itipur doing in Bhubaneswar block", [("gp", "119605")], "full",
+     [], False),
+    ("Compare Kalimela and Bheden", [("block", "3843"), ("block", "3678")],
+     "main", [("gp", "119936"), ("gp", "116438")], True),
+    ("Compare Kalimela, Bheden, Laxmipur and Boipariguda", [], "", [], False),
+    ("Which blocks stand out on expenditure?", [], "", [], False),
+]
+
+
+def _place_store(ctx):
+    if "place_store" not in ctx:
+        from DiscoverChat import place
+        store, why = place.open_store()
+        assert store is not None, f"the profile sheet store is refused: {why}"
+        ctx["place_store"] = store
+    return ctx["place_store"]
+
+
+def _resolve(ctx, text):
+    from DiscoverChat import place
+    geo = ctx["retriever"].extractor.geography(text)
+    return place.resolve(text, geo["mentions"], _place_store(ctx),
+                         max_places=config.PROFILE_MAX_PLACES)
+
+
+@check("place-resolution",
+       "a question's place names become the brief's places, levels, alternatives and note (WP-D15 T1)")
+def _place_resolution(ctx):
+    store = _place_store(ctx)
+    for text, answered, mode, alternatives, has_note in PLACE_TABLE:
+        plan = _resolve(ctx, text)
+        got = [(p["level"], p["code"]) for p in plan.places]
+        assert got == answered, f"{text!r}: answered {got}, expected {answered}"
+        assert plan.mode == mode, f"{text!r}: mode {plan.mode!r}, expected {mode!r}"
+        alts = [(a["level"], a["code"]) for a in plan.alternatives]
+        assert alts == alternatives, f"{text!r}: alternatives {alts}"
+        assert bool(plan.note) == has_note, f"{text!r}: note {plan.note!r}"
+        # Rule 5: the quoted words resolve, by the same rules, to the
+        # alternative.
+        for alt in plan.alternatives:
+            again = _resolve(ctx, alt["ask"])
+            assert [(p["level"], p["code"]) for p in again.places] == [
+                (alt["level"], alt["code"])], (
+                f"{text!r}: the note's {alt['ask']!r} does not resolve to "
+                f"the alternative")
+    first = _resolve(ctx, PLACE_TABLE[0][0])
+    assert first.note == ('This answer is about Kalimela block. For the Gram '
+                          'Panchayat, ask about "Kalimela GP".'), first.note
+    full = len(store.sentences("block", "3843"))
+    return (f"{len(PLACE_TABLE)} rows of the T1 table reproduced; every "
+            f"note's quoted words resolve to its alternative; Kalimela block "
+            f"hands {full} lines")
+
+
+def _place_fixture(ctx, level="block", code="3843"):
+    from DiscoverChat import place
+    store = _place_store(ctx)
+    info = store.place(level, code)
+    plan = place.Plan(places=[{k: info[k] for k in ("level", "code", "name",
+                                                       "label")}], mode="full")
+    groups = place.groups_for(plan, store)
+    return {f.row: f for f in place.all_facts(groups) if f.row[:1] in "AEFG"}
+
+
+@check("place-facts-optional",
+       "a place fact is never required: an answer that cites none passes step 4; a mined insight still is (WP-D15 T3)")
+def _place_facts_optional(ctx):
+    rows = _place_fixture(ctx)
+    facts = list(rows.values())
+    prose_no_fact = CLEAN_PROSE
+    result = checks.check_citations(prose_no_fact, SEED_FINDINGS,
+                                    run_date=SEED_RUN_DATE, place_facts=facts,
+                                    causal_mode="block")
+    assert result["4_all_findings_cited"]["pass"] and result["all_pass"], (
+        f"an answer citing no place fact was refused: "
+        f"{checks.citation_failure_reason(result)}")
+    with_fact = ("Kalimela block has 852 planned activities "
+                 f"[{rows['A1'].id}]. " + CLEAN_PROSE)
+    result = checks.check_citations(with_fact, SEED_FINDINGS,
+                                    run_date=SEED_RUN_DATE, place_facts=facts,
+                                    causal_mode="block")
+    assert result["all_pass"], checks.citation_failure_reason(result)
+    dropped = ("Kalimela block has 852 planned activities "
+               f"[{rows['A1'].id}]. Code 101 accounts for 51.96 percent of "
+               "total cost across 19 of 22 measures [1-00235].")
+    result = checks.check_citations(dropped, SEED_FINDINGS,
+                                    run_date=SEED_RUN_DATE, place_facts=facts)
+    assert not result["4_all_findings_cited"]["pass"], (
+        "a dropped mined insight passed step 4 on a place turn")
+    unhanded = "Kalimela has 852 planned activities [p-block-9999-A1]."
+    result = checks.check_citations(unhanded, [], place_facts=facts)
+    assert not result["1_ids_known"]["pass"], "an id not handed passed step 1"
+    return (f"{len(facts)} Kalimela block lines handed: an answer citing none "
+            f"passes; citing one passes; a dropped insight still fails step "
+            f"4; an id not handed fails step 1")
+
+
+@check("place-standing-check",
+       "a rank or quarter in a sentence citing a place fact must be the one the cited line states (WP-D15 T3 step 6)")
+def _place_standing(ctx):
+    rows = _place_fixture(ctx)
+    facts = list(rows.values())
+    a6, a1 = rows["A6"].id, rows["A1"].id
+    cases = [
+        (f"Spending is 23.0% of the planned cost, the 4th lowest of 16 blocks [{a6}].", True),
+        (f"Spending is 23.0% of the planned cost, the 4th highest of 16 blocks [{a6}].", False),
+        (f"Kalimela block has 852 planned activities, the 5th most of 16 blocks [{a1}].", True),
+        (f"Kalimela block has 852 planned activities, the 5th highest of 16 blocks [{a1}].", False),
+        (f"Kalimela block has 852 planned activities, the most of 16 blocks [{a1}].", False),
+        (f"Spending is 23.0% of the planned cost, in the lowest quarter of blocks [{a6}].", False),
+        ("Spending is the 4th highest of all blocks [1-00235].", True),
+    ]
+    for prose, should_pass in cases:
+        result = checks.check_citations(prose, SEED_FINDINGS[:1] if "1-00235" in prose else [],
+                                        place_facts=facts, standing_mode="block")
+        step = result.get("6_standing")
+        assert step is not None, "step 6 did not run on a place turn"
+        assert step["pass"] == should_pass, (
+            f"step 6 gave {step['pass']} for {prose!r}: {step['failures']}")
+        if not should_pass:
+            assert "these ranks" in checks.citation_failure_reason(result).lower()
+    return (f"{len(cases)} sentences: the line's own rank passes; the other "
+            f"end word, a first place it does not hold and a quarter it does "
+            f"not state are caught; a sentence citing no place fact is not "
+            f"checked (mode {config.STANDING_CHECK})")
+
+
+@check("place-prompt-ratified",
+       "the R18 paragraph is the operator's text, character for character (D78), and only a place turn carries it")
+def _place_prompt(ctx):
+    from DiscoverChat import place
+    assert context_brief.PLACE_FACTS_PARAGRAPH == R18_PARAGRAPH, (
+        "context_brief.PLACE_FACTS_PARAGRAPH is not the D78 text")
+    rows = _place_fixture(ctx)
+    group = place.Group(place={"level": "block", "code": "3843",
+                               "name": "Kalimela", "label": "Kalimela block"},
+                        facts=list(rows.values()))
+    with_place = writer.build_consolidation_prompt(
+        "What should I know about Kalimela?", SEED_FINDINGS,
+        run_date=SEED_RUN_DATE, place_groups=[group])
+    plain = writer.build_consolidation_prompt(
+        "What should I know about Kalimela?", SEED_FINDINGS,
+        run_date=SEED_RUN_DATE)
+    assert (R18_PARAGRAPH + "\n\nReturn only the finished prose.") in with_place, (
+        "the paragraph is not directly before the prompt's last line")
+    assert with_place.count(R18_PARAGRAPH) == 1
+    assert R18_PARAGRAPH not in plain, "a turn with no place facts carries R18"
+    assert plain == writer._build_plain(
+        "What should I know about Kalimela?", SEED_FINDINGS,
+        run_date=SEED_RUN_DATE)
+    assert with_place.index("PLACE FACTS — Kalimela block") < with_place.index("FINDINGS")
+    return ("R18 identical to the D78 text; directly before \"Return only the "
+            "finished prose.\" on a place turn; absent on any other")
+
+
+SWITCH_OFF_BASELINE = (REPO / "handoffs" / "WPD15_trial"
+                       / "offline_baseline_answers.json.gz")
+SWITCH_OFF_VECTORS = REPO / "handoffs" / "WPD15_trial" / "offline_baseline_vectors.npy"
+
+
+@check("place-switch-off-identical",
+       "with DISCOVERCHAT_PROFILE_SHEETS=0 every offline answer is byte-identical to the service before WP-D15; with it on, every answer that names no place is too (pass mark 3)")
+def _place_switch_off(ctx):
+    """Replays the baseline's own query vectors, so the comparison sees code
+    changes only -- never the embedding endpoint's drift between calls."""
+    import copy
+    import gzip
+    import numpy as np
+    assert SWITCH_OFF_BASELINE.exists(), f"no baseline at {SWITCH_OFF_BASELINE}"
+    with gzip.open(SWITCH_OFF_BASELINE, "rt", encoding="utf-8") as fh:
+        base = json.load(fh)
+    here = config.load_stamp()["candidate_set_id"]
+    assert base["candidate_set_id"] == here, (
+        f"the baseline was made on candidate set {base['candidate_set_id']}, "
+        f"this corpus is {here}: it no longer describes this service. "
+        f"Re-make it on the service before WP-D15, as WPD15_REPORT §5 says")
+    vectors = np.load(SWITCH_OFF_VECTORS)
+    pinned = copy.copy(ctx["retriever"])
+    pinned._query_cache = {t: vectors[i]
+                           for i, t in enumerate(base["vector_texts"])}
+
+    def answers(sheets_on: bool) -> dict:
+        saved = config.PROFILE_SHEETS
+        config.PROFILE_SHEETS = sheets_on
+        try:
+            assembler = assemble.Assembler(pinned, allow_model=False)
+            out = {}
+            for question in base["questions"]:
+                a = assembler.answer(question)
+                d = json.loads(json.dumps(a.as_dict(), ensure_ascii=False,
+                                          sort_keys=True))
+                d["citations_full"] = json.loads(json.dumps(a.citations))
+                out[question] = (d, bool(a.place))
+            return out
+        finally:
+            config.PROFILE_SHEETS = saved
+
+    off = answers(False)
+    differ = [q for q in base["questions"] if off[q][0] != base["answers"][q]]
+    assert not differ, (f"{len(differ)} answers differ with the switch off, "
+                        f"first {differ[0]!r}")
+    on = answers(True)
+
+    def without_place_log(d):
+        # A turn that named places but got no sheet (more than three) logs
+        # why under retrieval["place"]; nothing else may differ.
+        d = dict(d)
+        d["retrieval"] = {k: v for k, v in d["retrieval"].items()
+                          if k != "place"}
+        return d
+
+    changed_no_place = [q for q in base["questions"]
+                        if not on[q][1]
+                        and without_place_log(on[q][0])
+                        != without_place_log(base["answers"][q])]
+    assert not changed_no_place, (
+        f"a no-place answer changed with the switch on: {changed_no_place[0]!r}")
+    with_place = sum(1 for q in base["questions"] if on[q][1])
+    return (f"switch off: {len(base['questions'])} of "
+            f"{len(base['questions'])} answers byte-identical to the "
+            f"pre-WP-D15 service; switch on: {with_place} answers carry place "
+            f"facts, the other {len(base['questions']) - with_place} unchanged")
 
 
 # ── live-only ────────────────────────────────────────────────────────────────
