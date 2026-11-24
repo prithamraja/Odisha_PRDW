@@ -1,0 +1,52 @@
+{
+  "what_this_is": "Provenance for the profile sheet store (WP-D14). `generated_at` is the ONLY field expected to differ between two builds from the same views. `files` lists the index and every part with its SHA-256; the reader refuses a missing or altered file, a store whose candidate set differs from the findings corpus's, and any store marked synthetic.",
+  "candidate_set_id": "610cb3d26dff7bf3",
+  "source_generated_at": "2026-09-11T09:31:44Z",
+  "synthetic": false,
+  "whole_name": "the whole sample",
+  "view_parquets": {
+    "view1_activity_lifecycle.parquet": {
+      "sha256": "33311e2fd6d94e391789760eb18450feabde8c7620bc45be383e0c27dd449c5f",
+      "bytes": 330621
+    },
+    "view3_gp_performance.parquet": {
+      "sha256": "9a4bea34d33b04520647db329830516f54bffffa612dcb3c915bca4fae37d63b",
+      "bytes": 15994
+    },
+    "view4_gp_profile.parquet": {
+      "sha256": "aa9ce0ad9e96f1b7a91207b26e9d5dd04f107c4035147de31376f143edbb9e5d",
+      "bytes": 17475
+    }
+  },
+  "counts": {
+    "all": {
+      "sheets": 1,
+      "sentences": 78
+    },
+    "district": {
+      "sheets": 9,
+      "sentences": 575
+    },
+    "block": {
+      "sheets": 16,
+      "sentences": 981
+    },
+    "gp": {
+      "sheets": 20,
+      "sentences": 1237
+    }
+  },
+  "files": [
+    {
+      "file": "profile_sheets_index.json",
+      "sha256": "830aae7424cc05b1ffd8f6ee45daca3e53d06475baac099f7bd038f1ec48025c",
+      "bytes": 3245
+    },
+    {
+      "file": "profile_sheets.part0.bin",
+      "sha256": "d78a55f45376a913bfb9778629608f3a8b4d9316d8959e7440e2b0d53d2a673c",
+      "bytes": 236299
+    }
+  ],
+  "generated_at": "2026-11-24T10:09:23Z"
+}
