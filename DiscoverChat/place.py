@@ -19,7 +19,9 @@ Pure code: no model call, no number worked out. Three jobs.
         the parent is dropped.
      4  one place left: its full sheet; two or three: lines A1-A7 of each
         (ruling R16); none, or more than PROFILE_MAX_PLACES: no sheet.
-     5  the note, only when rule 2 chose between two levels.
+     5  the note, only when rule 2 chose between two levels -- since WP-D15c
+        (R27) only when R4 chose, not when the officer's words said the
+        level; the alternative is kept in both cases.
 
 2. THE LINES (T2). Each place's sentences exactly as the store holds them, in
    the store's order. No score, no mark, no ordering of our own (R5): every
@@ -209,6 +211,12 @@ def resolve(text: str, mentions: list, store, *, max_places: int = 3) -> Plan:
             pick = min(candidates, key=_RANK.get)
         others = sorted((lv for lv in candidates if lv != pick), key=_RANK.get)
         alternative = candidates[others[0]] if others else None
+        # WP-D15c (R27): R4 "chose" only when the name exists at two levels
+        # and the words beside it did not say which. Only then does the place
+        # join the note; its alternative is kept either way (the page's
+        # switch).
+        candidates[pick]["r4_chose"] = (alternative is not None
+                                        and said not in candidates)
         chosen.append((cluster["start"], candidates[pick], alternative))
 
     # The same place named twice is one place, kept at its first mention.
@@ -245,7 +253,7 @@ def resolve(text: str, mentions: list, store, *, max_places: int = 3) -> Plan:
     plan.alternatives = [{"level": a["level"], "code": a["code"],
                           "label": a["label"], "ask": _ask(a)}
                          for _, a in choices]
-    plan.note = note_for(choices)
+    plan.note = note_for([(pl, a) for pl, a in choices if pl["r4_chose"]])
     return plan
 
 
