@@ -378,6 +378,26 @@ if CAUSAL_CHECK not in ("block", "log", "off"):
     raise ValueError(f"DISCOVERCHAT_CAUSAL_CHECK={CAUSAL_CHECK!r}: "
                      f"expected block, log or off")
 
+# ── WP-D15c: the writer may leave an insight out (R25, D82) ──────────────────
+# Step `4_all_findings_cited` of `checks.check_citations`. Two modes:
+#   block  the old rule: every mined insight handed must be cited, else the
+#          draft is refused and retried with "Every finding supplied belongs
+#          in the answer."
+#   log    step 4 runs and records what was left out (`dropped`), but does not
+#          count toward all_pass and is not in the retry reason. No floor: an
+#          answer citing one insight of fifteen, or none, passes this step.
+# Default LOG, the operator's ruling R25 (2026-11-24), for every answer, place
+# or no place. Evidence: WP-D15 trial, rule off 0 of 63 answers lost against
+# 4 of 63, 60 against 3 passed first time, 9.7 s against 19.8 s. Cost, as the
+# operator was told: an insight left out is not shown anywhere on the present
+# page. The old rule, no code change:
+#     DISCOVERCHAT_EVERY_INSIGHT_CHECK=block
+EVERY_INSIGHT_CHECK = os.getenv("DISCOVERCHAT_EVERY_INSIGHT_CHECK",
+                                "log").strip().lower()
+if EVERY_INSIGHT_CHECK not in ("block", "log"):
+    raise ValueError(f"DISCOVERCHAT_EVERY_INSIGHT_CHECK={EVERY_INSIGHT_CHECK!r}: "
+                     f"expected block or log")
+
 # ── WP-D12: the Insight report layout (D62) ──────────────────────────────────
 # `layout.build` turns the records an answer already uses into up to three
 # cards, up to three small charts and a "Needs checking" list -- by code, from
@@ -538,6 +558,7 @@ def knobs() -> dict:
         "consolidate_min_findings": CONSOLIDATE_MIN_FINDINGS,
         "classifier_model": CLASSIFIER_MODEL,
         "causal_check": CAUSAL_CHECK,
+        "every_insight_check": EVERY_INSIGHT_CHECK,
         "direction_check": DIRECTION_CHECK,
         "layout": LAYOUT,
         "layout_cards_min_findings": LAYOUT_CARDS_MIN_FINDINGS,

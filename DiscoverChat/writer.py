@@ -182,7 +182,9 @@ def write(question: str, findings: list, *, corpus_roster: set,
 #   (b) THE CITATION CHECK.  `checks.check_citations` — every cited id is in the
 #       answer set, every numeral appears in the stored sentence of a finding
 #       cited in the same sentence, the causal scan, and every supplied finding
-#       is cited at least once. Steps 1, 2 and 4 always block. Step 3, the
+#       is cited at least once. Steps 1 and 2 always block; step 4 blocks
+#       only under DISCOVERCHAT_EVERY_INSIGHT_CHECK=block (WP-D15c, R25; the
+#       default `log` records what was left out). Step 3, the
 #       causal scan, blocks only under DISCOVERCHAT_CAUSAL_CHECK=block; the
 #       default `log` records it without counting it (WP-D13 Fix 6, D68). The
 #       direction step (5) follows DISCOVERCHAT_DIRECTION_CHECK.
@@ -219,10 +221,16 @@ class Consolidated:
     # call failed), so a fall-back can show the place facts it chose. Not in
     # `as_dict`: the payload is unchanged.
     last_prose: str = ""
+    # WP-D15c (R25): the mined insights handed and NOT cited by the shown
+    # narrative, in the order handed. Empty on a fall-back (the officer then
+    # sees every insight as a bare sentence). Kept for the log and for a later
+    # page package; it travels in the `prose` record of /chat.
+    left_out: list = field(default_factory=list)
 
     def as_dict(self) -> dict:
         return {"mode": "consolidated", "fell_back": self.fell_back,
                 "attempts": self.attempts, "reason": self.reason,
+                "left_out": list(self.left_out),
                 "citation_checks": [
                     {k: v for k, v in r.items() if k != "3_causal"}
                     for r in self.check_results]}
@@ -454,6 +462,8 @@ def consolidate(question: str, findings: list, *, run_date: str = "",
             result.text = checks.strip_tags(prose)
             result.fell_back = False
             result.reason = ""
+            cited = set(checks.cited_ids(prose))
+            result.left_out = [f.id for f in findings if f.id not in cited]
             _log_causal_words(turn_id, question, attempt,
                               results.get("3_causal"))
             _log_number_words(turn_id, question, attempt,

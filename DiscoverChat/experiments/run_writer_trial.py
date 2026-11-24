@@ -30,9 +30,12 @@ WHAT CAN BE VARIED, for this process only -- no file the service reads is edited
   --model         the writer model
   --max-tokens    the writer's answer budget
   --allow-unused-findings
-                  the rule "every finding the judge picked must be mentioned"
-                  is switched off: the writer chooses which findings to use.
-                  The report says how many it used.
+                  step 4 ("every finding the judge picked must be mentioned")
+                  in `log` mode: the writer chooses which findings to use.
+                  Since WP-D15c (R25) this is also the service default.
+  --every-insight block|log
+                  force step 4's mode (DISCOVERCHAT_EVERY_INSIGHT_CHECK) for
+                  this run; `block` is the old rule
 
 WHAT IT REPORTS, per answer and as middle values over the run:
   kept or lost    lost = both attempts failed a check and the officer would get
@@ -132,84 +135,6 @@ def measure(tagged: str, findings: list) -> dict:
 def _failed_on(results: dict) -> list:
     return [k for k, v in results.items()
             if k != "all_pass" and not v["pass"] and v.get("counts", True)]
-
-
-def let_the_writer_choose() -> None:
-    """FOR THIS PROCESS ONLY: an answer that leaves out some of the findings is
-    not rejected.
-
-    Step 4 of the citation check ("every finding the judge picked is cited")
-    still runs and still records which findings were left out, but it does not
-    count and is not fed back on a retry. Every other step is unchanged. The
-    service's own check is not edited; this wraps it for the test.
-    """
-    real = checks.check_citations
-
-    def relaxed(prose, findings, **kwargs):
-        results = real(prose, findings, **kwargs)
-        step = results["4_all_findings_cited"]
-        step["pass_if_enforced"] = step["pass"]
-        step["pass"] = True
-        step["counts"] = False
-        results["all_pass"] = all(
-            v["pass"] for k, v in results.items()
-            if k != "all_pass" and v.get("counts", True))
-        return results
-
-    checks.check_citations = relaxed
-
-
-# ── one question ─────────────────────────────────────────────────────────────
-
-def run_one(entry: dict, findings: list, stamp: str, label: str,
-            counter) -> dict:
-    turn_id = f"wt-{label}-{entry['id']}"
-    started = time.time()
-    out = writer_mod.consolidate(entry["question"], findings, run_date=stamp,
-                                 turn_id=turn_id)
-    seconds = round(time.time() - started, 1)
-
-    calls = counter.for_turn(turn_id, "write")
-    results = iter(out.check_results)
-    attempts = []
-    for call in calls:
-        prose = (call["response_text"] or "").strip()
-        item = {"attempt": call["attempt"], "seconds": call["seconds"],
-                "finish_reason": call["finish_reason"],
-                "completion_tokens": call["completion_tokens"],
-                "reasoning_tokens": call["reasoning_tokens"],
-                "prose": prose}
-        if prose:
-            item["failed_on"] = _failed_on(next(results, {}))
-        else:
-            item["failed_on"] = ["empty reply"]
-        attempts.append(item)
-
-    last = attempts[-1]["prose"] if attempts else ""
-    wrong = ([] if out.fell_back else second_pass(
-        out.tagged, findings,
-        stamp + "\n" + context_brief.for_consolidating_writer()))
-    return {
-        "id": entry["id"], "question": entry["question"],
-        "wrong_numbers_shown": wrong,
-        "tokens": {"prompt": sum(c["prompt_tokens"] for c in calls),
-                   "completion": sum(c["completion_tokens"] for c in calls)},
-        "findings": len(findings),
-        "seconds": seconds,
-        "attempts": out.attempts,
-        "lost": out.fell_back,
-        "lost_on": (attempts[-1]["failed_on"] if out.fell_back and attempts
-                    else []),
-        "reason": out.reason,
-        "tagged": out.tagged,
-        # What was written, measured even when it was lost: a lost answer is
-        # still evidence of how the wording made the model write.
-        "measures": measure(out.tagged or last, findings) if (out.tagged
-                                                             or last) else None,
-        "checks": [{k: v for k, v in a.items() if k != "prose"}
-                   for a in attempts],
-        "attempt_prose": [a["prose"] for a in attempts],
-    }
 
 
 # ── WP-D15: the second pass, independent of the check ────────────────────────
@@ -418,6 +343,11 @@ def run_one_service(entry: dict, findings: list, stamp: str, label: str,
         "fallback_lines_not_verbatim": fallback_bad,
         "number_words_shown": words7,
         "two_year_series": by_year,
+        "layout_counts": {k: len((answer.layout or {}).get(k, []))
+                          for k in ("cards", "panels", "warnings")},
+        "left_out": answer.prose.get("left_out", []),
+        "insights_cited": len(cited_findings),
+        "names_a_place": bool(place),
         "measures": (measure(answer.tagged_text or last, shown_findings)
                      if (answer.tagged_text or last) else None),
         "tokens": {"prompt": sum(c["prompt_tokens"] for c in calls),
@@ -500,6 +430,10 @@ def main(argv=None) -> int:
     parser.add_argument("--model", help="writer model; default the configured")
     parser.add_argument("--max-tokens", type=int,
                         help="writer answer budget; default the configured")
+    parser.add_argument("--every-insight", choices=("block", "log"),
+                        help="force step 4's mode for this run "
+                             "(DISCOVERCHAT_EVERY_INSIGHT_CHECK); default: "
+                             "the configured one")
     parser.add_argument("--allow-unused-findings", action="store_true",
                         help="test only: do not reject an answer for leaving "
                              "out some of the findings")
@@ -549,8 +483,12 @@ def main(argv=None) -> int:
         config.WRITER_MODEL = args.model
     if args.max_tokens:
         config.WRITER_MAX_COMPLETION = args.max_tokens
+    # WP-D15c: step 4 is a setting now, not a wrapper. --allow-unused-findings
+    # is "log"; --every-insight forces either mode; neither leaves the default.
     if args.allow_unused_findings:
-        let_the_writer_choose()
+        config.EVERY_INSIGHT_CHECK = "log"
+    if args.every_insight:
+        config.EVERY_INSIGHT_CHECK = args.every_insight
     prompt_text = context_brief.CONSOLIDATING_WRITER_PROMPT
 
     corpus = corpus_mod.load()
@@ -585,7 +523,7 @@ def main(argv=None) -> int:
           f"standing {config.STANDING_CHECK}; place facts "
           f"{'ON (as the service)' if args.sheets else 'off'}; "
           f"every-finding rule "
-          f"{'OFF (test only)' if args.allow_unused_findings else 'on'}")
+          f"{config.EVERY_INSIGHT_CHECK}")
     if args.sheets:
         for row, _ in jobs:
             service.add(row[0], row[1])
@@ -610,8 +548,7 @@ def main(argv=None) -> int:
         "prompt_sha256": hashlib.sha256(
             prompt_text.encode("utf-8")).hexdigest(),
         "prompt_text": prompt_text,
-        "every_finding_rule": ("off (test only)" if args.allow_unused_findings
-                               else "on"),
+        "every_finding_rule": config.EVERY_INSIGHT_CHECK,
         "causal_mode": config.CAUSAL_CHECK,
         "direction_mode": config.DIRECTION_CHECK,
         "standing_mode": config.STANDING_CHECK,

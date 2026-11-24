@@ -471,15 +471,17 @@ def check_citations(prose: str, findings: list, *, run_date: str = "",
                     causal_mode: str | None = None,
                     place_facts=None,
                     standing_mode: str | None = None,
-                    number_words_mode: str | None = None) -> dict:
+                    number_words_mode: str | None = None,
+                    every_insight_mode: str | None = None) -> dict:
     """The four steps of D7.3, in the brief's order, then WP-D13's direction
     step, then WP-D15's standing (6) and number-word (7) steps.
 
     `direction_mode` overrides `config.DIRECTION_CHECK` and `causal_mode`
     overrides `config.CAUSAL_CHECK` for one call (tests and the gate pin them;
     production passes nothing and gets the configured modes, read at call
-    time). `standing_mode` and `number_words_mode` do the same for
-    `config.STANDING_CHECK` and `config.NUMBER_WORDS`.
+    time). `standing_mode`, `number_words_mode` and `every_insight_mode` do
+    the same for `config.STANDING_CHECK`, `config.NUMBER_WORDS` and
+    `config.EVERY_INSIGHT_CHECK` (WP-D15c: step 4 blocks only under `block`).
 
     `place_facts` (WP-D15) are the sheet lines handed on this turn. Their ids
     are known ids (step 1) and their stored sentences support numerals (step
@@ -529,9 +531,17 @@ def check_citations(prose: str, findings: list, *, run_date: str = "",
     # 4. A finding the judge selected and the writer silently dropped is LOSS,
     #    not concision: the judge already picked the smallest sufficient set.
     #    WP-D15: the mined insights only. A place fact is never required.
+    #    WP-D15c (R25): under DISCOVERCHAT_EVERY_INSIGHT_CHECK=log (the
+    #    default) the step records what was left out and does not count;
+    #    under `block` it is exactly the old step, keys and all.
     dropped = sorted(answer_ids - set(tagged))
     results["4_all_findings_cited"] = {"pass": not dropped, "dropped": dropped,
                                        "of": len(answer_ids)}
+    imode = (every_insight_mode or config.EVERY_INSIGHT_CHECK).strip().lower()
+    if imode not in ("block", "log"):
+        raise ValueError(f"every-insight mode {imode!r}: expected block or log")
+    if imode == "log":
+        results["4_all_findings_cited"].update(mode="log", counts=False)
 
     # 5. WP-D13 Fix 1 (D63): a negative figure of a signed measure is written
     #    with its direction in words. Same sentences, same bindings as step 2.
@@ -583,7 +593,8 @@ def citation_failure_reason(results: dict) -> str:
     causal = results.get("3_causal")
     if causal and _counts(causal) and not causal["pass"]:
         bits.append(causal_gate.failure_reason(causal))
-    if not results["4_all_findings_cited"]["pass"]:
+    step4 = results["4_all_findings_cited"]
+    if not step4["pass"] and _counts(step4):
         bits.append("These findings were supplied but never cited: "
                     + ", ".join(results["4_all_findings_cited"]["dropped"])
                     + ". Every finding supplied belongs in the answer.")
@@ -851,7 +862,9 @@ def direction_failure_reason(direction: dict) -> str:
 #
 # Known limits, stated: an ordinal written as a word ("the second highest") is
 # not a standing phrase here -- it is step 7's (logged, R20); "joint" is not
-# compared (the rank and the end word are).
+# compared (the rank and the end are). Since WP-D15c the END is compared, not
+# the word: highest = most, lowest = fewest; "among/one of the highest" is not
+# a rank.
 
 _ORDINAL_STANDING = re.compile(
     r"\b(?:joint[\s-]+)?(\d+)(?:st|nd|rd|th)[\s-]+(highest|lowest|most|fewest)\b",
@@ -863,16 +876,28 @@ _QUARTER_STANDING = re.compile(
     r"\b(lowest|lower[\s-]middle|upper[\s-]middle|highest)\s+quarter\b", re.I)
 
 
+# WP-D15c (PM decision, D81): "highest" and "most" are one end, "lowest" and
+# "fewest" the other. The sheet's rule that counts say most/fewest is a rule
+# for the builder, not for the writer; the trial's five false alarms were
+# true ranks worded "highest" for a count. A rank is compared by its END.
+_END = {"highest": "high", "most": "high", "lowest": "low", "fewest": "low"}
+# "among the highest", "one of the highest" claim no single rank.
+_NOT_A_RANK_BEFORE = re.compile(r"(?:\bamong|\bone\s+of)\s+$", re.I)
+
+
 def standing_phrases(text: str) -> list:
     """[(key, surface)] for every standing phrase in `text`, in order.
-    key = ("rank", n, end word) or ("quarter", quarter word)."""
+    key = ("rank", n, end) with end "high" or "low", or ("quarter", word)."""
     text = normalize_dashes(text)
     found = []
     for m in _ORDINAL_STANDING.finditer(text):
-        found.append((m.start(), ("rank", int(m.group(1)), m.group(2).lower()),
+        found.append((m.start(), ("rank", int(m.group(1)),
+                                  _END[m.group(2).lower()]),
                       re.sub(r"\s+", " ", m.group(0))))
     for m in _FIRST_STANDING.finditer(text):
-        found.append((m.start(), ("rank", 1, m.group(1).lower()),
+        if _NOT_A_RANK_BEFORE.search(text[:m.start()]):
+            continue
+        found.append((m.start(), ("rank", 1, _END[m.group(1).lower()]),
                       re.sub(r"\s+", " ", m.group(0))))
     for m in _QUARTER_STANDING.finditer(text):
         word = re.sub(r"[\s-]+", "-", m.group(1).lower())
