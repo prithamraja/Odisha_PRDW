@@ -58,6 +58,31 @@ def citation_map(findings: list, *, run_date: str = "") -> dict:
     return out
 
 
+def place_citation_map(place_facts: list, *, run_date: str = "") -> dict:
+    """WP-D15 T5: one entry per place fact handed, in the shape of a finding's
+    entry, so the present page's hovers work with no front-end change.
+
+    `display_sentence` carries the place's label and a colon when the sentence
+    does not itself begin with the label ("Kalimela block: Its planned cost is
+    Rs 7.65 crore, ..."), so a hover never shows a figure without its place.
+    `standing` is the line's fixed note, or empty."""
+    out = {}
+    for fact in place_facts:
+        out[fact.id] = {
+            "id": fact.id,
+            "sentence": fact.sentence,
+            "display_sentence": fact.labelled_sentence(),
+            "scope": fact.label,
+            "standing": fact.note or "",
+            "view": "Place profile",
+            "is_decomposition": False,
+            "is_profile": True,
+            "stamp": run_date or config.run_stamp_line(),
+            "url": config.record_url(fact.id),
+        }
+    return out
+
+
 def _hover_text(entry: dict) -> str:
     bits = [entry["display_sentence"]]
     if entry["scope"]:
@@ -116,14 +141,18 @@ def _spans_for_sentence(sentence: str, findings: list, cites: dict,
         spans.append((tag.start(), tag.end(), ""))
 
     tag_bound = {i: False for i in range(len(tags))}
-    for match in checks._NUM.finditer(sentence):
+    # Numerals are read on the dash-normalised text (WP-D15 T3, the same rule
+    # as `bind_numerals`); the replacement is one character for one, so the
+    # positions are the original sentence's.
+    for match in checks._NUM.finditer(checks.normalize_dashes(sentence)):
         if any(s <= match.start() < e for s, e, _ in spans):
             continue                                   # a digit inside a tag
         variants = checks._num_variants(match.group(0))
         for index, tag_id in enumerate(tag_ids):
             if tag_id in by_id and (variants & stored[tag_id]):
                 spans.append((match.start(), match.end(),
-                              _wrap(match.group(0), cites[tag_id])))
+                              _wrap(sentence[match.start():match.end()],
+                                    cites[tag_id])))
                 tag_bound[index] = True
                 break
 
@@ -153,9 +182,20 @@ def _spans_for_sentence(sentence: str, findings: list, cites: dict,
     return cleaned
 
 
-def to_html(tagged_prose: str, findings: list, *, run_date: str = "") -> str:
-    """The narrative as an HTML fragment, every citation a hover element."""
+def to_html(tagged_prose: str, findings: list, *, run_date: str = "",
+            place_facts=(), lead: str = "") -> str:
+    """The narrative as an HTML fragment, every citation a hover element.
+
+    WP-D15: `place_facts` are wrapped like findings (their own citation
+    entries); `lead`, the place note, is a plain paragraph before the
+    narrative, because the page lines `answer_html` up with `answer`
+    character by character from the start and the note leads `answer`. It
+    goes inside the narrative paragraph (see below)."""
+    place_facts = list(place_facts or ())
     cites = citation_map(findings, run_date=run_date)
+    if place_facts:
+        cites.update(place_citation_map(place_facts, run_date=run_date))
+        findings = list(findings) + place_facts
     out = []
     for sentence in checks._tagged_sentences(tagged_prose or ""):
         spans = _spans_for_sentence(sentence, findings, cites, run_date)
@@ -170,6 +210,11 @@ def to_html(tagged_prose: str, findings: list, *, run_date: str = "") -> str:
             out.append(rendered)
     body = " ".join(out)
     body = re.sub(r"\s+([.,;:!?])", r"\1", body)
+    if lead:
+        # Inside the one narrative paragraph, not a paragraph of its own: the
+        # page reads the first bare <p> only and walks it against `answer`
+        # from the first character, whitespace runs matching each other.
+        body = html.escape(lead) + " " + body
     stamp = run_date or config.run_stamp_line()
     return (f'<div class="dc-answer">\n  <p>{body}</p>\n'
             f'  <p class="dc-stamp">({html.escape(stamp)})</p>\n</div>')

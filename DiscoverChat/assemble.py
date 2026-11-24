@@ -22,8 +22,13 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from . import (classifier, config, judge as judge_mod, layout as layout_mod,
-               navigate, render, writer as writer_mod)
+               navigate, place as place_mod, render, writer as writer_mod)
 from .retrieval import Result
+
+# The moves that search (WP-D15 T1 "Which turns"): a navigate turn reaches the
+# sheet code only when no structural walk answered it.
+_SHEET_MOVES = (classifier.RETRIEVE, classifier.DECOMPOSE, classifier.NAVIGATE)
+_UNSET = object()
 
 
 # A decomposition answers "where does this sit", and an officer who asked "who
@@ -67,15 +72,28 @@ class Answer:
     # -- the narrative AND the bare-sentence fallback -- and {} everywhere else.
     # Additive: nothing above changes with it on or off.
     layout: dict = field(default_factory=dict)
+    # WP-D15 T5. `place` is the response's new field ({} when no sheet was
+    # used); `place_facts` are the sheet lines handed on this turn (PlaceFact
+    # objects -- for the reference render, the gate and the tests; never
+    # findings, never anchors).
+    place: dict = field(default_factory=dict)
+    place_facts: list = field(default_factory=list)
+    # The code-written text that leads `text` ahead of the narrative on a
+    # place turn (the note, and the decompose scope note), so the reference
+    # render can lead with it too. "" on every other turn.
+    lead: str = ""
 
     def as_dict(self) -> dict:
-        return {"move": self.move, "text": self.text,
-                "findings": [f.id for f in self.findings],
-                "routing": self.routing, "prose": self.prose,
-                "retrieval": self.retrieval, "stamp": self.stamp,
-                "tagged_text": self.tagged_text,
-                "citations": sorted(self.citations),
-                "layout": self.layout}
+        out = {"move": self.move, "text": self.text,
+               "findings": [f.id for f in self.findings],
+               "routing": self.routing, "prose": self.prose,
+               "retrieval": self.retrieval, "stamp": self.stamp,
+               "tagged_text": self.tagged_text,
+               "citations": sorted(self.citations),
+               "layout": self.layout}
+        if self.place:
+            out["place"] = self.place
+        return out
 
 
 # ── deterministic rendering ──────────────────────────────────────────────────
@@ -166,9 +184,14 @@ def why_reframe(question: str, result: Result) -> str:
 
 class Assembler:
     def __init__(self, retriever, *, allow_model: bool = True,
-                 use_judge: bool | None = None):
+                 use_judge: bool | None = None, sheets=_UNSET):
         self.retriever = retriever
         self.allow_model = allow_model
+        # WP-D15: the profile sheet store. Left unset, it is opened on first
+        # use (`place.open_store`); the service passes the one it opened at
+        # start-up. None = run without sheets. Never raises.
+        self._sheets = sheets
+        self.sheets_status = "not opened"
         # The judged path needs a model, so `allow_model=False` forces the
         # threshold path. That is what keeps the offline gate meaningful: the
         # behaviours it pins -- the Ask decline, the why-reframe, the causal
@@ -215,6 +238,15 @@ class Assembler:
         meta["used"] = True
         meta["pool"] = len(pooled.hits)
         return result, meta
+
+    def sheet_store(self):
+        """The open profile sheet store, or None (switch off, or the store is
+        missing or refused -- the turn then runs exactly as before)."""
+        if not config.PROFILE_SHEETS:
+            return None
+        if self._sheets is _UNSET:
+            self._sheets, self.sheets_status = place_mod.open_store()
+        return self._sheets
 
     def _build_roster(self) -> set:
         """Every place / category name the corpus knows — the (b) check's net."""
@@ -284,6 +316,25 @@ class Assembler:
                           findings=[h.finding for h in result.hits],
                           routing=routing.as_dict(), retrieval=retrieval_meta,
                           stamp=stamp)
+
+        # WP-D15. A turn that searches and names one to three places is
+        # answered from their profile sheets as well as the mined insights. A
+        # turn that names none (or the switch off, or no store) carries on
+        # below exactly as before.
+        if routing.move in _SHEET_MOVES:
+            store = self.sheet_store()
+            if store is not None:
+                plan = place_mod.resolve(
+                    message, result.slots.mentions, store,
+                    max_places=config.PROFILE_MAX_PLACES)
+                if plan.places:
+                    return self._answer_with_sheets(
+                        message, routing, result, retrieval_meta, plan, store,
+                        stamp, turn_id)
+                if plan.named_anything:
+                    retrieval_meta["place"] = {
+                        "answered": [], "dropped": plan.dropped,
+                        "why_no_sheet": plan.why_no_sheet}
 
         if not result.hits:
             return Answer(move=routing.move,
@@ -371,6 +422,105 @@ class Assembler:
                       prose=prose_meta, retrieval=retrieval_meta, stamp=stamp,
                       tagged_text=tagged_text, citations=citations,
                       layout=layout)
+
+    # ── WP-D15: a turn with place facts ──────────────────────────────────────
+    def _answer_with_sheets(self, message, routing, result, retrieval_meta,
+                            plan, store, stamp, turn_id) -> Answer:
+        """T2, T4, T5. The place facts travel BESIDE the findings, never as
+        findings: the writer gets them in one request with at most
+        PROFILE_INSIGHT_CAP mined insights; the check knows their ids and
+        reads their sentences; the officer sees the writer's narrative, or on
+        a fall-back the facts the writer itself chose (else A1-A7) under each
+        place's label, then the insights' bare sentences."""
+        every = [h.finding for h in result.hits]
+        findings = every[:config.PROFILE_INSIGHT_CAP]
+        held_back = len(every) - len(findings)
+        groups = place_mod.groups_for(plan, store)
+        facts = place_mod.all_facts(groups)
+
+        tagged_text, citations, used = "", {}, []
+        if config.CONSOLIDATE and self.allow_model:
+            # A place with no mined insight still goes to the writer (T2.4).
+            consolidated = writer_mod.consolidate(
+                message, findings, run_date=stamp, turn_id=turn_id,
+                place_groups=groups)
+            prose_meta = consolidated.as_dict()
+            prose_meta["used"] = not consolidated.fell_back
+            if not consolidated.fell_back:
+                text = consolidated.text
+                tagged_text = consolidated.tagged
+                citations = render.citation_map(findings, run_date=stamp)
+                citations.update(render.place_citation_map(facts,
+                                                           run_date=stamp))
+                used = place_mod.used_in(tagged_text, groups)
+            else:
+                shown = place_mod.fallback_groups(groups,
+                                                  consolidated.last_prose)
+                used = place_mod.shown_ids(shown)
+                text = place_mod.render_groups(shown)
+                if findings:
+                    text += "\n\n" + render_findings(findings)
+        else:
+            # No writer (model off, or DISCOVERCHAT_CONSOLIDATE=0): lines
+            # A1-A7 under each label, then today's text for this turn.
+            # Deterministic, so the offline gate can pin it.
+            shown = place_mod.main_lines(groups)
+            used = place_mod.shown_ids(shown)
+            today, prose_meta = self._without_writer(message, findings, result)
+            text = place_mod.render_groups(shown) + "\n\n" + today
+
+        lead = []
+        if (routing.move == classifier.DECOMPOSE
+                and classifier.asked_causally(message)
+                and any(f.is_decomposition for f in findings)):
+            text = f"{DECOMPOSE_SCOPE_NOTE}\n\n{text}"
+            lead.append(DECOMPOSE_SCOPE_NOTE)
+
+        if held_back:
+            text += (f"\n\nMore than {len(findings)} findings clear the "
+                     f"relevance bar for this question; these are the "
+                     f"{len(findings)} closest to what you asked.")
+
+        # The note is code's, outside the prose and outside the number check,
+        # and it is the first line of the answer (T5.5).
+        if plan.note:
+            text = f"{plan.note}\n\n{text}"
+            lead.insert(0, plan.note)
+
+        layout = layout_mod.build(findings, tagged_text, run_date=stamp)
+        place = place_mod.payload(plan, groups, lines_used=used,
+                                  insights_offered=len(findings),
+                                  insights_held_back=held_back)
+        retrieval_meta["place"] = dict(place, dropped=plan.dropped)
+
+        return Answer(move=routing.move, text=_stamped(text, stamp),
+                      findings=findings, routing=routing.as_dict(),
+                      prose=prose_meta, retrieval=retrieval_meta, stamp=stamp,
+                      tagged_text=tagged_text, citations=citations,
+                      layout=layout, place=place, place_facts=facts,
+                      lead="\n\n".join(lead))
+
+    def _without_writer(self, message, findings, result) -> tuple:
+        """Today's text for a turn with no consolidating writer: the bare
+        sentences (or the pre-D7 connective prose), or the honest miss when
+        no insight cleared the bar. The same branches as `answer` above."""
+        if not findings:
+            return nothing_found(result), {"used": False,
+                                           "why": ("model disabled"
+                                                   if not self.allow_model
+                                                   else "no findings")}
+        body = render_findings(findings)
+        if (self.allow_model and config.CONSOLIDATE is False
+                and len(findings) > config.FULL_RENDER_MAX):
+            prose = writer_mod.write(message, findings,
+                                     corpus_roster=self._roster,
+                                     fallback="")
+            prose_meta = prose.as_dict()
+            prose_meta["used"] = not prose.fell_back
+            return (f"{prose.text}\n\n{body}" if prose.text else body), prose_meta
+        return body, {"used": False,
+                      "why": ("model disabled" if not self.allow_model
+                              else "few enough findings to render directly")}
 
 
 def _stamped(text: str, stamp: str) -> str:

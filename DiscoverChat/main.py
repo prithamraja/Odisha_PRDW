@@ -32,7 +32,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
-from . import assemble, config, corpus as corpus_mod, render
+from . import assemble, config, corpus as corpus_mod, place as place_mod, render
 from .retrieval import Retriever
 from .session import SessionStore
 
@@ -46,7 +46,17 @@ async def lifespan(app: FastAPI):
     stamp = config.assert_pin_matches_corpus()
     retriever = Retriever()
     STATE["retriever"] = retriever
-    STATE["assembler"] = assemble.Assembler(retriever)
+    # WP-D15 T5.7: the profile sheet store is opened ONCE, here. Missing or
+    # refused, the service runs without sheets and says why in /health; it
+    # never fails to start because of them.
+    if config.PROFILE_SHEETS:
+        sheets, why = place_mod.open_store()
+    else:
+        sheets, why = None, "switched off (DISCOVERCHAT_PROFILE_SHEETS=0)"
+    STATE["profile"], STATE["profile_status"] = sheets, why
+    if sheets is None:
+        _log.warning("DiscoverChat runs without profile sheets: %s", why)
+    STATE["assembler"] = assemble.Assembler(retriever, sheets=sheets)
     STATE["sessions"] = SessionStore()
     STATE["stamp"] = stamp
     _log.info("DiscoverChat up: %d findings, candidate set %s",
@@ -105,6 +115,11 @@ class AskResponse(BaseModel):
     # formatted here; the front end decides no number and no ranking. {} when
     # there is nothing to lay out or DISCOVERCHAT_LAYOUT=0.
     layout: dict = {}
+    # WP-D15 T5.4. Which place was answered, its alternatives and note, how
+    # many sheet lines were handed and which the answer used, in the order
+    # first used (`lines_used` -- what WP-D16 will highlight). {} when no
+    # sheet was used.
+    place: dict = {}
 
 
 @app.get("/health")
@@ -116,6 +131,8 @@ def health() -> dict:
         "candidate_set_id": STATE.get("stamp", {}).get("candidate_set_id"),
         "embedding_pin": STATE.get("stamp", {}).get("embedding_pin"),
         "knobs": config.knobs(),
+        "profile_sheets": {"available": STATE.get("profile") is not None,
+                           "why": STATE.get("profile_status", "not opened")},
     }
 
 
@@ -141,11 +158,24 @@ def chat(request: AskRequest) -> AskResponse:
         routing=answer.routing, retrieval=answer.retrieval,
         prose=answer.prose, stamp=answer.stamp,
         answer_tagged=answer.tagged_text, citations=answer.citations,
-        answer_html=(render.to_html(answer.tagged_text, answer.findings,
-                                    run_date=answer.stamp)
-                     if answer.tagged_text else ""),
+        answer_html=_answer_html(answer),
         layout=answer.layout,
+        place=answer.place,
     )
+
+
+def _answer_html(answer) -> str:
+    """The reference render. A place turn's facts are wrapped like findings,
+    and its note leads the render as it leads `answer` (WP-D15 T5.3, T5.5)."""
+    if not answer.tagged_text:
+        return ""
+    if not answer.place:
+        return render.to_html(answer.tagged_text, answer.findings,
+                              run_date=answer.stamp)
+    return render.to_html(answer.tagged_text, answer.findings,
+                          run_date=answer.stamp,
+                          place_facts=answer.place_facts,
+                          lead=answer.lead)
 
 
 @app.get("/finding/{finding_id}")
@@ -317,9 +347,72 @@ def record(finding_id: str, format: str = "json"):
     """
     found = STATE["retriever"].corpus.get(finding_id)
     if found is None:
-        raise HTTPException(status_code=404,
-                            detail=f"no record {finding_id} in this corpus")
+        # WP-D15 T5.2: a place fact (`p-...`) resolves through the sheet store.
+        place_payload = _place_record_payload(finding_id)
+        if place_payload is None:
+            raise HTTPException(status_code=404,
+                                detail=f"no record {finding_id} in this corpus")
+        if format == "html":
+            return HTMLResponse(_place_record_html(place_payload))
+        return place_payload
     payload = _record_payload(found)
     if format == "html":
         return HTMLResponse(_record_html(payload))
     return payload
+
+
+# ── WP-D15 T5.2: a place fact behind a citation ──────────────────────────────
+def _place_record_payload(fact_id: str) -> dict | None:
+    """One sheet sentence: the sentence, the place's label, the row, the
+    stored figures of that row exactly as the sheet holds them, the note and
+    the run stamp. None for an id that is not a sheet sentence (-> 404).
+
+    Layout (my decision, report §7): `figures` is the sheet's own entry for the
+    row -- `rows[row]` for a main-row line (plus G2 for the G1 line, which
+    states both), `lists[row][key]` for a list line -- copied, not
+    re-computed. Built in `place.record_payload`: every read of the sheet
+    store goes through `place.py`."""
+    return place_mod.record_payload(STATE.get("profile"), fact_id)
+
+
+def _place_record_html(payload: dict) -> str:
+    """The reader view of a place fact, in the plain style of `_record_html`."""
+    def row(label, value):
+        if value in (None, "", [], {}):
+            return ""
+        if isinstance(value, (list, dict)):
+            value = json.dumps(value, ensure_ascii=False, indent=2)
+            return (f"<tr><th>{html.escape(label)}</th>"
+                    f"<td><pre>{html.escape(str(value))}</pre></td></tr>")
+        return (f"<tr><th>{html.escape(label)}</th>"
+                f"<td>{html.escape(str(value))}</td></tr>")
+
+    rows = "".join([
+        row("Place", payload["label"]),
+        row("Stored sentence", payload["sentence"]),
+        row("Note", payload["note"]),
+        row("Kind", "place profile sheet line"),
+        row("Row", payload["row"] + (f" / {payload['key']}"
+                                     if payload["key"] else "")),
+        row("Stored figures", payload["figures"]),
+        row("Run stamp", payload["run_stamp"]),
+        row("Candidate set", payload["candidate_set_id"]),
+    ])
+    return (
+        "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">"
+        f"<title>Record {html.escape(payload['id'])}</title><style>"
+        "body{font-family:system-ui,sans-serif;max-width:52rem;margin:2rem auto;"
+        "padding:0 1rem;line-height:1.5}"
+        "table{border-collapse:collapse;width:100%}"
+        "th{text-align:left;vertical-align:top;width:14rem;padding:.4rem .6rem;"
+        "border-bottom:1px solid #eee;color:#444;font-weight:600}"
+        "td{padding:.4rem .6rem;border-bottom:1px solid #eee}"
+        "pre{margin:0;white-space:pre-wrap;font-size:.85em}"
+        "p.note{color:#666;font-size:.9em}"
+        "</style></head><body>"
+        f"<h1>{html.escape(payload['id'])}</h1>"
+        "<p class=\"note\">One line of a place's profile sheet, exactly as it "
+        "is stored. Nothing on this page is computed at request time.</p>"
+        f"<table>{rows}</table>"
+        "</body></html>"
+    )
