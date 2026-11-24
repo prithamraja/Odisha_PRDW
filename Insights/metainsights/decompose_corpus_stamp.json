@@ -6,8 +6,8 @@
     "metainsights/decompose_corpus.part1.npy"
   ],
   "candidate_set_id": "610cb3d26dff7bf3",
-  "generated_at": "2026-09-11T12:04:35Z",
-  "build_seconds": 412.6,
+  "generated_at": "2026-11-24T16:27:10Z",
+  "build_seconds": 1302.8,
   "embedding_pin": {
     "model": "qwen/qwen3-embedding-8b",
     "dims": 1024,
@@ -25,8 +25,8 @@
     }
   },
   "embedding_pin_fingerprint": "c2f9779ab6cf29d6",
-  "embedding_calls": 0,
-  "texts_embedded": 0,
+  "embedding_calls": 177,
+  "texts_embedded": 11268,
   "records": 66779,
   "reconciled": 66779,
   "counts": {
@@ -105,19 +105,19 @@
       1024
     ],
     "part_max_bytes": 95000000,
-    "matrix_sha256": "76eb1f2a85d6da7c99ec7f2bdd90f60b8d5bf565ea1118eaa55bd17f249fc453",
+    "matrix_sha256": "2d53f498ff14552c2a233b971c6ed01d071ca1d29d601e42aa8e3f1544294b65",
     "parts": [
       {
         "file": "decompose_corpus.part0.npy",
         "rows": 33390,
         "bytes": 68382848,
-        "sha256": "6ff9e3f1bf9988cbd2a1ba71b04b4a3a44c0f2b880b43a99ec2b96d9090b9acb"
+        "sha256": "79a06eed010cc22eae6799822cf419286101d1ec5224729f3522dc806edef657"
       },
       {
         "file": "decompose_corpus.part1.npy",
         "rows": 33389,
         "bytes": 68380800,
-        "sha256": "3ddec5cbbcf91ed47e5b05bc6a673d7b73b23a5b7dd20b0c57cfe53928dbec8d"
+        "sha256": "4e3bc04725ed0fe97755a52135914cf1e281022d999ed0016d7b07876bd5f8be"
       }
     ]
   }

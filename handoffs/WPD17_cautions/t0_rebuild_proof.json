@@ -1,0 +1,19 @@
+{
+ "expect": "identical",
+ "records_old": 66779,
+ "records_new": 66779,
+ "same_ids_same_order": true,
+ "top_level_keys_differing": [],
+ "field_differences": {},
+ "vectors_unchanged_records_bit_identical": 66779,
+ "vectors_unchanged_records_that_moved": [],
+ "vectors_changed_records_reembedded": 0,
+ "candidate_set_old": "610cb3d26dff7bf3",
+ "candidate_set_new": "610cb3d26dff7bf3",
+ "stamp_keys_differing": [
+  "build_seconds",
+  "generated_at"
+ ],
+ "problems": [],
+ "result": "PASS"
+}

@@ -1,0 +1,891 @@
+{
+ "summary": {
+  "questions": 78,
+  "pool_kept_share_middle": 0.97,
+  "pool_kept_share_lowest": 0.84,
+  "pools_identical": 22,
+  "threshold_hits_changed": 0,
+  "held_insights_out_of_pool": 15,
+  "held_questions_losing_an_insight": 10,
+  "no_match": [
+   {
+    "q": "What is the price of onions in Cuttack market?",
+    "threshold_old": 0,
+    "threshold_new": 0,
+    "pool_old": 100,
+    "pool_new": 100
+   },
+   {
+    "q": "What is the rainfall forecast for Koraput next week?",
+    "threshold_old": 0,
+    "threshold_new": 0,
+    "pool_old": 100,
+    "pool_new": 100
+   },
+   {
+    "q": "How many teachers are posted in the block primary schools?",
+    "threshold_old": 0,
+    "threshold_new": 0,
+    "pool_old": 100,
+    "pool_new": 100
+   },
+   {
+    "q": "Give me the list of pending court cases against the panchayat.",
+    "threshold_old": 0,
+    "threshold_new": 0,
+    "pool_old": 100,
+    "pool_new": 100
+   }
+  ],
+  "no_match_now_finds_something": []
+ },
+ "left": [
+  {
+   "q": "How is Barpali block doing?",
+   "held_insights_out_of_pool": [
+    "d1-09520",
+    "d4-02188"
+   ]
+  },
+  {
+   "q": "How is Khordha district doing overall?",
+   "held_insights_out_of_pool": [
+    "d3-01300"
+   ]
+  },
+  {
+   "q": "What stands out in Boipariguda?",
+   "held_insights_out_of_pool": [
+    "d1-29009",
+    "d1-29012",
+    "d1-29189",
+    "d1-29022"
+   ]
+  },
+  {
+   "q": "Is Laxmipur behind on anything?",
+   "held_insights_out_of_pool": [
+    "d1-31772"
+   ]
+  },
+  {
+   "q": "Mendarajpur - show me what the analysis found.",
+   "held_insights_out_of_pool": [
+    "d1-31994",
+    "d1-31974"
+   ]
+  },
+  {
+   "q": "Anything notable about Sharagada?",
+   "held_insights_out_of_pool": [
+    "d1-32328"
+   ]
+  },
+  {
+   "q": "What has been found in Attabira block?",
+   "held_insights_out_of_pool": [
+    "d4-02177"
+   ]
+  },
+  {
+   "q": "What has the analysis found in Koraput?",
+   "held_insights_out_of_pool": [
+    "d1-15810"
+   ]
+  },
+  {
+   "q": "How is GPDP implementation going under XV FC?",
+   "held_insights_out_of_pool": [
+    "d1-42175"
+   ]
+  },
+  {
+   "q": "How does Chikilli compare with Hirlipali?",
+   "held_insights_out_of_pool": [
+    "d1-30409"
+   ]
+  }
+ ],
+ "rows": [
+  {
+   "q": "How much was spent in Khordha last year?",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.98,
+   "jaccard": 0.9608,
+   "threshold_old": 12,
+   "threshold_new": 12
+  },
+  {
+   "q": "How many activities are ongoing in Barpali block?",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "What is the total sanctioned amount for 2024-2025?",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.98,
+   "jaccard": 0.9608,
+   "threshold_old": 11,
+   "threshold_new": 11
+  },
+  {
+   "q": "Give me the list of abandoned works.",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "Who is the current Sarpanch of Chikilli?",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 1,
+   "threshold_new": 1
+  },
+  {
+   "q": "Show me the top 10 GPs by expenditure.",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.89,
+   "jaccard": 0.8018,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "Why is spending low in Chikilli?",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 6,
+   "threshold_new": 6
+  },
+  {
+   "q": "What is causing the year-end payment spike?",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.84,
+   "jaccard": 0.7241,
+   "threshold_old": 16,
+   "threshold_new": 16
+  },
+  {
+   "q": "Why do so many activities have no asset category?",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "What is the reason for the drop in sanctions?",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.9,
+   "jaccard": 0.8182,
+   "threshold_old": 5,
+   "threshold_new": 5
+  },
+  {
+   "q": "Explain why Boipariguda is different.",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.92,
+   "jaccard": 0.8519,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "How come Ganjam is an exception?",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.97,
+   "jaccard": 0.9417,
+   "threshold_old": 14,
+   "threshold_new": 14
+  },
+  {
+   "q": "What is the price of onions in Cuttack market?",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.94,
+   "jaccard": 0.8868,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "What is the rainfall forecast for Koraput next week?",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.97,
+   "jaccard": 0.9417,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "How many teachers are posted in the block primary schools?",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "Give me the list of pending court cases against the panchayat.",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.96,
+   "jaccard": 0.9231,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "Where does the gap sit?",
+   "kind": "held:T07",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 1,
+   "threshold_new": 1
+  },
+  {
+   "q": "Which blocks account for the shortfall?",
+   "kind": "held:T06",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.98,
+   "jaccard": 0.9608,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "Break down spending by block",
+   "kind": "held:T08",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.98,
+   "jaccard": 0.9608,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "Who is driving the shortfall?",
+   "kind": "held:T10",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "What makes up the underspend?",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.99,
+   "jaccard": 0.9802,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "Break it down by fiscal year",
+   "kind": "held:T12",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.94,
+   "jaccard": 0.8868,
+   "threshold_old": 8,
+   "threshold_new": 8
+  },
+  {
+   "q": "Where is the money going?",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.95,
+   "jaccard": 0.9048,
+   "threshold_old": 1,
+   "threshold_new": 1
+  },
+  {
+   "q": "How is the total split across districts?",
+   "kind": "held:T09",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.95,
+   "jaccard": 0.9048,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "How is Chikilli doing?",
+   "kind": "held:T02",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 4,
+   "threshold_new": 4
+  },
+  {
+   "q": "Is spending on track?",
+   "kind": "held:T01",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "Where is money planned but not spent?",
+   "kind": "held:T03",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "How is Barpali block doing?",
+   "kind": "held:T04",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.95,
+   "jaccard": 0.9048,
+   "threshold_old": 5,
+   "threshold_new": 5
+  },
+  {
+   "q": "Which places are behaving differently from the rest?",
+   "kind": "held:T05",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "What should I know about Kalimela?",
+   "kind": "held:L06",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.92,
+   "jaccard": 0.8519,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "What should I know about Kalimela GP?",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.92,
+   "jaccard": 0.8519,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "How is Kalimela Gram Panchayat doing",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.94,
+   "jaccard": 0.8868,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "the panchayat of Kalimela",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.9,
+   "jaccard": 0.8182,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "How is Kalimela block doing",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.97,
+   "jaccard": 0.9417,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "Kalyansinghpur",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.95,
+   "jaccard": 0.9048,
+   "threshold_old": 1,
+   "threshold_new": 1
+  },
+  {
+   "q": "How is Khordha district doing overall?",
+   "kind": "held:GEO-29",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.96,
+   "jaccard": 0.9231,
+   "threshold_old": 1,
+   "threshold_new": 1
+  },
+  {
+   "q": "How is Itipur doing in Bhubaneswar block",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.97,
+   "jaccard": 0.9417,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "Compare Kalimela and Bheden",
+   "kind": "held:TWO-01",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.95,
+   "jaccard": 0.9048,
+   "threshold_old": 8,
+   "threshold_new": 8
+  },
+  {
+   "q": "Compare Kalimela, Bheden, Laxmipur and Boipariguda",
+   "kind": "gate",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.9,
+   "jaccard": 0.8182,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "Which blocks stand out on expenditure?",
+   "kind": "held:L02",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.96,
+   "jaccard": 0.9231,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "What should I know about Kandhamal?",
+   "kind": "held:L01",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.96,
+   "jaccard": 0.9231,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "What is unusual about water supply works?",
+   "kind": "held:L03",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.96,
+   "jaccard": 0.9231,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "what should I know about Cuttack?",
+   "kind": "held:L04",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.96,
+   "jaccard": 0.9231,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "What patterns show up in sanctions across districts?",
+   "kind": "held:L05",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.95,
+   "jaccard": 0.9048,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "How are untied funds being used?",
+   "kind": "held:L07",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "How is tied grant planned split across fiscal years?",
+   "kind": "held:T11",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "Tell me about untied grants.",
+   "kind": "held:T13",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "Anything I should be looking at in Ganjam?",
+   "kind": "held:T14",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.96,
+   "jaccard": 0.9231,
+   "threshold_old": 9,
+   "threshold_new": 9
+  },
+  {
+   "q": "What is the position on abandoned works?",
+   "kind": "held:T15",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "How is Biswamathpur performing on spending?",
+   "kind": "held:GEO-06",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.98,
+   "jaccard": 0.9608,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "What stands out in Boipariguda?",
+   "kind": "held:GEO-07",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.93,
+   "jaccard": 0.8692,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "What does the analysis say about Haldikudar?",
+   "kind": "held:GEO-12",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.95,
+   "jaccard": 0.9048,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "Is Laxmipur behind on anything?",
+   "kind": "held:GEO-18",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.93,
+   "jaccard": 0.8692,
+   "threshold_old": 1,
+   "threshold_new": 1
+  },
+  {
+   "q": "Mendarajpur - show me what the analysis found.",
+   "kind": "held:GEO-19",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.94,
+   "jaccard": 0.8868,
+   "threshold_old": 1,
+   "threshold_new": 1
+  },
+  {
+   "q": "Anything notable about Sharagada?",
+   "kind": "held:GEO-20",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.98,
+   "jaccard": 0.9608,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "What has been found in Attabira block?",
+   "kind": "held:GEO-22",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.97,
+   "jaccard": 0.9417,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "Is Lahunipara block an exception to anything?",
+   "kind": "held:GEO-24",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.96,
+   "jaccard": 0.9231,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "How do the GPs in Sheragada block look?",
+   "kind": "held:GEO-26",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.98,
+   "jaccard": 0.9608,
+   "threshold_old": 1,
+   "threshold_new": 1
+  },
+  {
+   "q": "What has the analysis found in Koraput?",
+   "kind": "held:GEO-30",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.96,
+   "jaccard": 0.9231,
+   "threshold_old": 2,
+   "threshold_new": 2
+  },
+  {
+   "q": "Sundergarh district - what should I look at?",
+   "kind": "held:GEO-32",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.98,
+   "jaccard": 0.9608,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "What does the analysis say about photo evidence?",
+   "kind": "held:MEA-02",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 3,
+   "threshold_new": 3
+  },
+  {
+   "q": "Anything about technical sanction?",
+   "kind": "held:MEA-03",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.86,
+   "jaccard": 0.7544,
+   "threshold_old": 4,
+   "threshold_new": 4
+  },
+  {
+   "q": "Which works have been abandoned?",
+   "kind": "held:MEA-04",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "How is the tied grant behaving?",
+   "kind": "held:MEA-05",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.99,
+   "jaccard": 0.9802,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "Findings on untied grant",
+   "kind": "held:MEA-06",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "What is happening with receipts?",
+   "kind": "held:MEA-07",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "Any pattern in payments?",
+   "kind": "held:MEA-08",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.9,
+   "jaccard": 0.8182,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "Anything on administrative approval?",
+   "kind": "held:MEA-09",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 4,
+   "threshold_new": 4
+  },
+  {
+   "q": "What has been found about training?",
+   "kind": "held:MEA-10",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 1.0,
+   "jaccard": 1.0,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "What should I raise at the next review meeting?",
+   "kind": "held:VAG-02",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.98,
+   "jaccard": 0.9608,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "Where is the biggest problem?",
+   "kind": "held:VAG-03",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.99,
+   "jaccard": 0.9802,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "Is money moving steadily or in year-end bursts?",
+   "kind": "held:VAG-04",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.89,
+   "jaccard": 0.8018,
+   "threshold_old": 20,
+   "threshold_new": 20
+  },
+  {
+   "q": "Anything worth my attention this quarter?",
+   "kind": "held:VAG-06",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.94,
+   "jaccard": 0.8868,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "How is GPDP implementation going under XV FC?",
+   "kind": "held:OPN-01",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.99,
+   "jaccard": 0.9802,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "Are the ODF and SBM works progressing?",
+   "kind": "held:OPN-02",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.96,
+   "jaccard": 0.9231,
+   "threshold_old": 0,
+   "threshold_new": 0
+  },
+  {
+   "q": "Is drinking water getting its share of the money?",
+   "kind": "held:OPN-03",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.93,
+   "jaccard": 0.8692,
+   "threshold_old": 17,
+   "threshold_new": 17
+  },
+  {
+   "q": "How does Chikilli compare with Hirlipali?",
+   "kind": "held:TWO-02",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.99,
+   "jaccard": 0.9802,
+   "threshold_old": 3,
+   "threshold_new": 3
+  },
+  {
+   "q": "Compare Khordha and Cuttack districts",
+   "kind": "held:TWO-03",
+   "pool_old": 100,
+   "pool_new": 100,
+   "kept_share": 0.94,
+   "jaccard": 0.8868,
+   "threshold_old": 20,
+   "threshold_new": 20
+  }
+ ]
+}

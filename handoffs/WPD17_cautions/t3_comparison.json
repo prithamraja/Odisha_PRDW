@@ -1,0 +1,38 @@
+{
+ "expect": "cautions-removed",
+ "records_old": 66779,
+ "records_new": 66779,
+ "same_ids_same_order": true,
+ "top_level_keys_differing": [],
+ "field_differences": {},
+ "sentences_changed": 11268,
+ "by_caution": {
+  "A rise here is a rise in recording completeness unless the c": 407,
+  "The sanctioned basis covers only the activities with a sanct": 7759,
+  "Only 17 completions are recorded in the whole sample, so thi": 1417,
+  "A swap between the SC and ST components is suspected and unc": 1685
+ },
+ "by_caution_expected": {
+  "A rise here is a rise in recording completeness unless the c": 407,
+  "The sanctioned basis covers only the activities with a sanct": 7759,
+  "Only 17 completions are recorded in the whole sample, so thi": 1417,
+  "A swap between the SC and ST components is suspected and unc": 1685
+ },
+ "other_changes": [],
+ "other_changes_count": 0,
+ "new_sentences_still_holding_a_caution": 0,
+ "vectors_unchanged_records_bit_identical": 55511,
+ "vectors_unchanged_records_that_moved": [],
+ "vectors_changed_records_reembedded": 11268,
+ "candidate_set_old": "610cb3d26dff7bf3",
+ "candidate_set_new": "610cb3d26dff7bf3",
+ "stamp_keys_differing": [
+  "build_seconds",
+  "embedding_calls",
+  "generated_at",
+  "texts_embedded",
+  "vector_storage"
+ ],
+ "problems": [],
+ "result": "PASS"
+}
