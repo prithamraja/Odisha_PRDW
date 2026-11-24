@@ -1056,7 +1056,13 @@ def _profile_sentences(ctx):
     return p5g.check_sentences(store)
 
 
-@check("profile-sheets-reference", "the spec §13 figures and the Appendix A sentences are reproduced exactly (spec §9 check 7)")
+@check("profile-sheets-places", "the profile sheet name table agrees with every sheet, and find() returns every sheet's code (WP-D14b)")
+def _profile_places(ctx):
+    p5g, store = _profile(ctx)
+    return p5g.check_places(store)
+
+
+@check("profile-sheets-reference","the spec §13 figures and the Appendix A sentences are reproduced exactly (spec §9 check 7)")
 def _profile_reference(ctx):
     p5g, store = _profile(ctx)
     return p5g.check_reference(store)

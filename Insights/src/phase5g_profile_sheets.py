@@ -1581,6 +1581,10 @@ def check_views(store: ProfileStore, views_dir: str) -> str:
     DuckDB build), and the view4 lifetime column where view4 holds one."""
     import pandas as pd
     paths = view_paths(views_dir)
+    v1 = pd.read_parquet(paths["view1"], columns=["gp_lgd_code", "is_abandoned",
+                                                  "total_cost"])
+    abandoned = (v1[v1.is_abandoned == 1].groupby("gp_lgd_code")
+                 .total_cost.sum(min_count=1).fillna(0.0))
     v3 = pd.read_parquet(paths["view3"])
     v4 = pd.read_parquet(paths["view4"]).set_index("gp_lgd_code")
     sums = v3.groupby("gp_lgd_code")[sorted(set(V3_SUMS.values()))].sum()
@@ -1599,9 +1603,48 @@ def check_views(store: ProfileStore, views_dir: str) -> str:
                 compared += 1
                 if not _close(float(v4.loc[code, col]), got):
                     problems.append((code, fig, "view4", v4.loc[code, col], got))
+        # E3's money (R10): the planned cost of the rows marked abandoned.
+        want = float(abandoned.get(code, 0.0))
+        compared += 1
+        if not _close(want, s["rows"]["E3"]["planned"]):
+            problems.append((code, "E3 planned", want, s["rows"]["E3"]["planned"]))
     assert not problems, f"{len(problems)} figures differ from the views: {problems[:3]}"
     return (f"{compared:,} Gram Panchayat figures equal the view3 sums "
-            f"(re-summed by pandas) and the view4 lifetime columns")
+            f"(re-summed by pandas), the view4 lifetime columns, and E3's money "
+            f"the view1 planned cost of the works marked abandoned")
+
+
+def check_places(store: ProfileStore) -> str:
+    """The name table (WP-D14b T3): every sheet's level, code, name, label and
+    parents equal its entry in `places`; every entry has a sheet; and
+    `find(level, name)` returns the code of every sheet."""
+    places = store.index()["places"]
+    problems, n, repeats = [], 0, {}
+    for level in STORE_ORDER:
+        codes = store.codes(level)
+        if sorted(places.get(level, {})) != sorted(codes):
+            problems.append((level, "places and sheets name different codes"))
+        for code in codes:
+            n += 1
+            s = store.get(level, code)
+            p = store.place(level, code)
+            if s is None or p is None:
+                problems.append((level, code, "missing"))
+                continue
+            want = {"level": level, "code": code, "name": s["name"],
+                    "label": s["label"], "parents": s["parents"]}
+            if p != want:
+                problems.append((level, code, p, want))
+            found = store.find(level, s["name"])
+            if code not in found:
+                problems.append((level, code, "find", s["name"], found))
+            if len(found) > 1:
+                repeats.setdefault(level, set()).add(s["name"])
+    assert not problems, (f"{len(problems)} name-table entries disagree with "
+                          f"their sheets: {problems[:3]}")
+    rep = ", ".join(f"{lv} {len(v)}" for lv, v in repeats.items()) or "none"
+    return (f"{n:,} places: name, label and parents equal the sheet's; find() "
+            f"returns every sheet's code; names repeated within a level: {rep}")
 
 
 def check_every_place(store: ProfileStore, views_dir: str) -> str:
@@ -1682,6 +1725,27 @@ REFERENCE = {
     ("district", "318"): {"A6": (0.167013, "all", 1, "low", 9, None)},
     ("district", "323"): {"A6": (0.229658,)},
 }
+# Spec §13 "The money on abandoned works, as corrected" (R10, D77): works /
+# planned cost on them / plan year with the most (count). Kalimela unchanged.
+REFERENCE_E3 = {
+    ("gp", "116350"): (29, 4019174, "2022-2023", 16),
+    ("gp", "116397"): (25, 5651792, "2020-2021", 10),
+    ("gp", "116438"): (52, 8781358, "2021-2022", 26),
+    ("gp", "121162"): (31, 4457998, "2021-2022", 14),
+    ("block", "3674"): (29, 4019174, "2022-2023", 16),
+    ("block", "3676"): (40, 7957981, "2022-2023", 19),
+    ("block", "3678"): (52, 8781358, "2021-2022", 26),
+    ("block", "3914"): (31, 4457998, "2021-2022", 14),
+    ("district", "306"): (121, 20758513, "2022-2023", 43),
+    ("district", "329"): (31, 4457998, "2021-2022", 14),
+    ("all", "all"): (420, 58463049, "2023-2024", 105),
+    ("gp", "119936"): (22, 272440, "2024-2025", 21),
+}
+for (_lv, _code), (_n, _money, _year, _k) in REFERENCE_E3.items():
+    REFERENCE.setdefault((_lv, _code), {})["E3"] = (
+        _n, None, None, None, None, None, ("planned", _money),
+        ("top_year", _year), ("top_year_count", _k))
+
 REFERENCE_BY_YEAR = {   # Kalimela block; the Gram Panchayat is the same
     "2020-2021": (20, 0, 4490312, 4200837, "93.6%"),
     "2021-2022": (32, 0, 6443270, 3320583, "51.5%"),
@@ -1708,7 +1772,8 @@ REFERENCE_PROFILE = {"population": 10681, "gp_size": "10,000 and above",
                      "households": 200, "social_composition": "ST-majority",
                      "remoteness": "Near", "ratio": "53.4"}
 
-# Appendix A examples, character for character (R6). id suffix -> sentence.
+# Spec Appendix A (current, D77) examples, character for character. id prefix
+# -> id suffix -> sentence. A test proves this is the spec's text.
 APPENDIX_A = {
     "p-gp-119936": {
         "A1": "Kalimela Gram Panchayat has 852 planned activities, the 2nd most of 20 Gram Panchayats. The middle value for these 20 is 602.5.",
@@ -1732,10 +1797,10 @@ APPENDIX_A = {
         "E3": "22 works are marked abandoned, with Rs 2.72 lakh planned on them. 21 of them were planned in 2024-2025.",
         "E4": "129 activities have photo evidence (553 uploads), the 2nd most of 20 Gram Panchayats. The middle value is 79.",
         "E5": "55 works planned in 2022-2023 or earlier are still marked ongoing. Rs 89.63 lakh of their Rs 1.04 crore planned cost has been spent (86.0%).",
-        "F1": "168 of the 852 activities (19.7%) have an administrative approval on file, the most of 20 Gram Panchayats.",
+        "F1": "168 of the 852 activities (19.7%) have an administrative approval on file, the most of 20 Gram Panchayats. The middle value is 96.",
         "F2": "168 activities have a technical approval on file.",
         "G1": "Its cashbook shows Rs 4.63 crore received and Rs 5.28 crore paid out.",
-        "G3": "33.3% of the payments are linked to a planned activity. The middle value is 42.2%.",
+        "G3": "33.3% of the payments are linked to a planned activity, the 9th lowest of 20 Gram Panchayats. The middle value is 42.2%.",
         "H2": "49 activities have no LSDG theme mapped; their planned cost is Rs 34.90 lakh.",
         "H5": "Its profile reports 10,681 people in 200 households, which is 53.4 people per household.",
         "I1": "Its profile reports a population of 10,681 (size band: 10,000 and above).",
@@ -1747,8 +1812,8 @@ APPENDIX_A = {
         "A3": "Its planned cost is Rs 7.65 crore, the 2nd highest of 16 blocks. The middle value is Rs 4.48 crore.",
         "A5": "It spent Rs 1.76 crore on planned activities, the 5th highest of 16 blocks. The middle value is Rs 1.40 crore.",
         "A6": "Spending is 23.0% of the planned cost, the 4th lowest of 16 blocks. The middle value is 36.6%.",
-        "F1": "168 of the 852 activities (19.7%) have an administrative approval on file, the 4th most of 16 blocks.",
-        "G3": "33.3% of the payments are linked to a planned activity. The middle value is 46.5%.",
+        "F1": "168 of the 852 activities (19.7%) have an administrative approval on file, the 4th most of 16 blocks. The middle value is 104.",
+        "G3": "33.3% of the payments are linked to a planned activity, the 6th lowest of 16 blocks. The middle value is 46.5%.",
         "I4": "Kalimela block has 1 Gram Panchayat in the data.",
         "J-119936": "Kalimela Gram Panchayat: 852 activities, Rs 7.65 crore planned, Rs 1.76 crore spent, 23.0% of the plan.",
     },
@@ -1759,7 +1824,17 @@ APPENDIX_A = {
         "A5": "It spent Rs 25.35 crore on planned activities.",
         "A6": "Spending is 32.8% of the planned cost.",
         "A7": "Spending is Rs 51.96 crore below plan.",
+        "E3": "420 works are marked abandoned, with Rs 5.85 crore planned on them. 105 of them were planned in 2023-2024.",
+        "F1": "2,101 of the 12,704 activities (16.5%) have an administrative approval on file.",
+        "G3": "37.0% of the payments are linked to a planned activity.",
+        "DS-code-1526": "Code 1526: 1 approval, Rs 4.49 lakh sanctioned.",
         "I4": "The whole sample has 9 districts, 16 blocks and 20 Gram Panchayats.",
+    },
+    "p-gp-116397": {
+        "E3": "25 works are marked abandoned, with Rs 56.52 lakh planned on them. 10 of them were planned in 2020-2021.",
+    },
+    "p-block-3823": {
+        "E2": "1 work is marked completed, out of 17 in the whole sample.",
     },
 }
 
@@ -1867,6 +1942,7 @@ def run_checks(store: ProfileStore, views_dir: str | None, decompositions,
         ("6 every place has a sheet",
          lambda: check_every_place(store, views_dir)),
         ("7 reference figures", lambda: check_reference(store)),
+        ("8 the name table (places)", lambda: check_places(store)),
         ("stamp matches the corpus",
          lambda: check_stamp(store, findings_stamp, decompose_stamp)),
     ]
