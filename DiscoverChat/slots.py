@@ -97,12 +97,9 @@ class Slots:
     mentions: list = field(default_factory=list)
     # WP-D15b: how every place was read -- {"level", "code", "name", "start",
     # "end", "how": exact | alias | loose, "typed"} and, for a loose reading,
-    # "score" and "others" (up to three other close names) -- and every word
-    # marked as a place that read as nothing ({"typed", "level", "start",
-    # "end", "close"}). Empty with DISCOVERCHAT_LOOSE_PLACES=0. Not in
-    # `as_dict`, like `mentions`.
+    # "score" and "others" (up to three other close names). Empty with
+    # DISCOVERCHAT_LOOSE_PLACES=0. Not in `as_dict`, like `mentions`.
     readings: list = field(default_factory=list)
-    not_found: list = field(default_factory=list)
 
     @property
     def has_geography(self) -> bool:
@@ -162,13 +159,11 @@ class SlotExtractor:
         place was read is returned by `read_places`."""
         found = self.read_places(text)
         found.pop("readings", None)
-        found.pop("not_found", None)
         return found
 
     def read_places(self, text: str) -> dict:
         """`geography`'s fields plus, with the loose pass on (WP-D15b),
-        `readings` (how every place was read) and `not_found` (words marked
-        as a place that read as nothing)."""
+        `readings` (how every place was read)."""
         found = {"gp_lgd_codes": [], "gp_names": [], "blocks": [], "districts": []}
         # Spans are tracked PER TIER, not globally. Within a tier a longer name
         # must swallow a shorter one — 'Tangi' sits inside 'Tangi Choudwar' and
@@ -389,31 +384,6 @@ class SlotExtractor:
         readings.sort(key=lambda r: (r["start"], r["level"]))
         found["readings"] = readings
 
-        # T3: a word marked as a place that reads as nothing.
-        read_spans = [(r["start"], r["end"]) for r in readings]
-        not_found = []
-        for start, end, typed, k in sorted(spans, key=lambda s: (-(s[1] - s[0]), s[0])):
-            marked = marked_level(text, start, end)
-            if not marked:
-                continue
-            # Only a word written as a name -- an initial capital -- is taken
-            # for a place the officer named. Measured on set A: the marked
-            # words that are not places are Hindi and Odia words typed in
-            # English ("kitne GP", "kaunse GP", "dusre panchayat", "jillare
-            # block"), all lowercase; the vocabulary holds English only.
-            if not typed[:1].isupper():
-                continue
-            if any(start < e and end > s for s, e in read_spans):
-                continue
-            if any(start < nf["end"] and end > nf["start"] for nf in not_found):
-                continue
-            close = [{"level": marked, "name": nm, "score": sc}
-                     for nm, sc in self._score(typed, marked, CLOSE_NAME_FLOOR)
-                     if sc < self._cutoff[marked]][:3]
-            not_found.append({"typed": typed, "level": marked, "start": start,
-                              "end": end, "close": close})
-        found["not_found"] = sorted(not_found, key=lambda n: n["start"])
-
     @staticmethod
     def _add(found: dict, level: str, name: str, code) -> None:
         if level == "gp":
@@ -476,10 +446,6 @@ _GAP = re.compile(r"[ \t]+")
 # Level words are marks, never part of a name tried loosely.
 _LEVEL_WORDS = {"block", "blocks", "district", "districts", "gp", "gps",
                 "gram", "panchayat", "panchayats"}
-# T3: close names under the cut-off are offered from this score (the brief's
-# 80, stated in WPD15b T3 point 3; Ask's cut-off is read, never restated).
-CLOSE_NAME_FLOOR = 80
-
 # The marks of T3 point 1, exactly the brief's list: a level word directly
 # after the word, or "block of", "district of", "GP of", "Gram Panchayat of",
 # "panchayat of" directly before it. (WP-D15's R4 also reads a bare "GP X";

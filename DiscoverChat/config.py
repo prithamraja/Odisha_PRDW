@@ -463,8 +463,8 @@ DATA_NUMBER_WORDS = HERE / "number_words.json"
 # After the exact pass, words of the officer's text that matched no place are
 # tried against the registry with Ask's scorer and Ask's cut-off for that level
 # (`slots.SlotExtractor`). A loose reading is always said, in one code-written
-# line (`place.reading_note`); a word marked as a place ("Rampur block") that
-# reads as nothing gets "I could not find a place called ...".
+# line (`place.reading_note`). (WP-D15d, R29: a word that reads as no place
+# gets no reply of its own; the turn is searched and answered as before.)
 #   DISCOVERCHAT_LOOSE_PLACES=0  restores the exact reading, byte for byte.
 LOOSE_PLACES = os.getenv("DISCOVERCHAT_LOOSE_PLACES", "1") not in (
     "0", "", "false", "False")

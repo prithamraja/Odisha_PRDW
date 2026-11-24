@@ -401,10 +401,10 @@ def payload(plan: Plan, groups: list, *, lines_used: list,
             "insights_held_back": insights_held_back}
 
 
-# ── WP-D15b: saying a loose reading, and "could not find" (R21-R23) ──────────
-# Built from the slot reader's `readings` and `not_found` alone -- no sheet
-# store -- because the line is shown whenever a place was read loosely,
-# whether or not a profile sheet is used on that turn.
+# ── WP-D15b: saying a loose reading (R21, R22) ───────────────────────────────
+# Built from the slot reader's `readings` alone -- no sheet store -- because
+# the line is shown whenever a place was read loosely, whether or not a
+# profile sheet is used on that turn.
 
 def _label(level: str, name: str) -> str:
     return f"{name} {_LEVEL_WORD[level]}"
@@ -460,36 +460,13 @@ def reading_note(text: str, readings: list) -> str:
     return " ".join(parts)
 
 
-def not_found_message(not_found: list) -> str:
-    """T3: the whole reply when no place was read at all.
-        I could not find a place called "Bhedan" in the data.
-        Close names in the data: Bheden block.
-    The second line only when a name scores at least 80 at the marked level."""
-    lines = []
-    for nf in not_found or []:
-        lines.append(f"I could not find a place called \"{nf['typed']}\" in the data.")
-        if nf.get("close"):
-            lines.append("Close names in the data: "
-                         + ", ".join(_label(c["level"], c["name"]) for c in nf["close"])
-                         + ".")
-    return "\n".join(lines)
-
-
-def not_found_first_lines(not_found: list) -> str:
-    """T3 point 4: when another place was read, only the first line of each."""
-    return " ".join(f"I could not find a place called \"{nf['typed']}\" in the data."
-                    for nf in not_found or [])
-
-
-def spelling_payload(text: str, readings: list, not_found: list) -> dict:
+def spelling_payload(text: str, readings: list) -> dict:
     """The facts the `place` field carries about how places were read: every
-    reading (typed words, how, level, code, name, score), the other close
-    names as alternatives with a ready question each, and every word marked
-    as a place that was not found. {} when nothing was read loosely and
-    nothing was not found -- so an exactly spelled question's payload is
-    unchanged."""
+    reading (typed words, how, level, code, name, score) and the other close
+    names as alternatives with a ready question each. {} when nothing was
+    read loosely -- so an exactly spelled question's payload is unchanged."""
     choices = loose_choices(text, readings)
-    if not choices and not not_found:
+    if not choices:
         return {}
     close = []
     for c in choices:
@@ -503,11 +480,6 @@ def spelling_payload(text: str, readings: list, not_found: list) -> dict:
                       "code": r.get("code"), "name": r["name"],
                       "score": r.get("score")} for r in readings or []],
         "close_names": close,
-        "not_found": [{"typed": nf["typed"], "level": nf["level"],
-                       "close": [{"level": c["level"], "name": c["name"],
-                                  "label": _label(c["level"], c["name"]),
-                                  "score": c["score"]} for c in nf.get("close", [])]}
-                      for nf in not_found or []],
     }
 
 

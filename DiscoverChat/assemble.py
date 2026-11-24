@@ -298,16 +298,6 @@ class Assembler:
             # free exploration D42 rules out.
             message = navigate.contextualise(message, previous_question, anchors)
 
-        # WP-D15b T3 (R23). A word the officer marked as a place ("Rampur
-        # block") that reads as nothing, when no place at all was read: the
-        # turn ends here with "I could not find ...", and nothing is searched.
-        if config.LOOSE_PLACES and routing.move in _SHEET_MOVES:
-            extractor = getattr(self.retriever, "extractor", None)
-            if extractor is not None:
-                early = extractor.extract(message)
-                if early.not_found and not early.readings:
-                    return self._not_found_answer(message, early, routing, stamp)
-
         result, judge_meta = self._retrieve(message, turn_id=turn_id)
         retrieval_meta = {
             "judge": judge_meta,
@@ -454,15 +444,11 @@ class Assembler:
     @staticmethod
     def _spelling(message, slots) -> tuple:
         """(the one line, the `place` facts) for this turn's readings: the
-        "could not find" first line of any marked word not found, then the
         "Reading ... as ..." line of every loose reading. ("", {}) when every
         place was spelled as stored -- the turn is then untouched."""
         readings = getattr(slots, "readings", []) or []
-        not_found = getattr(slots, "not_found", []) or []
-        line = " ".join(x for x in (place_mod.not_found_first_lines(not_found),
-                                    place_mod.reading_note(message, readings))
-                        if x)
-        return line, place_mod.spelling_payload(message, readings, not_found)
+        return (place_mod.reading_note(message, readings),
+                place_mod.spelling_payload(message, readings))
 
     @staticmethod
     def _with_spelling(text, line, facts, retrieval_meta, *, scoped=False):
@@ -476,21 +462,6 @@ class Assembler:
         retrieval_meta.setdefault("place", {}).update(place)
         lead = "\n\n".join([line] + ([DECOMPOSE_SCOPE_NOTE] if scoped else []))
         return f"{line}\n\n{text}", lead, place
-
-    def _not_found_answer(self, message, slots, routing, stamp) -> Answer:
-        """T3: nothing was read and a marked word was not found. The reply is
-        the message alone; nothing is searched or written."""
-        place = {"version": place_mod.PAYLOAD_VERSION, "mode": "not_found",
-                 "answered": [], "alternatives": [], "note": "",
-                 **place_mod.spelling_payload(message, slots.readings,
-                                              slots.not_found)}
-        return Answer(move=routing.move,
-                      text=_stamped(place_mod.not_found_message(slots.not_found),
-                                    stamp),
-                      routing=routing.as_dict(), stamp=stamp,
-                      retrieval={"slots": slots.as_dict(), "place": place},
-                      prose={"used": False, "why": "place not found"},
-                      place=place)
 
     # ── WP-D15: a turn with place facts ──────────────────────────────────────
     def _answer_with_sheets(self, message, routing, result, retrieval_meta,
@@ -552,8 +523,8 @@ class Assembler:
 
         # The note is code's, outside the prose and outside the number check,
         # and it is the first line of the answer (T5.5).
-        # WP-D15b: a reading line (or a "could not find" line) and the R4
-        # note make one code-written first line together.
+        # WP-D15b: a reading line and the R4 note make one code-written
+        # first line together.
         first = " ".join(x for x in (spelling_line, plan.note) if x)
         if first:
             text = f"{first}\n\n{text}"
